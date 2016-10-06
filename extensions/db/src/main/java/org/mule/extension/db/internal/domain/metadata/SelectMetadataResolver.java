@@ -14,7 +14,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSetMetaData;
@@ -22,18 +22,18 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SelectMetadataResolver extends BaseDbMetadataResolver implements MetadataOutputResolver<String> {
+public class SelectMetadataResolver extends BaseDbMetadataResolver implements OutputTypeResolver<String> {
 
   public static final String DUPLICATE_COLUMN_LABEL_ERROR =
       "Query metadata contains multiple columns with the same label. Define column aliases to resolve this problem";
 
   @Override
   public String getCategoryName() {
-    return "SelectDbCategory";
+    return "DbCategory";
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String query)
+  public MetadataType getOutputType(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 
     typeLoader = context.getTypeLoader();

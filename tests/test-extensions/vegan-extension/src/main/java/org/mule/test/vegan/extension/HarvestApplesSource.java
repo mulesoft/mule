@@ -8,17 +8,26 @@ package org.mule.test.vegan.extension;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.testmodels.fruit.Apple;
 
 @Alias("harvest-apples")
-@MetadataScope(keysResolver = HarvestAppleKeyResolver.class)
+@MetadataScope(keysResolver = HarvestAppleKeyResolver.class,
+    outputResolver = HarvestAppleKeyResolver.class)
 public class HarvestApplesSource extends Source<Apple, Attributes> {
 
   @UseConfig
   AppleConfig appleConfig;
+
+  @MetadataKeyId
+  @Parameter
+  @Optional
+  private String key;
 
   @Override
   public void start() {

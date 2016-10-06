@@ -10,29 +10,29 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 import java.util.Set;
 
 public class TestMetadataResolverRuntimeExceptionFailure
-    implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String> {
+    implements TypeKeysResolver, InputTypeResolver<String>, OutputTypeResolver<String> {
 
   @Override
   public String getCategoryName() {
     return "MetadataExtensionResolver";
   }
 
-  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException {
+  public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException {
     throw new RuntimeException("Runtime Exception thrown");
   }
 
-  public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+  public MetadataType getInputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
     throw new RuntimeException("Runtime Exception thrown");
   }
 
-  public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+  public MetadataType getOutputType(MetadataContext context, String key) throws MetadataResolvingException {
     throw new RuntimeException("Runtime Exception thrown");
   }
 }

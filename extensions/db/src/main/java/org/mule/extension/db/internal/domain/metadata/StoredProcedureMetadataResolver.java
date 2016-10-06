@@ -10,23 +10,18 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-public class StoredProcedureMetadataResolver extends BaseDbMetadataResolver implements MetadataOutputResolver<String> {
+public class StoredProcedureMetadataResolver implements OutputTypeResolver<String> {
 
   @Override
   public String getCategoryName() {
-    return "StoredProcedureDbCategory";
+    return "DbCategory";
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String query)
+  public MetadataType getOutputType(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
-
-    typeBuilder = context.getTypeBuilder();
-    return typeBuilder.dictionaryType()
-        .ofKey(typeBuilder.stringType())
-        .ofValue(typeBuilder.anyType())
-        .build();
+    return context.getTypeBuilder().objectType().build();
   }
 }

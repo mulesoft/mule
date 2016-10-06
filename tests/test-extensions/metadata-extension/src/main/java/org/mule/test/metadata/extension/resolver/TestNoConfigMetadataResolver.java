@@ -14,18 +14,18 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TestNoConfigMetadataResolver implements MetadataKeysResolver, MetadataContentResolver<Object>,
-    MetadataOutputResolver<Object>, MetadataAttributesResolver<Object> {
+public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputTypeResolver<Object>,
+    OutputTypeResolver<Object>, MetadataAttributesResolver<Object> {
 
   @Override
   public String getCategoryName() {
@@ -33,12 +33,12 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
   }
 
   @Override
-  public Set<MetadataKey> getMetadataKeys(MetadataContext context) {
+  public Set<MetadataKey> getKeys(MetadataContext context) {
     return Arrays.stream(KeyIds.values()).map(e -> MetadataKeyBuilder.newKey(e.name()).build()).collect(Collectors.toSet());
   }
 
   @Override
-  public MetadataType getContentMetadata(MetadataContext context, Object key) {
+  public MetadataType getInputMetadata(MetadataContext context, Object key) {
     if (key instanceof NullMetadataKey) {
       return BaseTypeBuilder.create(JAVA).nullType().build();
     }
@@ -47,7 +47,7 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, Object key) {
+  public MetadataType getOutputType(MetadataContext context, Object key) {
     if (key instanceof NullMetadataKey) {
       return BaseTypeBuilder.create(JAVA).nullType().build();
     }

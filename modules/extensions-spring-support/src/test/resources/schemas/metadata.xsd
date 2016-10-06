@@ -440,6 +440,26 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAndMultipleInputWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="output-and-multiple-input-with-key-id"></xs:element>
+  <xs:complexType name="OutputAndMultipleInputWithKeyIdType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="firstPerson"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="otherPerson"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="output-metadata-with-key-id"></xs:element>
     <xs:complexType name="OutputMetadataWithKeyIdType">
         <xs:complexContent>
@@ -599,7 +619,20 @@
     <xs:complexType name="ContentParameterShouldNotGenerateListChildElementType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:expressionList" use="required" name="listContent"></xs:attribute>
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" name="list-content">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="list-content-item">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="listContent"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -615,7 +648,16 @@
     <xs:complexType name="ContentParameterShouldNotGeneratePojoChildElementType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="xs:string" use="required" name="animalContent"></xs:attribute>
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" name="animal-content">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.animals.Bear"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="animalContent"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -731,14 +773,6 @@
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResolverTypeKeysWithContextClassLoaderType" substitutionGroup="mule:abstract-message-processor" name="resolver-type-keys-with-context-class-loader"></xs:element>
-    <xs:complexType name="ResolverTypeKeysWithContextClassLoaderType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

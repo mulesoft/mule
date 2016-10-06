@@ -7,6 +7,7 @@
 package org.mule.extension.file;
 
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.test.extension.file.common.FileMetadataResolverTestCommon;
@@ -32,7 +33,7 @@ public class FileMetadataResolverTestCase extends FileConnectorTestCase {
 
   @Test
   public void getReadAttributesMetadata() {
-    testCommon.testReadAttributesMetadata(manager, LocalFileAttributes.class);
+    testCommon.testReadAttributesMetadata(manager, FileAttributes.class);
   }
 
   @Test

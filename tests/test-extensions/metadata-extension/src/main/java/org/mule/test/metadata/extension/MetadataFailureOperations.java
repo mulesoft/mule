@@ -8,35 +8,32 @@ package org.mule.test.metadata.extension;
 
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.test.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverMetadataResolvingFailure;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverRuntimeExceptionFailure;
 
 public class MetadataFailureOperations extends MetadataOperationsParent {
 
-  // MetadataResolver throws MetadataResolvingException
-  @MetadataScope(keysResolver = TestMetadataResolverMetadataResolvingFailure.class,
-      contentResolver = TestMetadataResolverMetadataResolvingFailure.class,
-      outputResolver = TestMetadataResolverMetadataResolvingFailure.class)
-  public Object failWithResolvingException(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                           @Optional @Content Object content) {
+  // NamedTypeResolver throws MetadataResolvingException
+  @OutputResolver(TestMetadataResolverMetadataResolvingFailure.class)
+  public Object failWithResolvingException(@Connection MetadataConnection connection,
+                                           @MetadataKeyId(TestMetadataResolverMetadataResolvingFailure.class) String type,
+                                           @Optional @Content @TypeResolver(TestMetadataResolverMetadataResolvingFailure.class) Object content) {
     return null;
   }
 
   // With keysResolver resolver and without KeyParam
-  @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
   public void keyIdWithoutKeyResolver(@Connection MetadataConnection connection, @MetadataKeyId String type) {}
 
   // Resolver for content and output type
   // With keysResolver and KeyParam
-  @MetadataScope(keysResolver = TestMetadataResolverRuntimeExceptionFailure.class,
-      contentResolver = TestMetadataResolverRuntimeExceptionFailure.class,
-      outputResolver = TestMetadataResolverRuntimeExceptionFailure.class)
-  public Object failWithRuntimeException(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                         @Optional @Content Object content) {
+  @OutputResolver(TestMetadataResolverRuntimeExceptionFailure.class)
+  public Object failWithRuntimeException(@Connection MetadataConnection connection,
+                                         @MetadataKeyId(TestMetadataResolverRuntimeExceptionFailure.class) String type,
+                                         @Optional @TypeResolver(TestMetadataResolverRuntimeExceptionFailure.class) Object content) {
     return null;
   }
 

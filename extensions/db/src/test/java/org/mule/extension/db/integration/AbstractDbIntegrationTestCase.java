@@ -194,10 +194,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, query);
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getContentMetadata().isPresent(), is(true));
-    assertThat(metadata.get().getContentMetadata().get().isSuccess(), is(true));
-
-    return metadata.get().getContentMetadata().get().get();
+    return metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get();
   }
 
   protected void assertFieldOfType(ObjectType record, String name, MetadataType type) {

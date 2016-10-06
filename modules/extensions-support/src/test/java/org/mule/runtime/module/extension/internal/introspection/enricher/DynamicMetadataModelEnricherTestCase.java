@@ -93,7 +93,7 @@ public class DynamicMetadataModelEnricherTestCase {
     operations = declaration.getOperations();
     OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
     assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
-    assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
+    assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), false);
     params = dynamicOutputAndAttributes.getParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
 
@@ -116,7 +116,7 @@ public class DynamicMetadataModelEnricherTestCase {
         .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
             .with(new ClassInformationAnnotation(Object.class, null)).with(new TypeAliasAnnotation(Object.class.getSimpleName())))
         .build(), true);
-    assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
+    assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
     assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
 
     messageSources = declaration.getMessageSources();
@@ -145,7 +145,6 @@ public class DynamicMetadataModelEnricherTestCase {
 
   private void assertParameterType(ParameterDeclaration param, MetadataType type, boolean isDynamic) {
     assertThat(param.getType(), equalTo(type));
-    assertThat(param.hasDynamicType(), is(isDynamic));
   }
 
   private void assertOutputType(OutputDeclaration output, MetadataType type, boolean isDynamic) {

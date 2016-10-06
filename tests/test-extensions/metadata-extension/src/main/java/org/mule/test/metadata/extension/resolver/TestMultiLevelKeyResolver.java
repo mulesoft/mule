@@ -19,15 +19,15 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.test.metadata.extension.LocationKey;
 
 import java.util.Set;
 
-public class TestMultiLevelKeyResolver implements MetadataKeysResolver, MetadataContentResolver<LocationKey> {
+public class TestMultiLevelKeyResolver implements TypeKeysResolver, InputTypeResolver<LocationKey> {
 
-  public static final String ERROR_MESSAGE = "LocationKey type metadata key was not injected properly in the MetadataResolver";
+  public static final String ERROR_MESSAGE = "LocationKey type metadata key was not injected properly in the NamedTypeResolver";
 
   // continents
   public static final String AMERICA = "AMERICA";
@@ -52,7 +52,7 @@ public class TestMultiLevelKeyResolver implements MetadataKeysResolver, Metadata
   }
 
   @Override
-  public MetadataType getContentMetadata(MetadataContext context, LocationKey key)
+  public MetadataType getInputMetadata(MetadataContext context, LocationKey key)
       throws MetadataResolvingException, ConnectionException {
     checkLocationKey(key);
     final ObjectTypeBuilder objectBuilder =
@@ -64,7 +64,7 @@ public class TestMultiLevelKeyResolver implements MetadataKeysResolver, Metadata
   }
 
   @Override
-  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+  public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     return newHashSet(buildAmericaKey(), buildEuropeKey());
   }
 

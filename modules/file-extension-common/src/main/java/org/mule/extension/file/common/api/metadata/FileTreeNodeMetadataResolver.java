@@ -13,7 +13,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.extension.file.common.api.TreeNode;
 
 /**
@@ -21,12 +21,12 @@ import org.mule.extension.file.common.api.TreeNode;
  *
  * @since 1.0
  */
-public class FileTreeNodeMetadataResolver implements MetadataOutputResolver {
+public class FileTreeNodeMetadataResolver implements OutputTypeResolver {
 
   private FileAttributesMetadataResolver attributesResolver = new FileAttributesMetadataResolver();
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, Object key)
+  public MetadataType getOutputType(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
     MetadataType attributes = attributesResolver.getAttributesMetadata(context, key);
     ObjectTypeBuilder<?> treeNode = create(JAVA).objectType();

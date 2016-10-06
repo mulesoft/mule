@@ -20,7 +20,7 @@ import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
 
 import java.util.Map;
 
-@MetadataScope(keysResolver = TestMultiLevelKeyResolver.class, contentResolver = TestMultiLevelKeyResolver.class,
+@MetadataScope(keysResolver = TestMultiLevelKeyResolver.class,
     outputResolver = TestOutputAnyTypeResolver.class)
 public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, StringAttributes> {
 

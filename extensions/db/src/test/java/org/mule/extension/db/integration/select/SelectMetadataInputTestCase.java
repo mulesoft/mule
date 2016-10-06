@@ -27,11 +27,9 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Ignore("TODO MULE-10641")
 public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
   public SelectMetadataInputTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
@@ -53,9 +51,8 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("selectMetadata", "select * from PLANET");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getContentMetadata().isPresent(), is(true));
-    assertThat(metadata.get().getContentMetadata().get().isSuccess(), is(true));
-    assertThat(metadata.get().getContentMetadata().get().get().getType(), is(typeBuilder.nullType().build()));
+    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType(),
+               is(typeBuilder.nullType().build()));
   }
 
   @Test
@@ -66,9 +63,8 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
                     "select * from PLANET where id = #[payload.id] and name = #[message.outboundProperties.updateCount]");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getContentMetadata().isPresent(), is(true));
-    assertThat(metadata.get().getContentMetadata().get().isSuccess(), is(true));
-    assertThat(metadata.get().getContentMetadata().get().get().getType(), is(typeBuilder.anyType().build()));
+    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType(),
+               is(typeBuilder.anyType().build()));
   }
 
   @Test
@@ -77,10 +73,8 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
                                                                        "select * from PLANET where id = :id and name = :name");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getContentMetadata().isPresent(), is(true));
-    assertThat(metadata.get().getContentMetadata().get().isSuccess(), is(true));
-
-    ObjectType type = (ObjectType) metadata.get().getContentMetadata().get().get().getType();
+    ObjectType type =
+        (ObjectType) metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType();
     assertThat(type.getFields().size(), equalTo(2));
 
     Optional<ObjectFieldType> id = type.getFieldByName("id");

@@ -16,7 +16,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.introspection.dsql.Field;
@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.introspection.dsql.Field;
 import java.util.List;
 
 /**
- * {@link MetadataOutputResolver} implementation that automatic resolves the output {@link MetadataType} for a given
+ * {@link OutputTypeResolver} implementation that automatic resolves the output {@link MetadataType} for a given
  * {@link DsqlQuery}.
  * <p>
  * This resolver goes for all the selected fields in the {@link DsqlQuery} and return a new entity with a subset of the total
@@ -32,13 +32,13 @@ import java.util.List;
  *
  * @since 4.0
  */
-final class DsqlQueryMetadataResolver implements MetadataOutputResolver {
+final class DsqlQueryMetadataResolver implements OutputTypeResolver {
 
   private final QueryEntityResolver entityResolver;
-  private final MetadataOutputResolver nativeOutputResolver;
+  private final OutputTypeResolver nativeOutputResolver;
 
   DsqlQueryMetadataResolver(QueryEntityResolver entityResolver,
-                            MetadataOutputResolver nativeOutputResolver) {
+                            OutputTypeResolver nativeOutputResolver) {
     this.entityResolver = entityResolver;
     this.nativeOutputResolver = nativeOutputResolver;
   }
@@ -61,7 +61,7 @@ final class DsqlQueryMetadataResolver implements MetadataOutputResolver {
    * @param query the {@link DsqlQuery} to resolve the output metadata from.
    */
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, Object query)
+  public MetadataType getOutputType(MetadataContext context, Object query)
       throws MetadataResolvingException, ConnectionException {
 
     if (query instanceof DsqlQuery) {
@@ -93,7 +93,7 @@ final class DsqlQueryMetadataResolver implements MetadataOutputResolver {
 
       return builder.build();
     } else {
-      return nativeOutputResolver.getOutputMetadata(context, query);
+      return nativeOutputResolver.getOutputType(context, query);
     }
   }
 }

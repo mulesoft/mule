@@ -19,7 +19,7 @@ import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
@@ -75,12 +75,12 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
                                 MetadataKeysContainerBuilder keysBuilder)
       throws MetadataResolvingException, ConnectionException {
     for (ComponentModel component : components) {
-      MetadataKeysResolver keysResolver =
+      TypeKeysResolver keysResolver =
           ((MetadataEnrichableModel) component).getMetadataResolverFactory().getKeyResolver();
 
       String categoryName = keysResolver.getCategoryName();
       if (!NULL_CATEGORY_NAME.equals(categoryName) && !keysBuilder.containsCategory(categoryName)) {
-        keysBuilder.add(categoryName, keysResolver.getMetadataKeys(metadataContext));
+        keysBuilder.add(categoryName, keysResolver.getKeys(metadataContext));
       }
     }
   }

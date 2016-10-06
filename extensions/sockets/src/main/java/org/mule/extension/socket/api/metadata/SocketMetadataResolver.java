@@ -25,8 +25,8 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 
 import java.util.Set;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  * not. If no response is needed, the operation metadata should behave like a void operation.
  */
 public class SocketMetadataResolver
-    implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>, MetadataKeysResolver {
+    implements OutputTypeResolver<String>, MetadataAttributesResolver<String>, TypeKeysResolver {
 
   private final ClassTypeLoader typeLoader =
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClass().getClassLoader());
@@ -50,7 +50,7 @@ public class SocketMetadataResolver
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext metadataContext, String key)
+  public MetadataType getOutputType(MetadataContext metadataContext, String key)
       throws MetadataResolvingException, ConnectionException {
     return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).binaryType().build()
         : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
@@ -65,7 +65,7 @@ public class SocketMetadataResolver
   }
 
   @Override
-  public Set<MetadataKey> getMetadataKeys(MetadataContext metadataContext)
+  public Set<MetadataKey> getKeys(MetadataContext metadataContext)
       throws MetadataResolvingException, ConnectionException {
     return Stream.of(TRUE, FALSE).map(b -> newKey(b.toString()).build()).collect(Collectors.toSet());
   }

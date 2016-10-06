@@ -13,22 +13,22 @@ import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtil
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-public class TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam
-    implements MetadataContentResolver<String>, MetadataOutputResolver<String> {
+public class TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam
+    implements InputTypeResolver<String>, OutputTypeResolver<String> {
 
   private static final String KEY_SHOULD_BE_EMPTY = "Metadata resolvers without Key Resolver should get a NullMetadataKey as Key";
 
   @Override
-  public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+  public MetadataType getInputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
     checkArgument(isBlank(key), KEY_SHOULD_BE_EMPTY);
     return getMetadata(PERSON);
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+  public MetadataType getOutputType(MetadataContext context, String key) throws MetadataResolvingException {
     checkArgument(isBlank(key), KEY_SHOULD_BE_EMPTY);
     return getMetadata(PERSON);
   }

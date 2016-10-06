@@ -54,6 +54,7 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
@@ -182,7 +183,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(operationModel.getMetadataResolverFactory()).thenReturn(metadataResolverFactory);
     when(metadataResolverFactory.getKeyResolver()).thenReturn(new TestNoConfigMetadataResolver());
-    when(metadataResolverFactory.getContentResolver()).thenReturn(new TestNoConfigMetadataResolver());
+    when(metadataResolverFactory.getInputResolver("content")).thenReturn(new TestNoConfigMetadataResolver());
+    when(metadataResolverFactory.getInputResolver("type")).thenReturn(new NullMetadataResolver());
     when(metadataResolverFactory.getOutputResolver()).thenReturn(new TestNoConfigMetadataResolver());
     when(metadataResolverFactory.getOutputAttributesResolver()).thenReturn(new TestNoConfigMetadataResolver());
 
@@ -194,6 +196,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
+    when(contentMock.hasDynamicType()).thenReturn(true);
     when(contentMock.getType()).thenReturn(stringType);
     when(contentMock.getModelProperty(MetadataContentModelProperty.class))
         .thenReturn(of(new MetadataContentModelProperty()));
@@ -266,16 +269,16 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     MetadataResult<TypeMetadataDescriptor> attributesMetadata = outputMetadataDescriptor.get().getAttributesMetadata();
     assertThat(attributesMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
 
-    assertThat(metadata.get().getContentMetadata().get().get().getType(), is(TYPE_BUILDER.stringType().build()));
-    assertThat(metadata.get().getParametersMetadata().size(), is(1));
-    assertThat(metadata.get().getParametersMetadata().get(0).get().getType(), is(stringType));
+    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("content").get().getType(),
+               is(TYPE_BUILDER.stringType().build()));
+    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("type").get().getType(), is(stringType));
   }
 
   @Test
   public void getMetadataKeys() throws Exception {
     MetadataResult<MetadataKeysContainer> metadataKeysResult = messageProcessor.getMetadataKeys();
 
-    verify(operationModel, times(3)).getMetadataResolverFactory();
+    verify(operationModel, times(5)).getMetadataResolverFactory();
     verify(metadataResolverFactory).getKeyResolver();
 
     assertThat(metadataKeysResult.isSuccess(), is(true));

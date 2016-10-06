@@ -97,7 +97,7 @@ public abstract class ExtensionComponent
     this.componentModel = componentModel;
     this.configurationProviderName = configurationProviderName;
     this.extensionManager = extensionManager;
-    this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
+    this.metadataMediator = new MetadataMediator(componentModel);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getExtensionClassLoader());
   }
 
@@ -306,9 +306,8 @@ public abstract class ExtensionComponent
     try {
       return extensionManager.getConfigurationProvider(extensionModel);
     } catch (TooManyConfigsException e) {
-      throw new IllegalStateException(String.format(
-                                                    "No config-ref was specified for component '%s' of extension '%s', but %d are registered. Please specify which to use",
-                                                    componentModel.getName(), extensionModel.getName(), e.getConfigsCount()),
+      throw new IllegalStateException(format("No config-ref was specified for component '%s' of extension '%s', but %d are registered. Please specify which to use",
+                                             componentModel.getName(), extensionModel.getName(), e.getConfigsCount()),
                                       e);
     }
   }

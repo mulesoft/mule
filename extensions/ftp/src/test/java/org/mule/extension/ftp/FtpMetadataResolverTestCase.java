@@ -7,6 +7,7 @@
 package org.mule.extension.ftp;
 
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.test.extension.file.common.FileMetadataResolverTestCommon;
@@ -36,7 +37,7 @@ public class FtpMetadataResolverTestCase extends FtpConnectorTestCase {
 
   @Test
   public void getReadAttributesMetadata() {
-    testCommon.testReadAttributesMetadata(manager, testHarness.getAttributesType());
+    testCommon.testReadAttributesMetadata(manager, FileAttributes.class);
   }
 
   @Test

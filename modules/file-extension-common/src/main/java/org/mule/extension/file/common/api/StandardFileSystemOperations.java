@@ -9,14 +9,16 @@ package org.mule.extension.file.common.api;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
+import org.mule.extension.file.common.api.metadata.FileTreeNodeMetadataResolver;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -24,9 +26,6 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
-import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
-import org.mule.extension.file.common.api.metadata.FileAttributesMetadataResolver;
-import org.mule.extension.file.common.api.metadata.FileTreeNodeMetadataResolver;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -64,7 +63,7 @@ public class StandardFileSystemOperations {
    * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
    */
   @Summary("List all the files from given directory")
-  @MetadataScope(outputResolver = FileTreeNodeMetadataResolver.class)
+  @OutputResolver(FileTreeNodeMetadataResolver.class)
   public TreeNode list(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String directoryPath,
                        @Optional(defaultValue = "false") boolean recursive, Message message,
                        @Optional @Summary("Matcher to filter the listed files") @Placement(
@@ -97,7 +96,6 @@ public class StandardFileSystemOperations {
    */
   @DataTypeParameters
   @Summary("Obtains the content and metadata of a file at a given path")
-  @MetadataScope(attributesResolver = FileAttributesMetadataResolver.class)
   public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
                                                            @Connection FileSystem fileSystem, Message message,
                                                            @DisplayName("File Path") String path,

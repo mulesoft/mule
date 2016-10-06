@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -22,10 +22,10 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDecla
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
@@ -34,21 +34,19 @@ import org.mule.runtime.extension.api.introspection.property.MetadataContentMode
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.property.QueryOperationModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterWrapper;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
-import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for components (Operations and
@@ -96,20 +94,13 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
     }
   }
 
-  private void enrichSourceMetadata(SourceDeclaration sourceDeclaration) {
-    final Optional<ImplementingTypeModelProperty> modelProperty =
-        sourceDeclaration.getModelProperty(ImplementingTypeModelProperty.class);
-    if (modelProperty.isPresent()) {
-      final Class<?> operationMethod = modelProperty.get().getType();
-      MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(getMetadataScope(operationMethod));
-      MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-      sourceDeclaration.setMetadataResolverFactory(metadataResolverFactory);
-
-      if (metadataScope.isCustomScope()) {
-        declareOutput(sourceDeclaration.getOutput(), sourceDeclaration.getOutputAttributes(), metadataScope);
-        declareComponentMetadataKeyId(sourceDeclaration);
-      }
-    }
+  private void enrichSourceMetadata(SourceDeclaration declaration) {
+    declaration.getModelProperty(ImplementingTypeModelProperty.class)
+        .ifPresent(prop -> {
+          final Class<?> sourceType = prop.getType();
+          MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, sourceType);
+          declareMetadataResolverFactory(declaration, metadataScope);
+        });
   }
 
   private void enrichOperationMetadata(OperationDeclaration declaration) {
@@ -118,24 +109,30 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
           final Method method = prop.getMethod();
 
           if (method.isAnnotationPresent(Query.class)) {
-            Query query = method.getAnnotation(Query.class);
-            declaration.setMetadataResolverFactory(new QueryMetadataResolverFactory(query.nativeOutputResolver(),
-                                                                                    query.entityResolver()));
-            addQueryModelProperties(declaration, query);
-            declareOutputType(declaration.getOutput());
-            declareComponentMetadataKeyId(declaration);
+            enrichWithDsql(declaration, method);
           } else {
-            MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(getMetadataScope(method));
-            MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-            declaration.setMetadataResolverFactory(metadataResolverFactory);
-
-            if (metadataScope.isCustomScope()) {
-              declareOutput(declaration.getOutput(), declaration.getOutputAttributes(), metadataScope);
-              declareContent(declaration, method);
-              declareComponentMetadataKeyId(declaration);
-            }
+            MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, method, declaration);
+            declareMetadataResolverFactory(declaration, metadataScope);
           }
         });
+  }
+
+  private void declareMetadataResolverFactory(ComponentDeclaration<? extends ComponentDeclaration> declaration,
+                                              MetadataScopeAdapter metadataScope) {
+    MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
+    declaration.setMetadataResolverFactory(metadataResolverFactory);
+    declareMetadataKeyId(declaration);
+    declareOutputResolvers(declaration, metadataScope);
+    declareInputResolvers(declaration, metadataScope);
+  }
+
+  private void enrichWithDsql(OperationDeclaration declaration, Method method) {
+    Query query = method.getAnnotation(Query.class);
+    declaration.setMetadataResolverFactory(new QueryMetadataResolverFactory(query.nativeOutputResolver(),
+                                                                            query.entityResolver()));
+    addQueryModelProperties(declaration, query);
+    declareDynamicType(declaration.getOutput());
+    declareMetadataKeyId(declaration);
   }
 
 
@@ -154,52 +151,38 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
     declaration.addModelProperty(new QueryOperationModelProperty());
   }
 
-  private void declareContent(OperationDeclaration operationDeclaration, Method operationMethod) {
-    final Parameter[] parameters = operationMethod.getParameters();
-    for (int i = 0; i < parameters.length; i++) {
-      if (parameters[i].getAnnotation(Content.class) != null) {
-        final ParameterWrapper parameterWrapper = new ParameterWrapper(operationMethod, i);
-        operationDeclaration.getParameters().stream()
-            .filter(parameterDeclaration -> parameterDeclaration.getName().equals(parameterWrapper.getAlias()))
-            .forEach(parameterDeclaration -> parameterDeclaration.setType(parameterDeclaration.getType(), true));
-      }
-    }
-  }
-
-  private MetadataScope getMetadataScope(Method method) {
-    MetadataScope scope = method.getAnnotation(MetadataScope.class);
-    return scope != null ? scope : getMetadataScope(method.getDeclaringClass());
-  }
-
-  private MetadataScope getMetadataScope(Class<?> source) {
-    MetadataScope scope = getAnnotation(source, MetadataScope.class);
-    return scope != null ? scope : getAnnotation(extensionType, MetadataScope.class);
-  }
-
   private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope) {
-    return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getContentResolver(),
+
+    return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getInputResolvers(),
                                                                       scope.getOutputResolver(), scope.getAttributesResolver())
         : new NullMetadataResolverFactory();
 
   }
 
-  private void declareOutput(OutputDeclaration outputDeclaration,
-                             OutputDeclaration attributesDeclaration,
-                             MetadataScopeAdapter metadataScope) {
+  private void declareInputResolvers(ComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
+    if (metadataScope.hasInputResolvers()) {
+      Set<String> dynamicParameters = metadataScope.getInputResolvers().keySet();
+      declaration.getParameters().stream()
+          .filter(p -> dynamicParameters.contains(p.getName()))
+          .forEach(this::declareDynamicType);
+    }
+  }
+
+  private void declareOutputResolvers(ComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
     if (metadataScope.hasOutputResolver()) {
-      declareOutputType(outputDeclaration);
+      declareDynamicType(declaration.getOutput());
     }
 
     if (metadataScope.hasAttributesResolver()) {
-      declareOutputType(attributesDeclaration);
+      declareDynamicType(declaration.getOutputAttributes());
     }
   }
 
-  private void declareOutputType(OutputDeclaration component) {
+  private void declareDynamicType(TypedDeclaration component) {
     component.setType(component.getType(), true);
   }
 
-  private void declareComponentMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
+  private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
 
     Optional<MetadataType> keyId = component.getParameters().stream()
         .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))
@@ -222,7 +205,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
    * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link MetadataContentModelProperty}
    * if the parsedParameter is annotated either as {@link MetadataKeyId}, {@link MetadataKeyPart} or {@link Content} respectively.
    *
-   * @param element the method annotated parameter parsed
+   * @param element         the method annotated parameter parsed
    * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
    */
   private void parseMetadataAnnotations(AnnotatedElement element, BaseDeclaration baseDeclaration) {
@@ -240,21 +223,4 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
     }
   }
 
-  private Optional<AnnotatedElement> getAnnotatedElement(BaseDeclaration<?> declaration) {
-    final Optional<DeclaringMemberModelProperty> declaringMember =
-        declaration.getModelProperty(DeclaringMemberModelProperty.class);
-    final Optional<ImplementingParameterModelProperty> implementingParameter =
-        declaration.getModelProperty(ImplementingParameterModelProperty.class);
-
-    AnnotatedElement annotatedElement = null;
-    if (declaringMember.isPresent()) {
-      annotatedElement = declaringMember.get().getDeclaringField();
-    }
-
-    if (implementingParameter.isPresent()) {
-      annotatedElement = implementingParameter.get().getParameter();
-    }
-
-    return Optional.ofNullable(annotatedElement);
-  }
 }

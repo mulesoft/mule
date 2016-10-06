@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
@@ -29,27 +29,27 @@ public class NullMetadataResolverFactory implements MetadataResolverFactory {
   }
 
   /**
-   * @return a {@link NullMetadataResolver} implementation of {@link MetadataKeysResolver}
+   * @return a {@link NullMetadataResolver} implementation of {@link TypeKeysResolver}
    */
   @Override
-  public MetadataKeysResolver getKeyResolver() {
+  public TypeKeysResolver getKeyResolver() {
     return metadataResolver;
   }
 
   /**
-   * @return a {@link NullMetadataResolver} implementation of {@link MetadataContentResolver}
+   * @return a {@link NullMetadataResolver} implementation of {@link InputTypeResolver}
    */
   @Override
-  public <T> MetadataContentResolver<T> getContentResolver() {
-    return (MetadataContentResolver<T>) metadataResolver;
+  public <T> InputTypeResolver<T> getInputResolver(String parameterName) {
+    return (InputTypeResolver<T>) metadataResolver;
   }
 
   /**
-   * @return a {@link NullMetadataResolver} implementation of {@link MetadataOutputResolver}
+   * @return a {@link NullMetadataResolver} implementation of {@link OutputTypeResolver}
    */
   @Override
-  public <T> MetadataOutputResolver<T> getOutputResolver() {
-    return (MetadataOutputResolver<T>) metadataResolver;
+  public <T> OutputTypeResolver<T> getOutputResolver() {
+    return (OutputTypeResolver<T>) metadataResolver;
   }
 
   /**

@@ -16,4 +16,9 @@ public class MetadataInheritedOperationResolversOperations extends MetadataOpera
   public void shouldInheritOperationParentResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
                                                     @Optional @Content Object content) {}
 
+  public Object shouldInheritOperationResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
+                                                @Optional @Content Object content) {
+    return null;
+  }
+
 }

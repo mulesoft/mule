@@ -10,23 +10,19 @@ import static java.sql.Types.VARCHAR;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
-import org.mule.extension.db.internal.domain.param.InputQueryParam;
 import org.mule.extension.db.internal.domain.query.QueryTemplate;
 import org.mule.extension.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 
 import java.net.URL;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
-import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Ref;
 import java.sql.RowId;
@@ -36,53 +32,14 @@ import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class BaseDbMetadataResolver implements MetadataContentResolver<String> {
+public abstract class BaseDbMetadataResolver {
 
   protected BaseTypeBuilder typeBuilder;
   protected ClassTypeLoader typeLoader;
   private Map<Integer, MetadataType> dbToMetaDataType;
-
-  @Override
-  public String getCategoryName() {
-    return "BaseDbCategory";
-  }
-
-  @Override
-  public MetadataType getContentMetadata(MetadataContext context, String query)
-      throws MetadataResolvingException, ConnectionException {
-
-    this.typeLoader = context.getTypeLoader();
-    this.typeBuilder = context.getTypeBuilder();
-
-    QueryTemplate queryTemplate = parseQuery(query);
-    List<InputQueryParam> inputParams = queryTemplate.getInputParams();
-    // No metadata when no input parameters
-    if (inputParams.size() == 0) {
-      return typeBuilder.nullType().build();
-    }
-
-    PreparedStatement statement = getStatement(context, queryTemplate);
-    List<String> fieldNames = new ArrayList<>();
-    for (InputQueryParam inputParam : inputParams) {
-      String name = inputParam.getName();
-      if (name == null) {
-        return typeBuilder.anyType().build();
-      }
-
-      fieldNames.add(name);
-    }
-
-    try {
-      return getInputMetadataUsingStatementMetadata(statement, fieldNames);
-    } catch (SQLException e) {
-      return getStaticInputMetadata(fieldNames);
-    }
-  }
 
   protected QueryTemplate parseQuery(String query) {
     return new SimpleQueryTemplateParser().parse(query);
@@ -100,34 +57,6 @@ public class BaseDbMetadataResolver implements MetadataContentResolver<String> {
       throw new MetadataResolvingException(e.getMessage(), UNKNOWN, e);
     }
     return statement;
-  }
-
-  private MetadataType getStaticInputMetadata(List<String> fieldNames) {
-    Map<String, MetadataType> recordModels = new HashMap<>();
-
-    for (String fieldName : fieldNames) {
-      recordModels.put(fieldName, getDataTypeMetadataModel(VARCHAR));
-    }
-
-    ObjectTypeBuilder record = typeBuilder.objectType().id("recordModel");
-    recordModels.entrySet().forEach(e -> record.addField().key(e.getKey()).value(e.getValue()));
-    return record.build();
-  }
-
-  private MetadataType getInputMetadataUsingStatementMetadata(PreparedStatement statement, List<String> fieldNames)
-      throws SQLException {
-    ParameterMetaData parameterMetaData = statement.getParameterMetaData();
-
-    Map<String, MetadataType> recordModels = new HashMap<>();
-    int i = 1;
-    for (String fieldName : fieldNames) {
-      int dataType = parameterMetaData.getParameterType(i++);
-      recordModels.put(fieldName, getDataTypeMetadataModel(dataType));
-    }
-
-    ObjectTypeBuilder record = typeBuilder.objectType().id("recordModel");
-    recordModels.entrySet().forEach(e -> record.addField().key(e.getKey()).value(e.getValue()));
-    return record.build();
   }
 
   protected MetadataType getDataTypeMetadataModel(int columnTypeName, String columnClassName) {
