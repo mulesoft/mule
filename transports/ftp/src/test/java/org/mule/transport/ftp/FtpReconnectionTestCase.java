@@ -2,10 +2,9 @@ package org.mule.transport.ftp;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleContext;
 import org.mule.exception.AbstractSystemExceptionStrategy;
-import org.mule.exception.DefaultSystemExceptionStrategy;
-import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.transport.ConnectException;
 
