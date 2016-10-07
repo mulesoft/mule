@@ -9,9 +9,10 @@ package org.mule.runtime.core.el.v2;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import org.mule.runtime.api.el.Binding;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.el.v2.Binding;
-import org.mule.runtime.core.api.el.v2.BindingContext;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +25,10 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   public DefaultBindingContextBuilder() {
     this.bindings = new HashMap<>();
+  }
+
+  public DefaultBindingContextBuilder(BindingContext bindingContext) {
+    this.bindings = bindingContext.identifiers().stream().collect(toMap(id -> id, id -> bindingContext.lookup(id).get()));
   }
 
   @Override

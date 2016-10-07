@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.el;
 
-import org.mule.runtime.core.api.el.v2.BindingContext;
-import org.mule.runtime.core.api.el.v2.ExpressionLanguage;
+import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

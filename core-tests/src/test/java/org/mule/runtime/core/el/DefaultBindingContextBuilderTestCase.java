@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.el.v2.BindingContext;
 import org.mule.runtime.core.el.v2.DefaultBindingContextBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

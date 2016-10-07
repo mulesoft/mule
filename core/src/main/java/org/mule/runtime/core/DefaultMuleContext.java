@@ -232,7 +232,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
-  private org.mule.runtime.core.api.el.v2.ExpressionLanguage expressionLanguageV2;
+  private org.mule.runtime.api.el.ExpressionLanguage expressionLanguageV2;
 
   /**
    * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -892,7 +892,7 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public org.mule.runtime.core.api.el.v2.ExpressionLanguage getExpressionLanguageV2() {
+  public org.mule.runtime.api.el.ExpressionLanguage getExpressionLanguageV2() {
     if (this.expressionLanguageV2 == null) {
       this.expressionLanguageV2 = new MuleExpressionLanguage();
     }
