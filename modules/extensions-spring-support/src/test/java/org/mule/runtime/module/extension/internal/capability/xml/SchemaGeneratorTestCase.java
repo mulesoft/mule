@@ -8,20 +8,21 @@ package org.mule.runtime.module.extension.internal.capability.xml;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
@@ -118,14 +119,14 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
   @Before
   public void setup() throws IOException {
     generator = new SchemaGenerator();
-    expectedSchema = IOUtils.getResourceAsString("schemas/" + expectedXSD, getClass());
+    expectedSchema = getResourceAsString("schemas/" + expectedXSD, getClass());
   }
 
   @Test
   public void generate() throws Exception {
-    XmlModelProperty capability = extensionUnderTest.getModelProperty(XmlModelProperty.class).get();
+    XmlDslModel languageModel = extensionUnderTest.getXmlDslModel();
 
-    String schema = generator.generate(extensionUnderTest, capability, new SchemaTestDslContext());
+    String schema = generator.generate(extensionUnderTest, languageModel, new SchemaTestDslContext());
     compareXML(expectedSchema, schema);
   }
 
@@ -133,7 +134,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
 
     @Override
     public Optional<ExtensionModel> getExtension(String name) {
-      return Optional.ofNullable(extensionModels.get(name));
+      return ofNullable(extensionModels.get(name));
     }
   }
 

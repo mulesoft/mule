@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
@@ -29,20 +28,19 @@ import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
+import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
@@ -135,13 +133,10 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
   private void registerExtensionParsers(ExtensionModel extensionModel) {
 
-    Optional<XmlModelProperty> xmlModelProperty = extensionModel.getModelProperty(XmlModelProperty.class);
-    if (!xmlModelProperty.isPresent()) {
-      return;
-    }
+    XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
-    final Builder definitionBuilder = new Builder().withNamespace(xmlModelProperty.get().getNamespace());
+    final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getNamespace());
     final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel, new DefaultDslContext(extensionManager));
 
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
@@ -312,12 +307,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
   }
 
   private ExtensionParsingContext createParsingContext(ExtensionModel extensionModel) {
-    Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-
     final ExtensionParsingContext parsingContext = new ExtensionParsingContext();
-    parsingContext.setSubTypesMapping(
-                                      new SubTypesMappingContainer(subTypesProperty.isPresent()
-                                          ? subTypesProperty.get().getSubTypesMapping() : emptyMap()));
+    parsingContext.setSubTypesMapping(new SubTypesMappingContainer(extensionModel.getSubTypes()));
 
     return parsingContext;
   }

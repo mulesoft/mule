@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 
 /**
@@ -27,16 +27,16 @@ public class SpringSchemaBundleResourceFactory extends AbstractXmlResourceFactor
    * {@inheritDoc}
    */
   @Override
-  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty,
+  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                                   DslResolvingContext context) {
     StringBuilder contentBuilder = new StringBuilder();
-    contentBuilder.append(getSpringSchemaBundle(xmlModelProperty, xmlModelProperty.getSchemaVersion()));
-    contentBuilder.append(getSpringSchemaBundle(xmlModelProperty, "current"));
+    contentBuilder.append(getSpringSchemaBundle(xmlDslModel, xmlDslModel.getSchemaVersion()));
+    contentBuilder.append(getSpringSchemaBundle(xmlDslModel, "current"));
 
     return new GeneratedResource(GENERATED_FILE_NAME, contentBuilder.toString().getBytes());
   }
 
-  private String getSpringSchemaBundle(XmlModelProperty xmlProperty, String version) {
+  private String getSpringSchemaBundle(XmlDslModel xmlProperty, String version) {
     String filename = xmlProperty.getXsdFileName();
     return escape(String.format(BUNDLE_MASK, xmlProperty.getNamespaceUri(), version, filename, filename));
   }

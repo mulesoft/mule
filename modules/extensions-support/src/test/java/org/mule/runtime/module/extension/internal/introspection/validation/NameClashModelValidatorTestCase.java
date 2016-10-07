@@ -13,13 +13,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ElementDslModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -294,6 +293,10 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   private void mockXmlHintsInline(ParameterModel p, boolean inline) {
-    when(p.getModelProperty(XmlHintsModelProperty.class)).thenReturn(Optional.of(new XmlHintsModelProperty(inline, true, true)));
+    when(p.getDslModel()).thenReturn(ElementDslModel.builder()
+        .allowsInlineDefinition(inline)
+        .allowsReferences(true)
+        .allowTopLevelDefinition(true)
+        .build());
   }
 }

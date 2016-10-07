@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
+import org.mule.runtime.extension.api.introspection.display.LayoutModel;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class LayoutModelPropertyTestCase extends AbstractAnnotationsBasedDescriberTestCase {
+public class LayoutModelTestCase extends AbstractAnnotationsBasedDescriberTestCase {
 
   private static final String KILL_CUSTOM_OPERATION = "killWithCustomMessage";
 
@@ -73,13 +73,14 @@ public class LayoutModelPropertyTestCase extends AbstractAnnotationsBasedDescrib
   }
 
   private void assertParameterPlacement(ParameterDeclaration param, String groupName, Integer order) {
-    LayoutModelProperty display = param.getModelProperty(LayoutModelProperty.class).get();
+    LayoutModel layout = param.getLayoutModel();
+    assertThat(layout, is(notNullValue()));
 
     if (groupName != null) {
-      assertThat(display.getGroupName(), is(groupName));
+      assertThat(layout.getGroupName(), is(groupName));
     }
     if (order != null) {
-      assertThat(display.getOrder(), is(order));
+      assertThat(layout.getOrder(), is(order));
     }
   }
 }

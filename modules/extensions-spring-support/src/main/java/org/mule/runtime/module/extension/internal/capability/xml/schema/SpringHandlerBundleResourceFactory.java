@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
@@ -28,9 +28,9 @@ public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFacto
    * {@inheritDoc}
    */
   @Override
-  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty,
+  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                                   DslResolvingContext context) {
-    String content = String.format(BUNDLE_MASK, xmlModelProperty.getNamespaceUri(), ExtensionNamespaceHandler.class.getName());
+    String content = String.format(BUNDLE_MASK, xmlDslModel.getNamespaceUri(), ExtensionNamespaceHandler.class.getName());
     return new GeneratedResource(GENERATED_FILE_NAME, escape(content).getBytes());
   }
 }

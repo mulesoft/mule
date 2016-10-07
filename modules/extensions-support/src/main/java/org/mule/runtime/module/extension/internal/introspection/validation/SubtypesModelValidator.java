@@ -10,16 +10,16 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.toSubTypesMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.supportsTopLevelDeclaration;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.introspection.ImportedTypeModel;
+import org.mule.runtime.extension.api.introspection.SubTypesModel;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -30,13 +30,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link ModelValidator} which applies to {@link ExtensionModel}s.
  * <p>
- * This validator checks that all {@link ExtensionModel Extension} global elements declarations like {@link SubTypesModelProperty
- * Subtypes} or {@link ImportedTypesModelProperty Imported types} are valid.
+ * This validator checks that all {@link ExtensionModel Extension} global elements declarations like {@link SubTypesModel
+ * Subtypes} or {@link ImportedTypeModel Imported types} are valid.
  *
  * @since 4.0
  */
@@ -44,17 +44,14 @@ public final class SubtypesModelValidator implements ModelValidator {
 
   @Override
   public void validate(ExtensionModel model) throws IllegalModelDefinitionException {
-    Optional<Map<MetadataType, List<MetadataType>>> typesMapping =
-        model.getModelProperty(SubTypesModelProperty.class).map(SubTypesModelProperty::getSubTypesMapping);
-    if (typesMapping.isPresent()) {
-      validateBaseTypeNotFinal(model, typesMapping.get());
-      validateNonAbstractSubtypes(model, typesMapping.get());
-      validateSubtypesExtendOrImplementBaseType(model, typesMapping.get());
-      validateSubtypesNameClashing(model, typesMapping.get());
-    }
+    final Map<MetadataType, Set<MetadataType>> typesMapping = toSubTypesMap(model.getSubTypes());
+    validateBaseTypeNotFinal(model, typesMapping);
+    validateNonAbstractSubtypes(model, typesMapping);
+    validateSubtypesExtendOrImplementBaseType(model, typesMapping);
+    validateSubtypesNameClashing(model, typesMapping);
   }
 
-  private void validateBaseTypeNotFinal(ExtensionModel model, Map<MetadataType, List<MetadataType>> typesMapping) {
+  private void validateBaseTypeNotFinal(ExtensionModel model, Map<MetadataType, Set<MetadataType>> typesMapping) {
     List<String> finalBaseTypes = typesMapping.keySet().stream()
         .filter(MetadataTypeUtils::isFinal)
         .map(MetadataTypeUtils::getId)
@@ -66,9 +63,9 @@ public final class SubtypesModelValidator implements ModelValidator {
     }
   }
 
-  private void validateNonAbstractSubtypes(ExtensionModel model, Map<MetadataType, List<MetadataType>> typesMapping) {
+  private void validateNonAbstractSubtypes(ExtensionModel model, Map<MetadataType, Set<MetadataType>> typesMapping) {
     List<String> abstractSubtypes = new LinkedList<>();
-    for (List<MetadataType> subtypes : typesMapping.values()) {
+    for (Set<MetadataType> subtypes : typesMapping.values()) {
       abstractSubtypes.addAll(subtypes.stream().filter(s -> !isInstantiable(s))
           .map(MetadataTypeUtils::getId).collect(toList()));
     }
@@ -81,8 +78,8 @@ public final class SubtypesModelValidator implements ModelValidator {
   }
 
   private void validateSubtypesExtendOrImplementBaseType(ExtensionModel model,
-                                                         Map<MetadataType, List<MetadataType>> typesMapping) {
-    for (Map.Entry<MetadataType, List<MetadataType>> subtypes : typesMapping.entrySet()) {
+                                                         Map<MetadataType, Set<MetadataType>> typesMapping) {
+    for (Map.Entry<MetadataType, Set<MetadataType>> subtypes : typesMapping.entrySet()) {
       if (!subtypes.getKey().getMetadataFormat().equals(JAVA)) {
         continue;
       }
@@ -100,7 +97,7 @@ public final class SubtypesModelValidator implements ModelValidator {
     }
   }
 
-  private void validateSubtypesNameClashing(ExtensionModel model, Map<MetadataType, List<MetadataType>> typesMapping) {
+  private void validateSubtypesNameClashing(ExtensionModel model, Map<MetadataType, Set<MetadataType>> typesMapping) {
 
     ImmutableList<MetadataType> mappedTypes = ImmutableList.<MetadataType>builder()
         .addAll(typesMapping.keySet())

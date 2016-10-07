@@ -7,26 +7,26 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.introspection.ElementDslModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -60,12 +60,12 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-    when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
-    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+    mockSubTypes(extensionModel);
+    when(extensionModel.getImportedTypes()).thenReturn(emptySet());
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-    when(validParameterModel.getModelProperty(XmlHintsModelProperty.class)).thenReturn(Optional.empty());
+    when(validParameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-    when(invalidParameterModel.getModelProperty(XmlHintsModelProperty.class)).thenReturn(Optional.empty());
+    when(invalidParameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
     when(operationModel.getName()).thenReturn("dummyOperation");
     when(extensionModel.getName()).thenReturn("extensionModel");
   }

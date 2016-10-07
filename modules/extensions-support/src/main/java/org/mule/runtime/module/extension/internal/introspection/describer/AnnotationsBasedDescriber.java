@@ -6,8 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
-import com.google.common.collect.ImmutableList;
-
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.MuleVersion;
@@ -29,6 +45,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ElementDslModel;
 import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
@@ -39,20 +56,18 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasSourceDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
+import org.mule.runtime.extension.api.introspection.display.LayoutModel;
 import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
@@ -90,6 +105,8 @@ import org.mule.runtime.module.extension.internal.model.property.TypeRestriction
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
 
+import com.google.common.collect.ImmutableList;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -98,25 +115,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
-import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 
 /**
  * Implementation of {@link Describer} which generates a {@link ExtensionDeclarer} by scanning annotations on a type provided in
@@ -248,8 +246,9 @@ public final class AnnotationsBasedDescriber implements Describer {
     final Optional<ExtensionParameter> connectionParameter = getConnectionParameter(sourceType);
 
     if (isInvalidConfigSupport(supportsConfig, configParameter, connectionParameter)) {
-      throw new IllegalSourceModelDefinitionException(format("Source '%s' is defined at the extension level but it requires a config parameter. "
-          + "Remove such parameter or move the source to the proper config",
+      throw new IllegalSourceModelDefinitionException(
+                                                      format("Source '%s' is defined at the extension level but it requires a config parameter. "
+                                                          + "Remove such parameter or move the source to the proper config",
                                                              sourceType.getName()));
     }
 
@@ -538,17 +537,16 @@ public final class AnnotationsBasedDescriber implements Describer {
   }
 
   private void addLayoutModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    LayoutModelProperty layoutModelProperty = parseLayoutAnnotations(extensionParameter, extensionParameter.getAlias());
-    if (layoutModelProperty != null) {
-      parameter.withModelProperty(layoutModelProperty);
-    }
+    parseLayoutAnnotations(extensionParameter, LayoutModel.builder()).ifPresent(parameter::withLayout);
   }
 
   private void addXmlHintsModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    Optional<XmlHints> elementStyle = extensionParameter.getAnnotation(XmlHints.class);
-    if (elementStyle.isPresent()) {
-      parameter.withModelProperty(new XmlHintsModelProperty(elementStyle.get()));
-    }
+    extensionParameter.getAnnotation(XmlHints.class).ifPresent(
+                                                               hints -> parameter.withDsl(ElementDslModel.builder()
+                                                                   .allowsInlineDefinition(hints.allowInlineDefinition())
+                                                                   .allowsReferences(hints.allowReferences())
+                                                                   .allowTopLevelDefinition(hints.allowTopLevelDefinition())
+                                                                   .build()));
   }
 
   private void checkAnnotationsNotUsedMoreThanOnce(List<ExtensionParameter> parameters,
@@ -602,6 +600,7 @@ public final class AnnotationsBasedDescriber implements Describer {
     void contribute(ExtensionParameter parameter, ParameterDeclarer declarer, ParameterDeclarationContext declarationContext);
   }
 
+
   private static class InfrastructureFieldContributor implements ParameterDeclarerContributor {
 
     @Override
@@ -613,6 +612,7 @@ public final class AnnotationsBasedDescriber implements Describer {
       }
     }
   }
+
 
   private class ParameterResolverParameterTypeContributor implements ParameterDeclarerContributor {
 
@@ -626,8 +626,11 @@ public final class AnnotationsBasedDescriber implements Describer {
           metadataType = expressionResolverType.get();
         } else {
           throw new IllegalParameterModelDefinitionException(String
-              .format("The parameter [%s] from the Operation [%s] doesn't specify the %s parameterized type", parameter.getName(),
-                      declarationContext.getName(), ParameterResolver.class.getSimpleName()));
+              .format(
+                      "The parameter [%s] from the Operation [%s] doesn't specify the %s parameterized type",
+                      parameter.getName(),
+                      declarationContext.getName(),
+                      ParameterResolver.class.getSimpleName()));
         }
         declarer.ofType(metadataType);
         declarer.withModelProperty(new ParameterResolverTypeModelProperty());

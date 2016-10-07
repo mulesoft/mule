@@ -9,16 +9,17 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
+import org.mule.runtime.extension.api.introspection.ImportedTypeModel;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Base class for {@link GeneratedResourceFactory} implementations which generate resources needed to support configuring
@@ -31,19 +32,19 @@ abstract class AbstractXmlResourceFactory implements DslResourceFactory {
 
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
-    DslResolvingContext dslContext = extensionModel.getModelProperty(ImportedTypesModelProperty.class).isPresent()
-        ? new ClasspathBasedDslContext(
-                                       extensionModel.getModelProperty(ImplementingTypeModelProperty.class)
-                                           .map(mp -> mp.getType().getClassLoader())
-                                           .orElse(Thread.currentThread().getContextClassLoader()))
-        : name -> Optional.empty();
+    Set<ImportedTypeModel> importedTypes = extensionModel.getImportedTypes();
+    DslResolvingContext dslContext = importedTypes.isEmpty()
+        ? name -> Optional.empty()
+        : new ClasspathBasedDslContext(extensionModel.getModelProperty(ImplementingTypeModelProperty.class)
+            .map(mp -> mp.getType().getClassLoader())
+            .orElse(Thread.currentThread().getContextClassLoader()));
 
     return generateResource(extensionModel, dslContext);
   }
 
   /**
-   * Tests the given {@code extensionModel} to be enriched with the {@link XmlModelProperty}. If the property is present, then it
-   * delegates into {@link #generateXmlResource(ExtensionModel, XmlModelProperty, DslResolvingContext)}.
+   * Tests the given {@code extensionModel} to be enriched with the {@link XmlDslModel}. If the property is present, then it
+   * delegates into {@link #generateXmlResource(ExtensionModel, XmlDslModel, DslResolvingContext)}.
    * <p>
    * Otherwise, it returns {@link Optional#empty()}
    *
@@ -52,20 +53,19 @@ abstract class AbstractXmlResourceFactory implements DslResourceFactory {
    */
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel, DslResolvingContext context) {
-    XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
-
-    return xmlProperty == null ? empty() : of(generateXmlResource(extensionModel, xmlProperty, context));
+    XmlDslModel languageModel = extensionModel.getXmlDslModel();
+    return languageModel == null ? empty() : of(generateXmlResource(extensionModel, languageModel, context));
   }
 
   /**
    * Delegate method which should contain the actual logic to generate the resource
    *
    * @param extensionModel the {@link ExtensionModel} that requires the resource
-   * @param xmlModelProperty the extension's {@link XmlModelProperty}
+   * @param xmlDslModel    the extension's {@link XmlDslModel}
    * @param context
    * @return a {@link GeneratedResource}
    */
-  protected abstract GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty,
+  protected abstract GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                                            DslResolvingContext context);
 
   /**

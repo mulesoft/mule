@@ -22,7 +22,6 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.util.Collection;
@@ -49,9 +48,7 @@ public class ExtensionTypesModelEnricher implements ModelEnricher {
   }
 
   private void declareSubTypes(ExtensionDeclarer declarer) {
-    declarer.getDeclaration().getModelProperty(SubTypesModelProperty.class)
-        .ifPresent(p -> p.getSubTypesMapping().values().forEach(
-                                                                types -> registerTypes(declarer, types)));
+    declarer.getDeclaration().getSubTypes().forEach(type -> registerTypes(declarer, type.getSubTypes()));
   }
 
   private void declareDefaultTypes(final ExtensionDeclarer declarer) {

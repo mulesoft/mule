@@ -9,11 +9,12 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.deriveModelProperties;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
@@ -22,10 +23,11 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNB
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.extension.api.introspection.ElementDslModel;
+import org.mule.runtime.extension.api.introspection.SubTypesModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -37,7 +39,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -62,40 +63,36 @@ final class ObjectTypeSchemaDelegate {
   /**
    * For any given {@code parameter} with an {@link ObjectType} as {@link MetadataType}, the element generated in the schema
    * will vary depending on the properties of the type itself along with the properties associated to the parameter.
-   *
+   * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
    *
-   * @param type the {@link ObjectType} of the parameter for which the element is being created
-   * @param paramDsl the {@link DslElementSyntax} of the parameter for which the element is being created
-   * @param paramXmlHints the {@link XmlHintsModelProperty} associated to the parameter, if any is present.
+   * @param type        the {@link ObjectType} of the parameter for which the element is being created
+   * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
+   * @param paramDsl    the {@link ElementDslModel} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
-   * @param all the {@link ExplicitGroup group} the generated element should belong to
+   * @param all         the {@link ExplicitGroup group} the generated element should belong to
    */
-  void generatePojoElement(ObjectType type, DslElementSyntax paramDsl, Optional<XmlHintsModelProperty> paramXmlHints,
+  void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ElementDslModel paramDsl,
                            String description, ExplicitGroup all) {
 
-    if (paramDsl.supportsChildDeclaration()) {
-      if (isImported(type)) {
-        addImportedTypeElement(paramDsl, description, type, all);
+    if (paramSyntax.supportsChildDeclaration()) {
+      if (builder.isImported(type)) {
+        addImportedTypeElement(paramSyntax, description, type, all);
       } else {
-        if (paramDsl.isWrapped()) {
-          declareRefToType(type, paramDsl, description, all);
+        if (paramSyntax.isWrapped()) {
+          declareRefToType(type, paramSyntax, description, all);
         } else {
-          declareTypeInline(type, paramDsl, description, all);
+          declareTypeInline(type, paramSyntax, description, all);
         }
       }
     }
 
     Optional<DslElementSyntax> typeDsl = builder.getDslResolver().resolve(type);
-    boolean allowsRef = paramXmlHints.map(XmlHintsModelProperty::allowsReferences).orElse(true);
-    if (allowsRef && typeDsl.isPresent() && typeDsl.get().supportsTopLevelDeclaration() && !isImported(type)) {
+    if (paramDsl.allowsReferences() && typeDsl.isPresent() && typeDsl.get().supportsTopLevelDeclaration()
+        && !builder.isImported(type)) {
       // We need to register the type, just in case people want to use it as global elements
       registerPojoType(type, description);
     }
-  }
-
-  private boolean isImported(MetadataType type) {
-    return builder.getImportedTypes().get(type) != null;
   }
 
   private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description, ExplicitGroup all) {
@@ -203,13 +200,13 @@ final class ObjectTypeSchemaDelegate {
    * If an abstract or concrete {@link TopLevelElement} declaration are required for this type, then they will also be registered.
    * This method is idempotent for any given {@code type}
    *
-   * @param type a {@link MetadataType} describing a pojo type
-   * @param baseType a {@link MetadataType} describing a pojo's base type
+   * @param type        a {@link MetadataType} describing a pojo type
+   * @param baseType    a {@link MetadataType} describing a pojo's base type
    * @param description the type's description
    * @return the reference name of the complexType
    */
   private String registerPojoType(MetadataType type, MetadataType baseType, String description) {
-    if (!isImported(type)) {
+    if (!builder.isImported(type)) {
       registerPojoComplexType((ObjectType) type, (ObjectType) baseType, description);
 
       Optional<DslElementSyntax> typeDsl = builder.getDslResolver().resolve(type);
@@ -232,8 +229,8 @@ final class ObjectTypeSchemaDelegate {
   /**
    * Registers the {@link TopLevelComplexType} associated to the given {@link ObjectType} in the current namespace
    *
-   * @param type the {@link ObjectType} that will be represented by the registered {@link ComplexType}
-   * @param baseType the {@code base} for the {@link ComplexType} {@code extension} declaration
+   * @param type        the {@link ObjectType} that will be represented by the registered {@link ComplexType}
+   * @param baseType    the {@code base} for the {@link ComplexType} {@code extension} declaration
    * @param description
    * @return a new {@link ComplexType} declaration for the given {@link ObjectType}
    */
@@ -437,7 +434,8 @@ final class ObjectTypeSchemaDelegate {
   private ImmutableParameterModel asParameter(ObjectFieldType field) {
     return new ImmutableParameterModel(field.getKey().getName().getLocalPart(), "", field.getValue(), false, field.isRequired(),
                                        getExpressionSupport(field), getDefaultValue(field).orElse(null),
-                                       deriveModelProperties(field));
+                                       ElementDslModel.getDefaultInstance(),
+                                       null, getLayoutModel(field).orElse(null), emptySet());
   }
 
   private ExplicitGroup getOrCreateSequenceGroup(ExtensionType extension) {
@@ -449,8 +447,12 @@ final class ObjectTypeSchemaDelegate {
     return all;
   }
 
-  void registerPojoSubtypes(MetadataType baseType, List<MetadataType> subTypes) {
-    if (builder.getImportedTypes().get(baseType) == null) {
+  void registerPojoSubtypes(SubTypesModel subTypesModel) {
+    registerPojoSubtypes(subTypesModel.getBaseType(), subTypesModel.getSubTypes());
+  }
+
+  void registerPojoSubtypes(MetadataType baseType, Collection<MetadataType> subTypes) {
+    if (!builder.isImported(baseType)) {
       registerPojoType(baseType, EMPTY);
     }
 

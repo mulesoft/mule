@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.extension.api.introspection.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -29,11 +30,10 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.TypedDecl
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.introspection.property.QueryOperationModelProperty;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -143,12 +143,10 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
         .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).get()
             .getParameter().isAnnotationPresent(MetadataKeyId.class))
         .findFirst()
-        .orElseThrow(
-                     () -> new IllegalStateException("Query operation must have a parameter annotated with @MetadataKeyId"));
+        .orElseThrow(() -> new IllegalParameterModelDefinitionException("Query operation must have a parameter annotated with @MetadataKeyId"));
 
     parameterDeclaration.addModelProperty(new QueryParameterModelProperty(query.translator()));
-    parameterDeclaration.addModelProperty(LayoutModelPropertyBuilder.create().withText(true).build());
-    declaration.addModelProperty(new QueryOperationModelProperty());
+    parameterDeclaration.setLayoutModel(builderFrom(parameterDeclaration.getLayoutModel()).asQuery().build());
   }
 
   private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope) {
