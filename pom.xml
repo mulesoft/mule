@@ -684,13 +684,11 @@
                 <groupId>ru.yandex.qatools.allure</groupId>
                 <artifactId>allure-junit-adaptor</artifactId>
                 <version>${allure.junit.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>ru.yandex.qatools.allure</groupId>
                 <artifactId>allure-java-annotations</artifactId>
                 <version>${allure.junit.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <!--Logging-->
