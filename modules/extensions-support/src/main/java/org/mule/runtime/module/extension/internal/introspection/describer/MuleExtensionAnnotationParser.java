@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -33,6 +35,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -142,30 +145,30 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
-  static LayoutModel parseLayoutAnnotations(AnnotatedElement annotatedElement) {
+  static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement) {
     return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
   }
 
-  static LayoutModel parseLayoutAnnotations(WithAnnotations annotatedElement) {
+  static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement) {
     return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
   }
 
-  static LayoutModel parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
+  static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
       doParseLayoutAnnotations(annotatedElement, builder);
       parsePlacementAnnotation(annotatedElement, builder);
-      return builder.build();
+      return of(builder.build());
     }
-    return null;
+    return empty();
   }
 
-  static LayoutModel parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
+  static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
       doParseLayoutAnnotations(annotatedElement, builder);
       parsePlacementAnnotation(annotatedElement, builder);
-      return builder.build();
+      return of(builder.build());
     }
-    return null;
+    return empty();
   }
 
   private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement) {
@@ -181,7 +184,7 @@ public final class MuleExtensionAnnotationParser {
   static java.util.Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(WithAnnotations element) {
     final java.util.Optional<OnException> onExceptionAnnotation = element.getAnnotation(OnException.class);
     if (onExceptionAnnotation.isPresent()) {
-      return java.util.Optional.of(new DefaultExceptionEnricherFactory(onExceptionAnnotation.get().value()));
+      return of(new DefaultExceptionEnricherFactory(onExceptionAnnotation.get().value()));
     }
     return java.util.Optional.empty();
   }

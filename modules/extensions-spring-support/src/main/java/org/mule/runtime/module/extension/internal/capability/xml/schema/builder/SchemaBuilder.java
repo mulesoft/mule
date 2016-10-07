@@ -40,7 +40,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.utils.MetadataTypeUtils;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
@@ -456,7 +455,7 @@ public final class SchemaBuilder {
   }
 
   private String getTypeId(MetadataType type) {
-    return MetadataTypeUtils.getTypeId(type).orElse(null);
+    return getId(type);
   }
 
   /**

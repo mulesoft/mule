@@ -537,10 +537,7 @@ public final class AnnotationsBasedDescriber implements Describer {
   }
 
   private void addLayoutModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    LayoutModel layoutModel = parseLayoutAnnotations(extensionParameter, LayoutModel.builder());
-    if (layoutModel != null) {
-      parameter.withLayout(layoutModel);
-    }
+    parseLayoutAnnotations(extensionParameter, LayoutModel.builder()).ifPresent(parameter::withLayout);
   }
 
   private void addXmlHintsModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
