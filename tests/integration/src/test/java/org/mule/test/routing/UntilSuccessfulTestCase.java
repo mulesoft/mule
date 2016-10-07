@@ -101,12 +101,12 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
     Error error = CustomMP.getProcessedEvents().get(0).getError().get();
     assertThat(error, is(notNullValue()));
-    assertThat(error.getException(), instanceOf(RetryPolicyExhaustedException.class));
-    assertThat(error.getException().getMessage(),
+    assertThat(error.getCause(), instanceOf(RetryPolicyExhaustedException.class));
+    assertThat(error.getCause().getMessage(),
                containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
 
-    assertThat(error.getException().getCause(), instanceOf(MuleRuntimeException.class));
-    assertThat(error.getException().getMessage(),
+    assertThat(error.getCause().getCause(), instanceOf(MuleRuntimeException.class));
+    assertThat(error.getCause().getMessage(),
                containsString("Failure expression positive when processing event"));
   }
 

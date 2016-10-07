@@ -75,7 +75,7 @@ public class BindingInvocationHandler implements InvocationHandler {
         && replyEvent.getMessage() != null) {
       InternalMessage reply = replyEvent.getMessage();
       if (replyEvent.getError().isPresent()) {
-        throw findDeclaredMethodException(method, replyEvent.getError().get().getException());
+        throw findDeclaredMethodException(method, replyEvent.getError().get().getCause());
       } else {
         return determineReply(reply, method);
       }

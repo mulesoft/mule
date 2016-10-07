@@ -40,7 +40,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
   public void exception() throws Exception {
     Event event = createEvent();
     RuntimeException rte = new RuntimeException();
-    when(mockError.getException()).thenReturn(rte);
+    when(mockError.getCause()).thenReturn(rte);
     event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     Object exception = evaluate("exception", event);
 
@@ -53,7 +53,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
     Event event = createEvent();
     event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     RuntimeException runtimeException = new RuntimeException();
-    when(mockError.getException()).thenReturn(runtimeException);
+    when(mockError.getCause()).thenReturn(runtimeException);
     assertImmutableVariable("exception='other'", event);
   }
 
@@ -65,7 +65,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
         new MessagingException(CoreMessages.createStaticMessage(""),
                                Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build(),
                                new IllegalAccessException());
-    when(mockError.getException()).thenReturn(me);
+    when(mockError.getCause()).thenReturn(me);
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
   }
 

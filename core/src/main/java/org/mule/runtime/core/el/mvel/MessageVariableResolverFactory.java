@@ -76,7 +76,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
                                                                       null);
       } else if (EXCEPTION.equals(name)) {
         if (event.getError().isPresent()) {
-          Throwable exception = event.getError().get().getException();
+          Throwable exception = event.getError().get().getCause();
           return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else if (event.getMessage().getExceptionPayload() != null) {
           Throwable exception = event.getMessage().getExceptionPayload().getException();

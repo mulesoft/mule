@@ -10,9 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
@@ -22,6 +19,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;
+
+import org.junit.Test;
 
 public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
 
@@ -52,7 +51,7 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       Optional<Error> error = event.getError();
-      exceptionFromFlow = error.get().getException();
+      exceptionFromFlow = error.get().getCause();
 
       return null;
     }

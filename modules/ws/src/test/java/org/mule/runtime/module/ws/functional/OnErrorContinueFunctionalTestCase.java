@@ -42,7 +42,7 @@ public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctio
 
     assertThat(e.getEvent().getError().isPresent(), is(true));
 
-    SoapFaultException soapFault = (SoapFaultException) e.getEvent().getError().get().getException();
+    SoapFaultException soapFault = (SoapFaultException) e.getEvent().getError().get().getCause();
     assertThat(soapFault.getMessage(), startsWith("Hello"));
     assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
     assertThat(soapFault.getCause(), instanceOf(SoapFault.class));

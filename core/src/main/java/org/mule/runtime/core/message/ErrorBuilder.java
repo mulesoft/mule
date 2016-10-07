@@ -49,7 +49,7 @@ public final class ErrorBuilder {
   private ErrorBuilder(Throwable e) {
     Throwable exception = e;
     if (e instanceof ErrorMessageAwareException) {
-      exception = ((ErrorMessageAwareException) e).getException();
+      exception = ((ErrorMessageAwareException) e).getRootCause();
       this.errorMessage = ((ErrorMessageAwareException) e).getErrorMessage();
     }
     this.exception = exception;
@@ -63,12 +63,12 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Sets the exception that causes the error. @see {@link Error#getException()}
+   * Sets the exception that causes the error. @see {@link Error#getCause()}
    *
    * @param exception the exception that caused the error
    * @return {@code this} builder
    */
-  public ErrorBuilder exception(Exception exception) {
+  public ErrorBuilder exception(Throwable exception) {
     this.exception = exception;
     return this;
   }
@@ -189,7 +189,7 @@ public final class ErrorBuilder {
      * {@inheritDoc}
      */
     @Override
-    public Throwable getException() {
+    public Throwable getCause() {
       return exception;
     }
 

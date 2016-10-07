@@ -59,7 +59,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
-    assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
+    assertTrue(resultEvent.getError().get().getCause() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload().getValue());
     assertNotNull(exceptionListener.sensedException);
@@ -76,7 +76,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
-    assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
+    assertTrue(resultEvent.getError().get().getCause() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload().getValue());
     assertNotNull(exceptionListener.sensedException);
@@ -93,7 +93,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
-    assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
+    assertTrue(resultEvent.getError().get().getCause() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload().getValue());
     assertNotNull(exceptionListener.sensedException);
@@ -110,7 +110,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
-    assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
+    assertTrue(resultEvent.getError().get().getCause() instanceof IllegalStateException);
 
     assertEquals(null, resultEvent.getMessage().getPayload().getValue());
     assertNotNull(exceptionListener.sensedException);

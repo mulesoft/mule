@@ -167,7 +167,7 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
 
     @Override
     public Event process(Event event) throws MuleException {
-      throw new Fault(event.getError().get().getException().getCause());
+      throw new Fault(event.getError().get().getCause().getCause());
     }
   }
 

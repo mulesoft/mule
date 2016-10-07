@@ -139,7 +139,7 @@ public class MuleInvoker implements Invoker {
       InternalMessage resMessage = responseEvent.getMessage();
 
       if (responseEvent.getError().isPresent()) {
-        Throwable cause = responseEvent.getError().get().getException();
+        Throwable cause = responseEvent.getError().get().getCause();
         if (cause instanceof ComponentException) {
           cause = cause.getCause();
         }

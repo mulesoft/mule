@@ -45,7 +45,7 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
     if (getExpectedType() == null) {
       return errorOptional.isPresent();
     } else if (errorOptional.isPresent()) {
-      return getExpectedType().isAssignableFrom(errorOptional.get().getException().getClass());
+      return getExpectedType().isAssignableFrom(errorOptional.get().getCause().getClass());
     } else {
       return accept(event.getMessage(), builder);
     }

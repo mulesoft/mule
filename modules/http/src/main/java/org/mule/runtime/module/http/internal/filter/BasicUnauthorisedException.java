@@ -39,7 +39,7 @@ public class BasicUnauthorisedException extends UnauthorisedException implements
   }
 
   @Override
-  public Exception getException() {
+  public Throwable getRootCause() {
     return this;
   }
 
