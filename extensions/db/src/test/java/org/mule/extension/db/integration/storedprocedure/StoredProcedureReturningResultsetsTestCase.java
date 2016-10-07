@@ -10,31 +10,17 @@ package org.mule.extension.db.integration.storedprocedure;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.MySqlTestDatabase;
 import org.mule.runtime.api.message.Message;
 
-import java.util.List;
 import java.util.Map;
 
-import org.junit.runners.Parameterized;
-
 public class StoredProcedureReturningResultsetsTestCase extends AbstractStoredProcedureReturningStreamingResultsetsTestCase {
-
-  public StoredProcedureReturningResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

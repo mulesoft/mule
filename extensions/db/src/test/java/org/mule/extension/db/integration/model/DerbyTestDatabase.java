@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.model;
 
+import org.mule.extension.db.integration.DbTestUtil;
 import org.mule.extension.db.integration.model.derbyutil.DerbyTestStoredProcedure;
 
 import java.sql.Connection;
@@ -15,6 +16,11 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 public class DerbyTestDatabase extends AbstractTestDatabase {
+
+  @Override
+  public DbTestUtil.DbType getDbType() {
+    return DbTestUtil.DbType.DERBY;
+  }
 
   public static final String DERBY_ERROR_OBJECT_ALREADY_EXISTS = "X0Y68";
 

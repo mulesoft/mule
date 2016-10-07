@@ -8,24 +8,9 @@
 package org.mule.extension.db.integration.storedprocedure;
 
 import static org.junit.Assume.assumeThat;
-import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
-
-import java.util.List;
-
-import org.junit.runners.Parameterized;
 
 public class StoredProcedureReturningResultsetTestCase extends AbstractStoredProcedureReturningResultsetTestCase {
-
-  public StoredProcedureReturningResultsetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

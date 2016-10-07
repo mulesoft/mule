@@ -10,10 +10,9 @@ package org.mule.extension.db.integration.select;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.db.integration.DbTestUtil.DbType.MYSQL;
 import static org.mule.extension.db.internal.domain.metadata.SelectMetadataResolver.DUPLICATE_COLUMN_LABEL_ERROR;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.TestDbConfig;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
@@ -25,24 +24,13 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 
 import java.sql.Blob;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-
-  public SelectMetadataOutputTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {
@@ -57,7 +45,11 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
     assertFieldOfType(record, "ID", testDatabase.getIdFieldMetaDataType());
     assertFieldOfType(record, "POSITION", testDatabase.getPositionFieldMetaDataType());
     assertFieldOfType(record, "NAME", typeBuilder.stringType().build());
-    assertFieldOfType(record, "PICTURE", typeLoader.load(Blob.class));
+    if (testDatabase.getDbType().equals(MYSQL)) {
+      assertFieldOfType(record, "PICTURE", typeBuilder.binaryType().build());
+    } else {
+      assertFieldOfType(record, "PICTURE", typeLoader.load(Blob.class));
+    }
   }
 
   @Test

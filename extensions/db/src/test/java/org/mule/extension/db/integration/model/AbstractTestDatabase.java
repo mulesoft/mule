@@ -9,6 +9,8 @@ package org.mule.extension.db.integration.model;
 
 import static org.mule.extension.db.integration.model.RegionManager.NORTHWEST_MANAGER;
 import static org.mule.extension.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
+
+import org.mule.extension.db.integration.DbTestUtil;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -44,6 +46,7 @@ public abstract class AbstractTestDatabase {
 
   public abstract void createPlanetTable(Connection connection) throws SQLException;
 
+  public abstract DbTestUtil.DbType getDbType();
 
   public static void executeDdl(DataSource dataSource, String ddl) throws SQLException {
     Connection connection = dataSource.getConnection();

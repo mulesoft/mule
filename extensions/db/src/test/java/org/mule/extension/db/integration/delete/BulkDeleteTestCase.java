@@ -10,12 +10,10 @@ package org.mule.extension.db.integration.delete;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.extension.db.integration.DbTestUtil.assertExpectedUpdateCount;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.model.Planet.MARS;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
 
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
@@ -25,18 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class BulkDeleteTestCase extends AbstractDbIntegrationTestCase {
-
-  public BulkDeleteTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

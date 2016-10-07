@@ -7,13 +7,8 @@
 package org.mule.extension.db.integration.select;
 
 import org.mule.extension.db.integration.AbstractQueryTimeoutTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
 public class SelectTimeoutTestCase extends AbstractQueryTimeoutTestCase {
-
-  public SelectTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

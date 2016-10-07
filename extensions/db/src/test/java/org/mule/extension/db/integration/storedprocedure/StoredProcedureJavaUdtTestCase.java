@@ -13,7 +13,6 @@ import static org.mule.extension.db.integration.TestDbConfig.getDerbyResource;
 import static org.mule.extension.db.integration.TestDbConfig.getOracleResource;
 import static org.mule.extension.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
 import org.mule.runtime.api.message.Message;
 
@@ -26,15 +25,13 @@ import org.junit.runners.Parameterized;
 
 public class StoredProcedureJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 
-  public StoredProcedureJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{2}")
   public static List<Object[]> parameters() {
     List<Object[]> params = new LinkedList<>();
     if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+      final OracleTestDatabase oracleTestDatabase = new OracleTestDatabase();
+      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", oracleTestDatabase,
+          oracleTestDatabase.getDbType()});
     }
 
     if (!getDerbyResource().isEmpty()) {

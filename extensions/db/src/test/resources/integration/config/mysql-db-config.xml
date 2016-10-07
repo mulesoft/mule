@@ -6,10 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:config name="dbConfig">
-        <db:my-sql-connection url="localhost" port="3306" user="root" database="test">
-            <db:connection-properties>
-                <db:connection-property key="user" value="root"/>
-            </db:connection-properties>
-        </db:my-sql-connection>
+        <db:my-sql-connection host="192.168.99.100" port="3306" user="root" password="password" database="xe"/>
     </db:config>
 </mule>

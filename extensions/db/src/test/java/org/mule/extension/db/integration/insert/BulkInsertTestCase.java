@@ -13,9 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
@@ -25,18 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
-
-  public BulkInsertTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

@@ -12,29 +12,14 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.TestDbConfig;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
-import java.util.List;
-
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
-
-  public DeleteMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {
@@ -80,5 +65,4 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
         getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = #[payload]");
     assertThat(parameters.getType(), is(typeBuilder.anyType().build()));
   }
-
 }

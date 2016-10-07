@@ -59,17 +59,23 @@ import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class}, sharedRuntimeLibs = "org.apache.derby:derby")
+@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class},
+    sharedRuntimeLibs = {"org.apache.derby:derby"})
 public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
-  private final String dataSourceConfigResource;
-  protected final AbstractTestDatabase testDatabase;
+  @Parameterized.Parameter(0)
+  public String dataSourceConfigResource;
+  @Parameterized.Parameter(1)
+  public AbstractTestDatabase testDatabase;
+  @Parameterized.Parameter(2)
+  public DbTestUtil.DbType dbType;
+
   protected final BaseTypeBuilder<?> typeBuilder = BaseTypeBuilder.create(JAVA);
   protected final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  public AbstractDbIntegrationTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    this.dataSourceConfigResource = dataSourceConfigResource;
-    this.testDatabase = testDatabase;
+  @Parameterized.Parameters(name = "{2}")
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
   }
 
   @Before

@@ -9,28 +9,14 @@ package org.mule.extension.db.integration.executescript;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-
-import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runners.Parameterized;
 
 public class InvalidExecuteScriptTestCase extends AbstractDbIntegrationTestCase {
-
-  public InvalidExecuteScriptTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
-  }
 
   @Rule
   public ExpectedException expectedException = none();

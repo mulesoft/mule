@@ -10,25 +10,11 @@ import static org.mule.extension.db.integration.TestRecordUtil.assertMessageCont
 import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.TestDbConfig;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
-import java.util.List;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class SelectNameParamOverrideTestCase extends AbstractDbIntegrationTestCase {
-
-  public SelectNameParamOverrideTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

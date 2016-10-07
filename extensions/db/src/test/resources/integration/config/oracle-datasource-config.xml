@@ -12,5 +12,7 @@
         <spring:property name="url" value="jdbc:oracle:thin:pocholo/password@192.168.1.104:1521:XE"/>
     </spring:bean>
 
-    <db:oracle-config name="dbConfig" dataSource-ref="jdbcDataSource"/>
+    <db:config name="dbConfig">
+        <db:data-source-connection dataSourceRef="jdbcDataSource"/>
+    </db:config>
 </mule>

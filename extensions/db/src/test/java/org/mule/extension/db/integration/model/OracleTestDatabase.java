@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.model;
 
+import org.mule.extension.db.integration.DbTestUtil;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.math.BigDecimal;
@@ -19,6 +20,11 @@ import javax.sql.DataSource;
  * Defines an Oracle test database to use with ojdbc7 driver.
  */
 public class OracleTestDatabase extends AbstractTestDatabase {
+
+  @Override
+  public DbTestUtil.DbType getDbType() {
+    return DbTestUtil.DbType.ORACLE;
+  }
 
   @Override
   public void createPlanetTable(Connection connection) throws SQLException {
@@ -305,7 +311,7 @@ public class OracleTestDatabase extends AbstractTestDatabase {
   @Override
   protected void createRegionManagersTable(Connection connection) throws SQLException {
     String ddl = "create table REGION_MANAGERS(" + "REGION_NAME varchar(32) NOT NULL," + "MANAGER_NAME varchar(32) NOT NULL,"
-        + "DETAILS CONTACT_DETAILS NOT NULL," + "PRIMARY KEY (REGION_NAME));";
+        + "DETAILS CONTACT_DETAILS NOT NULL," + "PRIMARY KEY (REGION_NAME))";
 
     executeDdl(connection, ddl);
   }

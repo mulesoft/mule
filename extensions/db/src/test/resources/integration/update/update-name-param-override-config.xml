@@ -42,7 +42,7 @@
 
     <flow name="expressionParam">
         <db:update>
-            <db:sql>update PLANET set NAME='Mercury' where POSITION=#[type]AND NAME = 'Earth'</db:sql>
+            <db:sql>update PLANET set NAME='Mercury' where POSITION=#[type] AND NAME = 'Earth'</db:sql>
         </db:update>
     </flow>
 </mule>

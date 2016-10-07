@@ -5,12 +5,13 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:oracle-config name="dbConfig" url="jdbc:oracle:thin:@192.168.1.104:1521:xe" user="pocholo" password="password">
-        <db:data-types>
-            <db:data-type name="CONTACT_DETAILS" id="2002" className="org.mule.runtime.module.db.integration.model.ContactDetails"/>
-            <db:data-type name="CONTACT_DETAILS_ARRAY" id="2003"/>
-            <db:data-type name="ZIPARRAY" id="2003"/>
-        </db:data-types>
-    </db:oracle-config>
-
+    <db:config name="dbConfig">
+        <db:oracle-connection host="192.168.99.100" port="1521" instance="xe" user="system" password="oracle" >
+            <db:custom-data-types>
+                <db:custom-data-type id="2002" typeName="CONTACT_DETAILS" className="org.mule.extension.db.integration.model.ContactDetails"/>
+                <db:custom-data-type id="2003" typeName="CONTACT_DETAILS_ARRAY"/>
+                <db:custom-data-type id="2003" typeName="ZIPARRAY"/>
+            </db:custom-data-types>
+        </db:oracle-connection>
+    </db:config>
 </mule>

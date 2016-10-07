@@ -232,6 +232,7 @@
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <muleCommonVersion>3.8.0</muleCommonVersion>
+        <allure.junit.version>1.4.23.HOTFIX1</allure.junit.version>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -678,6 +679,16 @@
                         <artifactId>mx4j-impl</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>ru.yandex.qatools.allure</groupId>
+                <artifactId>allure-junit-adaptor</artifactId>
+                <version>${allure.junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.yandex.qatools.allure</groupId>
+                <artifactId>allure-java-annotations</artifactId>
+                <version>${allure.junit.version}</version>
             </dependency>
 
             <!--Logging-->
