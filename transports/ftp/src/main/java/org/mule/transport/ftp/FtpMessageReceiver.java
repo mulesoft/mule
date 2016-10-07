@@ -21,6 +21,7 @@ import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.ConnectException;
 import org.mule.util.lock.LockFactory;
 
 import java.io.FilenameFilter;
@@ -38,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.net.ftp.FTPReply;
@@ -164,6 +166,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             return v.toArray(new FTPFile[v.size()]);
+        }
+        catch (java.net.ConnectException | FTPConnectionClosedException e)
+        {
+            throw new ConnectException(e, this.connector);
         }
         finally
         {
