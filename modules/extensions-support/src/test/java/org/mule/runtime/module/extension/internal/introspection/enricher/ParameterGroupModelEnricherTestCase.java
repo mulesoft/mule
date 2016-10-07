@@ -12,9 +12,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getDeclaration;
 
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;

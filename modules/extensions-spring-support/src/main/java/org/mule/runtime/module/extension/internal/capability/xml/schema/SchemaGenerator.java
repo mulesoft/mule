@@ -10,14 +10,13 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_PREFIX;
-import org.mule.runtime.extension.api.IdempotentExtensionWalker;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
@@ -54,7 +53,7 @@ public class SchemaGenerator {
 
       @Override
       public void onConfiguration(ConfigurationModel model) {
-        schemaBuilder.registerConfigElement((RuntimeConfigurationModel) model);
+        schemaBuilder.registerConfigElement(model);
       }
 
       @Override

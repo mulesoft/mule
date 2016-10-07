@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 

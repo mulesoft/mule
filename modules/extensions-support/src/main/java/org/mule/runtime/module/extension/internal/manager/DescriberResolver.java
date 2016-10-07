@@ -12,8 +12,8 @@ import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
 
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.model.property;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.introspection.ModelProperty;
+import org.mule.runtime.api.meta.model.ModelProperty;
 
 /**
  * A custom model property which marks that an operation is augmenting the functionality of an {@link Extension} which is defined

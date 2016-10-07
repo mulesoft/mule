@@ -18,12 +18,12 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.KNOCKEABLE
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.introspection.display.DisplayModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;

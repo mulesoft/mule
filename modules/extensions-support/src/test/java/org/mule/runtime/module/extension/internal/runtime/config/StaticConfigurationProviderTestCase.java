@@ -9,10 +9,11 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -28,7 +29,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import org.junit.Before;
@@ -61,11 +61,8 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
 
   @Before
   public void before() throws Exception {
-    when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
-    when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-    when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
-    when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
-    when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
+    mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
+    mockInterceptors(configurationModel, null);
     when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
 
@@ -79,7 +76,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
     when(resolverSet.isDynamic()).thenReturn(false);
 
     provider = (LifecycleAwareConfigurationProvider) new DefaultConfigurationProviderFactory()
-        .createStaticConfigurationProvider(CONFIG_NAME, configurationModel, resolverSet,
+        .createStaticConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                            new StaticValueResolver<>(connectionProvider), muleContext);
     super.before();
   }

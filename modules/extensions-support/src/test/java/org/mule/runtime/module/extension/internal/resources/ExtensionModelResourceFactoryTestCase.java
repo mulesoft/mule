@@ -12,7 +12,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MODEL_JSON_FILE_NAME;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;

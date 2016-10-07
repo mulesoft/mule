@@ -12,9 +12,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -34,10 +34,10 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
   protected static final String CONFIG_NAME = "config";
 
   @Mock
-  protected RuntimeExtensionModel extensionModel;
+  protected ExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  protected RuntimeConfigurationModel configurationModel;
+  protected ConfigurationModel configurationModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected DefaultOperationContext operationContext;
@@ -62,7 +62,7 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
 
   @Test
   public void getConfigurationModel() {
-    assertThat(provider.getModel(), is(CoreMatchers.sameInstance(configurationModel)));
+    assertThat(provider.getConfigurationModel(), is(CoreMatchers.sameInstance(configurationModel)));
   }
 
   protected void assertSameInstancesResolved() throws Exception {

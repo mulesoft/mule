@@ -13,9 +13,9 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
-
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -29,8 +29,6 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.time.Time;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
@@ -111,7 +109,7 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public void registerExtension(RuntimeExtensionModel extensionModel) {
+  public void registerExtension(ExtensionModel extensionModel) {
     final String extensionName = extensionModel.getName();
     final String extensionVersion = extensionModel.getVersion();
     final String extensionVendor = extensionModel.getVendor();
@@ -136,7 +134,7 @@ public final class DefaultExtensionManager
     Describer describer = describerResolver.resolve(manifest, classLoader);
     final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
 
-    RuntimeExtensionModel extensionModel =
+    ExtensionModel extensionModel =
         withContextClassLoader(classLoader, () -> extensionFactory.createFrom(describer.describe(context), context));
 
     registerExtension(extensionModel);
@@ -217,7 +215,7 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public Set<RuntimeExtensionModel> getExtensions() {
+  public Set<ExtensionModel> getExtensions() {
     return extensionRegistry.getExtensions();
   }
 
@@ -225,7 +223,7 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public Optional<RuntimeExtensionModel> getExtension(String extensionName) {
+  public Optional<ExtensionModel> getExtension(String extensionName) {
     return extensionRegistry.getExtension(extensionName);
   }
 

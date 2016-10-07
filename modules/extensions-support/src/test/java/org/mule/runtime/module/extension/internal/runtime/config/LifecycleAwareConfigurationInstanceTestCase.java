@@ -30,6 +30,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -88,7 +88,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public ExpectedException expectedException = none();
 
   @Mock
-  private RuntimeConfigurationModel configurationModel;
+  private ConfigurationModel configurationModel;
 
   @Mock
   private Lifecycle value;

@@ -12,34 +12,40 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getDeclaration;
-
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -51,7 +57,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -71,10 +79,8 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionDeclaration extensionDeclaration;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
   private OperationDeclaration connectedOperation;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
   private OperationDeclaration notConnectedOperation;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
@@ -100,20 +106,21 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+
+    connectedOperation = spy(new ExtensionDeclarer().withOperation(CONNECTED_OPERATION)
+        .withModelProperty(connectedImplementingModelProperty)
+        .getDeclaration());
+
+    notConnectedOperation = spy(new ExtensionDeclarer().withOperation(NOT_CONNECTED_OPERATION)
+        .withModelProperty(notConnectedImplementingModelProperty)
+        .getDeclaration());
+
     when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
     when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
     when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
     when(extensionDeclaration.getMessageSources()).thenReturn(asList(connectedSource, notConnectedSource));
     when(extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class))
         .thenReturn(Optional.of(implementingTypeModelProperty));
-
-    when(connectedOperation.getModelProperty(ImplementingMethodModelProperty.class))
-        .thenReturn(Optional.of(connectedImplementingModelProperty));
-    when(connectedOperation.getParameters()).thenReturn(emptyList());
-    when(connectedOperation.getName()).thenReturn(CONNECTED_OPERATION);
-    when(notConnectedOperation.getModelProperty(ImplementingMethodModelProperty.class))
-        .thenReturn(Optional.of(notConnectedImplementingModelProperty));
-    when(notConnectedOperation.getName()).thenReturn(NOT_CONNECTED_OPERATION);
 
     when(connectedSource.getModelProperty(ImplementingTypeModelProperty.class))
         .thenReturn(Optional.of(connectedSourceImplementingTypeModelProperty));
@@ -125,28 +132,39 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
     when(notConnectedSource.getName()).thenReturn(NOT_CONNECTED_SOURCE);
   }
 
+
   @Test
   public void enrichConnectedOperation() throws Exception {
     enricher.enrich(describingContext);
-    ArgumentCaptor<InterceptorFactory> captor = ArgumentCaptor.forClass(InterceptorFactory.class);
-    verify(connectedOperation).addInterceptorFactory(captor.capture());
 
-    InterceptorFactory factory = captor.getValue();
-    assertThat(factory, is(notNullValue()));
-    assertThat(factory.createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+    doAnswer(new Answer<BaseDeclaration>() {
+
+      @Override
+      public BaseDeclaration answer(InvocationOnMock invocationOnMock) throws Throwable {
+        InterceptorsModelProperty property = (InterceptorsModelProperty) invocationOnMock.getArguments()[0];
+        assertThat(property.getInterceptorFactories(), hasSize(1));
+        InterceptorFactory factory = property.getInterceptorFactories().get(0);
+        assertThat(factory, is(notNullValue()));
+        assertThat(factory.createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+
+        return (BaseDeclaration) invocationOnMock.callRealMethod();
+      }
+    }).when(connectedOperation).addModelProperty(isA(InterceptorsModelProperty.class));
+
+    verify(connectedOperation).addModelProperty(isA(InterceptorsModelProperty.class));
   }
 
   @Test
   public void enrichOnlyOnceWhenFlyweight() throws Exception {
     when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, connectedOperation, notConnectedOperation));
     enricher.enrich(describingContext);
-    verify(connectedOperation, times(1)).addInterceptorFactory(any());
+    verify(connectedOperation, times(1)).addModelProperty(isA(InterceptorsModelProperty.class));
   }
 
   @Test
   public void skipNotConnectedOperation() throws Exception {
     enricher.enrich(describingContext);
-    verify(notConnectedOperation, never()).addInterceptorFactory(any(InterceptorFactory.class));
+    verify(notConnectedOperation, never()).addModelProperty(isA(InterceptorsModelProperty.class));
   }
 
 
@@ -164,9 +182,18 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
     enricher.enrich(describingContext);
     OperationDeclaration operationDeclaration =
         getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getOperations(), CONNECTED_OPERATION);
-    ArgumentCaptor<ConnectivityModelProperty> captor = ArgumentCaptor.forClass(ConnectivityModelProperty.class);
-    verify(operationDeclaration, times(1)).addModelProperty(captor.capture());
-    assertThat(captor.getValue().getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
+
+    doAnswer(new Answer<BaseDeclaration>() {
+
+      @Override
+      public BaseDeclaration answer(InvocationOnMock invocationOnMock) throws Throwable {
+        ConnectivityModelProperty property = (ConnectivityModelProperty) invocationOnMock.getArguments()[0];
+        assertThat(property.getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
+        return (BaseDeclaration) invocationOnMock.callRealMethod();
+      }
+    }).when(operationDeclaration).addModelProperty(isA(ConnectivityModelProperty.class));
+
+    verify(operationDeclaration, times(1)).addModelProperty(isA(ConnectivityModelProperty.class));
   }
 
   @Test
@@ -182,7 +209,7 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
     enricher.enrich(describingContext);
     SourceDeclaration sourceDeclaration =
         getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getMessageSources(), CONNECTED_SOURCE);
-    ArgumentCaptor<ConnectivityModelProperty> captor = ArgumentCaptor.forClass(ConnectivityModelProperty.class);
+    ArgumentCaptor<ConnectivityModelProperty> captor = forClass(ConnectivityModelProperty.class);
     verify(sourceDeclaration, times(1)).addModelProperty(captor.capture());
     assertThat(captor.getValue().getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
   }

@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;

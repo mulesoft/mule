@@ -10,9 +10,9 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.extension.api.introspection.ModelProperty;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.NamedDeclaration;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 
 import java.util.List;
 import java.util.Optional;

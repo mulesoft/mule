@@ -13,15 +13,16 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYP
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isNullType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 
 import java.util.List;
@@ -35,12 +36,12 @@ import java.util.stream.Stream;
  */
 class BaseMetadataDelegate {
 
-  protected final RuntimeComponentModel component;
+  protected final ComponentModel component;
   protected final MetadataResolverFactory resolverFactory;
 
-  BaseMetadataDelegate(RuntimeComponentModel component) {
+  BaseMetadataDelegate(ComponentModel component) {
     this.component = component;
-    this.resolverFactory = component.getMetadataResolverFactory();
+    this.resolverFactory = getMetadataResolverFactory(component);
   }
 
   /**

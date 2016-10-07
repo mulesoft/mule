@@ -7,10 +7,18 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.extension.api.introspection.display.LayoutModel.builderFrom;
+import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.Query;
@@ -19,14 +27,6 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ComponentDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
@@ -39,6 +39,7 @@ import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolver
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
@@ -120,7 +121,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
   private void declareMetadataResolverFactory(ComponentDeclaration<? extends ComponentDeclaration> declaration,
                                               MetadataScopeAdapter metadataScope) {
     MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-    declaration.setMetadataResolverFactory(metadataResolverFactory);
+    declaration.addModelProperty(new MetadataResolverFactoryModelProperty(metadataResolverFactory));
     declareMetadataKeyId(declaration);
     declareOutputResolvers(declaration, metadataScope);
     declareInputResolvers(declaration, metadataScope);
@@ -128,8 +129,9 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 
   private void enrichWithDsql(OperationDeclaration declaration, Method method) {
     Query query = method.getAnnotation(Query.class);
-    declaration.setMetadataResolverFactory(new QueryMetadataResolverFactory(query.nativeOutputResolver(),
-                                                                            query.entityResolver()));
+    declaration.addModelProperty(new MetadataResolverFactoryModelProperty(
+                                                                          new QueryMetadataResolverFactory(query
+                                                                              .nativeOutputResolver(), query.entityResolver())));
     addQueryModelProperties(declaration, query);
     declareDynamicType(declaration.getOutput());
     declareMetadataKeyId(declaration);
@@ -143,7 +145,8 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
         .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).get()
             .getParameter().isAnnotationPresent(MetadataKeyId.class))
         .findFirst()
-        .orElseThrow(() -> new IllegalParameterModelDefinitionException("Query operation must have a parameter annotated with @MetadataKeyId"));
+        .orElseThrow(() -> new IllegalParameterModelDefinitionException(
+                                                                        "Query operation must have a parameter annotated with @MetadataKeyId"));
 
     parameterDeclaration.addModelProperty(new QueryParameterModelProperty(query.translator()));
     parameterDeclaration.setLayoutModel(builderFrom(parameterDeclaration.getLayoutModel()).asQuery().build());

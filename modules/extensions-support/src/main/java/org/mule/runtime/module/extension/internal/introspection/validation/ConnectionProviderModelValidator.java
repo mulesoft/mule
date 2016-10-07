@@ -11,23 +11,23 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.extension.api.ExtensionWalker;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.runtime.extension.api.IdempotentExtensionWalker;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -61,7 +61,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator {
 
       @Override
       public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-        validateTransactions(extensionModel, (RuntimeConnectionProviderModel) model);
+        validateTransactions(extensionModel, model);
         if (owner instanceof ConfigurationModel) {
           configLevelConnectionProviders.put((ConfigurationModel) owner, model);
         } else {
@@ -74,17 +74,18 @@ public final class ConnectionProviderModelValidator implements ModelValidator {
     validateConfigLevelConnectionTypes(extensionModel, configLevelConnectionProviders);
   }
 
-  private void validateTransactions(ExtensionModel extensionModel, RuntimeConnectionProviderModel connectionProviderModel) {
+  private void validateTransactions(ExtensionModel extensionModel, ConnectionProviderModel connectionProviderModel) {
     Class<ConnectionProvider> providerType = (Class<ConnectionProvider>) connectionProviderModel
         .getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType).orElse(null);
 
+    final Class<?> connectionType = MuleExtensionUtils.getConnectionType(connectionProviderModel);
     if (providerType != null && CachedConnectionProvider.class.isAssignableFrom(providerType)
-        && TransactionalConnection.class.isAssignableFrom(connectionProviderModel.getConnectionType())) {
+        && TransactionalConnection.class.isAssignableFrom(connectionType)) {
       throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' contains a cached connection provider of name '%s' which provides connections of "
           + "transactional type '%s'. Transactional connections cannot be produced by cached providers, since the "
           + "same connection cannot join two different transactions at once", extensionModel.getName(),
                                                                          connectionProviderModel.getName(),
-                                                                         connectionProviderModel.getConnectionType().getName()));
+                                                                         connectionType.getName()));
     }
   }
 
@@ -94,9 +95,8 @@ public final class ConnectionProviderModelValidator implements ModelValidator {
       return;
     }
 
-    for (ConnectionProviderModel model : globalConnectionProviders) {
-      RuntimeConnectionProviderModel connectionProviderModel = (RuntimeConnectionProviderModel) model;
-      final Class<?> connectionType = connectionProviderModel.getConnectionType();
+    for (ConnectionProviderModel connectionProviderModel : globalConnectionProviders) {
+      final Class<?> connectionType = MuleExtensionUtils.getConnectionType(connectionProviderModel);
 
       new IdempotentExtensionWalker() {
 
@@ -118,7 +118,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator {
                                                   Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders) {
     configLevelConnectionProviders.asMap().forEach((configModel, providerModels) -> {
       for (ConnectionProviderModel providerModel : providerModels) {
-        Class<?> connectionType = ((RuntimeConnectionProviderModel) providerModel).getConnectionType();
+        Class<?> connectionType = MuleExtensionUtils.getConnectionType(providerModel);
         configModel.getOperationModels()
             .forEach(operationModel -> validateConnectionTypes(extensionModel, providerModel, operationModel, connectionType));
       }

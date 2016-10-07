@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 
 /**
  * Exception to signal that too many configs are eligible for executing a component and thus the user should manually select one

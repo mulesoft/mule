@@ -11,6 +11,8 @@ import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescripto
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
@@ -27,11 +29,8 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 
 import java.util.List;
@@ -48,16 +47,14 @@ import java.util.List;
  */
 public class MetadataMediator {
 
-  private final RuntimeComponentModel component;
+  private final ComponentModel component;
   private final List<ParameterModel> metadataKeyParts;
   private final MetadataKeyIdObjectResolver keyIdObjectResolver;
   private final MetadataKeysDelegate keysDelegate;
   private final MetadataOutputDelegate outputDelegate;
   private final MetadataInputDelegate inputDelegate;
 
-
-
-  public MetadataMediator(RuntimeComponentModel componentModel) {
+  public MetadataMediator(ComponentModel componentModel) {
     this.component = componentModel;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
     this.keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel, metadataKeyParts);
@@ -151,7 +148,7 @@ public class MetadataMediator {
     return mergeResults(componentDescriptor, output, input);
   }
 
-  private List<ParameterModel> getMetadataKeyParts(RuntimeComponentModel componentModel) {
+  private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
     return componentModel.getParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
         .collect(toList());

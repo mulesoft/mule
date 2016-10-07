@@ -7,17 +7,17 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;

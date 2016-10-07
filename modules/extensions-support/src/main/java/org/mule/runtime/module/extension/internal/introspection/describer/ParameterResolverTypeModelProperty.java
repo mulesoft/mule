@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.ModelProperty;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 /**

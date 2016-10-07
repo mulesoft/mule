@@ -20,8 +20,8 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.S
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CURRENT_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;

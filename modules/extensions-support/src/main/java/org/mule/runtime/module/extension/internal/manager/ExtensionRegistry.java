@@ -10,15 +10,14 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
@@ -56,11 +55,11 @@ final class ExtensionRegistry {
         @Override
         public List<ConfigurationProvider> load(ExtensionModel key) throws Exception {
           return registry.lookupObjects(ConfigurationProvider.class).stream()
-              .filter(provider -> provider.getModel().getExtensionModel() == key).collect(new ImmutableListCollector<>());
+              .filter(provider -> provider.getExtensionModel() == key).collect(new ImmutableListCollector<>());
         }
       });
 
-  private final Map<ExtensionEntityKey, RuntimeExtensionModel> extensions = new ConcurrentHashMap<>();
+  private final Map<ExtensionEntityKey, ExtensionModel> extensions = new ConcurrentHashMap<>();
   private final Set<Class<? extends Enum>> enumClasses = new HashSet<>();
   private final MuleRegistry registry;
 
@@ -79,7 +78,7 @@ final class ExtensionRegistry {
    * @param name the registration name you want for the {@code extension}
    * @param extensionModel a {@link ExtensionModel}
    */
-  void registerExtension(String name, RuntimeExtensionModel extensionModel) {
+  void registerExtension(String name, ExtensionModel extensionModel) {
     extensions.put(new ExtensionEntityKey(name), extensionModel);
     getParameterClasses(extensionModel).stream().filter(type -> Enum.class.isAssignableFrom(type)).forEach(type -> {
       final Class<Enum> enumClass = (Class<Enum>) type;
@@ -97,7 +96,7 @@ final class ExtensionRegistry {
   /**
    * @return an immutable view of the currently registered {@link ExtensionModel}
    */
-  Set<RuntimeExtensionModel> getExtensions() {
+  Set<ExtensionModel> getExtensions() {
     return ImmutableSet.copyOf(extensions.values());
   }
 
@@ -105,7 +104,7 @@ final class ExtensionRegistry {
    * @return an {@link Optional} with the {@link ExtensionModel} which name and vendor equals {@code extensionName} and
    *         {@code vendor}
    */
-  Optional<RuntimeExtensionModel> getExtension(String extensionName) {
+  Optional<ExtensionModel> getExtension(String extensionName) {
     return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName)));
   }
 
@@ -158,7 +157,7 @@ final class ExtensionRegistry {
                                      e);
     }
 
-    providersByExtension.invalidate(configurationProvider.getModel().getExtensionModel());
+    providersByExtension.invalidate(configurationProvider.getExtensionModel());
   }
 
   /**

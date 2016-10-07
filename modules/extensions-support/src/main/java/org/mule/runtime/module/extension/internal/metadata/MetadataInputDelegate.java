@@ -11,6 +11,8 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
@@ -22,8 +24,6 @@ import org.mule.runtime.api.metadata.descriptor.builder.ParameterMetadataDescrip
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,13 +31,13 @@ import java.util.Optional;
 
 /**
  * Metadata service delegate implementations that handles the resolution
- * of a {@link RuntimeComponentModel} {@link InputMetadataDescriptor}
+ * of a {@link ComponentModel} {@link InputMetadataDescriptor}
  *
  * @since 4.0
  */
 class MetadataInputDelegate extends BaseMetadataDelegate {
 
-  MetadataInputDelegate(RuntimeComponentModel componentModel) {
+  MetadataInputDelegate(ComponentModel componentModel) {
     super(componentModel);
   }
 

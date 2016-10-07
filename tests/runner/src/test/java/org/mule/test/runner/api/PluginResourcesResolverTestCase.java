@@ -22,7 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.runtime.api.MuleVersion;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;

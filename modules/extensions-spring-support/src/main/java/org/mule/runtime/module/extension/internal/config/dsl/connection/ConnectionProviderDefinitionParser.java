@@ -16,7 +16,7 @@ import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builde
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;

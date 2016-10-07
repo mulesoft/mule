@@ -11,12 +11,12 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;

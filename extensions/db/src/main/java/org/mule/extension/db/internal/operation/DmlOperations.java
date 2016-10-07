@@ -14,7 +14,7 @@ import static org.mule.extension.db.internal.domain.query.QueryType.SELECT;
 import static org.mule.extension.db.internal.domain.query.QueryType.STORE_PROCEDURE_CALL;
 import static org.mule.extension.db.internal.domain.query.QueryType.TRUNCATE;
 import static org.mule.extension.db.internal.domain.query.QueryType.UPDATE;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.internal.StatementStreamingResultSetCloser;
 import org.mule.extension.db.api.param.QueryDefinition;

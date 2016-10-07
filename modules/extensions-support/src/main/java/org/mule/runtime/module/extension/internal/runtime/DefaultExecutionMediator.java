@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -20,9 +22,7 @@ import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.work.SerialWorkManager;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
@@ -70,7 +70,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private final ConnectionManagerAdapter connectionManager;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
 
-  public DefaultExecutionMediator(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
+  public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel,
                                   ConnectionManagerAdapter connectionManager) {
     this.connectionManager = connectionManager;
     this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel);

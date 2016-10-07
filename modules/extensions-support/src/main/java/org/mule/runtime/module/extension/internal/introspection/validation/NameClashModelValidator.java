@@ -21,21 +21,21 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.DescribedObject;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.ExtensionWalker;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.Described;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
@@ -56,7 +56,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Validates names clashes in the model by comparing:
  * <ul>
- * <li>The {@link Named#getName()} value of all the {@link ConfigurationModel}, {@link OperationModel} and
+ * <li>The {@link NamedObject#getName()} value of all the {@link ConfigurationModel}, {@link OperationModel} and
  * {@link ConnectionProviderModel}</li>
  * <li>Makes sure that there no two {@link ParameterModel}s with the same name but different types, for those which represent an
  * object</li>
@@ -76,7 +76,7 @@ public final class NameClashModelValidator implements ModelValidator {
   private class ValidationDelegate {
 
     private final ExtensionModel extensionModel;
-    private final Set<DescribedReference<Named>> namedObjects = new HashSet<>();
+    private final Set<DescribedReference<NamedObject>> namedObjects = new HashSet<>();
     private final Map<String, DescribedParameter> singularizedObjects = new HashMap<>();
     private final Multimap<String, TopLevelParameter> topLevelParameters = LinkedListMultimap.create();
 
@@ -121,7 +121,7 @@ public final class NameClashModelValidator implements ModelValidator {
           validateSingularizedNameClash(model);
         }
 
-        private void registerNamedObject(Named named) {
+        private void registerNamedObject(NamedObject named) {
           namedObjects.add(new DescribedReference<>(named));
         }
       }.walk(extensionModel);
@@ -183,24 +183,24 @@ public final class NameClashModelValidator implements ModelValidator {
       }
     }
 
-    private Set<String> collectRepeatedNames(List<? extends Named> namedObject) {
+    private Set<String> collectRepeatedNames(List<? extends NamedObject> namedObject) {
       Set<String> names = new HashSet<>();
       return namedObject.stream()
           .filter(parameter -> !names.add(parameter.getName()))
-          .map(Named::getName).collect(toSet());
+          .map(NamedObject::getName).collect(toSet());
     }
 
-    private void validateNameClashes(Collection<? extends Named>... collections) {
-      Multimap<String, Named> names = LinkedListMultimap.create();
+    private void validateNameClashes(Collection<? extends NamedObject>... collections) {
+      Multimap<String, NamedObject> names = LinkedListMultimap.create();
       stream(collections).flatMap(Collection::stream).forEach(named -> names.put(hyphenize(named.getName()), named));
       validateNameClashBetweenElements(names);
     }
 
-    private void validateNameClashBetweenElements(Multimap<String, Named> names) {
+    private void validateNameClashBetweenElements(Multimap<String, NamedObject> names) {
       names.asMap().entrySet().forEach(entry -> {
-        List<Named> values = (List<Named>) entry.getValue();
+        List<NamedObject> values = (List<NamedObject>) entry.getValue();
         if (values.size() > 1) {
-          Set<String> offendingTypes = values.stream().map(Named::getName).collect(toSet());
+          Set<String> offendingTypes = values.stream().map(NamedObject::getName).collect(toSet());
           StringBuilder errorMessage =
               new StringBuilder(format("Extension '%s' contains %d components ", extensionModel.getName(), values.size()));
 
@@ -295,7 +295,7 @@ public final class NameClashModelValidator implements ModelValidator {
   }
 
 
-  private class TopLevelParameter implements Named, Described {
+  private class TopLevelParameter implements NamedObject, DescribedObject {
 
     protected final ParameterModel parameterModel;
     protected final String owner;
@@ -345,7 +345,7 @@ public final class NameClashModelValidator implements ModelValidator {
   }
 
 
-  private class DescribedReference<T extends Named> extends Reference<T> implements Named, Described {
+  private class DescribedReference<T extends NamedObject> extends Reference<T> implements NamedObject, DescribedObject {
 
     private DescribedReference(T value) {
       super(value);
@@ -358,7 +358,7 @@ public final class NameClashModelValidator implements ModelValidator {
 
     @Override
     public String getDescription() {
-      Named value = get();
+      NamedObject value = get();
       if (value instanceof ConfigurationModel) {
         return "configuration";
       } else if (value instanceof OperationModel) {
@@ -387,7 +387,7 @@ public final class NameClashModelValidator implements ModelValidator {
 
   private class DescribedParameter extends DescribedReference<ParameterModel> {
 
-    private DescribedReference<? extends Named> parent;
+    private DescribedReference<? extends NamedObject> parent;
 
     private DescribedParameter(ParameterModel value, ParameterizedModel parent) {
       super(value);

@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.config.dsl.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.time.TimeSupplier;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
@@ -39,7 +39,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     implements ObjectFactory<ConfigurationProvider> {
 
   private final String name;
-  private final RuntimeConfigurationModel configurationModel;
+  private final ExtensionModel extensionModel;
+  private final ConfigurationModel configurationModel;
   private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
   private final MuleContext muleContext;
 
@@ -52,8 +53,12 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private TimeSupplier timeSupplier;
 
 
-  ConfigurationProviderObjectFactory(String name, RuntimeConfigurationModel configurationModel, MuleContext muleContext) {
+  ConfigurationProviderObjectFactory(String name,
+                                     ExtensionModel extensionModel,
+                                     ConfigurationModel configurationModel,
+                                     MuleContext muleContext) {
     this.name = name;
+    this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     this.muleContext = muleContext;
   }
@@ -74,11 +79,19 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     try {
       if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
         configurationProvider =
-            configurationProviderFactory.createDynamicConfigurationProvider(name, configurationModel, resolverSet,
-                                                                            connectionProviderResolver, getDynamicConfigPolicy());
+            configurationProviderFactory.createDynamicConfigurationProvider(name, extensionModel,
+                                                                            configurationModel,
+                                                                            resolverSet,
+                                                                            connectionProviderResolver,
+                                                                            getDynamicConfigPolicy());
       } else {
         configurationProvider = configurationProviderFactory
-            .createStaticConfigurationProvider(name, configurationModel, resolverSet, connectionProviderResolver, muleContext);
+            .createStaticConfigurationProvider(name,
+                                               extensionModel,
+                                               configurationModel,
+                                               resolverSet,
+                                               connectionProviderResolver,
+                                               muleContext);
       }
 
       muleContext.getInjector().inject(configurationProvider);
@@ -100,7 +113,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private ValueResolver<ConnectionProvider> getConnectionProviderResolver() {
     return connectionProviderResolver.orElseGet(() -> {
       if (requiresConnection) {
-        return new ImplicitConnectionProviderValueResolver(name, configurationModel, muleContext);
+        return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, muleContext);
       }
       return new StaticValueResolver<>(null);
     });

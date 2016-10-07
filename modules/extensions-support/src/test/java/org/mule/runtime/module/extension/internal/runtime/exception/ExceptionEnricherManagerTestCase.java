@@ -13,17 +13,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Before;
@@ -39,10 +39,10 @@ public class ExceptionEnricherManagerTestCase {
   private static final String ERROR_MESSAGE = "ERROR MESSAGE";
 
   @Mock
-  private RuntimeExtensionModel extensionModel;
+  private ExtensionModel extensionModel;
 
   @Mock
-  private RuntimeSourceModel sourceModel;
+  private SourceModel sourceModel;
 
   @Mock
   private ExceptionEnricherFactory extensionFactory;
@@ -61,11 +61,11 @@ public class ExceptionEnricherManagerTestCase {
   @Before
   public void beforeTest() {
     when(extensionFactory.createEnricher()).thenReturn(extensionEnricher);
-    when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.of(extensionFactory));
+    mockExceptionEnricher(extensionModel, extensionFactory);
+    mockExceptionEnricher(sourceModel, sourceFactory);
 
     when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(new HeisenbergException(ERROR_MESSAGE));
     when(sourceFactory.createEnricher()).thenReturn(sourceEnricher);
-    when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.of(sourceFactory));
 
     manager = new ExceptionEnricherManager(extensionModel, sourceModel);
   }
@@ -100,7 +100,7 @@ public class ExceptionEnricherManagerTestCase {
   @Test
   public void findCorrectEnricher() {
     assertThat(manager.getExceptionEnricher(), is(sourceEnricher));
-    when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+    mockExceptionEnricher(sourceModel, null);
     ExceptionEnricherManager manager = new ExceptionEnricherManager(extensionModel, sourceModel);
     assertThat(manager.getExceptionEnricher(), is(extensionEnricher));
   }

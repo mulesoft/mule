@@ -7,7 +7,7 @@
 
 package org.mule.test.runner.api;
 
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;

@@ -13,11 +13,11 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_IN
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
 
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.display.LayoutModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 

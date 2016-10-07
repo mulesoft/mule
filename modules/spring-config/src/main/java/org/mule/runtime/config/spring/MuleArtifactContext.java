@@ -64,7 +64,7 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 
 import com.google.common.collect.ImmutableList;
 

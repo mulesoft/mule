@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.api.meta.ExpressionSupport;
 
 @Extensible
 public class ExtensibleOwner {

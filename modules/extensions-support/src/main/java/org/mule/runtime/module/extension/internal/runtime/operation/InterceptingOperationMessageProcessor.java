@@ -7,22 +7,21 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.NotificationUtils;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
@@ -47,7 +46,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
 
   private Processor next;
 
-  public InterceptingOperationMessageProcessor(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
+  public InterceptingOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
                                                String configurationProviderName, String target, ResolverSet resolverSet,
                                                ExtensionManagerAdapter extensionManager) {
     super(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);

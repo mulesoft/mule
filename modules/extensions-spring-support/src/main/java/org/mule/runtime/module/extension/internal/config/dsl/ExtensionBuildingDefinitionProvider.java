@@ -18,6 +18,13 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
@@ -25,21 +32,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.IdempotentExtensionWalker;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
@@ -145,14 +141,14 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
         @Override
         public void onConfiguration(ConfigurationModel model) {
-          parseWith(new ConfigurationDefinitionParser(definitionBuilder, (RuntimeConfigurationModel) model, dslSyntaxResolver,
+          parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
                                                       muleContext, parsingContext));
         }
 
         @Override
         public void onOperation(OperationModel model) {
-          parseWith(new OperationDefinitionParser(definitionBuilder, (RuntimeExtensionModel) extensionModel,
-                                                  (RuntimeOperationModel) model, dslSyntaxResolver, muleContext, parsingContext));
+          parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
+                                                  model, dslSyntaxResolver, muleContext, parsingContext));
         }
 
         @Override
@@ -163,8 +159,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
         @Override
         public void onSource(SourceModel model) {
-          parseWith(new SourceDefinitionParser(definitionBuilder, (RuntimeExtensionModel) extensionModel,
-                                               (RuntimeSourceModel) model, dslSyntaxResolver, muleContext, parsingContext));
+          parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver, muleContext,
+                                               parsingContext));
         }
 
         @Override

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

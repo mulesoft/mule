@@ -12,13 +12,13 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isTransactional;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
@@ -43,7 +43,7 @@ public class DefaultOperationContext implements OperationContextAdapter {
   private final Optional<ConfigurationInstance> configuration;
   private final Map<String, Object> parameters;
   private final Map<String, Object> variables = new HashMap<>();
-  private final RuntimeOperationModel operationModel;
+  private final OperationModel operationModel;
   private final Event event;
   private final MuleContext muleContext;
   private Optional<TransactionConfig> transactionConfig = null;
@@ -54,13 +54,13 @@ public class DefaultOperationContext implements OperationContextAdapter {
    *
    * @param configuration the {@link ConfigurationInstance} that the operation will use
    * @param parameters the parameters that the operation will use
-   * @param operationModel a {@link RuntimeOperationModel} for the operation being executed
+   * @param operationModel a {@link OperationModel} for the operation being executed
    * @param event the current {@link Event}
    */
   public DefaultOperationContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,
                                  ResolverSetResult parameters,
-                                 RuntimeOperationModel operationModel,
+                                 OperationModel operationModel,
                                  Event event,
                                  MuleContext muleContext) {
 
@@ -176,7 +176,7 @@ public class DefaultOperationContext implements OperationContextAdapter {
    * {@inheritDoc}
    */
   @Override
-  public RuntimeOperationModel getOperationModel() {
+  public OperationModel getOperationModel() {
     return operationModel;
   }
 

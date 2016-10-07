@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.SubTypesModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

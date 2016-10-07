@@ -7,15 +7,15 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import org.mule.runtime.extension.api.ExtensionWalker;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 
 import java.util.Optional;
 
@@ -36,9 +36,9 @@ public final class ConfigurationModelValidator implements ModelValidator {
 
       @Override
       public void onOperation(HasOperationModels owner, OperationModel operationModel) {
-        if (owner instanceof RuntimeConfigurationModel) {
+        if (owner instanceof ConfigurationModel) {
 
-          Class<?> configType = ((RuntimeConfigurationModel) owner).getConfigurationFactory().getObjectType();
+          Class<?> configType = getConfigurationFactory((ConfigurationModel) owner).getObjectType();
           Optional<Class<?>> operationConfigParameterType = operationModel.getModelProperty(ConfigTypeModelProperty.class)
               .map(modelProperty -> getType(modelProperty.getConfigType()));
 
@@ -49,7 +49,7 @@ public final class ConfigurationModelValidator implements ModelValidator {
                                                                                  model.getName(),
                                                                                  operationModel.getName(),
                                                                                  operationConfigParameterType.get().getName(),
-                                                                                 ((RuntimeConfigurationModel) owner).getName(),
+                                                                                 ((ConfigurationModel) owner).getName(),
                                                                                  configType.getName()));
           }
         }

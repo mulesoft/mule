@@ -25,19 +25,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -106,13 +106,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ExceptionEnricher exceptionEnricher;
 
   @Mock
-  private RuntimeConfigurationModel configurationModel;
+  private ConfigurationModel configurationModel;
 
   @Mock
-  private RuntimeExtensionModel extensionModel;
+  private ExtensionModel extensionModel;
 
   @Mock
-  private RuntimeOperationModel operationModel;
+  private OperationModel operationModel;
 
   @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
@@ -127,10 +127,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(configurationInstance.getStatistics()).thenReturn(configurationStats);
     when(configurationInstance.getName()).thenReturn(DUMMY_NAME);
     when(configurationInstance.getModel()).thenReturn(configurationModel);
-    when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
     when(extensionModel.getName()).thenReturn(DUMMY_NAME);
-    when(extensionModel.getExceptionEnricherFactory()).thenReturn(empty());
-    when(operationModel.getExceptionEnricherFactory()).thenReturn(empty());
+    mockExceptionEnricher(extensionModel, null);
+    mockExceptionEnricher(operationModel, null);
     when(operationExecutor.execute(operationContext)).thenReturn(result);
     when(operationExceptionExecutor.execute(operationContext)).thenThrow(exception);
     when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
@@ -229,9 +228,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public void enrichThrownException() throws Throwable {
     expectedException.expect(HeisenbergException.class);
     expectedException.expectMessage(ERROR);
-    ExceptionEnricherFactory exceptionEnricherFactory = mock(ExceptionEnricherFactory.class);
-    when(exceptionEnricherFactory.createEnricher()).thenReturn(exceptionEnricher);
-    when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.of(exceptionEnricherFactory));
+    mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext))
         .execute(operationExceptionExecutor, operationContext);
   }

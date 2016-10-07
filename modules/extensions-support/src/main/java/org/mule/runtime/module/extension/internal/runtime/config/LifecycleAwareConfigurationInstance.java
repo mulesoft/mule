@@ -18,6 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -30,8 +31,6 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -63,7 +62,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationInstance.class);
 
   private final String name;
-  private final RuntimeConfigurationModel model;
+  private final ConfigurationModel model;
   private final Object value;
   private final Optional<ConnectionProvider> connectionProvider;
 
@@ -87,7 +86,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @param interceptors the {@link List} of {@link Interceptor interceptors} that applies
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
-  public LifecycleAwareConfigurationInstance(String name, RuntimeConfigurationModel model, Object value,
+  public LifecycleAwareConfigurationInstance(String name, ConfigurationModel model, Object value,
                                              List<Interceptor> interceptors, Optional<ConnectionProvider> connectionProvider) {
     super(interceptors);
     this.name = name;
@@ -235,7 +234,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * {@inheritDoc}
    */
   @Override
-  public RuntimeConfigurationModel getModel() {
+  public ConfigurationModel getModel() {
     return model;
   }
 

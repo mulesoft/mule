@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.model.property;
 
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
-import org.mule.runtime.extension.api.introspection.ModelProperty;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 
 /**
  * An immutable model property which indicates that the owning {@link EnrichableModel} was derived from a given {@link #type}

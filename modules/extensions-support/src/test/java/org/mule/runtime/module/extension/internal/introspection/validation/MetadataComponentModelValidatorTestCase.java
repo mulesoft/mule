@@ -15,11 +15,16 @@ import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -27,20 +32,15 @@ import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -65,18 +65,19 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public ExpectedException exception = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private RuntimeExtensionModel extensionModel;
+  private ExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private DictionaryType dictionaryType;
 
   @Mock
-  private RuntimeOperationModel operationModel;
+  private OperationModel operationModel;
 
   @Mock
-  private RuntimeSourceModel sourceModel;
+  private SourceModel sourceModel;
 
   private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
+
 
   public static class SimpleOutputResolver implements OutputTypeResolver<String>, MetadataAttributesResolver<String> {
 
@@ -98,6 +99,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     }
   }
 
+
   public static class DifferentCategoryResolver implements TypeKeysResolver {
 
     @Override
@@ -110,6 +112,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
       return "NotSimpleOutputResolver";
     }
   }
+
 
   public static class EmptyCategoryName implements TypeKeysResolver {
 
@@ -131,11 +134,11 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
     when(operationModel.getName()).thenReturn("operation");
-    when(operationModel.getMetadataResolverFactory()).thenReturn(new NullMetadataResolverFactory());
+    mockMetadataResolverFactory(operationModel, null);
 
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
     when(sourceModel.getName()).thenReturn("source");
-    when(sourceModel.getMetadataResolverFactory()).thenReturn(new NullMetadataResolverFactory());
+    mockMetadataResolverFactory(sourceModel, null);
 
     MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class));
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
@@ -144,9 +147,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void valid() {
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
-                                                       NullMetadataResolver.class));
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
+                                                                   NullMetadataResolver.class));
     validator.validate(extensionModel);
   }
 
@@ -171,9 +174,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void operationReturnsDictionaryTypeWithPojoValue() {
     when(dictionaryType.getValueType()).thenReturn(toMetadataType(Apple.class));
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
-                                                       NullMetadataResolver.class));
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
+                                                                   NullMetadataResolver.class));
     validator.validate(extensionModel);
   }
 
@@ -195,9 +198,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void sourceReturnsPojoType() {
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
-                                                       NullMetadataResolver.class));
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
+                                                                   NullMetadataResolver.class));
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Apple.class), false, emptySet()));
     validator.validate(extensionModel);
   }
@@ -205,9 +208,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Test
   public void sourceReturnsObjectTypeWithDefinedOutputResolver() {
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
-                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
+                                                                                SimpleOutputResolver.class,
+                                                                                SimpleOutputResolver.class));
     validator.validate(extensionModel);
   }
 
@@ -215,27 +218,27 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void sourceReturnsDictionaryTypeWithDefinedOutputResolver() {
     when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
-                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
+                                                                                SimpleOutputResolver.class,
+                                                                                SimpleOutputResolver.class));
     validator.validate(extensionModel);
   }
 
   public void metadataResolverWithDifferentCategories() {
     exception.expect(IllegalModelDefinitionException.class);
 
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(DifferentCategoryResolver.class, emptyMap(),
-                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(DifferentCategoryResolver.class, emptyMap(),
+                                                                                SimpleOutputResolver.class,
+                                                                                SimpleOutputResolver.class));
     validator.validate(extensionModel);
   }
 
   public void metadataResolverWithEmptyCategoryName() {
     exception.expect(IllegalModelDefinitionException.class);
 
-    when(sourceModel.getMetadataResolverFactory())
-        .thenReturn(new DefaultMetadataResolverFactory(EmptyCategoryName.class, emptyMap(),
-                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(EmptyCategoryName.class, emptyMap(),
+                                                                                SimpleOutputResolver.class,
+                                                                                SimpleOutputResolver.class));
     validator.validate(extensionModel);
   }
 
@@ -299,6 +302,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     @Parameter
     private String partTwo;
   }
+
 
   public class ValidMetadataKeyIdPojo {
 

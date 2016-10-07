@@ -9,11 +9,11 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.api.IdempotentExtensionWalker;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;

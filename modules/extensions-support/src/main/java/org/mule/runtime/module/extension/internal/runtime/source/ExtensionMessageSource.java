@@ -14,12 +14,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -39,9 +41,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.execution.NullCompletionHandler;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -75,7 +74,7 @@ public class ExtensionMessageSource extends ExtensionComponent
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionMessageSource.class);
 
-  private final RuntimeSourceModel sourceModel;
+  private final SourceModel sourceModel;
   private final SourceFactory sourceFactory;
   private final ThreadingProfile threadingProfile;
   private final RetryPolicyTemplate retryPolicyTemplate;
@@ -84,7 +83,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   private SourceWrapper source;
   private WorkManager workManager;
 
-  public ExtensionMessageSource(RuntimeExtensionModel extensionModel, RuntimeSourceModel sourceModel, SourceFactory sourceFactory,
+  public ExtensionMessageSource(ExtensionModel extensionModel, SourceModel sourceModel, SourceFactory sourceFactory,
                                 String configurationProviderName, ThreadingProfile threadingProfile,
                                 RetryPolicyTemplate retryPolicyTemplate, ExtensionManagerAdapter managerAdapter) {
     super(extensionModel, sourceModel, configurationProviderName, managerAdapter);
@@ -327,9 +326,9 @@ public class ExtensionMessageSource extends ExtensionComponent
    */
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
-    RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
+    ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
-        && !configurationModel.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
+        && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
       throw new IllegalOperationException(String.format(
                                                         "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                             + "The selected config does not support that operation.",

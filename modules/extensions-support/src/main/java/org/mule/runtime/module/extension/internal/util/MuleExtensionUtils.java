@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -14,35 +16,53 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOI
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.InterceptableModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.source.SourceFactory;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.model.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
@@ -54,6 +74,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -66,7 +88,7 @@ public class MuleExtensionUtils {
    * Returns {@code true} if any of the items in {@code resolvers} return true for the {@link ValueResolver#isDynamic()} method
    *
    * @param resolvers a {@link Iterable} with instances of {@link ValueResolver}
-   * @param <T> the generic type of the {@link ValueResolver} items
+   * @param <T>       the generic type of the {@link ValueResolver} items
    * @return {@code true} if at least one {@link ValueResolver} is dynamic, {@code false} otherwise
    */
   public static <T extends Object> boolean hasAnyDynamic(Iterable<ValueResolver<T>> resolvers) {
@@ -80,43 +102,79 @@ public class MuleExtensionUtils {
 
 
   /**
-   * Returns all the {@link ConnectionProviderModel} instances available for the given {@code configurationModel}. The
-   * {@link List} will first contain those defined at a {@link ConfigurationModel#getConnectionProviders()} level and finally the
+   * Returns all the {@link ConnectionProviderModel} instances available for the given {@code configurationModel} plus the ones
+   * globally defined at the {@code extensionModel}.
+   * The {@link List} will first contain those defined at a {@link ConfigurationModel#getConnectionProviders()} level and finally the
    * ones at {@link ExtensionModel#getConnectionProviders()}
    *
-   * @param configurationModel a {@link RuntimeConfigurationModel}
+   * @param extensionModel     the {@link ExtensionModel} which owns the {@code configurationModel}
+   * @param configurationModel a {@link ConfigurationModel}
    * @return a {@link List}. Might be empty but will never be {@code null}
    */
-  public static List<ConnectionProviderModel> getAllConnectionProviders(RuntimeConfigurationModel configurationModel) {
+  public static List<ConnectionProviderModel> getAllConnectionProviders(ExtensionModel extensionModel,
+                                                                        ConfigurationModel configurationModel) {
     return ImmutableList.<ConnectionProviderModel>builder().addAll(configurationModel.getConnectionProviders())
-        .addAll(configurationModel.getExtensionModel().getConnectionProviders()).build();
+        .addAll(extensionModel.getConnectionProviders()).build();
   }
 
   /**
-   * Sorts the given {@code list} in ascending alphabetic order, using {@link Named#getName()} as the sorting criteria
+   * Sorts the given {@code list} in ascending alphabetic order, using {@link NamedObject#getName()} as the sorting criteria
    *
-   * @param list a {@link List} with instances of {@link Named}
-   * @param <T> the generic type of the items in the {@code list}
+   * @param list a {@link List} with instances of {@link NamedObject}
+   * @param <T>  the generic type of the items in the {@code list}
    * @return the sorted {@code list}
    */
-  public static <T extends Named> List<T> alphaSortDescribedList(List<T> list) {
+  public static <T extends NamedObject> List<T> alphaSortDescribedList(List<T> list) {
     if (isEmpty(list)) {
       return list;
     }
 
-    Collections.sort(list, new NamedComparator());
+    Collections.sort(list, new NamedObjectComparator());
     return list;
   }
 
   /**
    * Creates a new {@link List} of {@link Interceptor interceptors} using the factories returned by
-   * {@link InterceptableModel#getInterceptorFactories()}
+   * {@link InterceptorsModelProperty} (if present).
    *
-   * @param model the model on which {@link InterceptableModel#getInterceptorFactories()} is to be invoked
+   * @param model the model on which {@link InterceptorsModelProperty} is to be invoked
    * @return an immutable {@link List} with instances of {@link Interceptor}
    */
-  public static List<Interceptor> createInterceptors(InterceptableModel model) {
-    return createInterceptors(model.getInterceptorFactories());
+  public static List<Interceptor> createInterceptors(EnrichableModel model) {
+    return model.getModelProperty(InterceptorsModelProperty.class)
+        .map(p -> createInterceptors(p.getInterceptorFactories()))
+        .orElse(ImmutableList.of());
+  }
+
+  /**
+   * Adds the given {@code interceptorFactory} to the {@code declaration} as the last interceptor in the list
+   *
+   * @param declaration        a {@link BaseDeclaration}
+   * @param interceptorFactory a {@link InterceptorFactory}
+   */
+  public static void addInterceptorFactory(BaseDeclaration declaration, InterceptorFactory interceptorFactory) {
+    getOrCreateInterceptorModelProperty(declaration).addInterceptorFactory(interceptorFactory);
+  }
+
+  /**
+   * Adds the given {@code interceptorFactory} to the {@code declaration} at the given {@code position}
+   *
+   * @param declaration        a {@link BaseDeclaration}
+   * @param interceptorFactory a {@link InterceptorFactory}
+   * @param position           a valid list index
+   */
+  public static void addInterceptorFactory(BaseDeclaration declaration, InterceptorFactory interceptorFactory, int position) {
+    getOrCreateInterceptorModelProperty(declaration).addInterceptorFactory(interceptorFactory, position);
+  }
+
+  private static InterceptorsModelProperty getOrCreateInterceptorModelProperty(BaseDeclaration declaration) {
+    InterceptorsModelProperty property =
+        (InterceptorsModelProperty) declaration.getModelProperty(InterceptorsModelProperty.class).orElse(null);
+    if (property == null) {
+      property = new InterceptorsModelProperty(emptyList());
+      declaration.addModelProperty(property);
+    }
+    return property;
   }
 
   /**
@@ -231,8 +289,8 @@ public class MuleExtensionUtils {
    * Executes the given {@code callable} using the {@link ClassLoader} associated to the {@code extensionModel}
    *
    * @param extensionModel a {@link ExtensionModel}
-   * @param callable a {@link Callable}
-   * @param <T> the generic type of the {@code callable}'s return type
+   * @param callable       a {@link Callable}
+   * @param <T>            the generic type of the {@code callable}'s return type
    * @return the value returned by the {@code callable}
    * @throws Exception if the {@code callable} fails to execute
    */
@@ -245,9 +303,11 @@ public class MuleExtensionUtils {
       final Field configNameField = property.getConfigNameField();
 
       if (!configNameField.getDeclaringClass().isInstance(target)) {
-        throw new IllegalConfigurationModelDefinitionException(String
-            .format("field '%s' is annotated with @%s but not defined on an instance of type '%s'", configNameField.toString(),
-                    ConfigName.class.getSimpleName(), target.getClass().getName()));
+        throw new IllegalConfigurationModelDefinitionException(
+                                                               format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                                                                      configNameField.toString(),
+                                                                      ConfigName.class.getSimpleName(),
+                                                                      target.getClass().getName()));
       }
 
       configNameField.setAccessible(true);
@@ -275,8 +335,130 @@ public class MuleExtensionUtils {
   }
 
   public static boolean isTransactional(OperationModel operationModel) {
-    return operationModel.getModelProperty(ConnectivityModelProperty.class).map(ConnectivityModelProperty::supportsTransactions)
+    return operationModel
+        .getModelProperty(ConnectivityModelProperty.class)
+        .map(ConnectivityModelProperty::supportsTransactions)
         .orElse(false);
+  }
+
+  /**
+   * Tests the {@code configurationModel} for a {@link ConfigurationFactoryModelProperty} and
+   * returns the contained {@link ConfigurationFactory}.
+   *
+   * @param configurationModel a {@link ConfigurationModel}
+   * @return a {@link ConfigurationFactory}
+   * @throws IllegalConfigurationModelDefinitionException if the {@code configurationModel} doesn't contain such model property
+   */
+  public static ConfigurationFactory getConfigurationFactory(ConfigurationModel configurationModel) {
+    return fromModelProperty(configurationModel,
+                             ConfigurationFactoryModelProperty.class,
+                             ConfigurationFactoryModelProperty::getConfigurationFactory,
+                             () -> new IllegalConfigurationModelDefinitionException(
+                                                                                    format("Configuration '%s' does not provide a %s",
+                                                                                           configurationModel.getName(),
+                                                                                           ConfigurationFactory.class
+                                                                                               .getName())));
+  }
+
+  /**
+   * Tests the given {@code model} for a {@link MetadataResolverFactoryModelProperty} and if present
+   * it returns the contained {@link MetadataResolverFactory}. If no such property is found, then
+   * a {@link NullMetadataResolverFactory} is returned
+   *
+   * @param model an enriched model
+   * @return a {@link MetadataResolverFactory}
+   */
+  public static MetadataResolverFactory getMetadataResolverFactory(EnrichableModel model) {
+    return model.getModelProperty(MetadataResolverFactoryModelProperty.class)
+        .map(MetadataResolverFactoryModelProperty::getMetadataResolverFactory)
+        .orElse(new NullMetadataResolverFactory());
+  }
+
+  /**
+   * Tests the given {@code operationModel} for a {@link OperationExecutorModelProperty} and if present
+   * it returns the enclosed {@link OperationExecutorFactory}. If no such property is found, then a
+   * {@link IllegalOperationModelDefinitionException} is thrown.
+   *
+   * @param operationModel an {@link OperationModel}
+   * @return a {@link OperationExecutorFactory}
+   * @throws IllegalOperationModelDefinitionException if the operation is not properly enriched
+   */
+  public static OperationExecutorFactory getOperationExecutorFactory(OperationModel operationModel) {
+    OperationExecutorFactory executorFactory =
+        fromModelProperty(operationModel,
+                          OperationExecutorModelProperty.class,
+                          OperationExecutorModelProperty::getExecutorFactory,
+                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
+                                                                                    operationModel.getName(),
+                                                                                    OperationExecutorFactory.class
+                                                                                        .getSimpleName())));
+
+    return new OperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));
+  }
+
+  /**
+   * Tests the given {@code sourceModel} for a {@link SourceFactoryModelProperty} and if present
+   * it returns the enclosed {@link SourceFactory}. If no such property is found, then a
+   * {@link IllegalSourceModelDefinitionException} is thrown
+   *
+   * @param sourceModel a {@link SourceModel}
+   * @return a {@link SourceFactory}
+   * @throws IllegalSourceModelDefinitionException if the source is not properly enriched
+   */
+  public static SourceFactory getSourceFactory(SourceModel sourceModel) {
+    return fromModelProperty(sourceModel,
+                             SourceFactoryModelProperty.class,
+                             SourceFactoryModelProperty::getSourceFactory,
+                             () -> new IllegalSourceModelDefinitionException(
+                                                                             format("Source '%s' does not provide a %s",
+                                                                                    sourceModel.getName(),
+                                                                                    SourceFactory.class.getSimpleName())));
+  }
+
+  /**
+   * Tests the given {@code connectionProviderModel} for a {@link ConnectionProviderFactoryModelProperty} and if present
+   * it returns the enclosed {@link ConnectionProviderFactory}. If no such property is found, then a
+   * {@link IllegalConnectionProviderModelDefinitionException} is thrown
+   *
+   * @param connectionProviderModel a {@link ConnectionProviderModel}
+   * @return a {@link SourceFactory}
+   * @throws IllegalConnectionProviderModelDefinitionException if the connection provider is not properly enriched
+   */
+  public static ConnectionProviderFactory getConnectionProviderFactory(ConnectionProviderModel connectionProviderModel) {
+    return fromModelProperty(connectionProviderModel,
+                             ConnectionProviderFactoryModelProperty.class,
+                             ConnectionProviderFactoryModelProperty::getConnectionProviderFactory,
+                             () -> new IllegalConnectionProviderModelDefinitionException(
+                                                                                         format("Connection Provider '%s' does not provide a %s",
+                                                                                                connectionProviderModel.getName(),
+                                                                                                ConnectionProviderFactory.class
+                                                                                                    .getSimpleName())));
+  }
+
+  /**
+   * Tests the given {@code connectionProviderModel} for a {@link ConnectionTypeModelProperty} and if present
+   * it returns the enclosed connection type. If no such property is found, then a
+   * {@link IllegalConnectionProviderModelDefinitionException} is thrown
+   *
+   * @param connectionProviderModel a {@link ConnectionProviderModel}
+   * @return a connection {@link Class}
+   * @throws IllegalConnectionProviderModelDefinitionException if the connection provider is not properly enriched
+   */
+  public static Class<?> getConnectionType(ConnectionProviderModel connectionProviderModel) {
+    return fromModelProperty(connectionProviderModel,
+                             ConnectionTypeModelProperty.class,
+                             ConnectionTypeModelProperty::getConnectionType,
+                             () -> new IllegalConnectionProviderModelDefinitionException(
+                                                                                         format("Connection Provider '%s' does not specify a connection type",
+                                                                                                connectionProviderModel
+                                                                                                    .getName())));
+  }
+
+  private static <T, P extends ModelProperty> T fromModelProperty(EnrichableModel model,
+                                                                  Class<P> modelPropertyType,
+                                                                  Function<P, T> map,
+                                                                  Supplier<? extends RuntimeException> exceptionSupplier) {
+    return model.getModelProperty(modelPropertyType).map(map).orElseThrow(exceptionSupplier);
   }
 
   /**
@@ -289,10 +471,10 @@ public class MuleExtensionUtils {
     return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
   }
 
-  private static class NamedComparator implements Comparator<Named> {
+  private static class NamedObjectComparator implements Comparator<NamedObject> {
 
     @Override
-    public int compare(Named o1, Named o2) {
+    public int compare(NamedObject o1, NamedObject o2) {
       return o1.getName().compareTo(o2.getName());
     }
   }

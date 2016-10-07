@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
@@ -47,7 +47,7 @@ public class ConnectionProviderNameModelValidator implements ModelValidator {
     if (!repeatedNameModels.isEmpty()) {
       throw new IllegalModelDefinitionException(format("Extension '%s' defines %d connection providers with repeated names. "
           + "Offending names are: [%s]", model.getName(), repeatedNameModels
-              .size(), Joiner.on(", ").join(repeatedNameModels.stream().map(Named::getName).collect(toSet()))));
+              .size(), Joiner.on(", ").join(repeatedNameModels.stream().map(NamedObject::getName).collect(toSet()))));
     }
   }
 }

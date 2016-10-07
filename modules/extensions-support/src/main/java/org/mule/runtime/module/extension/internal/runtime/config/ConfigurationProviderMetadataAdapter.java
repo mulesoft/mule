@@ -12,23 +12,24 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataEnrichableModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.List;
@@ -52,9 +53,10 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
   protected ConnectionManagerAdapter connectionManager;
 
   public ConfigurationProviderMetadataAdapter(String name,
-                                              RuntimeConfigurationModel model,
+                                              ExtensionModel extensionModel,
+                                              ConfigurationModel configurationModel,
                                               ConfigurationInstance configuration) {
-    super(name, model, configuration);
+    super(name, extensionModel, configurationModel, configuration);
   }
 
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
@@ -62,8 +64,8 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     MetadataKeysContainerBuilder keysBuilder = MetadataKeysContainerBuilder.getInstance();
     MetadataContext metadataContext = getMetadataContext();
     try {
-      addComponentKeys(getModel().getOperationModels(), metadataContext, keysBuilder);
-      addComponentKeys(getModel().getSourceModels(), metadataContext, keysBuilder);
+      addComponentKeys(getConfigurationModel().getOperationModels(), metadataContext, keysBuilder);
+      addComponentKeys(getConfigurationModel().getSourceModels(), metadataContext, keysBuilder);
     } catch (Exception e) {
       return failure(null, format("%s: %s"), e);
     }
@@ -75,8 +77,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
                                 MetadataKeysContainerBuilder keysBuilder)
       throws MetadataResolvingException, ConnectionException {
     for (ComponentModel component : components) {
-      TypeKeysResolver keysResolver =
-          ((MetadataEnrichableModel) component).getMetadataResolverFactory().getKeyResolver();
+      TypeKeysResolver keysResolver = getMetadataResolverFactory(component).getKeyResolver();
 
       String categoryName = keysResolver.getCategoryName();
       if (!NULL_CATEGORY_NAME.equals(categoryName) && !keysBuilder.containsCategory(categoryName)) {
@@ -90,8 +91,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,
                                       metadataManager.getMetadataCache(getName()),
-                                      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(
-                                                                                                getClassLoader(getModel()
-                                                                                                    .getExtensionModel())));
+                                      ExtensionsTypeLoaderFactory.getDefault()
+                                          .createTypeLoader(getClassLoader(getExtensionModel())));
   }
 }

@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
-import org.mule.runtime.core.api.MuleException;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -32,8 +33,6 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,13 +57,10 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @Before
   public void before() throws Exception {
-    when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
-    when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-    when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
-    when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
+    mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
+    mockInterceptors(configurationModel, null);
     when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-    when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
 
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
     when(extensionModel.getSourceModels()).thenReturn(ImmutableList.of());
@@ -73,9 +69,10 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
 
 
-    expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
+    expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
 
-    provider = new DynamicConfigurationProvider(CONFIG_NAME, configurationModel, resolverSet, new StaticValueResolver<>(null),
+    provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
+                                                new StaticValueResolver<>(null),
                                                 expirationPolicy);
 
     super.before();
@@ -108,12 +105,12 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     HeisenbergExtension instance2 = makeAlternateInstance();
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
-    timeSupplier.move(1, TimeUnit.MINUTES);
+    timeSupplier.move(1, MINUTES);
 
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(true));
 
-    timeSupplier.move(10, TimeUnit.MINUTES);
+    timeSupplier.move(10, MINUTES);
 
     expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
@@ -122,8 +119,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     assertThat(configs, containsInAnyOrder(instance1, instance2));
   }
 
-  private HeisenbergExtension makeAlternateInstance() throws MuleException {
+  private HeisenbergExtension makeAlternateInstance() throws Exception {
     ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
+    mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
     when(resolverSet.resolve(event)).thenReturn(alternateResult);
 
     return (HeisenbergExtension) provider.get(event).getValue();

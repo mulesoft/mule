@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;

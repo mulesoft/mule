@@ -12,7 +12,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -23,7 +27,6 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
@@ -33,23 +36,23 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for implementations of {@link ConfigurationProvider} which keep track of the {@link ConfigurationInstance} they
  * generate and propagate lifecycle and IoC into them.
  * <p/>
  * It also implements the other common concerns of every {@link ConfigurationProvider}, leaving implementations with the need to
- * &quot;just&quot; implement {@link #get(Object)}
+ * &quot;just&quot; implement {@link #get(Event)}
  *
  * @since 4.0
  */
 public abstract class LifecycleAwareConfigurationProvider implements ConfigurationProvider, Lifecycle {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationProvider.class);
+  private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationProvider.class);
 
   private final String name;
-  private final RuntimeConfigurationModel configurationModel;
+  private final ExtensionModel extensionModel;
+  private final ConfigurationModel configurationModel;
   private final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
   protected SimpleLifecycleManager lifecycleManager =
@@ -58,10 +61,11 @@ public abstract class LifecycleAwareConfigurationProvider implements Configurati
   @Inject
   protected MuleContext muleContext;
 
-  public LifecycleAwareConfigurationProvider(String name, RuntimeConfigurationModel configurationModel) {
+  public LifecycleAwareConfigurationProvider(String name, ExtensionModel extensionModel, ConfigurationModel configurationModel) {
     this.name = name;
+    this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
-    extensionClassLoader = getClassLoader(configurationModel.getExtensionModel());
+    extensionClassLoader = getClassLoader(extensionModel);
   }
 
   /**
@@ -163,8 +167,16 @@ public abstract class LifecycleAwareConfigurationProvider implements Configurati
    * {@inheritDoc}
    */
   @Override
-  public RuntimeConfigurationModel getModel() {
+  public ConfigurationModel getConfigurationModel() {
     return configurationModel;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ExtensionModel getExtensionModel() {
+    return extensionModel;
   }
 
   protected void startConfig(ConfigurationInstance config) throws MuleException {

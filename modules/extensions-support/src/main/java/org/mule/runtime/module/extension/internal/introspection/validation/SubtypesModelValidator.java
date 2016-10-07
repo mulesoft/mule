@@ -17,9 +17,9 @@ import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.ImportedTypeModel;
-import org.mule.runtime.extension.api.introspection.SubTypesModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;

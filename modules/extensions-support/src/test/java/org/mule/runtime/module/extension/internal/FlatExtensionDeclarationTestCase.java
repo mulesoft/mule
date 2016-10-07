@@ -19,80 +19,80 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.extension.api.Category.COMMUNITY;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.ADDRESS;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.ARG_LESS;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.BROADCAST;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.BROADCAST_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CALLBACK;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CALLBACK_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONFIG_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONFIG_NAME;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_CONNECTOR_TYPE;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_NAME;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONSUMER;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.DEFAULT_PORT;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.GO_GET_THEM_TIGER;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.HAS_NO_ARGS;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.LISTENER;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.LISTEN_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.MTOM_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.MTOM_ENABLED;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.MULESOFT;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.OPERATION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.PASSWORD;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.PASSWORD_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.PORT;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.PORT_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.SERVICE;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.SERVICE_ADDRESS;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.SERVICE_NAME;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.SERVICE_PORT;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.THE_OPERATION_TO_USE;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.URI_TO_FIND_THE_WSDL;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.URL;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.URL_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.USERNAME;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.USERNAME_DESCRIPTION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.VERSION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.WSDL_LOCATION;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.WS_CONSUMER;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.WS_CONSUMER_DESCRIPTION;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.ADDRESS;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.ARG_LESS;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.BROADCAST;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.BROADCAST_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CALLBACK;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CALLBACK_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONFIG_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONFIG_NAME;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_NAME;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONSUMER;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.DEFAULT_PORT;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.GO_GET_THEM_TIGER;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.HAS_NO_ARGS;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.LISTENER;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.LISTEN_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.MTOM_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.MTOM_ENABLED;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.MULESOFT;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.OPERATION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.PASSWORD;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.PASSWORD_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.PORT;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.PORT_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.SERVICE;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.SERVICE_ADDRESS;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.SERVICE_NAME;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.SERVICE_PORT;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.THE_OPERATION_TO_USE;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.URI_TO_FIND_THE_WSDL;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.URL;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.URL_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.USERNAME;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.USERNAME_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.VERSION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.WSDL_LOCATION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.WS_CONSUMER;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.WS_CONSUMER_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.BooleanType;
-import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.MuleVersion;
+import org.mule.metadata.api.model.VoidType;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;
@@ -127,12 +127,10 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   @Test
   public void defaultConfiguration() throws Exception {
-    RuntimeConfigurationModel configurationModel =
-        (RuntimeConfigurationModel) extensionModel.getConfigurationModel(CONFIG_NAME).get();
+    ConfigurationModel configurationModel = extensionModel.getConfigurationModel(CONFIG_NAME).get();
     assertThat(configurationModel, is(notNullValue()));
     assertThat(configurationModel.getName(), equalTo(CONFIG_NAME));
     assertThat(configurationModel.getDescription(), equalTo(CONFIG_DESCRIPTION));
-    assertThat(configurationModel.getExtensionModel(), is(sameInstance(extensionModel)));
 
     List<ParameterModel> parameterModels = configurationModel.getParameterModels();
     assertThat(parameterModels, hasSize(4));
@@ -175,6 +173,11 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     factory.createFrom(new ExtensionDeclarer().named("bad").onVersion("i'm new"), createDescribingContext());
   }
 
+  private ConfigurationDeclarer withConfigurationFactory(ConfigurationDeclarer declarer,
+                                                         ConfigurationFactory configurationFactory) {
+    return declarer.withModelProperty(new ConfigurationFactoryModelProperty(configurationFactory));
+  }
+
   @Test
   public void configurationsOrder() {
     ConfigurationFactory mockInstantiator = mock(ConfigurationFactory.class);
@@ -191,9 +194,11 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         .withMinMuleVersion(MIN_MULE_VERSION)
         .withXmlDsl(XmlDslModel.builder().build());
 
-    extensionDeclarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
-    extensionDeclarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
-    extensionDeclarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
+    extensionDeclarer.withConfig(defaultConfiguration)
+        .describedAs(defaultConfiguration)
+        .withModelProperty(new ConfigurationFactoryModelProperty(mockInstantiator));
+    withConfigurationFactory(extensionDeclarer.withConfig(beta).describedAs(beta), mockInstantiator);
+    withConfigurationFactory(extensionDeclarer.withConfig(alpha).describedAs(alpha), mockInstantiator);
 
     ExtensionModel extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
     List<ConfigurationModel> configurationModels = extensionModel.getConfigurationModels();
@@ -212,7 +217,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void nameClashes() {
-    extensionDeclarer.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs("");
+    withConfigurationFactory(extensionDeclarer.withConfig(CONFIG_NAME).describedAs(""), mock(ConfigurationFactory.class));
     factory.createFrom(extensionDeclarer, createDescribingContext());
   }
 
@@ -309,7 +314,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
   @Test
   public void executorsAreInterceptable() {
     for (OperationModel operation : extensionModel.getOperationModels()) {
-      assertThat(((RuntimeOperationModel) operation).getExecutor().createExecutor(operation),
+      assertThat(getOperationExecutorFactory(operation).createExecutor(operation),
                  is(instanceOf(Interceptable.class)));
     }
   }
@@ -317,13 +322,10 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
   @Test
   public void connectionProviders() {
     assertThat(extensionModel.getConnectionProviders(), hasSize(1));
-    RuntimeConnectionProviderModel connectionProvider =
-        (RuntimeConnectionProviderModel) extensionModel.getConnectionProviders().get(0);
+    ConnectionProviderModel connectionProvider = extensionModel.getConnectionProviders().get(0);
     assertThat(connectionProvider, is(notNullValue()));
     assertThat(connectionProvider.getName(), is(CONNECTION_PROVIDER_NAME));
     assertThat(connectionProvider.getDescription(), is(CONNECTION_PROVIDER_DESCRIPTION));
-    assertThat(connectionProvider.getConnectionProviderFactory(), is(sameInstance(reference.getConnectionProviderFactory())));
-    assertThat(connectionProvider.getConnectionType(), is(sameInstance(CONNECTION_PROVIDER_CONNECTOR_TYPE)));
 
     List<ParameterModel> parameters = connectionProvider.getParameterModels();
     assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class),
@@ -335,11 +337,10 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
   @Test
   public void messageSources() {
     assertThat(extensionModel.getSourceModels(), hasSize(1));
-    RuntimeSourceModel sourceModel = (RuntimeSourceModel) extensionModel.getSourceModels().get(0);
+    SourceModel sourceModel = extensionModel.getSourceModels().get(0);
     assertThat(sourceModel, is(notNullValue()));
     assertThat(sourceModel.getName(), is(LISTENER));
     assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));
-    assertThat(sourceModel.getSourceFactory().createSource(), is(sameInstance(reference.getSource())));
     assertThat(getType(sourceModel.getOutput().getType()), is(equalTo(InputStream.class)));
     assertThat(getType(sourceModel.getOutputAttributes().getType()), is(equalTo(Serializable.class)));
 
@@ -378,7 +379,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
   private void assertBroadcastOperation(List<OperationModel> operationModels) {
     OperationModel operationModel = operationModels.get(1);
     assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(BROADCAST).get())));
-    assertDataType(operationModel.getOutput().getType(), void.class, NullType.class);
+    assertDataType(operationModel.getOutput().getType(), void.class, VoidType.class);
 
     assertThat(operationModel.getName(), equalTo(BROADCAST));
     assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
@@ -396,7 +397,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
   private void assertArglessOperation(List<OperationModel> operationModels) {
     OperationModel operationModel = operationModels.get(0);
     assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(ARG_LESS).get())));
-    assertDataType(operationModel.getOutput().getType(), int.class, NumberType.class);
+    assertDataType(operationModel.getOutput().getType(), Integer.class, NumberType.class);
 
     assertThat(operationModel.getName(), equalTo(ARG_LESS));
     assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));
@@ -407,8 +408,8 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   private ExtensionDeclarer getBaseDeclarer() {
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-    extensionDeclarer.named("BaseExtension").onVersion("1.2.3").withConfig("default")
-        .createdWith(mock(ConfigurationFactory.class));
+    extensionDeclarer.named("BaseExtension").onVersion("1.2.3").withConfig("default");
+
     return extensionDeclarer;
   }
 

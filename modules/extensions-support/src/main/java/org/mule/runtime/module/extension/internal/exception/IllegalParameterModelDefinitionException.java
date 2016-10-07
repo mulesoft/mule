@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.exception;
 
 
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 
 /**
  * A specialization of {@link IllegalModelDefinitionException} which marks that a {@link ParameterModel} is invalid

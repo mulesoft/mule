@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 
 /**
  * Creates instances of {@link ConnectionManagementStrategy}

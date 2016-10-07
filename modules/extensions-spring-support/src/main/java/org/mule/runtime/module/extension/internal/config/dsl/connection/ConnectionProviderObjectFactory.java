@@ -8,12 +8,12 @@ package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
@@ -26,14 +26,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  */
 public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFactory<ConnectionProviderResolver> {
 
-  private final RuntimeConnectionProviderModel providerModel;
+  private final ConnectionProviderModel providerModel;
   private MuleContext muleContext;
 
   private PoolingProfile poolingProfile = null;
   private RetryPolicyTemplate retryPolicyTemplate = null;
   private boolean disableValidation = false;
 
-  public ConnectionProviderObjectFactory(RuntimeConnectionProviderModel providerModel, MuleContext muleContext) {
+  public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel, MuleContext muleContext) {
     this.providerModel = providerModel;
     this.muleContext = muleContext;
   }

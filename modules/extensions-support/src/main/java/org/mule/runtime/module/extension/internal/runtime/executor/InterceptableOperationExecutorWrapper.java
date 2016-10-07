@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -20,7 +21,6 @@ import org.mule.runtime.module.extension.internal.introspection.AbstractIntercep
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Decorates an {@link OperationExecutor} adding the behavior defined in {@link AbstractInterceptable}.
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class InterceptableOperationExecutorWrapper extends AbstractInterceptable implements OperationExecutor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InterceptableOperationExecutorWrapper.class);
+  private static final Logger LOGGER = getLogger(InterceptableOperationExecutorWrapper.class);
 
   private final OperationExecutor delegate;
 

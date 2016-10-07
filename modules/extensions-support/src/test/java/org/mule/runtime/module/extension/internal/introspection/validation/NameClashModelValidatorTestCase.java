@@ -12,14 +12,13 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ElementDslModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -58,7 +57,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private ExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private RuntimeConfigurationModel configurationModel;
+  private ConfigurationModel configurationModel;
 
   @Mock
   private OperationModel operationModel;

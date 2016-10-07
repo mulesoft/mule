@@ -10,15 +10,15 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnect
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -30,8 +30,8 @@ import java.util.Optional;
  * Reusable and thread-safe factory that creates instances of {@link ConfigurationInstance}
  * <p>
  * The created instances will be of concrete type {@link LifecycleAwareConfigurationInstance}, which means that all the
- * {@link InterceptorFactory interceptor factories} obtained through {@link RuntimeConfigurationModel#getInterceptorFactories()}
- * will be exercised per each created instance
+ * {@link InterceptorFactory interceptor factories} obtained through the {@link InterceptorsModelProperty}
+ * (if present) will be exercised per each created instance
  *
  * @param <T> the generic type of the returned {@link ConfigurationInstance} instances
  * @since 4.0
@@ -40,7 +40,8 @@ public final class ConfigurationInstanceFactory<T> {
 
   private static final ValueResolver<ConnectionProvider> NULL_CONNECTION_PROVIDER = new StaticValueResolver<>(null);
 
-  private final RuntimeConfigurationModel configurationModel;
+  private final ExtensionModel extensionModel;
+  private final ConfigurationModel configurationModel;
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory =
       new DefaultImplicitConnectionProviderFactory();
@@ -52,10 +53,12 @@ public final class ConfigurationInstanceFactory<T> {
    * @param configurationModel the {@link ConfigurationModel} that describes the configurations to be created
    * @param resolverSet the {@link ResolverSet} which provides the values for the configuration's parameters
    */
-  public ConfigurationInstanceFactory(RuntimeConfigurationModel configurationModel, ResolverSet resolverSet) {
+  public ConfigurationInstanceFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                      ResolverSet resolverSet) {
+    this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
-    requiresConnection = !getConnectedComponents(configurationModel.getExtensionModel(), configurationModel).isEmpty();
+    requiresConnection = !getConnectedComponents(extensionModel, configurationModel).isEmpty();
   }
 
   /**
@@ -76,7 +79,7 @@ public final class ConfigurationInstanceFactory<T> {
     ValueResolver<ConnectionProvider> providerResolver;
     if (requiresConnection) {
       providerResolver = new StaticValueResolver<>(implicitConnectionProviderFactory
-          .createImplicitConnectionProvider(name, configurationModel, event, muleContext));
+          .createImplicitConnectionProvider(name, extensionModel, configurationModel, event, muleContext));
     } else {
       providerResolver = NULL_CONNECTION_PROVIDER;
     }
