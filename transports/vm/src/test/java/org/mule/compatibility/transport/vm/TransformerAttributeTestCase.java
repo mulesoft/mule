@@ -14,6 +14,7 @@ import org.mule.functional.functional.StringAppendTestTransformer;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TransformerAttributeTestCase extends CompatibilityFunctionalTestCase {
@@ -26,6 +27,7 @@ public class TransformerAttributeTestCase extends CompatibilityFunctionalTestCas
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testSimple() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://simple", OUTBOUND_MESSAGE, null).getRight();
@@ -34,6 +36,7 @@ public class TransformerAttributeTestCase extends CompatibilityFunctionalTestCas
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testThrough() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://chained", OUTBOUND_MESSAGE, null).getRight();
