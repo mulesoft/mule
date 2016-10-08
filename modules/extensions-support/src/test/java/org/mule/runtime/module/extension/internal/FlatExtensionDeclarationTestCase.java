@@ -66,8 +66,6 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.TAR
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
-import org.mule.runtime.api.MuleVersion;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.BooleanType;
@@ -75,9 +73,11 @@ import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.api.MuleVersion;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.Interceptable;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -183,8 +183,13 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     final String beta = "beta";
     final String alpha = "alpha";
 
-    ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer().named("test").onVersion("1.0").fromVendor("MuleSoft")
-        .withCategory(COMMUNITY).withMinMuleVersion(MIN_MULE_VERSION);
+    ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
+        .named("test")
+        .onVersion("1.0")
+        .fromVendor("MuleSoft")
+        .withCategory(COMMUNITY)
+        .withMinMuleVersion(MIN_MULE_VERSION)
+        .withXmlDsl(XmlDslModel.builder().build());
 
     extensionDeclarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
     extensionDeclarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
@@ -277,7 +282,12 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   @Test
   public void configlessDescriptor() {
-    factory.createFrom(new ExtensionDeclarer().named("noConfigs").onVersion("1.0").fromVendor("MuleSoft").withCategory(COMMUNITY)
+    factory.createFrom(new ExtensionDeclarer()
+        .named("noConfigs")
+        .onVersion("1.0")
+        .fromVendor("MuleSoft")
+        .withCategory(COMMUNITY)
+        .withXmlDsl(XmlDslModel.builder().build())
         .withMinMuleVersion(MIN_MULE_VERSION), createDescribingContext());
   }
 
