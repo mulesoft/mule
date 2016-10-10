@@ -28,11 +28,11 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     mapSplitter = new MapSplitter();
-    mapSplitter.setMuleContext(muleContext);
     mapSplitter.setListener(event -> {
       splitPayloads.add(event.getMessageAsString(muleContext));
       return event;
     });
+    mapSplitter.setMuleContext(muleContext);
   }
 
   @Test

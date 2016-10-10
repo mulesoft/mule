@@ -6,16 +6,22 @@
  */
 package org.mule.runtime.core.util.rx;
 
+import static reactor.core.Exceptions.unwrap;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import reactor.core.*;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.SynchronousSink;
 
 /**
  * Reuseable operators to be use with project reactor.
  */
 public final class Operators {
-
 
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return

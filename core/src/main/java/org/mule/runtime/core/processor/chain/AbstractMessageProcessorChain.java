@@ -6,27 +6,35 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.context.notification.MessageProcessorNotification;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -34,8 +42,13 @@ import org.mule.runtime.core.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -47,8 +60,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   protected String name;
   protected List<Processor> processors;
-  protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
   public AbstractMessageProcessorChain(List<Processor> processors) {
@@ -74,12 +87,10 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   protected Event doProcess(Event event) throws MuleException {
     Event copy;
-
     for (Processor processor : getProcessorsToExecute()) {
+      setCurrentEvent(event);
       copy = event;
-
       event = messageProcessorExecutionTemplate.execute(processor, event);
-
       if (VoidMuleEvent.getInstance().equals(event)) {
         setCurrentEvent(copy);
         event = copy;
@@ -88,6 +99,82 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       }
     }
     return event;
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    Flux<Event> stream = from(publisher);
+    for (Processor processor : getProcessorsToExecute()) {
+      if (flowConstruct instanceof Pipeline) {
+        ProcessingStrategy processingStrategy = ((Pipeline) flowConstruct).getProcessingStrategy();
+        stream = stream.transform(processingStrategy.onProcessor(processor, processorFunction(processor)));
+      } else {
+        stream = stream.transform(processorFunction(processor));
+      }
+    }
+    return stream;
+  }
+
+  private Function<Publisher<Event>, Publisher<Event>> processorFunction(Processor processor) {
+    return publisher -> from(publisher)
+        .doOnNext(preNotification(processor))
+        .concatMap(event -> {
+          setCurrentEvent(event);
+          Event beforeEvent = event;
+          return just(event)
+              .transform(stream -> from(stream.transform(processor)))
+              // If there is a messaging exception, reacreate it to add reference to processor that failed.
+              .mapError(MessagingException.class,
+                        exception -> new MessagingException(exception.getEvent(), exception.getCauseException(), processor))
+              .map(result -> {
+                Event nextEvent = VoidMuleEvent.getInstance().equals(result) ? beforeEvent : result;
+                setCurrentEvent(nextEvent);
+                return nextEvent;
+              })
+              .doOnNext(postNotification(processor))
+              .doOnError(MessagingException.class, errorNotification(processor));
+        });
+  }
+
+  private Consumer<Event> preNotification(Processor processor) {
+    return event -> {
+      if (event.isNotificationsEnabled()) {
+        fireNotification(muleContext.getNotificationManager(), flowConstruct, event, processor, null,
+                         MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+      }
+    };
+  }
+
+  private Consumer<Event> postNotification(Processor processor) {
+    return event -> {
+      if (event.isNotificationsEnabled()) {
+        fireNotification(muleContext.getNotificationManager(), flowConstruct, event, processor, null,
+                         MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+
+      }
+    };
+  }
+
+  private Consumer<MessagingException> errorNotification(Processor processor) {
+    return exception -> {
+      if (exception.getEvent().isNotificationsEnabled()) {
+        fireNotification(muleContext.getNotificationManager(), flowConstruct, exception.getEvent(),
+                         processor, exception, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+      }
+    };
+  }
+
+  private void fireNotification(ServerNotificationManager serverNotificationManager, FlowConstruct flowConstruct,
+                                Event event, Processor processor, MessagingException exceptionThrown,
+                                int action) {
+    if (serverNotificationManager != null
+        && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
+      if (flowConstruct instanceof MessageProcessorPathResolver
+          && ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(processor) != null) {
+        serverNotificationManager
+            .fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
+      }
+    }
   }
 
   protected List<Processor> getProcessorsToExecute() {

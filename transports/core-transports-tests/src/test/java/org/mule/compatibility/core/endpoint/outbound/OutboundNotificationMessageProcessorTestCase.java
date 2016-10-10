@@ -55,19 +55,6 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     assertMessageNotification(listener, endpoint, event, MESSAGE_SEND_END);
   }
 
-  @Test
-  @Ignore("MULE-9731")
-  public void testSendNonBlocking() throws Exception {
-    TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
-    muleContext.registerListener(listener);
-
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
-    Processor mp = new OutboundNotificationMessageProcessor(endpoint);
-    mp.process(testEvent);
-
-    assertMessageNotification(listener, endpoint, testEvent, MESSAGE_SEND_END);
-  }
-
   private void assertMessageNotification(TestEndpointMessageNotificationListener listener, OutboundEndpoint endpoint,
                                          Event event, int action)
       throws InterruptedException {

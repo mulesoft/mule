@@ -25,7 +25,7 @@ public class JmsRequestResponseTestCase extends AbstractJmsFunctionalTestCase {
   @Test
   public void testNotSendiningCorrelationIDWithTemporaryQueue() throws Exception {
     InternalMessage response =
-        flowRunner("JMSNoCorrelationIDTemporaryQueue").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
+        flowRunner("JMSNoCorrelationIDTemporaryQueue").withPayload(TEST_MESSAGE).run().getMessage();
     verify("JMSNoCorrelationIDTemporaryQueue");
     verify("JMSNoCorrelationIDTarget");
     assertEchoResponse(response);
@@ -34,7 +34,7 @@ public class JmsRequestResponseTestCase extends AbstractJmsFunctionalTestCase {
   @Test
   public void testNotSendiningCorrelationIDWithFixedQueue() throws Exception {
     InternalMessage response =
-        flowRunner("JMSNoCorrelationIDFixedQueue").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
+        flowRunner("JMSNoCorrelationIDFixedQueue").withPayload(TEST_MESSAGE).run().getMessage();
     verify("JMSNoCorrelationIDFixedQueue");
     verify("JMSNoCorrelationIDTarget");
     assertEchoResponse(response);
@@ -43,7 +43,7 @@ public class JmsRequestResponseTestCase extends AbstractJmsFunctionalTestCase {
   @Test
   public void testSendiningCorrelationIDWithTemporaryQueue() throws Exception {
     InternalMessage response =
-        flowRunner("JMSCorrelationIDTemporaryQueue").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
+        flowRunner("JMSCorrelationIDTemporaryQueue").withPayload(TEST_MESSAGE).run().getMessage();
     verify("JMSCorrelationIDTemporaryQueue");
     verify("JMSCorrelationIDTarget");
     assertFixedEchoResponse(response);
@@ -52,7 +52,7 @@ public class JmsRequestResponseTestCase extends AbstractJmsFunctionalTestCase {
   @Test
   public void testSendiningCorrelationIDWithFixedQueue() throws Exception {
     InternalMessage response =
-        flowRunner("JMSCorrelationIDFixedQueue").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
+        flowRunner("JMSCorrelationIDFixedQueue").withPayload(TEST_MESSAGE).run().getMessage();
     verify("JMSCorrelationIDFixedQueue");
     verify("JMSCorrelationIDTarget");
     assertFixedEchoResponse(response);

@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@Ignore("MULE-9792")
 @RunWith(Parameterized.class)
 public class NonBlockingFullySupportedOneWayReplyToFunctionalTestCase extends NonBlockingFullySupportedFunctionalTestCase {
 

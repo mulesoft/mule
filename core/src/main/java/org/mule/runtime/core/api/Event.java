@@ -193,7 +193,7 @@ public interface Event extends MuleEvent {
   /**
    * Return the replyToHandler (if any) that will be used to perform async reply
    * 
-   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
    */
   @Deprecated
   ReplyToHandler getReplyToHandler();
@@ -201,7 +201,7 @@ public interface Event extends MuleEvent {
   /**
    * Return the destination (if any) that will be passed to the reply-to handler.
    * 
-   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
    */
   @Deprecated
   Object getReplyToDestination();
@@ -220,15 +220,6 @@ public interface Event extends MuleEvent {
    * @return true if notifications are enabled, false otherwise
    */
   boolean isNotificationsEnabled();
-
-  /**
-   * Indicates if the current event allows non-blocking execution and IO.
-   *
-   * @return true if non-blocking execution and IO is allowed. False otherwise.
-   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
-   */
-  @Deprecated
-  boolean isAllowNonBlocking();
 
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
@@ -374,7 +365,7 @@ public interface Event extends MuleEvent {
      * 
      * @param replyToHandler
      * @return the builder instance
-     * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
+     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
      */
     @Deprecated
     Builder replyToHandler(ReplyToHandler replyToHandler);
@@ -383,7 +374,7 @@ public interface Event extends MuleEvent {
      * 
      * @param replyToDestination
      * @return the builder instance
-     * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
+     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
      */
     @Deprecated
     Builder replyToDestination(Object replyToDestination);

@@ -36,7 +36,7 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
     ScatterGatherRouter sg = new ScatterGatherRouter();
     sg.setTimeout(timeout);
     sg.setMuleContext(muleContext);
-    sg.setFlowConstruct(flowConstruct);
+    //sg.setFlowConstruct(flowConstruct);
 
     for (Processor mp : this.messageProcessors) {
       sg.addRoute(mp);

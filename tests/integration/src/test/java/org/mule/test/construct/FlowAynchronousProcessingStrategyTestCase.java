@@ -6,7 +6,7 @@
  */
 package org.mule.test.construct;
 
-import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
+import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;
@@ -42,7 +42,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
 
   private void setUpExpectedException() {
     expectedException.expect(MessagingException.class);
-    expectedException.expectMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE);
+    expectedException.expectMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE);
   }
 
 }

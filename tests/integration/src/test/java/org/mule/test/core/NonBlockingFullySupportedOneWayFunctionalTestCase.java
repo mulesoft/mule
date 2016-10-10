@@ -28,152 +28,123 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends AbstractI
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void flow() throws Exception {
-    assertVoidMuleEventResponse("flow");
+    run("flow");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void subFlow() throws Exception {
-    assertVoidMuleEventResponse("subFlow");
+    run("subFlow");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void childFlow() throws Exception {
-    assertVoidMuleEventResponse("childFlow");
+    run("childFlow");
     verify("childFlowChild");
   }
 
   @Test
-  @Ignore("MULE-9731")
-  public void childDefaultFlow() throws Exception {
-    flowRunner("childDefaultFlow").withPayload(TEST_MESSAGE).asynchronously().run();
-    verify("childDefaultFlowChild");
-  }
-
-  @Test
-  @Ignore("MULE-9731")
   public void childSyncFlow() throws Exception {
-    flowRunner("childSyncFlow").withPayload(TEST_MESSAGE).asynchronously().run();
+    run("childSyncFlow");
     verify("childSyncFlowChild");
   }
 
-  @Test(expected = MessagingException.class)
-  @Ignore("MULE-9731")
   public void childAsyncFlow() throws Exception {
-    flowRunner("childAsyncFlow").withPayload(TEST_MESSAGE).asynchronously().run();
+    run("childAsyncFlow");
     verify("childAsyncFlowChild");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void processorChain() throws Exception {
-    assertVoidMuleEventResponse("processorChain");
+    run("processorChain");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterAccepts() throws Exception {
-    assertVoidMuleEventResponse("filterAccepts");
+    run("filterAccepts");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterRejects() throws Exception {
     assertThat(flowRunner("filterRejects").withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run(), is(nullValue()));
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterAfterNonBlockingAccepts() throws Exception {
-    assertVoidMuleEventResponse("filterAfterNonBlockingAccepts");
+    run("filterAfterNonBlockingAccepts");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterAfterNonBlockingRejects() throws Exception {
-    assertVoidMuleEventResponse("filterAfterNonBlockingRejects");
+    run("filterAfterNonBlockingRejects");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterBeforeNonBlockingAccepts() throws Exception {
-    assertVoidMuleEventResponse("filterAfterNonBlockingAccepts");
+    run("filterAfterNonBlockingAccepts");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterBeforeNonBlockingRejects() throws Exception {
     assertThat(flowRunner("filterBeforeNonBlockingRejects").withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run(),
                is(nullValue()));
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void filterAfterEnricherBeforeNonBlocking() throws Exception {
     assertThat(flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run(),
                is(nullValue()));
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void securityFilter() throws Exception {
-    assertVoidMuleEventResponse("security-filter");
+    run("security-filter");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void transformer() throws Exception {
-    assertVoidMuleEventResponse("transformer");
+    run("transformer");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void choice() throws Exception {
-    assertVoidMuleEventResponse("choice");
+    run("choice");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void enricher() throws Exception {
-    assertVoidMuleEventResponse("enricher");
+    run("enricher");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void enricherIssue() throws Exception {
-    assertVoidMuleEventResponse("enricherIssue");
+    run("enricherIssue");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void enricherIssueNonBlocking() throws Exception {
-    assertVoidMuleEventResponse("enricherIssueNonBlocking");
+    run("enricherIssueNonBlocking");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void enricherFlowVar() throws Exception {
-    assertVoidMuleEventResponse("enricherFlowVar");
+    run("enricherFlowVar");
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void async() throws Exception {
-    assertVoidMuleEventResponse("async");
+    run("async");
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10617")
   public void catchExceptionStrategy() throws Exception {
-    assertVoidMuleEventResponse("catchExceptionStrategy");
+    run("catchExceptionStrategy");
     verify("catchExceptionStrategyChild");
   }
 
-  private void assertVoidMuleEventResponse(String flowName) throws Exception {
-    assertThat(flowRunner(flowName).withPayload(TEST_MESSAGE).asynchronously().run(), instanceOf(VoidMuleEvent.class));
+  private void run(String flowName) throws Exception {
+    flowRunner(flowName).withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run();
   }
 
 }

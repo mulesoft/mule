@@ -44,6 +44,8 @@ public abstract class AbstractMuleObjectOwner<T>
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
+    getOwnedObjects().stream().filter(object -> object instanceof FlowConstructAware)
+        .forEach(object -> ((FlowConstructAware) object).setFlowConstruct(flowConstruct));
   }
 
   @Override

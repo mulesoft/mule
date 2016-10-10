@@ -206,7 +206,7 @@
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
-        <projectreactorVersion>3.0.2.RELEASE</projectreactorVersion>
+        <projectReactorVersion>3.0.3.BUILD-SNAPSHOT</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.1</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
@@ -1416,7 +1416,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-core</artifactId>
-                <version>${projectreactorVersion}</version>
+                <version>${projectReactorVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
@@ -1463,6 +1463,11 @@
             <id>mule</id>
             <name>Mule Repository</name>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>http://repo.spring.io/snapshot/</url>
         </repository>
     </repositories>
 

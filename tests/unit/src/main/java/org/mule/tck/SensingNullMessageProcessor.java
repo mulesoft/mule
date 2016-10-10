@@ -33,7 +33,6 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
 
   protected InternalMessageSource source = new InternalMessageSource();
   private long waitTime = 0;
-  private boolean enableNonBlocking = true;
   private String appendString;
 
   public SensingNullMessageProcessor() {

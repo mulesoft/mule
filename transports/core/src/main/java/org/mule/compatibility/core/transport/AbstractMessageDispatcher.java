@@ -9,28 +9,19 @@ package org.mule.compatibility.core.transport;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.exception.MessagingException;
 
 import java.nio.charset.Charset;
 import java.util.List;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkListener;
 
 /**
  * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors send messages over over a specific
@@ -100,22 +91,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     }
   }
 
-  private boolean isNonBlocking(Event event) {
-    return endpoint.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null &&
-        isSupportsNonBlocking() && !endpoint.getTransactionConfig().isTransacted();
-  }
-
-  /**
-   * Dispatcher implementations that support non-blocking processing should override this method and return 'true'. To support
-   * non-blocking processing it is also necessary to implment the
-   * {@link AbstractMessageDispatcher#doSendNonBlocking(Event, CompletionHandler)} method.
-   *
-   * @return true if non-blocking processing is supported by this dispatcher implemnetation.
-   */
-  protected boolean isSupportsNonBlocking() {
-    return false;
-  }
-
   /**
    * @deprecated
    */
@@ -177,77 +152,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   protected abstract void doDispatch(Event event) throws Exception;
 
   protected abstract InternalMessage doSend(Event event) throws Exception;
-
-  protected void doSendNonBlocking(Event event, CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
-    throw new IllegalStateException("This MessageDispatcher does not support non-blocking");
-  }
-
-  private class NonBlockingSendCompletionHandler implements CompletionHandler<InternalMessage, Exception, Void> {
-
-    private final Event event;
-    private final WorkManager workManager;
-    private final WorkListener workListener;
-
-
-    public NonBlockingSendCompletionHandler(Event event, WorkManager workManager, WorkListener workListener) {
-      this.event = event;
-      this.workManager = workManager;
-      this.workListener = workListener;
-    }
-
-    @Override
-    public void onCompletion(final InternalMessage result, ExceptionCallback<Void, Exception> exceptionCallback) {
-      try {
-        workManager.scheduleWork(new Work() {
-
-          @Override
-          public void run() {
-            try {
-              Event responseEvent = createResponseEvent(result, event);
-              // Set RequestContext ThreadLocal in new thread for backwards compatibility
-              setCurrentEvent(responseEvent);
-              event.getReplyToHandler().processReplyTo(responseEvent, null, null);
-            } catch (MessagingException messagingException) {
-              event.getReplyToHandler().processExceptionReplyTo(messagingException, null);
-            } catch (MuleException exception) {
-              event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
-            }
-          }
-
-          @Override
-          public void release() {
-            // no-op
-          }
-        }, WorkManager.INDEFINITE, null, workListener);
-      } catch (Exception exception) {
-        onFailure(exception);
-        exceptionCallback.onException(exception);
-      }
-    }
-
-    @Override
-    public void onFailure(final Exception exception) {
-      try {
-        workManager.scheduleWork(new Work() {
-
-          @Override
-          public void run() {
-            // Set RequestContext ThreadLocal in new thread for backwards compatibility
-            setCurrentEvent(event);
-            event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
-          }
-
-          @Override
-          public void release() {
-            // no-op
-          }
-        }, WorkManager.INDEFINITE, null, workListener);
-      } catch (WorkException e) {
-        // Handle exception in transport thread if unable to schedule work
-        event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
-      }
-    }
-  }
 
   protected Charset resolveEncoding(Event event) {
     return event.getMessage().getPayload().getDataType().getMediaType().getCharset().orElseGet(() -> {

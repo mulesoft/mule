@@ -51,6 +51,10 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
     Event result = null;
     MessagingException exceptionThrown = null;
 
+    // Update RequestContext ThreadLocal in case if previous processor modified it
+    // also for backwards compatibility
+    setCurrentEvent(eventToProcess);
+
     try {
       if (next == null) {
         result = messageProcessor.process(eventToProcess);
@@ -72,8 +76,8 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
     return result;
   }
 
-  protected void fireNotification(ServerNotificationManager serverNotificationManager, FlowConstruct flowConstruct,
-                                  Event event, Processor processor, MessagingException exceptionThrown, int action) {
+  public static void fireNotification(ServerNotificationManager serverNotificationManager, FlowConstruct flowConstruct,
+                                      Event event, Processor processor, MessagingException exceptionThrown, int action) {
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
       if (flowConstruct instanceof MessageProcessorPathResolver

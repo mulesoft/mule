@@ -40,7 +40,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void testClientEchoHolder() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
@@ -57,7 +57,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void testClientProxyEchoHolder() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
@@ -73,7 +73,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void testClientEcho2Holder() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
@@ -89,7 +89,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void testClientProxyEcho2Holder() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
@@ -104,7 +104,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void testClientEcho3Holder() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
@@ -119,7 +119,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void testClientProxyEcho3Holder() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();

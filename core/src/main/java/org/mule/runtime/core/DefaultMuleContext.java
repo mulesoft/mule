@@ -38,8 +38,10 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
+import static reactor.core.Exceptions.unwrap;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -89,6 +91,7 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
@@ -119,6 +122,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
 
@@ -233,6 +237,18 @@ public class DefaultMuleContext implements MuleContext {
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
   private org.mule.runtime.api.el.ExpressionLanguage expressionLanguageV2;
+
+  static {
+    // Ensure reactor operatorError hook is always registered.
+    Hooks.onOperatorError((throwable, o) -> {
+      Throwable unwrapped = unwrap(throwable);
+      if (!(unwrapped instanceof MessagingException)) {
+        return new MessagingException((Event) o, unwrapped);
+      } else {
+        return unwrapped;
+      }
+    });
+  }
 
   /**
    * @deprecated Use empty constructor instead and use setter for dependencies.

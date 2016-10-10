@@ -92,52 +92,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   }
 
   @Test
-  @Ignore("MULE-9731")
-  public void testDefaultFlowNonBlocking() throws Exception {
-    Transformer reqTransformer = mock(Transformer.class);
-    when(reqTransformer.process(any(Event.class))).then(echoEventAnswer);
-    Transformer resTransformer = mock(Transformer.class);
-    when(resTransformer.process(any(Event.class))).then(echoEventAnswer);
-
-    final Flow flow = new Flow("", muleContext);
-    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    muleContext.getRegistry().registerFlowConstruct(flow);
-
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, reqTransformer, resTransformer, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(flow);
-
-    Event event = getTestEvent(TEST_MESSAGE, flow);
-
-    Event response = endpoint.process(event);
-    //assertThat(getNonBlockingResponse(nullReplyToHandler, response).getMessage().getPayload().getValue(),
-    //           equalTo(event.getMessage().getPayload().getValue()));
-    verify(reqTransformer, times(1)).process(any());
-    verify(resTransformer, times(1)).process(any());
-  }
-
-  @Test
-  @Ignore("MULE-9731")
-  public void testDefaultFlowNonBlockingError() throws Exception {
-    final Flow flow = new Flow("", muleContext);
-    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    muleContext.getRegistry().registerFlowConstruct(flow);
-
-    OutboundEndpoint endpoint = createOutboundEndpoint("test://AlwaysFail", null, null, null, null, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(flow);
-    Event event = getTestEvent(TEST_MESSAGE, flow);
-
-    Event response = endpoint.process(event);
-
-    try {
-      //  getNonBlockingResponse(nullReplyToHandler, response);
-      //  fail("Exception Expected");
-    } catch (Exception e) {
-      assertThat(e, instanceOf(MessagingException.class));
-      assertThat(e.getCause(), instanceOf(RoutingException.class));
-    }
-  }
-
-  @Test
   public void testDefaultFlowAsync() throws Exception {
     Transformer reqTransformer = mock(Transformer.class);
     when(reqTransformer.process(any(Event.class))).then(echoEventAnswer);
@@ -379,12 +333,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
       latch.countDown();
     }
 
-    @Override
-    protected void doSendNonBlocking(Event event, CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
-      sensedSendEvent = event;
-      latch.countDown();
-      super.doSendNonBlocking(event, completionHandler);
-    }
   }
 
 }

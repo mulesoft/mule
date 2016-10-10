@@ -156,8 +156,8 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     InternalMessage toSplit =
         InternalMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
     CollectionSplitter splitter = new CollectionSplitter();
-    splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
+    splitter.setMuleContext(muleContext);
     splitter.setListener(grabber);
 
     final Builder eventBuilder = eventBuilder().message(toSplit).session(session);

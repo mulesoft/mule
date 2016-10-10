@@ -36,7 +36,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
       throws MuleException;
 
   @Override
-  protected Event processBlocking(Event event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     long startTime = System.currentTimeMillis();
     ProcessingTime time = ((CoreEventContext) event.getContext()).getProcessingTime();
     boolean exceptionWasThrown = true;

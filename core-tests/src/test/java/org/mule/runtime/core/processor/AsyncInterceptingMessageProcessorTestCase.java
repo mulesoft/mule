@@ -16,9 +16,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
+import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -35,25 +34,26 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.beans.ExceptionListener;
 
 import org.junit.Test;
 
-public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextTestCase
+public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveProcessorTestCase
     implements ExceptionListener {
 
   public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR =
-      "Exception expected: '" + SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE + "'";
+      "Exception expected: '" + SYNCHRONOUS_EVENT_ERROR_MESSAGE + "'";
 
   protected AsyncInterceptingMessageProcessor messageProcessor;
   protected TestListener target = new TestListener();
   protected Exception exceptionThrown;
   protected Latch latch = new Latch();
 
-  public AsyncInterceptingMessageProcessorTestCase() {
+  public AsyncInterceptingMessageProcessorTestCase(boolean reactive) {
+    super(reactive);
     setStartContext(true);
   }
 
@@ -75,7 +75,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(REQUEST_RESPONSE).build();
 
     try {
-      messageProcessor.process(event);
+      process(messageProcessor, event);
       fail(EXPECTING_SYNCHRONOUS_EVENT_ERROR);
     } catch (Exception e) {
     }
@@ -88,7 +88,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      messageProcessor.process(event);
+      process(messageProcessor, event);
       fail(EXPECTING_SYNCHRONOUS_EVENT_ERROR);
     } catch (Exception e) {
     } finally {
@@ -103,7 +103,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      messageProcessor.process(event);
+      process(messageProcessor, event);
       fail(EXPECTING_SYNCHRONOUS_EVENT_ERROR);
     } catch (Exception e) {
     } finally {
@@ -131,7 +131,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     messageProcessor.setListener(next);
     messageProcessor.setMuleContext(muleContext);
     messageProcessor.setFlowConstruct(flow);
-    messageProcessor.process(event);
+    process(messageProcessor, event);
 
     assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
   }
@@ -156,13 +156,13 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     messageProcessor.setListener(next);
     messageProcessor.setMuleContext(muleContext);
     messageProcessor.setFlowConstruct(flow);
-    messageProcessor.process(event);
+    process(messageProcessor, event);
 
     assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
   }
 
-  protected void assertSync(Processor processor, Event event) throws MuleException {
-    Event result = processor.process(event);
+  protected void assertSync(Processor processor, Event event) throws Exception {
+    Event result = process(processor, event);
 
     assertSame(event, target.sensedEvent);
     assertSame(event, result);
@@ -170,8 +170,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
   }
 
   protected void assertAsync(Processor processor, Event event)
-      throws MuleException, InterruptedException {
-    Event result = processor.process(event);
+      throws Exception {
+    Event result = process(processor, event);
 
     latch.await(10000, MILLISECONDS);
     assertNotNull(target.sensedEvent);

@@ -6,28 +6,28 @@
  */
 package org.mule.functional.functional;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate;
-
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     implements InterceptingMessageProcessor, FlowConstructAware, Startable {
@@ -58,6 +58,25 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       return null;
     }
     return processResponse(processNext(processRequest(event)));
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    Flux<Event> flux = from(publisher).map(event -> {
+      try {
+        return processRequest(event);
+      } catch (MuleException e) {
+        throw propagate(new MessagingException(event, e));
+      }
+    });
+    flux = from(flux.transform(next));
+    return flux.map(event -> {
+      try {
+        return processResponse(event);
+      } catch (MuleException e) {
+        throw propagate(new MessagingException(event, e));
+      }
+    });
   }
 
   public Event processRequest(Event event) throws MuleException {
@@ -145,6 +164,14 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       return responseCount == responseInvocationCount;
     } else {
       return countReached;
+    }
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    super.setFlowConstruct(flowConstruct);
+    if (next instanceof FlowConstructAware) {
+      ((FlowConstructAware) next).setFlowConstruct(flowConstruct);
     }
   }
 }

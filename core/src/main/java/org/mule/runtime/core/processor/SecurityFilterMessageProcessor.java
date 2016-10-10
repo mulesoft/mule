@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.processor;
 
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.security.SecurityFilter;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Filters the flow using the specified {@link SecurityFilter}. If unauthorised the flow is stopped and therefore the message is
@@ -51,6 +55,21 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
       event = filter.doFilter(event);
     }
     return processNext(event);
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    if (filter == null) {
+      return from(publisher).transform(stream -> applyNext(stream));
+    } else {
+      return from(publisher).doOnNext(event -> {
+        try {
+          filter.doFilter(event);
+        } catch (Exception e) {
+          throw propagate(e);
+        }
+      }).transform(stream -> applyNext(stream));
+    }
   }
 
   public void setFilter(SecurityFilter filter) {

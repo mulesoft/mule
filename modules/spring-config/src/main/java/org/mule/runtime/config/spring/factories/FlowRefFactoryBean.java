@@ -8,6 +8,10 @@ package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.error;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -30,6 +34,7 @@ import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
+import org.mule.runtime.core.util.rx.Exceptions;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +42,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
+import org.reactivestreams.Publisher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -73,7 +79,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   }
 
   private abstract class FlowRefMessageProcessorContainer extends FlowRefMessageProcessor
-      implements DynamicMessageProcessorContainer {
+      implements DynamicMessageProcessorContainer, FlowConstructAware {
 
     private MessageProcessorPathElement pathElement;
     private Processor dynamicMessageProcessor;
@@ -157,14 +163,29 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         @Override
         public Event process(Event event) throws MuleException {
+          final Processor dynamicMessageProcessor = resolveReferencedProcessor(event);
+          // Because this is created dynamically annotations cannot be injected by Spring and so
+          // FlowRefMessageProcessor is not used here.
+          return ((Processor) event1 -> dynamicMessageProcessor.process(event1)).process(event);
+        }
+
+        @Override
+        public Publisher<Event> apply(Publisher<Event> publisher) {
+          return from(publisher).concatMap(event -> {
+            try {
+              return just(event).transform(resolveReferencedProcessor(event));
+            } catch (MuleException e) {
+              throw propagate(e);
+            }
+          });
+        }
+
+        private Processor resolveReferencedProcessor(Event event) throws MuleException {
           // Need to initialize because message processor won't be managed by parent
           String flowName = muleContext.getExpressionLanguage().parse(refName, event, flowConstruct);
           final Processor dynamicMessageProcessor = getReferencedFlow(flowName, flowConstruct);
           setResolvedMessageProcessor(dynamicMessageProcessor);
-
-          // Because this is created dynamically annotations cannot be injected by Spring and so
-          // FlowRefMessageProcessor is not used here.
-          return ((Processor) event1 -> dynamicMessageProcessor.process(event1)).process(event);
+          return dynamicMessageProcessor;
         }
       };
       if (dynamicReference instanceof Initialisable) {
@@ -231,6 +252,12 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         public Event process(Event event) throws MuleException {
           return referencedFlow.process(event);
         }
+
+        @Override
+        public Publisher<Event> apply(Publisher<Event> publisher) {
+          return from(publisher).transform(referencedFlow);
+        }
+
       };
     } else {
       if (referencedFlow instanceof AnnotatedObject) {

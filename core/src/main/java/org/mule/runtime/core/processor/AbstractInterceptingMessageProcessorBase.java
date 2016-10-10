@@ -6,24 +6,21 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.util.NotificationUtils;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-import java.util.Arrays;
-
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +40,9 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+    if (next instanceof MuleContextAware) {
+      ((MuleContextAware) next).setMuleContext(context);
+    }
   }
 
   @Override
@@ -89,6 +89,19 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
 
   protected boolean isEventValid(Event event) {
     return event != null && !(event instanceof VoidMuleEvent);
+  }
+
+  protected Publisher<Event> applyNext(Publisher<Event> publisher) {
+    if (next == null) {
+      return publisher;
+    }
+    return from(publisher).doOnNext(event -> logNextMessageProcessorInvocation()).transform(next);
+  }
+
+  private void logNextMessageProcessorInvocation() {
+    if (logger.isTraceEnabled()) {
+      logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
+    }
   }
 
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -66,12 +67,12 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
       }
 
       if (messagingException.getFailingMessageProcessor() == null) {
-        throw putContext(messagingException, messageProcessor, event);
+        throw putContext(messagingException, messageProcessor, event, flowConstruct, muleContext);
       } else {
-        throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event);
+        throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event, flowConstruct, muleContext);
       }
     } catch (Throwable ex) {
-      throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event);
+      throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
     }
   }
 
@@ -80,9 +81,12 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     Throwable causeException =
         exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
             : exception;
+    ComponentIdentifier componentIdentifier = null;
     if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {
-      ComponentIdentifier componentIdentifier =
+      componentIdentifier =
           (ComponentIdentifier) ((AnnotatedObject) messageProcessor).getAnnotation(ComponentIdentifier.ANNOTATION_NAME);
+    }
+    if (componentIdentifier != null) {
       errorType = errorTypeLocator.lookupComponentErrorType(componentIdentifier, causeException);
     } else {
       errorType = errorTypeLocator.lookupErrorType(causeException);
@@ -90,8 +94,14 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     return errorType;
   }
 
-  private MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
-                                        Event event) {
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+    this.errorTypeLocator = context.getErrorTypeLocator();
+  }
+
+  public static MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
+                                              Event event, FlowConstruct flowConstruct, MuleContext muleContext) {
     for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
       for (Entry<String, Object> contextInfoEntry : exceptionContextProvider
           .getContextInfo(event, failingMessageProcessor, flowConstruct).entrySet()) {
@@ -101,12 +111,6 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
       }
     }
     return messagingException;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-    this.errorTypeLocator = context.getErrorTypeLocator();
   }
 
   @Override

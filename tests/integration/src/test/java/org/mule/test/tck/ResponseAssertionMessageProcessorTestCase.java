@@ -30,12 +30,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   @Before
   public void before() throws InitialisationException {
     testNonBlockingProcessor = new TestNonBlockingProcessor();
-    testNonBlockingProcessor.initialise();
-  }
-
-  @After
-  public void after() {
-    testNonBlockingProcessor.dispose();
   }
 
   @Override
@@ -47,7 +41,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
 
   @Test
   public void responseProcess() throws Exception {
-    when(mockEvent.isAllowNonBlocking()).thenReturn(false);
     when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
@@ -67,9 +60,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void responseProcessNonBlocking() throws Exception {
-    when(mockEvent.isAllowNonBlocking()).thenReturn(true);
     when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
     when(mockEvent.getError()).thenReturn(empty());
 

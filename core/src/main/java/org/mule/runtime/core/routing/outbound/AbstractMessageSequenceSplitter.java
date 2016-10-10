@@ -38,7 +38,6 @@ import java.util.Set;
 public abstract class AbstractMessageSequenceSplitter extends AbstractInterceptingMessageProcessor
     implements MuleContextAware {
 
-  protected MuleContext muleContext;
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   protected int batchSize;
   protected String counterVariableName;
@@ -135,11 +134,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     } else {
       builder.message(InternalMessage.builder(originalEvent.getMessage()).payload(payload).build());
     }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
   /**

@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -21,7 +22,7 @@ import org.mule.runtime.core.exception.MessagingException;
  * should be performed blocking or non-blocking..
  */
 public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, MessagingExceptionHandlerAware {
+    implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware {
 
   private MessagingExceptionHandler messagingExceptionHandler;
 

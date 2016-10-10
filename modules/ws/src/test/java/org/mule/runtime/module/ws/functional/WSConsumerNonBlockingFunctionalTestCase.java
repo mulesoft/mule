@@ -45,7 +45,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void validRequestReturnsExpectedAnswer() throws Exception {
     assertValidResponse("http://localhost:" + dynamicPort.getNumber() + "/in");
     muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class)
@@ -53,7 +53,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void invalidRequestFormatReturnsSOAPFault() throws Exception {
     String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\"><invalid>Hello</invalid></tns:echo>";
     assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message,
@@ -63,7 +63,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void invalidNamespaceReturnsSOAPFault() throws Exception {
     String message = "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>";
     assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message,
@@ -73,7 +73,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
   }
 
   @Test
-  @Ignore("MULE-9731")
+  @Ignore("MULE-10618")
   public void webServiceConsumerMidFlow() throws Exception {
     InternalMessage request = InternalMessage.builder().payload(ECHO_REQUEST).build();
     MuleClient client = muleContext.getClient();

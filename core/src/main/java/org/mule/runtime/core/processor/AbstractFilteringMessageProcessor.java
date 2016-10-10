@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.empty;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
@@ -15,6 +19,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+
+import org.reactivestreams.Publisher;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Flux;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
@@ -48,6 +58,26 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     } else {
       return handleUnaccepted(builder.build());
     }
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).concatMap(event -> {
+      Builder builder = Event.builder(event);
+      boolean accepted = accept(event, builder);
+      event = builder.build();
+      if (accepted) {
+        return applyNext(just(event));
+      } else {
+        if (unacceptedMessageProcessor != null) {
+          return just(event).transform(unacceptedMessageProcessor);
+        } else if (throwOnUnaccepted) {
+          throw propagate(filterUnacceptedException(event));
+        } else {
+          return empty();
+        }
+      }
+    });
   }
 
   protected abstract boolean accept(Event event, Event.Builder builder);

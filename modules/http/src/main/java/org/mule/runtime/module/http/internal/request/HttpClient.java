@@ -33,6 +33,6 @@ public interface HttpClient extends Startable, Stoppable {
    * CompletionHandler will be invoked.
    */
   void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
-            final CompletionHandler<HttpResponse, Exception, Void> handler, WorkManager responseWorkManager);
+            final CompletionHandler<HttpResponse, Exception, Void> handler);
 
 }

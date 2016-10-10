@@ -8,10 +8,15 @@ package org.mule.runtime.core.routing;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static reactor.core.publisher.Flux.error;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.fromIterable;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -21,18 +26,18 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.util.NotificationUtils;
 
@@ -41,9 +46,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.ListUtils;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer {
@@ -66,6 +72,10 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
+    conditionalMessageProcessors.forEach(pair -> pair.setFlowConstruct(flowConstruct));
+    conditionalMessageProcessors.forEach(pair -> pair.setMuleContext(muleContext));
+    setMuleContextIfNeeded(defaultProcessor, muleContext);
+    setFlowConstructIfNeeded(defaultProcessor, flowConstruct);
   }
 
   @Override
@@ -166,24 +176,38 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public Event process(Event event) throws MuleException {
-    Builder builder = Event.builder(event);
-    Collection<Processor> selectedProcessors = selectProcessors(event, builder);
+    return routeWithProcessors(getProcessorsToRoute(event), event);
+  }
 
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).concatMap(event -> {
+      try {
+        return fromIterable(getProcessorsToRoute(event)).concatMap(mp -> just(event).transform(mp)).collectList()
+            .map(list -> resultsHandler.aggregateResults(list, event));
+      } catch (RoutePathNotFoundException e) {
+        return error(e);
+      }
+    });
+  }
+
+  protected Collection<Processor> getProcessorsToRoute(Event event) throws RoutePathNotFoundException {
+    Collection<Processor> selectedProcessors = selectProcessors(event, Event.builder(event));
     if (!selectedProcessors.isEmpty()) {
-      return routeWithProcessors(selectedProcessors, builder.build());
-    }
+      return selectedProcessors;
+    } else if (defaultProcessor != null) {
+      return Collections.singleton(defaultProcessor);
+    } else {
+      if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
+        getRouterStatistics().incrementNoRoutedMessage();
+      }
 
-    if (defaultProcessor != null) {
-      return routeWithProcessor(defaultProcessor, builder.build());
+      throw new RoutePathNotFoundException(
+                                           CoreMessages
+                                               .createStaticMessage("Can't process message because no route has been found " +
+                                                   "matching any filter and no default route is defined"),
+                                           this);
     }
-
-    if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
-      getRouterStatistics().incrementNoRoutedMessage();
-    }
-
-    throw new RoutePathNotFoundException(I18nMessageFactory
-        .createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-                                         this);
   }
 
   /**

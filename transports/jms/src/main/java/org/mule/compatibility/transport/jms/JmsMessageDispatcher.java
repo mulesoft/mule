@@ -164,25 +164,17 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
       if (useReplyToDestination && replyTo != null) {
         final int timeout = endpoint.getResponseTimeout();
+        try {
+          if (topic) {
+            return internalBlockingSendAndAwait(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
+                                                timeout, event);
 
-        if (completionHandler != null) {
-          internalNonBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, transacted,
-                                            timeout, completionHandler, event);
-          delayedCleanup = true;
-          return null;
-        } else {
-          try {
-            if (topic) {
-              return internalBlockingSendAndAwait(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
+          } else {
+            return internalBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
                                                   timeout, event);
-
-            } else {
-              return internalBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
-                                                    timeout, event);
-            }
-          } finally {
-            closeReplyQueue(session, replyTo);
           }
+        } finally {
+          closeReplyQueue(session, replyTo);
         }
       } else {
         return internalSend(producer, jmsMessage, topic, ttl, priority, persistent);
@@ -248,63 +240,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
-  private void internalNonBlockingSendAndReceive(final Session session, final MessageProducer producer, final Destination replyTo,
-                                                 Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent,
-                                                 final boolean transacted, int timeout,
-                                                 final CompletionHandler<InternalMessage, Exception, Void> completionHandler,
-                                                 Event event)
-      throws JMSException {
-    connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
-    final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
-    final TimerTask closeConsumerTask = new TimerTask() {
-
-      @Override
-      public void run() {
-        try {
-          completionHandler.onCompletion(createMuleMessage(null), (exception -> {
-            return null;
-          }));
-        } catch (MuleException e) {
-          completionHandler.onFailure(e);
-        } finally {
-          cleanup(producer, session, consumer, replyTo);
-        }
-      }
-    };
-
-    connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
-    consumer.setMessageListener(new CompletionHandlerReplyToListener(new CompletionHandler<Message, Exception, Void>() {
-
-      @Override
-      public void onCompletion(Message result, ExceptionCallback<Void, Exception> exceptionCallback) {
-        try {
-          closeConsumerTask.cancel();
-          completionHandler.onCompletion(createResponseMuleMessage(result, replyTo), exceptionCallback);
-        } catch (Exception e) {
-          completionHandler.onFailure(e);
-        } finally {
-          cleanup(producer, session, consumer, replyTo);
-        }
-      }
-
-      @Override
-      public void onFailure(Exception exception) {
-        try {
-          completionHandler.onFailure(exception);
-        } finally {
-          cleanup(producer, session, consumer, replyTo);
-        }
-      }
-    }));
-  }
-
-  private void cleanup(MessageProducer producer, Session session, MessageConsumer consumer, Destination replyTo) {
-    closeProducer(producer);
-    closeConsumer(consumer);
-    closeReplyQueue(session, replyTo);
-    closeSession(session);
-  }
-
   private MessageProducer createProducer(Session session, boolean topic) throws JMSException {
     final Destination dest = connector.getJmsSupport().createDestination(session, endpoint);
     return connector.getJmsSupport().createProducer(session, dest, topic);
@@ -340,10 +275,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
   private void closeConsumer(MessageConsumer consumer) {
     connector.closeQuietly(consumer);
-  }
-
-  private void closeProducer(MessageProducer producer) {
-    connector.closeQuietly(producer);
   }
 
   private void closeSession(Session session) {
@@ -407,15 +338,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   @Override
   protected InternalMessage doSend(Event event) throws Exception {
     return dispatchMessage(event, true, null);
-  }
-
-  @Override
-  protected void doSendNonBlocking(Event event, CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
-    try {
-      dispatchMessage(event, true, completionHandler);
-    } catch (Exception e) {
-      completionHandler.onFailure(e);
-    }
   }
 
   @Override
@@ -571,23 +493,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
-  private class CompletionHandlerReplyToListener implements MessageListener {
-
-    private final CompletionHandler<Message, Exception, Void> completionHandler;
-
-    public CompletionHandlerReplyToListener(CompletionHandler<Message, Exception, Void> completionHandler) {
-      this.completionHandler = completionHandler;
-    }
-
-    @Override
-    public void onMessage(Message message) {
-      completionHandler.onCompletion(message, (ExceptionCallback<Void, Exception>) (exception -> {
-        // TODO MULE-9629
-        return null;
-      }));
-    }
-  }
-
   @Override
   protected Event applyOutboundTransformers(Event event) throws MuleException {
     try {
@@ -598,8 +503,4 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return super.applyOutboundTransformers(event);
   }
 
-  @Override
-  protected boolean isSupportsNonBlocking() {
-    return true;
-  }
 }

@@ -16,7 +16,6 @@ import org.mule.runtime.core.util.concurrent.Latch;
 public class SensingNullReplyToHandler implements ReplyToHandler {
 
   public Event event;
-  public Exception exception;
   public Latch latch = new Latch();
 
   @Override
@@ -24,12 +23,6 @@ public class SensingNullReplyToHandler implements ReplyToHandler {
     this.event = event;
     latch.countDown();
     return event;
-  }
-
-  @Override
-  public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-    this.exception = exception;
-    latch.countDown();
   }
 
   public void clear() {

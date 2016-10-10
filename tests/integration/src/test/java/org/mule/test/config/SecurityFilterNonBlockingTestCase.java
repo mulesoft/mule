@@ -29,7 +29,6 @@ public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCa
   }
 
   @Test
-  @Ignore("MULE-9731")
   public void securityFilterShouldAllowNonBlocking() throws Exception {
     flowRunner("nonBlockingSecurity").withPayload(TEST_MESSAGE).nonBlocking().run();
   }

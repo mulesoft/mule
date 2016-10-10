@@ -8,20 +8,17 @@ package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.Transformer;
 
@@ -39,6 +36,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   private ReplyToHandler replyToHandler;
 
   private Transformer responseEventTransformer = input -> input;
+  private boolean nonBlocking = false;
 
   /**
    * Initializes this flow runner.
@@ -74,6 +72,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @return this {@link FlowRunner}
    */
   public FlowRunner nonBlocking() {
+    nonBlocking = true;
     return this;
   }
 
@@ -117,7 +116,13 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public Event runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    Event responseEvent = txExecutionTemplate.execute(() -> flow.process(getOrBuildEvent()));
+    Event responseEvent = txExecutionTemplate.execute(() -> {
+      if (nonBlocking) {
+        return processAsStreamAndBlock(getOrBuildEvent(), flow);
+      } else {
+        return flow.process(getOrBuildEvent());
+      }
+    });
     for (String flowNameToVerify : flowNamesToVerify) {
       FlowAssert.verify(flowNameToVerify);
     }
