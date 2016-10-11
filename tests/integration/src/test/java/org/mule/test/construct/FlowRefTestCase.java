@@ -34,6 +34,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -174,6 +175,7 @@ public class FlowRefTestCase extends FunctionalTestCase
         assertEquals("0C", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
     }
 
+    @Ignore("MULE-10879: Non-blocking inheritance in flow refs causes SerialWorkManager to execute NB work")
     @Test
     public void nonBlockingFlowRef() throws Exception
     {
