@@ -173,6 +173,20 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     Builder removeOutboundProperty(String key);
 
     /**
+     * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     */
+    @Deprecated
+    Builder clearInboundProperties();
+
+    /**
+     * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     */
+    @Deprecated
+    Builder clearOutboundProperties();
+
+    /**
      * @param key
      * @param value
      * @return
@@ -205,6 +219,20 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      */
     @Deprecated
     Builder removeOutboundAttachment(String key);
+
+    /**
+     * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     */
+    @Deprecated
+    Builder clearInboundAttachments();
+
+    /**
+     * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     */
+    @Deprecated
+    Builder clearOutboundAttachments();
 
     /**
      * @param inboundProperties

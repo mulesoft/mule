@@ -39,6 +39,7 @@ import javax.activation.DataHandler;
 import org.junit.Test;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 /**
  *
@@ -163,6 +164,17 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void inboundClear() {
+    Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
+    InternalMessage source = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+        .inboundProperties(inboundProperties).build()).build();
+
+    InternalMessage copy = new DefaultMessageBuilder(source).clearInboundProperties().build();
+
+    assertThat(copy.getInboundPropertyNames(), is(empty()));
+  }
+
+  @Test
   public void inboundPropertyMapCopy() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
     InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
@@ -195,6 +207,17 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     assertThat(copy.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
     assertThat(copy.getOutboundPropertyNames(), hasSize(1));
     assertThat(copy.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
+  }
+
+  @Test
+  public void outboundClear() {
+    Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
+    InternalMessage source = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+        .outboundProperties(outboundProperties).build()).build();
+
+    InternalMessage copy = new DefaultMessageBuilder(source).clearOutboundProperties().build();
+
+    assertThat(copy.getOutboundPropertyNames(), is(empty()));
   }
 
   @Test

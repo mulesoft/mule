@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;

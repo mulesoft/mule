@@ -6,12 +6,9 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.core.PropertyScope;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -19,9 +16,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Function;
 
 /**
  * Useful methods for formatting message strings for logging or exceptions.
@@ -181,44 +175,6 @@ public final class StringMessageUtils {
       return CollectionUtils.toString((Collection<?>) o, MAX_ELEMENTS);
     } else {
       return o.toString();
-    }
-  }
-
-  public static String headersToString(InternalMessage m) {
-    if (m == null) {
-      return null;
-    }
-    StringBuilder buf = new StringBuilder();
-    buf.append(SystemUtils.LINE_SEPARATOR).append("Message properties:").append(SystemUtils.LINE_SEPARATOR);
-
-    try {
-      Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
-      buf.append("  ").append(PropertyScope.INBOUND.toString().toUpperCase()).append(" scoped properties:")
-          .append(SystemUtils.LINE_SEPARATOR);
-      appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
-
-      Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
-      buf.append("  ").append(PropertyScope.OUTBOUND.toString().toUpperCase()).append(" scoped properties:")
-          .append(SystemUtils.LINE_SEPARATOR);
-      appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
-    } catch (IllegalArgumentException e) {
-      // ignored
-    }
-    return buf.toString();
-  }
-
-  private static void appendPropertyValues(InternalMessage m, StringBuilder buf, Set<String> names,
-                                           Function<String, Serializable> valueResolver) {
-    for (String name : names) {
-      Serializable value = valueResolver.apply(name);
-      // avoid calling toString recursively on Messages
-      if (value instanceof InternalMessage) {
-        value = "<<<Message>>>";
-      }
-      if (name.equals("password") || name.toString().contains("secret") || name.equals("pass")) {
-        value = "****";
-      }
-      buf.append("    ").append(name).append("=").append(value).append(SystemUtils.LINE_SEPARATOR);
     }
   }
 }

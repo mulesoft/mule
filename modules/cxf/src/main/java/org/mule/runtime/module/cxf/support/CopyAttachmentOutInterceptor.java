@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.support;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
+import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.module.cxf.CxfConstants.ATTACHMENTS;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;

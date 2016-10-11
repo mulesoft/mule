@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleSession;
@@ -27,6 +26,7 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -145,6 +145,13 @@ public class DefaultEventBuilder implements Event.Builder {
   @Override
   public Event.Builder removeVariable(String key) {
     flowVariables.remove(key);
+    this.modified = true;
+    return this;
+  }
+
+  @Override
+  public Builder clearVariables() {
+    flowVariables.clear();
     this.modified = true;
     return this;
   }
@@ -280,35 +287,37 @@ public class DefaultEventBuilder implements Event.Builder {
 
     /** Immutable MuleEvent state **/
 
-    private EventContext context;
+    private final EventContext context;
+    // TODO MULE-10013 make this final
     private InternalMessage message;
     private final MuleSession session;
+    // TODO MULE-10013 make this final
     private transient FlowConstruct flowConstruct;
 
-    protected MessageExchangePattern exchangePattern;
+    private final MessageExchangePattern exchangePattern;
     private final ReplyToHandler replyToHandler;
-    protected boolean transacted;
-    protected boolean synchronous;
+    private final boolean transacted;
+    private final boolean synchronous;
 
     /** Mutable MuleEvent state **/
-    private Object replyToDestination;
+    private final Object replyToDestination;
 
-    private boolean notificationsEnabled = true;
+    private final boolean notificationsEnabled;
 
-    private CopyOnWriteCaseInsensitiveMap<String, DefaultTypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
+    private final CopyOnWriteCaseInsensitiveMap<String, DefaultTypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
-    protected boolean nonBlocking;
-    private String legacyCorrelationId;
-    private Error error;
+    private final boolean nonBlocking;
+    private final String legacyCorrelationId;
+    private final Error error;
 
     // Use this constructor from the builder
-    public EventImplementation(EventContext context, InternalMessage message,
-                               Map<String, DefaultTypedValue<Object>> variables,
-                               MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
-                               boolean transacted, boolean synchronous, boolean nonBlocking, Object replyToDestination,
-                               ReplyToHandler replyToHandler, FlowCallStack flowCallStack, GroupCorrelation groupCorrelation,
-                               Error error, String legacyCorrelationId, boolean notificationsEnabled) {
+    private EventImplementation(EventContext context, InternalMessage message,
+                                Map<String, DefaultTypedValue<Object>> variables,
+                                MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
+                                boolean transacted, boolean synchronous, boolean nonBlocking, Object replyToDestination,
+                                ReplyToHandler replyToHandler, FlowCallStack flowCallStack, GroupCorrelation groupCorrelation,
+                                Error error, String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
       this.session = session;
@@ -571,26 +580,6 @@ public class DefaultEventBuilder implements Event.Builder {
       return legacyCorrelationId != null ? legacyCorrelationId : getContext().getCorrelationId();
     }
 
-    private static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
-
-    /**
-     * Return the event associated with the currently executing thread.
-     *
-     * @return event for currently executing thread.
-     */
-    public static Event getCurrentEvent() {
-      return currentEvent.get();
-    }
-
-    /**
-     * Set the event to be associated with the currently executing thread.
-     *
-     * @param event event for currently executing thread.
-     */
-    public static void setCurrentEvent(Event event) {
-      currentEvent.set(event);
-    }
-
     /**
      * Obtain the correlationId set during flow execution if any. This is only used to support transports and should not be used
      * otherwise. Customization of the correlationId, if needed, should instead be done as part of the source connector
@@ -599,21 +588,11 @@ public class DefaultEventBuilder implements Event.Builder {
      * @return legacy correlationId if set, otherwise {@code null}.
      * @deprecated Transport infrastructure is deprecated.
      */
+    @Override
     @Deprecated
     public String getLegacyCorrelationId() {
       return this.legacyCorrelationId;
     }
-
-    public static <T> T getVariableValueOrNull(String key, Event event) {
-      TypedValue<T> value = null;
-      try {
-        value = event.getVariable(key);
-      } catch (NoSuchElementException nsse) {
-        // Ignore
-      }
-      return value != null ? value.getValue() : null;
-    }
-
   }
 
 }
