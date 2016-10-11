@@ -32,6 +32,7 @@ import static org.mule.runtime.config.spring.dsl.api.CommonTypeConverters.string
 import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
@@ -66,6 +67,7 @@ import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
+import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
@@ -86,6 +88,7 @@ import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -213,6 +216,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
   private static final String ERROR_HANDLER = "error-handler";
   private static final String SET_PAYLOAD = "set-payload";
+  private static final String LOGGER = "logger";
   private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
@@ -223,6 +227,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String RESPONSE = "response";
   private static final String MESSAGE_FILTER = "message-filter";
   private static final String FLOW = "flow";
+  private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
   private static final String SCATTER_GATHER = "scatter-gather";
   private static final String WIRE_TAP = "wire-tap";
@@ -315,6 +320,21 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
             .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
             .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(LOGGER)
+            .withTypeDefinition(fromType(LoggerMessageProcessor.class))
+            .withSetterParameterDefinition("message", fromSimpleParameter("message").build())
+            .withSetterParameterDefinition("level", fromSimpleParameter("category").build())
+            .withSetterParameterDefinition("category", fromSimpleParameter("level").build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(FLOW_REF)
+            .withTypeDefinition(fromType(Processor.class))
+            .withObjectFactoryType(FlowRefFactoryBean.class)
+            .withSetterParameterDefinition(NAME_ATTRIBUTE, fromSimpleParameter(NAME_ATTRIBUTE).build())
+            .build());
 
     componentBuildingDefinitions
         .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyProcessor.class),
