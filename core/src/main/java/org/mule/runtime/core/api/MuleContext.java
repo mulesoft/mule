@@ -320,6 +320,13 @@ public interface MuleContext extends Lifecycle {
   ExpressionLanguage getExpressionLanguage();
 
   /**
+   * Expression Language for evaluating expressions using Mule as the context
+   *
+   * @return the {@link org.mule.runtime.api.el.ExpressionLanguage} to be used
+   */
+  org.mule.runtime.api.el.ExpressionLanguage getExpressionLanguageV2();
+
+  /**
    * Factory for creating locks for synchronizing mule components.
    *
    * Synchronization must be done using LockFactory locks in order for mule components to work in single servers as in a cluster
