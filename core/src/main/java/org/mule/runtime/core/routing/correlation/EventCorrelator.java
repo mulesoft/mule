@@ -130,7 +130,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
                                    groupId, StringMessageUtils
                                        .truncate(StringMessageUtils.toString(event.getMessage().getPayload().getValue()), 200,
                                                  false),
-                                   StringMessageUtils.headersToString(event.getMessage())));
+                                   event.getMessage().toString()));
       } catch (Exception e) {
         // ignore
       }

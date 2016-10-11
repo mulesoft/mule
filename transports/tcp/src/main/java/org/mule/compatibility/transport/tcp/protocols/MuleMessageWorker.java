@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.tcp.protocols;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;

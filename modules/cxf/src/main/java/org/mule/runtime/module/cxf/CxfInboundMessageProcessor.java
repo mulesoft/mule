@@ -16,7 +16,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
 

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENDPOINT_PROPERTY;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.MediaType;

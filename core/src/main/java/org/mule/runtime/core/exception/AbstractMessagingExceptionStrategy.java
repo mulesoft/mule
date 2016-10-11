@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 

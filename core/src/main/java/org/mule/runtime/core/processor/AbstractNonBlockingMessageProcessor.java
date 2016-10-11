@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;

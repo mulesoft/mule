@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.DefaultEventContext;

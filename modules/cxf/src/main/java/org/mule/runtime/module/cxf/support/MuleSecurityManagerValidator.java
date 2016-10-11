@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.support;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;

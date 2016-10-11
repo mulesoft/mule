@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.component;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;

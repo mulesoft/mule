@@ -10,8 +10,11 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.PropertyScope.INBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
@@ -27,19 +30,17 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.CollectionBuilder;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
-import org.mule.runtime.core.util.ObjectUtils;
-import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
@@ -53,6 +54,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
 
 import javax.activation.DataHandler;
 
@@ -357,14 +360,54 @@ public class DefaultMessageBuilder
       buf.append(LINE_SEPARATOR);
       buf.append("  payload=").append(getPayload().getDataType().getType().getName());
       buf.append(LINE_SEPARATOR);
+      buf.append("  attributes=").append(getAttributes().toString());
+      buf.append(LINE_SEPARATOR);
       buf.append("  mediaType=").append(getPayload().getDataType().getMediaType());
       buf.append(LINE_SEPARATOR);
-      buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
+      buf.append("  exceptionPayload=").append(defaultIfNull(exceptionPayload, NOT_SET));
       buf.append(LINE_SEPARATOR);
-      buf.append(StringMessageUtils.headersToString(this));
+
+      if (!getInboundPropertyNames().isEmpty() || !getOutboundPropertyNames().isEmpty()) {
+        headersToStringBuilder(this, buf);
+      }
       // no new line here, as headersToString() adds one
       buf.append('}');
       return buf.toString();
+    }
+
+    public static void headersToStringBuilder(InternalMessage m, StringBuilder buf) {
+      buf.append("  Message properties:").append(LINE_SEPARATOR);
+
+      try {
+        if (!m.getInboundPropertyNames().isEmpty()) {
+          Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
+          buf.append("    ").append(INBOUND.toString().toUpperCase()).append(" scoped properties:").append(LINE_SEPARATOR);
+          appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
+        }
+
+        if (!m.getOutboundPropertyNames().isEmpty()) {
+          Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
+          buf.append("    ").append(OUTBOUND.toString().toUpperCase()).append(" scoped properties:").append(LINE_SEPARATOR);
+          appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
+        }
+      } catch (IllegalArgumentException e) {
+        // ignored
+      }
+    }
+
+    private static void appendPropertyValues(InternalMessage m, StringBuilder buf, Set<String> names,
+                                             Function<String, Serializable> valueResolver) {
+      for (String name : names) {
+        Serializable value = valueResolver.apply(name);
+        // avoid calling toString recursively on Messages
+        if (value instanceof InternalMessage) {
+          value = "<<<Message>>>";
+        }
+        if (name.equals("password") || name.toString().contains("secret") || name.equals("pass")) {
+          value = "****";
+        }
+        buf.append("    ").append(name).append("=").append(value).append(LINE_SEPARATOR);
+      }
     }
 
     @Override
@@ -527,11 +570,6 @@ public class DefaultMessageBuilder
     public Attributes getAttributes() {
       return attributes;
     }
-
-    // @Override
-    // public DataType getDataType() {
-    // return typedValue.getDataType();
-    // }
 
     @Override
     public Serializable getInboundProperty(String name) {

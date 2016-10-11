@@ -14,8 +14,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;

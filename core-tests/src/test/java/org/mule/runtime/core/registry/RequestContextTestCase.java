@@ -7,7 +7,7 @@
 package org.mule.runtime.core.registry;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.runtime.core.api.Event;

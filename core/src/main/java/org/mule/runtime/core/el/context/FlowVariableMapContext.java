@@ -7,11 +7,10 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.message.DefaultEventBuilder;
+import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 
-import java.util.Collections;
+import org.mule.runtime.core.api.Event;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +59,7 @@ public class FlowVariableMapContext extends AbstractMapContext<Object> {
 
   @Override
   public String toString() {
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     for (String key : event.getVariableNames()) {
       Object value = event.getVariable(key) != null ? event.getVariable(key).getValue() : null;
       map.put(key, value);

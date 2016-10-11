@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.VoidMuleEvent;

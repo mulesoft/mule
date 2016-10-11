@@ -10,6 +10,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Legacy implementation of {@link Event}
@@ -35,6 +37,11 @@ import java.util.Map;
  * @see Message
  */
 public interface Event extends MuleEvent {
+
+  static class CurrentEventHolder {
+
+    private static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
+  }
 
   /**
    * @return the context applicable to all events created from the same root {@link Event} from a {@link MessageSource}.
@@ -430,4 +437,33 @@ public interface Event extends MuleEvent {
     Event build();
 
   }
+
+  public static <T> T getVariableValueOrNull(String key, Event event) {
+    TypedValue<T> value = null;
+    try {
+      value = event.getVariable(key);
+    } catch (NoSuchElementException nsse) {
+      // Ignore
+    }
+    return value != null ? value.getValue() : null;
+  }
+
+  /**
+   * Return the event associated with the currently executing thread.
+   *
+   * @return event for currently executing thread.
+   */
+  public static Event getCurrentEvent() {
+    return CurrentEventHolder.currentEvent.get();
+  }
+
+  /**
+   * Set the event to be associated with the currently executing thread.
+   *
+   * @param event event for currently executing thread.
+   */
+  public static void setCurrentEvent(Event event) {
+    CurrentEventHolder.currentEvent.set(event);
+  }
+
 }

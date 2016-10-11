@@ -6,15 +6,15 @@
  */
 package org.mule.functional.functional;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -23,10 +23,10 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -228,9 +228,9 @@ public class FunctionalTestComponent
     if (isLogMessageDetails() && logger.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
 
-      sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
-      sb.append(message.getPayload().getValue().toString()).append(SystemUtils.LINE_SEPARATOR);
-      sb.append(StringMessageUtils.headersToString(message));
+      sb.append("Full Message: ").append(LINE_SEPARATOR);
+      sb.append(message.getPayload().getValue().toString()).append(LINE_SEPARATOR);
+      sb.append(message.toString());
       logger.info(sb.toString());
     }
 

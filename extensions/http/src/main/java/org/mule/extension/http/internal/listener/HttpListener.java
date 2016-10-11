@@ -10,7 +10,7 @@ import static org.mule.extension.http.internal.HttpConnector.CONFIGURATION_OVERR
 import static org.mule.extension.http.internal.HttpConnector.RESPONSE_SETTINGS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;

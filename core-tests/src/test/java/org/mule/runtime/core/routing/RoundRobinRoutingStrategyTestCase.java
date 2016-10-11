@@ -10,7 +10,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
+import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
