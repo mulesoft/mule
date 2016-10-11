@@ -11,12 +11,24 @@ import static org.junit.Assert.fail;
 
 import org.mule.api.MuleContext;
 import org.mule.exception.AbstractSystemExceptionStrategy;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.transport.ConnectException;
+import org.mule.util.concurrent.Latch;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -26,11 +38,16 @@ import org.junit.runners.Parameterized;
 public class FtpReconnectionTestCase extends AbstractFtpServerTestCase
 {
     protected TestSystemExceptionStrategy tryReconnectionStrategy;
+    MockFailingServer server;
 
     public FtpReconnectionTestCase (ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
+
+    @Rule
+    public DynamicPort listenPort = new DynamicPort("port1");
+
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
@@ -43,12 +60,21 @@ public class FtpReconnectionTestCase extends AbstractFtpServerTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        super.doSetUp();
+        createFtpServerBaseDir();
 
         tryReconnectionStrategy = new TestSystemExceptionStrategy(muleContext);
         muleContext.setExceptionListener(tryReconnectionStrategy);
 
+        server = new MockFailingServer();
+        server.start();
         createFtpServerDir("lostConnection");
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        server.stop();
+        deleteFtpServerBaseDir();
     }
 
     @Test
@@ -56,32 +82,16 @@ public class FtpReconnectionTestCase extends AbstractFtpServerTestCase
     {
         try
         {
+            createFileOnFtpServer("lostConnection/test1");
             FlowExecutionListener flowExecutionListener = new FlowExecutionListener("LostConnection", muleContext);
-            Thread.sleep(1000);
-            stopServer();
             flowExecutionListener.waitUntilFlowIsComplete();
-            fail("Should be reconnecting forerver");
         }
         catch (java.lang.AssertionError e)
         {
             assertTrue(tryReconnectionStrategy.reconnect);
+            return;
         }
-    }
-
-    @Test
-    public void testNoConnection() throws Exception
-    {
-        try
-        {
-            stopServer();
-            FlowExecutionListener flowExecutionListener = new FlowExecutionListener("LostConnection", muleContext);
-            flowExecutionListener.waitUntilFlowIsComplete();
-            fail("Should be reconnecting forerver");
-        }
-        catch (java.lang.AssertionError e)
-        {
-            assertTrue(tryReconnectionStrategy.reconnect);
-        }
+        fail("Should try to reconnect");
     }
 
     protected class TestSystemExceptionStrategy extends AbstractSystemExceptionStrategy
@@ -97,4 +107,66 @@ public class FtpReconnectionTestCase extends AbstractFtpServerTestCase
             reconnect = true;
         }
     }
+
+    private class MockFailingServer implements Runnable
+    {
+
+        private Latch startedLatch = new Latch();
+        private Latch finishedLatch = new Latch();
+
+        public void start()
+        {
+            try
+            {
+                Thread serverThread = new Thread(this);
+                serverThread.start();
+                startedLatch.await();
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException("Failed to start mock server", e);
+            }
+        }
+
+        public void stop()
+        {
+            try
+            {
+                finishedLatch.await();
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException("Failed to stop mock server", e);
+            }
+        }
+
+        @Override
+        public void run()
+        {
+            try
+            {
+                ServerSocket serverSocket = new ServerSocket(listenPort.getNumber());
+                startedLatch.release();
+                Socket socket = serverSocket.accept();
+                InputStream inputStream = socket.getInputStream();
+                OutputStream outputStream = socket.getOutputStream();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream), 1);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream), 1);
+
+                reader.close();
+                // client reads null message
+                writer.close();
+                socket.close();
+                serverSocket.close();
+
+                finishedLatch.release();
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 }

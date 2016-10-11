@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
 
     <flow name="LostConnection">
-        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/LostConnection" />
+        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/lostConnection" />
         <test:component />
     </flow>
 </mule>

@@ -164,7 +164,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
             return v.toArray(new FTPFile[v.size()]);
         }
-        catch (java.net.ConnectException | FTPConnectionClosedException e)
+        catch (FTPConnectionClosedException e)
         {
             throw new ConnectException(e, this.connector);
         }
