@@ -38,7 +38,7 @@ import java.util.NoSuchElementException;
  */
 public interface Event extends MuleEvent {
 
-  public static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
+  static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
 
   /**
    * @return the context applicable to all events created from the same root {@link Event} from a {@link MessageSource}.
@@ -320,13 +320,6 @@ public interface Event extends MuleEvent {
      * @return the builder instance
      */
     Builder removeVariable(String key);
-
-    /**
-     * Removes all variables.
-     *
-     * @return the builder instance
-     */
-    Builder clearVariables();
 
     /**
      * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
