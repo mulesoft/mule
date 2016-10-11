@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -24,7 +24,7 @@ import org.junit.Test;
  * When exception strategies are used with transactions it should be possible to send the exception message while rolling back the
  * transaction. See MULE-4338
  */
-public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase {
+public class ExceptionStrategyTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   private static String failure;
 

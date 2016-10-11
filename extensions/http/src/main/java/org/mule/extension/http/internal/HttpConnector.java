@@ -50,7 +50,6 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 @Import(type = TcpServerSocketProperties.class, from = "Sockets")
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/httpn", namespace = "httpn")
 @Export(classes = {HttpBasicAuthenticationFilter.class, HttpClient.class})
-
 public class HttpConnector {
 
   public static final String URL_CONFIGURATION = "URL Configuration";

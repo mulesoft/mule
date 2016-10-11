@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MuleClientJmsTestCase extends FunctionalTestCase {
+public class MuleClientJmsTestCase extends CompatibilityFunctionalTestCase {
 
   public static final int INTERATIONS = 1;
 

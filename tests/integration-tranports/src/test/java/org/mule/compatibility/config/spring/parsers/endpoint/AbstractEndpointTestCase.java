@@ -13,10 +13,10 @@ import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 
-public abstract class AbstractEndpointTestCase extends FunctionalTestCase {
+public abstract class AbstractEndpointTestCase extends CompatibilityFunctionalTestCase {
 
   public ImmutableEndpoint doTest(String name) throws MuleException {
     ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(name);

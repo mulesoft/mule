@@ -8,7 +8,8 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpMultipleCookiesTestCase extends FunctionalTestCase {
+public class HttpMultipleCookiesTestCase extends CompatibilityFunctionalTestCase {
 
   protected static String TEST_MESSAGE = "Test Http Request ";
   protected static final Logger logger = LoggerFactory.getLogger(HttpMultipleCookiesTestCase.class);

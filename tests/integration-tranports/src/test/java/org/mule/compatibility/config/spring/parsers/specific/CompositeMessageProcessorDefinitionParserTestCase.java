@@ -12,14 +12,14 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 
 import org.junit.Test;
 
-public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase {
+public class CompositeMessageProcessorDefinitionParserTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

@@ -11,11 +11,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -25,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTestCase {
+public class HttpPollingWithTransformersFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -39,14 +38,10 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
   public void testPollingHttpConnector() throws Exception {
     final Latch latch = new Latch();
     final AtomicBoolean transformPropagated = new AtomicBoolean(false);
-    muleContext.registerListener(new FunctionalTestNotificationListener() {
-
-      @Override
-      public void onNotification(ServerNotification notification) {
-        latch.countDown();
-        if (notification.getSource().toString().endsWith("toClient-only")) {
-          transformPropagated.set(true);
-        }
+    muleContext.registerListener((FunctionalTestNotificationListener) notification -> {
+      latch.countDown();
+      if (notification.getSource().toString().endsWith("toClient-only")) {
+        transformPropagated.set(true);
       }
     }, "polledUMO");
 

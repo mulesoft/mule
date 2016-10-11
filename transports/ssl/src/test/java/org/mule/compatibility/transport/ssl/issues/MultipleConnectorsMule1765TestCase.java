@@ -8,13 +8,13 @@ package org.mule.compatibility.transport.ssl.issues;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase {
+public class MultipleConnectorsMule1765TestCase extends CompatibilityFunctionalTestCase {
 
   protected static String TEST_SSL_MESSAGE = "Test SSL Request";
 

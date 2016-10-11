@@ -12,7 +12,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.compatibility.transport.tcp.TcpConnector.DEFAULT_WAIT_TIMEOUT;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
@@ -27,7 +28,7 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpSocketsPoolTestCase extends FunctionalTestCase {
+public class TcpSocketsPoolTestCase extends CompatibilityFunctionalTestCase {
 
   protected static String TEST_MESSAGE = "Test TCP Request";
 

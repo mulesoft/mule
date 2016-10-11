@@ -8,20 +8,19 @@ package org.mule.compatibility.transport.vm.functional;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
 
-public class PersistentBoundedQueueTestCase extends FunctionalTestCase {
+public class PersistentBoundedQueueTestCase extends CompatibilityFunctionalTestCase {
 
   // add some sizeable delay, as queue store ordering won't be guaranteed
   private static final int SLEEP = 100;
@@ -46,7 +45,7 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase {
 
     // poll the 'out' queue 3 times, the first 2 times we must have a result. The
     // 3rd message must have been discarded as the queue was bounded.
-    Set<String> results = new HashSet<String>();
+    Set<String> results = new HashSet<>();
     pollOutQueue(client, results);
     pollOutQueue(client, results);
     assertTrue(results.contains("Test1"));

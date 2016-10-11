@@ -8,16 +8,17 @@ package org.mule.compatibility.transport.vm.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VmTransactionTestCase extends FunctionalTestCase {
+public class VmTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   protected static volatile boolean serviceComponentAck = false;
   protected static final Logger logger = LoggerFactory.getLogger(VmTransactionTestCase.class);

@@ -6,12 +6,12 @@
  */
 package org.mule.test.integration.transport.file;
 
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.FileUtils.newFile;
-import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
 import org.mule.compatibility.transport.file.ExpressionFilenameParser;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
@@ -19,7 +19,7 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTestCase {
+public class FileRuntimeExceptionStrategyFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

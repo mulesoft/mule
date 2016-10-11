@@ -8,10 +8,12 @@ package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.runtime.core.api.message.InternalMessage;
+
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 import static org.mule.compatibility.transport.file.FileTestUtils.createFolder;
 
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.File;

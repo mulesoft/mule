@@ -17,16 +17,72 @@
     </properties>
 
     <dependencies>
+        <!-- Mule Runtime Dependencies -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-management</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+              <artifactId>mule-module-scripting</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-tls</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Compatibility Module Dependencies -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-tcp</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <!-- TODO MULE-10509 Remove this dependency -->
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-tls</artifactId>
+            <artifactId>mule-module-cxf</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- Required extensions -->
+        <dependency>
+            <!-- TODO MULE-9705 remove this when http is fully migrated to the extension -->      
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http-ext</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sockets</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+         </dependency>
 
         <!-- test dependencies -->
         <dependency>
@@ -38,7 +94,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
+            <artifactId>mule-tests-functional-transports</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -47,11 +103,6 @@
             <artifactId>mule-core-transports-tests</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

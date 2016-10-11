@@ -21,7 +21,7 @@
     </spring:bean>
 
     <spring:bean id="fakeCredentialAccessor"
-                 class="org.mule.runtime.module.pgp.FakeCredentialAccessor">
+                 class="org.mule.test.module.pgp.FakeCredentialAccessor">
         <spring:property name="credentials"
                          value="Mule server &lt;mule_server@mule.com&gt;" />
     </spring:bean>

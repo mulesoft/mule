@@ -9,9 +9,8 @@ package org.mule.compatibility.transport.jms;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.test.JmsTestContextFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -22,7 +21,7 @@ import org.junit.Test;
 /**
  *
  */
-public class JmsJndiReconnectionTestCase extends FunctionalTestCase {
+public class JmsJndiReconnectionTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

@@ -11,9 +11,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -21,9 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
+public class ResponseTransformerScenariosTestCase extends CompatibilityFunctionalTestCase {
 
   private static String VM_INBOUND = " inbound";
   private static String VM_OUTBOUND = " outbound";
@@ -60,6 +62,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testVmSyncResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
 
@@ -73,6 +76,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testVmSyncOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null).getRight();
@@ -91,6 +95,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testJmsSyncOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null).getRight();
@@ -99,6 +104,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testChainedRouterOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null).getRight();
@@ -108,6 +114,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-10724")
   public void testNestedRouterOutboundEndpointResponseTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null).getRight();

@@ -26,7 +26,7 @@ import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.test.TestConnectionFactory;
 import org.mule.compatibility.transport.jms.test.TestRedeliveryHandler;
 import org.mule.compatibility.transport.jms.test.TestRedeliveryHandlerFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -43,7 +43,7 @@ import org.junit.Test;
 /**
  * Tests the "jms" namespace.
  */
-public class JmsNamespaceHandlerTestCase extends FunctionalTestCase {
+public class JmsNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   public JmsNamespaceHandlerTestCase() {
     setStartContext(false);

@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * See MULE-6968 "Http endpoint with path="" or path="/" do not attend requests at root level"
  */
-public class HttpRootLevelRequestsTestCase extends FunctionalTestCase {
+public class HttpRootLevelRequestsTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort httpPort1 = new DynamicPort("port1");

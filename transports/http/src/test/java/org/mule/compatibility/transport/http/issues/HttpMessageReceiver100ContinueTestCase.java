@@ -12,19 +12,20 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
-import org.junit.Rule;
-import org.junit.Test;
-
-public class HttpMessageReceiver100ContinueTestCase extends FunctionalTestCase {
+public class HttpMessageReceiver100ContinueTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");

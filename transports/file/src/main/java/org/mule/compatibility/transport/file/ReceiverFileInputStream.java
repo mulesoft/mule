@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This implementation is used when streaming and will move or delete the source file when the stream is closed.
  */
-class ReceiverFileInputStream extends FileInputStream {
+public class ReceiverFileInputStream extends FileInputStream {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 

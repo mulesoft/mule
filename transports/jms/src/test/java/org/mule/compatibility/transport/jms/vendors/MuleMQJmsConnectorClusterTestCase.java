@@ -13,11 +13,11 @@ import org.mule.compatibility.transport.jms.DefaultJmsTopicResolver;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.JmsTopicResolver;
 import org.mule.compatibility.transport.jms.mulemq.MuleMQJmsConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class MuleMQJmsConnectorClusterTestCase extends FunctionalTestCase {
+public class MuleMQJmsConnectorClusterTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

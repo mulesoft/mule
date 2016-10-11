@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpSyncTestCase extends FunctionalTestCase {
+public class TcpSyncTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

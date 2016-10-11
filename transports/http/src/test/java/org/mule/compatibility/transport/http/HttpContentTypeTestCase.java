@@ -10,15 +10,15 @@ package org.mule.compatibility.transport.http;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpContentTypeTestCase extends FunctionalTestCase {
+public class HttpContentTypeTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
 

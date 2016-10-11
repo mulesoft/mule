@@ -10,7 +10,8 @@ package org.mule.compatibility.transport.http.multipart;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import javax.activation.DataHandler;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpAttachmentDataTypeTestCase extends FunctionalTestCase {
+public class HttpAttachmentDataTypeTestCase extends CompatibilityFunctionalTestCase {
 
   private static final List<String> contentTypes = new ArrayList();
 

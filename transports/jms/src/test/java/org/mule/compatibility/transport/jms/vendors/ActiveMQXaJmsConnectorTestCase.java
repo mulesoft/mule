@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
@@ -23,7 +23,7 @@ import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.junit.Test;
 
-public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase {
+public class ActiveMQXaJmsConnectorTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

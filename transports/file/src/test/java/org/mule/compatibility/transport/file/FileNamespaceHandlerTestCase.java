@@ -14,19 +14,16 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.transport.file.ExpressionFilenameParser;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.compatibility.transport.file.FilenameParser;
 import org.mule.compatibility.transport.file.filters.FilenameRegexFilter;
 import org.mule.compatibility.transport.file.transformers.FileToByteArray;
 import org.mule.compatibility.transport.file.transformers.FileToString;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class FileNamespaceHandlerTestCase extends FunctionalTestCase {
+public class FileNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

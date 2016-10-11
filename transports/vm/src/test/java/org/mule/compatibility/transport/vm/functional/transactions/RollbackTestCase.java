@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.vm.functional.transactions;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class RollbackTestCase extends FunctionalTestCase {
+public class RollbackTestCase extends CompatibilityFunctionalTestCase {
 
   static Latch latch;
   static AtomicInteger totalSeen;

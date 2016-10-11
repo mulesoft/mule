@@ -10,7 +10,7 @@ import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
 
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase {
+public class FilterOnGlobalFileEndpointTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String TEXT_FILE = "sample.txt";
   private static final String XML_FILE = "sample.xml";

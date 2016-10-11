@@ -2,7 +2,6 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/transport/http"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-            xmlns:httpc="http://www.mulesoft.org/schema/mule/http"
             xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:tcp="http://www.mulesoft.org/schema/mule/transport/tcp"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
@@ -15,8 +14,6 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/transport/tcp"
                 schemaLocation="http://www.mulesoft.org/schema/mule/transport/tcp/current/mule-transport-tcp.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
-                schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
                 schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
@@ -904,12 +901,26 @@
         </xsd:union>
     </xsd:simpleType>
 
-    <!-- From the connector -->
-    <xsd:element name="response-builder" type="httpc:globalResponseBuilderType" substitutionGroup="mule:abstract-empty-processor">
+    <!-- From the old connector -->
+    <xsd:element name="response-builder" type="globalResponseBuilderType" substitutionGroup="mule:abstract-empty-processor">
         <xsd:annotation>
             <xsd:documentation>
                 HTTP response
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    
+    <xsd:complexType name="globalResponseBuilderType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractEmptyMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:any namespace="##any"
+                             processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:anyAttribute namespace="##any"
+                                  processContents="skip"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
 </xsd:schema>

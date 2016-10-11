@@ -12,18 +12,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class EndpointContentTypeTestCase extends FunctionalTestCase {
+public class EndpointContentTypeTestCase extends CompatibilityFunctionalTestCase {
 
   private MuleClient client;
 

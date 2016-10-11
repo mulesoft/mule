@@ -15,16 +15,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.transport.tcp.LocalSocketTcpMessageDispatcherFactory;
-import org.mule.compatibility.transport.tcp.PollingTcpConnector;
-import org.mule.compatibility.transport.tcp.TcpClientSocketProperties;
-import org.mule.compatibility.transport.tcp.TcpConnector;
-import org.mule.compatibility.transport.tcp.TcpProtocol;
-import org.mule.compatibility.transport.tcp.TcpServerSocketProperties;
-import org.mule.compatibility.transport.tcp.TcpSocketFactory;
 import org.mule.compatibility.transport.tcp.protocols.AbstractByteProtocol;
 import org.mule.compatibility.transport.tcp.protocols.CustomClassLoadingLengthProtocol;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.ResponseOutputStream;
 
 import java.io.IOException;
@@ -34,7 +27,7 @@ import java.net.Socket;
 
 import org.junit.Test;
 
-public class TcpNamespaceHandlerTestCase extends FunctionalTestCase {
+public class TcpNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

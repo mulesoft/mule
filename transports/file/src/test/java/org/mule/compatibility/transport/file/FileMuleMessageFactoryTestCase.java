@@ -14,6 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
+import org.mule.compatibility.transport.file.FileConnector;
+import org.mule.compatibility.transport.file.FileMuleMessageFactory;
+import org.mule.compatibility.transport.file.ReceiverFileInputStream;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.InternalMessage;
 

@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class VmSingleTransactionTransactionalElementTestCase extends FunctionalTestCase {
+public class VmSingleTransactionTransactionalElementTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
  */
 public abstract class AbstractPriorizableConnectorMessageProcessorProvider extends AbstractConnectorMessageProcessorProvider {
 
+  public static int BASE_PRIORITY = 500;
+
   /**
    * Defines the priority in which different implementations of this interface will be evaluated to use by calling
    * {@link #supportsUrl(String)}.

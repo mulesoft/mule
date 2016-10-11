@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.tcp.issues;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.net.Inet4Address;
@@ -23,7 +23,7 @@ import org.junit.Rule;
 /**
  * Tests how sockets are bound to addresses by the TCP transport. This test is related to MULE-6584.
  */
-public abstract class AbstractTcpSocketToAddressBindingTestCase extends FunctionalTestCase {
+public abstract class AbstractTcpSocketToAddressBindingTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort1 = new DynamicPort("port1");
@@ -62,7 +62,7 @@ public abstract class AbstractTcpSocketToAddressBindingTestCase extends Function
    * @throws java.net.SocketException If there is a problem getting the addresses.
    */
   private List<InetAddress> getAllLocalInetAddresses() throws SocketException {
-    List<InetAddress> result = new ArrayList<InetAddress>();
+    List<InetAddress> result = new ArrayList<>();
     Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
     for (NetworkInterface netInt : Collections.list(nets)) {
       Enumeration<InetAddress> inetAddresses = netInt.getInetAddresses();

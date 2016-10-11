@@ -9,13 +9,13 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class CustomFilterMule2437TestCase extends FunctionalTestCase {
+public class CustomFilterMule2437TestCase extends CompatibilityFunctionalTestCase {
 
   private static final long TIMEOUT = 3000L;
 

@@ -8,17 +8,16 @@
 package org.mule.compatibility.transport.file;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RecursiveWorkDirectoryTestCase extends FunctionalTestCase {
+public class RecursiveWorkDirectoryTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder("temp");

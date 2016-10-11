@@ -6,11 +6,11 @@
  */
 package org.mule.test.config;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class MultipleNamedConnectorsTestCase extends FunctionalTestCase {
+public class MultipleNamedConnectorsTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

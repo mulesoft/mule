@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase {
+public class HttpKeepAliveFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String IN_CONNECTOR_NO_KEEP_ALIVE_EP_NO_KEEP_ALIVE = "ConnectorNoKeepAliveEpNoKeepAlive";
   private static final String IN_CONNECTOR_KEEP_ALIVE_EP_KEEP_ALIVE = "ConnectorKeepAliveEpKeepAlive";

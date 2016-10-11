@@ -14,10 +14,10 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
@@ -29,7 +29,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase {
+public class VMUsersDefaultObjectSerializerTestCase extends CompatibilityFunctionalTestCase {
 
   private ObjectSerializer objectSerializer;
 

@@ -13,11 +13,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
@@ -100,7 +101,7 @@ import org.slf4j.LoggerFactory;
  * test suite and configure the objects to match the configuration in the ActiveMQ tests. Note that the object names must be
  * consistently the same for things to work.
  */
-public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase {
+public abstract class AbstractJmsFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
   public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";

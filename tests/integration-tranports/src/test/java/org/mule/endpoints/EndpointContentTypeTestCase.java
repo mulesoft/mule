@@ -15,7 +15,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 
 import java.nio.charset.Charset;
@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
 import org.junit.Test;
 
 /** Test configuration of content-type in various endpoints */
-public class EndpointContentTypeTestCase extends FunctionalTestCase {
+public class EndpointContentTypeTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

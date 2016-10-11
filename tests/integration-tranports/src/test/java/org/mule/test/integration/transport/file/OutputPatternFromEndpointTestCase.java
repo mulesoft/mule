@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.probe.PollingProber;
@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import junit.framework.AssertionFailedError;
 
-public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
+public class OutputPatternFromEndpointTestCase extends CompatibilityFunctionalTestCase
     implements EndpointMessageNotificationListener<EndpointMessageNotification> {
 
   protected CountDownLatch fileReceiveLatch;
@@ -55,8 +55,8 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
     if (myDir.isDirectory()) {
       // Delete Any Existing Files
       File[] files = myDir.listFiles();
-      for (int i = 0; i < files.length; i++) {
-        assertTrue(files[i].delete());
+      for (File file : files) {
+        assertTrue(file.delete());
       }
       // This may fail if this directory contains other directories.
       assertTrue(myDir.delete());
@@ -66,8 +66,8 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
     if (myDir2.isDirectory()) {
       // Delete Any Existing Files
       File[] files = myDir2.listFiles();
-      for (int i = 0; i < files.length; i++) {
-        assertTrue(files[i].delete());
+      for (File file : files) {
+        assertTrue(file.delete());
       }
       // This may fail if this directory contains other directories.
       assertTrue(myDir2.delete());

@@ -9,17 +9,18 @@ package org.mule.compatibility.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-public class VMRequestorTestCase extends FunctionalTestCase {
+public class VMRequestorTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -33,7 +34,7 @@ public class VMRequestorTestCase extends FunctionalTestCase {
     }
 
     MuleClient client = muleContext.getClient();
-    List<String> results = new ArrayList<String>();
+    List<String> results = new ArrayList<>();
     InternalMessage result = null;
     for (int i = 0; i < 10; i++) {
       result = client.request("vm://out", 3000L).getRight().get();
@@ -46,16 +47,12 @@ public class VMRequestorTestCase extends FunctionalTestCase {
 
   protected void makeClientRequest(final String message) throws MuleException {
     final MuleClient client = muleContext.getClient();
-    Thread t = new Thread(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          client.send("vm://in", message, null);
-        } catch (MuleException e) {
-          fail("failed to dispatch event: " + e);
-          e.printStackTrace();
-        }
+    Thread t = new Thread((Runnable) () -> {
+      try {
+        client.send("vm://in", message, null);
+      } catch (MuleException e) {
+        fail("failed to dispatch event: " + e);
+        e.printStackTrace();
       }
     }, "test-thread");
     t.start();

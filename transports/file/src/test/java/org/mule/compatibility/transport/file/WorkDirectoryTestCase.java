@@ -9,8 +9,8 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class WorkDirectoryTestCase extends FunctionalTestCase {
+public class WorkDirectoryTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String TEST_FILENAME = "test.txt";
 

@@ -10,11 +10,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -31,7 +31,7 @@ if they are using the same Session activeMQ won't execute them concurrently
 (since it will not do two onMessage invocations concurrently using the same session)
 One of the latch.await(..) will fail in that case.
  */
-public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase {
+public class JmsConcurrentConsumerExecutionTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String MESSAGE = "some message";
   public static final int TIMEOUT = 10000;

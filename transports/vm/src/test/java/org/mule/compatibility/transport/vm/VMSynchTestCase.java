@@ -9,16 +9,16 @@ package org.mule.compatibility.transport.vm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
 /**
  * Simple synch test used to study message flow.
  */
-public class VMSynchTestCase extends FunctionalTestCase {
+public class VMSynchTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

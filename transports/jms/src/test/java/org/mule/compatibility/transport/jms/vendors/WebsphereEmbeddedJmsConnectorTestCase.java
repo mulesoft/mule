@@ -12,11 +12,11 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.transport.jms.DefaultJmsTopicResolver;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.JmsTopicResolver;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class WebsphereEmbeddedJmsConnectorTestCase extends FunctionalTestCase {
+public class WebsphereEmbeddedJmsConnectorTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

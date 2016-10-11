@@ -10,16 +10,16 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.HttpExtensionFuntionalTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 
-public class Mule5415TestCase extends HttpExtensionFuntionalTestCase {
+public class Mule5415TestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

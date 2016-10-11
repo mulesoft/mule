@@ -9,9 +9,9 @@ package org.mule.compatibility.transport.tcp.issues;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.compatibility.transport.tcp.protocols.LengthProtocol;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedInputStream;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase {
+public class KeepSendSocketOpenMule1491TestCase extends CompatibilityFunctionalTestCase {
 
   protected static String TEST_TCP_MESSAGE = "Test TCP Request";
 

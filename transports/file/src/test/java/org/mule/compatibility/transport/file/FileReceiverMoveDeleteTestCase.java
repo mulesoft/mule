@@ -14,6 +14,8 @@ import static org.junit.Assert.fail;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.transport.file.FileMuleMessageFactory;
+import org.mule.compatibility.transport.file.ReceiverFileInputStream;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.Event;

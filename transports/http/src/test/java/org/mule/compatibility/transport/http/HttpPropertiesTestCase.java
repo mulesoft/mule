@@ -9,9 +9,9 @@ package org.mule.compatibility.transport.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -20,7 +20,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPropertiesTestCase extends FunctionalTestCase {
+public class HttpPropertiesTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

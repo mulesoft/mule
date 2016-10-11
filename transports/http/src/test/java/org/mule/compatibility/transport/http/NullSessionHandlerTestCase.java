@@ -9,9 +9,9 @@ package org.mule.compatibility.transport.http;
 
 import static junit.framework.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;
@@ -19,7 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Session properties are not supported anymore")
-public class NullSessionHandlerTestCase extends FunctionalTestCase {
+public class NullSessionHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");

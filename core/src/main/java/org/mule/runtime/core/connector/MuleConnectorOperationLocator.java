@@ -38,7 +38,7 @@ public class MuleConnectorOperationLocator implements ConnectorOperationLocator,
   public void initialise() throws InitialisationException {
     final List<ConnectorOperationProvider> providers =
         new ArrayList<>(muleContext.getRegistry().lookupObjects(ConnectorOperationProvider.class));
-    sort(providers, ((ConnectorOperationProvider p1, ConnectorOperationProvider p2) -> priority(p2) - priority(p1)));
+    sort(providers, (p1, p2) -> priority(p2) - priority(p1));
 
     this.connectorOperationProviders = providers;
   }

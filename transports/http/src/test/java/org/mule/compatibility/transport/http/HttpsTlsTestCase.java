@@ -11,12 +11,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.transport.http.HttpsConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class HttpsTlsTestCase extends FunctionalTestCase {
+public class HttpsTlsTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

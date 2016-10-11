@@ -9,6 +9,7 @@ package org.mule.test.integration.client;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -17,7 +18,6 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.HttpExtensionFuntionalTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import org.junit.Test;
  * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event to a
  * sub-flow, without losing the Session variables.
  */
-public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends HttpExtensionFuntionalTestCase {
+public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends CompatibilityFunctionalTestCase {
 
   @ClassRule
   public static DynamicPort port = new DynamicPort("port");

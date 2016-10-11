@@ -11,13 +11,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
 
-public class NonBlockingFullySupportedEndpointFunctionalTestCase extends FunctionalTestCase {
+public class NonBlockingFullySupportedEndpointFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

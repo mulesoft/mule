@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.vm.functional.transactions;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public abstract class AbstractExternalTransactionTestCase extends FunctionalTestCase {
+public abstract class AbstractExternalTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   protected static final Logger logger = LoggerFactory.getLogger(AbstractExternalTransactionTestCase.class);
 
@@ -83,7 +83,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
   /** An XA resource that allows setting, committing, and rolling back the value of one resource */
   public static class TestResource implements XAResource {
 
-    private Map<Transaction, Integer> transientValue = new HashMap<Transaction, Integer>();
+    private Map<Transaction, Integer> transientValue = new HashMap<>();
     private int persistentValue;
     private TransactionManager tm;
 

@@ -67,7 +67,7 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
         boolean allConsumersSet = true;
         for (MessageReceiver messageReceiver : connector.getReceivers().values()) {
           MultiConsumerJmsMessageReceiver receiver = (MultiConsumerJmsMessageReceiver) messageReceiver;
-          allConsumersSet = allConsumersSet && (CONSUMER_COUNT == receiver.consumers.size());
+          allConsumersSet = allConsumersSet && (CONSUMER_COUNT == receiver.getConsumers().size());
         }
         return allConsumersSet;
       }
@@ -85,8 +85,8 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
   private void assertConsumersConnected() {
     for (MessageReceiver messageReceiver : connector.getReceivers().values()) {
       MultiConsumerJmsMessageReceiver receiver = (MultiConsumerJmsMessageReceiver) messageReceiver;
-      for (MultiConsumerJmsMessageReceiver.SubReceiver consumer : receiver.consumers) {
-        assertThat(consumer.connected, is(true));
+      for (MultiConsumerJmsMessageReceiver.SubReceiver consumer : receiver.getConsumers()) {
+        assertThat(consumer.isConnected(), is(true));
       }
     }
 

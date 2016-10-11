@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.spring.security;
 
-import org.mule.runtime.module.spring.security.AuthenticationNamespaceHandlerFlowTestCase;
+import org.mule.test.module.spring.security.AuthenticationNamespaceHandlerFlowTestCase;
 
 public class SSAuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerFlowTestCase {
 

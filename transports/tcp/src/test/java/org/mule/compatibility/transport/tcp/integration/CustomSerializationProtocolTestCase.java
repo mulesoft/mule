@@ -9,9 +9,9 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class CustomSerializationProtocolTestCase extends FunctionalTestCase {
+public class CustomSerializationProtocolTestCase extends CompatibilityFunctionalTestCase {
 
   final private int messages = 1;
 

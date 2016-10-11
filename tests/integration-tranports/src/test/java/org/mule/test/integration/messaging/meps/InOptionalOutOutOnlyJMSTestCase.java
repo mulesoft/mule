@@ -11,9 +11,10 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -28,7 +29,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("MULE-6926: Flaky test")
-public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
+public class InOptionalOutOutOnlyJMSTestCase extends CompatibilityFunctionalTestCase {
 
   @ClassRule
   public static DynamicPort serverPort = new DynamicPort("serverPort");

@@ -11,9 +11,10 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("These tests have a property propagation / MEPs issue")
-public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase {
+public class InOptionalOutOutOptionalInTestCase extends CompatibilityFunctionalTestCase {
 
   public static final long TIMEOUT = 3000;
 

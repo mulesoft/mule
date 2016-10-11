@@ -9,10 +9,9 @@ package org.mule.compatibility.transport.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
-public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCase {
+public abstract class AbstractNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   private String prefix;
 

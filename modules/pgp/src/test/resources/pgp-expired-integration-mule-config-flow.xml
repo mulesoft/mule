@@ -21,7 +21,7 @@
     </spring:bean>
 
     <spring:bean id="fakeCredentialAccessor"
-        class="org.mule.runtime.module.pgp.FakeCredentialAccessor">
+        class="org.mule.test.module.pgp.FakeCredentialAccessor">
         <spring:property name="credentials"
             value="Mulesoft &lt;mulesoft@mulesoft.com&gt;" />
     </spring:bean>
@@ -41,7 +41,7 @@
         <test:queue name="out"/>
         <error-handler>
             <on-error-continue>
-                <custom-processor class="org.mule.runtime.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
+                <custom-processor class="org.mule.test.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
             </on-error-continue>
         </error-handler>
     </flow>

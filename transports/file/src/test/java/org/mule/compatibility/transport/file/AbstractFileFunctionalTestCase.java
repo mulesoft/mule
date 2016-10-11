@@ -12,7 +12,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.compatibility.transport.file.FileConnector;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
@@ -27,7 +28,7 @@ import java.net.MalformedURLException;
 /**
  * We are careful here to access the file system in a generic way. This means setting directories dynamically.
  */
-public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase {
+public abstract class AbstractFileFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String TEST_MESSAGE = "Test file contents";
   public static final String TARGET_FILE = "TARGET_FILE";

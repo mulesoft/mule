@@ -11,11 +11,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 
 import java.util.concurrent.CountDownLatch;
@@ -28,7 +28,7 @@ import org.junit.Test;
  * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT
  * WILL BE SIMILAR SIZE TO DATA TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
-public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCase {
+public abstract class AbstractStreamingCapacityTestCase extends CompatibilityFunctionalTestCase {
 
   public static final long ONE_KB = 1024;
   public static final long ONE_MB = ONE_KB * ONE_KB;

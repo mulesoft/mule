@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -21,7 +21,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase {
+public class StaticResourcesMPFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @ClassRule
   public static SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");

@@ -12,11 +12,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
+public class RestServiceWrapperFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   protected static String TEST_REQUEST = "Test Http Request";
 

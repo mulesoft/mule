@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ResponseTransformerTestCase extends FunctionalTestCase {
+public class ResponseTransformerTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

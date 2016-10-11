@@ -7,13 +7,13 @@
 package org.mule.compatibility.transport.file;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase {
+public class FileExceptionStrategyFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String TEST_MESSAGE = "Test file contents";
 

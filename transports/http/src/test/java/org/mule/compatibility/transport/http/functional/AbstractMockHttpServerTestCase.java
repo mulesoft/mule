@@ -8,9 +8,9 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
-public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase {
+public abstract class AbstractMockHttpServerTestCase extends CompatibilityFunctionalTestCase {
 
   private MockHttpServer mockHttpServer;
 

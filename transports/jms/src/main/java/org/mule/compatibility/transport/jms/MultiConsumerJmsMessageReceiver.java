@@ -6,7 +6,9 @@
  */
 package org.mule.compatibility.transport.jms;
 
+import static java.util.Collections.unmodifiableList;
 import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
@@ -16,17 +18,17 @@ import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.reconnect.ReconnectWorkManager;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.TransactionCollection;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -84,7 +86,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver {
       logger.debug("Creating " + receiversCount + " sub-receivers for " + endpoint.getEndpointURI());
     }
 
-    consumers = new CopyOnWriteArrayList<SubReceiver>();
+    consumers = new CopyOnWriteArrayList<>();
     reconnectWorkManager = new ReconnectWorkManager(getEndpoint().getMuleContext());
   }
 
@@ -368,13 +370,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver {
         worker.processMessages();
       } catch (Exception e) {
         // Use this rollback method in case a transaction has not been configured on the endpoint.
-        RollbackSourceCallback rollbackMethod = new RollbackSourceCallback() {
-
-          @Override
-          public void rollback() {
-            recoverSession();
-          }
-        };
+        RollbackSourceCallback rollbackMethod = () -> recoverSession();
 
         if (e instanceof MessagingException) {
           MessagingException messagingException = (MessagingException) e;
@@ -388,6 +384,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver {
         isProcessingMessage = false;
       }
     }
+
+    public boolean isConnected() {
+      return connected;
+    }
   }
 
   protected class JmsWorker extends AbstractReceiverWorker {
@@ -395,7 +395,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver {
     private final SubReceiver subReceiver;
 
     public JmsWorker(Message message, AbstractMessageReceiver receiver, SubReceiver subReceiver) {
-      super(new ArrayList<Object>(1), receiver);
+      super(new ArrayList<>(1), receiver);
       this.subReceiver = subReceiver;
       messages.add(message);
     }
@@ -452,4 +452,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver {
     return message.getInboundProperty(JMS_REPLY_TO);
   }
 
+  public List<SubReceiver> getConsumers() {
+    return unmodifiableList(consumers);
+  }
 }

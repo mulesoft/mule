@@ -12,9 +12,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.compatibility.transport.http.HttpConstants;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -33,7 +33,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPersistentQueueTestCase extends FunctionalTestCase {
+public class HttpPersistentQueueTestCase extends CompatibilityFunctionalTestCase {
 
   private CountDownLatch messageDidArrive = new CountDownLatch(1);
   private int port = -1;

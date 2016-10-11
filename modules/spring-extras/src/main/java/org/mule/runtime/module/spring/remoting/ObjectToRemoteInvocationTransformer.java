@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.spring.remoting;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -15,6 +17,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
 
+import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import org.springframework.remoting.support.RemoteInvocation;
 
 /**
@@ -39,16 +42,15 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer {
     Object o = null;
 
     if (src instanceof InputStream) {
-      try {
-        o = new ObjectInputStream((InputStream) src).readObject();
+      try (ObjectInputStream ois = new ClassLoaderObjectInputStream(currentThread().getContextClassLoader(), (InputStream) src)) {
+        o = ois.readObject();
       } catch (Exception e) {
         throw new TransformerException(this, e);
       }
     } else {
       byte[] data = (byte[]) src;
       ByteArrayInputStream bais = new ByteArrayInputStream(data);
-      try {
-        ObjectInputStream ois = new ObjectInputStream(bais);
+      try (ObjectInputStream ois = new ClassLoaderObjectInputStream(currentThread().getContextClassLoader(), bais)) {
         o = ois.readObject();
       } catch (Exception e) {
         throw new TransformerException(this, e);
@@ -71,5 +73,4 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer {
     }
     return ri;
   }
-
 }

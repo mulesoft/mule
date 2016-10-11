@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <spring:bean id="doSpringWork"
-        class="org.mule.runtime.module.spring.remoting.DoSomeWork" />
+        class="org.mule.test.module.spring.remoting.DoSomeWork" />
 
     <!-- Transform a byte[] from an Http request into a Spring RemoteInvocation 
         instance. -->
@@ -51,7 +51,7 @@
 
                     <!-- Set the serviceInterface property of Spring's RemoteInvocationBasedExporter -->
                     <spring:entry key="serviceInterface"
-                        value="org.mule.runtime.module.spring.remoting.WorkInterface" />
+                        value="org.mule.test.module.spring.remoting.WorkInterface" />
 
                     <!-- Set other properties of Spring's RemoteInvocationBasedExporter 
                         i.e. registerTraceInterceptor and remoteInvocationExecutor -->
