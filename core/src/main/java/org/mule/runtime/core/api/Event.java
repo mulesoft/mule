@@ -38,7 +38,10 @@ import java.util.NoSuchElementException;
  */
 public interface Event extends MuleEvent {
 
-  static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
+  static class CurrentEventHolder {
+
+    private static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
+  }
 
   /**
    * @return the context applicable to all events created from the same root {@link Event} from a {@link MessageSource}.
@@ -451,7 +454,7 @@ public interface Event extends MuleEvent {
    * @return event for currently executing thread.
    */
   public static Event getCurrentEvent() {
-    return currentEvent.get();
+    return CurrentEventHolder.currentEvent.get();
   }
 
   /**
@@ -460,7 +463,7 @@ public interface Event extends MuleEvent {
    * @param event event for currently executing thread.
    */
   public static void setCurrentEvent(Event event) {
-    currentEvent.set(event);
+    CurrentEventHolder.currentEvent.set(event);
   }
 
 }

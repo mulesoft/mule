@@ -227,18 +227,6 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder clearInboundProperties() {
-    inboundProperties.clear();
-    return this;
-  }
-
-  @Override
-  public InternalMessage.Builder clearOutboundProperties() {
-    outboundProperties.clear();
-    return this;
-  }
-
-  @Override
   public InternalMessage.Builder addInboundAttachment(String key, DataHandler value) {
     inboundAttachments.put(key, value);
     return this;
@@ -259,18 +247,6 @@ public class DefaultMessageBuilder
   @Override
   public InternalMessage.Builder removeOutboundAttachment(String key) {
     outboundAttachments.remove(key);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.Builder clearInboundAttachments() {
-    inboundAttachments.clear();
-    return this;
-  }
-
-  @Override
-  public InternalMessage.Builder clearOutboundAttachments() {
-    outboundAttachments.clear();
     return this;
   }
 
