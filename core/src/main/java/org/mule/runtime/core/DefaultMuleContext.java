@@ -891,6 +891,7 @@ public class DefaultMuleContext implements MuleContext {
     return this.expressionLanguage;
   }
 
+  //TODO: MULE-10429 - Rename once we migrate mule test cases to EL expressions
   @Override
   public org.mule.runtime.api.el.ExpressionLanguage getExpressionLanguageV2() {
     if (this.expressionLanguageV2 == null) {
