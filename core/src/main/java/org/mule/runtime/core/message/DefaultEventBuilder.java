@@ -122,7 +122,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   @Override
   public Event.Builder variables(Map<String, Object> flowVariables) {
-    flowVariables.clear();
+    this.flowVariables.clear();
     flowVariables.forEach((s, o) -> this.flowVariables.put(s, new DefaultTypedValue<>(o, DataType.fromObject(o))));
     this.modified = true;
     return this;
