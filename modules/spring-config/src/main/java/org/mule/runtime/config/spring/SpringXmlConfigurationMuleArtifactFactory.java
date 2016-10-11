@@ -16,10 +16,10 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.config.ConfigResource;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -274,7 +274,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
    * @throws ParserConfigurationException
    */
   public org.dom4j.Element convert(org.w3c.dom.Element element) throws ParserConfigurationException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
     DocumentBuilder builder = factory.newDocumentBuilder();
 
     org.w3c.dom.Document doc1 = builder.newDocument();

@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.util.XMLSecureFactories;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer {
         m.marshal(src, w);
         return w;
       } else if (Document.class.isAssignableFrom(getReturnDataType().getType())) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
         Document doc = factory.newDocumentBuilder().newDocument();
         m.marshal(src, doc);
         return doc;

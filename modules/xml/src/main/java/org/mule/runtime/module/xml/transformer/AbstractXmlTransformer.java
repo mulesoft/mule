@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
-import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
-import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -17,6 +15,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.util.XMLSecureFactories;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.io.InputStream;
@@ -70,23 +69,8 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
   @Override
   public final void initialise() throws InitialisationException {
-    xmlInputFactory = XMLInputFactory.newInstance();
-
-    if (!acceptExternalEntities) {
-      xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-      useStaxSource = true;
-    }
-
-    xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, acceptExternalEntities);
-    useStaxSource = !acceptExternalEntities;
-
-    xmlInputFactory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandInternalEntities);
-
-    if (acceptExternalEntities && !expandInternalEntities) {
-      logger
-          .warn("External entities are enabled (acceptExternalEntities=true) but won't be expanded in the XML body because expandInternalEntities=false");
-    }
-
+    xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, expandInternalEntities).createXmlInputFactory();
+    useStaxSource = !acceptExternalEntities || !expandInternalEntities;
     xmlOutputFactory = XMLOutputFactory.newInstance();
 
     this.doInitialise();
@@ -152,7 +136,8 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
       final DOMResult result;
 
       try {
-        result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
+        DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+        result = new DOMResult(factory.newDocumentBuilder().newDocument());
       } catch (Exception e) {
         throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Could not create result document"), e);
       }

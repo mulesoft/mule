@@ -23,6 +23,7 @@ import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.XMLSecureFactories;
 
 import java.io.File;
 import java.io.IOException;
@@ -356,7 +357,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * </ul>
    */
   protected void validateXML() throws FatalException {
-    SAXParserFactory f = SAXParserFactory.newInstance();
+    SAXParserFactory f = new XMLSecureFactories().createSaxParserFactory();
     if (f == null || f.getClass().getName().indexOf("crimson") != -1) {
       throw new FatalException(CoreMessages.valueIsInvalidFor(f.getClass().getName(), "javax.xml.parsers.SAXParserFactory"),
                                this);
