@@ -24,7 +24,7 @@ public interface ConnectivityTestingService {
    * @return connectivity testing result.
    * @throws UnsupportedConnectivityTestingObjectException when it's not possible to do connectivity testing over the mule
    *         component.
-   * @throws ConnectivityTestingObjectNotFoundException when the object to use to do connectivity does not exists
+   * @throws {@link org.mule.runtime.core.api.exception.ObjectNotFoundException} when the object to use to do connectivity does not exists
    */
   ConnectionValidationResult testConnection(String identifier);
 

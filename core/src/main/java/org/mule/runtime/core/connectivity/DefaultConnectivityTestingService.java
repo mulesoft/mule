@@ -12,10 +12,10 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingObjectNotFoundException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
+import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -74,7 +74,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
   public ConnectionValidationResult testConnection(String identifier) {
     Object connectivityTestingObject = muleContext.getRegistry().get(identifier);
     if (connectivityTestingObject == null) {
-      throw new ConnectivityTestingObjectNotFoundException(identifier);
+      throw new ObjectNotFoundException(identifier);
     }
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       if (connectivityTestingStrategy.accepts(connectivityTestingObject)) {

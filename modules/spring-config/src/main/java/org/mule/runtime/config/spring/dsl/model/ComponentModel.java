@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.config.ComponentIdentifier;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
@@ -48,6 +50,7 @@ public class ComponentModel {
   private Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
   private ComponentModel parent;
+  private Map<String, Object> annotations = new HashedMap();
   private List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
 
@@ -67,7 +70,7 @@ public class ComponentModel {
    * @return a {@code java.util.Map} with the simple parameters of the configuration.
    */
   public Map<String, String> getParameters() {
-    return Collections.unmodifiableMap(parameters);
+    return unmodifiableMap(parameters);
   }
 
   /**
@@ -173,6 +176,14 @@ public class ComponentModel {
    */
   public boolean isParameterValueProvidedBySchema(String parameterName) {
     return this.schemaValueParameter.contains(parameterName);
+  }
+
+  public void addAnnotation(String annotationKey, Object value) {
+    this.annotations.put(annotationKey, value);
+  }
+
+  public Map<String, Object> getAnnotations() {
+    return unmodifiableMap(annotations);
   }
 
   /**

@@ -17,9 +17,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingObjectNotFoundException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
+import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -82,7 +82,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   public void nonExistentConnectivityTestingObject() {
     reset(mockMuleContext);
     when(mockMuleContext.getRegistry().get(TEST_IDENTIFIER)).thenReturn(null);
-    expectedException.expect(ConnectivityTestingObjectNotFoundException.class);
+    expectedException.expect(ObjectNotFoundException.class);
     connectivityTestingService.testConnection(TEST_IDENTIFIER);
   }
 
