@@ -44,23 +44,6 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @ClassRule
   public static SystemProperty verboseExpcetions = new SystemProperty("mule.verbose.exceptions", "true");
 
-  // @BeforeClass
-  // public static void setup() throws Exception
-  // {
-  // mule.deploy(appsPath + customCiphersApplication);
-  //
-  // mule.start(
-  // "-M-Dmule.agent.enabled=false",
-  // "-M-DcipherSuites=" + invalidCipher,
-  // "-M-Dinternal.port.1=" + httpsInternalPort1.getValue(),
-  // "-M-Dinternal.port.2=" + httpsInternalPort2.getValue(),
-  // "-M-Dinternal.port.3=" + httpsInternalPort3.getValue(),
-  // "-M-DhttpsPort=" + httpsPort.getValue()
-  // );
-  //
-  // prober.check(isDeployed(mule, customCiphersApplication));
-  // }
-
   @Override
   protected String getConfigFile() {
     return "http-tls-ciphers-config.xml";
@@ -90,11 +73,4 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
     assertThat(response, contentValue(is(ERROR_RESPONSE)));
   }
 
-  // @AfterClass
-  // public static void stopMule()
-  // {
-  // mule.undeployAll();
-  // mule.stop();
-  // prober.check(isNotRunning(mule));
-  // }
 }

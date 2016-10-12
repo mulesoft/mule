@@ -43,25 +43,6 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
   private static final String OK_RESPONSE = "ok";
   private static final String ERROR_RESPONSE = "General SSLEngine problem";
 
-  //
-  // @BeforeClass
-  // public static void setup() throws Exception
-  // {
-  // mule.deploy(appsPath + insecureTlsApplication);
-  //
-  // mule.start(
-  // "-M-Dmule.agent.enabled=false",
-  // "-M-Dhttps.internal.insecure=" + httpsInternalInsecurePort.getValue(),
-  // "-M-Dhttps.internal.secure=" + httpsInternalSecurePort.getValue(),
-  // "-M-Dhttps.internal.secure.invalid=" + httpsInternalSecureInvalidPort.getValue(),
-  // "-M-Dhttps.internal.default=" + httpsInternalDefaultPort.getValue(),
-  // "-M-Dhttps.internal.default.invalid=" + httpsInternalDefaultInvalidPort.getValue(),
-  // "-M-DhttpsPort=" + httpsPort.getValue()
-  // );
-  //
-  // prober.check(isDeployed(mule, insecureTlsApplication));
-  // }
-
   @Override
   protected String getConfigFile() {
     return "http-tls-insecure-config.xml";
@@ -106,13 +87,5 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
     assertThat(response, contentValue(is(ERROR_RESPONSE)));
   }
-
-  // @AfterClass
-  // public static void stopMule()
-  // {
-  // mule.undeployAll();
-  // mule.stop();
-  // prober.check(isNotRunning(mule));
-  // }
 
 }

@@ -46,27 +46,6 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   private static final String OK_RESPONSE = "ok";
   private static final String ERROR_RESPONSE = "Error sending HTTP request.";
 
-  static {
-    DEFAULT_TIMEOUT = 10000;
-  }
-
-  // @BeforeClass
-  // public static void setup() throws Exception
-  // {
-  // mule.deploy(appsPath + customProtocolsApplication);
-  //
-  // mule.start(
-  // "-M-Dmule.agent.enabled=false",
-  // "-M-Dhttps.internal.tlsv11=" + httpsInternalTls11Port.getValue(),
-  // "-M-Dhttps.internal.tlsv12=" + httpsInternalTls12Port.getValue(),
-  // "-M-Dhttps.internal.alltls=" + httpsInternalAllTlsPort.getValue(),
-  // "-M-Dhttps.internal.default=" + httpsInternalDefaultPort.getValue(),
-  // "-M-DhttpsPort=" + httpsPort.getValue()
-  // );
-  //
-  // prober.check(isDeployed(mule, customProtocolsApplication));
-  // }
-
   @Override
   protected String getConfigFile() {
     return "http-tls-protocols-config.xml";
@@ -111,13 +90,5 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
     assertThat(response, hasStatusCode(SC_OK));
     assertThat(response, contentValue(is(OK_RESPONSE)));
   }
-
-  // @AfterClass
-  // public static void stopMule()
-  // {
-  // mule.undeployAll();
-  // mule.stop();
-  // prober.check(isNotRunning(mule));
-  // }
 
 }
