@@ -110,4 +110,6 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
     void start();
 
     void stop();
+
+    boolean isStarted();
 }

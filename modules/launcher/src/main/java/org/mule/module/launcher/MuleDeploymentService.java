@@ -71,6 +71,8 @@ public class MuleDeploymentService implements DeploymentService
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
     private DefaultArchiveDeployer<Application> applicationDeployer;
 
+    private boolean isStarted = false;
+
     public MuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
     {
         DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository();
@@ -132,6 +134,7 @@ public class MuleDeploymentService implements DeploymentService
         addStartupListener(summaryDeploymentListener);
 
         deploymentDirectoryWatcher.start();
+        isStarted = true;
 
         for (StartupListener listener : startupListeners)
         {
@@ -150,6 +153,12 @@ public class MuleDeploymentService implements DeploymentService
     public void stop()
     {
         deploymentDirectoryWatcher.stop();
+        isStarted = false;
+    }
+
+    public boolean isStarted()
+    {
+        return isStarted;
     }
 
     @Override
