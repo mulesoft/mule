@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>mule-subtypes-extension</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-extension</packaging>
 
     <name>Mule Subtypes Test Extension</name>
     <description>A Mule extension for testing</description>

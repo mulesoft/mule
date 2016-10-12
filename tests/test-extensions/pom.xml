@@ -44,5 +44,46 @@
             <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>2.2.4</version>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <outputDirectory>target/classes/META-INF</outputDirectory>
+                            <processors>
+                                <processor>org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
+                            </processors>
+                            <options>
+                                <extension.version>${project.version}</extension.version>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.extensions</groupId>
+                <artifactId>mule-extensions-maven-plugin</artifactId>
+                <version>${mule.extensions.maven.plugin.version}</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

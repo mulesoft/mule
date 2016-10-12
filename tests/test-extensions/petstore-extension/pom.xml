@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>mule-petstore-extension</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-extension</packaging>
 
     <name>Mule Petstore Test Extension</name>
     <description>A Mule extension for testing</description>
