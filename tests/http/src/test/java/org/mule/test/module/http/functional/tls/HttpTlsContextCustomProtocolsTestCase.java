@@ -33,7 +33,9 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   @ClassRule
   public static final DynamicPort httpsInternalAllTlsPort = new DynamicPort("https.internal.alltls");
   @ClassRule
-  public static SystemProperty encoding = new SystemProperty("enabledProtocols", "TLSv1.2");
+  public static SystemProperty enabledProtocols = new SystemProperty("enabledProtocols", "TLSv1.2");
+  @ClassRule
+  public static SystemProperty verboseExpcetions = new SystemProperty("mule.verbose.exceptions", "true");
 
   private static final String urlPrefix = "https://localhost:" + httpsPort.getValue();
   private static final String defaultProtocolsPassUrl = urlPrefix + "/test/defaultPass";

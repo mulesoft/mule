@@ -40,7 +40,9 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   private static final String ERROR_RESPONSE = "Error sending HTTP request.";
 
   @ClassRule
-  public static SystemProperty encoding = new SystemProperty("cipherSuites", invalidCipher);
+  public static SystemProperty cipherSuites = new SystemProperty("cipherSuites", invalidCipher);
+  @ClassRule
+  public static SystemProperty verboseExpcetions = new SystemProperty("mule.verbose.exceptions", "true");
 
   // @BeforeClass
   // public static void setup() throws Exception
