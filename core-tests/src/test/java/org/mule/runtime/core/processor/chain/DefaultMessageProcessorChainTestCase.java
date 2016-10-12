@@ -7,8 +7,10 @@
 
 package org.mule.runtime.core.processor.chain;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -98,7 +100,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   private int nonBlockingProcessorsExecuted;
 
   private ExecutorService executorService =
-      new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>()) {
+      new ThreadPoolExecutor(0, MAX_VALUE, 60L, SECONDS, new SynchronousQueue<>()) {
 
         @Override
         public Future<?> submit(Runnable task) {

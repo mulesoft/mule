@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -170,8 +172,6 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
-    if (next instanceof FlowConstructAware) {
-      ((FlowConstructAware) next).setFlowConstruct(flowConstruct);
-    }
+    setFlowConstructIfNeeded(next, flowConstruct);
   }
 }

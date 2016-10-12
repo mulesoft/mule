@@ -6,16 +6,9 @@
  */
 package org.mule.runtime.core.util.rx;
 
-import static reactor.core.Exceptions.unwrap;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
-
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import reactor.core.*;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Hooks;
 import reactor.core.publisher.SynchronousSink;
 
 /**

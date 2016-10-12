@@ -184,18 +184,18 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return Flux.from(publisher)
-        .concatMap(event -> {
+        .concatMap(request -> {
           try {
-            if (isProcessAsync(event)) {
-              just(event).doOnNext(event1 -> fireAsyncScheduledNotification(event1))
-                  .map(event1 -> Event.builder(event1).session(new DefaultMuleSession(event1.getSession())).build())
+            if (isProcessAsync(request)) {
+              just(request).doOnNext(event1 -> fireAsyncScheduledNotification(event1))
+                  .map(event -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
                   .transform(stream -> applyNext(stream)).subscribeOn(fromExecutor(workManagerSource.getWorkManager()))
-                  .doOnNext(event1 -> firePipelineNotification(event1, null))
+                  .doOnNext(event -> firePipelineNotification(event, null))
                   .doOnError(MessagingException.class, me -> firePipelineNotification(me.getEvent(), me))
                   .onErrorResumeWith(MessagingException.class, flowConstruct.getExceptionListener()).subscribe();
               return just(VoidMuleEvent.getInstance());
             } else {
-              return just(event).transform(stream -> applyNext(stream));
+              return just(request).transform(stream -> applyNext(stream));
             }
           } catch (MuleException e) {
             throw propagate(e);

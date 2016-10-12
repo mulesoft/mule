@@ -12,6 +12,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -140,7 +142,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     return event -> {
       if (event.isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), flowConstruct, event, processor, null,
-                         MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+                         MESSAGE_PROCESSOR_PRE_INVOKE);
       }
     };
   }
@@ -149,7 +151,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     return event -> {
       if (event.isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), flowConstruct, event, processor, null,
-                         MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+                         MESSAGE_PROCESSOR_POST_INVOKE);
 
       }
     };
@@ -158,8 +160,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   private Consumer<MessagingException> errorNotification(Processor processor) {
     return exception -> {
       if (exception.getEvent().isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), flowConstruct, exception.getEvent(),
-                         processor, exception, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+        fireNotification(muleContext.getNotificationManager(), flowConstruct, exception.getEvent(), processor, exception,
+                         MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };
   }

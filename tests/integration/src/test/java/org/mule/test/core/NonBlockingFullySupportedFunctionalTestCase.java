@@ -33,8 +33,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestCase {
+@RunnerDelegateTo(Parameterized.class)
+public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegrationTestCase {
 
   public static String FOO = "foo";
   private ProcessingStrategy processingStrategy;

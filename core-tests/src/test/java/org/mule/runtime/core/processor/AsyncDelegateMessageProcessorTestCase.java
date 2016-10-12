@@ -56,7 +56,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   public AsyncDelegateMessageProcessorTestCase(boolean nonBlocking) {
     super(nonBlocking);
     setStartContext(true);
-    Class clazz = Operators.class;
   }
 
   @Override
@@ -75,7 +74,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(target.sensedEvent, notNullValue());
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
-    assertThat(testEvent(), not(equalTo(target.sensedEvent)));
+    assertThat(testEvent(), not(sameInstance(target.sensedEvent)));
     assertThat(testEvent().getMessageAsString(muleContext), equalTo(target.sensedEvent.getMessageAsString(muleContext)));
 
     assertThat(VoidMuleEvent.getInstance(), sameInstance(result));

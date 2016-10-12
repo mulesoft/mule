@@ -63,12 +63,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
 import org.reactivestreams.Publisher;
 
+@RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
 
-  private MuleContext muleContext;
   private Event event;
   private ServerNotificationManager notificationManager;
   private TestPipeline pipeline;
@@ -94,7 +96,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);
     pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
-
     context = DefaultEventContext.create(pipeline, TEST_CONNECTOR);
   }
 
@@ -323,15 +324,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
         return expectedAction == notification.getAction() && exception == null && notification.getSource() != null
             && (this.event == null || this.event.getMessage().equals(((Event) notification.getSource()).getMessage()));
       }
-    }
-
-    @Override
-    public String toString() {
-      return "PipelineMessageNotificiationArgumentMatcher{" +
-          "expectedAction=" + expectedAction +
-          ", exceptionExpected=" + exceptionExpected +
-          ", event=" + event +
-          '}';
     }
   }
 

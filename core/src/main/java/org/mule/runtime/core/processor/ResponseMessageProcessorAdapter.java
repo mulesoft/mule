@@ -124,9 +124,6 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
     super.setFlowConstruct(flowConstruct);
     setFlowConstructIfNeeded(responseProcessor, flowConstruct);
     messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
-    if (responseProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) responseProcessor).setFlowConstruct(flowConstruct);
-    }
   }
 
   @Override

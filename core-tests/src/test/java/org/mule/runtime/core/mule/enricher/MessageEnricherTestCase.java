@@ -49,11 +49,11 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
-        .message(InternalMessage.builder(event.getMessage()).payload("test").build()).build());
+        .message(InternalMessage.builder(event.getMessage()).payload(TEST_PAYLOAD).build()).build());
     enricher.initialise();
 
     InternalMessage result = process(enricher, testEvent()).getMessage();
-    assertEquals("test", result.getOutboundProperty("myHeader"));
+    assertEquals(TEST_PAYLOAD, result.getOutboundProperty("myHeader"));
     assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
   }
 

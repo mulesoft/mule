@@ -6,6 +6,7 @@
  */
 package org.mule.tck.junit4;
 
+import static java.util.Arrays.asList;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
@@ -18,9 +19,14 @@ import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.reactivestreams.Publisher;
 
 /**
- * TODO
+ * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or
+ * {@link org.mule.runtime.core.construct.Flow} that implements both {@link Processor#process(Event)} and
+ * {@link Processor#apply(Publisher)} needs paramatized tests so that both approaches are tested with the same test method. Test
+ * cases that extend this abstract class should use (@link {@link #process(Processor, Event)} to invoke {@link Processor}'s as
+ * part of the test, rather than invoking them directly.
  */
 @RunWith(Parameterized.class)
 public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleContextTestCase {
@@ -33,7 +39,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{false}, {true}});
+    return asList(new Object[][] {{false}, {true}});
   }
 
   @Override
