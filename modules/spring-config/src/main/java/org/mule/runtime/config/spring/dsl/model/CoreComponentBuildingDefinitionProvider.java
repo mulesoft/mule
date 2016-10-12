@@ -325,8 +325,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.copy().withIdentifier(LOGGER)
             .withTypeDefinition(fromType(LoggerMessageProcessor.class))
             .withSetterParameterDefinition("message", fromSimpleParameter("message").build())
-            .withSetterParameterDefinition("level", fromSimpleParameter("category").build())
-            .withSetterParameterDefinition("category", fromSimpleParameter("level").build())
+            .withSetterParameterDefinition("level", fromSimpleParameter("level").build())
+            .withSetterParameterDefinition("category", fromSimpleParameter("category").build())
             .build());
 
     componentBuildingDefinitions
