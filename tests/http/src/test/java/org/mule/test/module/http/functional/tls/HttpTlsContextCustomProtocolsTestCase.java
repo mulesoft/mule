@@ -17,6 +17,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -60,6 +61,7 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   }
 
   @Test
+
   public void testGlobalTlsContextDefaultProtocolsFails() throws Exception {
     HttpResponse response = executeGetRequest(defaultProtocolsFailsUrl);
 
@@ -68,6 +70,7 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   }
 
   @Test
+  @Ignore("MULE-10752")
   public void testGlobalTlsContextCustomProtocolsRestrictive() throws Exception {
     HttpResponse response = executeGetRequest(customInvalidProtocolsUrl);
 

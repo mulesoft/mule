@@ -37,7 +37,7 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   private static final String validProtocolValidCipher = urlPrefix + "/test/validProtocolValidCipher";
   private static final String validProtocolInvalidCipher = urlPrefix + "/test/validProtocolInvalidCipher";
   private static final String OK_RESPONSE = "ok";
-  private static final String ERROR_RESPONSE = "Error sending HTTP request.";
+  private static final String ERROR_RESPONSE = "Remotely closed";
 
   @ClassRule
   public static SystemProperty cipherSuites = new SystemProperty("cipherSuites", invalidCipher);
