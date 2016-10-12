@@ -10,34 +10,34 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
 public class TestTransactionalConnection implements TransactionalConnection {
 
-  private boolean begun, commited, rolledback = false;
+  private boolean transactionBegun, transactionCommited, transactionRolledback = false;
   private boolean connected = true;
 
   @Override
   public void begin() throws Exception {
-    begun = true;
+    transactionBegun = true;
   }
 
   @Override
   public void commit() throws Exception {
-    commited = true;
+    transactionCommited = true;
   }
 
   @Override
   public void rollback() throws Exception {
-    rolledback = true;
+    transactionRolledback = true;
   }
 
   public boolean isTransactionBegun() {
-    return begun;
+    return transactionBegun;
   }
 
   public boolean isTransactionCommited() {
-    return commited;
+    return transactionCommited;
   }
 
   public boolean isTransactionRolledback() {
-    return rolledback;
+    return transactionRolledback;
   }
 
   public void disconnect() {

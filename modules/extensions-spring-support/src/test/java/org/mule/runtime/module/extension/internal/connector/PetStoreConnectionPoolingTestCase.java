@@ -132,7 +132,7 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
   @Override
   protected void assertConnected(PetStoreClient client) {
     if (NO_POOLING.equals(name)) {
-      assertThat(client.isConnected(), is(false));
+      assertThat(client.hasActiveConnection(), is(false));
     } else {
       super.assertConnected(client);
     }

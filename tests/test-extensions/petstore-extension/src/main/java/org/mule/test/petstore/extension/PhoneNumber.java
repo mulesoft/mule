@@ -15,4 +15,12 @@ public class PhoneNumber {
 
   @Parameter
   private String home;
+
+  public String getMobile() {
+    return mobile;
+  }
+
+  public String getHome() {
+    return home;
+  }
 }

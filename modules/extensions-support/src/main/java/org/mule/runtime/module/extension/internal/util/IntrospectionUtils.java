@@ -6,23 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang.ArrayUtils.isEmpty;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isObjectType;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.getAllSuperTypes;
-import static org.reflections.ReflectionUtils.withAnnotation;
-import static org.reflections.ReflectionUtils.withName;
-import static org.springframework.core.ResolvableType.forType;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -51,7 +36,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Ignore;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
@@ -60,9 +44,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -75,14 +57,32 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.springframework.core.ResolvableType;
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isObjectType;
+import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.getAllSuperTypes;
+import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.ReflectionUtils.withName;
+import static org.springframework.core.ResolvableType.forType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -247,23 +247,23 @@ public final class IntrospectionUtils {
     return typeLoader.load(ResolvableType.forField(field).getType());
   }
 
-  public static Field getField(Class<?> clazz, ParameterModel parameterModel) {
+  public static Optional<Field> getField(Class<?> clazz, ParameterModel parameterModel) {
     return getField(clazz, getMemberName(parameterModel, parameterModel.getName()));
   }
 
-  public static Field getField(Class<?> clazz, ParameterDeclaration parameterDeclaration) {
+  public static Optional<Field> getField(Class<?> clazz, ParameterDeclaration parameterDeclaration) {
     return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()));
   }
 
-  public static Field getField(Class<?> clazz, String name) {
+  public static Optional<Field> getField(Class<?> clazz, String name) {
     Collection<Field> candidates = getAllFields(clazz, withName(name));
-    return CollectionUtils.isEmpty(candidates) ? null : candidates.iterator().next();
+    return CollectionUtils.isEmpty(candidates) ? Optional.empty() : Optional.of(candidates.iterator().next());
   }
 
-  public static Field getFieldByAlias(Class<?> clazz, String alias) {
+  public static Optional<Field> getFieldByAlias(Class<?> clazz, String alias) {
     Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class));
-    return candidates.stream().filter(f -> alias.equals(f.getAnnotation(Alias.class).value())).findFirst()
-        .orElseGet(() -> getField(clazz, alias));
+    Optional<Field> field = candidates.stream().filter(f -> alias.equals(f.getAnnotation(Alias.class).value())).findFirst();
+    return field.isPresent() ? field : getField(clazz, alias);
   }
 
   public static String getMemberName(EnrichableModel enrichableModel, String defaultName) {
@@ -365,7 +365,7 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isRequired(AccessibleObject object) {
-    return object.getAnnotation(Optional.class) == null;
+    return object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) == null;
   }
 
   public static boolean isRequired(ParameterModel parameterModel, boolean forceOptional) {
@@ -417,14 +417,19 @@ public final class IntrospectionUtils {
     if (!allFields.isEmpty()) {
       return allFields;
     }
-    return getFieldsWithGetterAndSetters(extensionType);
+    return getFieldsWithGetters(extensionType);
   }
 
-  public static Set<Field> getFieldsWithGetterAndSetters(Class<?> extensionType) {
+  public static Set<Field> getFieldsWithGetters(Class<?> extensionType) {
+    return getPropertyDescriptors(extensionType).stream().filter(p -> p.getReadMethod() != null)
+        .map(p -> getField(extensionType, p.getName())).filter(Optional::isPresent).map(Optional::get)
+        .collect(toSet());
+  }
+
+  private static List<PropertyDescriptor> getPropertyDescriptors(Class<?> extensionType) {
     try {
       PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
-      return stream(propertyDescriptors).map(p -> getField(extensionType, p.getName())).filter(field -> field != null)
-          .collect(toSet());
+      return Arrays.asList(propertyDescriptors);
     } catch (IntrospectionException e) {
       throw new IllegalModelDefinitionException("Could not introspect POJO: " + extensionType.getName(), e);
     }

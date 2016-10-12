@@ -59,7 +59,6 @@ public class IMAPEmailPredicateBuilder extends BaseEmailPredicateBuilder {
   @Optional
   private Boolean recent;
 
-
   @Override
   protected Predicate<? extends BaseEmailAttributes> getBasePredicate() {
 
@@ -82,6 +81,22 @@ public class IMAPEmailPredicateBuilder extends BaseEmailPredicateBuilder {
     }
 
     return predicate;
+  }
+
+  public Boolean getSeen() {
+    return seen;
+  }
+
+  public Boolean getAnswered() {
+    return answered;
+  }
+
+  public Boolean getDeleted() {
+    return deleted;
+  }
+
+  public Boolean getRecent() {
+    return recent;
   }
 
   public IMAPEmailPredicateBuilder setAnswered(Boolean answered) {

@@ -11,7 +11,7 @@ import static org.mule.test.metadata.extension.model.animals.AnimalClade.FISH;
 public class SwordFish implements Animal {
 
   @Override
-  public AnimalClade getClade() {
+  public AnimalClade clade() {
     return FISH;
   }
 }

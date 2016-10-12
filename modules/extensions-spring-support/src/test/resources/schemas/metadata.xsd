@@ -16,7 +16,6 @@
         <xs:complexContent>
             <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.animals.Animal">
                 <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="bearName"></xs:attribute>
-                <xs:attribute type="metadata:org.mule.test.metadata.extension.model.animals.AnimalCladeEnumType" use="optional" name="clade"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

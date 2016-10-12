@@ -7,13 +7,14 @@
 package org.mule.test.petstore.extension;
 
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 
 import java.util.Date;
 import java.util.List;
+
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 
 public class PetStoreClient {
 
@@ -56,7 +57,7 @@ public class PetStoreClient {
     return disconnectCount;
   }
 
-  public boolean isConnected() {
+  public boolean hasActiveConnection() {
     checkState(disconnectCount >= 0, "negative disconnectCount");
     return disconnectCount == 0;
   }

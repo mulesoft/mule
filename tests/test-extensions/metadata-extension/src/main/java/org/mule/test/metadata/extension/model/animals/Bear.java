@@ -6,8 +6,9 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
-import static org.mule.test.metadata.extension.model.animals.AnimalClade.MAMMAL;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+
+import static org.mule.test.metadata.extension.model.animals.AnimalClade.MAMMAL;
 
 @XmlHints(allowTopLevelDefinition = true)
 public class Bear implements Animal {
@@ -23,7 +24,7 @@ public class Bear implements Animal {
   }
 
   @Override
-  public AnimalClade getClade() {
+  public AnimalClade clade() {
     return MAMMAL;
   }
 }

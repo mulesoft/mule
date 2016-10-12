@@ -54,7 +54,7 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
     muleContext.stop();
 
     assertThat(client.getDisconnectCount(), is(1));
-    assertThat(client.isConnected(), is(false));
+    assertThat(client.hasActiveConnection(), is(false));
   }
 
   protected PetStoreClient getClient() throws Exception {
@@ -72,7 +72,7 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
   }
 
   protected void assertConnected(PetStoreClient client) {
-    assertThat(client.isConnected(), is(true));
+    assertThat(client.hasActiveConnection(), is(true));
   }
 
   protected String getConfigName() {
