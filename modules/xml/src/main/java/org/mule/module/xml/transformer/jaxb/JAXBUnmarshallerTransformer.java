@@ -99,6 +99,7 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
             if (src instanceof String)
             {
                 SAXParserFactory spf = new XMLSecureFactories().createSaxParserFactory();
+                spf.setNamespaceAware(true);
                 Source xmlSource = new SAXSource(spf.newSAXParser().getXMLReader(), new InputSource(new StringReader((String) src)));
                 result = u.unmarshal(xmlSource);
             }
