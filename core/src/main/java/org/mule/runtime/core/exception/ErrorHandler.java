@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_ERROR_TYPE;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
@@ -78,7 +80,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   public List<MessagingExceptionHandlerAcceptor> getExceptionListeners() {
-    return Collections.unmodifiableList(exceptionListeners);
+    return unmodifiableList(exceptionListeners);
   }
 
   @Override
@@ -104,7 +106,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Override
   protected List<MessagingExceptionHandlerAcceptor> getOwnedObjects() {
-    return Collections.unmodifiableList(exceptionListeners);
+    return exceptionListeners != null ? unmodifiableList(exceptionListeners) : emptyList();
   }
 
   private void validateConfiguredExceptionStrategies() {

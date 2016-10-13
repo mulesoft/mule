@@ -67,9 +67,9 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   public void nonMatchThenCallDefault() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
     when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
-    errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
+    errorHandler.setMuleContext(mockMuleContext);
     errorHandler.initialise();
     when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(false);
     when(mockTestExceptionStrategy2.accept(any(Event.class))).thenReturn(false);
@@ -86,10 +86,10 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void secondMatches() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
-    errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
     when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
+    errorHandler.setMuleContext(mockMuleContext);
     errorHandler.initialise();
     when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(false);
     when(mockTestExceptionStrategy2.accept(any(Event.class))).thenReturn(true);
@@ -105,9 +105,9 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   @Test(expected = MuleRuntimeException.class)
   public void firstAcceptsAllMatches() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
-    errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
+    errorHandler.setMuleContext(mockMuleContext);
     when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
     when(mockTestExceptionStrategy1.acceptsAll()).thenReturn(true);
     when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);
@@ -119,9 +119,9 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   public void criticalIsNotHandled() throws Exception {
     when(mockErrorType.getParentErrorType()).thenReturn(CRITICAL_ERROR_TYPE);
     ErrorHandler errorHandler = new ErrorHandler();
-    errorHandler.setMuleContext(mockMuleContext);
     when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1)));
+    errorHandler.setMuleContext(mockMuleContext);
     errorHandler.initialise();
     when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(true);
     errorHandler.handleException(mockException, mockMuleEvent);
