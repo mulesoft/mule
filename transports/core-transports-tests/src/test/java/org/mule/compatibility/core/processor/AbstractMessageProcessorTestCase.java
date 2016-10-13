@@ -327,10 +327,4 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
   }
 
-  protected Event getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
-      throws Exception {
-    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(payload).build())
-        .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
-  }
 }

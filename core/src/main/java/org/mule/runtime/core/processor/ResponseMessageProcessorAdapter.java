@@ -10,7 +10,10 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -28,6 +31,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.List;
+import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMessageProcessor
     implements Lifecycle, FlowConstructAware {
@@ -50,25 +56,32 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
   }
 
   @Override
-  protected Event processResponse(Event response, final Event request) throws MuleException {
+  protected Event processResponse(final Event response, final Event request) throws MuleException {
     if (responseProcessor == null || !isEventValid(response)) {
       return response;
     } else {
-      return new CopyOnNullNonBlockingProcessorExecutor(response, singletonList(responseProcessor),
-                                                        messageProcessorExecutionTemplate, true).execute();
+      return resolveReturnEvent(responseProcessor.process(response), response);
     }
   }
 
-  class CopyOnNullNonBlockingProcessorExecutor extends NonBlockingProcessorExecutor {
-
-    public CopyOnNullNonBlockingProcessorExecutor(Event event, List<Processor> processors,
-                                                  MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent) {
-      super(event, processors, executionTemplate, copyOnVoidEvent, flowConstruct);
+  @Override
+  protected Function<Publisher<Event>, Publisher<Event>> processResponse(Event request) {
+    if (responseProcessor == null) {
+      return stream -> stream;
+    } else {
+      return stream -> from(stream).transform(responseProcessor).map(result -> resolveReturnEvent(result, request));
     }
+  }
 
-    @Override
-    protected boolean isUseEventCopy(Event result) {
-      return super.isUseEventCopy(result) || result == null;
+  private Event resolveReturnEvent(Event result, Event original) {
+    if (result == null || VoidMuleEvent.getInstance().equals(result)) {
+      // If <response> returns null then it acts as an implicit branch like in flows, the different
+      // here is that what's next, it's not another message processor that follows this one in the
+      // configuration file but rather the response phase of the inbound endpoint, or optionally
+      // other response processing on the way back to the inbound endpoint.
+      return original;
+    } else {
+      return result;
     }
   }
 

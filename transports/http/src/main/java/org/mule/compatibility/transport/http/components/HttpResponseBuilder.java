@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -52,7 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpResponseBuilder extends AbstractMessageProcessorOwner
-    implements Initialisable, Processor, NonBlockingSupported {
+    implements Initialisable, Processor {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpResponseBuilder.class);
 

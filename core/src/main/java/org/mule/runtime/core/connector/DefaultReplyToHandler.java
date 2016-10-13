@@ -68,12 +68,6 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     // TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
   }
 
-  @Override
-  public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-    // DefaultReplyToHandler does not send a reply message when an exception errors, this is rather handled by
-    // using an exception strategy.
-  }
-
   public void initAfterDeserialisation(MuleContext context) throws MuleException {
     // this method can be called even on objects that were not serialized. In this case,
     // the temporary holder for serialized data is not initialized and we can just return

@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -24,11 +23,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
@@ -38,24 +36,18 @@ import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.compatibility.core.transformer.simple.OutboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
@@ -89,71 +81,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
     assertMessageSentSame(true);
     assertEqualMessages(responseMessage, result.getMessage());
-  }
-
-  @Test
-  public void testDefaultFlowNonBlocking() throws Exception {
-    Transformer reqTransformer = mock(Transformer.class);
-    when(reqTransformer.process(any(Event.class))).then(echoEventAnswer);
-    Transformer resTransformer = mock(Transformer.class);
-    when(resTransformer.process(any(Event.class))).then(echoEventAnswer);
-
-    final Flow flow = new Flow("", muleContext);
-    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    muleContext.getRegistry().registerFlowConstruct(flow);
-
-    OutboundEndpoint endpoint = createOutboundEndpoint(null, null, reqTransformer, resTransformer, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(flow);
-
-    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    Event event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, flow);
-
-    Event response = endpoint.process(event);
-    assertThat(response, equalTo(NonBlockingVoidMuleEvent.getInstance()));
-
-    assertThat(getNonBlockingResponse(nullReplyToHandler, response).getMessage().getPayload().getValue(),
-               equalTo(event.getMessage().getPayload().getValue()));
-    verify(reqTransformer, times(1)).process(any());
-    verify(resTransformer, times(1)).process(any());
-  }
-
-  @Test
-  public void testDefaultFlowNonBlockingError() throws Exception {
-    final Flow flow = new Flow("", muleContext);
-    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    muleContext.getRegistry().registerFlowConstruct(flow);
-
-    OutboundEndpoint endpoint = createOutboundEndpoint("test://AlwaysFail", null, null, null, null, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(flow);
-    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    Event event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, flow);
-
-    Event response = endpoint.process(event);
-    assertThat(response, equalTo(NonBlockingVoidMuleEvent.getInstance()));
-
-    try {
-      getNonBlockingResponse(nullReplyToHandler, response);
-      fail("Exception Expected");
-    } catch (Exception e) {
-      assertThat(e, instanceOf(MessagingException.class));
-      assertThat(e.getCause(), instanceOf(RoutingException.class));
-    }
-
-    assertThat(nullReplyToHandler.event, is(nullValue()));
-  }
-
-  protected Event getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, Event result) throws Exception {
-    if (NonBlockingVoidMuleEvent.getInstance() == result) {
-      if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, MILLISECONDS)) {
-        throw new RuntimeException("No Non-Blocking Response");
-      }
-      if (replyToHandler.exception != null) {
-        throw replyToHandler.exception;
-      }
-      return replyToHandler.event;
-    } else {
-      return result;
-    }
   }
 
   @Test
@@ -398,12 +325,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
       latch.countDown();
     }
 
-    @Override
-    protected void doSendNonBlocking(Event event, CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
-      sensedSendEvent = event;
-      latch.countDown();
-      super.doSendNonBlocking(event, completionHandler);
-    }
   }
 
 }

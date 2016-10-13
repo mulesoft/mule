@@ -6,13 +6,20 @@
  */
 package org.mule.runtime.core.api.exception;
 
+import static reactor.core.publisher.Flux.error;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
+
+import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import reactor.core.Exceptions;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
  */
-public interface MessagingExceptionHandler extends ExceptionHandler {
+public interface MessagingExceptionHandler extends ExceptionHandler, Function<MessagingException, Publisher<? extends Event>> {
 
   /**
    * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
@@ -22,6 +29,16 @@ public interface MessagingExceptionHandler extends ExceptionHandler {
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
    */
   Event handleException(MessagingException exception, Event event);
+
+  @Override
+  default Publisher<? extends Event> apply(MessagingException exception) {
+    exception.setProcessedEvent(handleException(exception, exception.getEvent()));
+    if (exception.handled()) {
+      return just(exception.getEvent());
+    } else {
+      return error(exception);
+    }
+  }
 }
 
 

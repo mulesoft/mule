@@ -8,9 +8,17 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
+import static org.mule.runtime.core.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.fromIterable;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -29,7 +37,6 @@ import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
@@ -46,11 +53,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.resource.spi.work.WorkException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +111,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   /**
    * chains built around the routes
    */
-  private List<MessageProcessorChain> routeChains;
+  private List<Processor> routeChains = emptyList();
 
   /**
    * The aggregation strategy. By default is this instance
@@ -123,12 +130,10 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (CollectionUtils.isEmpty(routes)) {
-      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
-    }
+    assertMorethanOneRoute();
 
     InternalMessage message = event.getMessage();
-    AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
+    validateMessageIsNotConsumable(event, message);
 
     List<ProcessingMuleEventWork> works = executeWork(event);
     Event response = processResponses(event, works);
@@ -142,6 +147,21 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     }
 
     return response;
+  }
+
+  private void assertMorethanOneRoute() throws RoutePathNotFoundException {
+    if (CollectionUtils.isEmpty(routes)) {
+      throw new RoutePathNotFoundException(noEndpointsForRouter(), null);
+    }
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).doOnNext(checkedConsumer(event -> {
+      assertMorethanOneRoute();
+      validateMessageIsNotConsumable(event, event.getMessage());
+    })).concatMap(event -> from(fromIterable(routeChains).concatMap(processor -> just(event).transform(processor))).collectList()
+        .map(checkedFunction(list -> aggregationStrategy.aggregate(new AggregationContext(event, list)))));
   }
 
   private Event processResponses(Event event, List<ProcessingMuleEventWork> works)
@@ -306,7 +326,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    return routeChains.stream().map(messageProcessorChain -> (Processor) messageProcessorChain).collect(toList());
+    return routeChains;
   }
 
   public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
@@ -328,7 +348,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
     pathElement = pathElement.addChild(this);
-    for (MessageProcessorChain route : routeChains) {
+    for (Processor route : routeChains) {
       NotificationUtils.addMessageProcessorPathElements(route, pathElement);
     }
   }

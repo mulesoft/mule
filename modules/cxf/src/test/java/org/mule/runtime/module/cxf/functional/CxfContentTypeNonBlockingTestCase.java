@@ -37,6 +37,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   }
 
   @Test
+  @Ignore("MULE-10618")
   public void testCxfService() throws Exception {
     InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
     MuleClient client = muleContext.getClient();
@@ -49,6 +50,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   }
 
   @Test
+  @Ignore("MULE-10618")
   public void testCxfClient() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("hello").build();
     MuleClient client = muleContext.getClient();
@@ -62,6 +64,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   }
 
   @Test
+  @Ignore("MULE-10618")
   public void testCxfClientProxy() throws Exception {
     InternalMessage request = InternalMessage.builder().payload("hello").build();
     MuleClient client = muleContext.getClient();

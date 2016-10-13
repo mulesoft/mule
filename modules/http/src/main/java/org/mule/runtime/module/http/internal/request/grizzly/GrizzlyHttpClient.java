@@ -238,24 +238,21 @@ public class GrizzlyHttpClient implements HttpClient {
 
   @Override
   public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
-                   final CompletionHandler<HttpResponse, Exception, Void> completionHandler, WorkManager workManager) {
+                   final CompletionHandler<HttpResponse, Exception, Void> completionHandler) {
     try {
       asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
-                                     new WorkManagerSourceAsyncCompletionHandler(completionHandler, workManager));
+                                     new WorkManagerSourceAsyncCompletionHandler(completionHandler));
     } catch (Exception e) {
       completionHandler.onFailure(e);
     }
   }
 
-  private class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> implements WorkManagerSource {
+  private class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> {
 
     private CompletionHandler<HttpResponse, Exception, Void> completionHandler;
-    private WorkManager workManager;
 
-    WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception, Void> completionHandler,
-                                            WorkManager workManager) {
+    WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception, Void> completionHandler) {
       this.completionHandler = completionHandler;
-      this.workManager = workManager;
     }
 
     @Override
@@ -272,10 +269,6 @@ public class GrizzlyHttpClient implements HttpClient {
       completionHandler.onFailure((Exception) t);
     }
 
-    @Override
-    public WorkManager getWorkManager() throws MuleException {
-      return workManager;
-    }
   }
 
   private HttpResponse createMuleResponse(Response response) throws IOException {

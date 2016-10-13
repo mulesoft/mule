@@ -262,7 +262,7 @@ public class TestEventBuilder {
    * Configures the product event to have the provided {@link ReplyToHandler}.
    *
    * @return this {@link TestEventBuilder}
-   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
    */
   @Deprecated
   public TestEventBuilder withReplyToHandler(ReplyToHandler replyToHandler) {

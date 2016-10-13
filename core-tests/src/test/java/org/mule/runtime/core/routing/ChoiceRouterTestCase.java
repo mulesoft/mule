@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -16,16 +19,22 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class ChoiceRouterTestCase extends AbstractMuleContextTestCase {
+public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
+
+  @Rule
+  public ExpectedException thrown = none();
 
   private ChoiceRouter choiceRouter;
 
-  public ChoiceRouterTestCase() {
+  public ChoiceRouterTestCase(boolean nonBlocking) {
+    super(nonBlocking);
     setDisposeContextPerClass(true);
   }
 
@@ -37,64 +46,54 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testNoRoute() throws Exception {
-    try {
-      choiceRouter.process(fooEvent());
-      fail("should have got a MuleException");
-    } catch (MuleException me) {
-      assertTrue(me instanceof RoutePathNotFoundException);
-    }
+    thrown.expect(is(instanceOf(RoutePathNotFoundException.class)));
+    process(choiceRouter, fooEvent());
   }
 
   @Test
   public void testOnlyDefaultRoute() throws Exception {
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("foo:default", choiceRouter.process(fooEvent()).getMessageAsString(muleContext));
+    assertEquals("foo:default", process(choiceRouter, fooEvent()).getMessageAsString(muleContext));
   }
 
   @Test
   public void testNoMatchingNorDefaultRoute() throws Exception {
-    try {
-      choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
-      choiceRouter.process(fooEvent());
-      fail("should have got a MuleException");
-    } catch (MuleException me) {
-      assertTrue(me instanceof RoutePathNotFoundException);
-    }
+    choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
+
+    thrown.expect(is(instanceOf(RoutePathNotFoundException.class)));
+    process(choiceRouter, fooEvent());
   }
 
   @Test
   public void testNoMatchingRouteWithDefaultRoute() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("foo:default", choiceRouter.process(fooEvent()).getMessageAsString(muleContext));
+    assertEquals("foo:default", process(choiceRouter, fooEvent()).getMessageAsString(muleContext));
   }
 
   @Test
   public void testMatchingRouteWithDefaultRoute() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("zap:bar", choiceRouter.process(zapEvent()).getMessageAsString(muleContext));
+    assertEquals("zap:bar", process(choiceRouter, zapEvent()).getMessageAsString(muleContext));
   }
 
   @Test
   public void testMatchingRouteWithStatistics() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
     choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-    assertEquals("zap:bar", choiceRouter.process(zapEvent()).getMessageAsString(muleContext));
+    assertEquals("zap:bar", process(choiceRouter, zapEvent()).getMessageAsString(muleContext));
   }
 
   @Test
   public void testAddAndDeleteRoute() throws Exception {
-    try {
-      TestMessageProcessor mp = new TestMessageProcessor("bar");
-      choiceRouter.addRoute(mp, new EqualsFilter("zap"));
-      choiceRouter.removeRoute(mp);
-      choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-      choiceRouter.process(zapEvent());
-      fail("should have got a MuleException");
-    } catch (MuleException me) {
-      assertTrue(me instanceof RoutePathNotFoundException);
-    }
+    TestMessageProcessor mp = new TestMessageProcessor("bar");
+    choiceRouter.addRoute(mp, new EqualsFilter("zap"));
+    choiceRouter.removeRoute(mp);
+    choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
+
+    thrown.expect(is(instanceOf(RoutePathNotFoundException.class)));
+    process(choiceRouter, zapEvent());
   }
 
   @Test
@@ -102,7 +101,7 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase {
     TestMessageProcessor mp = new TestMessageProcessor("bar");
     choiceRouter.addRoute(mp, new EqualsFilter("paz"));
     choiceRouter.updateRoute(mp, new EqualsFilter("zap"));
-    assertEquals("zap:bar", choiceRouter.process(zapEvent()).getMessageAsString(muleContext));
+    assertEquals("zap:bar", process(choiceRouter, zapEvent()).getMessageAsString(muleContext));
   }
 
   protected Event fooEvent() throws MuleException {

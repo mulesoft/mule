@@ -49,20 +49,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   }
 
   @Test
-  public void testReplyEnabledNonBlocking() throws Exception {
-    InternalMessage response =
-        flowRunner("JMSService1NonBlockingFixed").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
-    assertEchoResponse(response);
-  }
-
-  @Test
-  public void testReplyEnabledNonBlockingTimeout() throws Exception {
-    InternalMessage response =
-        flowRunner("JMSService1NonBlockingTimeoutFixed").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
-    assertNullPayloadResponse(response);
-  }
-
-  @Test
   public void testTemporaryReplyEnabledSync() throws Exception {
     InternalMessage response = flowRunner("JMSService1Sync").withPayload(TEST_MESSAGE).run().getMessage();
     assertEchoResponse(response);
@@ -72,19 +58,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   public void testTemporaryReplyEnabledSyncTimeout() throws Exception {
     InternalMessage response = flowRunner("JMSService1SyncTimeout").withPayload(TEST_MESSAGE).run().getMessage();
     assertNullPayloadResponse(response);
-  }
-
-  @Test
-  public void testTemporaryReplyEnabledNonBlocking() throws Exception {
-    InternalMessage response = flowRunner("JMSService1NonBlocking").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
-    assertEchoResponse(response);
-  }
-
-  @Test
-  public void testTemporaryReplyEnabledNonBlockingTimeout() throws Exception {
-    InternalMessage response =
-        flowRunner("JMSService1NonBlockingTimeout").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
-    assertThat(response.getPayload().getValue(), is(nullValue()));
   }
 
   @Test

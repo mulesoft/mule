@@ -9,13 +9,26 @@ package org.mule.tck;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+import static reactor.core.Exceptions.unwrap;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -82,7 +95,7 @@ public final class MuleTestUtils {
     }
   }
 
-  public static interface TestCallback {
+  public interface TestCallback {
 
     void run() throws Exception;
   }
@@ -101,5 +114,24 @@ public final class MuleTestUtils {
     }
 
     return null;
+  }
+
+  public static Event processAsStreamAndBlock(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
+      throws MuleException {
+    try {
+      return just(event)
+          .transform(processor)
+          .subscribe()
+          .blockMillis(RECEIVE_TIMEOUT);
+    } catch (Throwable exception) {
+      Throwable unwrapped = unwrap(exception);
+      if (unwrapped instanceof MuleException) {
+        throw (MuleException) unwrapped;
+      } else if (unwrapped instanceof RuntimeException) {
+        throw (RuntimeException) unwrapped;
+      } else {
+        throw new MuleRuntimeException(unwrapped);
+      }
+    }
   }
 }

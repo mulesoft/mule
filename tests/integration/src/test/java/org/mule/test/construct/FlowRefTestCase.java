@@ -7,14 +7,9 @@
 package org.mule.test.construct;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -23,20 +18,13 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -149,63 +137,6 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
   public void flowRefNotFound() throws Exception {
     assertEquals("0C",
                  flowRunner("flow2").withPayload("0").withVariable("letter", "Z").run().getMessageAsString(muleContext));
-  }
-
-  @Test
-  @Ignore("MULE-10618")
-  public void nonBlockingFlowRef() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefBasic"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_MESSAGE));
-
-    SensingNullRequestResponseMessageProcessor flow1RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(FLOW1_SENSING_PROCESSOR_NAME);
-    SensingNullRequestResponseMessageProcessor flow2RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(FLOW2_SENSING_PROCESSOR_NAME);
-    assertThat(flow1RequestResponseProcessor.requestThread, not(equalTo(flow1RequestResponseProcessor.responseThread)));
-    assertThat(flow2RequestResponseProcessor.requestThread, not(equalTo(flow2RequestResponseProcessor.responseThread)));
-  }
-
-  @Test
-  @Ignore("MULE-10618")
-  public void nonBlockingFlowRefToAsyncFlow() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToAsyncFlow"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()),
-               containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
-  }
-
-  @Test
-  @Ignore("MULE-10618")
-  public void nonBlockingFlowRefToSyncFlow() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToSyncFlow"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_MESSAGE));
-
-    SensingNullRequestResponseMessageProcessor flow1RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(TO_SYNC_FLOW1_SENSING_PROCESSOR_NAME);
-    SensingNullRequestResponseMessageProcessor flow2RequestResponseProcessor =
-        muleContext.getRegistry().lookupObject(TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME);
-    assertThat(flow1RequestResponseProcessor.requestThread, equalTo(flow1RequestResponseProcessor.responseThread));
-    assertThat(flow2RequestResponseProcessor.requestThread, equalTo(flow2RequestResponseProcessor.responseThread));
-  }
-
-
-  @Test
-  @Ignore("MULE-10618")
-  public void nonBlockingFlowRefErrorHandling() throws Exception {
-    Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefErrorHandling"))
-        .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-    HttpResponse httpResponse = response.returnResponse();
-
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(ERROR_MESSAGE));
   }
 
 }

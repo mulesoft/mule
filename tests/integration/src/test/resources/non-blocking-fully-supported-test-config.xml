@@ -45,21 +45,6 @@
         <test:assert expression="#[assertPayload()]"/>
     </flow>
 
-    <flow name="childDefaultFlow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]" message="1"/>
-        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
-        <flow-ref name="childDefaultFlowChild"/>
-        <test:assert expression="#[assertPayload()]"/>
-        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
-        <test:assert expression="#[flow.name=='childDefaultFlow']"/>
-    </flow>
-    <flow name="childDefaultFlowChild" processingStrategy="default">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]" message="2"/>
-        <test:non-blocking-processor/>
-        <logger level="ERROR" message="#[Thread.currentThread()]"/>
-        <test:assert expression="#[assertPayload()]"/>
-    </flow>
-
     <flow name="childSyncFlow">
         <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>

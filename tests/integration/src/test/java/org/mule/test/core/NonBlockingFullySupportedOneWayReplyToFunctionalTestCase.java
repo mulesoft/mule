@@ -10,6 +10,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,8 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@Ignore("MULE-9792")
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public class NonBlockingFullySupportedOneWayReplyToFunctionalTestCase extends NonBlockingFullySupportedFunctionalTestCase {
 
   public NonBlockingFullySupportedOneWayReplyToFunctionalTestCase(ProcessingStrategy processingStrategy) {

@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

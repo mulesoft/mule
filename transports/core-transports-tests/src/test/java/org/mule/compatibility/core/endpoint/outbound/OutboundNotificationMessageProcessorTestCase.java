@@ -21,10 +21,10 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.SensingNullReplyToHandler;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class OutboundNotificationMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
@@ -50,20 +50,6 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
     Processor mp = new OutboundNotificationMessageProcessor(endpoint);
     Event event = createTestOutboundEvent();
-    mp.process(event);
-
-    assertMessageNotification(listener, endpoint, event, MESSAGE_SEND_END);
-  }
-
-  @Test
-  public void testSendNonBlocking() throws Exception {
-    TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
-    muleContext.registerListener(listener);
-
-    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
-    Processor mp = new OutboundNotificationMessageProcessor(endpoint);
-    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    Event event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, getTestFlow(muleContext));
     mp.process(event);
 
     assertMessageNotification(listener, endpoint, event, MESSAGE_SEND_END);

@@ -258,7 +258,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                              setCurrentEvent(event);
                              return event;
                            }
-                         }, getWorkManager(muleEvent));
+                         });
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {
@@ -269,14 +269,6 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     if (requestConfig.getTlsContext() != null && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger.error("Remote host closed connection. Possible SSL/TLS handshake issue."
           + " Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
-    }
-  }
-
-  private WorkManager getWorkManager(Event event) {
-    if (flowConstruct instanceof Flow) {
-      return ((Flow) flowConstruct).getWorkManager();
-    } else {
-      return null;
     }
   }
 

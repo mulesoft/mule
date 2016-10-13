@@ -10,6 +10,7 @@ import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
+import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 
 /**
@@ -28,7 +29,7 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer {
 
   @Override
   public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder) {
-    transport.setIOStrategy(FlowWorkManagerIOStrategy.getInstance());
+    transport.setIOStrategy(SameThreadIOStrategy.getInstance());
     transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
 
     transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);

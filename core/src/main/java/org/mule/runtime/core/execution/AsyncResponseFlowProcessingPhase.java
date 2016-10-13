@@ -12,7 +12,6 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -71,27 +70,10 @@ public class AsyncResponseFlowProcessingPhase
             final Event response = transactionTemplate.execute(() -> {
               Event muleEvent = template.getMuleEvent();
               fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
-              if (muleEvent.isAllowNonBlocking()) {
-                muleEvent = Event.builder(muleEvent)
-                    .replyToHandler(new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template,
-                                                                                                                             messageProcessContext
-                                                                                                                                 .getFlowConstruct(),
-                                                                                                                             phaseResultNotifier,
-                                                                                                                             exceptionHandler),
-                                                                                 messageProcessContext.getFlowConstruct()
-                                                                                     .getExceptionListener(),
-                                                                                 messageProcessContext.getFlowConstruct()))
-                    .build();
-                // Update RequestContext ThreadLocal for backwards compatibility
-                setCurrentEvent(muleEvent);
-              }
               return template.routeEvent(muleEvent);
             });
-
-            if (response != NonBlockingVoidMuleEvent.getInstance()) {
-              fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
-              template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
-            }
+            fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
+            template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
           } catch (final MessagingException e) {
             fireNotification(messageSource, e.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
             template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
@@ -172,38 +154,4 @@ public class AsyncResponseFlowProcessingPhase
 
   }
 
-  class FlowProcessingNonBlockingReplyToHandler implements ReplyToHandler {
-
-    private final AsyncResponseFlowProcessingPhaseTemplate template;
-    private final FlowConstruct flow;
-    private final PhaseResultNotifier phaseResultNotifier;
-    private final MessagingExceptionHandler exceptionHandler;
-
-    public FlowProcessingNonBlockingReplyToHandler(AsyncResponseFlowProcessingPhaseTemplate template,
-                                                   FlowConstruct flow,
-                                                   PhaseResultNotifier phaseResultNotifier,
-                                                   MessagingExceptionHandler exceptionHandler) {
-      this.template = template;
-      this.flow = flow;
-      this.phaseResultNotifier = phaseResultNotifier;
-      this.exceptionHandler = exceptionHandler;
-    }
-
-    @Override
-    public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
-      fireNotification(null, event, flow, MESSAGE_RESPONSE);
-      template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
-      return event;
-    }
-
-    @Override
-    public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-      try {
-        fireNotification(null, exception.getEvent(), flow, MESSAGE_ERROR_RESPONSE);
-        template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
-      } catch (MuleException e) {
-        phaseResultNotifier.phaseFailure(e);
-      }
-    }
-  }
 }

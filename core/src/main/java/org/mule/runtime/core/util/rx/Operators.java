@@ -16,7 +16,6 @@ import reactor.core.publisher.SynchronousSink;
  */
 public final class Operators {
 
-
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return
    * {@code null} and this should be interpreted as empty rather than causing an error.

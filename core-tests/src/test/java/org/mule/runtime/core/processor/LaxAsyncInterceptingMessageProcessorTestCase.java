@@ -17,6 +17,10 @@ import org.junit.Test;
 
 public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncInterceptingMessageProcessorTestCase {
 
+  public LaxAsyncInterceptingMessageProcessorTestCase(boolean reactive) {
+    super(reactive);
+  }
+
   @Override
   @Test
   public void testProcessRequestResponse() throws Exception {

@@ -17,19 +17,24 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.junit.Test;
 
-public class MessageFilterTestCase extends AbstractMuleContextTestCase {
+public class MessageFilterTestCase extends AbstractReactiveProcessorTestCase {
+
+  public MessageFilterTestCase(boolean nonBlocking) {
+    super(nonBlocking);
+  }
 
   @Test
   public void testFilterPass() throws Exception {
     MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_PAYLOAD), false, null);
     SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
     mp.setListener(listener);
+    mp.setMuleContext(muleContext);
 
-    Event resultEvent = mp.process(testEvent());
+    Event resultEvent = process(mp, testEvent());
 
     assertNotNull(listener.event);
     assertEquals(testEvent().getMessage(), resultEvent.getMessage());
@@ -39,9 +44,10 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
   public void testFilterFail() throws Exception {
     MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, null);
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+    mp.setMuleContext(muleContext);
     mp.setListener(out);
 
-    Event resultEvent = mp.process(testEvent());
+    Event resultEvent = process(mp, testEvent());
 
     assertNull(out.event);
     assertNull(resultEvent);
@@ -53,9 +59,10 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
     mp.setListener(out);
+    mp.setMuleContext(muleContext);
     mp.setUnacceptedMessageProcessor(unaccepted);
 
-    Event resultEvent = mp.process(testEvent());
+    Event resultEvent = process(mp, testEvent());
 
     assertNotNull(out.event);
     assertEquals(testEvent().getMessage(), resultEvent.getMessage());
@@ -67,11 +74,12 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
     MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, unaccepted);
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+    mp.setMuleContext(muleContext);
     mp.setListener(out);
 
     Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(ONE_WAY).build();
 
-    Event resultEvent = mp.process(inEvent);
+    Event resultEvent = process(mp, inEvent);
 
     assertNull(out.event);
     assertSame(VoidMuleEvent.getInstance(), resultEvent);

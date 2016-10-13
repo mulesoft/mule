@@ -65,6 +65,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     asyncReplyMP.setListener(target);
     asyncReplyMP.setReplySource(target.getMessageSource());
+    asyncReplyMP.setMuleContext(muleContext);
 
     Event resultEvent = asyncReplyMP.process(testEvent());
 
@@ -81,6 +82,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
+    asyncReplyMP.setMuleContext(muleContext);
 
     Event resultEvent = asyncReplyMP.process(testEvent());
 
@@ -99,6 +101,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
+    asyncReplyMP.setMuleContext(muleContext);
 
     Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(ONE_WAY).build();
 
@@ -136,6 +139,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     MessageSource messageSource = mock(MessageSource.class);
     asyncReplyMP.setReplySource(messageSource);
+    asyncReplyMP.setMuleContext(muleContext);
 
     final boolean[] exceptionThrown = new boolean[1];
     final Object[] responseEvent = new Object[1];

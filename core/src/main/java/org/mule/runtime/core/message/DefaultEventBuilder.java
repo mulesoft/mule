@@ -70,7 +70,6 @@ public class DefaultEventBuilder implements Event.Builder {
   private Object replyToDestination;
   private boolean transacted;
   private Boolean synchronous;
-  private boolean nonBlocking;
   private MuleSession session = new DefaultMuleSession();
   private Event originalEvent;
   private boolean modified;
@@ -102,7 +101,6 @@ public class DefaultEventBuilder implements Event.Builder {
       this.synchronous = event.isSynchronous();
     }
     this.transacted = event.isTransacted();
-    this.nonBlocking = event.isAllowNonBlocking();
 
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
@@ -231,8 +229,6 @@ public class DefaultEventBuilder implements Event.Builder {
   @Deprecated
   public Event.Builder refreshSync() {
     this.synchronous = resolveEventSynchronicity();
-    this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
-
     this.modified = true;
     return this;
   }
@@ -245,7 +241,7 @@ public class DefaultEventBuilder implements Event.Builder {
       return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session, transacted,
                                      synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null)
                                          : synchronous,
-                                     nonBlocking || isFlowConstructNonBlockingProcessingStrategy(), replyToDestination,
+                                     replyToDestination,
                                      replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
                                      notificationsEnabled);
     }
@@ -301,7 +297,6 @@ public class DefaultEventBuilder implements Event.Builder {
     private final CopyOnWriteCaseInsensitiveMap<String, DefaultTypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
-    private final boolean nonBlocking;
     private final String legacyCorrelationId;
     private final Error error;
 
@@ -309,9 +304,9 @@ public class DefaultEventBuilder implements Event.Builder {
     private EventImplementation(EventContext context, InternalMessage message,
                                 Map<String, DefaultTypedValue<Object>> variables,
                                 MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
-                                boolean transacted, boolean synchronous, boolean nonBlocking, Object replyToDestination,
-                                ReplyToHandler replyToHandler, FlowCallStack flowCallStack, GroupCorrelation groupCorrelation,
-                                Error error, String legacyCorrelationId, boolean notificationsEnabled) {
+                                boolean transacted, boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler,
+                                FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
+                                String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
       this.session = session;
@@ -323,7 +318,6 @@ public class DefaultEventBuilder implements Event.Builder {
       this.replyToDestination = replyToDestination;
       this.transacted = transacted;
       this.synchronous = synchronous;
-      this.nonBlocking = nonBlocking;
 
       this.flowCallStack = flowCallStack;
 
@@ -545,11 +539,6 @@ public class DefaultEventBuilder implements Event.Builder {
     @Override
     public boolean isNotificationsEnabled() {
       return notificationsEnabled;
-    }
-
-    @Override
-    public boolean isAllowNonBlocking() {
-      return nonBlocking && !synchronous;
     }
 
     @Override

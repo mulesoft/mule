@@ -21,6 +21,7 @@ public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessa
     super(threadingProfile, name, shutdownTimeout);
   }
 
+  @Override
   protected boolean isProcessAsync(Event event) throws MuleException {
     return doThreading && canProcessAsync(event);
   }

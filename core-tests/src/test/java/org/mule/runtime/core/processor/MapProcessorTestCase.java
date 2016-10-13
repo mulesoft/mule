@@ -8,15 +8,18 @@ package org.mule.runtime.core.processor;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.message.InternalMessage.of;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -27,6 +30,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import reactor.core.Exceptions;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -97,16 +101,24 @@ public class MapProcessorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void mapStreamBlockingGetExceptionThrown() {
-    thrown.expect(is(exception));
-    assertThat(just(event).transform(testProcessorThrowsException).block(), is(nullValue()));
+  public void mapStreamBlockingGetExceptionThrown() throws Throwable {
+    thrown.expect(is(instanceOf(MessagingException.class)));
+    thrown.expectCause(is(exception));
+    Event result;
+    try {
+      result = just(event).transform(testProcessorThrowsException).block();
+    } catch (Exception e) {
+      throw unwrap(e);
+    }
+    assertThat(result, is(nullValue()));
   }
 
   @Test
   public void mapStreamSubscribeExceptionThrown() throws Exception {
     Latch latch = new Latch();
     just(event).transform(testProcessorThrowsException).doOnError(throwable -> {
-      assertThat(throwable, is(exception));
+      assertThat(throwable, is(instanceOf(MessagingException.class)));
+      assertThat(throwable.getCause(), is(exception));
       latch.countDown();
     }).subscribe();
     latch.await(RECEIVE_TIMEOUT, MILLISECONDS);

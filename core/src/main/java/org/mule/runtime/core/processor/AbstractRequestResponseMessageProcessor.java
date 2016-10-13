@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.exception.MessagingException;
+
+import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * Base implementation of a {@link org.mule.runtime.core.api.processor.Processor} that may performs processing during both the
@@ -30,19 +34,11 @@ import org.mule.runtime.core.exception.MessagingException;
  *
  * @since 3.7.0
  */
-public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor implements
-    NonBlockingSupported {
+public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   @Override
-  public final Event process(Event event) throws MuleException {
-    if (isNonBlocking(event)) {
-      return processNonBlocking(event);
-    } else {
-      return processBlocking(event);
-    }
-  }
+  public Event process(Event event) throws MuleException {
 
-  protected Event processBlocking(Event event) throws MuleException {
     MessagingException exception = null;
     Event response = null;
     try {
@@ -60,72 +56,24 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     }
   }
 
-  protected Event processNonBlocking(final Event request) throws MuleException {
-    MessagingException exception = null;
-    Event eventToProcess = Event.builder(request).replyToHandler(createReplyToHandler(request)).build();
-    // Update RequestContext ThreadLocal for backwards compatibility
-    setCurrentEvent(eventToProcess);
-
-    try {
-      Event result = processNext(processRequest(eventToProcess));
-      if (!(result instanceof NonBlockingVoidMuleEvent)) {
-        return processResponse(recreateEventWithOriginalReplyToHandler(result, request.getReplyToHandler()), eventToProcess);
-      } else {
-        return result;
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).concatMap(request -> {
+      Flux<Event> stream = just(request).transform(processRequest());
+      if (next != null) {
+        stream = stream.transform(s -> applyNext(s));
       }
-    } catch (MessagingException e) {
-      exception = e;
-      return processCatch(request, e);
-    } finally {
-      processFinally(request, exception);
-    }
-  }
-
-  protected ReplyToHandler createReplyToHandler(final Event request) {
-    final ReplyToHandler originalReplyToHandler = request.getReplyToHandler();
-    return new NonBlockingReplyToHandler() {
-
-      @Override
-      public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
-        try {
-          Event response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
-          if (!NonBlockingVoidMuleEvent.getInstance().equals(response)) {
-            response = originalReplyToHandler.processReplyTo(response, null, null);
+      return stream.transform(processResponse(request));
+    })
+        .doOnNext(result -> processFinally(result, null))
+        .onErrorResumeWith(MessagingException.class, e -> {
+          try {
+            return just(processCatch(e.getEvent(), e));
+          } catch (MessagingException e1) {
+            throw propagate(e1);
           }
-          return response;
-        } catch (Exception e) {
-          processExceptionReplyTo(new MessagingException(event, e), null);
-          return event;
-        } finally {
-          processFinally(event, null);
-        }
-      }
-
-      @Override
-      public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-        try {
-          Event handledEvent = processCatch(exception.getEvent(), exception);
-          originalReplyToHandler.processReplyTo(handledEvent, null, null);
-        } catch (Exception e) {
-          originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-        } finally {
-          processFinally(exception.getEvent(), exception);
-        }
-      }
-    };
-  }
-
-  private Event recreateEventWithOriginalReplyToHandler(Event event, ReplyToHandler originalReplyToHandler) {
-    if (event != null) {
-      event = Event.builder(event).replyToHandler(originalReplyToHandler).build();
-      // Update RequestContext ThreadLocal for backwards compatibility
-      setCurrentEvent(event);
-    }
-    return event;
-  }
-
-  protected boolean isNonBlocking(Event event) {
-    return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+        })
+        .doOnError(MessagingException.class, checkedConsumer(e -> processFinally(e.getEvent(), e)));
   }
 
   /**
@@ -140,6 +88,15 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
   }
 
   /**
+   * Processes the request phase before the next message processor is invoked.
+   *
+   * @return function that performs request processing
+   */
+  protected Function<Publisher<Event>, Publisher<Event>> processRequest() {
+    return stream -> from(stream).handle(nullSafeMap(checkedFunction(event -> processRequest(event))));
+  }
+
+  /**
    * Processes the response phase after the next message processor and it's response phase have been invoked
    *
    * @param response response event to be processed.
@@ -148,20 +105,16 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * @throws MuleException exception thrown by implementations of this method whiile performing response processing
    */
   protected Event processResponse(Event response, final Event request) throws MuleException {
-    return processResponse(response);
+    return response;
   }
 
   /**
-   * Processes the response phase after the next message processor and it's response phase have been invoked. This method is
-   * deprecated, use {@link #processResponse(Event, Event)} instead.
+   * Processes the response phase after the next message processor and it's response phase have been invoked
    *
-   * @param response response event to be processed.
-   * @return result of response processing.
-   * @throws MuleException exception thrown by implementations of this method whiile performing response processing
+   * @return function that performs request processing
    */
-  @Deprecated
-  protected Event processResponse(Event response) throws MuleException {
-    return response;
+  protected Function<Publisher<Event>, Publisher<Event>> processResponse(Event request) {
+    return stream -> from(stream).handle(nullSafeMap(checkedFunction(response -> processResponse(response, request))));
   }
 
   /**

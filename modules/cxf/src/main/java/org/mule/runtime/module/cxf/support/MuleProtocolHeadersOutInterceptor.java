@@ -13,7 +13,6 @@ import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_M
 import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
@@ -46,7 +45,7 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
   public void handleMessage(Message message) throws Fault {
     Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
 
-    if (event == null || event instanceof NonBlockingVoidMuleEvent) {
+    if (event == null) {
       return;
     }
 

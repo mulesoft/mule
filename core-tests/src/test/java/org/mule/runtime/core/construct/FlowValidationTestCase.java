@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,10 +61,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Test
   public void testProcessingStrategyNonBlockingSupported() throws Exception {
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    flow.setMessageSource(new NonBlockingMessageSource() {
-
-      @Override
-      public void setListener(Processor listener) {}
+    flow.setMessageSource((NonBlockingMessageSource) listener -> {
     });
     flow.validateConstruct();
   }
@@ -73,10 +69,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Test(expected = FlowConstructInvalidException.class)
   public void testProcessingStrategyNonBlockingNotSupported() throws Exception {
     flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-    flow.setMessageSource(new MessageSource() {
-
-      @Override
-      public void setListener(Processor listener) {}
+    flow.setMessageSource(listener -> {
     });
     flow.validateConstruct();
   }

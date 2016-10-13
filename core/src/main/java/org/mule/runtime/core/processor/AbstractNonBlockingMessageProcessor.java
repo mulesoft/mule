@@ -6,21 +6,19 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
 /**
- * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing
+ * Abstract implementation of {@link Processor} that determines if processing
  * should be performed blocking or non-blocking..
  */
 public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject
@@ -30,19 +28,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (isNonBlocking(event)) {
-      processNonBlocking(event, createNonBlockingCompletionHandler(event));
-      // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this
-      // thread.
-      setCurrentEvent(null);
-      return NonBlockingVoidMuleEvent.getInstance();
-    } else {
-      return processBlocking(event);
-    }
-  }
-
-  protected boolean isNonBlocking(Event event) {
-    return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+    return processBlocking(event);
   }
 
   @Override
@@ -61,30 +47,4 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
     };
   }
 
-  private NonBlockingCompletionHandler createNonBlockingCompletionHandler(Event event) {
-    return new NonBlockingCompletionHandler(event);
-  }
-
-  class NonBlockingCompletionHandler implements CompletionHandler<Event, MessagingException, Void> {
-
-    final private ReplyToHandler replyToHandler;
-
-    NonBlockingCompletionHandler(Event event) {
-      this.replyToHandler = event.getReplyToHandler();
-    }
-
-    @Override
-    public void onFailure(final MessagingException exception) {
-      replyToHandler.processExceptionReplyTo(exception, null);
-    }
-
-    @Override
-    public void onCompletion(Event result, ExceptionCallback<Void, Exception> exceptionCallback) {
-      try {
-        replyToHandler.processReplyTo(result, null, null);
-      } catch (Exception e) {
-        exceptionCallback.onException(e);
-      }
-    }
-  }
 }

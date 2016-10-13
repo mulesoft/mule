@@ -14,7 +14,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
+import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
@@ -36,8 +36,7 @@ import org.junit.Test;
 
 public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextEndpointTestCase implements ExceptionListener {
 
-  public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR =
-      "Exception expected: '" + SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE + "'";
+  public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR = "Exception expected: '" + SYNCHRONOUS_EVENT_ERROR_MESSAGE + "'";
 
   protected AsyncInterceptingMessageProcessor messageProcessor;
   protected TestListener target = new TestListener();

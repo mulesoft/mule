@@ -6,37 +6,30 @@
  */
 package org.mule.runtime.core.enricher;
 
+import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate resource.
@@ -60,7 +53,7 @@ import java.util.List;
  * <p/>
  * <b>EIP Reference:</b> <a href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
  */
-public class MessageEnricher extends AbstractMessageProcessorOwner implements NonBlockingMessageProcessor {
+public class MessageEnricher extends AbstractMessageProcessorOwner implements Processor {
 
   private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
 
@@ -68,7 +61,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
   @Override
   public Event process(Event event) throws MuleException {
-    return new EnricherProcessor(enrichmentProcessor, muleContext).process(event);
+    return enrich(enrichmentProcessor.process(Event.builder(event).session(new DefaultMuleSession(event.getSession())).build()),
+                  event);
   }
 
   protected Event enrich(Event currentEvent,
@@ -95,6 +89,26 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
       return Event.builder(currentEvent).message(InternalMessage.builder(currentEvent.getMessage())
           .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).flatMap(event -> Mono.just(event)
+        .map(event1 -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
+        .transform(enrichmentProcessor).map(checkedFunction(response -> enrich(response, event)))
+        .otherwiseIfEmpty(Mono.just(event)));
+  }
+
+  protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {
+    final ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
+
+    if (event != null && !VoidMuleEvent.getInstance().equals(eventToEnrich)) {
+      for (EnrichExpressionPair pair : enrichExpressionPairs) {
+        eventToEnrich = enrich(eventToEnrich, event, pair.getSource(), pair.getTarget(), expressionLanguage);
+      }
+    }
+    setCurrentEvent(eventToEnrich);
+    return eventToEnrich;
   }
 
   public void setEnrichmentMessageProcessor(Processor enrichmentProcessor) {
@@ -154,7 +168,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    return Collections.singletonList(enrichmentProcessor);
+    return singletonList(enrichmentProcessor);
   }
 
   @Override
@@ -162,54 +176,4 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     NotificationUtils.addMessageProcessorPathElements(enrichmentProcessor, pathElement.addChild(this));
   }
 
-  /**
-   * Enriches the current event using the result of processing the next message processor (the enrichment processor) and the
-   * configured enrichment pairs.
-   */
-  private class EnricherProcessor extends AbstractRequestResponseMessageProcessor implements InternalMessageProcessor {
-
-    private Event eventToEnrich;
-
-    protected EnricherProcessor(Processor enrichmentProcessor, MuleContext muleContext) {
-      this.next = enrichmentProcessor;
-      this.muleContext = muleContext;
-    }
-
-    @Override
-    protected Event processBlocking(Event event) throws MuleException {
-      this.eventToEnrich = event;
-      return super.processBlocking(copyEventForEnrichment(event));
-    }
-
-    @Override
-    protected Event processNonBlocking(Event event) throws MuleException {
-      this.eventToEnrich = event;
-      Event result =
-          processNext(copyEventForEnrichment(Event.builder(event).replyToHandler(createReplyToHandler(event)).build()));
-      if (!(result instanceof NonBlockingVoidMuleEvent)) {
-        result = processResponse(result, event);
-      }
-      return result;
-    }
-
-    private Event copyEventForEnrichment(Event event) {
-      Event copy = Event.builder(event).session(new DefaultMuleSession(event.getSession())).build();
-      setCurrentEvent(copy);
-      return copy;
-    }
-
-    @Override
-    protected Event processResponse(Event response, final Event request) throws MuleException {
-      final ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
-
-      if (response != null && !VoidMuleEvent.getInstance().equals(eventToEnrich)) {
-        for (EnrichExpressionPair pair : enrichExpressionPairs) {
-          eventToEnrich = enrich(eventToEnrich, response, pair.getSource(), pair.getTarget(), expressionLanguage);
-        }
-      }
-      setCurrentEvent(eventToEnrich);
-      return eventToEnrich;
-    }
-
-  }
 }

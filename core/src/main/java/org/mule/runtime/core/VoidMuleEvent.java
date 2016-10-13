@@ -145,11 +145,6 @@ public class VoidMuleEvent implements Event {
   }
 
   @Override
-  public boolean isAllowNonBlocking() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public FlowCallStack getFlowCallStack() {
     throw new UnsupportedOperationException();
   }

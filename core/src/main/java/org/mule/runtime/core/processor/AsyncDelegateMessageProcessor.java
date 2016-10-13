@@ -7,26 +7,26 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSourceProvider;
+import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.util.NotificationUtils;
@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements Processor, Initialisable, Startable, Stoppable, NonBlockingSupported {
+    implements Processor, Initialisable, Startable, Stoppable {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);
@@ -105,26 +106,46 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (event.isTransacted()) {
-      throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event, this);
-    }
+    assertNotTransactional(event);
 
     final InternalMessage message = event.getMessage();
+    warnConsumablePayload(message);
+
+    if (target != null) {
+      target.process(updateEventForAsync(event));
+    }
+    return VoidMuleEvent.getInstance();
+  }
+
+  private void assertNotTransactional(Event event) throws RoutingException {
+    if (event.isTransacted()) {
+      throw new RoutingException(asyncDoesNotSupportTransactions(), delegate);
+    }
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher)
+        .doOnNext(checkedConsumer(event -> assertNotTransactional(event)))
+        .doOnNext(event -> warnConsumablePayload(event.getMessage())).map(event -> updateEventForAsync(event)).transform(target)
+        .map(event -> VoidMuleEvent.getInstance());
+  }
+
+  private Event updateEventForAsync(Event event) {
+    // Clone event, make it async and remove ReplyToHandler
+    Event newEvent = Event.builder(event).variables(emptyMap()).synchronous(false)
+        .exchangePattern(ONE_WAY).replyToHandler(null).build();
+    // Update RequestContext ThreadLocal for backwards compatibility
+    setCurrentEvent(newEvent);
+    return newEvent;
+  }
+
+  private void warnConsumablePayload(InternalMessage message) {
     if (consumablePayloadWarned.compareAndSet(false, true) && message.getPayload().getDataType().isStreamType()) {
       logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
           " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
                                 message.getPayload().getValue().getClass().getName()));
     }
-
-    if (target != null) {
-      // Clone event, make it async and remove ReplyToHandler
-      Event newEvent = Event.builder(event).message(message).variables(emptyMap()).synchronous(false)
-          .exchangePattern(ONE_WAY).replyToHandler(null).build();
-      // Update RequestContext ThreadLocal for backwards compatibility
-      setCurrentEvent(newEvent);
-      target.process(newEvent);
-    }
-    return VoidMuleEvent.getInstance();
   }
 
   public void setDelegate(Processor delegate) {
