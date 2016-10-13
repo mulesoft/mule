@@ -61,7 +61,6 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   }
 
   @Test
-
   public void testGlobalTlsContextDefaultProtocolsFails() throws Exception {
     HttpResponse response = executeGetRequest(defaultProtocolsFailsUrl);
 
