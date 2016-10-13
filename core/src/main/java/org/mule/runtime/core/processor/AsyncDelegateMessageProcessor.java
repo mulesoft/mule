@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -133,8 +133,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Event updateEventForAsync(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    Event newEvent = Event.builder(event).variables(emptyMap()).synchronous(false)
-        .exchangePattern(ONE_WAY).replyToHandler(null).build();
+    Event newEvent = Event.builder(event).synchronous(false).exchangePattern(ONE_WAY).replyToHandler(null).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(newEvent);
     return newEvent;
