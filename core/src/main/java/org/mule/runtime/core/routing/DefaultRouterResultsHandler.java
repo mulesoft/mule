@@ -10,7 +10,6 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -60,7 +59,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
       return null;
     } else if (results.size() == 1) {
       Event event = results.get(0);
-      if (event == null || event instanceof VoidMuleEvent) {
+      if (event == null) {
         return event;
       } else if (event != null && event.getMessage() != null) {
         if (returnCollectionWithSingleResult) {
@@ -69,17 +68,14 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
           return event;
         }
       } else {
-        return VoidMuleEvent.getInstance();
+        return previous;
       }
     } else {
-      List<Event> nonNullResults = results.stream().filter(object -> {
-        return !VoidMuleEvent.getInstance().equals(object) &&
-            object != null &&
-            object.getMessage() != null;
-      }).collect(toList());
+      List<Event> nonNullResults = results.stream().filter(object -> object != null &&
+          object.getMessage() != null).collect(toList());
 
       if (nonNullResults.size() == 0) {
-        return VoidMuleEvent.getInstance();
+        return previous;
       } else if (nonNullResults.size() == 1) {
         return nonNullResults.get(0);
       } else {

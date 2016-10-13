@@ -128,6 +128,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint {
       String endpointName = TransportObjectNameHelper.getEndpointNameFor(uri);
       staticBuilder.setName(endpointName);
       OutboundEndpoint endpoint = staticBuilder.buildOutboundEndpoint();
+      endpoint.setFlowConstruct(flowConstruct);
       endpoint.setMessagingExceptionHandler(exceptionHandler);
       return endpoint;
     } catch (CloneNotSupportedException e) {

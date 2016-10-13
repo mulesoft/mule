@@ -8,7 +8,6 @@ package org.mule.runtime.core.execution;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -36,13 +35,13 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   protected void fireNotification(Object source, Event event, FlowConstruct flow, int action) {
     try {
-      if (event == null || VoidMuleEvent.getInstance().equals(event)) {
+      if (event == null) {
         // Null result only happens when there's a filter in the chain.
         // Unfortunately a filter causes the whole chain to return null
         // and there's no other way to retrieve the last event but using the RequestContext.
         // see https://www.mulesoft.org/jira/browse/MULE-8670
         event = getCurrentEvent();
-        if (event == null || VoidMuleEvent.getInstance().equals(event)) {
+        if (event == null) {
           return;
         }
       }

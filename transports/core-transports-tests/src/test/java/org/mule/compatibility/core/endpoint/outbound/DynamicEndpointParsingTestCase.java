@@ -12,6 +12,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
@@ -19,10 +20,10 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
@@ -69,6 +70,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
   public void testMEPOverridingInUri() throws Exception {
     OutboundEndpoint endpoint =
         createEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]", ONE_WAY);
+    endpoint.setFlowConstruct(getTestFlow(muleContext));
 
     assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
@@ -77,7 +79,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         .addOutboundProperty("host", "localhost").build()).build();
 
     Event response = endpoint.process(event);
-    assertSame(VoidMuleEvent.getInstance(), response);
+    assertSame(event, response);
 
     // Now test set on the endpoint
     endpoint =

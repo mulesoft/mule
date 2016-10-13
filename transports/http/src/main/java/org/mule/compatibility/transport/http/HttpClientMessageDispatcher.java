@@ -12,7 +12,6 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -293,7 +292,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     OutboundEndpoint out =
         new EndpointURIEndpointBuilder(locationHeader.getValue(), getEndpoint().getMuleContext()).buildOutboundEndpoint();
     Event result = out.process(event);
-    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+    if (result != null) {
       return result.getMessage();
     } else {
       return null;

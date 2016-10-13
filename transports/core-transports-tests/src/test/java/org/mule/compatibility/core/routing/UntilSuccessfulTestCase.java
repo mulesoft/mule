@@ -15,7 +15,6 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -107,7 +106,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(eventBuilder().message(InternalMessage.of("ERROR")).build()));
+    Event event = eventBuilder().message(InternalMessage.of("ERROR")).build();
+    assertSame(event, untilSuccessful.process(event));
 
     pollingProber.check(new JUnitProbe() {
 

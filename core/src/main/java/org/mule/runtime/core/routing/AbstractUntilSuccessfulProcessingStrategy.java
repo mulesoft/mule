@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -49,7 +48,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
       throw new MuleRuntimeException(me);
     }
 
-    if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
+    if (returnEvent == null) {
       return returnEvent;
     }
 
@@ -74,8 +73,8 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
    * @return the response message to be sent to the until successful caller.
    */
   protected Event processResponseThroughAckResponseExpression(Event event) {
-    if (event == null || VoidMuleEvent.getInstance().equals(event)) {
-      return VoidMuleEvent.getInstance();
+    if (event == null) {
+      return null;
     }
     final String ackExpression = getUntilSuccessfulConfiguration().getAckExpression();
     if (ackExpression == null) {

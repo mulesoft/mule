@@ -9,14 +9,12 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
@@ -68,8 +66,6 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
         logger.trace("MuleEvent is null.  Next MessageProcessor '" + next.getClass().getName() + "' will not be invoked.");
       }
       return null;
-    } else if (VoidMuleEvent.getInstance().equals(event)) {
-      return event;
     } else {
       if (logger.isTraceEnabled()) {
         logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
@@ -88,7 +84,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
   }
 
   protected boolean isEventValid(Event event) {
-    return event != null && !(event instanceof VoidMuleEvent);
+    return event != null;
   }
 
   protected Publisher<Event> applyNext(Publisher<Event> publisher) {

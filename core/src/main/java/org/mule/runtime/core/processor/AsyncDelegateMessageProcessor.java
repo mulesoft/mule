@@ -11,8 +11,7 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Flux.from;
-
-import org.mule.runtime.core.VoidMuleEvent;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -114,7 +113,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (target != null) {
       target.process(updateEventForAsync(event));
     }
-    return VoidMuleEvent.getInstance();
+    return event;
   }
 
   private void assertNotTransactional(Event event) throws RoutingException {
@@ -125,10 +124,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher)
+    return from(publisher).concatMap(request -> just(request)
         .doOnNext(checkedConsumer(event -> assertNotTransactional(event)))
         .doOnNext(event -> warnConsumablePayload(event.getMessage())).map(event -> updateEventForAsync(event)).transform(target)
-        .map(event -> VoidMuleEvent.getInstance());
+        .map(event -> request));
   }
 
   private Event updateEventForAsync(Event event) {

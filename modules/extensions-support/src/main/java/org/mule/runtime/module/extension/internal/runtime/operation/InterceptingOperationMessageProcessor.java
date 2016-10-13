@@ -11,7 +11,6 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -150,8 +149,6 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
         LOGGER.debug("MuleEvent is null. Next MessageProcessor '{}' will not be invoked.", next.getClass().getName());
       }
       return null;
-    } else if (VoidMuleEvent.getInstance().equals(interceptedEvent)) {
-      return interceptedEvent;
     } else {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Invoking next MessageProcessor: '{}'", next.getClass().getName());

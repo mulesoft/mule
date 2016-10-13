@@ -9,7 +9,6 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -75,7 +74,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     protected Event processResponse(Event response, Event request) throws MuleException {
       processOutboundRouterStatistics();
       response = afterRouting(exception, response);
-      if (response != null && !VoidMuleEvent.getInstance().equals(response)) {
+      if (response != null) {
         response = processReplyTo(response, exception);
         closeStream(response.getMessage());
         return nullifyExceptionPayloadIfRequired(response);

@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -71,8 +70,7 @@ public class BindingInvocationHandler implements InvocationHandler {
     Event currentEvent = getCurrentEvent();
     Event replyEvent = router.process(Event.builder(currentEvent).message(message).build());
 
-    if (replyEvent != null && !VoidMuleEvent.getInstance().equals(replyEvent)
-        && replyEvent.getMessage() != null) {
+    if (replyEvent != null && replyEvent.getMessage() != null) {
       InternalMessage reply = replyEvent.getMessage();
       if (replyEvent.getError().isPresent()) {
         throw findDeclaredMethodException(method, replyEvent.getError().get().getCause());

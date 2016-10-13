@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.endpoint.inbound;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -40,7 +39,7 @@ public class InboundExceptionDetailsMessageProcessor implements Processor, MuleC
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
+    if (event != null) {
       if (event.getMessage().getExceptionPayload() != null) {
         event = setExceptionDetails(event, connector, event.getMessage().getExceptionPayload().getException());
       }

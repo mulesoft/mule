@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -76,7 +75,7 @@ public final class GroupValueSetter implements ValueSetter {
     group.getParameters()
         .forEach(field -> groupBuilder.addPropertyResolver(field, new StaticValueResolver<>(result.get(field.getName()))));
 
-    Object groupValue = groupBuilder.build(VoidMuleEvent.getInstance());
+    Object groupValue = groupBuilder.build(null);
 
     Field field = group.getContainer();
     field.setAccessible(true);

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -55,7 +54,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
         Event toProcess = cloneEventForRouting(event, mp);
         returnEvent = processor.processRoute(mp, toProcess);
 
-        if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
+        if (returnEvent == null) {
           failed = false;
         } else if (returnEvent.getMessage() == null) {
           failed = true;

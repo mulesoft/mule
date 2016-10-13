@@ -13,7 +13,6 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.ContinuousPollingReceiverWorker;
 import org.mule.compatibility.core.transport.PollingReceiverWorker;
 import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
@@ -94,7 +93,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
       ExecutionTemplate<Event> executionTemplate = createExecutionTemplate();
       Event resultEvent = executionTemplate.execute(() -> {
         Event event = routeMessage(message);
-        if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse()) {
+        if (event != null && getEndpoint().getExchangePattern().hasResponse()) {
           return event;
         }
         return null;

@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
@@ -122,7 +121,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
     Event event = eventBuilder().message(toSplit).session(session).build();
-    assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
+    assertSame(event, splitter.process(event));
   }
 
   @Test

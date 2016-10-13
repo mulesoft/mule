@@ -8,8 +8,6 @@ package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
 
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
@@ -47,15 +45,10 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     if (isSplitRequired(event)) {
       MessageSequence<?> seq = splitMessageIntoSequence(event);
       if (!seq.isEmpty()) {
-        Event aggregatedResults = resultsHandler.aggregateResults(processParts(seq, event), event);
-        if (aggregatedResults instanceof VoidMuleEvent) {
-          return null;
-        } else {
-          return aggregatedResults;
-        }
+        return resultsHandler.aggregateResults(processParts(seq, event), event);
       } else {
         logger.warn("Splitter returned no results. If this is not expected, please check your split expression");
-        return VoidMuleEvent.getInstance();
+        return event;
       }
     } else {
       return processNext(event);
@@ -98,7 +91,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
       final Event event = builder.build();
       Event resultEvent = processNext(event);
-      if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
+      if (resultEvent != null) {
         resultEvents.add(resultEvent);
         lastResult = resultEvent;
       }

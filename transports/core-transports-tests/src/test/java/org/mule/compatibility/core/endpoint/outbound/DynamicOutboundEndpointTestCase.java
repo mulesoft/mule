@@ -42,7 +42,6 @@ import org.mule.compatibility.core.transformer.simple.OutboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
 import org.mule.compatibility.core.transport.service.DefaultTransportServiceDescriptor;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -113,7 +112,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     Event result = endpoint.process(testOutboundEvent);
 
     assertEventDispatched();
-    assertSame(VoidMuleEvent.getInstance(), result);
+    assertSame(testOutboundEvent, result);
     assertMessageSentEqual(MyMessageDispatcherFactory.dispatcher.sensedDispatchEvent);
   }
 

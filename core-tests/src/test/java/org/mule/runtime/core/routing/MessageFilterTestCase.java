@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
@@ -82,7 +81,7 @@ public class MessageFilterTestCase extends AbstractReactiveProcessorTestCase {
     Event resultEvent = process(mp, inEvent);
 
     assertNull(out.event);
-    assertSame(VoidMuleEvent.getInstance(), resultEvent);
+    assertSame(inEvent, resultEvent);
     assertNotNull(unaccepted.event);
   }
 }

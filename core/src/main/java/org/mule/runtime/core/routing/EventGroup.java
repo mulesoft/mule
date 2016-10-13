@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.util.StringUtils.DASH;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -329,11 +328,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             Event.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {
-        return VoidMuleEvent.getInstance();
+        return null;//VoidMuleEvent.getInstance();
       }
     } catch (ObjectStoreException e) {
       // Nothing to do...
-      return VoidMuleEvent.getInstance();
+      return null;//VoidMuleEvent.getInstance();
     }
   }
 

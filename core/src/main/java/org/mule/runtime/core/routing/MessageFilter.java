@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -79,7 +78,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
       return true;
     }
 
-    if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
+    if (event != null) {
       return filter.accept(event, builder);
     } else {
       return false;

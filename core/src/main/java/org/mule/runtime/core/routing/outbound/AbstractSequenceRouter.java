@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
@@ -53,7 +52,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
           InternalMessage clonedMessage = cloneMessage(event, message);
 
           Event result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
-          if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+          if (result != null) {
             results.add(result);
           }
 

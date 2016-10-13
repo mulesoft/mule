@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -22,7 +23,6 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -158,14 +159,14 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
   public void successfulWithNullResponseFromRoute() throws Exception {
     when(mockRoute.process(any(Event.class))).thenReturn(null);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    assertThat(processingStrategy.route(testEvent(), getTestFlow(muleContext)), is(testEvent()));
+    assertThat(processingStrategy.route(testEvent(), getTestFlow(muleContext)), is(nullValue()));
   }
 
   @Test
   public void successfulWithNullEventResponseFromRoute() throws Exception {
-    when(mockRoute.process(any(Event.class))).thenReturn(VoidMuleEvent.getInstance());
+    when(mockRoute.process(any(Event.class))).thenReturn(null);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    assertThat(processingStrategy.route(testEvent(), getTestFlow(muleContext)), is(testEvent()));
+    assertThat(processingStrategy.route(testEvent(), getTestFlow(muleContext)), is(nullValue()));
   }
 
   private SynchronousUntilSuccessfulProcessingStrategy createProcessingStrategy() throws InitialisationException {

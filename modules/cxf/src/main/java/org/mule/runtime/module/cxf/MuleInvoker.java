@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.module.cxf.CxfConstants.UNWRAP_MULE_EXCEPTIONS;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
@@ -28,7 +27,6 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
-import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -122,7 +120,7 @@ public class MuleInvoker implements Invoker {
       responseEvent = null;
     }
 
-    if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent)) {
+    if (responseEvent != null) {
       exchange.put(CxfConstants.MULE_EVENT, responseEvent);
       InternalMessage resMessage = responseEvent.getMessage();
 

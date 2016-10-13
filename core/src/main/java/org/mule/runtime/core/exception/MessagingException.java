@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -181,7 +180,7 @@ public class MessagingException extends MuleException {
    * @return event associated with the exception
    */
   public Event getEvent() {
-    return processedEvent != null && !VoidMuleEvent.getInstance().equals(processedEvent) ? processedEvent : event;
+    return processedEvent != null ? processedEvent : event;
   }
 
   /**
@@ -190,7 +189,7 @@ public class MessagingException extends MuleException {
    * @param processedEvent event bounded to the exception
    */
   public void setProcessedEvent(Event processedEvent) {
-    if (processedEvent != null && !VoidMuleEvent.getInstance().equals(processedEvent)) {
+    if (processedEvent != null) {
       this.processedEvent = processedEvent;
       extractMuleMessage(processedEvent);
     } else {
@@ -320,7 +319,7 @@ public class MessagingException extends MuleException {
   }
 
   protected void extractMuleMessage(Event event) {
-    this.muleMessage = event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
+    this.muleMessage = event == null ? null : event.getMessage();
   }
 
   private void writeObject(ObjectOutputStream out) throws Exception {

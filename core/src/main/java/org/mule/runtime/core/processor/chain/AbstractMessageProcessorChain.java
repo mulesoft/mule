@@ -19,7 +19,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -50,7 +49,6 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -88,15 +86,10 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   protected Event doProcess(Event event) throws MuleException {
-    Event copy;
     for (Processor processor : getProcessorsToExecute()) {
       setCurrentEvent(event);
-      copy = event;
       event = messageProcessorExecutionTemplate.execute(processor, event);
-      if (VoidMuleEvent.getInstance().equals(event)) {
-        setCurrentEvent(copy);
-        event = copy;
-      } else if (event == null) {
+      if (event == null) {
         return null;
       }
     }
@@ -120,22 +113,14 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   private Function<Publisher<Event>, Publisher<Event>> processorFunction(Processor processor) {
     return publisher -> from(publisher)
         .doOnNext(preNotification(processor))
-        .concatMap(event -> {
-          setCurrentEvent(event);
-          Event beforeEvent = event;
-          return just(event)
-              .transform(stream -> from(stream.transform(processor)))
-              // If there is a messaging exception, reacreate it to add reference to processor that failed.
-              .mapError(MessagingException.class,
-                        exception -> new MessagingException(exception.getEvent(), exception.getCauseException(), processor))
-              .map(result -> {
-                Event nextEvent = VoidMuleEvent.getInstance().equals(result) ? beforeEvent : result;
-                setCurrentEvent(nextEvent);
-                return nextEvent;
-              })
-              .doOnNext(postNotification(processor))
-              .doOnError(MessagingException.class, errorNotification(processor));
-        });
+        .doOnNext(event -> setCurrentEvent(event))
+        .transform(stream -> from(stream.transform(processor)))
+        // If there is a messaging exception, reacreate it to add reference to processor that failed.
+        .mapError(MessagingException.class,
+                  exception -> new MessagingException(exception.getEvent(), exception.getCauseException(), processor))
+        .doOnNext(result -> setCurrentEvent(result))
+        .doOnNext(postNotification(processor))
+        .doOnError(MessagingException.class, errorNotification(processor));
   }
 
   private Consumer<Event> preNotification(Processor processor) {

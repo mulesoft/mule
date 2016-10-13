@@ -14,7 +14,6 @@ import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutio
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -87,7 +86,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
       return event;
     } else if (isProcessAsync(event)) {
       processNextAsync(event);
-      return VoidMuleEvent.getInstance();
+      return event;
     } else {
       Event response = processNext(event);
       return response;
@@ -154,18 +153,19 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
       try {
         executionTemplate.execute(() -> {
           MessagingException exceptionThrown = null;
+          Event response = null;
           try {
-            event = processNextTimed(event);
+            response = processNextTimed(event);
           } catch (MessagingException e1) {
             exceptionThrown = e1;
             throw e1;
           } catch (Exception e2) {
-            exceptionThrown = new MessagingException(event, e2, next);
+            exceptionThrown = new MessagingException(response != null ? response : event, e2, next);
             throw exceptionThrown;
           } finally {
-            firePipelineNotification(event, exceptionThrown);
+            firePipelineNotification(response != null ? response : event, exceptionThrown);
           }
-          return VoidMuleEvent.getInstance();
+          return event;
         });
       } catch (MessagingException e) {
         // Already handled by TransactionTemplate
@@ -193,7 +193,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                   .doOnNext(event -> firePipelineNotification(event, null))
                   .doOnError(MessagingException.class, me -> firePipelineNotification(me.getEvent(), me))
                   .onErrorResumeWith(MessagingException.class, flowConstruct.getExceptionListener()).subscribe();
-              return just(VoidMuleEvent.getInstance());
+              return just(request);
             } else {
               return just(request).transform(stream -> applyNext(stream));
             }

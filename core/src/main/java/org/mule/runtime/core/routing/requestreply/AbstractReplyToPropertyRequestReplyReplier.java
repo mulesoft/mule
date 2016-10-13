@@ -8,7 +8,6 @@ package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -30,7 +29,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
       resultEvent = processNext(event);
 
       // Allow components to stop processing of the ReplyTo property (e.g. CXF)
-      if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
+      if (resultEvent != null) {
         // reply-to processing should not resurrect a dead event
         event = processReplyTo(event, resultEvent, replyToHandler, replyTo);
       }

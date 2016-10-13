@@ -33,7 +33,6 @@ import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -74,7 +73,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
@@ -84,7 +82,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -917,7 +914,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
       }
 
       Event result = processNext(appendBefore(event));
-      if (result != null && !result.equals(VoidMuleEvent.getInstance())) {
+      if (result != null) {
         return appendAfter(result);
       } else {
         return result;
@@ -931,7 +928,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
       } else {
         return from(publisher).map(before -> appendBefore(before)).transform(eventFlux -> applyNext(eventFlux))
             .map(after -> {
-              if (after != null && !after.equals(VoidMuleEvent.getInstance())) {
+              if (after != null) {
                 return appendAfter(after);
               } else {
                 return after;
@@ -1018,7 +1015,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     @Override
     public Event process(Event event) throws MuleException {
       this.event = event;
-      return VoidMuleEvent.getInstance();
+      return event;
     }
   }
 
@@ -1026,7 +1023,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
     @Override
     public Event process(Event event) throws MuleException {
-      return VoidMuleEvent.getInstance();
+      return event;
     }
   }
 

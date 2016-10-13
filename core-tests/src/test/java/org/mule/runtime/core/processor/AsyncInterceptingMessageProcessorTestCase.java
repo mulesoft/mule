@@ -19,7 +19,6 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -181,7 +180,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
     assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
     assertNotSame(Thread.currentThread(), target.thread);
 
-    assertSame(VoidMuleEvent.getInstance(), result);
+    assertSame(event, result);
     assertNull(exceptionThrown);
   }
 

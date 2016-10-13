@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotCopyStreamPayload;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -63,7 +62,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
       throw new RoutingException(null, e);
     }
 
-    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+    if (result != null) {
       InternalMessage resultMessage = result.getMessage();
       if (logger.isTraceEnabled()) {
         if (resultMessage != null) {

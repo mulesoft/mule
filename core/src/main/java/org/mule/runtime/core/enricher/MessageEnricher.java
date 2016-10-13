@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
@@ -102,7 +101,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
   protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {
     final ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
 
-    if (event != null && !VoidMuleEvent.getInstance().equals(eventToEnrich)) {
+    if (event != null) {
       for (EnrichExpressionPair pair : enrichExpressionPairs) {
         eventToEnrich = enrich(eventToEnrich, event, pair.getSource(), pair.getTarget(), expressionLanguage);
       }

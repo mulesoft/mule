@@ -19,7 +19,6 @@ import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -138,13 +137,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     List<ProcessingMuleEventWork> works = executeWork(event);
     Event response = processResponses(event, works);
 
-    if (!(response instanceof VoidMuleEvent)) {
-      // use a copy instead of a resetAccessControl
-      // to assure that all property changes
-      // are flushed from the worker thread to this one
-      response = Event.builder(response).session(new DefaultMuleSession(response.getSession())).build();
-      setCurrentEvent(response);
-    }
+    // use a copy instead of a resetAccessControl
+    // to assure that all property changes
+    // are flushed from the worker thread to this one
+    response = Event.builder(response).session(new DefaultMuleSession(response.getSession())).build();
+    setCurrentEvent(response);
 
     return response;
   }

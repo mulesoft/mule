@@ -24,7 +24,6 @@ import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilde
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -373,7 +372,7 @@ public class MuleClient implements Disposable {
     Event event = getEvent(message, REQUEST_RESPONSE);
 
     Event response = endpoint.process(event);
-    if (response != null && !VoidMuleEvent.getInstance().equals(response)) {
+    if (response != null) {
       return response.getMessage();
     } else {
       return InternalMessage.builder().nullPayload().build();
