@@ -321,6 +321,7 @@ public class DefaultMessageBuilder
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
     private transient DefaultTypedValue typedValue;
+    //TODO: MULE-10774 - Make attributes a TypedValue
     private Attributes attributes;
 
     private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
