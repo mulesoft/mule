@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
@@ -89,6 +90,7 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.internal.locator.DefaultConfigurationComponentLocator;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
@@ -218,6 +220,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(OBJECT_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class))
+      .put(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getBeanDefinition(DefaultConfigurationComponentLocator.class))
       .build();
 
   public SpringMuleContextServiceConfigurator(MuleContext muleContext, ArtifactType artifactType,

@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
@@ -423,5 +424,10 @@ public interface MuleContext extends Lifecycle {
    * @param bootstrapServiceDiscoverer bootstrap service discoverer instance. Non null.
    */
   void setBootstrapServiceDiscoverer(BootstrapServiceDiscoverer bootstrapServiceDiscoverer);
+
+  /**
+   * @return locator for accessing runtime object created by the mule configuration.
+   */
+  ConfigurationComponentLocator getConfigurationComponentLocator();
 }
 
