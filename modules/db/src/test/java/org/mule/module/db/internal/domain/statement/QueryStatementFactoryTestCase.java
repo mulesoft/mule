@@ -7,19 +7,23 @@
 
 package org.mule.module.db.internal.domain.statement;
 
+import static java.sql.ResultSet.CONCUR_READ_ONLY;
+import static java.sql.ResultSet.TYPE_FORWARD_ONLY;
+import static java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE;
+import static java.sql.ResultSet.TYPE_SCROLL_SENSITIVE;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.module.db.internal.domain.query.QueryType.STORE_PROCEDURE_CALL;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.sql.CallableStatement;
-import java.sql.ResultSet;
+import java.sql.DatabaseMetaData;
 import java.util.Collections;
 
 import org.junit.Test;
@@ -29,16 +33,41 @@ public class QueryStatementFactoryTestCase extends AbstractMuleTestCase
 {
 
     @Test
-    public void createsPreparedStatements() throws Exception
+    public void createsPreparedStatementsWithScrolling() throws Exception
     {
 
         String sqlText = "call test";
         CallableStatement createdStatement = mock(CallableStatement.class);
+        DatabaseMetaData metadata = mock(DatabaseMetaData.class);
         DbConnection connection = mock(DbConnection.class);
-        when(connection.prepareCall(sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(createdStatement);
+
+        when(metadata.supportsResultSetType(TYPE_SCROLL_INSENSITIVE)).thenReturn(true);
+        when(connection.getMetaData()).thenReturn(metadata);
+        when(connection.prepareCall(sqlText, TYPE_SCROLL_INSENSITIVE, CONCUR_READ_ONLY)).thenReturn(createdStatement);
 
         QueryStatementFactory factory = new QueryStatementFactory();
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList());
+        QueryTemplate queryTemplate = new QueryTemplate(sqlText, STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList());
+        CallableStatement statement = (CallableStatement) factory.create(connection, queryTemplate);
+
+        assertThat(statement, is(createdStatement));
+    }
+
+    @Test
+    public void createsPreparedStatementsWithForwardOnly() throws Exception
+    {
+
+        String sqlText = "call test";
+        CallableStatement createdStatement = mock(CallableStatement.class);
+        DatabaseMetaData metadata = mock(DatabaseMetaData.class);
+        DbConnection connection = mock(DbConnection.class);
+
+        when(metadata.supportsResultSetType(TYPE_SCROLL_INSENSITIVE)).thenReturn(false);
+        when(metadata.supportsResultSetType(TYPE_SCROLL_SENSITIVE)).thenReturn(false);
+        when(connection.getMetaData()).thenReturn(metadata);
+        when(connection.prepareCall(sqlText, TYPE_FORWARD_ONLY, CONCUR_READ_ONLY)).thenReturn(createdStatement);
+
+        QueryStatementFactory factory = new QueryStatementFactory();
+        QueryTemplate queryTemplate = new QueryTemplate(sqlText, STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList());
         CallableStatement statement = (CallableStatement) factory.create(connection, queryTemplate);
 
         assertThat(statement, is(createdStatement));
