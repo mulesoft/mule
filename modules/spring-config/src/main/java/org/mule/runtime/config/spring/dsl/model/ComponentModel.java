@@ -178,10 +178,6 @@ public class ComponentModel {
     return this.schemaValueParameter.contains(parameterName);
   }
 
-  public void addAnnotation(String annotationKey, Object value) {
-    this.annotations.put(annotationKey, value);
-  }
-
   public Map<String, Object> getAnnotations() {
     return unmodifiableMap(annotations);
   }
