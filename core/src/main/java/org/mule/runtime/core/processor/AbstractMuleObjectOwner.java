@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 
@@ -69,6 +68,9 @@ public abstract class AbstractMuleObjectOwner<T>
 
   @Override
   public void initialise() throws InitialisationException {
+    // TODO TMULE-10764 This shouldn't happen here.
+    setMuleContext(muleContext);
+    setFlowConstruct(flowConstruct);
     for (T object : getOwnedObjects()) {
       if (messagingExceptionHandler != null && object instanceof MessagingExceptionHandlerAware) {
         ((MessagingExceptionHandlerAware) object).setMessagingExceptionHandler(messagingExceptionHandler);

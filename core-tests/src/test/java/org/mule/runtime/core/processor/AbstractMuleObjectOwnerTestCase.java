@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -57,10 +58,11 @@ public class AbstractMuleObjectOwnerTestCase {
     abstractMuleObjectOwner.initialise();
     verify(mockObject1).initialise();
     verify(mockObject2).initialise();
-    verify(mockObject1).setMuleContext(mockMuleContext);
-    verify(mockObject2).setMuleContext(mockMuleContext);
-    verify(mockObject1).setFlowConstruct(mockFlowConstruct);
-    verify(mockObject2).setFlowConstruct(mockFlowConstruct);
+    // TODO TMULE-10764 Injection should only happen once
+    verify(mockObject1, times(2)).setMuleContext(mockMuleContext);
+    verify(mockObject2, times(2)).setMuleContext(mockMuleContext);
+    verify(mockObject1, times(2)).setFlowConstruct(mockFlowConstruct);
+    verify(mockObject2, times(2)).setFlowConstruct(mockFlowConstruct);
   }
 
   @Test
