@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -17,6 +20,7 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 
@@ -37,15 +41,15 @@ public abstract class AbstractMuleObjectOwner<T>
   protected MessagingExceptionHandler messagingExceptionHandler;
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+    setMuleContextIfNeeded(getOwnedObjects(), muleContext);
   }
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
-    getOwnedObjects().stream().filter(object -> object instanceof FlowConstructAware)
-        .forEach(object -> ((FlowConstructAware) object).setFlowConstruct(flowConstruct));
+    setFlowConstructIfNeeded(getOwnedObjects(), flowConstruct);
   }
 
   @Override
@@ -66,19 +70,11 @@ public abstract class AbstractMuleObjectOwner<T>
   @Override
   public void initialise() throws InitialisationException {
     for (T object : getOwnedObjects()) {
-      if (object instanceof MuleContextAware) {
-        ((MuleContextAware) object).setMuleContext(muleContext);
-      }
-      if (object instanceof FlowConstructAware) {
-        ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
-      }
       if (messagingExceptionHandler != null && object instanceof MessagingExceptionHandlerAware) {
         ((MessagingExceptionHandlerAware) object).setMessagingExceptionHandler(messagingExceptionHandler);
       }
-      if (object instanceof Initialisable) {
-        ((Initialisable) object).initialise();
-      }
     }
+    initialiseIfNeeded(getOwnedObjects());
   }
 
   @Override
