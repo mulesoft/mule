@@ -34,10 +34,17 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   private final XmlConfigurationDocumentLoader documentLoader = new XmlConfigurationDocumentLoader();
 
   @Test
+  public void noElements() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
+    assertThat(minimalModel.findNamedComponent("flow"), notNullValue());
+  }
+
+  @Test
   public void singleElement() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("single-element-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByName("errorHandler");
-    assertThat(minimalModel.findNamedComponent("errorHandler"), notNullValue());;
+    assertThat(minimalModel.findNamedComponent("errorHandler"), notNullValue());
   }
 
   @Test
