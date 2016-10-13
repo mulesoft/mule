@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.model.property;
 
-import org.mule.runtime.extension.api.introspection.ModelProperty;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 
 /**
  * A {@link ModelProperty} meant to be applied on {@link ParameterModel} instances which represent an infrastructure parameter

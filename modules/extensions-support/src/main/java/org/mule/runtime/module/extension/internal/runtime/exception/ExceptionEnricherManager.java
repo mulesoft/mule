@@ -9,29 +9,30 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnrichableModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
+import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;
 
 /**
- * Given a {@link RuntimeExtensionModel} and another {@link ExceptionEnrichableModel} such as {@link RuntimeSourceModel} or
- * {@link RuntimeOperationModel}, this class will inspect for the correct {@link ExceptionEnricher} if there is one.
+ * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will
+ * test for a {@link ExceptionEnricherModelProperty} to determine the {@link ExceptionEnricher}
+ * which should be use. If no such property is available then a default {@link NullExceptionEnricher}
+ * is used.
  * <p>
- * It contains all the logic for operations and sources {@link Throwable} process and handling.
+ * It also contains all the logic for operations and sources {@link Throwable} process and handling.
  *
  * @since 4.0
  */
 public final class ExceptionEnricherManager {
 
+  private static final ExceptionEnricher DEFAULT_EXCEPTION_ENRICHER = new NullExceptionEnricher();
   private final ExceptionEnricher exceptionEnricher;
 
-  public ExceptionEnricherManager(RuntimeExtensionModel extensionModel, ExceptionEnrichableModel childEnrichableModel) {
+  public ExceptionEnricherManager(ExtensionModel extensionModel, EnrichableModel childEnrichableModel) {
     exceptionEnricher = findExceptionEnricher(extensionModel, childEnrichableModel);
   }
 
@@ -57,12 +58,13 @@ public final class ExceptionEnricherManager {
     return t instanceof Exception ? (Exception) t : new Exception(t);
   }
 
-  private ExceptionEnricher findExceptionEnricher(RuntimeExtensionModel extension, ExceptionEnrichableModel child) {
-    Optional<ExceptionEnricherFactory> exceptionEnricherFactory = child.getExceptionEnricherFactory();
-    if (!exceptionEnricherFactory.isPresent()) {
-      exceptionEnricherFactory = extension.getExceptionEnricherFactory();
-    }
-    return exceptionEnricherFactory.isPresent() ? exceptionEnricherFactory.get().createEnricher() : new NullExceptionEnricher();
+  private ExceptionEnricher findExceptionEnricher(ExtensionModel extension, EnrichableModel child) {
+    return findExceptionEnricher(child).orElseGet(() -> findExceptionEnricher(extension).orElse(DEFAULT_EXCEPTION_ENRICHER));
+  }
+
+  private Optional<ExceptionEnricher> findExceptionEnricher(EnrichableModel model) {
+    return model.getModelProperty(ExceptionEnricherModelProperty.class)
+        .map(p -> p.getExceptionEnricherFactory().createEnricher());
   }
 
   ExceptionEnricher getExceptionEnricher() {

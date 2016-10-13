@@ -11,7 +11,7 @@ import static java.util.Optional.ofNullable;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 import com.google.common.collect.ImmutableList;

@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.api.meta.ExpressionSupport;
 
 @Extension(name = "GlobalPojo", description = "GlobalPojo Test connector")
 @Operations(VoidOperations.class)

@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
@@ -40,22 +40,22 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.api.meta.model.SubTypesModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
-import org.mule.runtime.extension.api.introspection.ElementDslModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.ImportedTypeModel;
-import org.mule.runtime.extension.api.introspection.SubTypesModel;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
@@ -117,6 +117,7 @@ public final class SchemaBuilder {
   private Schema schema;
   private boolean requiresTls = false;
 
+  private ExtensionModel extensionModel;
   private DslSyntaxResolver dslResolver;
   private SubTypesMappingContainer subTypesMapping;
   private Set<ImportedTypeModel> importedTypes;
@@ -126,6 +127,7 @@ public final class SchemaBuilder {
                                         DslResolvingContext dslContext) {
 
     SchemaBuilder builder = new SchemaBuilder();
+    builder.extensionModel = extensionModel;
     builder.schema = new Schema();
     builder.schema.setTargetNamespace(xmlDslModel.getNamespaceUri());
     builder.schema.setElementFormDefault(FormChoice.QUALIFIED);
@@ -235,7 +237,7 @@ public final class SchemaBuilder {
     return this;
   }
 
-  public SchemaBuilder registerConfigElement(final RuntimeConfigurationModel configurationModel) {
+  public SchemaBuilder registerConfigElement(ConfigurationModel configurationModel) {
     configurationSchemaDelegate.registerConfigElement(schema, configurationModel, dslResolver.resolve(configurationModel));
     return this;
   }
@@ -648,6 +650,10 @@ public final class SchemaBuilder {
     element.setComplexType(type);
 
     return element;
+  }
+
+  ExtensionModel getExtensionModel() {
+    return extensionModel;
   }
 
   private void generateTextElement(DslElementSyntax paramDsl, String description, boolean isRequired, Group all) {

@@ -36,7 +36,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.api.meta.ExpressionSupport;
 
 import javax.xml.namespace.QName;
 

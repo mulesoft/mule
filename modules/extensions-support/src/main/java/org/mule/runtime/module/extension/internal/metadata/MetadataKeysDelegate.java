@@ -12,6 +12,10 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
@@ -21,11 +25,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 
 import com.google.common.collect.ImmutableSet;
@@ -36,7 +36,7 @@ import java.util.Set;
 
 /**
  * Metadata service delegate implementations that handles the resolution
- * of a {@link RuntimeComponentModel} {@link MetadataKeysContainer}
+ * of a {@link ComponentModel} {@link MetadataKeysContainer}
  *
  * @since 4.0
  */
@@ -45,7 +45,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
   private static final int INITIAL_PART_LEVEL = 1;
   private final List<ParameterModel> keyParts;
 
-  public MetadataKeysDelegate(RuntimeComponentModel componentModel, List<ParameterModel> metadataKeyParts) {
+  public MetadataKeysDelegate(ComponentModel componentModel, List<ParameterModel> metadataKeyParts) {
     super(componentModel);
     keyParts = metadataKeyParts;
   }
@@ -63,7 +63,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * Dynamic keys are a available or the retrieval fails for any reason
    */
   MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
-    final String componentResolverName = getAliasName(component.getMetadataResolverFactory().getClass());
+    final String componentResolverName = getAliasName(getMetadataResolverFactory(component).getClass());
     final MetadataKeysContainerBuilder keysContainer = MetadataKeysContainerBuilder.getInstance();
     if (keyParts.isEmpty()) {
       return success(keysContainer.add(componentResolverName, ImmutableSet.of(new NullMetadataKey())).build());
@@ -93,7 +93,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
   private Map<Integer, String> getPartOrderMapping(List<ParameterModel> parameterModels) {
     return parameterModels.stream()
         .filter(this::isKeyPart)
-        .collect(toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), Named::getName));
+        .collect(toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), NamedObject::getName));
   }
 
   private boolean isKeyPart(ParameterModel part) {

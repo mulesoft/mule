@@ -11,10 +11,11 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
@@ -31,13 +32,15 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
  */
 public final class ConfigurationDefinitionParser extends ExtensionDefinitionParser {
 
-  private final RuntimeConfigurationModel configurationModel;
+  private final ExtensionModel extensionModel;
+  private final ConfigurationModel configurationModel;
   private final DslElementSyntax configDsl;
 
-  public ConfigurationDefinitionParser(Builder definition, RuntimeConfigurationModel configurationModel,
+  public ConfigurationDefinitionParser(Builder definition, ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                        DslSyntaxResolver dslResolver, MuleContext muleContext,
                                        ExtensionParsingContext parsingContext) {
     super(definition, dslResolver, parsingContext, muleContext);
+    this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     this.configDsl = dslResolver.resolve(configurationModel);
   }
@@ -47,6 +50,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
     definitionBuilder.withIdentifier(configDsl.getElementName()).withTypeDefinition(fromType(ConfigurationProvider.class))
         .withObjectFactoryType(ConfigurationProviderObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
         .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
         .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
@@ -57,7 +61,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
   }
 
   private void parseConnectionProvider(Builder definitionBuilder) {
-    if (!getConnectedComponents(configurationModel.getExtensionModel(), configurationModel).isEmpty()) {
+    if (!getConnectedComponents(extensionModel, configurationModel).isEmpty()) {
       definitionBuilder.withSetterParameterDefinition("requiresConnection", fromFixedValue(true).build());
       definitionBuilder.withSetterParameterDefinition("connectionProviderResolver",
                                                       fromChildConfiguration(ConnectionProviderResolver.class).build());

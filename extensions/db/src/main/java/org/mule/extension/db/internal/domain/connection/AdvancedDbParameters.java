@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 /**
  * Maintains configuration information about how to build a {@link javax.sql.DataSource}

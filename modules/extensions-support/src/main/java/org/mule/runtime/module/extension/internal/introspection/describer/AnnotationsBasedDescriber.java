@@ -10,13 +10,13 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
@@ -26,10 +26,25 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.MuleVersion;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -45,24 +60,9 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ElementDslModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.Declarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.HasSourceDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.display.LayoutModel;
 import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
@@ -94,13 +94,19 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.introspection.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
@@ -175,8 +181,9 @@ public final class AnnotationsBasedDescriber implements Describer {
             .withCategory(extension.category())
             .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
             .describedAs(extension.description())
-            .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionElement))
             .withModelProperty(new ImplementingTypeModelProperty(extensionType));
+
+    addExceptionEnricher(extensionElement, declarer);
 
     declareConfigurations(declarer, extensionElement);
     declareConnectionProviders(declarer, extensionElement);
@@ -186,6 +193,11 @@ public final class AnnotationsBasedDescriber implements Describer {
       extensionElement.getSources().forEach(source -> declareMessageSource(declarer, declarer, source, false));
     }
 
+    return declarer;
+  }
+
+  private <M extends WithAnnotations> HasModelProperties addExceptionEnricher(M model, HasModelProperties declarer) {
+    getExceptionEnricherFactory(model).map(ExceptionEnricherModelProperty::new).ifPresent(declarer::withModelProperty);
     return declarer;
   }
 
@@ -218,9 +230,12 @@ public final class AnnotationsBasedDescriber implements Describer {
           declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);
     }
 
-    configurationDeclarer
-        .createdWith(new TypeAwareConfigurationFactory(configurationType.getDeclaringClass(),
-                                                       extensionType.getDeclaringClass().getClassLoader()))
+    configurationDeclarer.withModelProperty(
+                                            new ConfigurationFactoryModelProperty(new TypeAwareConfigurationFactory(configurationType
+                                                .getDeclaringClass(),
+                                                                                                                    extensionType
+                                                                                                                        .getDeclaringClass()
+                                                                                                                        .getClassLoader())))
         .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaringClass()));
 
     declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters(),
@@ -273,12 +288,13 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                        sourceGenerics.size()));
     }
 
-    source.sourceCreatedBy(new DefaultSourceFactory(sourceType.getDeclaringClass()))
-        .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
-        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
-
-    source.withOutput().ofType(typeLoader.load(sourceGenerics.get(0)));
+    source
+        .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
+        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()))
+        .withOutput().ofType(typeLoader.load(sourceGenerics.get(0)));
     source.withOutputAttributes().ofType(typeLoader.load(sourceGenerics.get(1)));
+
+    addExceptionEnricher(sourceType, source);
     declareFieldBasedParameters(source, sourceType.getParameters(),
                                 new ParameterDeclarationContext(SOURCE, source.getDeclaration()));
 
@@ -331,9 +347,10 @@ public final class AnnotationsBasedDescriber implements Describer {
 
       final OperationDeclarer operation = actualDeclarer.withOperation(operationMethod.getAlias())
           .withModelProperty(new ImplementingMethodModelProperty(method))
-          .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(declaringClass, method))
-          .withExceptionEnricherFactory(getExceptionEnricherFactory(operationMethod));
+          .withModelProperty(new OperationExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass,
+                                                                                                         method)));
 
+      addExceptionEnricher(operationMethod, operation);
       operation.withOutput().ofType(getMethodReturnType(method, typeLoader));
       operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, typeLoader));
       addInterceptingCallbackModelProperty(operationMethod, operation);
@@ -401,8 +418,11 @@ public final class AnnotationsBasedDescriber implements Describer {
     }
 
     providerDeclarer = declarer.withConnectionProvider(name).describedAs(description)
-        .createdWith(new DefaultConnectionProviderFactory<>(providerClass, extensionType.getClassLoader()))
-        .whichGivesConnectionsOfType(providerGenerics.get(0)).withModelProperty(new ImplementingTypeModelProperty(providerClass));
+        .withModelProperty(new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory<>(providerClass,
+                                                                                                             extensionType
+                                                                                                                 .getClassLoader())))
+        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0)))
+        .withModelProperty(new ImplementingTypeModelProperty(providerClass));
 
     ConnectionManagementType managementType = NONE;
     if (PoolingConnectionProvider.class.isAssignableFrom(providerClass)) {
@@ -556,7 +576,7 @@ public final class AnnotationsBasedDescriber implements Describer {
       if (count > 1) {
         throw new IllegalModelDefinitionException(
                                                   format("The defined parameters %s from %s, uses the annotation @%s more than once",
-                                                         parameters.stream().map(Named::getName).collect(toList()),
+                                                         parameters.stream().map(p -> p.getName()).collect(toList()),
                                                          parameters.get(0).getOwnerDescription(), annotation.getSimpleName()));
       }
     }

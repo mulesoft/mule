@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.model.property;
 
-import org.mule.runtime.extension.api.introspection.ModelProperty;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 
 /**
  * A marker {@link ModelProperty} to signal that the owning {@link OperationModel} is intercepting

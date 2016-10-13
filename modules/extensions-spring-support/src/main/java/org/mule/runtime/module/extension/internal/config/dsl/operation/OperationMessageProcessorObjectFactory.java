@@ -9,14 +9,14 @@ package org.mule.runtime.module.extension.internal.config.dsl.operation;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
-import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.InterceptingOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.PagedOperationMessageProcessor;
@@ -29,14 +29,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  */
 public class OperationMessageProcessorObjectFactory extends AbstractExtensionObjectFactory<OperationMessageProcessor> {
 
-  private final RuntimeExtensionModel extensionModel;
-  private final RuntimeOperationModel operationModel;
+  private final ExtensionModel extensionModel;
+  private final OperationModel operationModel;
   private final MuleContext muleContext;
 
   private String configurationProviderName;
   private String target = EMPTY;
 
-  public OperationMessageProcessorObjectFactory(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
+  public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel, OperationModel operationModel,
                                                 MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;

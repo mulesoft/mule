@@ -9,14 +9,13 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
-
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -128,13 +127,13 @@ public class ExtensionPluginMetadataGenerator {
   }
 
   /**
-   * Discovers the extension and builds the {@link RuntimeExtensionModel}.
+   * Discovers the extension and builds the {@link ExtensionModel}.
    *
    * @param plugin the extension {@link Artifact} plugin
    * @param extensionClass the {@link Class} annotated with {@link Extension}
-   * @return {@link RuntimeExtensionModel} for the extensionClass
+   * @return {@link ExtensionModel} for the extensionClass
    */
-  public RuntimeExtensionModel getExtensionModel(Artifact plugin, Class extensionClass) {
+  public ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass) {
     final StaticVersionResolver versionResolver = new StaticVersionResolver(plugin.getVersion());
     return extensionsInfrastructure.discoverExtension(extensionClass, versionResolver);
   }
@@ -151,7 +150,7 @@ public class ExtensionPluginMetadataGenerator {
 
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
-    final RuntimeExtensionModel extensionModel = getExtensionModel(plugin, extensionClass);
+    final ExtensionModel extensionModel = getExtensionModel(plugin, extensionClass);
     extensionsInfrastructure
         .generateLoaderResources(extensionModel, generatedResourcesDirectory);
 
@@ -175,7 +174,7 @@ public class ExtensionPluginMetadataGenerator {
   public void generateDslResources() {
     extensionGeneratorEntries.stream()
         .forEach(entry -> extensionsInfrastructure.generateDslResources(entry.getResourcesFolder(),
-                                                                        entry.getRuntimeExtensionModel()));
+                                                                        entry.getExtensionModel()));
   }
 
   /**
@@ -183,20 +182,20 @@ public class ExtensionPluginMetadataGenerator {
    */
   class ExtensionGeneratorEntry {
 
-    private RuntimeExtensionModel runtimeExtensionModel;
+    private ExtensionModel runtimeExtensionModel;
     private File resourcesFolder;
 
-    public ExtensionGeneratorEntry(RuntimeExtensionModel runtimeExtensionModel, File resourcesFolder) {
+    public ExtensionGeneratorEntry(ExtensionModel runtimeExtensionModel, File resourcesFolder) {
       this.runtimeExtensionModel = runtimeExtensionModel;
       this.resourcesFolder = resourcesFolder;
     }
 
-    public RuntimeExtensionModel getRuntimeExtensionModel() {
-      return this.runtimeExtensionModel;
+    public ExtensionModel getExtensionModel() {
+      return runtimeExtensionModel;
     }
 
     public File getResourcesFolder() {
-      return this.resourcesFolder;
+      return resourcesFolder;
     }
   }
 }

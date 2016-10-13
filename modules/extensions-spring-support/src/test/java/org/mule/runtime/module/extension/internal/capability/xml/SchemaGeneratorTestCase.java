@@ -15,13 +15,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
@@ -61,7 +60,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
 
-  static final Map<String, RuntimeExtensionModel> extensionModels = new HashMap<>();
+  static final Map<String, ExtensionModel> extensionModels = new HashMap<>();
 
   @Parameterized.Parameter(0)
   public ExtensionModel extensionUnderTest;
@@ -101,7 +100,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     Function<Class<?>, ExtensionModel> createExtensionModel = extension -> {
       ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extension, new StaticVersionResolver(getProductVersion()))
           .describe(new DefaultDescribingContext(extension.getClassLoader()));
-      RuntimeExtensionModel model = extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, classLoader));
+      ExtensionModel model = extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, classLoader));
 
       if (extensionModels.put(model.getName(), model) != null) {
         throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",

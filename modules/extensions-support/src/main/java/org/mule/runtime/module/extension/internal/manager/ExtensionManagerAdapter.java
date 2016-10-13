@@ -7,9 +7,8 @@
 package org.mule.runtime.module.extension.internal.manager;
 
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
@@ -50,7 +49,7 @@ public interface ExtensionManagerAdapter extends ExtensionManager {
    *
    * @param extensionModel the {@link ExtensionModel} to be registered. Cannot be {@code null}
    */
-  void registerExtension(RuntimeExtensionModel extensionModel);
+  void registerExtension(ExtensionModel extensionModel);
 
   /**
    * Registered the given {@link ConfigurationProvider} which should be later be used to serve invocations to

@@ -21,15 +21,14 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
-
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -68,13 +67,13 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   private ResolverSetResult parameters;
 
   @Mock
-  private RuntimeExtensionModel extensionModel;
+  private ExtensionModel extensionModel;
 
   @Mock
-  private RuntimeConfigurationModel configurationModel;
+  private ConfigurationModel configurationModel;
 
   @Mock
-  private RuntimeOperationModel operationModel;
+  private OperationModel operationModel;
 
   @Mock
   private ExtensionManager extensionManager;

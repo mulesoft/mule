@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -18,12 +20,11 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 
 import java.util.Set;
 
@@ -41,8 +42,8 @@ public class EntityMetadataMediator {
 
   private final MetadataResolverFactory resolverFactory;
 
-  public EntityMetadataMediator(RuntimeOperationModel operationModel) {
-    this.resolverFactory = operationModel.getMetadataResolverFactory();
+  public EntityMetadataMediator(OperationModel operationModel) {
+    this.resolverFactory = getMetadataResolverFactory(operationModel);
   }
 
   public MetadataResult<MetadataKeysContainer> getEntityKeys(MetadataContext context) {

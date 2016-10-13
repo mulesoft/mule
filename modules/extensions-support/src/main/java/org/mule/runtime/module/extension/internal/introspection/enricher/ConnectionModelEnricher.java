@@ -7,28 +7,28 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.String.format;
-import static org.mule.runtime.extension.api.connectivity.OperationTransactionalAction.JOIN_IF_POSSIBLE;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.tx.OperationTransactionalAction.JOIN_IF_POSSIBLE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
-
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.addInterceptorFactory;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterizableTypeWrapper;
-import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
@@ -105,7 +105,8 @@ public class ConnectionModelEnricher extends AbstractAnnotatedModelEnricher {
 
   private void addConnectionInterceptors(OperationDeclaration declaration, DescribingContext describingContext,
                                          ConnectivityModelProperty connection) {
-    declaration.addInterceptorFactory(ConnectionInterceptor::new);
+
+    addInterceptorFactory(declaration, ConnectionInterceptor::new);
     if (connection.supportsTransactions()) {
       addTransactionalActionParameter(describingContext, declaration);
     }

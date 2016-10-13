@@ -8,15 +8,15 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public interface ExtensionParameter extends WithType, WithAnnotations, Named, WithAlias, WithOwner {
+public interface ExtensionParameter extends WithType, WithAnnotations, NamedObject, WithAlias, WithOwner {
 
   Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder().add(Event.class).add(Message.class)
       .add(InternalMessage.class).build();

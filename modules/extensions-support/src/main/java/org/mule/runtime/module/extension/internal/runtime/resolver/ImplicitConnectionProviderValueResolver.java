@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 
@@ -33,9 +33,11 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
   private ConnectionProvider connectionProvider = null;
   private Function<Event, ConnectionProvider> delegate;
 
-  public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel,
+  public ImplicitConnectionProviderValueResolver(String name,
+                                                 ExtensionModel extensionModel,
+                                                 ConfigurationModel configurationModel,
                                                  MuleContext muleContext) {
-    if (getAllConnectionProviders(configurationModel).isEmpty()) {
+    if (getAllConnectionProviders(extensionModel, configurationModel).isEmpty()) {
       // No connection provider to resolve
       delegate = nextEvent -> null;
     } else {
@@ -43,7 +45,10 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
         synchronized (this) {
           if (connectionProvider == null) {
             connectionProvider =
-                new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event,
+                new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name,
+                                                                                                extensionModel,
+                                                                                                configurationModel,
+                                                                                                event,
                                                                                                 muleContext);
             delegate = nextEvent -> connectionProvider;
           }

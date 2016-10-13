@@ -7,15 +7,15 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectedDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedInterceptableDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourcesDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.util.DeclarationWalker;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +47,7 @@ public class IdempotentDeclarationWalker extends DeclarationWalker {
   }
 
   @Override
-  public void onParameter(ParameterizedInterceptableDeclaration owner, ParameterDeclaration declaration) {
+  public void onParameter(ParameterizedDeclaration owner, ParameterDeclaration declaration) {
     doOnce(parameters, declaration, this::onParameter);
   }
 

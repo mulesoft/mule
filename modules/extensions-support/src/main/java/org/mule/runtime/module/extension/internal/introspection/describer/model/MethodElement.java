@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.extension.api.introspection.Named;
+import org.mule.runtime.api.meta.NamedObject;
 
 import java.lang.reflect.Method;
 
@@ -15,7 +15,8 @@ import java.lang.reflect.Method;
  *
  * @since 4.0
  */
-public interface MethodElement extends WithParameters, WithReturnType, Named, WithAnnotations, WithAlias, WithDeclaringClass {
+public interface MethodElement
+    extends WithParameters, WithReturnType, NamedObject, WithAnnotations, WithAlias, WithDeclaringClass {
 
   /**
    * @return The represented method

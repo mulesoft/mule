@@ -16,28 +16,27 @@ import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.ExtensionWalker;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.Named;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 
 import com.google.common.collect.ImmutableList;
 
@@ -56,7 +55,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {
-    if (!(extensionModel instanceof RuntimeExtensionModel)) {
+    if (!(extensionModel instanceof ExtensionModel)) {
       return;
     }
     new ExtensionWalker() {
@@ -73,7 +72,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
       private void validateComponent(ComponentModel model) {
         validateMetadataReturnType(extensionModel, model);
-        MetadataResolverFactory resolverFactory = ((RuntimeComponentModel) model).getMetadataResolverFactory();
+        MetadataResolverFactory resolverFactory = getMetadataResolverFactory(model);
         validateMetadataKeyId(model, resolverFactory);
         validateCategoriesInScope(model, resolverFactory);
       }
@@ -120,7 +119,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
   }
 
   private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel component) {
-    MetadataResolverFactory resolverFactory = ((RuntimeComponentModel) component).getMetadataResolverFactory();
+    MetadataResolverFactory resolverFactory = getMetadataResolverFactory(component);
     if (!(resolverFactory.getOutputResolver() instanceof NullMetadataResolver)) {
       return;
     }
@@ -161,7 +160,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
   private List<InputTypeResolver<Object>> getAllInputResolvers(ComponentModel componentModel,
                                                                MetadataResolverFactory resolverFactory) {
-    return componentModel.getParameterModels().stream().map(Named::getName)
+    return componentModel.getParameterModels().stream().map(NamedObject::getName)
         .map(resolverFactory::getInputResolver).collect(toList());
   }
 

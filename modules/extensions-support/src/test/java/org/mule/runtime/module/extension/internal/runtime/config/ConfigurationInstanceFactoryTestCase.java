@@ -14,21 +14,23 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase.TestConfig;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -56,10 +58,13 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   private static final String CONFIG_NAME = "config";
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private RuntimeConfigurationModel configurationModel;
+  private ConfigurationModel configurationModel;
 
   @Mock
   private OperationModel operationModel;
+
+  @Mock
+  private ExtensionModel extensionModel;
 
   @Mock
   private SourceModel sourceModel;
@@ -81,20 +86,19 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(new TestConfig());
-    when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
-    when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
+    mockConfigurationInstance(configurationModel, new TestConfig());
+    mockInterceptors(configurationModel, asList(() -> interceptor1, () -> interceptor2));
     when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-    when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
-    when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(asList(sourceModel));
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(operationModel.getModelProperty(ConnectivityModelProperty.class))
         .thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
     when(sourceModel.getModelProperty(ConnectivityModelProperty.class))
         .thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
 
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
-    factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);
+    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet);
   }
 
   @Test
@@ -141,6 +145,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
       return ConnectionValidationResult.success();
     }
   }
+
 
   public static class InvalidConnectionTypeProvider implements ConnectionProvider<Kiwi> {
 

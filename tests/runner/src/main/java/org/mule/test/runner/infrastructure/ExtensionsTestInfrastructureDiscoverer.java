@@ -12,11 +12,11 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
@@ -71,10 +71,10 @@ public class ExtensionsTestInfrastructureDiscoverer {
    * It will register the extensions described or annotated and it will generate their resources. If no describers are defined the
    * annotatedClasses would be used to generate the describers.
    *
-   * @param describers if empty it will use annotatedClasses param to build the describers
+   * @param describers       if empty it will use annotatedClasses param to build the describers
    * @param annotatedClasses used to build the describers
-   * @throws IllegalStateException if no extensions can be described
    * @return a {@link List} of the resources generated for the given describers or annotated classes
+   * @throws IllegalStateException if no extensions can be described
    */
   public void discoverExtensions(Describer[] describers, Class<?>[] annotatedClasses) {
     if (isEmpty(describers) && !isEmpty(annotatedClasses)) {
@@ -92,19 +92,18 @@ public class ExtensionsTestInfrastructureDiscoverer {
    * It will register the extensions described or annotated and it will generate their resources. If no describers are defined the
    * annotatedClasses would be used to generate the describers.
    *
-   * @throws IllegalStateException if no extensions can be described
    * @return a {@link List} of the resources generated for the given describers or annotated classes
+   * @throws IllegalStateException if no extensions can be described
    */
-  public RuntimeExtensionModel discoverExtension(Class<?> annotatedClass, VersionResolver versionResolver) {
-    RuntimeExtensionModel model =
+  public ExtensionModel discoverExtension(Class<?> annotatedClass, VersionResolver versionResolver) {
+    ExtensionModel model =
         loadExtensionModel(new AnnotationsBasedDescriber(annotatedClass, versionResolver));
     extensionManager.registerExtension(model);
 
     return model;
   }
 
-  public List<GeneratedResource> generateLoaderResources(RuntimeExtensionModel extensionModel,
-                                                         File generatedResourcesDirectory) {
+  public List<GeneratedResource> generateLoaderResources(ExtensionModel extensionModel, File generatedResourcesDirectory) {
     createManifestFileIfNecessary(generatedResourcesDirectory);
     ExtensionsTestLoaderResourcesGenerator generator =
         new ExtensionsTestLoaderResourcesGenerator(getResourceFactories(), generatedResourcesDirectory);
@@ -117,7 +116,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
     return generateDslResources(generatedResourcesDirectory, null);
   }
 
-  public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory, RuntimeExtensionModel forExtensionModel) {
+  public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory, ExtensionModel forExtensionModel) {
     DslResolvingContext context =
         extensionManager.getExtensions().stream().anyMatch(e -> !e.getImportedTypes().isEmpty())
             ? name -> extensionManager.getExtension(name).map(e -> e)
@@ -147,7 +146,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
     }
   }
 
-  private RuntimeExtensionModel loadExtensionModel(Describer describer) {
+  private ExtensionModel loadExtensionModel(Describer describer) {
     final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
     return extensionFactory.createFrom(describer.describe(context), context);
   }

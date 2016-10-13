@@ -15,9 +15,8 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
@@ -43,7 +42,7 @@ final class ConfigurationSchemaDelegate {
     this.builder = builder;
   }
 
-  public void registerConfigElement(Schema schema, final RuntimeConfigurationModel configurationModel,
+  public void registerConfigElement(Schema schema, final ConfigurationModel configurationModel,
                                     DslElementSyntax dslConfigElement) {
     this.schema = schema;
 
@@ -80,8 +79,8 @@ final class ConfigurationSchemaDelegate {
     return complexContentExtension;
   }
 
-  private void addConnectionProviderElement(ExplicitGroup all, RuntimeConfigurationModel configurationModel) {
-    ExtensionModel extensionModel = configurationModel.getExtensionModel();
+  private void addConnectionProviderElement(ExplicitGroup all, ConfigurationModel configurationModel) {
+    ExtensionModel extensionModel = builder.getExtensionModel();
     if (!extensionModel.getConnectionProviders().isEmpty() || !configurationModel.getConnectionProviders().isEmpty()) {
       TopLevelElement objectElement = new TopLevelElement();
 

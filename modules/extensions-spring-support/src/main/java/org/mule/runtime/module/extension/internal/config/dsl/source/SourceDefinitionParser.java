@@ -11,13 +11,12 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
-
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
@@ -32,12 +31,12 @@ import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessag
  */
 public class SourceDefinitionParser extends ExtensionDefinitionParser {
 
-  private final RuntimeExtensionModel extensionModel;
-  private final RuntimeSourceModel sourceModel;
+  private final ExtensionModel extensionModel;
+  private final SourceModel sourceModel;
   private final DslElementSyntax sourceDsl;
 
-  public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel,
-                                RuntimeSourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
+  public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, ExtensionModel extensionModel,
+                                SourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                 ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext, muleContext);
     this.extensionModel = extensionModel;

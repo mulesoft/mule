@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -13,8 +15,6 @@ import org.mule.runtime.core.streaming.Consumer;
 import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.core.streaming.ListConsumer;
 import org.mule.runtime.core.streaming.Producer;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
@@ -28,8 +28,8 @@ import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProvid
  */
 public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
-  public PagedOperationMessageProcessor(RuntimeExtensionModel extensionModel,
-                                        RuntimeOperationModel operationModel,
+  public PagedOperationMessageProcessor(ExtensionModel extensionModel,
+                                        OperationModel operationModel,
                                         String configurationProviderName,
                                         String target,
                                         ResolverSet resolverSet,

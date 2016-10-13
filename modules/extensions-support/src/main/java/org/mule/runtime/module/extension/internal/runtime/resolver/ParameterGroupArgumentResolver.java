@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;

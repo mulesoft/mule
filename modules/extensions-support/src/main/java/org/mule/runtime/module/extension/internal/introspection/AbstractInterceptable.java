@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
+import static com.google.common.collect.ImmutableList.copyOf;
+import static com.google.common.collect.ImmutableList.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -17,14 +20,11 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for implementation of {@link Interceptable}.
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractInterceptable implements Interceptable, Lifecycle {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractInterceptable.class);
+  private static final Logger LOGGER = getLogger(AbstractInterceptable.class);
 
   private final List<Interceptor> interceptors;
 
@@ -52,7 +52,7 @@ public abstract class AbstractInterceptable implements Interceptable, Lifecycle 
    * @param interceptors a {@link List} with {@link Interceptor interceptors}. Can be empty or even {@code null}
    */
   public AbstractInterceptable(List<Interceptor> interceptors) {
-    this.interceptors = interceptors != null ? ImmutableList.copyOf(interceptors) : ImmutableList.of();
+    this.interceptors = interceptors != null ? copyOf(interceptors) : of();
   }
 
   /**

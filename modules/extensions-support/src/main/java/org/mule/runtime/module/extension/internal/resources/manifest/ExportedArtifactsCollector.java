@@ -19,17 +19,17 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.extension.api.ExtensionWalker;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.api.introspection.XmlDslModel;
+import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 
 import com.google.common.collect.ImmutableSet;
 

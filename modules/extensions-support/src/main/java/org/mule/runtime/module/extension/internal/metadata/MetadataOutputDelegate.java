@@ -13,6 +13,8 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -21,18 +23,16 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.introspection.OutputModel;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 
 /**
  * Metadata service delegate implementations that handles the resolution
- * of a {@link RuntimeComponentModel} {@link OutputMetadataDescriptor}
+ * of a {@link ComponentModel} {@link OutputMetadataDescriptor}
  *
  * @since 4.0
  */
 class MetadataOutputDelegate extends BaseMetadataDelegate {
 
-  public MetadataOutputDelegate(RuntimeComponentModel componentModel) {
+  public MetadataOutputDelegate(ComponentModel componentModel) {
     super(componentModel);
   }
 

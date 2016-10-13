@@ -17,6 +17,8 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
@@ -27,8 +29,8 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -40,9 +42,6 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -74,7 +73,7 @@ public abstract class ExtensionComponent
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
   protected final ExtensionManagerAdapter extensionManager;
   private final TemplateParser expressionParser = createMuleStyleParser();
-  private final RuntimeExtensionModel extensionModel;
+  private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
   private final String configurationProviderName;
   private final MetadataMediator metadataMediator;
@@ -89,8 +88,8 @@ public abstract class ExtensionComponent
   @Inject
   private MuleMetadataManager metadataManager;
 
-  protected ExtensionComponent(RuntimeExtensionModel extensionModel,
-                               RuntimeComponentModel componentModel,
+  protected ExtensionComponent(ExtensionModel extensionModel,
+                               ComponentModel componentModel,
                                String configurationProviderName,
                                ExtensionManagerAdapter extensionManager) {
     this.extensionModel = extensionModel;
@@ -197,7 +196,7 @@ public abstract class ExtensionComponent
 
   /**
    * Validates that the configuration returned by the {@code configurationProvider} is compatible with the associated
-   * {@link RuntimeComponentModel}
+   * {@link ComponentModel}
    *
    * @param configurationProvider
    */

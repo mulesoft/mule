@@ -23,8 +23,8 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNB
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.extension.api.introspection.ElementDslModel;
-import org.mule.runtime.extension.api.introspection.SubTypesModel;
+import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;

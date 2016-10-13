@@ -11,14 +11,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_
 import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
@@ -32,11 +32,11 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
    * {@inheritDoc}
    */
   @Override
-  public <Connector> ConnectionProvider<Connector> createImplicitConnectionProvider(String configName,
-                                                                                    RuntimeConfigurationModel configurationModel,
-                                                                                    Event event, MuleContext muleContext) {
-    RuntimeConnectionProviderModel implicitModel =
-        (RuntimeConnectionProviderModel) getFirstImplicit(getAllConnectionProviders(configurationModel));
+  public <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName,
+                                                                    ExtensionModel extensionModel,
+                                                                    ConfigurationModel configurationModel,
+                                                                    Event event, MuleContext muleContext) {
+    ConnectionProviderModel implicitModel = getFirstImplicit(getAllConnectionProviders(extensionModel, configurationModel));
 
     if (implicitModel == null) {
       throw new IllegalStateException(format(

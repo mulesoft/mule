@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -18,9 +20,6 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -28,6 +27,7 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapte
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceConfigurer;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.base.Joiner;
 
@@ -42,8 +42,8 @@ import javax.inject.Inject;
  */
 public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory<ExtensionMessageSource> {
 
-  private final RuntimeExtensionModel extensionModel;
-  private final RuntimeSourceModel sourceModel;
+  private final ExtensionModel extensionModel;
+  private final SourceModel sourceModel;
   private final MuleContext muleContext;
 
   private String configurationProviderName;
@@ -52,7 +52,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   @Inject
   private ConnectionManagerAdapter connectionManager;
 
-  public ExtensionSourceObjectFactory(RuntimeExtensionModel extensionModel, RuntimeSourceModel sourceModel,
+  public ExtensionSourceObjectFactory(ExtensionModel extensionModel, SourceModel sourceModel,
                                       MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -89,7 +89,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private SourceFactory getSourceFactory(ResolverSet resolverSet) {
     return () -> {
-      Source source = sourceModel.getSourceFactory().createSource();
+      Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
       try {
         return new SourceConfigurer(sourceModel, resolverSet, muleContext).configure(source);
       } catch (Exception e) {

@@ -14,18 +14,29 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collection;
@@ -53,8 +64,31 @@ abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase {
     when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class))).thenReturn(emptyList);
 
     factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
-    extensionDeclarer = createDeclarationDescriptor();
+    extensionDeclarer = enrich(createDeclarationDescriptor());
     extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  private ExtensionDeclarer enrich(ExtensionDeclarer declarer) {
+    new IdempotentDeclarationWalker() {
+
+      @Override
+      public void onConfiguration(ConfigurationDeclaration declaration) {
+        declaration.addModelProperty(new ConfigurationFactoryModelProperty(mock(ConfigurationFactory.class, RETURNS_DEEP_STUBS)));
+      }
+
+      @Override
+      protected void onOperation(OperationDeclaration declaration) {
+        declaration
+            .addModelProperty(new OperationExecutorModelProperty(mock(OperationExecutorFactory.class, RETURNS_DEEP_STUBS)));
+      }
+
+      @Override
+      protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
+        declaration.addModelProperty(new ConnectionTypeModelProperty(Object.class));
+      }
+    }.walk(declarer.getDeclaration());
+
+    return declarer;
   }
 
   protected DescribingContext createDescribingContext() {
@@ -69,7 +103,7 @@ abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase {
     assertThat(parameterModel.getDescription(), equalTo(description));
     assertThat(parameterModel.getExpressionSupport(), is(expressionSupport));
     assertThat(parameterModel.isRequired(), is(required));
-    assertThat(parameterModel.getType(), equalTo(metadataType));
+    assertThat(getType(parameterModel.getType()), equalTo(getType(metadataType)));
     assertThat(parameterModel.getType(), is(instanceOf(qualifier)));
 
     if (defaultValue != null) {

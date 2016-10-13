@@ -12,10 +12,11 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getResolver;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -53,12 +54,10 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   private ExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private RuntimeConfigurationModel configurationModel;
+  private ConfigurationModel configurationModel;
 
   @Mock
   private Event event;
-
-  private TestConfig configuration;
 
   private ConfigurationObjectBuilder<TestConfig> configurationObjectBuilder;
   private ResolverSet resolverSet;
@@ -66,11 +65,8 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    configuration = new TestConfig();
-
     when(configurationModel.getParameterModels()).thenReturn(Arrays.asList(nameParameterModel, descriptionParameterModel));
-    when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(configuration);
-    when(configurationModel.getConfigurationFactory().getObjectType()).thenAnswer(invocation -> TestConfig.class);
+    mockConfigurationInstance(configurationModel, new TestConfig());
     when(configurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
 
     resolverSet = createResolverSet();

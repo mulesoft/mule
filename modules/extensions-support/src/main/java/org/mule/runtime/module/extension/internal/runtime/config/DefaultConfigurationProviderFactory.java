@@ -10,10 +10,11 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.withExtensionClassLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
@@ -33,13 +34,14 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
    */
   @Override
   public ConfigurationProvider createDynamicConfigurationProvider(String name,
-                                                                  RuntimeConfigurationModel configurationModel,
+                                                                  ExtensionModel extensionModel,
+                                                                  ConfigurationModel configurationModel,
                                                                   ResolverSet resolverSet,
                                                                   ValueResolver<ConnectionProvider> connectionProviderResolver,
                                                                   DynamicConfigPolicy dynamicConfigPolicy)
       throws Exception {
     configureConnectionProviderResolver(name, connectionProviderResolver);
-    return new DynamicConfigurationProvider(name, configurationModel, resolverSet, connectionProviderResolver,
+    return new DynamicConfigurationProvider(name, extensionModel, configurationModel, resolverSet, connectionProviderResolver,
                                             dynamicConfigPolicy.getExpirationPolicy());
   }
 
@@ -47,24 +49,26 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationProvider createStaticConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
+  public ConfigurationProvider createStaticConfigurationProvider(String name,
+                                                                 ExtensionModel extensionModel,
+                                                                 ConfigurationModel configurationModel,
                                                                  ResolverSet resolverSet,
                                                                  ValueResolver<ConnectionProvider> connectionProviderResolver,
                                                                  MuleContext muleContext)
       throws Exception {
-    return withExtensionClassLoader(configurationModel.getExtensionModel(), () -> {
+    return withExtensionClassLoader(extensionModel, () -> {
       configureConnectionProviderResolver(name, connectionProviderResolver);
       ConfigurationInstance configuration;
       try {
-        configuration = new ConfigurationInstanceFactory(configurationModel, resolverSet)
+        configuration = new ConfigurationInstanceFactory(extensionModel, configurationModel, resolverSet)
             .createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
       } catch (MuleException e) {
         throw new ConfigurationException(createStaticMessage(String
-            .format("Could not create configuration '%s' for the '%s'", name, configurationModel.getExtensionModel().getName())),
+            .format("Could not create configuration '%s' for the '%s'", name, extensionModel.getName())),
                                          e);
       }
 
-      return new ConfigurationProviderMetadataAdapter(name, configurationModel, configuration);
+      return new ConfigurationProviderMetadataAdapter(name, extensionModel, configurationModel, configuration);
     });
   }
 

@@ -8,6 +8,7 @@ package org.mule.test.module.extension.internal.util;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -27,21 +28,36 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
+import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.SubTypesModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.ElementDslModel;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.SubTypesModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +68,8 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public abstract class ExtensionsTestUtils {
 
@@ -144,7 +162,7 @@ public abstract class ExtensionsTestUtils {
    * Receives to {@link String} representation of two XML files and verify that they are semantically equivalent
    *
    * @param expected the reference content
-   * @param actual the actual content
+   * @param actual   the actual content
    * @throws Exception if comparison fails
    */
   public static void compareXML(String expected, String actual) throws Exception {
@@ -190,5 +208,54 @@ public abstract class ExtensionsTestUtils {
     } else {
       when(mockModel.getSubTypes()).thenReturn(copyOf(subtypes));
     }
+  }
+
+  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionEnricherFactory exceptionEnricherFactory) {
+    Optional<ExceptionEnricherModelProperty> property = exceptionEnricherFactory != null
+        ? of(new ExceptionEnricherModelProperty(exceptionEnricherFactory))
+        : empty();
+
+    when(enrichableModel.getModelProperty(ExceptionEnricherModelProperty.class)).thenReturn(property);
+  }
+
+  public static void mockInterceptors(EnrichableModel enrichableModel, List<InterceptorFactory> interceptorFactories) {
+    if (interceptorFactories == null) {
+      interceptorFactories = ImmutableList.of();
+    }
+
+    when(enrichableModel.getModelProperty(InterceptorsModelProperty.class))
+        .thenReturn(of(new InterceptorsModelProperty(interceptorFactories)));
+  }
+
+  public static void mockConfigurationInstance(ConfigurationModel configurationModel, Object config) {
+    ConfigurationFactory configurationFactory = mock(ConfigurationFactory.class);
+    when(configurationFactory.newInstance()).thenReturn(config);
+    when(configurationFactory.getObjectType()).thenReturn((Class) config.getClass());
+
+    when(configurationModel.getModelProperty(any())).thenAnswer(new Answer<Optional<ModelProperty>>() {
+
+      @Override
+      public Optional<ModelProperty> answer(InvocationOnMock invocationOnMock) throws Throwable {
+        Class<? extends ModelProperty> propertyType = (Class<? extends ModelProperty>) invocationOnMock.getArguments()[0];
+        if (ConfigurationFactoryModelProperty.class.equals(propertyType)) {
+          return of(new ConfigurationFactoryModelProperty(configurationFactory));
+        }
+
+        return empty();
+      }
+    });
+  }
+
+  public static void mockMetadataResolverFactory(EnrichableModel model, MetadataResolverFactory factory) {
+    Optional<MetadataResolverFactoryModelProperty> property = factory != null
+        ? of(new MetadataResolverFactoryModelProperty(factory))
+        : empty();
+
+    when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(property);
+  }
+
+  public static void mockExecutorFactory(OperationModel operationModel, OperationExecutorFactory operationExecutorFactory) {
+    when(operationModel.getModelProperty(OperationExecutorModelProperty.class))
+        .thenReturn(of(new OperationExecutorModelProperty(operationExecutorFactory)));
   }
 }

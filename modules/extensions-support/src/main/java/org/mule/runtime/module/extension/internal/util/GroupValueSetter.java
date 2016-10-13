@@ -10,7 +10,7 @@ import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;

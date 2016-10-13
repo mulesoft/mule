@@ -15,7 +15,7 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;

@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.model.property;
 
 import org.mule.runtime.extension.api.annotation.Query;
-import org.mule.runtime.extension.api.introspection.ModelProperty;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.introspection.dsql.QueryTranslator;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 
 
 /**
