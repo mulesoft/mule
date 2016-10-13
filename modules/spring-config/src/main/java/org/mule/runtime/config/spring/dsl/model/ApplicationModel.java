@@ -287,14 +287,16 @@ public class ApplicationModel {
    */
   private void processSourcesRedeliveryPolicy() {
     executeOnEveryFlow(flowComponentModel -> {
-      ComponentModel possibleSourceComponent = flowComponentModel.getInnerComponents().get(0);
-      possibleSourceComponent.getInnerComponents().stream()
-          .filter(childComponent -> childComponent.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER))
-          .findAny()
-          .ifPresent(redeliveryPolicyComponentModel -> {
-            possibleSourceComponent.getInnerComponents().remove(redeliveryPolicyComponentModel);
-            flowComponentModel.getInnerComponents().add(1, redeliveryPolicyComponentModel);
-          });
+      if (!flowComponentModel.getInnerComponents().isEmpty()) {
+        ComponentModel possibleSourceComponent = flowComponentModel.getInnerComponents().get(0);
+        possibleSourceComponent.getInnerComponents().stream()
+            .filter(childComponent -> childComponent.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER))
+            .findAny()
+            .ifPresent(redeliveryPolicyComponentModel -> {
+              possibleSourceComponent.getInnerComponents().remove(redeliveryPolicyComponentModel);
+              flowComponentModel.getInnerComponents().add(1, redeliveryPolicyComponentModel);
+            });
+      }
     });
   }
 
