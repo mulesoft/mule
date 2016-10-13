@@ -27,7 +27,7 @@ import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractMuleObjectOwnerTest {
+public class AbstractMuleObjectOwnerTestCase {
 
   @Mock
   private TestClass mockObject1;
