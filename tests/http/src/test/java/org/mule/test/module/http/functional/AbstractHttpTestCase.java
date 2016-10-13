@@ -13,5 +13,5 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
-  protected static final int DEFAULT_TIMEOUT = 1000;
+  protected static int DEFAULT_TIMEOUT = 1000;
 }

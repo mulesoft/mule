@@ -143,6 +143,7 @@
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.39</asyncHttpClientVersion>
+        <apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.54</bouncycastleVersion>
