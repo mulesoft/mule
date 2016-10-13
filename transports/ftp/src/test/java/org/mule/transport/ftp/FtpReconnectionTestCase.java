@@ -13,6 +13,8 @@ import org.mule.api.MuleContext;
 import org.mule.exception.AbstractSystemExceptionStrategy;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.listener.FlowExecutionListener;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.transport.ConnectException;
 import org.mule.util.concurrent.Latch;
 
@@ -37,7 +39,7 @@ import org.junit.runners.Parameterized;
  */
 public class FtpReconnectionTestCase extends AbstractFtpServerTestCase
 {
-    protected TestSystemExceptionStrategy tryReconnectionStrategy;
+    private TestSystemExceptionStrategy tryReconnectionStrategy;
     MockFailingServer server;
 
     public FtpReconnectionTestCase (ConfigVariant variant, String configResources)
@@ -80,21 +82,24 @@ public class FtpReconnectionTestCase extends AbstractFtpServerTestCase
     @Test
     public void testLostConnection() throws Exception
     {
-        try
+        createFileOnFtpServer("lostConnection/test1");
+        new PollingProber(5000, 50).check(new Probe()
         {
-            createFileOnFtpServer("lostConnection/test1");
-            FlowExecutionListener flowExecutionListener = new FlowExecutionListener("LostConnection", muleContext);
-            flowExecutionListener.waitUntilFlowIsComplete();
-        }
-        catch (java.lang.AssertionError e)
-        {
-            assertTrue(tryReconnectionStrategy.reconnect);
-            return;
-        }
-        fail("Should try to reconnect");
+            @Override
+            public boolean isSatisfied()
+            {
+                return tryReconnectionStrategy.reconnect;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Should try to reconnect";
+            }
+        });
     }
 
-    protected class TestSystemExceptionStrategy extends AbstractSystemExceptionStrategy
+    private class TestSystemExceptionStrategy extends AbstractSystemExceptionStrategy
     {
         public boolean reconnect = false;
         public TestSystemExceptionStrategy(MuleContext muleContext)
