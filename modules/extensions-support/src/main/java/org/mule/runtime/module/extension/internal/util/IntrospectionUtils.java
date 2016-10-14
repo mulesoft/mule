@@ -27,7 +27,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -35,14 +35,16 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -51,8 +53,6 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
@@ -145,7 +145,7 @@ public final class IntrospectionUtils {
    * given {@code method}.
    * <p>
    * If the {@code method} returns a {@link OperationResult}, then it returns the type of the {@code Attributes} generic. In any
-   * other case (including raw uses of {@link OperationResult}) it will return a {@link NullType}
+   * other case (including raw uses of {@link OperationResult}) it will return a {@link VoidType}
    *
    * @param method the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
@@ -167,7 +167,7 @@ public final class IntrospectionUtils {
       }
     }
 
-    return type != null ? typeLoader.load(type) : typeBuilder().nullType().build();
+    return type != null ? typeLoader.load(type) : typeBuilder().voidType().build();
   }
 
   static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {
@@ -377,7 +377,7 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isVoid(ComponentModel componentModel) {
-    return componentModel.getOutput().getType() instanceof NullType;
+    return componentModel.getOutput().getType() instanceof VoidType;
   }
 
   private static boolean isVoid(Class<?> type) {

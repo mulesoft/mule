@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
@@ -46,7 +47,7 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
   public void deleteNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = 'Mars'");
-    assertThat(parameters.getType(), is(typeBuilder.nullType().build()));
+    assertThat(parameters.getType(), is(instanceOf(NullType.class)));
   }
 
   @Test

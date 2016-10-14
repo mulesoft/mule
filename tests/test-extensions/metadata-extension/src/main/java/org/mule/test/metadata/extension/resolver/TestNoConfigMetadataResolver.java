@@ -40,7 +40,7 @@ public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputType
   @Override
   public MetadataType getInputMetadata(MetadataContext context, Object key) {
     if (key instanceof NullMetadataKey) {
-      return BaseTypeBuilder.create(JAVA).nullType().build();
+      return BaseTypeBuilder.create(JAVA).voidType().build();
     }
 
     return BaseTypeBuilder.create(JAVA).stringType().build();
@@ -49,7 +49,7 @@ public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputType
   @Override
   public MetadataType getOutputType(MetadataContext context, Object key) {
     if (key instanceof NullMetadataKey) {
-      return BaseTypeBuilder.create(JAVA).nullType().build();
+      return BaseTypeBuilder.create(JAVA).voidType().build();
     }
 
     return BaseTypeBuilder.create(JAVA).booleanType().build();
@@ -59,7 +59,7 @@ public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputType
   public MetadataType getAttributesMetadata(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
     if (key instanceof NullMetadataKey) {
-      return BaseTypeBuilder.create(JAVA).nullType().build();
+      return BaseTypeBuilder.create(JAVA).voidType().build();
     }
 
     return BaseTypeBuilder.create(JAVA).booleanType().build();

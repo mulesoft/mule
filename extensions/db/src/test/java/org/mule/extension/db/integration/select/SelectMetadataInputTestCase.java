@@ -14,10 +14,12 @@
 package org.mule.extension.db.integration.select;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
+import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -47,7 +49,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
     assertThat(metadata.isSuccess(), is(true));
     assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType(),
-               is(typeBuilder.nullType().build()));
+               is(instanceOf(NullType.class)));
   }
 
   @Test

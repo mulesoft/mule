@@ -72,7 +72,7 @@ import org.junit.Test;
 public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCase {
 
   private static final String MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA = "messageAttributesPersonTypeMetadata";
-  private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesNullTypeMetadata";
+  private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesVoidTypeMetadata";
   private static final String PAGED_OPERATION_METADATA = "pagedOperationMetadata";
   private static final String CONFIG = "config";
   private static final String ALTERNATIVE_CONFIG = "alternative-config";
@@ -229,7 +229,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   }
 
   @Test
-  public void messageAttributesNullTypeMetadata() throws Exception {
+  public void messageAttributesVoidTypeMetadata() throws Exception {
     componentId = new ProcessorId(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId);
     assertSuccess(componentMetadata);

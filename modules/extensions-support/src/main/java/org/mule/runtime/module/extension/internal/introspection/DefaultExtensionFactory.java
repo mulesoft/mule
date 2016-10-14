@@ -253,7 +253,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
       return declaration != null
           ? new ImmutableOutputModel(declaration.getDescription(), declaration.getType(), declaration.hasDynamicType(),
                                      declaration.getModelProperties())
-          : new ImmutableOutputModel(EMPTY, create(JAVA).nullType().build(), false, emptySet());
+          : new ImmutableOutputModel(EMPTY, create(JAVA).voidType().build(), false, emptySet());
     }
 
     private ConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration) {

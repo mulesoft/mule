@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isNullType;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -58,8 +58,7 @@ class BaseMetadataDelegate {
                                                              MetadataDelegate delegate, String elementName) {
     try {
       MetadataType dynamicType = delegate.resolve();
-      // TODO review this once MULE-10438 and MDM-21 are done
-      if (dynamicType == null || (isNullType(dynamicType) && !allowsNullType)) {
+      if (dynamicType == null || (isVoid(dynamicType) && !allowsNullType)) {
         return failure(staticType, format("An error occurred while resolving the MetadataType of the [%s]", elementName),
                        NO_DYNAMIC_TYPE_AVAILABLE,
                        "The resulting MetadataType was of NullType, but it is not a valid type for this element");

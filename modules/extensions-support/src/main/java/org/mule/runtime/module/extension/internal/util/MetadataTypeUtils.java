@@ -9,13 +9,11 @@ package org.mule.runtime.module.extension.internal.util;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
-import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 
 import java.lang.reflect.Modifier;
@@ -29,16 +27,12 @@ public final class MetadataTypeUtils {
 
   private MetadataTypeUtils() {}
 
-  public static boolean isNullType(MetadataType type) {
-    return type instanceof NullType;
-  }
-
   public static boolean isObjectType(MetadataType type) {
     return type instanceof ObjectType;
   }
 
   public static boolean isVoid(MetadataType type) {
-    return isNullType(type);
+    return type instanceof VoidType;
   }
 
   /**
@@ -92,13 +86,4 @@ public final class MetadataTypeUtils {
       return "";
     }
   }
-
-  public static boolean isExtensible(MetadataType metadataType) {
-    return metadataType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent();
-  }
-
-  public static boolean isEnum(MetadataType metadataType) {
-    return metadataType.getAnnotation(EnumAnnotation.class).isPresent();
-  }
-
 }
