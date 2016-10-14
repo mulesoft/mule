@@ -16,6 +16,7 @@ import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.core.streaming.ListConsumer;
 import org.mule.runtime.core.streaming.Producer;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -30,11 +31,11 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
   public PagedOperationMessageProcessor(ExtensionModel extensionModel,
                                         OperationModel operationModel,
-                                        String configurationProviderName,
+                                        ConfigurationProvider configurationProvider,
                                         String target,
                                         ResolverSet resolverSet,
                                         ExtensionManagerAdapter extensionManager) {
-    super(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
+    super(extensionModel, operationModel, configurationProvider, target, resolverSet, extensionManager);
   }
 
   @Override

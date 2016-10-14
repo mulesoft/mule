@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
@@ -75,7 +75,7 @@ public abstract class ExtensionComponent
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
-  private final String configurationProviderName;
+  private final ConfigurationProvider configurationProvider;
   private final MetadataMediator metadataMediator;
   private final ClassTypeLoader typeLoader;
 
@@ -90,11 +90,11 @@ public abstract class ExtensionComponent
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                ComponentModel componentModel,
-                               String configurationProviderName,
+                               ConfigurationProvider configurationProvider,
                                ExtensionManagerAdapter extensionManager) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
-    this.configurationProviderName = configurationProviderName;
+    this.configurationProvider = configurationProvider;
     this.extensionManager = extensionManager;
     this.metadataMediator = new MetadataMediator(componentModel);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getExtensionClassLoader());
@@ -271,11 +271,11 @@ public abstract class ExtensionComponent
     }
 
     if (isConfigurationSpecified()) {
-      return getConfigurationProviderByName()
+      return findConfigurationProvider()
           .map(provider -> Optional.of(provider.get(event)))
           .orElseThrow(() -> new IllegalModelDefinitionException(format(
                                                                         "Flow '%s' contains a reference to config '%s' but it doesn't exists",
-                                                                        flowConstruct.getName(), configurationProviderName)));
+                                                                        flowConstruct.getName(), configurationProvider)));
     }
 
     return Optional.of(getConfigurationProviderByModel()
@@ -290,15 +290,11 @@ public abstract class ExtensionComponent
   private Optional<ConfigurationProvider> findConfigurationProvider() {
     if (requiresConfig(componentModel)) {
       return isConfigurationSpecified()
-          ? getConfigurationProviderByName()
+          ? of(configurationProvider)
           : getConfigurationProviderByModel();
     }
 
     return empty();
-  }
-
-  private Optional<ConfigurationProvider> getConfigurationProviderByName() {
-    return extensionManager.getConfigurationProvider(configurationProviderName);
   }
 
   private Optional<ConfigurationProvider> getConfigurationProviderByModel() {
@@ -312,19 +308,19 @@ public abstract class ExtensionComponent
   }
 
   private boolean isConfigurationSpecified() {
-    return !isBlank(configurationProviderName);
+    return configurationProvider != null;
   }
 
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
-    if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProviderName)) {
+    if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.getName())) {
       throw new InitialisationException(createStaticMessage(format("Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
           + "Expressions are not allowed as config references", flowConstruct.getName(), hyphenize(componentModel.getName()),
-                                                                   configurationProviderName)),
+                                                                   configurationProvider)),
                                         this);
     }
   }
 
-  protected String getConfigurationProviderName() {
-    return configurationProviderName;
+  protected ConfigurationProvider getConfigurationProvider() {
+    return configurationProvider;
   }
 }

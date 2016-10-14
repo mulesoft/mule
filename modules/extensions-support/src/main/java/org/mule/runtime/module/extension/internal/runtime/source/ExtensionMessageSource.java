@@ -84,9 +84,9 @@ public class ExtensionMessageSource extends ExtensionComponent
   private WorkManager workManager;
 
   public ExtensionMessageSource(ExtensionModel extensionModel, SourceModel sourceModel, SourceFactory sourceFactory,
-                                String configurationProviderName, ThreadingProfile threadingProfile,
+                                ConfigurationProvider configurationProvider, ThreadingProfile threadingProfile,
                                 RetryPolicyTemplate retryPolicyTemplate, ExtensionManagerAdapter managerAdapter) {
-    super(extensionModel, sourceModel, configurationProviderName, managerAdapter);
+    super(extensionModel, sourceModel, configurationProvider, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceFactory = sourceFactory;
     this.threadingProfile = threadingProfile;
@@ -102,7 +102,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   @Override
   public void handle(Message message,
                      CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> completionHandler) {
-    Event event = Event.builder(create(flowConstruct, getConfigurationProviderName()))
+    Event event = Event.builder(create(flowConstruct, getConfigName()))
         .message((InternalMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
         .build();
     messageProcessingManager
@@ -112,12 +112,17 @@ public class ExtensionMessageSource extends ExtensionComponent
 
   @Override
   public void handle(Message message) {
-    Event event = Event.builder(create(flowConstruct, getConfigurationProviderName()))
+    Event event = Event.builder(create(flowConstruct, getConfigName()))
         .message((InternalMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
         .build();
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()),
                         createProcessingContext());
+  }
+
+  private String getConfigName() {
+    ConfigurationProvider configurationProvider = getConfigurationProvider();
+    return configurationProvider != null ? configurationProvider.getName() : null;
   }
 
   @Override

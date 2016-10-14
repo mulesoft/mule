@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
@@ -33,7 +34,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private final OperationModel operationModel;
   private final MuleContext muleContext;
 
-  private String configurationProviderName;
+  private ConfigurationProvider configurationProvider;
   private String target = EMPTY;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel, OperationModel operationModel,
@@ -61,19 +62,19 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
 
   private OperationMessageProcessor createMessageProcessor(ResolverSet resolverSet) {
     if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
-      return new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target,
+      return new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target,
                                                        resolverSet, (ExtensionManagerAdapter) muleContext.getExtensionManager());
     } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet,
+      return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                                 (ExtensionManagerAdapter) muleContext.getExtensionManager());
     } else {
-      return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet,
+      return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                            (ExtensionManagerAdapter) muleContext.getExtensionManager());
     }
   }
 
-  public void setConfigurationProviderName(String configurationProviderName) {
-    this.configurationProviderName = configurationProviderName;
+  public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
+    this.configurationProvider = configurationProvider;
   }
 
   public void setTarget(String target) {
