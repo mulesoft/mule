@@ -13,13 +13,11 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -87,7 +85,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   public Event processResponse(Event event) throws MuleException {
-    if (event == null || VoidMuleEvent.getInstance().equals(event)) {
+    if (event == null) {
       return event;
     }
     responseThread = Thread.currentThread();
@@ -99,7 +97,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   private Event processNext(Event event) throws MuleException {
-    if (event != null || event instanceof VoidMuleEvent) {
+    if (event != null) {
       return next.process(event);
     } else {
       return event;

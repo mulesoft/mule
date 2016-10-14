@@ -13,19 +13,16 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.CxfConfiguration;
@@ -135,7 +132,7 @@ public class MuleUniversalConduit extends AbstractConduit {
     // are we sending an out of band response for a server side request?
     boolean decoupled = event != null && message.getExchange().getInMessage() != null;
 
-    if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled) {
+    if (event == null || decoupled) {
       // we've got an out of band WS-RM message or a message from a standalone client
       InternalMessage muleMsg = InternalMessage.builder().payload(handler).build();
 
@@ -237,7 +234,7 @@ public class MuleUniversalConduit extends AbstractConduit {
   }
 
   protected void sendResultBackToCxf(Message m, Event resEvent) throws TransformerException, IOException {
-    if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent)) {
+    if (resEvent != null) {
       m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
 
       // If we have a result, send it back to CXF

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -146,7 +145,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   @Override
   public Event process(Event event) throws MuleException {
     Event result = eventCorrelator.process(event);
-    if (result == null || VoidMuleEvent.getInstance().equals(result)) {
+    if (result == null) {
       return result;
     }
     return processNext(result);

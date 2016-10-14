@@ -12,7 +12,6 @@ import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUN
 import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -36,7 +35,6 @@ import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -97,7 +95,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       final Serializable eventStoreKey = storeEvent(event, flow);
       scheduleForProcessing(eventStoreKey, true);
       if (getUntilSuccessfulConfiguration().getAckExpression() == null) {
-        return VoidMuleEvent.getInstance();
+        return event;
       }
       return processResponseThroughAckResponseExpression(event);
     } catch (final Exception e) {

@@ -17,7 +17,6 @@ import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.DispatchException;
@@ -384,9 +383,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     // One way dispatches over an async transport result in this
     if (transportResponse == null) {
       return null;
-    }
-    if (VoidMuleEvent.getInstance().equals(transportResponse)) {
-      return transportResponse;
     }
 
     // Otherwise we may have a response!

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
@@ -40,17 +39,15 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
       for (int i = 0; i <= getUntilSuccessfulConfiguration().getMaxRetries(); i++) {
         try {
           Event successEvent = processResponseThroughAckResponseExpression(processEvent(retryEvent));
-          Event finalEvent;
-          if (successEvent instanceof VoidMuleEvent) {
-            // continue processing with the original event
-            finalEvent = event;
-          } else {
-            Builder builder = Event.builder(event).message(successEvent.getMessage());
-            for (String flowVar : successEvent.getVariableNames()) {
-              builder.addVariable(flowVar, successEvent.getVariable(flowVar).getValue());
-            }
-            finalEvent = builder.build();
+          if (successEvent == null) {
+            return null;
           }
+          Event finalEvent;
+          Builder builder = Event.builder(event).message(successEvent.getMessage());
+          for (String flowVar : successEvent.getVariableNames()) {
+            builder.addVariable(flowVar, successEvent.getVariable(flowVar).getValue());
+          }
+          finalEvent = builder.build();
           setCurrentEvent(finalEvent);
           return finalEvent;
         } catch (Exception e) {

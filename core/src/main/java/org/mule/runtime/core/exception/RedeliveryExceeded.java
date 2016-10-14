@@ -7,7 +7,6 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -51,7 +50,7 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
     if (!messageProcessors.isEmpty()) {
       result = configuredMessageProcessors.process(event);
     }
-    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+    if (result != null) {
       result = Event.builder(result).error(null)
           .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
     }

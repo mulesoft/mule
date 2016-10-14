@@ -22,7 +22,6 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
@@ -416,15 +415,13 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   public Event routeEvent(Event muleEvent) throws MuleException {
     Event resultEvent = listener.process(muleEvent);
     if (resultEvent != null
-        && !VoidMuleEvent.getInstance().equals(resultEvent)
         && resultEvent.getError().isPresent()
         && resultEvent.getError().get().getCause() instanceof FilterUnacceptedException) {
       handleUnacceptedFilter(muleEvent.getMessage());
       return muleEvent;
     }
 
-    if (endpoint.getExchangePattern().hasResponse() && resultEvent != null
-        && !VoidMuleEvent.getInstance().equals(resultEvent)) {
+    if (endpoint.getExchangePattern().hasResponse() && resultEvent != null) {
       // Do not propagate security context back to caller
       MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());
       resultSession.setSecurityContext(null);

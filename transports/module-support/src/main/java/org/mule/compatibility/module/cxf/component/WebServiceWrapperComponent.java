@@ -10,7 +10,6 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.module.cxf.endpoint.CxfEndpointBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -52,7 +51,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
 
     Event responseEvent = endpoint.process(event);
 
-    if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent)) {
+    if (responseEvent != null) {
       return responseEvent.getMessage();
     } else {
       return null;

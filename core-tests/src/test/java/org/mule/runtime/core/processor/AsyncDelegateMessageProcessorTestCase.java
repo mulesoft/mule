@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -32,7 +31,6 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.rx.Operators;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -77,7 +75,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(testEvent(), not(sameInstance(target.sensedEvent)));
     assertThat(testEvent().getMessageAsString(muleContext), equalTo(target.sensedEvent.getMessageAsString(muleContext)));
 
-    assertThat(VoidMuleEvent.getInstance(), sameInstance(result));
+    assertThat(testEvent(), sameInstance(result));
     assertThat(exceptionThrown, nullValue());
     assertThat(target.thread, not(sameInstance(Thread.currentThread())));
 
@@ -96,7 +94,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertNotSame(testEvent(), target.sensedEvent);
     assertEquals(testEvent().getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
-    assertSame(VoidMuleEvent.getInstance(), result);
+    assertSame(testEvent(), result);
     assertNull(exceptionThrown);
     assertNotSame(Thread.currentThread(), target.thread);
 

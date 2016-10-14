@@ -10,7 +10,6 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
@@ -87,7 +86,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
    */
   private static Event produceEvent(Event sourceEvent, FlowConstruct flowConstruct) {
     String rootId = lastRootMessageId.get();
-    if (sourceEvent != null && !VoidMuleEvent.getInstance().equals(sourceEvent)) {
+    if (sourceEvent != null) {
       lastRootMessageId.set(sourceEvent.getCorrelationId());
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {

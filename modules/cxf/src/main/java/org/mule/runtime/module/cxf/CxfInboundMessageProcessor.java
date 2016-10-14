@@ -24,7 +24,6 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -353,7 +352,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
   private Event processResponse(Event event, Exchange exchange, Event responseEvent) {
     // If there isn't one, there was probably a fault, so use the original event
-    if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent) || !event.getExchangePattern().hasResponse()) {
+    if (responseEvent == null || !event.getExchangePattern().hasResponse()) {
       return null;
     }
 

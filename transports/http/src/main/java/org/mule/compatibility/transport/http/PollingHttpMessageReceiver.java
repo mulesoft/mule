@@ -27,7 +27,6 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -122,7 +121,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
 
     Event result = outboundEndpoint.process(event);
     CompatibilityMessage message = null;
-    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+    if (result != null) {
       message = new MuleCompatibilityMessageBuilder(result.getMessage()).build();
     }
 

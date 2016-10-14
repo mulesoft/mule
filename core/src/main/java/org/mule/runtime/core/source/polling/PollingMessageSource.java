@@ -13,7 +13,6 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedN
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -309,7 +308,7 @@ public class PollingMessageSource
    * @return true if the polled message processor return new content, false otherwise
    */
   protected boolean isNewMessage(Event event) {
-    if (event != null && !VoidMuleEvent.getInstance().equals(event) && event.getMessage() != null) {
+    if (event != null && event.getMessage() != null) {
       InternalMessage message = event.getMessage();
       return message.getPayload().getValue() != null;
     }

@@ -7,7 +7,6 @@
 package org.mule.extension.validation.api.el;
 
 import static org.mule.extension.validation.api.ValidationExtension.DEFAULT_LOCALE;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.ValidationContext;
@@ -54,7 +53,7 @@ public final class ValidatorElContext {
   }
 
   public ValidatorElContext() {
-    this.event = VoidMuleEvent.getInstance();
+    this.event = null;
     validationContext = new ValidationContext(new ValidationMessages(), new ValidationOptions(), event);
   }
 

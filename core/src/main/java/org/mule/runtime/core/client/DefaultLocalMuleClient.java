@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.Map;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -187,7 +186,7 @@ public class DefaultLocalMuleClient implements MuleClient {
       }
       final Event event =
           connectorMessageProcessor.process(createOneWayMuleEvent(InternalMessage.builder().nullPayload().build()));
-      if (event == null || event instanceof VoidMuleEvent) {
+      if (event == null) {
         return right(empty());
       }
       if (event.getError().isPresent()) {
@@ -212,7 +211,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected Event returnEvent(Event event) {
-    if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
+    if (event != null) {
       return event;
     } else {
       return null;

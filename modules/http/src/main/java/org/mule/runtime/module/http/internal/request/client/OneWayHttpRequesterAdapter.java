@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.http.internal.request.client;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -35,7 +34,7 @@ public class OneWayHttpRequesterAdapter implements Processor, FlowConstructAware
   public Event process(Event event) throws MuleException {
     final Event result = this.httpRequester.process(event);
     consumePayload(event, result);
-    return VoidMuleEvent.getInstance();
+    return event;
   }
 
   private void consumePayload(Event event, Event result) throws MessagingException {

@@ -7,25 +7,20 @@
 package org.mule.compatibility.module.cxf.transport;
 
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.CxfConfiguration;
@@ -100,7 +95,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
     OutboundEndpoint ep = null;
 
-    if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled) {
+    if (event == null || decoupled) {
       // we've got an out of band WS-RM message or a message from a standalone client
       MuleContext muleContext = configuration.getMuleContext();
       InternalMessage muleMsg = InternalMessage.builder().payload(handler).build();

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -58,7 +57,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
       for (int i = 0; i < messageProcessors.size(); i++) {
         Processor mp = messageProcessors.get(i);
         Event result = sendRequest(event, message, mp, true);
-        if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+        if (result != null) {
           results.add(result);
         }
       }

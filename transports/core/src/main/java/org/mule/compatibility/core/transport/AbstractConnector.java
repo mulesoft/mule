@@ -36,7 +36,6 @@ import org.mule.compatibility.core.transport.service.TransportServiceException;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -2188,7 +2187,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         if (fireNotification) {
           // We need to invoke notification message processor with request
           // message only after successful send/dispatch
-          notificationMessageProcessor.process((result != null && !(result instanceof VoidMuleEvent)) ? result : event);
+          notificationMessageProcessor.process((result != null) ? result : event);
         }
 
         return result;

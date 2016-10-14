@@ -7,7 +7,6 @@
 package org.mule.runtime.core.execution;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -38,7 +37,7 @@ class CommitTransactionInterceptor implements ExecutionInterceptor<Event> {
         // Unfortunately a filter causes the whole chain to return null
         // and there's no other way to retrieve the last event but using the RequestContext.
         // see https://www.mulesoft.org/jira/browse/MULE-8670
-        if (result == null || VoidMuleEvent.getInstance().equals(result)) {
+        if (result == null) {
           result = getCurrentEvent();
         }
         throw new MessagingException(result, e);

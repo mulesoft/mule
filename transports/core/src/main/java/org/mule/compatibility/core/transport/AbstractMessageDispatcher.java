@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANS
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleSession;
@@ -68,7 +67,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         return createResponseEvent(doSend(event), event);
       } else {
         doDispatch(event);
-        return VoidMuleEvent.getInstance();
+        return event;
       }
     } catch (MuleException muleException) {
       throw muleException;

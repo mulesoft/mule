@@ -12,14 +12,12 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
@@ -39,7 +37,6 @@ import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.work.SerialWorkManager;
 
 import java.util.Optional;
 
@@ -133,7 +130,7 @@ public class Flow extends AbstractPipeline implements Processor, StageNameSource
   }
 
   private Event createReturnEventForParentFlowConstruct(Event result, Event original) {
-    if (result != null && !(result instanceof VoidMuleEvent)) {
+    if (result != null) {
       Optional<Error> errorOptional = result.getError();
       // TODO MULE-10013
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous

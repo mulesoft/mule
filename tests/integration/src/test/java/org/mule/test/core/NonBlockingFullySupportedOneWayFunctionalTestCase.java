@@ -6,14 +6,11 @@
  */
 package org.mule.test.core;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Ignore;
 import org.junit.Test;

@@ -37,7 +37,6 @@ import org.mule.compatibility.core.transformer.simple.OutboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -100,7 +99,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
     dispacher.latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
     assertMessageSentSame(false);
-    assertSame(VoidMuleEvent.getInstance(), result);
+    assertSame(testOutboundEvent, result);
   }
 
   @Test

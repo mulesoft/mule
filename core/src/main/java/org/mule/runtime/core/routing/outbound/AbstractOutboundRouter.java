@@ -8,7 +8,6 @@ package org.mule.runtime.core.routing.outbound;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
 
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -116,7 +115,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       }
     }
 
-    if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
+    if (result != null) {
       InternalMessage resultMessage = result.getMessage();
       if (logger.isTraceEnabled()) {
         if (resultMessage != null) {
