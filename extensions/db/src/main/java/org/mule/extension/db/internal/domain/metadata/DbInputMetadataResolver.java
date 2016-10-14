@@ -46,7 +46,7 @@ public class DbInputMetadataResolver extends BaseDbMetadataResolver implements I
     List<InputQueryParam> inputParams = queryTemplate.getInputParams();
     // No metadata when no input parameters
     if (inputParams.size() == 0) {
-      return typeBuilder.voidType().build();
+      return typeBuilder.nullType().build();
     }
 
     PreparedStatement statement = getStatement(context, queryTemplate);

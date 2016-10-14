@@ -69,8 +69,8 @@
         <metadata:key-id-without-key-resolver config-ref="config" type="PERSON"/>
     </flow>
 
-    <flow name="messageAttributesNullTypeMetadata">
-        <metadata:message-attributes-null-type-metadata />
+    <flow name="messageAttributesVoidTypeMetadata">
+        <metadata:message-attributes-void-type-metadata />
     </flow>
 
     <flow name="messageAttributesPersonTypeMetadata">

@@ -159,7 +159,7 @@ public class MetadataOperations {
   }
 
   @OutputResolver(TestOutputAnyTypeResolver.class)
-  public OperationResult messageAttributesNullTypeMetadata() {
+  public OperationResult messageAttributesVoidTypeMetadata() {
     return null;
   }
 
