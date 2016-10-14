@@ -162,13 +162,6 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     assertThat(processingStrategy.route(testEvent(), getTestFlow(muleContext)), is(nullValue()));
   }
 
-  @Test
-  public void successfulWithNullEventResponseFromRoute() throws Exception {
-    when(mockRoute.process(any(Event.class))).thenReturn(null);
-    SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    assertThat(processingStrategy.route(testEvent(), getTestFlow(muleContext)), is(nullValue()));
-  }
-
   private SynchronousUntilSuccessfulProcessingStrategy createProcessingStrategy() throws InitialisationException {
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = new SynchronousUntilSuccessfulProcessingStrategy();
     processingStrategy.setUntilSuccessfulConfiguration(mockUntilSuccessfulConfiguration);

@@ -328,11 +328,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             Event.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {
-        return null;//VoidMuleEvent.getInstance();
+        return null;
       }
     } catch (ObjectStoreException e) {
       // Nothing to do...
-      return null;//VoidMuleEvent.getInstance();
+      return null;
     }
   }
 
