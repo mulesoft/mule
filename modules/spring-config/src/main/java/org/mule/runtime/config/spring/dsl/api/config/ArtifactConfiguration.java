@@ -6,11 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.api.config;
 
-import static java.util.Arrays.asList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
-import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
-import org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +29,7 @@ public class ArtifactConfiguration {
    */
   public ArtifactConfiguration(List<ComponentConfiguration> componentConfigurations) {
     checkArgument(componentConfigurations != null, "component configurations cannot be null");
-    ComponentConfiguration.Builder rootComponent = new ComponentConfiguration.Builder()
-        .setNamespace(CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME)
-        .setIdentifier(ApplicationModel.MULE_ROOT_ELEMENT);
-    for (ComponentConfiguration componentConfiguration : componentConfigurations) {
-      rootComponent.addNestedConfiguration(componentConfiguration);
-    }
-    this.componentConfiguration = asList(rootComponent.build());
+    this.componentConfiguration = componentConfigurations;
   }
 
   /**
