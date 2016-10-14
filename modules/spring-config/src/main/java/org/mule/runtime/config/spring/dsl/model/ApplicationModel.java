@@ -304,8 +304,7 @@ public class ApplicationModel {
 
   private void convertArtifactConfigurationToComponentModel(ArtifactConfiguration artifactConfiguration) {
     if (artifactConfiguration != null) {
-      for (ComponentConfiguration componentConfiguration : artifactConfiguration.getComponentConfiguration().get(0)
-          .getNestedComponentConfiguration()) {
+      for (ComponentConfiguration componentConfiguration : artifactConfiguration.getComponentConfiguration()) {
         ComponentModel componentModel = convertComponentConfiguration(componentConfiguration, true);
         this.muleComponentModels.add(componentModel);
       }
@@ -324,11 +323,8 @@ public class ApplicationModel {
     for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponentConfiguration()) {
       builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration, false));
     }
-    ComponentModel componentModel = builder.build();
-    for (ComponentModel childComponent : componentModel.getInnerComponents()) {
-      childComponent.setParent(componentModel);
-    }
-    return componentModel;
+    return builder.build();
+
   }
 
   private void configurePropertyPlaceholderResolver(ArtifactConfig artifactConfig) {

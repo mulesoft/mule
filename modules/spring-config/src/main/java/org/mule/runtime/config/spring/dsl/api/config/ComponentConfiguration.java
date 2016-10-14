@@ -114,7 +114,7 @@ public class ComponentConfiguration {
      * @return
      */
     public Builder addNestedConfiguration(ComponentConfiguration componentConfiguration) {
-      this.componentConfiguration.nestedComponentConfiguration.add(componentConfiguration);
+      componentConfiguration.nestedComponentConfiguration.add(componentConfiguration);
       return this;
     }
 
