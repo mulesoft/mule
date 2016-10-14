@@ -124,7 +124,7 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
         super.doTearDown();
     }
 
-    private void createFtpServerBaseDir()
+    protected void createFtpServerBaseDir()
     {
         deleteFtpServerBaseDir();
         File ftpBaseDir = new File(FTP_SERVER_BASE_DIR);
@@ -137,7 +137,7 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
         ftpDir.mkdirs();
     }
 
-    private void deleteFtpServerBaseDir()
+    protected void deleteFtpServerBaseDir()
     {
         File ftpServerBase = new File(FTP_SERVER_BASE_DIR);
         FileUtils.deleteTree(ftpServerBase);
