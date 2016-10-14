@@ -232,6 +232,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(configurationProvider.get(event)).thenReturn(configurationInstance);
     when(configurationProvider.getConfigurationModel()).thenReturn(configurationModel);
+    when(configurationProvider.getName()).thenReturn(configurationName);
 
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 

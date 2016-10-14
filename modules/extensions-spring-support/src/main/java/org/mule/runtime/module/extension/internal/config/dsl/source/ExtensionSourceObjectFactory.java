@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -46,7 +47,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   private final SourceModel sourceModel;
   private final MuleContext muleContext;
 
-  private String configurationProviderName;
+  private ConfigurationProvider configurationProvider;
   private RetryPolicyTemplate retryPolicyTemplate;
 
   @Inject
@@ -67,7 +68,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     }
 
     ExtensionMessageSource messageSource =
-        new ExtensionMessageSource(extensionModel, sourceModel, getSourceFactory(resolverSet), configurationProviderName,
+        new ExtensionMessageSource(extensionModel, sourceModel, getSourceFactory(resolverSet), configurationProvider,
                                    getThreadingProfile(), getRetryPolicyTemplate(), (ExtensionManagerAdapter) muleContext
                                        .getExtensionManager());
     try {
@@ -116,7 +117,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
         + "Offending parameters are: [%s]", model.getName(), Joiner.on(',').join(dynamicParams))));
   }
 
-  public void setConfigurationProviderName(String configurationProviderName) {
-    this.configurationProviderName = configurationProviderName;
+  public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
+    this.configurationProvider = configurationProvider;
   }
 }

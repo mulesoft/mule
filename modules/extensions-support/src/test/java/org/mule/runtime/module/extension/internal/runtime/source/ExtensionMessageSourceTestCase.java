@@ -156,6 +156,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
     when(configurationProvider.get(any())).thenReturn(configurationInstance);
     when(configurationProvider.getConfigurationModel()).thenReturn(configurationModel);
+    when(configurationProvider.getName()).thenReturn(CONFIG_NAME);
 
     messageSource = getNewExtensionMessageSourceInstance();
   }
@@ -373,8 +374,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   }
 
   private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
-    ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, CONFIG_NAME,
-                                                                      threadingProfile, retryPolicyTemplate, extensionManager);
+    ExtensionMessageSource messageSource =
+        new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, configurationProvider,
+                                   threadingProfile, retryPolicyTemplate, extensionManager);
     messageSource.setListener(messageProcessor);
     messageSource.setFlowConstruct(flowConstruct);
     muleContext.getInjector().inject(messageSource);

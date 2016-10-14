@@ -49,7 +49,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     InterceptingOperationMessageProcessor messageProcessor =
-        new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationName, target, resolverSet,
+        new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                                   extensionManager);
 
     messageProcessor.setListener(next);

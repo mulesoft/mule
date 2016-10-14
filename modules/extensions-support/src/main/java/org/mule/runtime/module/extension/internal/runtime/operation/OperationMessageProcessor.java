@@ -90,11 +90,11 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
-                                   String configurationProviderName,
+                                   ConfigurationProvider configurationProvider,
                                    String target,
                                    ResolverSet resolverSet,
                                    ExtensionManagerAdapter extensionManager) {
-    super(extensionModel, operationModel, configurationProviderName, extensionManager);
+    super(extensionModel, operationModel, configurationProvider, extensionManager);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.resolverSet = resolverSet;
