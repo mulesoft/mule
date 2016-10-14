@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -47,7 +48,7 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
   public void insertNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')");
-    assertThat(parameters.getType(), is(typeBuilder.nullType().build()));
+    assertThat(parameters.getType(), is(instanceOf(VoidType.class)));
   }
 
   @Test

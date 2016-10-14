@@ -47,7 +47,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
     assertThat(metadata.isSuccess(), is(true));
     assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType(),
-               is(typeBuilder.nullType().build()));
+               is(typeBuilder.voidType().build()));
   }
 
   @Test
