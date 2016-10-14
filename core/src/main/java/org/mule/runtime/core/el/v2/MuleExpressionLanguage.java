@@ -6,18 +6,31 @@
  */
 package org.mule.runtime.core.el.v2;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.ServiceLoader.load;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class MuleExpressionLanguage implements ExpressionLanguage {
+
+  public static final String ATTRIBUTES = "attributes";
+  public static final String PAYLOAD = "payload";
+  public static final String ERROR = "error";
+  public static final String VARIABLES = "variables";
 
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
@@ -29,7 +42,7 @@ public class MuleExpressionLanguage implements ExpressionLanguage {
       this.expressionExecutor = executors.next();
       break;
     }
-    // TODO: MULE-10424 - Define bindings to use in Mule 4 (global ones)
+    // TODO: MULE-10765 - Define global bindings
     this.globalBindingContext = BindingContext.builder().build();
   }
 
@@ -42,7 +55,7 @@ public class MuleExpressionLanguage implements ExpressionLanguage {
   public TypedValue evaluate(String expression, BindingContext context, MuleEvent event) {
     BindingContext.Builder contextBuilder = BindingContext.builder();
     contextBuilder.addAll(context);
-    // TODO: MULE-10424 - Define bindings to use in Mule 4 (from the event)
+    addEventBindings(event, contextBuilder);
     return evaluate(expression, contextBuilder.build());
   }
 
@@ -60,7 +73,7 @@ public class MuleExpressionLanguage implements ExpressionLanguage {
   public TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, MuleEvent event) {
     BindingContext.Builder contextBuilder = BindingContext.builder();
     contextBuilder.addAll(context);
-    // TODO: MULE-10424 - Define bindings to use in Mule 4 (from the event)
+    addEventBindings(event, contextBuilder);
     return evaluate(expression, expectedOutputType, contextBuilder.build());
   }
 
@@ -72,6 +85,19 @@ public class MuleExpressionLanguage implements ExpressionLanguage {
   @Override
   public ValidationResult validate(String expression) {
     return expressionExecutor.validate(expression);
+  }
+
+  private void addEventBindings(MuleEvent event, BindingContext.Builder contextBuilder) {
+    Message message = event.getMessage();
+    Attributes attributes = message.getAttributes();
+    contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
+    contextBuilder.addBinding(PAYLOAD, message.getPayload());
+    Error error = event.getError().isPresent() ? event.getError().get() : null;
+    contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
+    Map<String, TypedValue> flowVars = new HashMap<>();
+    event.getVariableNames().forEach(name -> flowVars.put(name, event.getVariable(name)));
+    contextBuilder.addBinding(VARIABLES,
+                              new DefaultTypedValue(unmodifiableMap(flowVars), DataType.fromType(flowVars.getClass())));
   }
 
 }
