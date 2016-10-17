@@ -57,10 +57,12 @@ import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class},
     sharedRuntimeLibs = {"org.apache.derby:derby"})
+@Features("DB Extension")
 public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
   @Parameterized.Parameter(0)

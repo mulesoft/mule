@@ -154,4 +154,68 @@
         </plugins>
     </build>
 
+    <profiles>
+    <profile>
+        <id>allure</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <testFailureIgnore>false</testFailureIgnore>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${allure.aspectj.version}/aspectjweaver-${allure.aspectj.version}.jar
+                        </argLine>
+                        <properties>
+                            <property>
+                                <name>listener</name>
+                                <value>ru.yandex.qatools.allure.junit.AllureRunListener</value>
+                            </property>
+                        </properties>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.aspectj</groupId>
+                            <artifactId>aspectjweaver</artifactId>
+                            <version>${allure.aspectj.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <!--Needed only to show reports locally. Run jetty:run and open localhost:8080 to show the report-->
+                <plugin>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>9.2.10.v20150310</version>
+                    <configuration>
+                        <webAppSourceDirectory>${project.build.directory}/site/allure-maven-plugin</webAppSourceDirectory>
+                        <stopKey>stop</stopKey>
+                        <stopPort>1234</stopPort>
+                    </configuration>
+                </plugin>
+            </plugins>
+
+        </build>
+        <properties>
+            <allure.aspectj.version>1.7.4</allure.aspectj.version>
+        </properties>
+
+
+        <reporting>
+                <excludeDefaults>true</excludeDefaults>
+                <plugins>
+                    <plugin>
+                        <groupId>ru.yandex.qatools.allure</groupId>
+                        <artifactId>allure-maven-plugin</artifactId>
+                        <version>2.5</version>
+                    </plugin>
+                </plugins>
+            </reporting>
+    </profile>
+    </profiles>
+
+
+
+
 </project>
