@@ -64,16 +64,6 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
-        <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-junit-adaptor</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-java-annotations</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <pluginRepositories>
