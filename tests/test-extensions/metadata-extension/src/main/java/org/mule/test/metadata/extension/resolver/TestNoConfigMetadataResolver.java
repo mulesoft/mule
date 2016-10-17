@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputTypeResolver<Object>,
-    OutputTypeResolver<Object>, MetadataAttributesResolver<Object> {
+    OutputTypeResolver<Object>, AttributesTypeResolver<Object> {
 
   @Override
   public String getCategoryName() {
@@ -56,7 +56,7 @@ public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputType
   }
 
   @Override
-  public MetadataType getAttributesMetadata(MetadataContext context, Object key)
+  public MetadataType getAttributesType(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
     if (key instanceof NullMetadataKey) {
       return BaseTypeBuilder.create(JAVA).voidType().build();

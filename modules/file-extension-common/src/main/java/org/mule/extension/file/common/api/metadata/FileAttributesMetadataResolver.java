@@ -11,7 +11,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileSystem;
@@ -24,7 +24,7 @@ import java.util.Optional;
  *
  * @since 1.0
  */
-public final class FileAttributesMetadataResolver implements MetadataAttributesResolver {
+public final class FileAttributesMetadataResolver implements AttributesTypeResolver {
 
   private ClassTypeLoader typeLoader;
 
@@ -33,7 +33,7 @@ public final class FileAttributesMetadataResolver implements MetadataAttributesR
   }
 
   @Override
-  public MetadataType getAttributesMetadata(MetadataContext context, Object key)
+  public MetadataType getAttributesType(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
     Optional<FileSystem> connection = context.getConnection();
     FileSystem fileSystem =

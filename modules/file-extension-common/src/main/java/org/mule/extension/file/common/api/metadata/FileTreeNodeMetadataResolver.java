@@ -28,7 +28,7 @@ public class FileTreeNodeMetadataResolver implements OutputTypeResolver {
   @Override
   public MetadataType getOutputType(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
-    MetadataType attributes = attributesResolver.getAttributesMetadata(context, key);
+    MetadataType attributes = attributesResolver.getAttributesType(context, key);
     ObjectTypeBuilder<?> treeNode = create(JAVA).objectType();
     treeNode.addField().key("attributes").value(attributes);
     treeNode.addField().key("content").value().anyType();

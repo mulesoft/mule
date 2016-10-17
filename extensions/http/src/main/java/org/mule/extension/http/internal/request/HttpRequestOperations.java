@@ -71,7 +71,7 @@ public class HttpRequestOperations {
    * @return an {@link OperationResult} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
-  @OutputResolver(HttpMetadataResolver.class)
+  @OutputResolver(output = HttpMetadataResolver.class)
   public OperationResult<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
                                                                  @Optional @Placement(tab = ADVANCED,
                                                                      group = "Response Validation Settings") ResponseValidator responseValidator,

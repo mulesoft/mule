@@ -90,7 +90,6 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA = "outputAttributesWithDynamicMetadata";
   protected static final String OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA =
       "outputAttributesWithDeclaredSubtypesMetadata";
-  protected static final String RESOLVER_KEYS_WITH_CONTEXT_CLASSLOADER = "resolverTypeKeysWithContextClassLoader";
   protected static final String RESOLVER_CONTENT_WITH_CONTEXT_CLASSLOADER = "resolverContentWithContextClassLoader";
   protected static final String RESOLVER_OUTPUT_WITH_CONTEXT_CLASSLOADER = "resolverOutputWithContextClassLoader";
   protected static final String ENUM_METADATA_KEY = "enumMetadataKey";

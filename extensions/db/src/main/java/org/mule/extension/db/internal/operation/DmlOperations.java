@@ -75,7 +75,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return depending on the value of {@code streaming}, it can be a {@link List} or {@link Iterator} of maps
    * @throws SQLException if an error is produced
    */
-  @OutputResolver(SelectMetadataResolver.class)
+  @OutputResolver(output = SelectMetadataResolver.class)
   public InterceptingCallback<Object> select(@ParameterGroup QueryDefinition query,
                                              @Optional(defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,
                                              @ParameterGroup StatementAttributes statementAttributes,
@@ -165,7 +165,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return A {@link Map} with the procedure's output
    * @throws SQLException if an error is produced
    */
-  @OutputResolver(StoredProcedureMetadataResolver.class)
+  @OutputResolver(output = StoredProcedureMetadataResolver.class)
   public InterceptingCallback<Map<String, Object>> storedProcedure(@ParameterGroup StoredProcedureCall call,
                                                                    @Optional(
                                                                        defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,
