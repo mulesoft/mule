@@ -26,6 +26,8 @@ import org.apache.cxf.phase.Phase;
 
 /**
  * CXF interceptor that adds inbound properties to the Mule message based on the SOAP headers received in the response.
+ *
+ * @since 4.0
  */
 public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
 

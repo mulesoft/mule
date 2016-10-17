@@ -34,9 +34,12 @@ import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AG
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 import org.mule.functional.listener.Callback;
+import org.mule.metadata.api.model.DateType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -219,8 +222,6 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     componentId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
 
     final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
-
-
     assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
     assertSuccess(metadataDescriptor.getInputMetadata());
@@ -253,6 +254,17 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   }
 
   @Test
+  public void attributesDynamicPersonTypeMetadata() throws Exception {
+    componentId = new ProcessorId(OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA, FIRST_PROCESSOR_INDEX);
+    final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
+    MetadataType type = metadataDescriptor.getOutputMetadata().get().getAttributesMetadata().get().getType();
+    assertThat(type, is(instanceOf(DictionaryType.class)));
+    DictionaryType dictionary = (DictionaryType) type;
+    assertThat(dictionary.getKeyType(), is(instanceOf(DateType.class)));
+    assertThat(dictionary.getValueType(), is(instanceOf(StringType.class)));
+  }
+
+  @Test
   public void attributesUnionTypeMetadata() throws Exception {
     componentId = new ProcessorId(OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
 
@@ -280,8 +292,6 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
 
     final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
-
-
     assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
     assertSuccess(metadataDescriptor.getInputMetadata());

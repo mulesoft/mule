@@ -100,7 +100,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     }
 
     return resolveMetadataType(false, attributes.getType(),
-                               () -> resolverFactory.getOutputAttributesResolver().getAttributesMetadata(context, key),
+                               () -> resolverFactory.getOutputAttributesResolver().getAttributesType(context, key),
                                "OutputAttributes");
   }
 
