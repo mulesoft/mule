@@ -24,7 +24,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  * not. If no response is needed, the operation metadata should behave like a void operation.
  */
 public class SocketMetadataResolver
-    implements OutputTypeResolver<String>, MetadataAttributesResolver<String>, TypeKeysResolver {
+    implements OutputTypeResolver<String>, AttributesTypeResolver<String>, TypeKeysResolver {
 
   private final ClassTypeLoader typeLoader =
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClass().getClassLoader());
@@ -57,7 +57,7 @@ public class SocketMetadataResolver
   }
 
   @Override
-  public MetadataType getAttributesMetadata(MetadataContext context, String key)
+  public MetadataType getAttributesType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     return valueOf(key) ? typeLoader.load(ImmutableSocketAttributes.class)
         : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();

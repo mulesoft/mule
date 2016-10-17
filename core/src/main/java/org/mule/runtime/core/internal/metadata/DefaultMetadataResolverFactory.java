@@ -10,7 +10,7 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.core.util.ClassUtils.getClassName;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
@@ -33,22 +33,24 @@ import java.util.Map;
 public final class DefaultMetadataResolverFactory implements MetadataResolverFactory {
 
   private final OutputTypeResolver outputTypeResolver;
-  private final MetadataAttributesResolver metadataAttributesResolver = new NullMetadataResolver();
+  private final AttributesTypeResolver attributesTypeResolver;
   private final Map<String, InputTypeResolver> inputResolvers = new HashMap<>();
   private final TypeKeysResolver keysResolver;
 
   public DefaultMetadataResolverFactory(Class<? extends TypeKeysResolver> keyResolver,
                                         Map<String, Class<? extends InputTypeResolver>> typeResolvers,
                                         Class<? extends OutputTypeResolver> outputResolver,
-                                        Class<? extends MetadataAttributesResolver> attributesResolver) {
+                                        Class<? extends AttributesTypeResolver> attributesResolver) {
 
     checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
     checkArgument(typeResolvers != null, "InputTypeResolvers cannot be null");
     checkArgument(outputResolver != null, "OutputTypeResolver type cannot be null");
+    checkArgument(attributesResolver != null, "AttributesTypeResolver type cannot be null");
 
     typeResolvers.forEach((k, v) -> inputResolvers.put(k, instantiateResolver(v)));
     keysResolver = instantiateResolver(keyResolver);
     outputTypeResolver = instantiateResolver(outputResolver);
+    attributesTypeResolver = instantiateResolver(attributesResolver);
   }
 
   /**
@@ -79,8 +81,8 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
    * {@inheritDoc}
    */
   @Override
-  public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
-    return metadataAttributesResolver;
+  public <T> AttributesTypeResolver<T> getOutputAttributesResolver() {
+    return attributesTypeResolver;
   }
 
   /**

@@ -30,6 +30,7 @@
         <module>sockets</module>
         <module>validation</module>
         <module>email</module>
+        <module>wsc</module>
     </modules>
 
     <dependencies>

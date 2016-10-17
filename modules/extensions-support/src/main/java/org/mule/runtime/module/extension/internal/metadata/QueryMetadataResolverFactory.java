@@ -10,7 +10,7 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.core.util.ClassUtils.getClassName;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolve
  * A {@link MetadataResolverFactory} implementation for {@link Query} operations, it provides initialized instances of
  * {@link OutputTypeResolver} and {@link QueryEntityResolver}.
  *
- * {@link MetadataAttributesResolver}, {@link InputTypeResolver} and {@link TypeKeysResolver} returned instances are
+ * {@link AttributesTypeResolver}, {@link InputTypeResolver} and {@link TypeKeysResolver} returned instances are
  * always instances of {@link NullMetadataResolver}.
  *
  * @since 4.0
@@ -63,8 +63,8 @@ public final class QueryMetadataResolverFactory implements MetadataResolverFacto
    * {@inheritDoc}
    */
   @Override
-  public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
-    return (MetadataAttributesResolver<T>) new NullMetadataResolver();
+  public <T> AttributesTypeResolver<T> getOutputAttributesResolver() {
+    return (AttributesTypeResolver<T>) new NullMetadataResolver();
   }
 
   /**

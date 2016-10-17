@@ -1,0 +1,3 @@
+<con:echoWithHeaders xmlns:con="http://consumer.ws.extension.mule.org/">
+    <text>test</text>
+</con:echoWithHeaders>
