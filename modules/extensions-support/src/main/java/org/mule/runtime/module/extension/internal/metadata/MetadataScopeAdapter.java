@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -41,7 +41,7 @@ public final class MetadataScopeAdapter {
   private Class<? extends TypeKeysResolver> keysResolver = NullMetadataResolver.class;
   private Class<? extends OutputTypeResolver> outputResolver = NullMetadataResolver.class;
   private Map<String, Class<? extends InputTypeResolver>> inputResolvers = new HashMap<>();
-  private Class<? extends MetadataAttributesResolver> attributesResolver = NullMetadataResolver.class;
+  private Class<? extends AttributesTypeResolver> attributesResolver = NullMetadataResolver.class;
 
   public MetadataScopeAdapter(Class<?> extensionType, Method operation, OperationDeclaration declaration) {
     OutputResolver outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
@@ -54,9 +54,9 @@ public final class MetadataScopeAdapter {
 
     if (outputResolverDeclaration != null || !inputResolvers.isEmpty()) {
       if (outputResolverDeclaration != null) {
-        outputResolver = outputResolverDeclaration.value();
+        outputResolver = outputResolverDeclaration.output();
+        attributesResolver = outputResolverDeclaration.attributes();
       }
-
       if (keyId.isPresent()) {
         keysResolver = keyId.get().value();
       }
@@ -76,6 +76,7 @@ public final class MetadataScopeAdapter {
     if (scope != null) {
       this.keysResolver = scope.keysResolver();
       this.outputResolver = scope.outputResolver();
+      this.attributesResolver = scope.attributesResolver();
     }
   }
 
@@ -124,7 +125,7 @@ public final class MetadataScopeAdapter {
     return outputResolver;
   }
 
-  public Class<? extends MetadataAttributesResolver> getAttributesResolver() {
+  public Class<? extends AttributesTypeResolver> getAttributesResolver() {
     return attributesResolver;
   }
 

@@ -15,7 +15,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -45,7 +44,7 @@ public class SocketOperations {
    *        input.
    * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
    */
-  @OutputResolver(SocketMetadataResolver.class)
+  @OutputResolver(output = SocketMetadataResolver.class)
   public OperationResult<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
                                     @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
                                     @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,

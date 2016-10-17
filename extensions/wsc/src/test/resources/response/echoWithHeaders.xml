@@ -1,0 +1,3 @@
+<ns2:echoWithHeadersResponse xmlns:ns2="http://consumer.ws.extension.mule.org/">
+    <text>test response</text>
+</ns2:echoWithHeadersResponse>

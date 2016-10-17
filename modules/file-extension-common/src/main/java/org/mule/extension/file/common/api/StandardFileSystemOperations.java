@@ -63,7 +63,7 @@ public class StandardFileSystemOperations {
    * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
    */
   @Summary("List all the files from given directory")
-  @OutputResolver(FileTreeNodeMetadataResolver.class)
+  @OutputResolver(output = FileTreeNodeMetadataResolver.class)
   public TreeNode list(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String directoryPath,
                        @Optional(defaultValue = "false") boolean recursive, Message message,
                        @Optional @Summary("Matcher to filter the listed files") @Placement(

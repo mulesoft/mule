@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.metadata;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
@@ -53,11 +53,11 @@ public class NullMetadataResolverFactory implements MetadataResolverFactory {
   }
 
   /**
-   * @return a {@link NullMetadataResolver} instance implementation of {@link MetadataAttributesResolver}
+   * @return a {@link NullMetadataResolver} instance implementation of {@link AttributesTypeResolver}
    */
   @Override
-  public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
-    return (MetadataAttributesResolver<T>) metadataResolver;
+  public <T> AttributesTypeResolver<T> getOutputAttributesResolver() {
+    return (AttributesTypeResolver<T>) metadataResolver;
   }
 
   /**

@@ -1,0 +1,3 @@
+<con:fail xmlns:con="http://consumer.ws.extension.mule.org/">
+    <text>test</text>
+</con:fail>

@@ -18,7 +18,7 @@ import org.mule.test.metadata.extension.resolver.TestMetadataResolverRuntimeExce
 public class MetadataFailureOperations extends MetadataOperationsParent {
 
   // NamedTypeResolver throws MetadataResolvingException
-  @OutputResolver(TestMetadataResolverMetadataResolvingFailure.class)
+  @OutputResolver(output = TestMetadataResolverMetadataResolvingFailure.class)
   public Object failWithResolvingException(@Connection MetadataConnection connection,
                                            @MetadataKeyId(TestMetadataResolverMetadataResolvingFailure.class) String type,
                                            @Optional @Content @TypeResolver(TestMetadataResolverMetadataResolvingFailure.class) Object content) {
@@ -30,7 +30,7 @@ public class MetadataFailureOperations extends MetadataOperationsParent {
 
   // Resolver for content and output type
   // With keysResolver and KeyParam
-  @OutputResolver(TestMetadataResolverRuntimeExceptionFailure.class)
+  @OutputResolver(output = TestMetadataResolverRuntimeExceptionFailure.class)
   public Object failWithRuntimeException(@Connection MetadataConnection connection,
                                          @MetadataKeyId(TestMetadataResolverRuntimeExceptionFailure.class) String type,
                                          @Optional @TypeResolver(TestMetadataResolverRuntimeExceptionFailure.class) Object content) {

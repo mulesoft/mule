@@ -13,13 +13,13 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 import java.util.Set;
 
 public class TestInputAndOutputWithAttributesResolverWithKeyResolver implements TypeKeysResolver,
-    InputTypeResolver<String>, OutputTypeResolver<String>, MetadataAttributesResolver<String> {
+    InputTypeResolver<String>, OutputTypeResolver<String>, AttributesTypeResolver<String> {
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
@@ -37,7 +37,7 @@ public class TestInputAndOutputWithAttributesResolverWithKeyResolver implements 
   }
 
   @Override
-  public MetadataType getAttributesMetadata(MetadataContext context, String key)
+  public MetadataType getAttributesType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     return TestMetadataResolverUtils.getMetadata(key);
   }
