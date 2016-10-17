@@ -63,6 +63,13 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-services-all</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Mule Plugins -->
         <dependency>

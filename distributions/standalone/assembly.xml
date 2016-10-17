@@ -171,6 +171,16 @@
             </excludes>
         </dependencySet>
 
+        <!-- Mule Services -->
+        <dependencySet>
+            <outputDirectory>services</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+            <useStrictFiltering>true</useStrictFiltering>
+            <includes>
+                <include>org.mule.services:mule-service-scheduler</include>
+            </includes>
+        </dependencySet>
+        
         <!-- 3rd-party libraries -->
         <dependencySet>
             <outputDirectory>lib/opt</outputDirectory>
@@ -197,6 +207,7 @@
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.extensions:mule-extensions-all</exclude>
+                <exclude>org.mule.services:mule-services-all</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-artifact</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>

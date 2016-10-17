@@ -171,6 +171,14 @@
             <type>zip</type>
         </dependency>
 
+        <!-- Include all Mule Services -->
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-services-all</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+        </dependency>
+
         <!-- Include all Mule Extensions -->
         <dependency>
             <groupId>org.mule.extensions</groupId>
