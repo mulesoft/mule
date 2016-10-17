@@ -10,7 +10,7 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.test.module.http.functional.matcher.HttpResponseContentStringMatcher.contentValue;
+import static org.mule.test.module.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -53,7 +53,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(insecureModeUrl);
 
     assertThat(response, hasStatusCode(SC_OK));
-    assertThat(response, contentValue(is(OK_RESPONSE)));
+    assertThat(response, body(is(OK_RESPONSE)));
   }
 
   @Test
@@ -61,7 +61,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(secureModeUrl);
 
     assertThat(response, hasStatusCode(SC_OK));
-    assertThat(response, contentValue(is(OK_RESPONSE)));
+    assertThat(response, body(is(OK_RESPONSE)));
   }
 
   @Test
@@ -69,7 +69,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(secureModeInvalidUrl);
 
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
-    assertThat(response, contentValue(is(ERROR_RESPONSE)));
+    assertThat(response, body(is(ERROR_RESPONSE)));
   }
 
   @Test
@@ -77,7 +77,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(defaultModeUrl);
 
     assertThat(response, hasStatusCode(SC_OK));
-    assertThat(response, contentValue(is(OK_RESPONSE)));
+    assertThat(response, body(is(OK_RESPONSE)));
   }
 
   @Test
@@ -85,7 +85,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(defaultModeInvalidUrl);
 
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
-    assertThat(response, contentValue(is(ERROR_RESPONSE)));
+    assertThat(response, body(is(ERROR_RESPONSE)));
   }
 
 }
