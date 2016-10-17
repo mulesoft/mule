@@ -8,19 +8,19 @@ package org.mule.test.subtypes.extension;
 
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.test.vegan.extension.VeganCookBook;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 
+@MetadataScope(outputResolver = SubtypesOutputResolver.class)
 public class SubTypesTestOperations {
 
   public ParentShape shapeRetriever(ParentShape shape) {

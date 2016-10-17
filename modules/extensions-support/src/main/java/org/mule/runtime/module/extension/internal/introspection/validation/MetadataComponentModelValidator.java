@@ -6,19 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang.StringUtils.join;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
-import static org.mule.runtime.core.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
+import com.google.common.collect.ImmutableList;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.NamedObject;
@@ -39,12 +30,23 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolve
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang.StringUtils.join;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 
 /**
  * Validates that all {@link OperationModel operations} which return type is a {@link Object} or a {@link Map} have defined a
@@ -130,33 +132,25 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
 
   private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel component) {
-    MetadataResolverFactory resolverFactory = getMetadataResolverFactory(component);
-    if (!(resolverFactory.getOutputResolver() instanceof NullMetadataResolver)) {
-      return;
+    if (getMetadataResolverFactory(component).getOutputResolver() instanceof NullMetadataResolver) {
+      component.getOutput().getType().accept(new MetadataTypeVisitor() {
+
+        @Override
+        public void visitObject(ObjectType objectType) {
+          failIfTypeIsObject(component, extensionModel, objectType);
+        }
+
+        @Override
+        public void visitDictionary(DictionaryType dictionaryType) {
+          failIfTypeIsObject(component, extensionModel, dictionaryType.getValueType());
+        }
+
+        @Override
+        public void visitArrayType(ArrayType arrayType) {
+          arrayType.getType().accept(this);
+        }
+      });
     }
-
-    component.getOutput().getType().accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (Object.class.equals(getType(objectType))) {
-          throw new IllegalModelDefinitionException(format("%s '%s' specifies '%s' as a return type. Operations and Sources with "
-              + "return type such as Object or Map must have defined a not null OutputTypeResolver",
-                                                           component.getName(),
-                                                           extensionModel.getName(), getId(objectType)));
-        }
-      }
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        if (Object.class.equals(getType(dictionaryType.getValueType()))) {
-          throw new IllegalModelDefinitionException(format("%s '%s' specifies '%s' as a return type. Operations and Sources with "
-              + "return type such as Object or Map must have defined a not null OutputTypeResolver",
-                                                           component.getName(),
-                                                           extensionModel.getName(), getId(dictionaryType)));
-        }
-      }
-    });
   }
 
   private void validateCategoriesInScope(ComponentModel componentModel, MetadataResolverFactory metadataResolverFactory) {
@@ -194,6 +188,16 @@ public class MetadataComponentModelValidator implements ModelValidator {
                                                        "%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found [%s]",
                                                        getComponentModelTypeName(componentModel), componentModel.getName(),
                                                        join(names, ",")));
+    }
+  }
+
+  private void failIfTypeIsObject(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType type) {
+    if (Object.class.equals(getType(type))) {
+      String componentTypeName = getComponentModelTypeName(componentModel);
+      throw new IllegalModelDefinitionException(format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Operations and Sources with "
+          + "return type such as Object or Map (or a collection of any of those) must have defined a not null OutputTypeResolver",
+                                                       extensionModel.getName(), componentTypeName, componentModel.getName(),
+                                                       getId(type)));
     }
   }
 }
