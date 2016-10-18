@@ -8,11 +8,11 @@ package org.mule.test.service.scheduler;
 
 import static java.lang.Thread.currentThread;
 
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.ExecutionException;

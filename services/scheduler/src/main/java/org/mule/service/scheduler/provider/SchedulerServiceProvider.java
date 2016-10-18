@@ -8,9 +8,9 @@ package org.mule.service.scheduler.provider;
 
 import static java.util.Collections.singletonList;
 
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.scheduler.internal.DefaultSchedulerService;
 
 import java.util.List;

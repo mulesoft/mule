@@ -11,7 +11,7 @@ import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.Collection;

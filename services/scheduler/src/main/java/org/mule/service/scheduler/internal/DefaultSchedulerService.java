@@ -10,11 +10,11 @@ import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.util.concurrent.ArrayBlockingQueue;
