@@ -6,35 +6,37 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import com.google.common.collect.ImmutableSet;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 
-import com.google.common.collect.ImmutableSet;
-
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 /**
  * Utility class which calculates the default set of java package names and resources that a given extension should export in
@@ -48,7 +50,7 @@ final class ExportedArtifactsCollector {
   private final Set<String> filteredPackages = ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.").build();
 
   private final ExtensionModel extensionModel;
-  private final ImmutableSet.Builder<Class> exportedClasses = ImmutableSet.builder();
+  private final Set<Class> exportedClasses = new LinkedHashSet<>();
   private final ImmutableSet.Builder<String> exportedResources = ImmutableSet.builder();
   private final ClassLoader extensionClassloader;
 
@@ -82,7 +84,7 @@ final class ExportedArtifactsCollector {
     collectDefault();
     collectManuallyExportedPackages();
 
-    Set<String> exportedPackages = exportedClasses.build().stream().filter(type -> type.getPackage() != null)
+    Set<String> exportedPackages = exportedClasses.stream().filter(type -> type.getPackage() != null)
         .map(type -> type.getPackage().getName()).collect(toSet());
 
     return filterExportedPackages(exportedPackages);
@@ -151,13 +153,18 @@ final class ExportedArtifactsCollector {
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        dictionaryType.getKeyType().accept(this);
-        dictionaryType.getValueType().accept(this);
+        addType(dictionaryType.getKeyType(), exportedClasses);
+        addType(dictionaryType.getValueType(), exportedClasses);
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
+        addType(arrayType.getType(), exportedClasses);
+      }
+
+      @Override
+      public void visitObjectField(ObjectFieldType objectFieldType) {
+        addType(objectFieldType.getValue(), exportedClasses);
       }
 
       @Override
@@ -167,6 +174,7 @@ final class ExportedArtifactsCollector {
           classInformation.get().getGenericTypes().forEach(generic -> exportedClasses.add(loadClass(generic)));
         }
         exportedClasses.add(getType(objectType));
+        objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
       }
 
       @Override
@@ -174,6 +182,12 @@ final class ExportedArtifactsCollector {
         Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
         if (enumAnnotation.isPresent()) {
           exportedClasses.add(getType(stringType));
+        }
+      }
+
+      private void addType(MetadataType type, Set<Class> exportedClasses) {
+        if (!exportedClasses.contains(getType(type))) {
+          type.accept(this);
         }
       }
 

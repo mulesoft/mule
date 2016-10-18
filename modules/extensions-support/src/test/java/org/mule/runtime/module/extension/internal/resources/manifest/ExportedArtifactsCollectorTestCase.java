@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.google.common.reflect.TypeToken;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
@@ -26,18 +25,18 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.vegan.extension.VeganAttributes;
 
-import com.google.common.reflect.TypeToken;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExportedArtifactsCollectorTestCase {
@@ -45,6 +44,7 @@ public class ExportedArtifactsCollectorTestCase {
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   private static final String APPLE_PACKAGE = "org.mule.tck.testmodels.fruit";
+  private static final String PEEL_PACKAGE = "org.mule.tck.testmodels.fruit.peel";
   private static final String VEGAN_PACKAGE = "org.mule.test.vegan.extension";
   private static final String SHAPE_PACKAGE = "org.mule.test.metadata.extension.model.shapes";
 
@@ -74,8 +74,8 @@ public class ExportedArtifactsCollectorTestCase {
   @Test
   public void collect() {
     Set<String> exportedPackages = collector.getExportedPackages();
-    assertThat(exportedPackages, hasSize(3));
-    assertThat(exportedPackages, hasItems(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE));
+    assertThat(exportedPackages, hasSize(4));
+    assertThat(exportedPackages, hasItems(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE));
   }
 
   private OutputModel mockOutputModel(Type type) {
