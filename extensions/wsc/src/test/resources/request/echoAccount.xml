@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:echoAccount xmlns:con="http://consumer.ws.extension.mule.org/">
+    <account>
+        <id>12</id>
+        <items>chocolate</items>
+        <items>banana</items>
+        <items>dulce de leche</items>
+        <startingDate>2016-09-23T00:00:00-03:00</startingDate>
+    </account>
+    <name>Juan</name>
+</con:echoAccount>

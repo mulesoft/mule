@@ -1,0 +1,3 @@
+<ns2:noParamsResponse xmlns:ns2="http://consumer.ws.extension.mule.org/">
+    <text>response</text>
+</ns2:noParamsResponse>

@@ -1,0 +1,3 @@
+<ns2:noParamsWithHeaderResponse xmlns:ns2="http://consumer.ws.extension.mule.org/">
+    <text>Header In Value</text>
+</ns2:noParamsWithHeaderResponse>

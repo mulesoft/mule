@@ -1,0 +1,30 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <ws:config name="config">
+        <ws:connection address="http://localhost:${port}/testService"
+                       soapVersion="SOAP11"
+                       service="TestService"
+                       port="TestPort"
+                       wsdlLocation="http://localhost:${port}/testService?wsdl"/>
+    </ws:config>
+
+    <flow name="getEchoMetadata">
+        <ws:consume config-ref="config" operation="echo" body="#[payload]"/>
+    </flow>
+
+    <flow name="getNoParams">
+        <ws:consume config-ref="config" operation="noParams" body="#[payload]"/>
+    </flow>
+
+    <flow name="getEchoHeadersMetadata">
+        <ws:consume config-ref="config" operation="echoWithHeaders" body="#[payload]"/>
+    </flow>
+
+    <flow name="getEchoAccountMetadata">
+        <ws:consume config-ref="config" operation="echoAccount" body="#[payload]"/>
+    </flow>
+</mule>
