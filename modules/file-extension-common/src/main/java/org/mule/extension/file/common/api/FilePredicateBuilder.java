@@ -6,17 +6,17 @@
  */
 package org.mule.extension.file.common.api;
 
-import static java.lang.String.format;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
+import org.mule.extension.file.common.api.matcher.PathMatcherPredicate;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.extension.file.common.api.matcher.PathMatcherPredicate;
 
 import java.util.function.Predicate;
+
+import static java.lang.String.format;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 /**
  * Builds a {@link Predicate} which verifies that a {@link FileAttributes} instance is compliant with a number of criterias. This
@@ -157,6 +157,34 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
    */
   protected Predicate<Attributes> addConditions(Predicate<Attributes> predicate) {
     return predicate;
+  }
+
+  public String getFilenamePattern() {
+    return filenamePattern;
+  }
+
+  public String getPathPattern() {
+    return pathPattern;
+  }
+
+  public Boolean getDirectory() {
+    return directory;
+  }
+
+  public Boolean getRegularFile() {
+    return regularFile;
+  }
+
+  public Boolean getSymbolicLink() {
+    return symbolicLink;
+  }
+
+  public Long getMinSize() {
+    return minSize;
+  }
+
+  public Long getMaxSize() {
+    return maxSize;
   }
 
   public T setFilenamePattern(String filenamePattern) {

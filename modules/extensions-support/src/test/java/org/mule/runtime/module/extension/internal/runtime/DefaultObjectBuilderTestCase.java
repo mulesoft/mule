@@ -6,30 +6,30 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
-import org.mule.test.heisenberg.extension.model.LifetimeInfo;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
+import org.mule.test.heisenberg.extension.model.LifetimeInfo;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -56,9 +56,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   public void before() {
     builder = new DefaultObjectBuilder(PROTOTYPE_CLASS);
 
-    nameField = getField(PROTOTYPE_CLASS, "name");
-    ageField = getField(PROTOTYPE_CLASS, "age");
-    lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo");
+    nameField = getField(PROTOTYPE_CLASS, "name").get();
+    ageField = getField(PROTOTYPE_CLASS, "age").get();
+    lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo").get();
   }
 
   @Test

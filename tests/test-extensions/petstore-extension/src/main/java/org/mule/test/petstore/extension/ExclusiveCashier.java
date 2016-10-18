@@ -32,6 +32,10 @@ public class ExclusiveCashier {
   @ParameterGroup
   private BankAccount account;
 
+  public String getCashierName() {
+    return cashierName;
+  }
+
   public String getRothIRA() {
     return rothIRA;
   }
@@ -42,5 +46,9 @@ public class ExclusiveCashier {
 
   public BankAccount getAccount() {
     return account;
+  }
+
+  public PhoneNumber getPhoneNumber() {
+    return phoneNumber;
   }
 }

@@ -30,7 +30,7 @@ public class Apple implements Fruit, Callable, MuleContextAware {
   private boolean bitten = false;
   private boolean washed = false;
 
-  private FruitCleaner cleaner;
+  private FruitCleaner appleCleaner;
 
   private Seed seed;
 
@@ -43,14 +43,14 @@ public class Apple implements Fruit, Callable, MuleContextAware {
   }
 
   public void wash() {
-    if (cleaner != null) {
-      cleaner.wash(this);
+    if (appleCleaner != null) {
+      appleCleaner.wash(this);
     }
     washed = true;
   }
 
   public void polish() {
-    cleaner.polish(this);
+    appleCleaner.polish(this);
   }
 
   public boolean isWashed() {
@@ -84,11 +84,11 @@ public class Apple implements Fruit, Callable, MuleContextAware {
 
 
   public FruitCleaner getAppleCleaner() {
-    return cleaner;
+    return appleCleaner;
   }
 
   public void setAppleCleaner(FruitCleaner cleaner) {
-    this.cleaner = cleaner;
+    this.appleCleaner = cleaner;
   }
 
   public Object methodReturningNull() {
@@ -140,5 +140,9 @@ public class Apple implements Fruit, Callable, MuleContextAware {
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  public MuleContext getMuleContext() {
+    return muleContext;
   }
 }

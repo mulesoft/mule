@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
-
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -33,6 +30,9 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
 
 import java.lang.reflect.Field;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for annotated component
@@ -160,7 +160,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
     List<FieldElement> annotatedFields = paramGroupType.getAnnotatedFields(Parameter.class);
     if (annotatedFields.isEmpty()) {
       annotatedFields =
-          getFieldsWithGetterAndSetters(paramGroupType.getDeclaringClass()).stream().map(FieldWrapper::new).collect(toList());
+          getFieldsWithGetters(paramGroupType.getDeclaringClass()).stream().map(FieldWrapper::new).collect(toList());
     }
 
     annotatedFields.forEach(field -> parameterGroup.addParameter(field.getField()));

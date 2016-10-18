@@ -20,4 +20,12 @@ public class ExclusivePetBreeder {
   @Optional
   @Parameter
   private String birds;
+
+  public String getBirds() {
+    return birds;
+  }
+
+  public String getMammals() {
+    return mammals;
+  }
 }

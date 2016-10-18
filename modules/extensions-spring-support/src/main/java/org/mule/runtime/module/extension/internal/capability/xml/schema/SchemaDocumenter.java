@@ -6,27 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
-import org.mule.runtime.extension.api.annotation.Configuration;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.CollectionUtils;
-
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Map;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -34,6 +24,15 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.util.Collection;
+import java.util.Map;
+
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 /**
  * Utility class that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel} has already been described and
@@ -121,10 +120,9 @@ final class SchemaDocumenter {
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {
       Class<?> declaringClass = AnnotationProcessorUtils.classFor(traversingElement, processingEnv);
       for (ParameterDeclaration parameter : parameters) {
-        Field field = IntrospectionUtils.getField(declaringClass, parameter);
-        if (field != null && variableElements.containsKey(field.getName())) {
-          parameter.setDescription(getJavaDocSummary(processingEnv, variableElements.get(field.getName())));
-        }
+        getField(declaringClass, parameter).filter(field -> variableElements.containsKey(field.getName()))
+            .ifPresent(field -> parameter
+                .setDescription(getJavaDocSummary(processingEnv, variableElements.get(field.getName()))));
       }
 
       traversingElement = (TypeElement) processingEnv.getTypeUtils().asElement(traversingElement.getSuperclass());

@@ -55,4 +55,8 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   public Map<String, String> getQueryParams() {
     return queryParams;
   }
+
+  public Map<String, String> getUriParams() {
+    return uriParams;
+  }
 }

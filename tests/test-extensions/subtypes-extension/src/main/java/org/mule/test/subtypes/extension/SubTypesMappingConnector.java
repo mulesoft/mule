@@ -92,8 +92,12 @@ public class SubTypesMappingConnector {
     return pojoListTwo;
   }
 
-  public ExtensiblePojo getExtensiblePojo() {
+  public ExtensiblePojo getPojoWithExtension() {
     return pojoWithExtension;
+  }
+
+  public Weapon getExtensibleWeapon() {
+    return extensibleWeapon;
   }
 
   public ParentShape getAbstractShape() {

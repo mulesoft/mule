@@ -22,4 +22,16 @@ public class RecursiveChainA {
 
   @Parameter
   List<RecursiveChainB> bChains;
+
+  public String getFieldA() {
+    return fieldA;
+  }
+
+  public RecursiveChainB getChainB() {
+    return chainB;
+  }
+
+  public List<RecursiveChainB> getbChains() {
+    return bChains;
+  }
 }

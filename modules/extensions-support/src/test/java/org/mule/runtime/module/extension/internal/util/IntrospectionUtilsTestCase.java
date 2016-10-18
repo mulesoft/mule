@@ -6,23 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertThat;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
-import static org.springframework.core.ResolvableType.forType;
+import org.junit.Test;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -39,6 +23,8 @@ import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.test.heisenberg.extension.model.LifetimeInfo;
+import org.mule.test.petstore.extension.PhoneNumber;
+import org.springframework.core.ResolvableType;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -53,8 +39,24 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.junit.Test;
-import org.springframework.core.ResolvableType;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
+import static org.springframework.core.ResolvableType.forType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
@@ -125,9 +127,15 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void getFieldsWithGettersOnly() {
+    Collection<Field> fieldsWithGetters = getFieldsWithGetters(PhoneNumber.class);
+    assertThat(fieldsWithGetters.size(), is(2));
+  }
+
+  @Test
   public void getWildCardFieldsDataTypes() {
 
-    Collection<Field> exposedFields = getExposedFields(FruitBox.class);
+    Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class);
     assertNotNull(exposedFields);
     assertEquals(6, exposedFields.size());
     assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);

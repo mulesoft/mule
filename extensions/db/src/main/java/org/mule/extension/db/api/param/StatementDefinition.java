@@ -60,7 +60,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
 
   /**
    * Returns a globally defined definition this instance points to. Can be {@code null}.
-   * 
+   *
    * @return Another definition of the same type or {@code null}
    */
   public abstract T getTemplate();
@@ -91,10 +91,9 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
     return resolvedDefinition;
   }
 
-
   /**
    * Returns a shallow copy of {@code this} instance.
-   * 
+   *
    * @return
    */
   protected T copy() {
@@ -114,12 +113,16 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
 
   /**
    * Returns the type for a given parameter
-   * 
+   *
    * @param paramName the parameter's name
    * @return an optional {@link ParameterType}
    */
   public java.util.Optional<ParameterType> getParameterType(String paramName) {
     return parameterTypes.stream().filter(p -> p.getKey().equals(paramName)).findFirst();
+  }
+
+  public List<ParameterType> getParameterTypes() {
+    return parameterTypes;
   }
 
   public String getSql() {
