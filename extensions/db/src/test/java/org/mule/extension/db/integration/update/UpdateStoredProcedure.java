@@ -22,7 +22,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Stories("Update Statement")
 public class UpdateStoredProcedure extends AbstractDbIntegrationTestCase {
 
   @Override

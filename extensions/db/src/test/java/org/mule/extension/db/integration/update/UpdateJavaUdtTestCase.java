@@ -20,7 +20,9 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Stories("Update Statement")
 public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 
   @Parameterized.Parameters(name = "{2}")

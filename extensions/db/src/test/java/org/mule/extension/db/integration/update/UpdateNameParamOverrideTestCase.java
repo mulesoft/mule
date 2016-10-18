@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Stories("Update Statement")
 public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCase {
 
   @Override
