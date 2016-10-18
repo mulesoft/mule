@@ -6,17 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -47,13 +43,21 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -133,10 +137,15 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
 
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
+    when(operationModel.getOutputAttributes())
+        .thenReturn(new ImmutableOutputModel(EMPTY, create(JAVA).voidType().build(), false, emptySet()));
     when(operationModel.getName()).thenReturn("operation");
     mockMetadataResolverFactory(operationModel, null);
 
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
+    when(sourceModel.getOutputAttributes())
+        .thenReturn(new ImmutableOutputModel(EMPTY, create(JAVA).voidType().build(), false, emptySet()));
+
     when(sourceModel.getName()).thenReturn("source");
     mockMetadataResolverFactory(sourceModel, null);
 
@@ -150,6 +159,21 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
                                                                    NullMetadataResolver.class));
+    validator.validate(extensionModel);
+  }
+
+  @Test
+  public void operationWithAttributeResolverButNoAttributes() {
+    exception.expect(IllegalModelDefinitionException.class);
+    when(extensionModel.getSourceModels()).thenReturn(emptyList());
+    mockMetadataResolverFactory(operationModel, new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
+                                                                                   SimpleOutputResolver.class,
+                                                                                   SimpleOutputResolver.class));
+
+    when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    when(operationModel.getOutputAttributes())
+        .thenReturn(new ImmutableOutputModel("", toMetadataType(void.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 
@@ -210,7 +234,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
     mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
                                                                                 SimpleOutputResolver.class,
-                                                                                SimpleOutputResolver.class));
+                                                                                NullMetadataResolver.class));
     validator.validate(extensionModel);
   }
 
@@ -220,7 +244,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
     mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
                                                                                 SimpleOutputResolver.class,
-                                                                                SimpleOutputResolver.class));
+                                                                                NullMetadataResolver.class));
     validator.validate(extensionModel);
   }
 
