@@ -13,7 +13,6 @@ import static org.junit.Assume.assumeThat;
 import static org.mule.extension.db.integration.DbTestUtil.DbType.MYSQL;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
-
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.Field;
@@ -27,11 +26,10 @@ import java.util.Map;
 import java.util.Random;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Update Statement")
+@Stories("Update Statement")
 public class UpdateTestCase extends AbstractDbIntegrationTestCase {
 
   private static final String PLUTO = "Pluto";
