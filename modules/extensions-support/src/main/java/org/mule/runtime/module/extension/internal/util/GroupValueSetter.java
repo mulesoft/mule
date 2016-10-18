@@ -12,8 +12,8 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
@@ -26,7 +26,7 @@ import java.util.Optional;
 /**
  * An implementation of {@link ValueSetter} for parameter groups. Parameter groups are a set of parameters defined inside a Pojo
  * in order to reference them as a group and avoid code repetition. The parameter groups are defined by applying the
- * {@link org.mule.runtime.extension.api.annotation.ParameterGroup} annotation to a field.
+ * {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup} annotation to a field.
  * <p/>
  * This {@link ValueSetter} knows how to map a {@link ResolverSetResult} to an object which acts as a group. Because group nesting
  * is allowed, this class is a composite with a {@link #childSetters} collection.
@@ -45,10 +45,12 @@ public final class GroupValueSetter implements ValueSetter {
    * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
    */
   public static List<ValueSetter> settersFor(EnrichableModel model) {
-    Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
+    return settersFor(model.getModelProperty(ParameterGroupModelProperty.class));
+  }
 
-    if (parameterGroupModelProperty.isPresent()) {
-      return parameterGroupModelProperty.get().getGroups().stream().map(group -> new GroupValueSetter(group))
+  public static List<ValueSetter> settersFor(Optional<ParameterGroupModelProperty> groupModelProperty) {
+    if (groupModelProperty.isPresent()) {
+      return groupModelProperty.get().getGroups().stream().map(group -> new GroupValueSetter(group))
           .collect(new ImmutableListCollector<>());
     }
 

@@ -64,7 +64,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
   }
 
   @Override
-  public Event getMuleEvent() throws MuleException {
+  public Event getEvent() throws MuleException {
     return this.sourceMuleEvent;
   }
 
@@ -74,12 +74,12 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
   }
 
   @Override
-  public void sendResponseToClient(Event muleEvent, ResponseCompletionCallback responseCompletationCallback)
+  public void sendResponseToClient(Event event, ResponseCompletionCallback responseCompletationCallback)
       throws MuleException {
     final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder responseBuilder =
         new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder();
-    final HttpResponse httpResponse = buildResponse(muleEvent, responseBuilder, responseCompletationCallback);
-    responseReadyCallback.responseReady(httpResponse, getResponseFailureCallback(responseCompletationCallback, muleEvent));
+    final HttpResponse httpResponse = buildResponse(event, responseBuilder, responseCompletationCallback);
+    responseReadyCallback.responseReady(httpResponse, getResponseFailureCallback(responseCompletationCallback, event));
   }
 
   protected HttpResponse buildErrorResponse() {

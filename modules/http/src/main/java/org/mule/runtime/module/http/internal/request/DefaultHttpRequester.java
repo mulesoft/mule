@@ -12,13 +12,12 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-
-import org.mule.runtime.api.execution.BlockingCompletionHandler;
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.execution.BlockingCompletionHandler;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -210,7 +209,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent),
                          resolveAuthentication(muleEvent),
-                         new BlockingCompletionHandler<HttpResponse, Exception, Void>() {
+                         new BlockingCompletionHandler<HttpResponse, Exception>() {
 
                            @Override
                            public void onFailure(Exception exception) {

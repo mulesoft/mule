@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
 
@@ -45,10 +45,10 @@ public class SocketOperations {
    * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
    */
   @OutputResolver(output = SocketMetadataResolver.class)
-  public OperationResult<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
-                                    @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
-                                    @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
-                                    @MetadataKeyId(SocketMetadataResolver.class) String hasResponse, Message muleMessage)
+  public Result<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
+                           @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
+                           @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
+                           @MetadataKeyId(SocketMetadataResolver.class) String hasResponse, Message muleMessage)
       throws ConnectionException, IOException {
     SocketClient client = connection.getClient();
 
@@ -59,7 +59,7 @@ public class SocketOperations {
     client.write(content, outputEncoding);
 
     return Boolean.valueOf(hasResponse)
-        ? OperationResult.builder().output(client.read()).attributes(client.getAttributes()).build()
-        : OperationResult.builder(muleMessage).build();
+        ? Result.builder().output(client.read()).attributes(client.getAttributes()).build()
+        : Result.builder(muleMessage).build();
   }
 }

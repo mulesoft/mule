@@ -37,7 +37,7 @@ import org.mule.extension.db.internal.result.statement.EagerStatementResultHandl
 import org.mule.extension.db.internal.result.statement.StatementResultHandler;
 import org.mule.extension.db.internal.result.statement.StreamingStatementResultHandler;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;

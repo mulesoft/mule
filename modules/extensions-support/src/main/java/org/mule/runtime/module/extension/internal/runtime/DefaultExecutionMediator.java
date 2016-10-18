@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,8 +27,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarati
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
@@ -53,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * {@link MutableConfigurationStats#addInflightOperation()} and {@link MutableConfigurationStats#discountInflightOperation()} are
  * guaranteed to be called, whatever the operation's outcome.
  * <p>
- * In case of operation failure, it will execute the {@link Interceptor#onError(OperationContext, RetryRequest, Throwable)} method
+ * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, RetryRequest, Throwable)} method
  * of all the available interceptors, even if any of them request for a retry. When a retry request is granted, the entire cycle
  * of interception (before, onSuccess/onError, after) will be fired again, but no interceptor which required a retry on the first
  * execution will be allowed to request it again. If an interceptor makes such a requirement after it already did on the first
@@ -80,11 +81,11 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link OperationExecutor}
-   * @param context the {@link OperationContextAdapter} for the {@code executor} to use
+   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
-   * @throws Exception if the operation or a {@link Interceptor#before(OperationContext)} invokation fails
+   * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
-  public Object execute(OperationExecutor executor, OperationContextAdapter context) throws Throwable {
+  public Object execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable {
     final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
     final MutableConfigurationStats mutableStats = getMutableConfigurationStats(context);
     if (mutableStats != null) {
@@ -99,7 +100,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     }
   }
 
-  private Object executeWithRetryPolicy(OperationExecutor executor, OperationContextAdapter context,
+  private Object executeWithRetryPolicy(OperationExecutor executor, ExecutionContextAdapter context,
                                         List<Interceptor> interceptors)
       throws Throwable {
     RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate(context.getConfiguration());
@@ -117,7 +118,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     return connectionRetry.getOperationExecutionResult().getOutput();
   }
 
-  private OperationExecutionResult executeWithInterceptors(OperationExecutor executor, OperationContextAdapter context,
+  private OperationExecutionResult executeWithInterceptors(OperationExecutor executor, ExecutionContextAdapter context,
                                                            List<Interceptor> interceptors,
                                                            ValueHolder<InterceptorsRetryRequest> retryRequestHolder) {
     Object result = null;
@@ -145,14 +146,14 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   }
 
 
-  private InterceptorsExecutionResult before(OperationContext operationContext, List<Interceptor> interceptors) {
+  private InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
 
     List<Interceptor> interceptorList = new ArrayList<>();
 
     try {
       for (Interceptor interceptor : interceptors) {
         interceptorList.add(interceptor);
-        interceptor.before(operationContext);
+        interceptor.before(executionContext);
       }
     } catch (Exception e) {
       return new InterceptorsExecutionResult(exceptionEnricherManager.handleException(e), interceptorList);
@@ -160,15 +161,15 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     return new InterceptorsExecutionResult(null, interceptorList);
   }
 
-  private void onSuccess(OperationContext operationContext, Object result, List<Interceptor> interceptors) {
+  private void onSuccess(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     intercept(interceptors,
-              interceptor -> interceptor.onSuccess(operationContext, result), interceptor -> format(
+              interceptor -> interceptor.onSuccess(executionContext, result), interceptor -> format(
                                                                                                     "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)"
                                                                                                         + "will be executed and the operation's result will be returned",
                                                                                                     interceptor));
   }
 
-  private Throwable onError(OperationContext operationContext, ValueHolder<InterceptorsRetryRequest> retryRequestHolder,
+  private Throwable onError(ExecutionContext executionContext, ValueHolder<InterceptorsRetryRequest> retryRequestHolder,
                             Throwable e, List<Interceptor> interceptors) {
     ValueHolder<Throwable> exceptionHolder = new ValueHolder<>(e);
 
@@ -176,7 +177,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
       InterceptorsRetryRequest retryRequest = new InterceptorsRetryRequest(interceptor, retryRequestHolder.get());
       retryRequestHolder.set(retryRequest);
 
-      Throwable decoratedException = interceptor.onError(operationContext, retryRequest, exceptionHolder.get());
+      Throwable decoratedException = interceptor.onError(executionContext, retryRequest, exceptionHolder.get());
       if (decoratedException != null) {
         exceptionHolder.set(decoratedException);
       }
@@ -186,10 +187,10 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     return exceptionHolder.get();
   }
 
-  private void after(OperationContext operationContext, Object result, List<Interceptor> interceptors) {
+  private void after(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     {
       intercept(interceptors,
-                interceptor -> interceptor.after(operationContext, result), interceptor -> format(
+                interceptor -> interceptor.after(executionContext, result), interceptor -> format(
                                                                                                   "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)"
                                                                                                       + "will be executed and the operation's result be returned",
                                                                                                   interceptor));
@@ -209,9 +210,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     });
   }
 
-  private <T> ExecutionTemplate<T> getExecutionTemplate(OperationContextAdapter context) {
+  private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<OperationModel> context) {
     return context.getTransactionConfig()
-        .map(txConfig -> (ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig))
+        .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
   }
 
@@ -230,7 +231,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     return connectionManager.getDefaultRetryPolicyTemplate();
   }
 
-  private MutableConfigurationStats getMutableConfigurationStats(OperationContext context) {
+  private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<ComponentModel> context) {
     ConfigurationStats stats = context.getConfiguration().map(ConfigurationInstance::getStatistics).orElse(null);
     return stats instanceof MutableConfigurationStats ? (MutableConfigurationStats) stats : null;
   }
@@ -252,12 +253,12 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
 
   private class OperationRetryCallBack implements RetryCallback {
 
-    private final OperationContextAdapter context;
+    private final ExecutionContextAdapter<OperationModel> context;
     private final List<Interceptor> interceptorList;
     private OperationExecutor operationExecutor;
     private OperationExecutionResult operationExecutionResult;
 
-    private OperationRetryCallBack(OperationExecutor operationExecutor, OperationContextAdapter context,
+    private OperationRetryCallBack(OperationExecutor operationExecutor, ExecutionContextAdapter context,
                                    List<Interceptor> interceptorList) {
       this.operationExecutor = operationExecutor;
       this.context = context;

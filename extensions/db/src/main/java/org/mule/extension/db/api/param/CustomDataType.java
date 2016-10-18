@@ -8,7 +8,7 @@ package org.mule.extension.db.api.param;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**

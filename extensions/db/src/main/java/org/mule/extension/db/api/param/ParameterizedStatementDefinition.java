@@ -10,7 +10,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.extension.db.internal.domain.metadata.DbInputMetadataResolver;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Optional;

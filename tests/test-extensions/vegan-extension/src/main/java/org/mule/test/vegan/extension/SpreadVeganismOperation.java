@@ -6,11 +6,17 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 public class SpreadVeganismOperation {
 
   public String spreadTheWord(String theWord, @UseConfig Object config) {
     return theWord;
+  }
+
+  public VeganPolicy applyPolicy(@Optional @NullSafe VeganPolicy policy) {
+    return policy;
   }
 }

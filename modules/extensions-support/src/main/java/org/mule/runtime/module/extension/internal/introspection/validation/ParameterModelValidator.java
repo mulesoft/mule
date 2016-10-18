@@ -22,7 +22,7 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.XmlHintsAnnotation;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 

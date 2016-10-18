@@ -386,7 +386,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
   protected HttpResponse doBad(RequestLine requestLine) throws MuleException {
     InternalMessage message = getMessageReceiver().createMuleMessage(null);
-    Event event = Event.builder(getMuleEvent().getContext()).message(message).flow(getFlowConstruct()).build();
+    Event event = Event.builder(getEvent().getContext()).message(message).flow(getFlowConstruct()).build();
     event = populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
     setCurrentEvent(event);
     HttpResponse response = new HttpResponse();

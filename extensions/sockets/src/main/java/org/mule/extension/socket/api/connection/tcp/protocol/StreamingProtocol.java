@@ -57,7 +57,7 @@ public class StreamingProtocol extends EOFProtocol {
       os.close();
       is.close();
     } else {
-      this.writeByteArray(os, getByteArray(data, false, true, encoding, objectSerializer));
+      this.writeByteArray(os, getByteArray(data, true, encoding, objectSerializer));
     }
   }
 }

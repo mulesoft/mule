@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**

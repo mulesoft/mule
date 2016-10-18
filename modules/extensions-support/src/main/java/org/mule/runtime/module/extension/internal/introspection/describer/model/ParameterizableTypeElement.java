@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 

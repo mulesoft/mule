@@ -18,16 +18,16 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
- * Implementation of {@link ParameterGroupAwareObjectBuilder} which produces instances of {@link ConnectionProviderModel}
+ * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
  *
  * @since 4.0
  */
-public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareObjectBuilder<ConnectionProvider> {
+public final class ConnectionProviderObjectBuilder extends ResolverSetBasedObjectBuilder<ConnectionProvider> {
 
   private final ConnectionProviderModel providerModel;
   private final boolean disableValidation;

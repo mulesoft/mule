@@ -25,9 +25,9 @@ public interface ExecutionMediator {
    * Coordinates the execution of the {@code executor} using the given {@code context}
    *
    * @param executor an {@link OperationExecutor}
-   * @param context an {@link OperationContextAdapter}
+   * @param context an {@link ExecutionContextAdapter}
    * @return the operation's result
    * @throws Exception if any exception is encountered
    */
-  Object execute(OperationExecutor executor, OperationContextAdapter context) throws Throwable;
+  Object execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable;
 }

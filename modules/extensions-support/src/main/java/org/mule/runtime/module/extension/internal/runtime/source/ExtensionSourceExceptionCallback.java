@@ -6,44 +6,51 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
+
+import java.util.function.Consumer;
 
 /**
  * Channels exceptions through the
- * {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, org.mule.runtime.core.api.Event)}.
+ * {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, Event)}.
  *
  * @since 4.0
  */
-class ExtensionSourceExceptionCallback implements ExceptionCallback<MuleEvent, Exception> {
+class ExtensionSourceExceptionCallback implements ExceptionCallback {
 
   private final ResponseCompletionCallback completionCallback;
-  private final MuleEvent muleEvent;
+  private final Event event;
+  private final Consumer<MessagingException> errorResponseHandler;
 
   /**
    * Creates a new instance
    *
-   * @param completionCallback the callback used to send the failure response
-   * @param muleEvent the related {@link MuleEvent}
+   * @param completionCallback    the callback used to send the failure response
+   * @param event                 the related {@link MuleEvent}
+   * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link Event} which results
+   *                              from handling exceptions
    */
-  ExtensionSourceExceptionCallback(ResponseCompletionCallback completionCallback, MuleEvent muleEvent) {
+  public ExtensionSourceExceptionCallback(ResponseCompletionCallback completionCallback, Event event,
+                                          Consumer<MessagingException> errorResponseCallback) {
     this.completionCallback = completionCallback;
-    this.muleEvent = muleEvent;
+    this.event = event;
+    this.errorResponseHandler = errorResponseCallback;
   }
 
   /**
-   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, org.mule.runtime.core.api.Event)} over
-   * the {@link #completionCallback}, using the {@code exception} and {@link #muleEvent}
+   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, Event)} over
+   * the {@link #completionCallback}, using the {@code exception} and {@link #event}
    *
-   * @param exception a {@link Exception}
+   * @param exception a {@link Throwable}
    * @return a response {@link MuleEvent}
    */
   @Override
-  public MuleEvent onException(Exception exception) {
-    return completionCallback
-        .responseSentWithFailure(new MessagingException((org.mule.runtime.core.api.Event) muleEvent, exception),
-                                 (org.mule.runtime.core.api.Event) muleEvent);
+  public void onException(Throwable exception) {
+    Event errorHandlingEvent = completionCallback.responseSentWithFailure(new MessagingException(event, exception), event);
+    errorResponseHandler.accept(new MessagingException(errorHandlingEvent, exception));
   }
 }

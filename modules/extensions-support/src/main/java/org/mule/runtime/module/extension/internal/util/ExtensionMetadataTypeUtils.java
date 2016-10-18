@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.internal.utils.MetadataTypeUtils;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
@@ -67,7 +67,7 @@ public final class ExtensionMetadataTypeUtils {
 
   public static String getId(MetadataType metadataType) {
     try {
-      return MetadataTypeUtils.getTypeId(metadataType)
+      return getTypeId(metadataType)
           .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getType(metadataType).getName() : "");
     } catch (Exception e) {
       return "";

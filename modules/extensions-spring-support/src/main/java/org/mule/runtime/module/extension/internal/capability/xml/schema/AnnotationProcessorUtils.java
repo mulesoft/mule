@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Ignore;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableMap;

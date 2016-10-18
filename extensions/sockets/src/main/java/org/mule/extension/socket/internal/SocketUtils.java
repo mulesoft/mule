@@ -17,6 +17,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,29 +33,22 @@ public final class SocketUtils {
 
   }
 
-  public static final String DEFAULT_ENCODING = "UTF-8";
   private static final String SOCKET_COULD_NOT_BE_CREATED = "%s Socket could not be created correctly";
+  public static final String WORK = "work";
 
   /**
    * UDP doesn't allow streaming and it always sends payload when dealing with a {@link Message}
    */
   public static byte[] getUdpAllowedByteArray(Object data, String encoding, ObjectSerializer objectSerializer)
       throws IOException {
-    return getByteArray(data, true, false, encoding, objectSerializer);
+    return getByteArray(data, false, encoding, objectSerializer);
   }
 
-  public static byte[] getByteArray(Object data, boolean payloadOnly, boolean streamingIsAllowed, String encoding,
+  public static byte[] getByteArray(Object data, boolean streamingIsAllowed, String encoding,
                                     ObjectSerializer objectSerializer)
       throws IOException {
     if (data instanceof InputStream && !streamingIsAllowed) {
       throw new IOException("Streaming is not allowed with this configuration");
-    } else if (data instanceof Message) {
-      if (payloadOnly) {
-        return getByteArray(((Message) data).getPayload().getValue(), payloadOnly, streamingIsAllowed, encoding,
-                            objectSerializer);
-      } else {
-        return objectSerializer.getExternalProtocol().serialize(data);
-      }
     } else if (data instanceof byte[]) {
       return (byte[]) data;
     } else if (data instanceof String) {
@@ -74,8 +68,8 @@ public final class SocketUtils {
     return connection.validate();
   }
 
-  public static Message createMuleMessage(InputStream content, SocketAttributes attributes) {
-    return Message.builder().payload(content).attributes(attributes).build();
+  public static Result<InputStream, SocketAttributes> createResult(InputStream content, SocketAttributes attributes) {
+    return Result.<InputStream, SocketAttributes>builder().output(content).attributes(attributes).build();
   }
 
   /**

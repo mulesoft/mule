@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -19,10 +20,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static java.util.Optional.empty;
-
 /**
- * A lazy version of a {@link OperationContext} which resolves the values of the parameters
+ * A lazy version of a {@link ExecutionContext} which resolves the values of the parameters
  * of the operation on demand.
  * The laziness of this class is meant for cases where the resolution of a parameters are wanted to
  * be isolated between each other, so when resolving a parameter value, does not matter if other
@@ -30,7 +29,7 @@ import static java.util.Optional.empty;
  *
  * @since 4.0
  */
-public class LazyOperationContext implements OperationContext {
+public class LazyOperationContext implements ExecutionContext<OperationModel> {
 
   private final Map<String, ValueResolver> valueResolvers;
   private final OperationModel operationModel;
@@ -100,7 +99,7 @@ public class LazyOperationContext implements OperationContext {
    * {@inheritDoc}
    */
   @Override
-  public OperationModel getOperationModel() {
+  public OperationModel getComponentModel() {
     return operationModel;
   }
 

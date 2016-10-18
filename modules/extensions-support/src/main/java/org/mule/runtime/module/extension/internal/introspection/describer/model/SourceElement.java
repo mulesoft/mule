@@ -10,6 +10,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A contract for an element from which a message source can be derived
@@ -22,4 +23,11 @@ public interface SourceElement extends ParameterizableTypeElement {
    * @return The list of generics of the super class {@link Source}
    */
   List<Type> getSuperClassGenerics();
+
+  //TODO: MULE-9220 not more than one
+  Optional<MethodElement> getOnResponseMethod();
+
+  //TODO: MULE-9220 not more than one
+  Optional<MethodElement> getOnErrorMethod();
+
 }

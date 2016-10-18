@@ -9,7 +9,7 @@ package org.mule.extension.email.api.predicate;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.time.LocalDateTime;

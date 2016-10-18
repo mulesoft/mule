@@ -18,7 +18,6 @@ import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.BulkUpdateExecutor;
-import org.mule.extension.db.internal.domain.metadata.BaseDbMetadataResolver;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
@@ -30,9 +29,8 @@ import org.mule.extension.db.internal.resolver.query.BulkQueryResolver;
 import org.mule.extension.db.internal.resolver.query.DefaultBulkQueryFactory;
 import org.mule.extension.db.internal.resolver.query.FileBulkQueryFactory;
 import org.mule.extension.db.internal.util.DefaultFileReader;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 

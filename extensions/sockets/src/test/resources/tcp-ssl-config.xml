@@ -26,6 +26,7 @@
                                           failOnUnresolvedHost="true"
                                           sendTcpNoDelay="true"
                                           tlsContext="globalTlsContext">
+            <reconnect blocking="false" />
             <pooling-profile maxActive="1"/>
         </sockets:tcp-requester-connection>
     </sockets:request-config>
@@ -42,6 +43,7 @@
                                           failOnUnresolvedHost="true"
                                           sendTcpNoDelay="true"
                                           tlsContext="requestTlsContext">
+            <reconnect blocking="false" />
             <pooling-profile maxActive="1"/>
         </sockets:tcp-requester-connection>
     </sockets:request-config>

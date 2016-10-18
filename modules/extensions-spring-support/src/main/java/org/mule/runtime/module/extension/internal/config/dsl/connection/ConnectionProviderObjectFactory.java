@@ -27,15 +27,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFactory<ConnectionProviderResolver> {
 
   private final ConnectionProviderModel providerModel;
-  private MuleContext muleContext;
 
   private PoolingProfile poolingProfile = null;
   private RetryPolicyTemplate retryPolicyTemplate = null;
   private boolean disableValidation = false;
 
   public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel, MuleContext muleContext) {
+    super(muleContext);
     this.providerModel = providerModel;
-    this.muleContext = muleContext;
   }
 
   @Override

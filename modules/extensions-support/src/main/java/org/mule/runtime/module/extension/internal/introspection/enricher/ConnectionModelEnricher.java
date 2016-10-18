@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.introspection.declaration.DescribingContex
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;

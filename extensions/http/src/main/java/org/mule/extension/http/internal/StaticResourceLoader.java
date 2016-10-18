@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.http.internal.component.ResourceNotFoundException;
 

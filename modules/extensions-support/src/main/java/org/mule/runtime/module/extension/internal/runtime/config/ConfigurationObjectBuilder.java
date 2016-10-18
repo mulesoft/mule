@@ -10,8 +10,8 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  *
  * @since 3.7.0
  */
-public final class ConfigurationObjectBuilder<T> extends ParameterGroupAwareObjectBuilder<T> {
+public final class ConfigurationObjectBuilder<T> extends ResolverSetBasedObjectBuilder<T> {
 
   private final ConfigurationModel configurationModel;
 

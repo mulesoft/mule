@@ -6,7 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class PhoneNumber {
 

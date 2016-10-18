@@ -42,8 +42,6 @@
         <error-handler>
             <on-error-propagate>
                 <processor ref="rollbackSensingMessageProcessor"/>
-                <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
-                <set-payload value="Service Down"/>
             </on-error-propagate>
         </error-handler>
     </flow>

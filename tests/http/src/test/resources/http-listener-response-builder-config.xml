@@ -41,18 +41,14 @@
 
     <flow name="headersResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headersResponseBuilderPath}">
-            <httpn:response-builder headersRef="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime]]"/>
+            <httpn:response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]"/>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="headersOverrideResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headersOverrideResponseBuilderPath}">
-            <httpn:response-builder headersRef="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime]]">
-                <httpn:headers>
-                    <httpn:header key="Date" value="notAValidDate"/>
-                </httpn:headers>
-            </httpn:response-builder>
+            <httpn:response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]" />
         </httpn:listener>
         <echo-component/>
     </flow>
@@ -100,18 +96,14 @@
 
     <flow name="errorHeadersResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeadersResponseBuilderPath}">
-            <httpn:error-response-builder headersRef="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime]]"/>
+            <httpn:error-response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]"/>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="errorHeadersOverrideResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeadersOverrideResponseBuilderPath}">
-            <httpn:error-response-builder headersRef="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime]]">
-                <httpn:headers>
-                    <httpn:header key="Date" value="notAValidDate"/>
-                </httpn:headers>
-            </httpn:error-response-builder>
+            <httpn:error-response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]" />
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>

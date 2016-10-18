@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
- * An implementation of {@link ArgumentResolver} which returns the {@link Event} associated with a given {@link OperationContext}.
+ * An implementation of {@link ArgumentResolver} which returns the {@link Event} associated with a given {@link ExecutionContext}.
  * <p/>
- * Notice that for this to work, the {@link OperationContext} has to be an instance of {@link OperationContextAdapter}
+ * Notice that for this to work, the {@link ExecutionContext} has to be an instance of {@link ExecutionContextAdapter}
  *
  * @since 3.7.0
  */
@@ -22,10 +22,10 @@ public final class EventArgumentResolver implements ArgumentResolver<Event> {
   /**
    * Returns the {@link Event} associated to the {@code operationContext}
    *
-   * @throws ClassCastException if {@code operationContext} is not an {@link OperationContextAdapter}
+   * @throws ClassCastException if {@code operationContext} is not an {@link ExecutionContextAdapter}
    */
   @Override
-  public Event resolve(OperationContext operationContext) {
-    return ((OperationContextAdapter) operationContext).getEvent();
+  public Event resolve(ExecutionContext executionContext) {
+    return ((ExecutionContextAdapter) executionContext).getEvent();
   }
 }

@@ -31,7 +31,7 @@ import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;

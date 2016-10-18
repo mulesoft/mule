@@ -10,7 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -22,7 +22,7 @@ import java.util.Spliterator;
 /**
  * Represents a node on a file system tree.
  * <p>
- * It contains an {@link OperationResult} which represents the file {@code this} node points to.
+ * It contains an {@link Result} which represents the file {@code this} node points to.
  * <p>
  * Because {@code this} node itself can point to a directory, it also contains a {@link List} of {@link #getChilds() childs).
  * <p>
@@ -38,10 +38,10 @@ import java.util.Spliterator;
  */
 public class TreeNode implements Serializable, Iterable {
 
-  private transient final OperationResult<?, FileAttributes> info;
+  private transient final Result<?, FileAttributes> info;
   private final List<TreeNode> childs;
 
-  private TreeNode(OperationResult<?, FileAttributes> info, List<TreeNode> childs) {
+  private TreeNode(Result<?, FileAttributes> info, List<TreeNode> childs) {
     this.info = info;
     this.childs = childs;
   }
@@ -100,7 +100,7 @@ public class TreeNode implements Serializable, Iterable {
   public static class Builder {
 
     private final List<Builder> childs = new LinkedList<>();
-    private OperationResult<?, FileAttributes> info;
+    private Result<?, FileAttributes> info;
     private TreeNode instance;
 
     private Builder() {}
@@ -113,7 +113,7 @@ public class TreeNode implements Serializable, Iterable {
      */
     public static Builder forDirectory(FileAttributes attributes) {
       Builder builder = new Builder();
-      builder.info = OperationResult.<Object, FileAttributes>builder().output(null).attributes(attributes).build();
+      builder.info = Result.<Object, FileAttributes>builder().output(null).attributes(attributes).build();
 
       return builder;
     }
@@ -125,7 +125,7 @@ public class TreeNode implements Serializable, Iterable {
      *        instance as attributes
      * @return a new {@link Builder}
      */
-    public static Builder forFile(OperationResult<InputStream, FileAttributes> message) {
+    public static Builder forFile(Result<InputStream, FileAttributes> message) {
       Builder builder = new Builder();
       builder.info = message;
 

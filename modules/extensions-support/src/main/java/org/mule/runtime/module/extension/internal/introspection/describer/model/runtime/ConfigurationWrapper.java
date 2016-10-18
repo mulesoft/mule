@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterizableTypeElement;

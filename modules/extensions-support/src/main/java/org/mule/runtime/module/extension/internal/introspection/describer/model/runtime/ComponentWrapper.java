@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;

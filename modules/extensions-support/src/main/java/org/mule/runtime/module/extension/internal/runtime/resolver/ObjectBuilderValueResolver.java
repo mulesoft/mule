@@ -10,7 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 /**
  * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(Event)} on each

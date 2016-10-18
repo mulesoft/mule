@@ -169,7 +169,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="type"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

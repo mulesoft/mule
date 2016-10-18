@@ -12,7 +12,7 @@ import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import com.google.common.cache.CacheBuilder;

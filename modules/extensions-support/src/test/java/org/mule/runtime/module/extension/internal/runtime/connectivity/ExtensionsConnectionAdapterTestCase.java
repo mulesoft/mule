@@ -22,7 +22,7 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -54,7 +54,7 @@ public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTest
     XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
     Object config = new Object();
 
-    OperationContextAdapter operationContext = mock(OperationContextAdapter.class, RETURNS_DEEP_STUBS);
+    ExecutionContextAdapter operationContext = mock(ExecutionContextAdapter.class, RETURNS_DEEP_STUBS);
     ConnectionProvider connectionProvider = mock(ConnectionProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
     when(configurationInstance.getConnectionProvider()).thenReturn(of(connectionProvider));

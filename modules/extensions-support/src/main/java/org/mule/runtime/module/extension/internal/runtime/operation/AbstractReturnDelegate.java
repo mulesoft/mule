@@ -10,13 +10,14 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -42,12 +43,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     this.muleContext = muleContext;
   }
 
-  protected Message toMessage(Object value, OperationContextAdapter operationContext) {
+  protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
     MediaType mediaType = resolveMediaType(value, operationContext);
-    if (value instanceof OperationResult) {
-      OperationResult operationResult = (OperationResult) value;
-      return Message.builder().payload(operationResult.getOutput()).mediaType(mediaType)
-          .attributes((Attributes) operationResult.getAttributes().orElse(NULL_ATTRIBUTES)).build();
+    if (value instanceof Result) {
+      return MuleExtensionUtils.toMessage((Result) value, mediaType);
     } else {
       return Message.builder().payload(value).mediaType(mediaType).attributes(NULL_ATTRIBUTES).build();
     }
@@ -61,11 +60,11 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * @param operationContext
    * @return
    */
-  private MediaType resolveMediaType(Object value, OperationContextAdapter operationContext) {
+  private MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
     Charset existingEncoding = getDefaultEncoding(muleContext);
     MediaType mediaType = null;
-    if (value instanceof OperationResult) {
-      final Optional<MediaType> optionalMediaType = ((OperationResult) value).getMediaType();
+    if (value instanceof Result) {
+      final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
       if (optionalMediaType.isPresent()) {
         mediaType = optionalMediaType.get();
         if (mediaType.getCharset().isPresent()) {

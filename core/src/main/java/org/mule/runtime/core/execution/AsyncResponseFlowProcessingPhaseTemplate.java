@@ -6,41 +6,45 @@
  */
 package org.mule.runtime.core.execution;
 
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
- * Template methods for {@link org.mule.runtime.core.api.source.MessageSource} specific behavior during flow execution.
+ * Template methods for {@link MessageSource} specific behavior during flow execution.
  */
 public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcessTemplate {
 
   /**
-   * @return a {@link org.mule.runtime.core.api.Event} created from the original message
+   * @return a {@link Event} created from the original message
    */
-  Event getMuleEvent() throws MuleException;
+  Event getEvent() throws MuleException;
 
   /**
-   * Routes the {@link org.mule.runtime.core.api.Event} through the processors chain
+   * Routes the {@link Event} through the processors chain
    *
-   * @param muleEvent {@link org.mule.runtime.core.api.Event} created from the raw message of this context
-   * @return the response {@link org.mule.runtime.core.api.Event}
+   * @param event {@link Event} created from the raw message of this context
+   * @return the response {@link Event}
+   * @throws MuleException
+   * @param event {@link Event} created from the raw message of this context
+   * @return the response {@link Event}
    * @throws MuleException
    */
-  Event routeEvent(Event muleEvent) throws MuleException;
+  Event routeEvent(Event event) throws MuleException;
 
   /**
    * Template method to send a response after processing the message.
    * <p/>
    * This method is executed within the flow so if it fails it will trigger the exception strategy.
    *
-   * @param muleEvent the event with the content of the response to be sent.
+   * @param event the event with the content of the response to be sent.
    * @param responseCompletionCallback callback to be used for notifying the result of the operation
    * @throws MuleException exception thrown when processing the message to send the response. If there's a failure when writing
    *         the response using the underlying transport or connector then the exception to throw must be a
    *         {@link ResponseDispatchException}.
    */
-  void sendResponseToClient(Event muleEvent, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
+  void sendResponseToClient(Event event, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
 
 
   /**

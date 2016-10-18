@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 
 import com.google.common.collect.ImmutableList;

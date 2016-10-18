@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 public class ExtendedPersonalInfo extends PersonalInfo {
 

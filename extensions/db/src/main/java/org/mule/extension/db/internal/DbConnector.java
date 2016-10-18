@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 import java.util.ArrayList;

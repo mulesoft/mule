@@ -11,7 +11,7 @@ import static org.mule.runtime.core.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.net.InetSocketAddress;

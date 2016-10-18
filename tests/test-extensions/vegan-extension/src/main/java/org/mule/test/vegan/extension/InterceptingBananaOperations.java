@@ -9,7 +9,7 @@ package org.mule.test.vegan.extension;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 
@@ -37,14 +37,14 @@ public class InterceptingBananaOperations {
     }
   }
 
-  public InterceptingCallback<OperationResult<Fruit, VeganAttributes>> getQualifiedLunch(@UseConfig BananaConfig config) {
-    return new VeganInterceptor<OperationResult<Fruit, VeganAttributes>>(config) {
+  public InterceptingCallback<Result<Fruit, VeganAttributes>> getQualifiedLunch(@UseConfig BananaConfig config) {
+    return new VeganInterceptor<Result<Fruit, VeganAttributes>>(config) {
 
       private final VeganAttributes veganAttributes = new VeganAttributes();
 
       @Override
-      public OperationResult<Fruit, VeganAttributes> getResult() {
-        return OperationResult.<Fruit, VeganAttributes>builder().output(banana).attributes(veganAttributes).build();
+      public Result<Fruit, VeganAttributes> getResult() {
+        return Result.<Fruit, VeganAttributes>builder().output(banana).attributes(veganAttributes).build();
       }
     };
   }

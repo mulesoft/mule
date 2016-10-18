@@ -11,7 +11,7 @@ import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 /**

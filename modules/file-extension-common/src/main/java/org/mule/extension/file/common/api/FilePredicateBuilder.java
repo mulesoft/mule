@@ -9,7 +9,7 @@ package org.mule.extension.file.common.api;
 import org.mule.extension.file.common.api.matcher.PathMatcherPredicate;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 

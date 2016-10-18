@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
-import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 
 import java.util.Optional;
 

@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
 
@@ -51,17 +51,17 @@ public class IMAPOperations {
    * @param mailboxFolder Mailbox folder where the emails are going to be fetched
    * @param imapMatcher   Email Matcher which gives the capability of filter the retrieved emails
    * @param deleteAfterRetrieve Specifies if the returned emails must be deleted after being retrieved or not.
-   * @return an {@link OperationResult} {@link List} carrying all the emails content
+   * @return an {@link Result} {@link List} carrying all the emails content
    * and it's corresponding {@link IMAPEmailAttributes}.
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
-  public List<OperationResult<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
-                                                                     @Connection MailboxConnection connection,
-                                                                     @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                     @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher,
-                                                                     @Optional(
-                                                                         defaultValue = "false") boolean deleteAfterRetrieve) {
-    List<OperationResult<Object, IMAPEmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, imapMatcher);
+  public List<Result<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
+                                                            @Connection MailboxConnection connection,
+                                                            @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                                            @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher,
+                                                            @Optional(
+                                                                defaultValue = "false") boolean deleteAfterRetrieve) {
+    List<Result<Object, IMAPEmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, imapMatcher);
     if (deleteAfterRetrieve) {
       emails.forEach(e -> {
         long uid = e.getAttributes()

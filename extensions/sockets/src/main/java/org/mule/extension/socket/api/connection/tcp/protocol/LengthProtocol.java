@@ -9,7 +9,7 @@ package org.mule.extension.socket.api.connection.tcp.protocol;
 import static java.lang.String.format;
 import org.mule.extension.socket.api.exceptions.LengthExceededException;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -19,9 +19,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This protocol is an application level {@link TcpProtocol} that can be used to transfer large amounts of data without risking
@@ -38,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
 public class LengthProtocol extends DirectProtocol {
 
   public static final String LENGTH_EXCEEDED = "Message length is '%d' and exceeds the limit '%d";
-  private static final Log LOGGER = LogFactory.getLog(LengthProtocol.class);
   private static final int SIZE_INT = Integer.BYTES;
   /**
    * Indicates the maximum length of the message

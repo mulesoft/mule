@@ -10,7 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;
 

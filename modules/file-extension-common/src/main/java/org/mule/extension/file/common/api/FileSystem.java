@@ -11,7 +11,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.extension.file.common.api.lock.PathLock;
 
 import java.io.InputStream;
@@ -57,7 +57,7 @@ public interface FileSystem {
    * <p>
    * Locking can be actually enabled through the {@code lock} argument, however, the extent of such lock will depend on the
    * implementation. What is guaranteed by passing {@code true} on the {@code lock} argument is that {@code this} instance will
-   * not attempt to modify this file until the {@link InputStream} returned by {@link OperationResult#getOutput()} this method
+   * not attempt to modify this file until the {@link InputStream} returned by {@link Result#getOutput()} this method
    * returns is closed or fully consumed. Some implementation might actually perform a file system level locking which goes beyond
    * the extend of {@code this} instance or even mule. For some other file systems that might be simply not possible and no extra
    * assumptions are to be taken.
@@ -69,12 +69,12 @@ public interface FileSystem {
    * @param message the incoming {@link Message}
    * @param filePath the path of the file you want to read
    * @param lock whether or not to lock the file
-   * @return An {@link OperationResult} with an {@link InputStream} with the file's content as payload and a
+   * @return An {@link Result} with an {@link InputStream} with the file's content as payload and a
    *         {@link FileAttributes} object as {@link Message#getAttributes()}
    * @throws IllegalArgumentException if the file at the given path doesn't exists
    */
-  OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
-                                                    boolean lock);
+  Result<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
+                                           boolean lock);
 
   /**
    * Writes the {@code content} into the file pointed by {@code filePath}.

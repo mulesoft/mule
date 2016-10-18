@@ -65,7 +65,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                 if (message == null) {
                   return null;
                 }
-                Event muleEvent = flowProcessingPhaseTemplate.getMuleEvent();
+                Event muleEvent = flowProcessingPhaseTemplate.getEvent();
                 muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
                 muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
                 muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);

@@ -6,24 +6,20 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.execution.ExceptionCallback;
-
 /**
  * Ignores the result of asynchronous processing
  *
  * @since 4.0
  */
-public class NullCompletionHandler<Response, ProcessingException extends Throwable, HandledCompletionExceptionResult>
-    implements CompletionHandler<Response, ProcessingException, HandledCompletionExceptionResult> {
+public class NullCompletionHandler<R, E extends Throwable> implements CompletionHandler<R, E> {
 
   @Override
-  public void onCompletion(Response result, ExceptionCallback<HandledCompletionExceptionResult, Exception> exceptionCallback) {
+  public void onCompletion(R result, ExceptionCallback<Throwable> exceptionCallback) {
     // Nothing to do
   }
 
   @Override
-  public void onFailure(ProcessingException exception) {
+  public void onFailure(E exception) {
     // Nothing to do
   }
 }

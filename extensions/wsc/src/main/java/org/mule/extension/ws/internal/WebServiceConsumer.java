@@ -10,7 +10,9 @@ import org.mule.extension.ws.api.exception.WscException;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
  * Web Service Consumer extension used to consume SOAP web services.
@@ -24,4 +26,14 @@ import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 @Extension(name = "wsc")
 public class WebServiceConsumer {
 
+  /**
+   * If should use the MTOM protocol to manage the attachments or not.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  private boolean mtomEnabled;
+
+  public boolean isMtomEnabled() {
+    return mtomEnabled;
+  }
 }

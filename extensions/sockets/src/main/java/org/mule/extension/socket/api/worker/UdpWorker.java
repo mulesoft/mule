@@ -8,17 +8,12 @@ package org.mule.extension.socket.api.worker;
 
 import static java.lang.String.format;
 import static java.util.Arrays.copyOf;
-import static org.mule.extension.socket.internal.SocketUtils.createMuleMessage;
 import static org.mule.extension.socket.internal.SocketUtils.createPacket;
 import static org.mule.extension.socket.internal.SocketUtils.getUdpAllowedByteArray;
-
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
 import org.mule.extension.socket.api.SocketAttributes;
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.extension.api.runtime.MessageHandler;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,9 +36,11 @@ public final class UdpWorker extends SocketWorker {
   private final DatagramPacket packet;
   private final ObjectSerializer objectSerializer;
 
-  public UdpWorker(DatagramSocket socket, DatagramPacket packet, ObjectSerializer objectSerializer,
-                   MessageHandler<InputStream, SocketAttributes> messageHandler) {
-    super(messageHandler);
+  public UdpWorker(DatagramSocket socket,
+                   DatagramPacket packet,
+                   ObjectSerializer objectSerializer,
+                   SourceCallback<InputStream, SocketAttributes> callback) {
+    super(callback);
     this.socket = socket;
     this.packet = packet;
     this.objectSerializer = objectSerializer;
@@ -51,28 +48,26 @@ public final class UdpWorker extends SocketWorker {
 
   @Override
   public void run() {
-    SocketAttributes attributes = new ImmutableSocketAttributes(packet);
     InputStream content = new ByteArrayInputStream(copyOf(packet.getData(), packet.getLength()));
-    messageHandler.handle(createMuleMessage(content, attributes), new CompletionHandler<MuleEvent, Exception, MuleEvent>() {
+    handle(content, new ImmutableSocketAttributes(packet));
+  }
 
-      @Override
-      public void onCompletion(MuleEvent muleEvent, ExceptionCallback<MuleEvent, Exception> exceptionCallback) {
-        try {
-          byte[] byteArray = getUdpAllowedByteArray(muleEvent.getMessage().getPayload().getValue(), encoding, objectSerializer);
-          DatagramPacket sendPacket = createPacket(byteArray);
-          sendPacket.setSocketAddress(packet.getSocketAddress());
-          socket.send(sendPacket);
-        } catch (IOException e) {
-          exceptionCallback.onException(new IOException(format("An error occurred while sending UDP packet to address '%s'",
-                                                               packet.getSocketAddress().toString(), e)));
-        }
-      }
+  @Override
+  public void onComplete(Object result) {
+    try {
+      byte[] byteArray = getUdpAllowedByteArray(result, encoding, objectSerializer);
+      DatagramPacket sendPacket = createPacket(byteArray);
+      sendPacket.setSocketAddress(packet.getSocketAddress());
+      socket.send(sendPacket);
+    } catch (IOException e) {
+      callback.onSourceException(new IOException(format("An error occurred while sending UDP packet to address '%s'",
+                                                        packet.getSocketAddress().toString(), e)));
+    }
+  }
 
-      @Override
-      public void onFailure(Exception e) {
-        LOGGER.error("UDP worker will not answer back due an exception was received", e);
-      }
-    });
+  @Override
+  public void onError(Throwable e) {
+    LOGGER.error("UDP worker will not answer back due an exception was received", e);
   }
 
   @Override

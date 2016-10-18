@@ -10,7 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
  * An implementation of {@link ReturnDelegate} which allows setting the response value into the {@link Message} that will continue
@@ -43,7 +43,7 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
    * If the {@code value} is of any other type, then it's set as the payload of the outgoing message {@inheritDoc}
    */
   @Override
-  public Event asReturnValue(Object value, OperationContextAdapter operationContext) {
+  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return Event.builder(operationContext.getEvent())
         .message((InternalMessage) toMessage(value, operationContext)).build();
   }

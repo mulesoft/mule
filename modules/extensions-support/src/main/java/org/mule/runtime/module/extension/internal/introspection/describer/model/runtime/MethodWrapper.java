@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 

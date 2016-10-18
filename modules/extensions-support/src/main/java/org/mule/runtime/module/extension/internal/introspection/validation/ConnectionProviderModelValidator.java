@@ -25,7 +25,7 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 

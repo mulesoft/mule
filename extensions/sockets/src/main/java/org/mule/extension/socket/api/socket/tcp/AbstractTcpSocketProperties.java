@@ -7,7 +7,7 @@
 package org.mule.extension.socket.api.socket.tcp;
 
 import org.mule.extension.socket.api.socket.AbstractSocketProperties;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;

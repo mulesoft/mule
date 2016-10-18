@@ -11,7 +11,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 

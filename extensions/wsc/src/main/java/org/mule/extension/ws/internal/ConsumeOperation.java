@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.xml.stax.StaxSource;
 
 import com.google.common.collect.ImmutableList;
@@ -85,11 +85,11 @@ public class ConsumeOperation {
   public static final String MULE_SOAP_ACTION = "mule.wsc.soap.action";
 
   @OutputResolver(output = OutputBodyResolver.class, attributes = WscAttributesResolver.class)
-  public OperationResult<Object, WscAttributes> consume(@Connection WscConnection connection,
-                                                        @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                                        @Optional @Content @TypeResolver(InputBodyResolver.class) String body,
-                                                        @Optional @TypeResolver(InputHeadersResolver.class) List<String> headers,
-                                                        @Optional List<WsAttachment> attachments) {
+  public Result<Object, WscAttributes> consume(@Connection WscConnection connection,
+                                               @MetadataKeyId(OperationKeysResolver.class) String operation,
+                                               @Optional @Content @TypeResolver(InputBodyResolver.class) String body,
+                                               @Optional @TypeResolver(InputHeadersResolver.class) List<String> headers,
+                                               @Optional List<WsAttachment> attachments) {
     Map<String, Object> ctx = getInvocationContext(headers, attachments, operation);
     XMLStreamReader request = stringToXmlStreamReader(body, connection, operation);
     try {
@@ -113,7 +113,7 @@ public class ConsumeOperation {
     return ctx;
   }
 
-  private OperationResult<Object, WscAttributes> buildResult(Object[] invocationResponse, Exchange exchange) {
+  private Result<Object, WscAttributes> buildResult(Object[] invocationResponse, Exchange exchange) {
     String response = processOutput(invocationResponse);
     WscAttributes attributes = processAttributes(exchange);
     List<Message> receivedAttachments = (List<Message>) exchange.get(MULE_ATTACHMENTS_KEY);
@@ -129,7 +129,7 @@ public class ConsumeOperation {
       output = response;
     }
 
-    return OperationResult.<Object, WscAttributes>builder()
+    return Result.<Object, WscAttributes>builder()
         .output(output)
         .attributes(attributes)
         .build();

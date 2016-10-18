@@ -128,7 +128,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
         Mockito.inOrder(mockContext, mockContext.getFlowConstruct(), mockRequestResponseTemplate, mockNotifier);
     inOrderVerify.verify(mockContext, atLeastOnce()).getTransactionConfig();
     inOrderVerify.verify(mockContext.getFlowConstruct()).getExceptionListener();
-    inOrderVerify.verify(mockRequestResponseTemplate).getMuleEvent();
+    inOrderVerify.verify(mockRequestResponseTemplate).getEvent();
     inOrderVerify.verify(mockRequestResponseTemplate).beforeRouteEvent(any(Event.class));
     inOrderVerify.verify(mockRequestResponseTemplate).routeEvent(any(Event.class));
     inOrderVerify.verify(mockRequestResponseTemplate).afterRouteEvent(any(Event.class));

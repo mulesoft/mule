@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -44,7 +44,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   protected MuleContext muleContext;
 
   @Mock
-  protected OperationContextAdapter operationContext;
+  protected ExecutionContextAdapter operationContext;
 
   protected Event event;
 
@@ -77,7 +77,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
     org.mule.runtime.api.message.MuleEvent result =
-        delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
+        delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -91,7 +91,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Object payload = "hello world!";
 
     org.mule.runtime.api.message.MuleEvent result =
-        delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
+        delegate.asReturnValue(Result.builder().output(payload).build(), operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -106,7 +106,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Attributes newAttributes = mock(Attributes.class);
 
     org.mule.runtime.api.message.MuleEvent result =
-        delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
+        delegate.asReturnValue(Result.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
     Message message = getOutputMessage(result);
 

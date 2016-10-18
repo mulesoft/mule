@@ -22,7 +22,7 @@
         <httpn:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
             <httpn:response-builder statusCode="#[message.getAttributes().getStatusCode()]"
                                     reasonPhrase="#[message.getAttributes().getReasonPhrase()]"
-                                    headersRef="#[message.getAttributes().getHeaders()]" />
+                                    headers="#[message.getAttributes().getHeaders()]" />
         </httpn:listener>
 
         <processor ref="sensingRequestResponseProcessor" />

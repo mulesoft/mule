@@ -87,7 +87,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
 
   @Before
   public void configureExpectedBehaviour() throws Exception {
-    when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
+    when(mockTemplate.getEvent()).thenReturn(mockMuleEvent);
     doAnswer(invocationOnMock -> {
       ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
       callback.responseSentSuccessfully();
@@ -98,7 +98,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
       callback.responseSentSuccessfully();
       return null;
     }).when(mockTemplate).sendResponseToClient(any(Event.class), any(ResponseCompletionCallback.class));
-    when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
+    when(mockTemplate.getEvent()).thenReturn(mockMuleEvent);
   }
 
 
@@ -178,7 +178,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   @Test
   public void allowNullEventsOnNotifications() throws Exception {
     setCurrentEvent(null);
-    when(mockTemplate.getMuleEvent()).thenReturn(null);
+    when(mockTemplate.getEvent()).thenReturn(null);
     when(mockTemplate.routeEvent(any(Event.class))).thenReturn(null);
     phase.runPhase(mockTemplate, mockContext, mockNotifier);
 

@@ -16,8 +16,8 @@ import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

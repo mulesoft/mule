@@ -15,8 +15,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;

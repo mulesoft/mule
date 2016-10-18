@@ -11,3 +11,4 @@ org.mule.runtime.module.extension.internal.introspection.enricher.DisplayModelEn
 org.mule.runtime.module.extension.internal.introspection.enricher.ParameterGroupModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.DynamicMetadataModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionTypesModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.SourceCallbackSanitizerModelEnricher

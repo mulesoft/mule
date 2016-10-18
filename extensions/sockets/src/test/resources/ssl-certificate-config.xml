@@ -20,6 +20,7 @@
                                           sendTcpNoDelay="true"
                                           tlsContext="tlsContext">
             <pooling-profile maxActive="1"/>
+            <reconnect blocking="false" />
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 

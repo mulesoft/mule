@@ -16,9 +16,10 @@ import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.core.streaming.ListConsumer;
 import org.mule.runtime.core.streaming.Producer;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 
@@ -39,18 +40,19 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, OperationContextAdapter operationContext)
+  protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, ExecutionContextAdapter operationContext)
       throws MuleException {
 
     Event resultEvent = (Event) super.doProcess(event, operationContext);
-    PagingProvider pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
+    PagingProvider<?, ?> pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
 
     if (pagingProvider == null) {
       throw new IllegalStateException("Obtained paging delegate cannot be null");
     }
 
     Producer<?> producer =
-        new PagingProviderProducer(pagingProvider, operationContext.getConfiguration().get(), connectionManager);
+        new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
+                                   connectionManager);
     Consumer<?> consumer = new ListConsumer(producer);
 
     return returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext);

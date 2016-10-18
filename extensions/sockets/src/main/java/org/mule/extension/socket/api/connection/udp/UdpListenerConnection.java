@@ -8,17 +8,16 @@ package org.mule.extension.socket.api.connection.udp;
 
 import static org.mule.extension.socket.internal.SocketUtils.configureConnection;
 import static org.mule.extension.socket.internal.SocketUtils.createPacket;
-
 import org.mule.extension.socket.api.ConnectionSettings;
-import org.mule.extension.socket.api.connection.ListenerConnection;
-import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
-import org.mule.extension.socket.api.worker.UdpWorker;
-import org.mule.extension.socket.api.exceptions.ReadingTimeoutException;
 import org.mule.extension.socket.api.SocketAttributes;
+import org.mule.extension.socket.api.connection.ListenerConnection;
+import org.mule.extension.socket.api.exceptions.ReadingTimeoutException;
+import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.api.worker.SocketWorker;
+import org.mule.extension.socket.api.worker.UdpWorker;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +52,7 @@ public class UdpListenerConnection extends AbstractUdpConnection implements List
    * @throws IOException if the socket was close while blocked on {@link DatagramSocket#receive(DatagramPacket)} method.
    */
   @Override
-  public SocketWorker listen(MessageHandler<InputStream, SocketAttributes> messageHandler)
+  public SocketWorker listen(SourceCallback<InputStream, SocketAttributes> sourceCallback)
       throws IOException, ConnectionException {
     DatagramPacket packet = createPacket(socketProperties.getReceiveBufferSize());
 
@@ -74,6 +73,6 @@ public class UdpListenerConnection extends AbstractUdpConnection implements List
 
     DatagramSocket newConnection = new DatagramSocket();
     configureConnection(newConnection, socketProperties);
-    return new UdpWorker(newConnection, packet, objectSerializer, messageHandler);
+    return new UdpWorker(newConnection, packet, objectSerializer, sourceCallback);
   }
 }

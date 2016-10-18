@@ -10,18 +10,20 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -102,7 +104,7 @@ public class PetStoreSourceRetryPolicyTestCase extends ExtensionFunctionalTestCa
     public static boolean failedDueOnException = false;
 
     @Override
-    public void start() {
+    public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {
       PetStoreConnectorWithSource.timesStarted++;
 
       if (failOnStart || failedDueOnException) {
@@ -112,14 +114,12 @@ public class PetStoreSourceRetryPolicyTestCase extends ExtensionFunctionalTestCa
       if (failOnException) {
         failedDueOnException = true;
         Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> sourceContext.getExceptionCallback().onException(new ConnectionException("ERROR")));
+        executor.execute(() -> sourceCallback.onSourceException(new ConnectionException("ERROR")));
       }
     }
 
     @Override
-    public void stop() {
-
-    }
+    public void onStop() {}
   }
 
   private void startFlow(String flowName) throws Exception {

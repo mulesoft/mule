@@ -8,6 +8,7 @@
     <sockets:request-config name="tcp-requester">
         <sockets:tcp-requester-connection host="localhost" port="${port}" failOnUnresolvedHost="true" sendTcpNoDelay="true">
             <pooling-profile maxActive="1"/>
+            <reconnect blocking="false" />
             <sockets:protocol>
                 <sockets:custom-protocol class="org.mule.extension.socket.protocol.MockTcpProtocol"/>
             </sockets:protocol>
