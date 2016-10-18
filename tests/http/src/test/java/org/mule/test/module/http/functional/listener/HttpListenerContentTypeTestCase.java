@@ -17,9 +17,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
@@ -27,6 +27,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.StringEntity;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -62,12 +63,14 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
   }
 
   @Test
+  @Ignore("MULE-10772")
   public void rejectsInvalidContentTypeWithoutBody() throws Exception {
     Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
     testRejectContentType(request, "MediaType cannot be parsed: application");
   }
 
   @Test
+  @Ignore("MULE-10772")
   public void rejectsInvalidContentTypeWithBody() throws Exception {
     Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "application", null));
     testRejectContentType(request, "MediaType cannot be parsed: application");
