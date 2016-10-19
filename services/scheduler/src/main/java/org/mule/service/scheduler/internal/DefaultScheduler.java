@@ -6,8 +6,10 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
 import static java.util.Collections.synchronizedSet;
+import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 
@@ -16,6 +18,7 @@ import org.mule.runtime.core.api.scheduler.Scheduler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -62,50 +65,52 @@ public class DefaultScheduler implements Scheduler {
   @Override
   public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
     checkShutdown();
-    if (command == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(command);
 
-    final DefaultSchedulerTaskDecorator decorated = decorateRunnable(command);
+    final SchedulerRunnableDecorator decorated = decorateRunnable(command);
 
-    return scheduledExecutor.schedule(() -> executor.execute(decorated), delay, unit);
+    final ScheduledFuture<?> submittedFuture = scheduledExecutor.schedule(() -> executor.execute(decorated), delay, unit);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
     checkShutdown();
-    if (callable == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(callable);
 
-    final DefaultSchedulerTaskDecorator decorated = new DefaultSchedulerTaskDecorator(new FutureTask<>(callable), this);
+    final SchedulerRunnableDecorator decorated = new SchedulerRunnableDecorator(new FutureTask<>(callable), this);
     currentTasks.add(decorated);
-
-    return (ScheduledFuture<V>) scheduledExecutor.schedule(() -> executor.execute(decorated), delay, unit);
+    final ScheduledFuture<V> submittedFuture =
+        (ScheduledFuture<V>) scheduledExecutor.schedule(() -> executor.execute(decorated), delay, unit);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
     checkShutdown();
-    if (command == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(command);
 
-    final DefaultSchedulerTaskDecorator decorated = decorateRunnable(command);
+    final SchedulerRunnableDecorator decorated = decorateRunnable(command);
 
-    return scheduledExecutor.scheduleAtFixedRate(() -> executor.execute(decorated), initialDelay, period, unit);
+    final ScheduledFuture<?> submittedFuture =
+        scheduledExecutor.scheduleAtFixedRate(() -> executor.execute(decorated), initialDelay, period, unit);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
     checkShutdown();
-    if (command == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(command);
 
-    final DefaultSchedulerTaskDecorator decorated = decorateRunnable(command);
+    final SchedulerRunnableDecorator decorated = decorateRunnable(command);
 
-    return scheduledExecutor.scheduleWithFixedDelay(() -> executor.execute(decorated), initialDelay, delay, unit);
+    final ScheduledFuture<?> submittedFuture =
+        scheduledExecutor.scheduleWithFixedDelay(() -> executor.execute(decorated), initialDelay, delay, unit);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
@@ -124,7 +129,9 @@ public class DefaultScheduler implements Scheduler {
         tasks = new ArrayList<>(currentTasks.size());
         for (BaseSchedulerTaskDecorator task : currentTasks) {
           task.stop();
-          tasks.add(task.getDecoratedRunnable());
+          if (!task.isStarted()) {
+            tasks.add(task.getDecoratedRunnable());
+          }
         }
         currentTasks.clear();
 
@@ -163,44 +170,42 @@ public class DefaultScheduler implements Scheduler {
   @Override
   public <T> Future<T> submit(Callable<T> task) {
     checkShutdown();
-    if (task == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(task);
 
-    final DefaultSchedulerFutureTaskDecorator<T> decorated = decorateCallable(task);
-    return executor.submit(decorated);
+    final SchedulerCallableDecorator<T> decorated = decorateCallable(task);
+    final Future<T> submittedFuture = executor.submit(decorated);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
   public <T> Future<T> submit(Runnable task, T result) {
     checkShutdown();
-    if (task == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(task);
 
-    final DefaultSchedulerTaskDecorator decorated = decorateRunnable(task);
-    return executor.submit(decorated, result);
+    final SchedulerRunnableDecorator decorated = decorateRunnable(task);
+    final Future<T> submittedFuture = executor.submit(decorated, result);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
   public Future<?> submit(Runnable task) {
     checkShutdown();
-    if (task == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(task);
 
-    final DefaultSchedulerTaskDecorator decorated = decorateRunnable(task);
-    return executor.submit(decorated);
+    final SchedulerRunnableDecorator decorated = decorateRunnable(task);
+    final Future<?> submittedFuture = executor.submit(decorated);
+    decorated.linkWithSubmittedFuture(submittedFuture);
+    return submittedFuture;
   }
 
   @Override
   public void execute(Runnable command) {
     checkShutdown();
-    if (command == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(command);
 
-    final DefaultSchedulerTaskDecorator decorated = decorateRunnable(command);
+    final SchedulerRunnableDecorator decorated = decorateRunnable(command);
     executor.execute(decorated);
   }
 
@@ -213,61 +218,71 @@ public class DefaultScheduler implements Scheduler {
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
     checkShutdown();
-    if (tasks == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(tasks);
 
-    final List<DefaultSchedulerFutureTaskDecorator<T>> decorated =
-        tasks.stream().map(t -> decorateCallable(t)).collect(toList());
-    return executor.invokeAll(decorated);
+    final List<SchedulerCallableDecorator<T>> decoratedTasks =
+        tasks.stream().map(t -> requireNonNull(t)).map(t -> decorateCallable(t)).collect(toList());
+    final List<Future<T>> submittedFutures = executor.invokeAll(decoratedTasks);
+
+    linkTasksWithSubmittedFutures(decoratedTasks, submittedFutures);
+    return submittedFutures;
   }
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException {
     checkShutdown();
-    if (tasks == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(tasks);
 
-    final List<DefaultSchedulerFutureTaskDecorator<T>> decorated =
-        tasks.stream().map(t -> decorateCallable(t)).collect(toList());
-    return executor.invokeAll(decorated, timeout, unit);
+    final List<SchedulerCallableDecorator<T>> decoratedTasks =
+        tasks.stream().map(t -> requireNonNull(t)).map(t -> decorateCallable(t)).collect(toList());
+    final List<Future<T>> submittedFutures = executor.invokeAll(decoratedTasks, timeout, unit);
+
+    linkTasksWithSubmittedFutures(decoratedTasks, submittedFutures);
+    return submittedFutures;
+  }
+
+  protected <T> void linkTasksWithSubmittedFutures(final List<SchedulerCallableDecorator<T>> decoratedTasks,
+                                                   final List<Future<T>> submittedFutures) {
+    // This will work because we converted the parameter collection to a list, so the consistent order is ensured.
+    Iterator<SchedulerCallableDecorator<T>> it1 = decoratedTasks.iterator();
+    Iterator<Future<T>> it2 = submittedFutures.iterator();
+    while (it1.hasNext() && it2.hasNext()) {
+      SchedulerCallableDecorator<T> decorated = it1.next();
+      Future<T> submittedFuture = it2.next();
+      decorated.linkWithSubmittedFuture(submittedFuture);
+    }
   }
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
     checkShutdown();
-    if (tasks == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(tasks);
 
-    final List<DefaultSchedulerFutureTaskDecorator<T>> decorated =
-        tasks.stream().map(t -> decorateCallable(t)).collect(toList());
-    return executor.invokeAny(decorated);
+    final List<SchedulerCallableDecorator<T>> decoratedTasks =
+        tasks.stream().map(t -> requireNonNull(t)).map(t -> decorateCallable(t)).collect(toList());
+    return executor.invokeAny(decoratedTasks);
   }
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
     checkShutdown();
-    if (tasks == null) {
-      throw new NullPointerException();
-    }
+    requireNonNull(tasks);
 
-    final List<DefaultSchedulerFutureTaskDecorator<T>> decorated =
-        tasks.stream().map(t -> decorateCallable(t)).collect(toList());
+    final List<SchedulerCallableDecorator<T>> decorated =
+        tasks.stream().map(t -> requireNonNull(t)).map(t -> decorateCallable(t)).collect(toList());
     return executor.invokeAny(decorated, timeout, unit);
   }
 
-  protected <T> DefaultSchedulerFutureTaskDecorator<T> decorateCallable(Callable<T> task) {
-    final DefaultSchedulerFutureTaskDecorator<T> decorated = new DefaultSchedulerFutureTaskDecorator<>(task, this);
+  protected <T> SchedulerCallableDecorator<T> decorateCallable(Callable<T> task) {
+    final SchedulerCallableDecorator<T> decorated = new SchedulerCallableDecorator<>(task, this);
     currentTasks.add(decorated);
     return decorated;
   }
 
-  protected DefaultSchedulerTaskDecorator decorateRunnable(Runnable task) {
-    final DefaultSchedulerTaskDecorator decorated = new DefaultSchedulerTaskDecorator(task, this);
+  protected SchedulerRunnableDecorator decorateRunnable(Runnable task) {
+    final SchedulerRunnableDecorator decorated = new SchedulerRunnableDecorator(task, this);
     currentTasks.add(decorated);
     return decorated;
   }
@@ -285,10 +300,10 @@ public class DefaultScheduler implements Scheduler {
 
   @Override
   public String toString() {
-    return super.toString() + "{" + System.lineSeparator()
-        + "  executor: " + executor.toString() + System.lineSeparator()
-        + "  currentTasks: " + currentTasks.toString() + System.lineSeparator()
-        + "  shutdown: " + shutdown + System.lineSeparator()
+    return super.toString() + "{" + lineSeparator()
+        + "  executor: " + executor.toString() + lineSeparator()
+        + "  currentTasks: " + currentTasks.toString() + lineSeparator()
+        + "  shutdown: " + shutdown + lineSeparator()
         + "}";
   }
 }

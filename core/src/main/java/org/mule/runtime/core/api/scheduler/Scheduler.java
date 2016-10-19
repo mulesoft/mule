@@ -10,9 +10,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * Provides access to a specific executor in the Mule runtime. Different {@link Scheduler} instances may be backed by the same
- * {@link ExecutorService}, allowing for a fine control of the source of the tasks that the underlying {@link ExecutorService}
- * will run.
+ * Allows tasks to be submitted/scheduled to a specific executor in the Mule runtime. Different {@link Scheduler} instances may be
+ * backed by the same {@link ExecutorService}, allowing for a fine control of the source of the tasks that the underlying
+ * {@link ExecutorService} will run.
  * <p>
  * See {@link ScheduledExecutorService} and {@link ExecutorService} for documentation on the provided methods.
  * 

@@ -15,9 +15,14 @@ import java.util.function.Consumer;
 
 import org.junit.Test;
 
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+
+@Features("Scheduler Exhaustion")
 public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTestCase {
 
   @Test
+  @Description("Tests that trying to execute a runnable on a full executor fails due to exhaustion")
   public void failOnExhaustedExecute() {
     final ScheduledExecutorService executor = buildExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
@@ -26,6 +31,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   }
 
   @Test
+  @Description("Tests that trying to submit a runnable on a full executor fails due to exhaustion")
   public void failOnExhaustedSubmitRunnable() {
     final ScheduledExecutorService executor = buildExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
@@ -35,6 +41,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   }
 
   @Test
+  @Description("Tests that trying to submit a callable on a full executor fails due to exhaustion")
   public void failOnExhaustedSubmitCallable() {
     final ScheduledExecutorService executor = buildExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
@@ -46,11 +53,12 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   }
 
   @Test
+  @Description("Tests that trying to submit a runnable with result on a full executor fails due to exhaustion")
   public void failOnExhaustedSubmitCallableWithResult() {
     final ScheduledExecutorService executor = buildExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
 
-    failOnExhausted(executor, exec -> exec.submit(() -> awaitLatch(latch), 0), SUBMIT_RESULT_RUNNABLE, SUBMIT_EMPTY_RUNNABLE);
+    failOnExhausted(executor, exec -> exec.submit(() -> awaitLatch(latch), 0), SUBMIT_RESULT_RUNNABLE, SUBMIT_RESULT_RUNNABLE);
   }
 
 

@@ -31,7 +31,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features("Scheduler Shutdown")
-public class DefaultShutdownSchedulerTestCase extends BaseDefaultSchedulerTestCase {
+public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCase {
 
   @Test
   @Description("Tests that calling shutdown() on a Scheduler while it's running a task waits for it to finish before terminating")
@@ -164,6 +164,31 @@ public class DefaultShutdownSchedulerTestCase extends BaseDefaultSchedulerTestCa
     assertThat(notStartedTasks, is(empty()));
 
     assertRejected(executor, SUBMIT_EMPTY_RUNNABLE);
+  }
+
+  @Test
+  @Description("Tests that a running task is interrupted when shutdownNow() is called")
+  public void shutdownNowInterruptsTask() throws InterruptedException, ExecutionException {
+    final ScheduledExecutorService executor = buildExecutor();
+
+    final CountDownLatch latch = new CountDownLatch(1);
+    final CountDownLatch triggeredLatch = new CountDownLatch(1);
+    final CountDownLatch interruptionLatch = new CountDownLatch(1);
+
+    final Future<Boolean> result = executor.submit(() -> {
+      triggeredLatch.countDown();
+      final boolean awaited = awaitLatch(latch);
+      assertThat(Thread.interrupted(), is(true));
+      interruptionLatch.countDown();
+      return awaited;
+    });
+
+    triggeredLatch.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+    final List<Runnable> notStartedTasks = executor.shutdownNow();
+    interruptionLatch.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+
+    assertThat(notStartedTasks, is(empty()));
+    assertThat(result.isCancelled(), is(true));
   }
 
   protected void assertRejected(final ScheduledExecutorService executor,

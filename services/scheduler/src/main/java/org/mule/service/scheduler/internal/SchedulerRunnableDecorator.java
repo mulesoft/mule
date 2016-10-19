@@ -6,8 +6,6 @@
  */
 package org.mule.service.scheduler.internal;
 
-import static java.lang.Thread.currentThread;
-
 import java.util.concurrent.Executor;
 
 /**
@@ -16,17 +14,17 @@ import java.util.concurrent.Executor;
  *
  * @since 4.0
  */
-public class DefaultSchedulerTaskDecorator extends BaseSchedulerTaskDecorator implements Runnable {
+public class SchedulerRunnableDecorator extends BaseSchedulerTaskDecorator implements Runnable {
 
   private final Runnable task;
 
   /**
-   * Decorates the given {@code command}
+   * Decorates the given {@code task}
    * 
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
    */
-  public DefaultSchedulerTaskDecorator(Runnable task, DefaultScheduler scheduler) {
+  public SchedulerRunnableDecorator(Runnable task, DefaultScheduler scheduler) {
     super(scheduler);
     this.task = task;
   }
@@ -34,20 +32,15 @@ public class DefaultSchedulerTaskDecorator extends BaseSchedulerTaskDecorator im
   @Override
   public void run() {
     try {
-      this.runner = currentThread();
-      if (stopped) {
+      if (!start()) {
         return;
       }
       task.run();
     } finally {
-      this.runner = null;
       wrapUp();
     }
   }
 
-  /**
-   * @return the task decorated by this decorator.
-   */
   @Override
   public Runnable getDecoratedRunnable() {
     return task;

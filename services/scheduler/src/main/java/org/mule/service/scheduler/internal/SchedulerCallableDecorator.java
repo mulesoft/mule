@@ -17,7 +17,7 @@ import java.util.concurrent.RunnableFuture;
  *
  * @since 4.0
  */
-public class DefaultSchedulerFutureTaskDecorator<V> extends BaseSchedulerTaskDecorator implements Callable<V> {
+public class SchedulerCallableDecorator<V> extends BaseSchedulerTaskDecorator implements Callable<V> {
 
   private final Callable<V> task;
 
@@ -27,7 +27,7 @@ public class DefaultSchedulerFutureTaskDecorator<V> extends BaseSchedulerTaskDec
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
    */
-  public DefaultSchedulerFutureTaskDecorator(Callable<V> task, DefaultScheduler scheduler) {
+  public SchedulerCallableDecorator(Callable<V> task, DefaultScheduler scheduler) {
     super(scheduler);
     this.task = task;
   }
@@ -35,13 +35,11 @@ public class DefaultSchedulerFutureTaskDecorator<V> extends BaseSchedulerTaskDec
   @Override
   public V call() throws Exception {
     try {
-      this.runner = Thread.currentThread();
-      if (stopped) {
+      if (!start()) {
         return null;
       }
       return task.call();
     } finally {
-      this.runner = null;
       wrapUp();
     }
   }

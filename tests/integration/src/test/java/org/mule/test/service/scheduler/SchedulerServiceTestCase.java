@@ -22,7 +22,11 @@ import javax.inject.Inject;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+
 @Ignore("MULE-10136")
+@Features("Scheduler Service")
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
   @Override
@@ -31,6 +35,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
+  @Description("Test that the scheduler service is properly injected into a Mule component")
   public void useSchedulingService() throws Exception {
     flowRunner("willSchedule").run();
   }

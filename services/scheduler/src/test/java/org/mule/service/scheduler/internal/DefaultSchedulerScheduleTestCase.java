@@ -124,8 +124,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     }, 1, SECONDS);
 
     assertThat(executor.shutdownNow(), hasSize(1));
-
-    scheduled.get(2 * EXECUTOR_TIMEOUT_SECS, SECONDS);
+    assertThat(scheduled.isCancelled(), is(true));
   }
 
   @Test
@@ -138,7 +137,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     }, 1, SECONDS);
 
     assertThat(executor.shutdownNow(), hasSize(1));
-
-    scheduled.get(2 * EXECUTOR_TIMEOUT_SECS, SECONDS);
+    assertThat(scheduled.isCancelled(), is(true));
   }
 }
