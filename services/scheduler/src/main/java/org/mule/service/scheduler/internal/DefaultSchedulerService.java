@@ -41,17 +41,17 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return new DefaultScheduler(cpuLightExecutor, scheduledExecutor);
+    return new DefaultScheduler(cpuLightExecutor, scheduledExecutor, true);
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return new DefaultScheduler(ioExecutor, scheduledExecutor);
+    return new DefaultScheduler(ioExecutor, scheduledExecutor, false);
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return new DefaultScheduler(computationExecutor, scheduledExecutor);
+    return new DefaultScheduler(computationExecutor, scheduledExecutor, false);
   }
 
   @Override

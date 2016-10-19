@@ -34,8 +34,8 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling shutdown() on a Scheduler while it's running a task waits for it to finish before terminating")
   public void shutdownWhileRunningTasksFromDifferentSources() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor1 = buildExecutor();
-    final ScheduledExecutorService executor2 = buildExecutor();
+    final ScheduledExecutorService executor1 = createExecutor();
+    final ScheduledExecutorService executor2 = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -59,8 +59,8 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Description("Tests that calling shutdownNow() on a Scheduler with a queued task cancels that task")
   public void shutdownNowWhileRunningTasksFromDifferentSources()
       throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor1 = buildExecutor();
-    final ScheduledExecutorService executor2 = buildExecutor();
+    final ScheduledExecutorService executor1 = createExecutor();
+    final ScheduledExecutorService executor2 = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -84,7 +84,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdown() is rejected")
   public void submitAfterShutdownSameExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     executor.shutdown();
 
@@ -94,8 +94,8 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdown() on another Scheduler is NOT rejected")
   public void submitAfterShutdownOtherExecutor() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor1 = buildExecutor();
-    final ScheduledExecutorService executor2 = buildExecutor();
+    final ScheduledExecutorService executor1 = createExecutor();
+    final ScheduledExecutorService executor2 = createExecutor();
 
     executor1.shutdown();
 
@@ -113,7 +113,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdownNow() is rejected")
   public void submitAfterShutdownNowSameExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final List<Runnable> notStartedTasks = executor.shutdownNow();
 
@@ -125,8 +125,8 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdownNow() on another Scheduler is NOT rejected")
   public void submitAfterShutdownNowOtherExecutor() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor1 = buildExecutor();
-    final ScheduledExecutorService executor2 = buildExecutor();
+    final ScheduledExecutorService executor1 = createExecutor();
+    final ScheduledExecutorService executor2 = createExecutor();
 
     executor1.shutdownNow();
 
@@ -144,7 +144,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after the service is stopped is rejected")
   public void submitAfterShutdownSharedExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     sharedExecutor.shutdown();
 
@@ -154,7 +154,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after the service is force-stopped is rejected")
   public void submitAfterShutdownNowSharedExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final List<Runnable> notStartedTasks = sharedExecutor.shutdownNow();
 
@@ -166,7 +166,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a running task is interrupted when shutdownNow() is called")
   public void shutdownNowInterruptsTask() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CountDownLatch triggeredLatch = new CountDownLatch(1);

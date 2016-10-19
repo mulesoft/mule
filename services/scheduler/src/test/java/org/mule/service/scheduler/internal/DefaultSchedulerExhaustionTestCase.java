@@ -24,7 +24,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   @Test
   @Description("Tests that trying to execute a runnable on a full executor fails due to exhaustion")
   public void failOnExhaustedExecute() {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
 
     failOnExhausted(executor, exec -> exec.execute(() -> awaitLatch(latch)), EXECUTE_EMPTY_RUNNABLE, EXECUTE_EMPTY_RUNNABLE);
@@ -33,7 +33,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   @Test
   @Description("Tests that trying to submit a runnable on a full executor fails due to exhaustion")
   public void failOnExhaustedSubmitRunnable() {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
 
     failOnExhausted(executor, exec -> exec.submit((Runnable) () -> awaitLatch(latch)), SUBMIT_EMPTY_RUNNABLE,
@@ -43,7 +43,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   @Test
   @Description("Tests that trying to submit a callable on a full executor fails due to exhaustion")
   public void failOnExhaustedSubmitCallable() {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
 
     failOnExhausted(executor, exec -> exec.submit(() -> {
@@ -55,7 +55,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
   @Test
   @Description("Tests that trying to submit a runnable with result on a full executor fails due to exhaustion")
   public void failOnExhaustedSubmitCallableWithResult() {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
 
     failOnExhausted(executor, exec -> exec.submit(() -> awaitLatch(latch), 0), SUBMIT_RESULT_RUNNABLE, SUBMIT_RESULT_RUNNABLE);
@@ -64,7 +64,7 @@ public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTest
 
   @Test
   public void failOnExhaustedMixed() {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
     final CountDownLatch latch = new CountDownLatch(1);
 
     failOnExhausted(executor, exec -> exec.submit(() -> awaitLatch(latch), 0), EXECUTE_EMPTY_RUNNABLE, SUBMIT_EMPTY_RUNNABLE);

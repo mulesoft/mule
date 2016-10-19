@@ -49,11 +49,10 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     });
   }
 
-
   @Test
   @Description("Tests that the Scheduler is properly terminated after calling shutdown()")
   public void terminatedAfterShutdownSameExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     executor.shutdown();
 
@@ -63,8 +62,8 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that calling shutdown() in a Scheduler has no impact on another Scheduler backed by the same Executor")
   public void terminatedAfterShutdownOtherExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor1 = buildExecutor();
-    final ScheduledExecutorService executor2 = buildExecutor();
+    final ScheduledExecutorService executor1 = createExecutor();
+    final ScheduledExecutorService executor2 = createExecutor();
 
     executor1.shutdown();
 
@@ -75,7 +74,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that the Scheduler is properly terminated after calling shutdownNow()")
   public void terminatedAfterShutdownNowSameExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     executor.shutdownNow();
 
@@ -85,8 +84,8 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that calling shutdownNow() in a Scheduler has no impact on another Scheduler backed by the same Executor")
   public void terminatedAfterShutdownNowOtherExecutor() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor1 = buildExecutor();
-    final ScheduledExecutorService executor2 = buildExecutor();
+    final ScheduledExecutorService executor1 = createExecutor();
+    final ScheduledExecutorService executor2 = createExecutor();
 
     executor1.shutdownNow();
 
@@ -97,7 +96,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that calling shutdown() on a Scheduler while it's running a task waits for it to finish before terminating")
   public void terminatedAfterShutdownRunningTask() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -116,7 +115,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that calling shutdownNow() on a Scheduler terminates it even if it's running a task")
   public void terminatedAfterShutdownNowRunningTask() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -132,7 +131,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that calling shutdown() on a Scheduler with a queued task runs that task before terminating")
   public void terminatedAfterShutdownPendingTask() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
@@ -158,7 +157,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   @Test
   @Description("Tests that calling shutdownNow() on a Scheduler with a queued task doesn't wait for that task to run before terminating")
   public void terminatedAfterShutdownNowPendingTask() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = buildExecutor();
+    final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
 

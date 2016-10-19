@@ -13,14 +13,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Decorates a {@link Runnable} in order to do hook behavior both before and after the execution of the decorated {@link Runnable}
- * so a consistent state is maintained in the owner {@link DefaultScheduler}.
+ * Decorates a {@link RunnableFuture} in order to do hook behavior both before and after the execution of the decorated
+ * {@link RunnableFuture} so a consistent state is maintained in the owner {@link DefaultScheduler}.
  *
  * @since 4.0
  */
-public class SchedulerRunnableDecorator<V> extends BaseSchedulerTaskDecorator implements RunnableFuture<V> {
+class SchedulerRunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   private final RunnableFuture<V> task;
+
+  private final DefaultScheduler scheduler;
+
+  private volatile boolean started = false;
+  private volatile boolean stopped = false;
 
   /**
    * Decorates the given {@code task}
@@ -28,8 +33,8 @@ public class SchedulerRunnableDecorator<V> extends BaseSchedulerTaskDecorator im
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
    */
-  public SchedulerRunnableDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
-    super(scheduler);
+  SchedulerRunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
+    this.scheduler = scheduler;
     this.task = task;
   }
 
@@ -45,13 +50,34 @@ public class SchedulerRunnableDecorator<V> extends BaseSchedulerTaskDecorator im
     }
   }
 
-  @Override
-  protected void doCancelTask() {
-    task.cancel(true);
+  protected void wrapUp() {
+    scheduler.taskFinished(this);
+  }
+
+  protected boolean start() {
+    if (!stopped) {
+      this.started = true;
+    }
+    return !stopped;
+  }
+
+  /**
+   * @return {@code true} if the execution of this task has already started, false otherwise.
+   */
+  boolean isStarted() {
+    return started;
+  }
+
+  /**
+   * Marks this task as stopped so is is not executed when started, and interrupts its thread if it has been already started.
+   */
+  protected void doCancel() {
+    this.stopped = true;
   }
 
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
+    doCancel();
     return task.cancel(mayInterruptIfRunning);
   }
 
