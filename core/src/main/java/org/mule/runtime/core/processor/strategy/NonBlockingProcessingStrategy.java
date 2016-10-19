@@ -8,16 +8,16 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutor;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -48,10 +48,11 @@ public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProce
                                   org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                   MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
     for (Processor processor : processors) {
-      chainBuilder.chain((Processor) processor);
+      chainBuilder.chain(processor);
     }
   }
 
+  @Override
   public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
                                                                   Function<Publisher<Event>, Publisher<Event>> publisherFunction) {
     if (processor instanceof NonBlockingMessageProcessor) {

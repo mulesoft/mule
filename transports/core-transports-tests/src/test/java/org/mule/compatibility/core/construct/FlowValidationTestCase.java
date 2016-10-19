@@ -14,12 +14,12 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.processor.factory.AsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -47,14 +47,14 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws RegistrationException {
-    when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
+    when(mockMuleContext.getConfiguration().getDefaultProcessingStrategyFactory()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }
 
   @Test(expected = FlowConstructInvalidException.class)
   public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    flow.setProcessingStrategy(new AsynchronousProcessingStrategy());
+    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
     flow.validateConstruct();
   }
 

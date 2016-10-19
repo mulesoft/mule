@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.factory.AsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.AbstractPipeline;
@@ -48,7 +49,6 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -212,7 +212,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Test
   public void oneWayAsyncRequestException() throws Exception {
     Flow pipeline = new Flow("test", muleContext);
-    pipeline.setProcessingStrategy(new AsynchronousProcessingStrategy());
+    pipeline.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
     List<Processor> processors = new ArrayList<>();
     processors.add(event -> {

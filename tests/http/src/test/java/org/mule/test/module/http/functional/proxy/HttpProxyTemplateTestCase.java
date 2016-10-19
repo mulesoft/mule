@@ -12,9 +12,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
-import org.mule.runtime.core.api.config.MuleProperties;
+
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -24,12 +25,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.TestInputStream;
 import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -50,6 +45,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
@@ -83,8 +84,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     this.responeThreadNameSubString = responeThreadNameSubString;
     this.nonBlocking = nonBlocking;
     if (nonBlocking) {
-      systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
-                                          ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+      systemProperty = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, NON_BLOCKING_PROCESSING_STRATEGY);
     }
   }
 
@@ -161,21 +161,15 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   public void proxyStreaming() throws Exception {
     final Latch latch = new Latch();
     consumeAllRequest = false;
-    handlerExtender = new RequestHandlerExtender() {
+    handlerExtender = (baseRequest, request, response) -> {
+      extractHeadersFromBaseRequest(baseRequest);
 
-      @Override
-      public void handleRequest(org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response)
-          throws IOException {
-        extractHeadersFromBaseRequest(baseRequest);
+      latch.release();
+      IOUtils.toString(baseRequest.getInputStream());
 
-        latch.release();
-        IOUtils.toString(baseRequest.getInputStream());
-
-        response.setContentType(request.getContentType());
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().print("OK");
-      }
+      response.setContentType(request.getContentType());
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.getWriter().print("OK");
     };
 
     AsyncHttpClientConfig.Builder configBuilder = new AsyncHttpClientConfig.Builder();
@@ -312,6 +306,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     return String.format("http://localhost:%s/%s", httpPort.getNumber(), path);
   }
 
+  @Override
   protected void handleRequest(org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request,
                                HttpServletResponse response)
       throws IOException {

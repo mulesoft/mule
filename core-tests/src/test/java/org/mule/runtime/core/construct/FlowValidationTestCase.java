@@ -15,13 +15,13 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.processor.factory.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.NonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -47,20 +47,20 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws MuleException {
-    when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
+    when(mockMuleContext.getConfiguration().getDefaultProcessingStrategyFactory()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }
 
   @Test(expected = FlowConstructInvalidException.class)
   public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    flow.setProcessingStrategy(new AsynchronousProcessingStrategy());
+    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
     flow.validateConstruct();
   }
 
   @Test
   public void testProcessingStrategyNonBlockingSupported() throws Exception {
-    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    flow.setProcessingStrategyFactory(new NonBlockingProcessingStrategyFactory());
     flow.setMessageSource((NonBlockingMessageSource) listener -> {
     });
     flow.validateConstruct();
@@ -68,7 +68,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
 
   @Test(expected = FlowConstructInvalidException.class)
   public void testProcessingStrategyNonBlockingNotSupported() throws Exception {
-    flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+    flow.setProcessingStrategyFactory(new NonBlockingProcessingStrategyFactory());
     flow.setMessageSource(listener -> {
     });
     flow.validateConstruct();

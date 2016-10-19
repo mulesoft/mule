@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.construct;
 
+import static java.lang.String.format;
+import static org.apache.commons.collections.CollectionUtils.selectRejected;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
@@ -22,12 +24,17 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.factory.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -35,7 +42,6 @@ import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
@@ -43,11 +49,8 @@ import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
 
@@ -70,6 +73,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected List<Processor> messageProcessors = Collections.emptyList();
   private PathResolver flowMap;
 
+  protected ProcessingStrategyFactory processingStrategyFactory;
   protected ProcessingStrategy processingStrategy;
   private boolean canProcessMessage = false;
 
@@ -80,8 +84,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       if (messageSource instanceof LegacyInboundEndpoint) {
         return ((LegacyInboundEndpoint) messageSource).isCompatibleWithAsync();
       } else if (messageSource instanceof CompositeMessageSource) {
-        return CollectionUtils.selectRejected(((CompositeMessageSource) messageSource).getSources(), sourceCompatibleWithAsync)
-            .isEmpty();
+        return selectRejected(((CompositeMessageSource) messageSource).getSources(), this).isEmpty();
       } else {
         return true;
       }
@@ -111,23 +114,31 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   /**
-   * A fallback method for creating a {@link ProcessingStrategy} to be used in case the user hasn't specified one through either
-   * {@link #setProcessingStrategy(ProcessingStrategy)}, through {@link MuleConfiguration#getDefaultProcessingStrategy()} or the
+   * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one through
+   * either {@link #setProcessingStrategyFactory(ProcessingStrategyFactory)}, through
+   * {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
    * {@link MuleProperties#MULE_DEFAULT_PROCESSING_STRATEGY} system property
    *
-   * @return a {@link SynchronousProcessingStrategy}
+   * @return a {@link SynchronousProcessingStrategyFactory}
    */
-  protected ProcessingStrategy createDefaultProcessingStrategy() {
-    return new SynchronousProcessingStrategy();
+  protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
+    return new SynchronousProcessingStrategyFactory();
   }
 
   protected void initialiseProcessingStrategy() {
     if (processingStrategy == null) {
-      processingStrategy = muleContext.getConfiguration().getDefaultProcessingStrategy();
+      if (processingStrategyFactory == null) {
+        final ProcessingStrategyFactory defaultProcessingStrategyFactory =
+            muleContext.getConfiguration().getDefaultProcessingStrategyFactory();
 
-      if (processingStrategy == null) {
-        processingStrategy = createDefaultProcessingStrategy();
+        if (defaultProcessingStrategyFactory == null) {
+          processingStrategyFactory = createDefaultProcessingStrategyFactory();
+        } else {
+          processingStrategyFactory = defaultProcessingStrategyFactory;
+        }
       }
+
+      processingStrategy = processingStrategyFactory.create();
     }
   }
 
@@ -165,17 +176,23 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   public boolean isSynchronous() {
-    return this.processingStrategy.getClass().equals(SynchronousProcessingStrategy.class);
+    return getProcessingStrategy().getClass().equals(SynchronousProcessingStrategy.class);
+  }
+
+  @Override
+  public ProcessingStrategyFactory getProcessingStrategyFactory() {
+    return processingStrategyFactory;
+  }
+
+  @Override
+  public void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory) {
+    this.processingStrategyFactory = processingStrategyFactory;
+    this.processingStrategy = null;
   }
 
   @Override
   public ProcessingStrategy getProcessingStrategy() {
     return processingStrategy;
-  }
-
-  @Override
-  public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
-    this.processingStrategy = processingStrategy;
   }
 
   @Override
@@ -217,9 +234,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.validateConstruct();
 
     // Ensure that inbound endpoints are compatible with processing strategy.
-    boolean userConfiguredProcessingStrategy = !(processingStrategy instanceof DefaultFlowProcessingStrategy);
+    boolean userConfiguredProcessingStrategy = !(getProcessingStrategyFactory() instanceof DefaultFlowProcessingStrategyFactory);
     boolean userConfiguredAsyncProcessingStrategy =
-        processingStrategy instanceof AsynchronousProcessingStrategy && userConfiguredProcessingStrategy;
+        getProcessingStrategyFactory() instanceof AsynchronousProcessingStrategyFactory && userConfiguredProcessingStrategy;
 
     boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
 
@@ -232,15 +249,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
               + "because it is request-response, has a transaction defined, or " + "messaging redelivered is configured."), this);
     }
 
-    if (processingStrategy instanceof NonBlockingProcessingStrategy && messageSource != null
+    if (getProcessingStrategyFactory() instanceof NonBlockingProcessingStrategyFactory && messageSource != null
         && !(messageSource instanceof NonBlockingMessageSource)) {
-      throw new FlowConstructInvalidException(CoreMessages.createStaticMessage(String
-          .format("The non-blocking processing strategy (%s) currently only supports non-blocking messages sources (source is %s).",
-                  processingStrategy.toString(), messageSource.toString())), this);
+      throw new FlowConstructInvalidException(CoreMessages
+          .createStaticMessage(format("The non-blocking processing strategy (%s) currently only supports non-blocking messages sources (source is %s).",
+                                      getProcessingStrategyFactory().toString(), messageSource.toString())), this);
     }
 
     if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
-      setProcessingStrategy(new SynchronousProcessingStrategy());
+      processingStrategy = new SynchronousProcessingStrategy();
       if (LOGGER.isWarnEnabled()) {
         LOGGER
             .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");

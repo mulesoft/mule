@@ -94,6 +94,7 @@ public class ApplicationModel {
   public static final String ANNOTATION_ELEMENT = "annotations";
   public static final String FILTER_ELEMENT_SUFFIX = "-filter";
   public static final String PROCESSING_STRATEGY_ATTRIBUTE = "processingStrategy";
+  public static final String PROCESSING_STRATEGY_FACTORY_ATTRIBUTE = "processingStrategyFactory";
   public static final String QUEUE_STORE = "queue-store";
   public static final String CONFIGURATION_ELEMENT = "configuration";
   public static final String DATA_WEAVE = "weave";

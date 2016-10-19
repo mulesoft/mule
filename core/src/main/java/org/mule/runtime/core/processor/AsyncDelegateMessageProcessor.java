@@ -9,9 +9,11 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -25,6 +27,7 @@ import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSourceProvider;
+import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -54,27 +57,29 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   protected Processor delegate;
 
   protected List<Processor> processors;
+  protected ProcessingStrategyFactory processingStrategyFactory;
   protected ProcessingStrategy processingStrategy;
   protected String name;
 
   private Processor target;
 
   public AsyncDelegateMessageProcessor(Processor delegate,
-                                       ProcessingStrategy processingStrategy,
+                                       ProcessingStrategyFactory processingStrategyFactory,
                                        String name) {
     this.delegate = delegate;
-    this.processingStrategy = processingStrategy;
+    this.processingStrategyFactory = processingStrategyFactory;
     this.name = name;
   }
 
   @Override
   public void initialise() throws InitialisationException {
     if (delegate == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("delegate message processor"), this);
+      throw new InitialisationException(objectIsNull("delegate message processor"), this);
     }
-    if (processingStrategy == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
+    if (processingStrategyFactory == null) {
+      throw new InitialisationException(objectIsNull("processingStrategy"), this);
     }
+    processingStrategy = processingStrategyFactory.create();
 
     validateFlowConstruct();
 

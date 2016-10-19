@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api.processor;
 
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Pipeline;
 
 import java.util.List;
 import java.util.function.Function;

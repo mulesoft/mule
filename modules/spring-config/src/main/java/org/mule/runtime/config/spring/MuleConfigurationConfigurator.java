@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
+
 import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -48,18 +49,22 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
 
   protected transient Logger logger = LoggerFactory.getLogger(MuleConfigurationConfigurator.class);
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
 
+  @Override
   public boolean isEagerInit() {
     return true;
   }
 
+  @Override
   public boolean isPrototype() {
     return false;
   }
 
+  @Override
   public Object getObject() throws Exception {
     MuleConfiguration configuration = muleContext.getConfiguration();
     if (configuration instanceof DefaultMuleConfiguration) {
@@ -82,13 +87,12 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
   }
 
   private void determineDefaultProcessingStrategy(DefaultMuleConfiguration defaultConfig) {
-    if (config.getDefaultProcessingStrategy() != null) {
-      defaultConfig.setDefaultProcessingStrategy(config.getDefaultProcessingStrategy());
+    if (config.getDefaultProcessingStrategyFactory() != null) {
+      defaultConfig.setDefaultProcessingStrategyFactory(config.getDefaultProcessingStrategyFactory());
     } else {
-      String processingStrategyFromSystemProperty = System.getProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY);
+      String processingStrategyFromSystemProperty = System.getProperty(MULE_DEFAULT_PROCESSING_STRATEGY);
       if (!StringUtils.isBlank(processingStrategyFromSystemProperty)) {
-        defaultConfig
-            .setDefaultProcessingStrategy(ProcessingStrategyUtils.parseProcessingStrategy(processingStrategyFromSystemProperty));
+        defaultConfig.setDefaultProcessingStrategyFactory(parseProcessingStrategy(processingStrategyFromSystemProperty));
       }
     }
   }
@@ -126,10 +130,12 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     }
   }
 
+  @Override
   public Class<?> getObjectType() {
     return MuleConfiguration.class;
   }
 
+  @Override
   public boolean isSingleton() {
     return true;
   }
@@ -158,8 +164,8 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     config.setDefaultObjectSerializer(objectSerializer);
   }
 
-  public void setDefaultProcessingStrategy(ProcessingStrategy processingStrategy) {
-    config.setDefaultProcessingStrategy(processingStrategy);
+  public void setDefaultProcessingStrategy(ProcessingStrategyFactory processingStrategyFactory) {
+    config.setDefaultProcessingStrategyFactory(processingStrategyFactory);
   }
 
   public void setMaxQueueTransactionFilesSize(int queueTransactionFilesSizeInMegabytes) {

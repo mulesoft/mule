@@ -7,10 +7,10 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
 
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.core.context.notification.Node;
@@ -36,8 +36,7 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
 
   public HttpMessageProcessorNotificationTestCase(boolean nonBlocking) {
     if (nonBlocking) {
-      systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
-                                          ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+      systemProperty = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, NON_BLOCKING_PROCESSING_STRATEGY);
     }
   }
 

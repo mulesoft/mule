@@ -6,10 +6,15 @@
  */
 package org.mule.test.config;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY;
+
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
@@ -18,7 +23,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
@@ -30,10 +34,11 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
-    return Arrays
-        .asList(new Object[][] {{ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategy.class},
-            {ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategy.class},
-            {ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY, AsynchronousProcessingStrategy.class},});
+    return asList(new Object[][] {
+        {DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategy.class},
+        {SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategy.class},
+        {ASYNC_PROCESSING_STRATEGY, AsynchronousProcessingStrategy.class},
+    });
   }
 
   private final Class<? extends ProcessingStrategy> expectedStrategyType;
@@ -44,7 +49,7 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
   public ConfigurationProcessingStrategyParserTestCase(String defaultProcessingStrategy,
                                                        Class<? extends ProcessingStrategy> expectedStrategyType) {
     this.expectedStrategyType = expectedStrategyType;
-    processingStrategyProperty = new SystemProperty("processingStrategy", defaultProcessingStrategy);
+    processingStrategyProperty = new SystemProperty(PROCESSING_STRATEGY_ATTRIBUTE, defaultProcessingStrategy);
   }
 
   @Override
@@ -54,6 +59,7 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
 
   @Test
   public void verifyConfigurationProcessingStrategy() throws Exception {
-    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategy(), is(instanceOf(expectedStrategyType)));
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(),
+               is(instanceOf(expectedStrategyType)));
   }
 }

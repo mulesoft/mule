@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.runtime.core.api.config.MuleProperties;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
+import static org.mule.runtime.config.spring.util.ProcessingStrategyParserUtils.configureProcessingStrategy;
+
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.construct.Flow;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -21,14 +23,14 @@ public class FlowDefinitionParser extends OrphanDefinitionParser {
     super(Flow.class, true);
     addIgnored("abstract");
     addIgnored("name");
-    addIgnored("processingStrategy");
+    addIgnored(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE);
   }
 
   @Override
   protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
     builder.addConstructorArgValue(element.getAttribute(ATTRIBUTE_NAME));
     builder.addConstructorArgReference(MuleProperties.OBJECT_MULE_CONTEXT);
-    ProcessingStrategyUtils.configureProcessingStrategy(element, builder, ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY);
+    configureProcessingStrategy(element, builder, PROCESSING_STRATEGY_FACTORY_ATTRIBUTE);
     super.doParse(element, parserContext, builder);
   }
 }

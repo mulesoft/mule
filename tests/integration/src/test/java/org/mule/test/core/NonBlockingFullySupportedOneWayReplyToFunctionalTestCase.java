@@ -6,35 +6,35 @@
  */
 package org.mule.test.core;
 
+import static java.util.Arrays.asList;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.api.processor.factory.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Ignore;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
 public class NonBlockingFullySupportedOneWayReplyToFunctionalTestCase extends NonBlockingFullySupportedFunctionalTestCase {
 
-  public NonBlockingFullySupportedOneWayReplyToFunctionalTestCase(ProcessingStrategy processingStrategy) {
-    super(processingStrategy);
+  public NonBlockingFullySupportedOneWayReplyToFunctionalTestCase(ProcessingStrategyFactory processingStrategyFactory) {
+    super(processingStrategyFactory);
   }
 
   @Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{new DefaultFlowProcessingStrategy()}, {new NonBlockingProcessingStrategy()}});
+    return asList(new Object[][] {{new DefaultFlowProcessingStrategyFactory()}, {new NonBlockingProcessingStrategyFactory()}});
   }
 
   @Override
   protected MessageExchangePattern getMessageExchnagePattern() {
-    return MessageExchangePattern.ONE_WAY;
+    return ONE_WAY;
   }
 }
 

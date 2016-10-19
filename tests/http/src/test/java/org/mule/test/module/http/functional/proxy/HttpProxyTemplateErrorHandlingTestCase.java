@@ -11,8 +11,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
-import org.mule.runtime.core.api.config.MuleProperties;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
+
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -59,8 +60,7 @@ public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestT
     this.configFile = configFile;
     this.nonBlocking = nonBlocking;
     if (nonBlocking) {
-      systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
-                                          ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+      systemProperty = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, NON_BLOCKING_PROCESSING_STRATEGY);
     }
   }
 
@@ -69,11 +69,13 @@ public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestT
     return configFile;
   }
 
+  @Override
   @Before
   public void startServer() throws Exception {
     // Don't start server so that requests fail
   }
 
+  @Override
   @After
   public void stopServer() throws Exception {
     // No server to stop

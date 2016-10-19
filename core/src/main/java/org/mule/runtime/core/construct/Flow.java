@@ -11,27 +11,28 @@ import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.cre
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.NamedStageNameSource;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.SequentialStageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSourceProvider;
+import org.mule.runtime.core.api.processor.factory.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
@@ -167,11 +168,11 @@ public class Flow extends AbstractPipeline implements Processor, StageNameSource
   /**
    * {@inheritDoc}
    * 
-   * @return a {@link DefaultFlowProcessingStrategy}
+   * @return a {@link DefaultFlowProcessingStrategyFactory}
    */
   @Override
-  protected ProcessingStrategy createDefaultProcessingStrategy() {
-    return new DefaultFlowProcessingStrategy();
+  protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
+    return new DefaultFlowProcessingStrategyFactory();
   }
 
   @Override
