@@ -9,7 +9,7 @@ package org.mule.extension.ws.internal;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
-import org.mule.extension.ws.api.WscAttachment;
+import org.mule.extension.ws.api.WsAttachment;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.introspection.RequestBodyGenerator;
@@ -78,7 +78,7 @@ public class ConsumeOperation {
                                                         @MetadataKeyId(OperationKeysResolver.class) String operation,
                                                         @Optional @Content @TypeResolver(InputBodyResolver.class) String body,
                                                         @Optional @TypeResolver(InputHeadersResolver.class) Map<String, String> headers,
-                                                        @Optional List<WscAttachment> attachments)
+                                                        @Optional List<WsAttachment> attachments)
       throws Exception {
     Map<String, Object> ctx = getContext(headers, attachments, operation);
     Exchange exchange = new ExchangeImpl();
@@ -92,7 +92,7 @@ public class ConsumeOperation {
     return new WscAttributes(headers, null);
   }
 
-  private Map<String, Object> getContext(Map<String, String> headers, List<WscAttachment> attachments, String operation) {
+  private Map<String, Object> getContext(Map<String, String> headers, List<WsAttachment> attachments, String operation) {
     Map<String, Object> props = new HashMap<>();
     props.put(MULE_ATTACHMENTS_KEY, transformAttachments(attachments));
     props.put(MULE_HEADERS_KEY, transformHeaders(headers));
@@ -128,7 +128,7 @@ public class ConsumeOperation {
         .collect(new ImmutableListCollector<>());
   }
 
-  private List<Attachment> transformAttachments(List<WscAttachment> attachments) {
+  private List<Attachment> transformAttachments(List<WsAttachment> attachments) {
     if (attachments == null) {
       return emptyList();
     }

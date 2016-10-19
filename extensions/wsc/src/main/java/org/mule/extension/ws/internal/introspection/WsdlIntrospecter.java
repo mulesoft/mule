@@ -117,30 +117,10 @@ public final class WsdlIntrospecter {
    */
   private Definition parseWsdl(final String wsdlLocation) {
     try {
-      validateBlankString(wsdlLocation, "Wsdl Location");
+      validateBlankString(wsdlLocation, "wsdl Location");
 
       WSDLFactory factory = WSDLFactory.newInstance();
-      ExtensionRegistry registry = factory.newPopulatedExtensionRegistry();
-      registry.registerSerializer(Types.class,
-                                  new QName("http://www.w3.org/2001/XMLSchema", "schema"),
-                                  new SchemaSerializer());
-
-      // these will replace whatever may have already been registered
-      // in these places, but there's no good way to check what was
-      // there before.
-      QName header = new QName("http://schemas.xmlsoap.org/wsdl/soap/", "header");
-      registry.registerDeserializer(MIMEPart.class,
-                                    header,
-                                    registry.queryDeserializer(BindingInput.class, header));
-      registry.registerSerializer(MIMEPart.class,
-                                  header,
-                                  registry.querySerializer(BindingInput.class, header));
-
-      // get the original classname of the SOAPHeader
-      // implementation that was stored in the registry.
-      Class<? extends ExtensibilityElement> clazz = registry.createExtension(BindingInput.class, header).getClass();
-      registry.mapExtensionTypes(MIMEPart.class, header, clazz);
-
+      ExtensionRegistry registry = initExtensionRegistry(factory);
       WSDLReader wsdlReader = factory.newWSDLReader();
       wsdlReader.setFeature("javax.wsdl.verbose", false);
       wsdlReader.setFeature("javax.wsdl.importDocuments", true);
@@ -155,6 +135,30 @@ public final class WsdlIntrospecter {
       //TODO MULE-10784 we should analyze the type of exception (missing or corrupted file) and thrown better exceptions
       throw new IllegalArgumentException(format("Something went wrong when parsing the wsdl file [%s]", wsdlLocation), e);
     }
+  }
+
+  private ExtensionRegistry initExtensionRegistry(WSDLFactory factory) throws WSDLException {
+    ExtensionRegistry registry = factory.newPopulatedExtensionRegistry();
+    registry.registerSerializer(Types.class,
+                                new QName("http://www.w3.org/2001/XMLSchema", "schema"),
+                                new SchemaSerializer());
+
+    // these will replace whatever may have already been registered
+    // in these places, but there's no good way to check what was
+    // there before.
+    QName header = new QName("http://schemas.xmlsoap.org/wsdl/soap/", "header");
+    registry.registerDeserializer(MIMEPart.class,
+                                  header,
+                                  registry.queryDeserializer(BindingInput.class, header));
+    registry.registerSerializer(MIMEPart.class,
+                                header,
+                                registry.querySerializer(BindingInput.class, header));
+
+    // get the original classname of the SOAPHeader
+    // implementation that was stored in the registry.
+    Class<? extends ExtensibilityElement> clazz = registry.createExtension(BindingInput.class, header).getClass();
+    registry.mapExtensionTypes(MIMEPart.class, header, clazz);
+    return registry;
   }
 
   private void validateNotNull(Object paramValue, String errorMessage) {

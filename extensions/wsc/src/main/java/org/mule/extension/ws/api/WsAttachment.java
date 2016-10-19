@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
-public final class WscAttachment {
+public final class WsAttachment {
 
   /**
    * the name of the attachment.
@@ -37,9 +37,9 @@ public final class WscAttachment {
   @Optional
   private String contentType;
 
-  public WscAttachment() {}
+  public WsAttachment() {}
 
-  public WscAttachment(String id, Object content, MediaType contentType) {
+  public WsAttachment(String id, Object content, MediaType contentType) {
     this.id = id;
     this.content = content;
     this.contentType = contentType.toString();

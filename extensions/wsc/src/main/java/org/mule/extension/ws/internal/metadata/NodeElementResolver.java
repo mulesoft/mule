@@ -15,7 +15,7 @@ import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
-import org.mule.metadata.api.model.impl.DefaultStringType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -44,7 +44,7 @@ public abstract class NodeElementResolver extends BaseWscResolver {
   }
 
   static {
-    DefaultStringType stringType = create(XML).stringType().build();
+    StringType stringType = create(XML).stringType().build();
     BooleanType booleanType = create(XML).booleanType().build();
     DateType dateType = create(XML).dateType().build();
     NumberType numberType = create(XML).numberType().build();
