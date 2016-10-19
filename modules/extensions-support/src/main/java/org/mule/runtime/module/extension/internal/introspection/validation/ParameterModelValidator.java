@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.introspection.declaration.type.annotation.
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +40,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.supportsTopLevelDeclaration;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -173,7 +173,7 @@ public final class ParameterModelValidator implements ModelValidator {
   }
 
   private boolean supportsGlobalReferences(MetadataType type) {
-    return supportsTopLevelDeclaration(type) && MetadataTypeUtils.isInstantiable(type);
+    return supportsTopLevelDeclaration(type) && ExtensionMetadataTypeUtils.isInstantiable(type);
   }
 
   private boolean supportsGlobalReferences(ObjectFieldType field) {

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static java.util.Collections.emptySet;
-import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;

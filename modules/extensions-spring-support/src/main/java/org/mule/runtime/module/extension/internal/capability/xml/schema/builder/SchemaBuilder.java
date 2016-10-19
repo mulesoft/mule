@@ -16,7 +16,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;

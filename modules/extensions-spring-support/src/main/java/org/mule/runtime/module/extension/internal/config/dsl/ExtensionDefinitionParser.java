@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
