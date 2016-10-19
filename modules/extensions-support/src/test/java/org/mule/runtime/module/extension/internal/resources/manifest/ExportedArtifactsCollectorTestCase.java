@@ -45,6 +45,7 @@ public class ExportedArtifactsCollectorTestCase {
 
   private static final String APPLE_PACKAGE = "org.mule.tck.testmodels.fruit";
   private static final String PEEL_PACKAGE = "org.mule.tck.testmodels.fruit.peel";
+  private static final String SEED_PACKAGE = "org.mule.tck.testmodels.fruit.seed";
   private static final String VEGAN_PACKAGE = "org.mule.test.vegan.extension";
   private static final String SHAPE_PACKAGE = "org.mule.test.metadata.extension.model.shapes";
 
@@ -74,8 +75,8 @@ public class ExportedArtifactsCollectorTestCase {
   @Test
   public void collect() {
     Set<String> exportedPackages = collector.getExportedPackages();
-    assertThat(exportedPackages, hasSize(4));
-    assertThat(exportedPackages, hasItems(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE));
+    assertThat(exportedPackages, hasSize(5));
+    assertThat(exportedPackages, hasItems(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE));
   }
 
   private OutputModel mockOutputModel(Type type) {

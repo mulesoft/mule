@@ -153,28 +153,32 @@ final class ExportedArtifactsCollector {
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        addType(dictionaryType.getKeyType(), exportedClasses);
-        addType(dictionaryType.getValueType(), exportedClasses);
+        dictionaryType.getKeyType().accept(this);
+        dictionaryType.getValueType().accept(this);
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        addType(arrayType.getType(), exportedClasses);
+        arrayType.getType().accept(this);
       }
 
       @Override
       public void visitObjectField(ObjectFieldType objectFieldType) {
-        addType(objectFieldType.getValue(), exportedClasses);
+        objectFieldType.getValue().accept(this);
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
-        Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
-        if (classInformation.isPresent()) {
-          classInformation.get().getGenericTypes().forEach(generic -> exportedClasses.add(loadClass(generic)));
+        if (!exportedClasses.contains(getType(objectType))) {
+
+          Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
+          if (classInformation.isPresent()) {
+            classInformation.get().getGenericTypes().forEach(generic -> exportedClasses.add(loadClass(generic)));
+          }
+
+          exportedClasses.add(getType(objectType));
+          objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
         }
-        exportedClasses.add(getType(objectType));
-        objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
       }
 
       @Override
@@ -182,12 +186,6 @@ final class ExportedArtifactsCollector {
         Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
         if (enumAnnotation.isPresent()) {
           exportedClasses.add(getType(stringType));
-        }
-      }
-
-      private void addType(MetadataType type, Set<Class> exportedClasses) {
-        if (!exportedClasses.contains(getType(type))) {
-          type.accept(this);
         }
       }
 
