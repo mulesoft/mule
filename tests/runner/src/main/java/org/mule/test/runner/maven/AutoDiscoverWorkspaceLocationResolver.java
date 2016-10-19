@@ -14,6 +14,7 @@ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.Paths.get;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
@@ -144,7 +145,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    * @param classPath
    */
   private void discoverMavenProjectsFromClassPath(List<URL> classPath) {
-    List<Path> classPaths = classPath.stream().map(url -> get(url.getFile())).collect(toList());
+    List<Path> classPaths = classPath.stream().map(url -> toFile(url).toPath()).collect(toList());
     List<File> mavenProjects = classPaths.stream()
         .filter(path -> containsMavenProject(path.getParent().getParent().toFile()))
         .map(path -> path.getParent().getParent().toFile()).collect(toList());
@@ -222,7 +223,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
 
     public MavenDiscovererFileVisitor(List<URL> urlClassPath) {
       this.classPath =
-          urlClassPath.stream().map(url -> new File(url.getFile()).getParentFile().getParentFile().toPath()).collect(toList());
+          urlClassPath.stream().map(url -> toFile(url).getParentFile().getParentFile().toPath()).collect(toList());
     }
 
     @Override
