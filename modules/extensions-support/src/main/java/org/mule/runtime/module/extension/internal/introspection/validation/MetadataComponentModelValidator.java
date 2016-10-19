@@ -19,7 +19,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
@@ -74,8 +73,8 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
       private void validateComponent(ComponentModel model) {
         validateMetadataReturnType(extensionModel, model);
-        validateMetadataOutputAttributes(extensionModel, model);
         MetadataResolverFactory resolverFactory = getMetadataResolverFactory(model);
+        validateMetadataOutputAttributes(model, resolverFactory);
         validateMetadataKeyId(model, resolverFactory);
         validateCategoriesInScope(model, resolverFactory);
       }
@@ -121,13 +120,11 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
   }
 
-  private void validateMetadataOutputAttributes(ExtensionModel extensionModel, ComponentModel component) {
-    MetadataResolverFactory resolverFactory = getMetadataResolverFactory(component);
+  private void validateMetadataOutputAttributes(ComponentModel component, MetadataResolverFactory resolverFactory) {
     if (isVoid(component.getOutputAttributes().getType())
         && !(resolverFactory.getOutputAttributesResolver() instanceof NullMetadataResolver)) {
-      throw new IllegalModelDefinitionException(format("Extension '%s' has a/an %s named '%s' which specifies a non null %s but the output attributes were not defined",
-                                                       extensionModel.getName(), getComponentModelTypeName(component),
-                                                       component.getName(), AttributesTypeResolver.class.getName()));
+      throw new IllegalModelDefinitionException(format("%s '%s' has an attributes metadata resolver defined but it doesn't set any attributes",
+                                                       getComponentModelTypeName(component), component.getName()));
     }
   }
 
