@@ -146,13 +146,13 @@ public final class WsdlIntrospecter {
       wsdlReader.setFeature("javax.wsdl.importDocuments", true);
       wsdlReader.setExtensionRegistry(registry);
 
-      // TODO: don't delegate this call, get the wsdl using the transport configuration specified in the connection.
+      // TODO: MULE-10783 don't delegate this call, get the wsdl using the transport configuration specified in the connection.
       Definition definition = wsdlReader.readWSDL(wsdlLocation);
       validateNotNull(definition, format("Cannot obtain WSDL definition for file [%s]", wsdlLocation));
 
       return definition;
     } catch (WSDLException e) {
-      //TODO tech debt: we should analyze the type of exception (missing or corrupted file) and thrown better exceptions
+      //TODO MULE-10784 we should analyze the type of exception (missing or corrupted file) and thrown better exceptions
       throw new IllegalArgumentException(format("Something went wrong when parsing the wsdl file [%s]", wsdlLocation), e);
     }
   }

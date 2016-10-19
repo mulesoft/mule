@@ -6,6 +6,8 @@
  */
 package org.mule.extension.ws.internal.interceptor;
 
+import static org.mule.extension.ws.internal.ConsumeOperation.MULE_SOAP_ACTION;
+
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -18,15 +20,14 @@ import org.apache.cxf.phase.Phase;
  */
 public class SoapActionInterceptor extends AbstractPhaseInterceptor<Message> {
 
-  private final String soapAction;
 
-  public SoapActionInterceptor(String soapAction) {
+  public SoapActionInterceptor() {
     super(Phase.PRE_LOGICAL);
-    this.soapAction = soapAction;
   }
 
   @Override
   public void handleMessage(Message message) throws Fault {
+    String soapAction = (String) message.getExchange().get(MULE_SOAP_ACTION);
     message.put("SOAPAction", soapAction);
   }
 }

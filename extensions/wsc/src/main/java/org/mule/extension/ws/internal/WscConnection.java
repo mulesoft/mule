@@ -11,6 +11,7 @@ import org.mule.extension.ws.api.SoapVersion;
 import org.mule.extension.ws.internal.interceptor.NamespaceRestorerStaxInterceptor;
 import org.mule.extension.ws.internal.interceptor.NamespaceSaverStaxInterceptor;
 import org.mule.extension.ws.internal.interceptor.OutputSoapHeadersInterceptor;
+import org.mule.extension.ws.internal.interceptor.SoapActionInterceptor;
 import org.mule.extension.ws.internal.interceptor.StreamClosingInterceptor;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 import org.mule.extension.ws.internal.transport.WscTransportFactory;
@@ -72,14 +73,6 @@ public class WscConnection {
     return client.invoke(getOperation(), new Object[] {payload}, ctx, exchange);
   }
 
-  public void addOutInterceptor(Interceptor<? extends Message> i) {
-    client.getOutInterceptors().add(i);
-  }
-
-  public void addInInterceptor(Interceptor<? extends Message> i) {
-    client.getInInterceptors().add(i);
-  }
-
   public void disconnect() {
     client.destroy();
   }
@@ -107,6 +100,9 @@ public class WscConnection {
     WscTransportFactory factory = new WscTransportFactory();
     Client client = factory.createClient(address, soapVersion.getVersion());
 
+    // Request Interceptors
+    client.getOutInterceptors().add(new SoapActionInterceptor());
+
     // Response Interceptors
     client.getInInterceptors().add(new NamespaceRestorerStaxInterceptor());
     client.getInInterceptors().add(new NamespaceSaverStaxInterceptor());
@@ -127,11 +123,7 @@ public class WscConnection {
   }
 
   private void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
-    inInterceptors.stream()
-        .filter(i -> i instanceof PhaseInterceptor)
-        .filter(i -> ((PhaseInterceptor) i).getId().equals(name))
-        .findFirst()
-        .ifPresent(inInterceptors::remove);
+    inInterceptors.removeIf(i -> i instanceof PhaseInterceptor && ((PhaseInterceptor) i).getId().equals(name));
   }
 
   private String getSoapAddress() throws ConnectionException {

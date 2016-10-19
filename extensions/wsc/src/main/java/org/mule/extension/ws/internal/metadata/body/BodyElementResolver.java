@@ -7,6 +7,8 @@
 package org.mule.extension.ws.internal.metadata.body;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
@@ -50,7 +52,6 @@ abstract class BodyElementResolver extends NodeElementResolver {
     BindingOperation bindingOperation = introspecter.getBindingOperation(operationName);
     XmlTypeLoader loader = new XmlTypeLoader(introspecter.getSchemas());
     Part body = getBodyPart(operation, bindingOperation);
-    // TODO: Check if for objects with no fields null type is better
     return buildPartMetadataType(loader, body);
   }
 
@@ -77,7 +78,7 @@ abstract class BodyElementResolver extends NodeElementResolver {
       throws MetadataResolvingException {
     List elements = delegate.getBindingType(bindingOperation).getExtensibilityElements();
     if (elements != null) {
-      //TODO what about other type of SOAP body out there? (e.g.: SOAP12Body)
+      //TODO: MULE-10796 - what about other type of SOAP body out there? (e.g.: SOAP12Body)
       Optional<SOAPBody> body = elements.stream().filter(e -> e instanceof SOAPBody).findFirst();
       if (body.isPresent()) {
         List bodyParts = body.get().getParts();
@@ -85,10 +86,10 @@ abstract class BodyElementResolver extends NodeElementResolver {
           if (bodyParts.size() > 1) {
             throw new MetadataResolvingException("Multipart body operations are not supported", INVALID_CONFIGURATION);
           }
-          return Optional.ofNullable((String) bodyParts.get(0));
+          return ofNullable((String) bodyParts.get(0));
         }
       }
     }
-    return Optional.empty();
+    return empty();
   }
 }

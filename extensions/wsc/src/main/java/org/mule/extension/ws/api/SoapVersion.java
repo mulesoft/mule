@@ -18,8 +18,8 @@ public enum SoapVersion {
 
   SOAP11("1.1", SOAP_1_1_PROTOCOL), SOAP12("1.2", SOAP_1_2_PROTOCOL);
 
-  private String version;
-  private String protocol;
+  private final String version;
+  private final String protocol;
 
   SoapVersion(String version, String protocol) {
     this.version = version;

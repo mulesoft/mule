@@ -12,7 +12,6 @@ import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.WscAttachment;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.extension.ws.api.exception.WscException;
-import org.mule.extension.ws.internal.interceptor.SoapActionInterceptor;
 import org.mule.extension.ws.internal.introspection.RequestBodyGenerator;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
 import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
@@ -72,6 +71,7 @@ public class ConsumeOperation {
 
   public static final String MULE_ATTACHMENTS_KEY = "mule.wsc.attachments";
   public static final String MULE_HEADERS_KEY = "mule.wsc.headers";
+  public static final String MULE_SOAP_ACTION = "mule.wsc.soap.action";
 
   @OutputResolver(output = OutputBodyResolver.class, attributes = WscAttributesResolver.class)
   public OperationResult<String, WscAttributes> consume(@Connection WscConnection connection,
@@ -80,8 +80,7 @@ public class ConsumeOperation {
                                                         @Optional @TypeResolver(InputHeadersResolver.class) Map<String, String> headers,
                                                         @Optional List<WscAttachment> attachments)
       throws Exception {
-    connection.addOutInterceptor(new SoapActionInterceptor(operation));
-    Map<String, Object> ctx = getContext(headers, attachments);
+    Map<String, Object> ctx = getContext(headers, attachments, operation);
     Exchange exchange = new ExchangeImpl();
     XMLStreamReader request = stringToXmlStreamReader(body, connection, operation);
     Object[] response = connection.invoke(request, ctx, exchange);
@@ -93,10 +92,11 @@ public class ConsumeOperation {
     return new WscAttributes(headers, null);
   }
 
-  private Map<String, Object> getContext(Map<String, String> headers, List<WscAttachment> attachments) {
+  private Map<String, Object> getContext(Map<String, String> headers, List<WscAttachment> attachments, String operation) {
     Map<String, Object> props = new HashMap<>();
     props.put(MULE_ATTACHMENTS_KEY, transformAttachments(attachments));
     props.put(MULE_HEADERS_KEY, transformHeaders(headers));
+    props.put(MULE_SOAP_ACTION, operation);
 
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(Client.REQUEST_CONTEXT, props);

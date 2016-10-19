@@ -8,8 +8,10 @@ package org.mule.extension.ws.internal.introspection;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import org.mule.extension.ws.internal.WscConnection;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.internal.WscConnection;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.xml.XmlTypeLoader;
@@ -47,9 +49,15 @@ public class RequestBodyGenerator {
   public String generateRequest(WscConnection connection, String operation) {
 
     BindingOperation bindingOperation = connection.getWsdlIntrospecter().getBindingOperation(operation);
-    List<String> soapBodyParts = getSoapBodyParts(bindingOperation);
+    Optional<List<String>> soapBodyParts = getSoapBodyParts(bindingOperation);
+
+    if (!soapBodyParts.isPresent()) {
+      throw new WscException("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation "
+          + "requires input parameters. The payload will be used as SOAP body.");
+    }
+
     Message message = bindingOperation.getOperation().getInput().getMessage();
-    Optional<Part> part = getSinglePart(soapBodyParts, message);
+    Optional<Part> part = getSinglePart(soapBodyParts.get(), message);
 
     // Checks that the message has a single part with at least one element defined.
     if (part.isPresent() && part.get().getElementName() != null) {
@@ -79,15 +87,15 @@ public class RequestBodyGenerator {
     if (soapBodyParts.isEmpty()) {
       Map parts = inputMessage.getParts();
       if (parts.size() == 1) {
-        return Optional.ofNullable((Part) parts.values().iterator().next());
+        return ofNullable((Part) parts.values().iterator().next());
       }
     } else {
       if (soapBodyParts.size() == 1) {
         String partName = soapBodyParts.get(0);
-        return Optional.ofNullable(inputMessage.getPart(partName));
+        return ofNullable(inputMessage.getPart(partName));
       }
     }
-    return Optional.empty();
+    return empty();
   }
 
   /**
@@ -95,19 +103,13 @@ public class RequestBodyGenerator {
    *
    * @param bindingOperation the binding operation that we want to get the SOAP body parts from.
    */
-  public static List<String> getSoapBodyParts(BindingOperation bindingOperation) {
+  @SuppressWarnings("unchecked")
+  private static Optional<List<String>> getSoapBodyParts(BindingOperation bindingOperation) {
     List elements = bindingOperation.getBindingInput().getExtensibilityElements();
-    List result = null;
-    for (Object element : elements) {
-      if (element instanceof SOAPBody) {
-        result = ((SOAPBody) element).getParts();
-        break;
-      }
-      if (element instanceof SOAP12Body) {
-        result = ((SOAP12Body) element).getParts();
-        break;
-      }
-    }
-    return result != null ? result : emptyList();
+    return elements.stream()
+        .filter(e -> e instanceof SOAPBody || e instanceof SOAP12Body)
+        .map(e -> e instanceof SOAPBody ? ((SOAPBody) e).getParts() : ((SOAP12Body) e).getParts())
+        .map(parts -> parts == null ? emptyList() : parts)
+        .findFirst();
   }
 }

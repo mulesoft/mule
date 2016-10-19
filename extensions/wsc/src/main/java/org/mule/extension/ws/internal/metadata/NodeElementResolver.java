@@ -21,7 +21,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 
-import java.util.LinkedHashMap;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 
 import javax.wsdl.Part;
@@ -33,7 +34,7 @@ import javax.wsdl.Part;
  */
 public abstract class NodeElementResolver extends BaseWscResolver {
 
-  private static final Map<String, MetadataType> TYPES = new LinkedHashMap<>();
+  private static final Map<String, MetadataType> TYPES;
   private static final MetadataType NULL_TYPE = create(XML).nullType().build();
 
   protected final TypeResolverDelegate delegate;
@@ -49,21 +50,22 @@ public abstract class NodeElementResolver extends BaseWscResolver {
     NumberType numberType = create(XML).numberType().build();
     DateTimeType dateTimeType = create(XML).dateTimeType().build();
 
-    TYPES.put("string", stringType);
-    TYPES.put("boolean", booleanType);
-    TYPES.put("date", dateType);
-    TYPES.put("decimal", numberType);
-    TYPES.put("byte", numberType);
-    TYPES.put("unsignedByte", numberType);
-    TYPES.put("dateTime", dateTimeType);
-    TYPES.put("int", numberType);
-    TYPES.put("integer", numberType);
-    TYPES.put("unsignedInt", numberType);
-    TYPES.put("short", numberType);
-    TYPES.put("unsignedShort", numberType);
-    TYPES.put("long", numberType);
-    TYPES.put("unsignedLong", numberType);
-    TYPES.put("double", numberType);
+    TYPES = ImmutableMap.<String, MetadataType>builder()
+        .put("string", stringType)
+        .put("boolean", booleanType)
+        .put("date", dateType)
+        .put("decimal", numberType)
+        .put("byte", numberType)
+        .put("unsignedByte", numberType)
+        .put("dateTime", dateTimeType)
+        .put("int", numberType)
+        .put("integer", numberType)
+        .put("unsignedInt", numberType)
+        .put("short", numberType)
+        .put("unsignedShort", numberType)
+        .put("long", numberType)
+        .put("unsignedLong", numberType)
+        .put("double", numberType).build();
   }
 
   protected abstract MetadataType getMetadata(MetadataContext context, String operationName)

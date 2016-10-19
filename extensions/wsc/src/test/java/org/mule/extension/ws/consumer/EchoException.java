@@ -9,14 +9,15 @@ package org.mule.extension.ws.consumer;
 
 import javax.xml.ws.WebFault;
 
+import org.apache.cxf.interceptor.FaultOutInterceptor;
+
 
 @WebFault
-public class EchoException { //extends FaultInfoException {
+public class EchoException implements FaultOutInterceptor.FaultInfoException {
 
   private EchoFault echoFault;
 
   public EchoException(String message) {
-    //super(message);
     this.echoFault = new EchoFault();
     this.echoFault.setText(message);
   }
