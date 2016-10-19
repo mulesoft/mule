@@ -6,7 +6,11 @@
  */
 package org.mule.service.scheduler.internal;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Decorates a {@link Runnable} in order to do hook behavior both before and after the execution of the decorated {@link Runnable}
@@ -14,9 +18,9 @@ import java.util.concurrent.Executor;
  *
  * @since 4.0
  */
-public class SchedulerRunnableDecorator extends BaseSchedulerTaskDecorator implements Runnable {
+public class SchedulerRunnableDecorator<V> extends BaseSchedulerTaskDecorator implements RunnableFuture<V> {
 
-  private final Runnable task;
+  private final RunnableFuture<V> task;
 
   /**
    * Decorates the given {@code task}
@@ -24,7 +28,7 @@ public class SchedulerRunnableDecorator extends BaseSchedulerTaskDecorator imple
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
    */
-  public SchedulerRunnableDecorator(Runnable task, DefaultScheduler scheduler) {
+  public SchedulerRunnableDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
     super(scheduler);
     this.task = task;
   }
@@ -42,7 +46,32 @@ public class SchedulerRunnableDecorator extends BaseSchedulerTaskDecorator imple
   }
 
   @Override
-  public Runnable getDecoratedRunnable() {
-    return task;
+  protected void doCancelTask() {
+    task.cancel(true);
+  }
+
+  @Override
+  public boolean cancel(boolean mayInterruptIfRunning) {
+    return task.cancel(mayInterruptIfRunning);
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return task.isCancelled();
+  }
+
+  @Override
+  public boolean isDone() {
+    return task.isDone();
+  }
+
+  @Override
+  public V get() throws InterruptedException, ExecutionException {
+    return task.get();
+  }
+
+  @Override
+  public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    return task.get(timeout, unit);
   }
 }

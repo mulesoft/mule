@@ -9,7 +9,6 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Thread.currentThread;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 
 /**
  * Base decorator for tasks to be executed in a {@link DefaultScheduler}, in order to do hook behavior both before and after the
@@ -21,8 +20,6 @@ public abstract class BaseSchedulerTaskDecorator {
 
   private final DefaultScheduler scheduler;
 
-  private volatile Future<?> submittedFuture;
-
   private volatile Thread runner;
 
   private volatile boolean stopped = false;
@@ -32,21 +29,6 @@ public abstract class BaseSchedulerTaskDecorator {
    */
   protected BaseSchedulerTaskDecorator(DefaultScheduler scheduler) {
     this.scheduler = scheduler;
-  }
-
-  /**
-   * Sets the {@link Future} associated to this task decorator, so it may be cancelled when {@link #stop()} is called.
-   * <p>
-   * If {@link #stop()} has already been called, {@code submittedFuture} will be immediately cancelled.
-   * 
-   * @param submittedFuture
-   */
-  public void linkWithSubmittedFuture(Future<?> submittedFuture) {
-    if (stopped) {
-      submittedFuture.cancel(true);
-    } else {
-      this.submittedFuture = submittedFuture;
-    }
   }
 
   protected void wrapUp() {
@@ -73,16 +55,11 @@ public abstract class BaseSchedulerTaskDecorator {
    */
   public void stop() {
     this.stopped = true;
-    if (submittedFuture != null) {
-      submittedFuture.cancel(true);
-    }
+    doCancelTask();
     if (runner != null) {
       runner.interrupt();
     }
   }
 
-  /**
-   * @return the {@link Runnable} command that this decorator is decorating.
-   */
-  public abstract Runnable getDecoratedRunnable();
+  protected abstract void doCancelTask();
 }

@@ -124,7 +124,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     }, 1, SECONDS);
 
     assertThat(executor.shutdownNow(), hasSize(1));
-    assertThat(scheduled.isCancelled(), is(true));
   }
 
   @Test
@@ -137,6 +136,5 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     }, 1, SECONDS);
 
     assertThat(executor.shutdownNow(), hasSize(1));
-    assertThat(scheduled.isCancelled(), is(true));
   }
 }

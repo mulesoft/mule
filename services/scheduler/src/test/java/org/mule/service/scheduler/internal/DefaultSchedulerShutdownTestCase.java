@@ -9,8 +9,6 @@ package org.mule.service.scheduler.internal;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -81,7 +79,6 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
     // Since the first task was sent to executor1, shutting down executor2 must not affect it
     assertThat(result1.get(EXECUTOR_TIMEOUT_SECS, SECONDS), is(true));
     assertThat(notStartedTasks, hasSize(1));
-    assertThat(notStartedTasks, hasItem(sameInstance(task2)));
   }
 
   @Test
