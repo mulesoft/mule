@@ -12,15 +12,15 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.toSubTypesMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getAlias;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getAlias;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isInstantiable;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
-import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -53,8 +53,8 @@ public final class SubtypesModelValidator implements ModelValidator {
 
   private void validateBaseTypeNotFinal(ExtensionModel model, Map<MetadataType, Set<MetadataType>> typesMapping) {
     List<String> finalBaseTypes = typesMapping.keySet().stream()
-        .filter(MetadataTypeUtils::isFinal)
-        .map(MetadataTypeUtils::getId)
+        .filter(ExtensionMetadataTypeUtils::isFinal)
+        .map(ExtensionMetadataTypeUtils::getId)
         .collect(toList());
 
     if (!finalBaseTypes.isEmpty()) {
@@ -67,7 +67,7 @@ public final class SubtypesModelValidator implements ModelValidator {
     List<String> abstractSubtypes = new LinkedList<>();
     for (Set<MetadataType> subtypes : typesMapping.values()) {
       abstractSubtypes.addAll(subtypes.stream().filter(s -> !isInstantiable(s))
-          .map(MetadataTypeUtils::getId).collect(toList()));
+          .map(ExtensionMetadataTypeUtils::getId).collect(toList()));
     }
 
     if (!abstractSubtypes.isEmpty()) {

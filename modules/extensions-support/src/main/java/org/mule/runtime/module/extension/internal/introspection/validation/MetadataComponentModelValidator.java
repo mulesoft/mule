@@ -6,7 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import com.google.common.collect.ImmutableList;
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang.StringUtils.join;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
@@ -28,23 +39,12 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolve
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang.StringUtils.join;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 
 /**
  * Validates that all {@link OperationModel operations} which return type is a {@link Object} or a {@link Map} have defined a

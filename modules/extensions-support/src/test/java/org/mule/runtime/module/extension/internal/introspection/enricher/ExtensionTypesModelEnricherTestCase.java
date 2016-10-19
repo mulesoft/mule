@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.api.meta.model.ExtensionModel;

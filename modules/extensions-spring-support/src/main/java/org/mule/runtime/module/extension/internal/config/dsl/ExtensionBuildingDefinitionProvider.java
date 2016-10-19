@@ -18,6 +18,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.internal.utils.MetadataTypeUtils;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
@@ -50,7 +51,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.operation.Operation
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
-import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -292,7 +293,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                           ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                           ExtensionParsingContext parsingContext) {
 
-    parameters.filter(MetadataTypeUtils::isInstantiable)
+    parameters.filter(ExtensionMetadataTypeUtils::isInstantiable)
         .filter(MetadataTypeUtils::hasExposedFields)
         .forEach(subType -> registerTopLevelParameter(subType,
                                                       definitionBuilder,

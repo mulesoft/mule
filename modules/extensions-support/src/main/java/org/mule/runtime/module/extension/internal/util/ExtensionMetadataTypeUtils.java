@@ -10,8 +10,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.VoidType;
+import org.mule.metadata.internal.utils.MetadataTypeUtils;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
@@ -23,17 +22,9 @@ import java.lang.reflect.Modifier;
  *
  * @since 4.0
  */
-public final class MetadataTypeUtils {
+public final class ExtensionMetadataTypeUtils {
 
-  private MetadataTypeUtils() {}
-
-  public static boolean isObjectType(MetadataType type) {
-    return type instanceof ObjectType;
-  }
-
-  public static boolean isVoid(MetadataType type) {
-    return type instanceof VoidType;
-  }
+  private ExtensionMetadataTypeUtils() {}
 
   /**
    * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
@@ -65,10 +56,6 @@ public final class MetadataTypeUtils {
     }
   }
 
-  public static boolean hasExposedFields(MetadataType metadataType) {
-    return metadataType instanceof ObjectType && !((ObjectType) metadataType).getFields().isEmpty();
-  }
-
   public static boolean isFinal(MetadataType metadataType) {
     try {
       return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isFinal)
@@ -80,7 +67,7 @@ public final class MetadataTypeUtils {
 
   public static String getId(MetadataType metadataType) {
     try {
-      return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
+      return MetadataTypeUtils.getTypeId(metadataType)
           .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getType(metadataType).getName() : "");
     } catch (Exception e) {
       return "";
