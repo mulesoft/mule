@@ -376,10 +376,6 @@ public final class IntrospectionUtils {
     return isVoid(method.getReturnType());
   }
 
-  public static boolean isVoid(MetadataType metadataType) {
-    return isVoid(metadataType);
-  }
-
   public static boolean isVoid(ComponentModel componentModel) {
     return componentModel.getOutput().getType() instanceof VoidType;
   }
