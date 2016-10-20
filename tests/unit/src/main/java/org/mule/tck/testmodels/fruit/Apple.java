@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
+import org.mule.tck.testmodels.fruit.peel.ApplePeel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class Apple implements Fruit, Callable, MuleContextAware {
   private Seed seed;
 
   private MuleContext muleContext;
+
+  private ApplePeel peel;
 
   public Apple() {}
 
@@ -144,5 +147,9 @@ public class Apple implements Fruit, Callable, MuleContextAware {
 
   public MuleContext getMuleContext() {
     return muleContext;
+  }
+
+  public ApplePeel getPeel() {
+    return peel;
   }
 }
