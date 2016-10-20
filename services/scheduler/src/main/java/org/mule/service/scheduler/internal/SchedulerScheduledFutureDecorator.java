@@ -8,6 +8,7 @@ package org.mule.service.scheduler.internal;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledFuture;
@@ -24,16 +25,20 @@ class SchedulerScheduledFutureDecorator<V> implements ScheduledFuture<V> {
 
   private ScheduledFuture<V> scheduled;
   private RunnableFuture<?> task;
+  private DefaultScheduler scheduler;
 
   /**
    * Decorates the given {@code scheduled}
    * 
    * @param scheduled the {@link ScheduledFuture} to be decorated
    * @param task the actual task that was scheduled.
+   * @param scheduler the owner {@link Executor} of this task
+   * 
    */
-  SchedulerScheduledFutureDecorator(ScheduledFuture<V> scheduled, RunnableFuture<?> task) {
+  SchedulerScheduledFutureDecorator(ScheduledFuture<V> scheduled, RunnableFuture<?> task, DefaultScheduler scheduler) {
     this.scheduled = scheduled;
     this.task = task;
+    this.scheduler = scheduler;
   }
 
   @Override
@@ -58,7 +63,7 @@ class SchedulerScheduledFutureDecorator<V> implements ScheduledFuture<V> {
 
   @Override
   public boolean isDone() {
-    return task.isDone();
+    return scheduled.isDone() || task.isDone();
   }
 
   @Override

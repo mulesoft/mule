@@ -34,8 +34,8 @@ class SchedulerRunnableFutureDecorator<V> implements RunnableFuture<V> {
    * @param scheduler the owner {@link Executor} of this task
    */
   SchedulerRunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
-    this.scheduler = scheduler;
     this.task = task;
+    this.scheduler = scheduler;
   }
 
   @Override

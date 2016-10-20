@@ -13,6 +13,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -109,7 +112,13 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     assertThat(executor, not(terminatedMatcher));
     latch.countDown();
     result.get(EXECUTOR_TIMEOUT_SECS, SECONDS);
-    assertThat(executor, terminatedMatcher);
+
+    // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
+    // returns.
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
   }
 
   @Test
@@ -151,7 +160,13 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     assertThat(executor, not(terminatedMatcher));
     latch2.countDown();
     assertThat(pendingResult.get(EXECUTOR_TIMEOUT_SECS, SECONDS), is(true));
-    assertThat(executor, terminatedMatcher);
+
+    // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
+    // returns.
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
   }
 
   @Test
@@ -176,17 +191,17 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   private static Matcher<ExecutorService> isTerminated() {
     return new TypeSafeMatcher<ExecutorService>() {
 
-      private ExecutorService item;
+      private String itemString;
 
       @Override
       protected boolean matchesSafely(ExecutorService item) {
-        this.item = item;
+        this.itemString = item.toString();
         return item.isTerminated();
       }
 
       @Override
       public void describeTo(org.hamcrest.Description description) {
-        description.appendValue(item);
+        description.appendValue(itemString);
       }
     };
   }
@@ -194,11 +209,11 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
   private static Matcher<ExecutorService> isTerminatedAfterAwait() {
     return new TypeSafeMatcher<ExecutorService>() {
 
-      private ExecutorService item;
+      private String itemString;
 
       @Override
       protected boolean matchesSafely(ExecutorService item) {
-        this.item = item;
+        this.itemString = item.toString();
         try {
           return item.awaitTermination(EXECUTOR_TIMEOUT_SECS, SECONDS);
         } catch (InterruptedException e) {
@@ -209,7 +224,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
       @Override
       public void describeTo(org.hamcrest.Description description) {
-        description.appendValue(item);
+        description.appendValue(itemString);
       }
     };
   }

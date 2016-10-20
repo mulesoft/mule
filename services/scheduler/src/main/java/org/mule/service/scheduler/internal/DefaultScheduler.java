@@ -15,8 +15,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
@@ -39,16 +41,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private final ScheduledExecutorService scheduledExecutor;
   private final boolean scheduledSameThread;
 
-  private final CountDownLatch terminationLatch = new CountDownLatch(1);
-
-  private Set<SchedulerScheduledFutureDecorator<?>> scheduledTasks = synchronizedSet(new HashSet<>());
-  private Set<SchedulerRunnableFutureDecorator<?>> currentTasks = synchronizedSet(new HashSet<>());
-
-  private volatile boolean shutdown = false;
-
   /**
    * Wait condition to support awaitTermination
    */
+  private final CountDownLatch terminationLatch = new CountDownLatch(1);
+
+  private Set<SchedulerRunnableFutureDecorator<?>> currentTasks = synchronizedSet(new HashSet<>());
+  private Map<RunnableFuture<?>, SchedulerScheduledFutureDecorator<?>> scheduledTasks = new HashMap<>();
+
+  private volatile boolean shutdown = false;
+
 
   /**
    * @param executor the actual executor that will run the dispatched tasks.
@@ -69,10 +71,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(command);
 
-    final RunnableFuture<?> task = newTaskFor(command, null);
+    final SchedulerRunnableFutureDecorator<?> task =
+        new SchedulerRunnableFutureDecorator<>(super.newTaskFor(command, null), this);
+
     final SchedulerScheduledFutureDecorator<?> scheduled =
-        new SchedulerScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
-    scheduledTasks.add(scheduled);
+        new SchedulerScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task, this);
+
+    synchronized (currentTasks) {
+      scheduledTasks.put(task, scheduled);
+      currentTasks.add(task);
+    }
     return scheduled;
   }
 
@@ -81,10 +89,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(callable);
 
-    final RunnableFuture<V> task = newTaskFor(callable);
+    final SchedulerRunnableFutureDecorator<V> task =
+        new SchedulerRunnableFutureDecorator<>(super.newTaskFor(callable), this);
+
     final SchedulerScheduledFutureDecorator<V> scheduled =
-        new SchedulerScheduledFutureDecorator(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
-    scheduledTasks.add(scheduled);
+        new SchedulerScheduledFutureDecorator(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task, this);
+
+    synchronized (currentTasks) {
+      scheduledTasks.put(task, scheduled);
+      currentTasks.add(task);
+    }
     return scheduled;
   }
 
@@ -93,10 +107,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(command);
 
-    final RunnableFuture<?> task = newTaskFor(command, null);
+    final SchedulerRunnableFutureDecorator<?> task =
+        new SchedulerRunnableFutureDecorator<>(super.newTaskFor(command, null), this);
+
     final SchedulerScheduledFutureDecorator<?> scheduled = new SchedulerScheduledFutureDecorator<>(scheduledExecutor
-        .scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit), task);
-    scheduledTasks.add(scheduled);
+        .scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit), task, this);
+
+    synchronized (currentTasks) {
+      scheduledTasks.put(task, scheduled);
+      currentTasks.add(task);
+    }
     return scheduled;
   }
 
@@ -105,10 +125,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(command);
 
-    final RunnableFuture<?> task = newTaskFor(command, null);
+    final SchedulerRunnableFutureDecorator<?> task =
+        new SchedulerRunnableFutureDecorator<>(super.newTaskFor(command, null), this);
+
     final SchedulerScheduledFutureDecorator<?> scheduled = new SchedulerScheduledFutureDecorator<>(scheduledExecutor
-        .scheduleWithFixedDelay(schedulableTask(task), initialDelay, delay, unit), task);
-    scheduledTasks.add(scheduled);
+        .scheduleWithFixedDelay(schedulableTask(task), initialDelay, delay, unit), task, this);
+
+    synchronized (currentTasks) {
+      scheduledTasks.put(task, scheduled);
+      currentTasks.add(task);
+    }
     return scheduled;
   }
 
@@ -132,16 +158,14 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
     List<Runnable> tasks;
     try {
-      synchronized (scheduledTasks) {
-        for (SchedulerScheduledFutureDecorator<?> scheduled : scheduledTasks) {
-          scheduled.cancel(true);
-        }
-        scheduledTasks.clear();
-      }
       synchronized (currentTasks) {
         tasks = new ArrayList<>(currentTasks.size());
         for (SchedulerRunnableFutureDecorator<?> task : currentTasks) {
-          task.cancel(true);
+          if (scheduledTasks.containsKey(task)) {
+            scheduledTasks.remove(task).cancel(true);
+          } else {
+            task.cancel(true);
+          }
           if (!task.isStarted()) {
             tasks.add(task);
           }
