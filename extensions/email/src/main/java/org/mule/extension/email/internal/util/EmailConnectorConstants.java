@@ -6,6 +6,8 @@
  */
 package org.mule.extension.email.internal.util;
 
+import org.mule.extension.email.internal.commands.PagingProviderEmailDelegate;
+
 /**
  * this class contains common methods for email handling.
  *
@@ -67,6 +69,13 @@ public final class EmailConnectorConstants {
    * The content type header name.
    */
   public static final String CONTENT_TYPE_HEADER = "Content-Type";
+
+  /**
+   * Default page size to be fetched by the {@link PagingProviderEmailDelegate}
+   */
+  public static final String DEFAULT_PAGE_SIZE = "10";
+
+  public static final String PAGE_SIZE_ERROR_MESSAGE = "Page size attribute must be greater than zero but '%d' was received";
 
   /**
    * Hide constructor

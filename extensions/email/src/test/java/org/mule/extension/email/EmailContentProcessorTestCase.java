@@ -46,7 +46,7 @@ public class EmailContentProcessorTestCase extends AbstractMuleTestCase {
     javax.mail.Message message = getMultipartTestMessage();
     List<Message> attachments = EmailContentProcessor.getInstance(message).getAttachments();
     assertThat(attachments, hasSize(2));
-    assertAttachmentContent(attachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
-    assertAttachmentContent(attachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
+    assertAttachmentContent(attachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT.getBytes());
+    assertAttachmentContent(attachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT.getBytes());
   }
 }
