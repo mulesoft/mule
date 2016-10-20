@@ -39,7 +39,6 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private final ExecutorService executor;
   private final ScheduledExecutorService scheduledExecutor;
-  private final boolean scheduledSameThread;
 
   /**
    * Wait condition to support awaitTermination
@@ -56,14 +55,10 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param executor the actual executor that will run the dispatched tasks.
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
-   * @param scheduledSameThread whether the scheduled tasks (by calling schedule* methods) will be run in the
-   *        {@code scheduledExecutor}, by passing {@code true}; or it will be dispatched to {@code executor}, by passing
-   *        {@code false}.
    */
-  DefaultScheduler(ExecutorService executor, ScheduledExecutorService scheduledExecutor, boolean scheduledSameThread) {
+  DefaultScheduler(ExecutorService executor, ScheduledExecutorService scheduledExecutor) {
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
-    this.scheduledSameThread = scheduledSameThread;
   }
 
   @Override
@@ -137,11 +132,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   private Runnable schedulableTask(RunnableFuture<?> task) {
-    if (scheduledSameThread) {
-      return task;
-    } else {
-      return () -> executor.execute(task);
-    }
+    return () -> executor.execute(task);
   }
 
   @Override

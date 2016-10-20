@@ -32,8 +32,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@link ProcessingType#CPU_LITE cpu-light} if it doesn't block at any time and its duration is less than
    * 10 milliseconds.
    * 
-   * @return a scheduler for {@link ProcessingType#CPU_LITE cpu-light} tasks. Due to the nature of the tasks expected to be
-   *         received by the returned scheduler, some optimizations will be applied by the returned scheduler.
+   * @return a scheduler for {@link ProcessingType#CPU_LITE cpu-light} tasks.
    */
   Scheduler cpuLightScheduler();
 

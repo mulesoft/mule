@@ -52,17 +52,17 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return new DefaultScheduler(cpuLightExecutor, scheduledExecutor, true);
+    return new DefaultScheduler(cpuLightExecutor, scheduledExecutor);
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return new DefaultScheduler(ioExecutor, scheduledExecutor, false);
+    return new DefaultScheduler(ioExecutor, scheduledExecutor);
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return new DefaultScheduler(computationExecutor, scheduledExecutor, false);
+    return new DefaultScheduler(computationExecutor, scheduledExecutor);
   }
 
   @Override
@@ -71,6 +71,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     logger.info("Starting " + this.toString() + "...");
 
+    // TODO MULE-10585
     final String prefix = SchedulerService.class.getSimpleName();
     cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(2 * cores),
                                               new NamedThreadFactory(prefix + "_cpuLight"));

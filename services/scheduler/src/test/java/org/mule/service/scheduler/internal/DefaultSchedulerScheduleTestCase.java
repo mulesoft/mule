@@ -427,10 +427,10 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   }
 
   protected ScheduledExecutorService createScheduledSameThreadExecutor() {
-    return new DefaultScheduler(sharedExecutor, sharedScheduledExecutor, true);
+    return new DefaultScheduler(sharedExecutor, sharedScheduledExecutor);
   }
 
   protected ScheduledExecutorService createScheduledNotSameThreadExecutor() {
-    return new DefaultScheduler(sharedExecutor, sharedScheduledExecutor, false);
+    return new DefaultScheduler(sharedExecutor, sharedScheduledExecutor);
   }
 }

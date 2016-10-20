@@ -58,7 +58,7 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
   }
 
   protected ScheduledExecutorService createExecutor() {
-    return new DefaultScheduler(sharedExecutor, sharedScheduledExecutor, false);
+    return new DefaultScheduler(sharedExecutor, sharedScheduledExecutor);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {
