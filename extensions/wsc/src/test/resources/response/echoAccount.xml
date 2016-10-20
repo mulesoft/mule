@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:echoAccountResponse xmlns:ns2="http://consumer.ws.extension.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <account>
+        <id>12</id>
+        <clientName>Juan</clientName>
+        <items>chocolate</items>
+        <items>banana</items>
+        <items>dulce de leche</items>
+        <startingDate>2016-09-23T00:00:00-03:00</startingDate>
+    </account>
+</ns2:echoAccountResponse>

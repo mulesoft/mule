@@ -1,0 +1,14 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <wsc:config name="config">
+        <wsc:connection wsdlLocation="http://localhost:${port}/testService?wsdl" address="http://localhost:${port}/testService" service="TestService" port="TestPort"/>
+    </wsc:config>
+
+    <flow name="noParamsOperation">
+        <wsc:consume config-ref="config" operation="noParams" body="#[payload]"/>
+    </flow>
+</mule>
