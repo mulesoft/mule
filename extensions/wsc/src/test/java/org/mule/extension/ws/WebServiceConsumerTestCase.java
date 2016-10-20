@@ -45,9 +45,7 @@ public abstract class WebServiceConsumerTestCase extends MuleArtifactFunctionalT
   @BeforeClass
   public static void startService() throws MuleException {
     XMLUnit.setIgnoreWhitespace(true);
-    if (service == null || !service.isPublished()) {
-      service = withContextClassLoader(ClassLoader.getSystemClassLoader(), () -> publish(SERVICE_URL, new TestService()));
-    }
+    service = withContextClassLoader(ClassLoader.getSystemClassLoader(), () -> publish(SERVICE_URL, new TestService()));
     assertTrue(service.isPublished());
   }
 
@@ -57,10 +55,6 @@ public abstract class WebServiceConsumerTestCase extends MuleArtifactFunctionalT
   }
 
   protected Message runFlowWithRequest(String name, String bodyRequestFileName) throws Exception {
-    return runFlowWithRequest(name, bodyRequestFileName, emptyMap());
-  }
-
-  protected Message runFlowWithRequest(String name, String bodyRequestFileName, Map<String, String> headers) throws Exception {
     return flowRunner(name).withPayload(resourceAsString("request/" + bodyRequestFileName)).run().getMessage();
   }
 

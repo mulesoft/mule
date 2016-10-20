@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
 
 public class EchoTestCase extends WebServiceConsumerTestCase {
 
@@ -36,6 +37,7 @@ public class EchoTestCase extends WebServiceConsumerTestCase {
   }
 
   @Test
+  @Description("Consumes an operation that expects a simple type and returns a simple type")
   public void echoOperation() throws Exception {
     Message message = runFlowWithRequest(ECHO_FLOW, ECHO_XML);
     String out = (String) message.getPayload().getValue();
@@ -43,6 +45,7 @@ public class EchoTestCase extends WebServiceConsumerTestCase {
   }
 
   @Test
+  @Description("Consumes an operation that expects an input and a set of headers and returns a simple type and a set of headers")
   public void echoWithHeadersOperation() throws Exception {
     Message message = runFlowWithRequest(ECHO_HEADERS_FLOW, ECHO_HEADERS_XML);
 
@@ -57,6 +60,7 @@ public class EchoTestCase extends WebServiceConsumerTestCase {
   }
 
   @Test
+  @Description("Consumes an operation that expects 2 parameters (a simple one and a complex one) and returns a complex type")
   public void echoAccountOperation() throws Exception {
     Message message = runFlowWithRequest(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT_XML);
     String out = (String) message.getPayload().getValue();

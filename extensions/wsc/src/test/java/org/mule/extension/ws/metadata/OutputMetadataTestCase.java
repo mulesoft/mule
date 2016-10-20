@@ -37,9 +37,9 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   public void getEchoOutputBodyMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_FLOW, ECHO);
     MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
-    ObjectType operation = toObjectType(type);
-    assertThat(operation.getFields(), hasSize(1));
-    ObjectType echoType = toObjectType(operation.getFields().iterator().next().getValue());
+    Collection<ObjectFieldType> resultFields = toObjectType(type).getFields();
+    assertThat(resultFields, hasSize(1));
+    ObjectType echoType = toObjectType(resultFields.iterator().next().getValue());
     Collection<ObjectFieldType> echoFields = echoType.getFields();
     assertThat(echoFields, hasSize(1));
     ObjectFieldType textField = echoFields.iterator().next();
@@ -52,9 +52,9 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   public void getEchoAccountOutputBodyMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
     MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
-    ObjectType operation = toObjectType(type);
-    assertThat(operation.getFields(), hasSize(1));
-    ObjectType echoType = toObjectType(operation.getFields().iterator().next().getValue());
+    Collection<ObjectFieldType> operationFields = toObjectType(type).getFields();
+    assertThat(operationFields, hasSize(1));
+    ObjectType echoType = toObjectType(operationFields.iterator().next().getValue());
     Collection<ObjectFieldType> echoFields = echoType.getFields();
     assertThat(echoFields, hasSize(1));
     ObjectFieldType accountField = echoFields.iterator().next();
@@ -68,10 +68,10 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   public void getEchoOutputAttributesMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_FLOW, ECHO);
     MetadataType type = result.get().getOutputMetadata().get().getAttributesMetadata().get().getType();
-    ObjectType attributes = toObjectType(type);
-    assertThat(attributes.getFields(), hasSize(2));
+    Collection<ObjectFieldType> attributeFields = toObjectType(type).getFields();
+    assertThat(attributeFields, hasSize(2));
 
-    Iterator<ObjectFieldType> iterator = attributes.getFields().iterator();
+    Iterator<ObjectFieldType> iterator = attributeFields.iterator();
     MetadataType soapHeaders = iterator.next().getValue();
     MetadataType protocolHeaders = iterator.next().getValue();
     assertThat(soapHeaders, is(instanceOf(NullType.class)));

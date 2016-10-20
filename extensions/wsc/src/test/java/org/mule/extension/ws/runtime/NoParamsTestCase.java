@@ -11,6 +11,7 @@ import org.mule.extension.ws.WebServiceConsumerTestCase;
 import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
 
 public class NoParamsTestCase extends WebServiceConsumerTestCase {
 
@@ -22,6 +23,7 @@ public class NoParamsTestCase extends WebServiceConsumerTestCase {
   }
 
   @Test
+  @Description("Consumes an operation that expects no parameters and returns a simple type")
   public void noParamsOperation() throws Exception {
     Message message = runFlowWithRequest(NO_PARAMS_FLOW, NO_PARAMS_XML);
     String payload = (String) message.getPayload().getValue();

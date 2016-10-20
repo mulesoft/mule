@@ -7,12 +7,12 @@
 package org.mule.extension.ws.internal.introspection;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 import com.ibm.wsdl.extensions.schema.SchemaSerializer;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
@@ -39,7 +39,7 @@ import org.apache.commons.lang.StringUtils;
  * @since 4.0
  */
 @SuppressWarnings("unchecked")
-public final class WsdlIntrospecter {
+public class WsdlIntrospecter {
 
   private static final WsdlSchemaCollector schemaCollector = new WsdlSchemaCollector();
 
@@ -69,7 +69,7 @@ public final class WsdlIntrospecter {
 
   public List<String> getOperationNames() {
     List<BindingOperation> bindingOperations = (List<BindingOperation>) port.getBinding().getBindingOperations();
-    return bindingOperations.stream().map(BindingOperation::getName).collect(Collectors.toList());
+    return bindingOperations.stream().map(BindingOperation::getName).collect(toList());
   }
 
   public Operation getOperation(String operationName) {
@@ -169,7 +169,7 @@ public final class WsdlIntrospecter {
 
   private void validateBlankString(String paramValue, String paramName) {
     if (StringUtils.isBlank(paramValue)) {
-      throw new IllegalArgumentException("The " + paramName + " can not be blank nor null.");
+      throw new IllegalArgumentException("The [" + paramName + "] can not be blank nor null.");
     }
   }
 }

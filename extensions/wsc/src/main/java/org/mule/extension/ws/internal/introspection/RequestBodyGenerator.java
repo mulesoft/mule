@@ -10,12 +10,16 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.hasExposedFields;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isObjectType;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.WscConnection;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.xml.XmlTypeLoader;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +37,9 @@ import javax.xml.namespace.QName;
  * @since 4.0
  */
 public class RequestBodyGenerator {
+
+  private static final String REQUIRED_PARAMS_ERROR_MASK =
+      "Cannot build default body request for operation [%s]%s, the operation requires input parameters";
 
   /**
    * SOAP request mask for operations without input parameters
@@ -53,28 +60,50 @@ public class RequestBodyGenerator {
 
     if (!soapBodyParts.isPresent()) {
       throw new WscException("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation "
-          + "requires input parameters. The payload will be used as SOAP body.");
+          + "requires input parameters.");
     }
 
     Message message = bindingOperation.getOperation().getInput().getMessage();
     Optional<Part> part = getSinglePart(soapBodyParts.get(), message);
 
-    // Checks that the message has a single part with at least one element defined.
-    if (part.isPresent() && part.get().getElementName() != null) {
-      XmlTypeLoader loader = new XmlTypeLoader(connection.getWsdlIntrospecter().getSchemas());
-      Optional<MetadataType> loadedType = loader.load(part.get().getElementName().toString());
-      if (loadedType.isPresent()) {
-        MetadataType metadataType = loadedType.get();
-        if (metadataType instanceof ObjectType) {
-          ObjectType type = (ObjectType) ((ObjectType) metadataType).getFields().iterator().next().getValue();
-          if (type.getFields().isEmpty()) {
-            QName element = part.get().getElementName();
-            return format(NO_PARAMS_SOAP_BODY_CALL_MASK, element.getLocalPart(), element.getNamespaceURI());
-          }
-        }
+    if (!part.isPresent()) {
+      throw new WscException(
+                             format(REQUIRED_PARAMS_ERROR_MASK, operation, " there is no single part in the input message"));
+    }
+
+    if (part.get().getElementName() == null) {
+      throw new WscException(
+                             format(REQUIRED_PARAMS_ERROR_MASK, operation,
+                                    " there is one message body part but no does not have an element defined"));
+    }
+
+    Part bodyPart = part.get();
+    if (isOperationWithNoParameters(connection, bodyPart)) {
+      // operation has required parameters
+      throw new WscException(format(REQUIRED_PARAMS_ERROR_MASK, operation, ""));
+    }
+
+    // There is a single part with an element defined and it does not require parameters
+    QName element = bodyPart.getElementName();
+    return format(NO_PARAMS_SOAP_BODY_CALL_MASK, element.getLocalPart(), element.getNamespaceURI());
+  }
+
+  private boolean isOperationWithNoParameters(WscConnection connection, Part part) {
+    XmlTypeLoader loader = new XmlTypeLoader(connection.getWsdlIntrospecter().getSchemas());
+    String bodyPartQName = part.getElementName().toString();
+
+    // Find the body type
+    Optional<MetadataType> bodyType = loader.load(bodyPartQName);
+    if (bodyType.isPresent()) {
+      if (isObjectType(bodyType.get())) {
+        Collection<ObjectFieldType> bodyFields = ((ObjectType) bodyType.get()).getFields();
+        // Contains only one field which represents de operation
+        ObjectType operationType = (ObjectType) bodyFields.iterator().next().getValue();
+        // Check if the operation type has
+        return hasExposedFields(operationType);
       }
     }
-    throw new WscException(format("No payload was provided for the operation [%s] and a default one cannot be built", operation));
+    return false;
   }
 
   /**

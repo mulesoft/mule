@@ -1,0 +1,18 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <wsc:config name="single-instance">
+        <wsc:connection wsdlLocation="http://localhost:${port}/testService?wsdl" service="TestService" port="TestPort">
+            <pooling-profile maxActive="1"/>
+        </wsc:connection>
+    </wsc:config>
+
+    <flow name="operationShareInstance">
+        <wsc:consume config-ref="single-instance" operation="echo" body="#[flowVars.req]"/>
+        <wsc:consume config-ref="single-instance" operation="echo" body="#[flowVars.req]"/>
+    </flow>
+
+</mule>

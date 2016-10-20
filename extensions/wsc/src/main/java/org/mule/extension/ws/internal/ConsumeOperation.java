@@ -8,6 +8,7 @@ package org.mule.extension.ws.internal;
 
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.WsAttachment;
 import org.mule.extension.ws.api.WscAttributes;
@@ -89,7 +90,7 @@ public class ConsumeOperation {
 
   private WscAttributes processAttributes(Exchange exchange) {
     Map<String, String> headers = (Map<String, String>) exchange.get(MULE_HEADERS_KEY);
-    return new WscAttributes(headers, null);
+    return new WscAttributes(headers, emptyMap());
   }
 
   private Map<String, Object> getContext(Map<String, String> headers, List<WsAttachment> attachments, String operation) {
