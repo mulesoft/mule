@@ -8,11 +8,14 @@ package org.mule.service.scheduler.internal;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -23,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -186,6 +190,140 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     executor.shutdownNow();
 
     assertThat(executor, terminatedMatcher);
+  }
+
+  @Test
+  @Description("Tests that the Scheduler is gracefully terminated after calling stop()")
+  public void terminatedAfterStopGracefully() throws InterruptedException, ExecutionException {
+    final Scheduler executor = (Scheduler) createExecutor();
+
+    sharedExecutor.submit(() -> executor.stop(10, SECONDS));
+
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
+  }
+
+  @Test
+  @Description("Tests that calling stop() on a Scheduler while it's running a task waits for it to finish before terminating gracefully")
+  public void terminatedAfterStopGracefullyRunningTask() throws InterruptedException, ExecutionException, TimeoutException {
+    final Scheduler executor = (Scheduler) createExecutor();
+
+    final CountDownLatch latch1 = new CountDownLatch(1);
+    final CountDownLatch latch2 = new CountDownLatch(1);
+
+    executor.submit(() -> {
+      latch1.countDown();
+      return awaitLatch(latch2);
+    });
+
+    latch1.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+
+    newSingleThreadExecutor().submit(() -> executor.stop(10, SECONDS));
+    latch2.countDown();
+
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
+  }
+
+  @Test
+  @Description("Tests that calling stop() on a Scheduler with a queued task runs that task before terminating gracefully")
+  public void terminatedAfterStopGracefullyPendingTask() throws InterruptedException, ExecutionException, TimeoutException {
+    final Scheduler executor = (Scheduler) createExecutor();
+
+    final CountDownLatch latch1 = new CountDownLatch(1);
+    final CountDownLatch latch2 = new CountDownLatch(1);
+
+    executor.submit(() -> {
+      return awaitLatch(latch1);
+    });
+    executor.submit(() -> {
+      return awaitLatch(latch2);
+    });
+
+    newSingleThreadExecutor().submit(() -> executor.stop(10, SECONDS));
+
+    latch1.countDown();
+    latch2.countDown();
+
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
+  }
+
+  @Test
+  @Description("Tests that calling stop() on a Scheduler while it's running a task forcefully terminates it")
+  public void terminatedAfterStopForcefullyRunningTask() throws InterruptedException, ExecutionException, TimeoutException {
+    final Scheduler executor = (Scheduler) createExecutor();
+
+    final CountDownLatch latch1 = new CountDownLatch(1);
+    final CountDownLatch latch2 = new CountDownLatch(1);
+
+    AtomicReference<Thread> taskThread = new AtomicReference<>();
+
+    executor.submit(() -> {
+      latch1.countDown();
+      try {
+        return awaitLatch(latch2);
+      } finally {
+        if (currentThread().isInterrupted()) {
+          taskThread.set(currentThread());
+        }
+      }
+    });
+
+    latch1.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+
+    executor.stop(2, SECONDS);
+
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(taskThread.get(), is(not(nullValue())));
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
+  }
+
+  @Test
+  @Description("Tests that calling stop() on a Scheduler with a queued task forcefully terminates it")
+  public void terminatedAfterStopForcefullyPendingTask() throws InterruptedException, ExecutionException, TimeoutException {
+    final Scheduler executor = (Scheduler) createExecutor();
+
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    AtomicReference<Thread> taskThread = new AtomicReference<>();
+    AtomicReference<Thread> pendingTaskThread = new AtomicReference<>();
+
+    executor.submit(() -> {
+      try {
+        return awaitLatch(latch);
+      } finally {
+        if (currentThread().isInterrupted()) {
+          taskThread.set(currentThread());
+        }
+      }
+    });
+    executor.submit(() -> {
+      try {
+        return awaitLatch(latch);
+      } finally {
+        if (currentThread().isInterrupted()) {
+          pendingTaskThread.set(currentThread());
+        }
+      }
+    });
+
+    executor.stop(2, SECONDS);
+
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(taskThread.get(), is(not(nullValue())));
+      assertThat(pendingTaskThread.get(), is(nullValue()));
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
   }
 
   private static Matcher<ExecutorService> isTerminated() {

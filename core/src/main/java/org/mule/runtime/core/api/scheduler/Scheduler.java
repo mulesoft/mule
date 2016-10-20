@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.scheduler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Allows tasks to be submitted/scheduled to a specific executor in the Mule runtime. Different {@link Scheduler} instances may be
@@ -20,4 +21,13 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public interface Scheduler extends ScheduledExecutorService {
 
+  /**
+   * Tries to do a graceful shutdown.
+   * <p>
+   * If this hasn't terminated after a configured time, a forceful shutdown takes place.
+   * 
+   * @param gracefulShutdownTimeoutSecs the maximum time to wait for the running tasks to gracefully complete.
+   * @param unit the time unit of the {@code timeout} argument
+   */
+  void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit);
 }

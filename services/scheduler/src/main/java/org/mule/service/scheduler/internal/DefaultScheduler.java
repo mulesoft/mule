@@ -8,9 +8,11 @@ package org.mule.service.scheduler.internal;
 
 import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.synchronizedSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
@@ -30,12 +32,22 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Proxy for a {@link ScheduledExecutorService} that adds tracking of the source of the dispatched tasks.
  *
  * @since 4.0
  */
 class DefaultScheduler extends AbstractExecutorService implements Scheduler {
+
+  /**
+   * Forced shutdown delay. The time to wait while threads are being interrupted.
+   */
+  private static final long FORCEFUL_SHUTDOWN_TIMEOUT_SECS = 5;
+
+  private static final Logger logger = LoggerFactory.getLogger(DefaultScheduler.class);
 
   private final ExecutorService executor;
   private final ScheduledExecutorService scheduledExecutor;
@@ -191,6 +203,34 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       }
     }
     return false;
+  }
+
+  @Override
+  public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
+    // Disable new tasks from being submitted
+    shutdown();
+    try {
+      // Wait a while for existing tasks to terminate
+      if (!awaitTermination(gracefulShutdownTimeoutSecs, unit)) {
+        // Cancel currently executing tasks and return list of pending
+        // tasks
+        List<Runnable> cancelledJobs = shutdownNow();
+        // Wait a while for tasks to respond to being cancelled
+        if (!awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT_SECS, SECONDS)) {
+          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + gracefulShutdownTimeoutSecs
+              + " seconds. " + cancelledJobs.size() + " jobs were cancelled.");
+        } else {
+          if (!cancelledJobs.isEmpty()) {
+            logger.warn("Scheduler " + this.toString() + " terminated. " + cancelledJobs.size() + " jobs were cancelled.");
+          }
+        }
+      }
+    } catch (InterruptedException ie) {
+      // (Re-)Cancel if current thread also interrupted
+      shutdownNow();
+      // Preserve interrupt status
+      currentThread().interrupt();
+    }
   }
 
   @Override

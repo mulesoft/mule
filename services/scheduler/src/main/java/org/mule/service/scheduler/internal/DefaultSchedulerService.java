@@ -81,6 +81,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
                                                  new NamedThreadFactory(prefix + "_compute"));
     scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(prefix + "_sched"));
 
+    ((ThreadPoolExecutor) cpuLightExecutor).prestartAllCoreThreads();
+    ((ThreadPoolExecutor) ioExecutor).prestartAllCoreThreads();
+    ((ThreadPoolExecutor) computationExecutor).prestartAllCoreThreads();
+    ((ThreadPoolExecutor) scheduledExecutor).prestartAllCoreThreads();
+
     logger.info("Started " + this.toString());
   }
 
@@ -105,13 +110,18 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       currentThread().interrupt();
       logger.info("Stop of " + this.toString() + " interrupted", e);
     }
+
+    cpuLightExecutor = null;
+    ioExecutor = null;
+    computationExecutor = null;
+    scheduledExecutor = null;
   }
 
   protected void waitForExecutorTermination(final long startMillis, final ExecutorService executor, final String executorLabel)
       throws InterruptedException {
     if (!executor.awaitTermination(GRACEFUL_SHUTDOWN_TIMEOUT_SECS * 1000 - (currentTimeMillis() - startMillis), MILLISECONDS)) {
-      final List<Runnable> cancelledJobs = scheduledExecutor.shutdownNow();
-      logger.warn("'" + executorLabel + "' " + scheduledExecutor.toString() + " of " + this.toString()
+      final List<Runnable> cancelledJobs = executor.shutdownNow();
+      logger.warn("'" + executorLabel + "' " + executor.toString() + " of " + this.toString()
           + " did not shutdown gracefully after " + GRACEFUL_SHUTDOWN_TIMEOUT_SECS + " seconds. " + cancelledJobs.size()
           + " jobs were cancelled.");
     }
