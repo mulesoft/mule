@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
  * that have the expected tuning configuration. Each {@link Scheduler} will have its own lifecycle, managed by its user and NOT
  * this service.
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface SchedulerService extends Service {
 

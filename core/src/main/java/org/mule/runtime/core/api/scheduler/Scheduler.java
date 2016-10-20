@@ -16,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * <p>
  * See {@link ScheduledExecutorService} and {@link ExecutorService} for documentation on the provided methods.
  * 
- * @since 1.0
+ * @since 4.0
  */
 public interface Scheduler extends ScheduledExecutorService {
 
