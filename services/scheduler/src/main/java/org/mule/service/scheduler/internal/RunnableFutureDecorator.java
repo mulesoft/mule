@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @since 4.0
  */
-class SchedulerRunnableFutureDecorator<V> implements RunnableFuture<V> {
+class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   private final RunnableFuture<V> task;
 
@@ -33,7 +33,7 @@ class SchedulerRunnableFutureDecorator<V> implements RunnableFuture<V> {
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
    */
-  SchedulerRunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
+  RunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
     this.task = task;
     this.scheduler = scheduler;
   }
@@ -41,7 +41,8 @@ class SchedulerRunnableFutureDecorator<V> implements RunnableFuture<V> {
   @Override
   public void run() {
     try {
-      if (!start()) {
+      if (!startTask()) {
+        // In case the scheduler that owns this task was shutdown, we behave consistently by just not executing the task.
         return;
       }
       task.run();
@@ -50,11 +51,11 @@ class SchedulerRunnableFutureDecorator<V> implements RunnableFuture<V> {
     }
   }
 
-  protected void wrapUp() {
+  private void wrapUp() {
     scheduler.taskFinished(this);
   }
 
-  protected boolean start() {
+  private boolean startTask() {
     if (!stopped) {
       this.started = true;
     }

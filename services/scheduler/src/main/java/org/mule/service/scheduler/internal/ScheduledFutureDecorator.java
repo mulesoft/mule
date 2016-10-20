@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @since 4.0
  */
-class SchedulerScheduledFutureDecorator<V> implements ScheduledFuture<V> {
+class ScheduledFutureDecorator<V> implements ScheduledFuture<V> {
 
   private ScheduledFuture<V> scheduled;
   private RunnableFuture<?> task;
@@ -35,7 +35,7 @@ class SchedulerScheduledFutureDecorator<V> implements ScheduledFuture<V> {
    * @param scheduler the owner {@link Executor} of this task
    * 
    */
-  SchedulerScheduledFutureDecorator(ScheduledFuture<V> scheduled, RunnableFuture<?> task, DefaultScheduler scheduler) {
+  ScheduledFutureDecorator(ScheduledFuture<V> scheduled, RunnableFuture<?> task, DefaultScheduler scheduler) {
     this.scheduled = scheduled;
     this.task = task;
     this.scheduler = scheduler;
