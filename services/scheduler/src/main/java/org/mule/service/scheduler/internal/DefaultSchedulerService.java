@@ -49,6 +49,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   // TODO MULE-10585 Externalize this timeout
   private static final int GRACEFUL_SHUTDOWN_TIMEOUT_SECS = 60;
 
+  private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
+  private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
+  private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
+  private static final String SCHEDULER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_sched";
+
   private ExecutorService cpuLightExecutor;
   private ExecutorService ioExecutor;
   private ExecutorService computationExecutor;
@@ -73,11 +78,6 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   public Scheduler computationScheduler() {
     return new DefaultScheduler(computationExecutor, scheduledExecutor);
   }
-
-  private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
-  private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
-  private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
-  private static final String SCHEDULER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_sched";
 
   @Override
   public void start() throws MuleException {
