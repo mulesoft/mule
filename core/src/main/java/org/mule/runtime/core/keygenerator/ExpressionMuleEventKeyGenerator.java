@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.keygenerator;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -25,12 +26,11 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private String expression;
-  private MuleContext muleContext;
+  private AttributeEvaluator attributeEvaluator;
 
   @Override
   public Serializable generateKey(Event event) throws NotSerializableException {
-    Object key = muleContext.getExpressionLanguage().evaluate(expression, event, null);
+    Object key = attributeEvaluator.resolveValue(event);
 
     if (logger.isDebugEnabled()) {
       logger.debug("Generated key for event: " + event + " key: " + key);
@@ -45,16 +45,15 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
   }
 
   public String getExpression() {
-    return expression;
+    return this.attributeEvaluator.getRawValue();
   }
 
   public void setExpression(String expression) {
-    this.expression = expression;
+    this.attributeEvaluator = new AttributeEvaluator(expression);
   }
-
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+    attributeEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 }
