@@ -26,8 +26,8 @@ public interface Scheduler extends ScheduledExecutorService {
    * <p>
    * If this hasn't terminated after a configured time, a forceful shutdown takes place.
    * 
-   * @param gracefulShutdownTimeoutSecs the maximum time to wait for the running tasks to gracefully complete.
+   * @param gracefulShutdownTimeout the maximum time to wait for the running tasks to gracefully complete.
    * @param unit the time unit of the {@code timeout} argument
    */
-  void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit);
+  void stop(long gracefulShutdownTimeout, TimeUnit unit);
 }

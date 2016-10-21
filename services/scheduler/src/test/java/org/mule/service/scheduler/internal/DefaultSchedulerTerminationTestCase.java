@@ -220,13 +220,18 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     latch1.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
 
-    newSingleThreadExecutor().submit(() -> executor.stop(10, SECONDS));
-    latch2.countDown();
+    final ExecutorService auxExecutor = newSingleThreadExecutor();
+    try {
+      auxExecutor.submit(() -> executor.stop(10, SECONDS));
+      latch2.countDown();
 
-    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
-      assertThat(executor, terminatedMatcher);
-      return true;
-    }));
+      new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+        assertThat(executor, terminatedMatcher);
+        return true;
+      }));
+    } finally {
+      auxExecutor.shutdown();
+    }
   }
 
   @Test
@@ -244,15 +249,21 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
       return awaitLatch(latch2);
     });
 
-    newSingleThreadExecutor().submit(() -> executor.stop(10, SECONDS));
+    final ExecutorService auxExecutor = newSingleThreadExecutor();
+    try {
+      auxExecutor.submit(() -> executor.stop(10, SECONDS));
 
-    latch1.countDown();
-    latch2.countDown();
+      latch1.countDown();
+      latch2.countDown();
 
-    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
-      assertThat(executor, terminatedMatcher);
-      return true;
-    }));
+      new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+        assertThat(executor, terminatedMatcher);
+        return true;
+      }));
+    } finally {
+      auxExecutor.shutdown();
+    }
+
   }
 
   @Test

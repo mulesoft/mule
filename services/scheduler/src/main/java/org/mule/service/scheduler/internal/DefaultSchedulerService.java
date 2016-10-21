@@ -12,6 +12,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -23,21 +24,29 @@ import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link SchedulerService}.
+ * <p>
+ * {@link Scheduler}s provided by this implementation of {@link SchedulerService} use a shared single-threaded
+ * {@link ScheduledExecutorService} for scheduling work. When a scheduled tasks is fired, they are executed using the
+ * {@link Scheduler}'s own executor.
+ * <p>
+ * The returned {@link Scheduler}s have an {@code AbortPolicy} rejection policy. That means that when sending a task to a full
+ * {@link Scheduler} a {@link RejectedExecutionException} will be thrown.
  *
  * @since 4.0
  */
 public class DefaultSchedulerService implements SchedulerService, Startable, Stoppable {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultSchedulerService.class);
+  private static final Logger logger = getLogger(DefaultSchedulerService.class);
 
+  // TODO MULE-10585 Externalize this timeout
   private static final int GRACEFUL_SHUTDOWN_TIMEOUT_SECS = 60;
 
   private ExecutorService cpuLightExecutor;
@@ -65,21 +74,25 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     return new DefaultScheduler(computationExecutor, scheduledExecutor);
   }
 
+  private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
+  private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
+  private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
+  private static final String SCHEDULER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_sched";
+
   @Override
   public void start() throws MuleException {
     int cores = getRuntime().availableProcessors();
 
     logger.info("Starting " + this.toString() + "...");
 
-    // TODO MULE-10585
-    final String prefix = SchedulerService.class.getSimpleName();
+    // TODO MULE-10585 Externalize the threads configuration
     cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(2 * cores),
-                                              new NamedThreadFactory(prefix + "_cpuLight"));
+                                              new NamedThreadFactory(CPU_LIGHT_THREADS_NAME));
     ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new ArrayBlockingQueue<>(cores * cores),
-                                        new NamedThreadFactory(prefix + "_io"));
+                                        new NamedThreadFactory(IO_THREADS_NAME));
     computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(2 * cores),
-                                                 new NamedThreadFactory(prefix + "_compute"));
-    scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(prefix + "_sched"));
+                                                 new NamedThreadFactory(COMPUTATION_THREADS_NAME));
+    scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(SCHEDULER_THREADS_NAME));
 
     ((ThreadPoolExecutor) cpuLightExecutor).prestartAllCoreThreads();
     ((ThreadPoolExecutor) ioExecutor).prestartAllCoreThreads();
@@ -100,10 +113,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     try {
       final long startMillis = currentTimeMillis();
-      waitForExecutorTermination(startMillis, scheduledExecutor, "scheduledExecutor");
-      waitForExecutorTermination(startMillis, cpuLightExecutor, "cpuLightExecutor");
-      waitForExecutorTermination(startMillis, ioExecutor, "ioExecutor");
-      waitForExecutorTermination(startMillis, computationExecutor, "computationExecutor");
+
+      // Stop the scheduled first to avoid it dispatching tasks to an already stopped executor
+      waitForExecutorTermination(startMillis, scheduledExecutor, SCHEDULER_THREADS_NAME);
+      waitForExecutorTermination(startMillis, cpuLightExecutor, CPU_LIGHT_THREADS_NAME);
+      waitForExecutorTermination(startMillis, ioExecutor, IO_THREADS_NAME);
+      waitForExecutorTermination(startMillis, computationExecutor, COMPUTATION_THREADS_NAME);
 
       logger.info("Stopped " + this.toString());
     } catch (InterruptedException e) {

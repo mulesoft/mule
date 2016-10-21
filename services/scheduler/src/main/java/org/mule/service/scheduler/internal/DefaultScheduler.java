@@ -9,7 +9,6 @@ package org.mule.service.scheduler.internal;
 import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.synchronizedSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -17,20 +16,22 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +58,45 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    */
   private final CountDownLatch terminationLatch = new CountDownLatch(1);
 
-  private Set<RunnableFutureDecorator<?>> currentTasks = synchronizedSet(new HashSet<>());
-  private Map<RunnableFuture<?>, ScheduledFutureDecorator<?>> scheduledTasks = new HashMap<>();
+  private static final ScheduledFuture<?> NULL_SCHEDULED_FUTURE = new ScheduledFuture() {
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+      return 0;
+    }
+
+    @Override
+    public int compareTo(Delayed o) {
+      return 0;
+    }
+
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+      return false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+      return false;
+    }
+
+    @Override
+    public boolean isDone() {
+      return false;
+    }
+
+    @Override
+    public Object get() throws InterruptedException, ExecutionException {
+      return null;
+    }
+
+    @Override
+    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+      return null;
+    }
+
+  };
+  private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
   private volatile boolean shutdown = false;
 
@@ -81,12 +119,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     final RunnableFutureDecorator<?> task = new RunnableFutureDecorator<>(super.newTaskFor(command, null), this);
 
     final ScheduledFutureDecorator<?> scheduled =
-        new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task, this);
+        new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
 
-    synchronized (currentTasks) {
-      scheduledTasks.put(task, scheduled);
-      currentTasks.add(task);
-    }
+    scheduledTasks.put(task, scheduled);
     return scheduled;
   }
 
@@ -98,12 +133,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     final RunnableFutureDecorator<V> task = new RunnableFutureDecorator<>(super.newTaskFor(callable), this);
 
     final ScheduledFutureDecorator<V> scheduled =
-        new ScheduledFutureDecorator(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task, this);
+        new ScheduledFutureDecorator(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
 
-    synchronized (currentTasks) {
-      scheduledTasks.put(task, scheduled);
-      currentTasks.add(task);
-    }
+    scheduledTasks.put(task, scheduled);
     return scheduled;
   }
 
@@ -116,12 +148,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
-                                       task, this);
+                                       task);
 
-    synchronized (currentTasks) {
-      scheduledTasks.put(task, scheduled);
-      currentTasks.add(task);
-    }
+    scheduledTasks.put(task, scheduled);
     return scheduled;
   }
 
@@ -134,12 +163,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleWithFixedDelay(schedulableTask(task), initialDelay, delay, unit),
-                                       task, this);
+                                       task);
 
-    synchronized (currentTasks) {
-      scheduledTasks.put(task, scheduled);
-      currentTasks.add(task);
-    }
+    scheduledTasks.put(task, scheduled);
     return scheduled;
   }
 
@@ -159,22 +185,19 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
     List<Runnable> tasks;
     try {
-      synchronized (currentTasks) {
-        tasks = new ArrayList<>(currentTasks.size());
-        for (RunnableFutureDecorator<?> task : currentTasks) {
-          if (scheduledTasks.containsKey(task)) {
-            scheduledTasks.remove(task).cancel(true);
-          } else {
-            task.cancel(true);
-          }
-          if (!task.isStarted()) {
-            tasks.add(task);
-          }
-        }
-        currentTasks.clear();
+      tasks = new ArrayList<>(scheduledTasks.size());
 
-        return tasks;
+      for (Entry<RunnableFuture<?>, ScheduledFuture<?>> taskEntry : scheduledTasks.entrySet()) {
+        taskEntry.getValue().cancel(true);
+        taskEntry.getKey().cancel(true);
+        if (taskEntry.getKey() instanceof RunnableFutureDecorator
+            && !((RunnableFutureDecorator<?>) taskEntry.getKey()).isStarted()) {
+          tasks.add(taskEntry.getKey());
+        }
       }
+      scheduledTasks.clear();
+
+      return tasks;
     } finally {
       tryTerminate();
     }
@@ -187,7 +210,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   public boolean isTerminated() {
-    return shutdown && currentTasks.isEmpty();
+    return shutdown && scheduledTasks.isEmpty();
   }
 
   @Override
@@ -206,19 +229,19 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   @Override
-  public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
+  public void stop(long gracefulShutdownTimeout, TimeUnit unit) {
     // Disable new tasks from being submitted
     shutdown();
     try {
       // Wait a while for existing tasks to terminate
-      if (!awaitTermination(gracefulShutdownTimeoutSecs, unit)) {
+      if (!awaitTermination(gracefulShutdownTimeout, unit)) {
         // Cancel currently executing tasks and return list of pending
         // tasks
         List<Runnable> cancelledJobs = shutdownNow();
         // Wait a while for tasks to respond to being cancelled
         if (!awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT_SECS, SECONDS)) {
-          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + gracefulShutdownTimeoutSecs
-              + " seconds. " + cancelledJobs.size() + " jobs were cancelled.");
+          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + gracefulShutdownTimeout
+              + " " + unit.toString() + ". " + cancelledJobs.size() + " jobs were cancelled.");
         } else {
           if (!cancelledJobs.isEmpty()) {
             logger.warn("Scheduler " + this.toString() + " terminated. " + cancelledJobs.size() + " jobs were cancelled.");
@@ -236,14 +259,14 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
     final RunnableFutureDecorator<T> decorated = new RunnableFutureDecorator<>(super.newTaskFor(callable), this);
-    currentTasks.add(decorated);
+    scheduledTasks.put(decorated, NULL_SCHEDULED_FUTURE);
     return decorated;
   }
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
     final RunnableFutureDecorator<T> decorated = new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this);
-    currentTasks.add(decorated);
+    scheduledTasks.put(decorated, NULL_SCHEDULED_FUTURE);
     return decorated;
   }
 
@@ -262,7 +285,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   protected void taskFinished(RunnableFutureDecorator<?> task) {
-    currentTasks.remove(task);
+    scheduledTasks.remove(task);
     tryTerminate();
   }
 

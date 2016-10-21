@@ -25,7 +25,6 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
   private final DefaultScheduler scheduler;
 
   private volatile boolean started = false;
-  private volatile boolean stopped = false;
 
   /**
    * Decorates the given {@code task}
@@ -40,11 +39,8 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   @Override
   public void run() {
+    started = true;
     try {
-      if (!startTask()) {
-        // In case the scheduler that owns this task was shutdown, we behave consistently by just not executing the task.
-        return;
-      }
       task.run();
     } finally {
       wrapUp();
@@ -55,13 +51,6 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
     scheduler.taskFinished(this);
   }
 
-  private boolean startTask() {
-    if (!stopped) {
-      this.started = true;
-    }
-    return !stopped;
-  }
-
   /**
    * @return {@code true} if the execution of this task has already started, false otherwise.
    */
@@ -69,16 +58,8 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
     return started;
   }
 
-  /**
-   * Marks this task as stopped so is is not executed when started, and interrupts its thread if it has been already started.
-   */
-  protected void doCancel() {
-    this.stopped = true;
-  }
-
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
-    doCancel();
     return task.cancel(mayInterruptIfRunning);
   }
 

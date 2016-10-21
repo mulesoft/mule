@@ -14,6 +14,8 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import org.junit.Test;
 
@@ -32,6 +34,11 @@ public class DefaultSchedulerTestCase extends AbstractMuleTestCase {
     assertThat(collectThreadNames(), hasItem(startsWith(SchedulerService.class.getSimpleName())));
 
     service.stop();
-    assertThat(collectThreadNames(), not(hasItem(startsWith(SchedulerService.class.getSimpleName()))));
+
+    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      assertThat(collectThreadNames(), not(hasItem(startsWith(SchedulerService.class.getSimpleName()))));
+      return true;
+    }));
+
   }
 }
