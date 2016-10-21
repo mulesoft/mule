@@ -7,8 +7,9 @@
 package org.mule.runtime.module.cxf.employee;
 
 
-import org.mule.runtime.module.cxf.employee.example.Employee;
-import org.mule.runtime.module.cxf.employee.example.EmployeeDirectory;
+
+import org.mule.example.employee.Employee;
+import org.mule.example.employee.EmployeeDirectory;
 
 import java.io.IOException;
 import java.io.InputStream;

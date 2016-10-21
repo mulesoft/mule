@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.cxf.employee.example;
+package org.mule.example.employee;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;

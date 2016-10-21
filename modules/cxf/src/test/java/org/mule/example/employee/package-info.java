@@ -6,4 +6,4 @@
  */
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://employee.example.mule.org/",
     elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package org.mule.runtime.module.cxf.employee.example;
+package org.mule.example.employee;
