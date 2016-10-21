@@ -21,7 +21,8 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
 
   /**
    * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
-   *  @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
+   * 
+   * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
    */
   public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,

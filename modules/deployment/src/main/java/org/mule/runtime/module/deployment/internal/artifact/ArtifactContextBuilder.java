@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext}
- * and a {@link MuleContext} that can be retrieved from the {@link ArtifactContext} by calling {@link ArtifactContext#getMuleContext()}
+ * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext} and a
+ * {@link MuleContext} that can be retrieved from the {@link ArtifactContext} by calling {@link ArtifactContext#getMuleContext()}
  *
  * @since 4.0
  */
@@ -213,11 +213,12 @@ public class ArtifactContextBuilder {
   /**
    * Allows to lazily create the artifact resources.
    *
-   * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact components
-   *                       from the configuration will be created on demand when requested. For instance, when using {@link ArtifactContext#getConnectivityTestingService()}
-   *                       and then invoking {@link org.mule.runtime.core.api.connectivity.ConnectivityTestingService#testConnection(String)} will
-   *                       cause the creation of the component requested to do test connectivity, if it was not already created.
-   *                       when false, the application will be created completely at startup.
+   * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
+   *        components from the configuration will be created on demand when requested. For instance, when using
+   *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
+   *        {@link org.mule.runtime.core.api.connectivity.ConnectivityTestingService#testConnection(String)} will cause the
+   *        creation of the component requested to do test connectivity, if it was not already created. when false, the
+   *        application will be created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {

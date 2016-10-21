@@ -7,7 +7,6 @@
 package org.mule.runtime.deployment.model.internal.application;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -66,7 +65,7 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
   private List<URL> getApplicationResourceUrls(ApplicationDescriptor descriptor) {
     List<URL> urls = new LinkedList<>();
     try {
-      urls.add(getAppClassesFolder(descriptor.getName()).toURI().toURL());
+      urls.add(descriptor.getClassesFolder().toURI().toURL());
 
       for (URL url : descriptor.getRuntimeLibs()) {
         urls.add(url);

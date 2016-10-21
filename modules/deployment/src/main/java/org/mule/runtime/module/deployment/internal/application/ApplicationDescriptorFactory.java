@@ -11,12 +11,10 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedPluginLibsFolder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -91,8 +89,9 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
       verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
       desc.setPlugins(plugins);
-      desc.setRuntimeLibs(findLibraries(appName));
-      desc.setSharedRuntimeLibs(findSharedLibraries(appName));
+      desc.setClassesFolder(getAppClassesFolder(desc));
+      desc.setRuntimeLibs(findLibraries(desc));
+      desc.setSharedRuntimeLibs(findSharedLibraries(desc));
       desc.setClassLoaderFilter(createApplicationClassLoaderFilter(desc));
     } catch (IOException e) {
       throw new ArtifactDescriptorCreateException("Unable to create application descriptor", e);
@@ -101,19 +100,27 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     return desc;
   }
 
-  private URL[] findLibraries(String appName) throws MalformedURLException {
-    return findJars(getAppLibFolder(appName)).toArray(new URL[0]);
+  private URL[] findLibraries(ApplicationDescriptor descriptor) throws MalformedURLException {
+    return findJars(getAppLibFolder(descriptor)).toArray(new URL[0]);
   }
 
-  private URL[] findSharedLibraries(String appName) throws MalformedURLException {
-    return findJars(getAppSharedPluginLibsFolder(appName)).toArray(new URL[0]);
+  protected File getAppLibFolder(ApplicationDescriptor descriptor) {
+    return MuleFoldersUtil.getAppLibFolder(descriptor.getName());
+  }
+
+  private URL[] findSharedLibraries(ApplicationDescriptor descriptor) throws MalformedURLException {
+    return findJars(getAppSharedPluginLibsFolder(descriptor)).toArray(new URL[0]);
+  }
+
+  protected File getAppSharedPluginLibsFolder(ApplicationDescriptor descriptor) {
+    return MuleFoldersUtil.getAppSharedPluginLibsFolder(descriptor.getName());
   }
 
   private ArtifactClassLoaderFilter createApplicationClassLoaderFilter(ApplicationDescriptor descriptor) {
     final JarInfo librariesInfo = findExportedResources(descriptor.getSharedRuntimeLibs());
     final JarInfo classesInfo;
     try {
-      final File appClassesFolder = getAppClassesFolder(descriptor.getName());
+      final File appClassesFolder = getAppClassesFolder(descriptor);
       if (appClassesFolder.exists()) {
         classesInfo = findExportedResources(appClassesFolder.toURI().toURL());
       } else {
@@ -126,6 +133,10 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     librariesInfo.getResources().addAll(classesInfo.getResources());
 
     return new DefaultArtifactClassLoaderFilter(librariesInfo.getPackages(), librariesInfo.getResources());
+  }
+
+  protected File getAppClassesFolder(ApplicationDescriptor descriptor) {
+    return MuleFoldersUtil.getAppClassesFolder(descriptor.getName());
   }
 
   private JarInfo findExportedResources(URL... libraries) {
@@ -142,7 +153,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     return new JarInfo(packages, resources);
   }
 
-  private List<URL> findJars(File dir) throws MalformedURLException {
+  protected List<URL> findJars(File dir) throws MalformedURLException {
     List<URL> result = new LinkedList<>();
 
     if (dir.exists() && dir.canRead()) {
@@ -241,4 +252,5 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     }
     desc.setAppProperties(m);
   }
+
 }

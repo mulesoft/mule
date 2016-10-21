@@ -119,5 +119,4 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
         .collect(toList());
   }
 
-
 }

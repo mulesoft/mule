@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.internal.application;
 
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyMap;
@@ -21,11 +22,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -88,6 +87,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setDomain(DOMAIN_NAME);
+    descriptor.setClassesFolder(toFile(classesFolderUrl));
 
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(parentArtifactClassLoader, descriptor, emptyList());
