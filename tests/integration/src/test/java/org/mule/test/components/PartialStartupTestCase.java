@@ -7,11 +7,11 @@
 package org.mule.test.components;
 
 import static org.junit.Assert.fail;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.test.AbstractIntegrationTestCase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -58,14 +58,6 @@ public class PartialStartupTestCase extends AbstractIntegrationTestCase {
         return "mule threads running during dispose";
       }
     });
-  }
-
-  private static List<String> collectThreadNames() {
-    List<String> threadNames = new ArrayList<String>();
-    for (Thread t : Thread.getAllStackTraces().keySet()) {
-      threadNames.add(t.getName());
-    }
-    return threadNames;
   }
 
   private static int countOcurrences(List<String> elements, String prefix) {

@@ -230,7 +230,7 @@ public abstract class AbstractMuleTestCase {
     setCurrentEvent(null);
   }
 
-  private static List<String> collectThreadNames() {
+  protected static List<String> collectThreadNames() {
     List<String> threadNames = new ArrayList<>();
     for (Thread t : Thread.getAllStackTraces().keySet()) {
       if (t.isAlive()) {

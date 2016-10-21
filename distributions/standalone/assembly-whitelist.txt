@@ -160,7 +160,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
 
 #
-# /app-plugins
+# /plugins
 #
 /mule-standalone-${productVersion}/plugins
 /mule-standalone-${productVersion}/plugins/mule-module-db-${productVersion}.zip
@@ -172,6 +172,12 @@
 /mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}.zip
+
+#
+# /services
+#
+/mule-standalone-${productVersion}/services
+/mule-standalone-${productVersion}/services/mule-service-scheduler-${productVersion}.zip
 
 #
 # /lib/opt
