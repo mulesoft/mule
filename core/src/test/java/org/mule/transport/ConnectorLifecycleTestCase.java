@@ -370,7 +370,9 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         connector.start();
         assertEquals(0, connector.receivers.size());
 
-        service.start();
+        // Needs to start the context as the endpoints are not started otherwise
+        muleContext.start();
+
         assertEquals(1, connector.receivers.size());
         assertTrue((connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
