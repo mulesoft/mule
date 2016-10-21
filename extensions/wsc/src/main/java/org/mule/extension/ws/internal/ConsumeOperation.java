@@ -9,6 +9,7 @@ package org.mule.extension.ws.internal;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.WsAttachment;
 import org.mule.extension.ws.api.WscAttributes;
@@ -155,7 +156,7 @@ public class ConsumeOperation {
 
   private XMLStreamReader stringToXmlStreamReader(String body, WscConnection connection, String operation) {
     try {
-      if (body == null) {
+      if (isBlank(body)) {
         body = new RequestBodyGenerator().generateRequest(connection, operation);
       }
       return XMLInputFactory.newInstance().createXMLStreamReader(new ByteArrayInputStream(body.getBytes()));

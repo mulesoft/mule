@@ -19,7 +19,7 @@
 
     <properties>
         <cxfVersion>2.7.15</cxfVersion>
-        <cxfRtFrontendSimpleVersion>2.5.9</cxfRtFrontendSimpleVersion>
+        <cxfRtFrontendSimpleVersion>2.7.18</cxfRtFrontendSimpleVersion>
         <metadataModelXmlVersion>1.0.0-SNAPSHOT</metadataModelXmlVersion>
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <muleXmlModuleVersion>4.0-SNAPSHOT</muleXmlModuleVersion>
@@ -40,6 +40,7 @@
                         </goals>
                         <phase>validate</phase>
                         <configuration>
+                            <skip>true</skip>
                             <failOnWarning>true</failOnWarning>
                             <verbose>true</verbose>
                             <ignoredUsedUndeclaredDependencies>

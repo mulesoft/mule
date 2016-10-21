@@ -18,39 +18,40 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxfVersion}</version>
-                <executions>
-                    <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>
-                                        ${basedir}/src/test/resources/employeeDirectory.wsdl
-                                    </wsdl>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <!-- We reconfigure CXF to use log4j. This affects the classes that run as part
-                         of the plugin as well -->
-                    <dependency>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                        <version>${log4jVersion}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+            <!--TODO FIX: MULE-10747 test generated classes are copied into org.mule.runtime.module.cxf.example -->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.cxf</groupId>-->
+                <!--<artifactId>cxf-codegen-plugin</artifactId>-->
+                <!--<version>${cxfVersion}</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>generate-test-sources</id>-->
+                        <!--<phase>generate-test-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>wsdl2java</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>-->
+                            <!--<wsdlOptions>-->
+                                <!--<wsdlOption>-->
+                                    <!--<wsdl>-->
+                                        <!--${basedir}/src/test/resources/employeeDirectory.wsdl-->
+                                    <!--</wsdl>-->
+                                <!--</wsdlOption>-->
+                            <!--</wsdlOptions>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--&lt;!&ndash;<dependencies>&ndash;&gt;-->
+                    <!--&lt;!&ndash;&lt;!&ndash; We reconfigure CXF to use log4j. This affects the classes that run as part&ndash;&gt;-->
+                         <!--&lt;!&ndash;of the plugin as well &ndash;&gt;&ndash;&gt;-->
+                    <!--&lt;!&ndash;<dependency>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<groupId>org.apache.logging.log4j</groupId>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<artifactId>log4j-api</artifactId>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<version>${log4jVersion}</version>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</dependency>&ndash;&gt;-->
+                <!--&lt;!&ndash;</dependencies>&ndash;&gt;-->
+            <!--</plugin>-->
             <!--
                 This is absolutely necessary as the cxf-codegen-plugin already attaches
                 the generated source dir to the lifecycle. Then again, when generating your IDE
