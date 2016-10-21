@@ -23,15 +23,12 @@ import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,44 +55,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    */
   private final CountDownLatch terminationLatch = new CountDownLatch(1);
 
-  private static final ScheduledFuture<?> NULL_SCHEDULED_FUTURE = new ScheduledFuture() {
-
-    @Override
-    public long getDelay(TimeUnit unit) {
-      return 0;
-    }
-
-    @Override
-    public int compareTo(Delayed o) {
-      return 0;
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-      return false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-      return false;
-    }
-
-    @Override
-    public boolean isDone() {
-      return false;
-    }
-
-    @Override
-    public Object get() throws InterruptedException, ExecutionException {
-      return null;
-    }
-
-    @Override
-    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-      return null;
-    }
-
-  };
+  private static final ScheduledFuture<?> NULL_SCHEDULED_FUTURE = NullScheduledFuture.INSTANCE;
   private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
   private volatile boolean shutdown = false;
