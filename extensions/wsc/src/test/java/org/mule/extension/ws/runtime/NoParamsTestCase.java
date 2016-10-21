@@ -29,4 +29,12 @@ public class NoParamsTestCase extends WebServiceConsumerTestCase {
     String payload = (String) message.getPayload().getValue();
     assertSoapResponse(NO_PARAMS_XML, payload);
   }
+
+  @Test
+  @Description("Consumes an operation that expects no parameters and returns a simple type")
+  public void noParamsOperationNoPayload() throws Exception {
+    Message message = flowRunner(NO_PARAMS_FLOW).run().getMessage();
+    String payload = (String) message.getPayload().getValue();
+    assertSoapResponse(NO_PARAMS_XML, payload);
+  }
 }

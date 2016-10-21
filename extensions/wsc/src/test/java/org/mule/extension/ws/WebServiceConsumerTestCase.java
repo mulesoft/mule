@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ws;
 
-import static java.util.Collections.emptyMap;
 import static javax.xml.ws.Endpoint.publish;
 import static org.junit.Assert.assertTrue;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
@@ -17,8 +16,6 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Map;
 
 import javax.xml.ws.Endpoint;
 
