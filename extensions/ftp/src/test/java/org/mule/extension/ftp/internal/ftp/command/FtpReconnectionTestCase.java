@@ -52,7 +52,7 @@ public class FtpReconnectionTestCase extends AbstractMuleTestCase {
       @Override
       public void describeTo(org.hamcrest.Description description) {}
     });
-    
+
     command.getFile(null);
   }
 
