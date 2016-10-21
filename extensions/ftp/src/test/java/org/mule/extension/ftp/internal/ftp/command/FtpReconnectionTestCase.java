@@ -6,10 +6,10 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.core.Is.isA;
 
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -20,21 +20,40 @@ import java.nio.file.Path;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
+@Features("Reconnection from FTP exception")
 public class FtpReconnectionTestCase extends AbstractMuleTestCase {
 
   private FtpDummyCommand command = new FtpDummyCommand();
 
+  @Rule
+  public ExpectedException ftpConnectionThrown = ExpectedException.none();
+
   @Test
+  @Description("When the FTP connection closes, a FTPConnectionClosedException is raised. " +
+      "This should be treated as a ConnectionException")
   public void testReconnectionFromFTPConnectionClosed() {
-    try {
-      command.getFile(null);
-      fail("Should have handled an FTPConnectionClosedException");
-    } catch (Exception e) {
-      assertTrue(e.getCause().getCause() instanceof FTPConnectionClosedException);
-    }
+    ftpConnectionThrown.expectCause(isA(ConnectionException.class));
+    ftpConnectionThrown.expectCause(new TypeSafeMatcher<Throwable>() {
+
+      @Override
+      protected boolean matchesSafely(Throwable throwable) {
+        return isA(FTPConnectionClosedException.class).matches(throwable.getCause());
+      }
+
+      @Override
+      public void describeTo(org.hamcrest.Description description) {}
+    });
+    
+    command.getFile(null);
   }
 
   private class FtpDummyCommand extends ClassicFtpCommand {
