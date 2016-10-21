@@ -56,7 +56,6 @@ import org.reactivestreams.Publisher;
  */
 public class Flow extends AbstractPipeline implements Processor, StageNameSourceProvider, DynamicPipeline {
 
-  private int stageCount = 0;
   private final StageNameSource sequentialStageNameSource;
   private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
 
@@ -195,9 +194,7 @@ public class Flow extends AbstractPipeline implements Processor, StageNameSource
 
   @Override
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    getProcessingStrategy().configureProcessors(getMessageProcessors(),
-                                                () -> String.format("%s.stage%s", Flow.this.getName(), ++stageCount), builder,
-                                                muleContext);
+    getProcessingStrategy().configureProcessors(getMessageProcessors(), schedulerService, builder, muleContext);
   }
 
   /**

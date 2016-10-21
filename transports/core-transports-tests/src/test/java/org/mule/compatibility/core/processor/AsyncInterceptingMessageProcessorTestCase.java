@@ -17,15 +17,14 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -51,6 +50,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
   protected void doSetUp() throws Exception {
     super.doSetUp();
     messageProcessor = createAsyncInterceptingMessageProcessor(target);
+    messageProcessor.start();
   }
 
   @Test
@@ -118,7 +118,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
-    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new TestWorkManagerSource());
+    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService());
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);
@@ -143,13 +143,4 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
   public void exceptionThrown(Exception e) {
     exceptionThrown = e;
   }
-
-  class TestWorkManagerSource implements WorkManagerSource {
-
-    @Override
-    public WorkManager getWorkManager() throws MuleException {
-      return muleContext.getWorkManager();
-    }
-  }
-
 }

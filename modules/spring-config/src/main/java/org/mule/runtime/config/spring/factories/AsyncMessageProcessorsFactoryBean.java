@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   protected MuleContext muleContext;
 
   protected List messageProcessors;
-  protected ProcessingStrategyFactory processingStrategyFactory;
+  protected ProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
   protected String name;
 
   @Override

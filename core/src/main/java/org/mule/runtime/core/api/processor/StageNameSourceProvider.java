@@ -12,6 +12,7 @@ package org.mule.runtime.core.api.processor;
  *
  * @since 3.5.0
  */
+@Deprecated
 public interface StageNameSourceProvider {
 
   /**

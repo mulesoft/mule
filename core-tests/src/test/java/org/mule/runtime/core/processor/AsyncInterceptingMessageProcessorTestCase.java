@@ -18,12 +18,11 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -33,6 +32,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -60,6 +60,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
   protected void doSetUp() throws Exception {
     super.doSetUp();
     messageProcessor = createAsyncInterceptingMessageProcessor(target);
+    messageProcessor.start();
   }
 
   @Test
@@ -186,8 +187,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
 
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
-    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
-                                                                                 new TestWorkManagerSource());
+    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService());
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);
@@ -211,14 +211,6 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
   @Override
   public void exceptionThrown(Exception e) {
     exceptionThrown = e;
-  }
-
-  class TestWorkManagerSource implements WorkManagerSource {
-
-    @Override
-    public WorkManager getWorkManager() throws MuleException {
-      return muleContext.getWorkManager();
-    }
   }
 
   private static class LatchedExceptionListener implements MessagingExceptionHandler {

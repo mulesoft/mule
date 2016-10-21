@@ -7,9 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 /**
@@ -26,29 +24,29 @@ public abstract class AbstractThreadingProfileProcessingStrategy implements Proc
   protected Long threadWaitTimeout;
   protected Integer poolExhaustedAction;
 
-  protected ThreadingProfile createThreadingProfile(MuleContext muleContext) {
-    ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
-    if (maxThreads != null) {
-      threadingProfile.setMaxThreadsActive(maxThreads);
-    }
-    if (minThreads != null) {
-      threadingProfile.setMaxThreadsIdle(minThreads);
-    }
-    if (maxBufferSize != null) {
-      threadingProfile.setMaxBufferSize(maxBufferSize);
-    }
-    if (threadTTL != null) {
-      threadingProfile.setThreadTTL(threadTTL);
-    }
-    if (threadWaitTimeout != null) {
-      threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
-    }
-    if (poolExhaustedAction != null) {
-      threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
-    }
-    threadingProfile.setMuleContext(muleContext);
-    return threadingProfile;
-  }
+  // protected ThreadingProfile createThreadingProfile(MuleContext muleContext) {
+  // ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
+  // if (maxThreads != null) {
+  // threadingProfile.setMaxThreadsActive(maxThreads);
+  // }
+  // if (minThreads != null) {
+  // threadingProfile.setMaxThreadsIdle(minThreads);
+  // }
+  // if (maxBufferSize != null) {
+  // threadingProfile.setMaxBufferSize(maxBufferSize);
+  // }
+  // if (threadTTL != null) {
+  // threadingProfile.setThreadTTL(threadTTL);
+  // }
+  // if (threadWaitTimeout != null) {
+  // threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
+  // }
+  // if (poolExhaustedAction != null) {
+  // threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
+  // }
+  // threadingProfile.setMuleContext(muleContext);
+  // return threadingProfile;
+  // }
 
   protected String getThreadPoolName(String stageName, MuleContext muleContext) {
     return ThreadNameHelper.flow(muleContext, stageName);

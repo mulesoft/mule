@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -156,8 +157,7 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
     }
 
     @Override
-    public void configureProcessors(List<Processor> processors,
-                                    org.mule.runtime.core.api.processor.StageNameSource nameSource,
+    public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
                                     MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
       for (Processor processor : processors) {
         chainBuilder.chain(processor);

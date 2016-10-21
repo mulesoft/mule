@@ -164,6 +164,7 @@ public interface MuleContext extends Lifecycle {
    *
    * @return a workManager instance used by the current MuleManager
    */
+  @Deprecated
   WorkManager getWorkManager();
 
   WorkListener getWorkListener();
@@ -210,14 +211,19 @@ public interface MuleContext extends Lifecycle {
 
   MuleConfiguration getConfiguration();
 
+  @Deprecated
   ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
 
+  @Deprecated
   ThreadingProfile getDefaultMessageRequesterThreadingProfile();
 
+  @Deprecated
   ThreadingProfile getDefaultMessageReceiverThreadingProfile();
 
+  @Deprecated
   ThreadingProfile getDefaultServiceThreadingProfile();
 
+  @Deprecated
   ThreadingProfile getDefaultThreadingProfile();
 
   /**
