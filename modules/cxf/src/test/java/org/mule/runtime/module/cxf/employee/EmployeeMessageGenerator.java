@@ -7,7 +7,8 @@
 package org.mule.runtime.module.cxf.employee;
 
 
-import org.mule.runtime.module.cxf.employee.example.Employee;
+
+import org.mule.example.employee.Employee;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;

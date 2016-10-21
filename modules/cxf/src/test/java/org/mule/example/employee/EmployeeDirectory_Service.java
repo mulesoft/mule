@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.cxf.employee.example;
+package org.mule.example.employee;
 
 import java.net.MalformedURLException;
 import java.net.URL;
