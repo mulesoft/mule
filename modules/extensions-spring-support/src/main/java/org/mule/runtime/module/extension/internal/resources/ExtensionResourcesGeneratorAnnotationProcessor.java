@@ -11,10 +11,10 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
@@ -36,8 +36,10 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
@@ -55,11 +57,13 @@ import javax.tools.Diagnostic;
  */
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedOptions(ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 
   public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
   public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
   public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
+  public static final String EXTENSION_VERSION = "extension.version";
 
   private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
@@ -87,7 +91,8 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
 
   private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment) {
     Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
-    Describer describer = new AnnotationsBasedDescriber(extensionClass, new StaticVersionResolver(getVersion()));
+    Describer describer =
+        new AnnotationsBasedDescriber(extensionClass, new StaticVersionResolver(getVersion(extensionElement.getQualifiedName())));
 
     DescribingContext context = new DefaultDescribingContext(extensionClass.getClassLoader());
     context.addParameter(EXTENSION_ELEMENT, extensionElement);
@@ -116,10 +121,11 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
   }
 
-  private String getVersion() {
-    String extensionVersion = processingEnv.getOptions().get("extension.version");
+  private String getVersion(Name qualifiedName) {
+    String extensionVersion = processingEnv.getOptions().get(EXTENSION_VERSION);
     if (extensionVersion == null) {
-      throw new RuntimeException("Cannot resolve version for extension %s: option extension.version is missing.");
+      throw new RuntimeException(String.format("Cannot resolve version for extension %s: option '%s' is missing.", qualifiedName,
+                                               EXTENSION_VERSION));
     }
 
     return extensionVersion;
