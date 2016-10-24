@@ -370,7 +370,10 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         startIfStartable(component);
         startIfStartable(messageProcessorChain);
 
-        startIfStartable(messageSource);
+        if (muleContext.isStarted())
+        {
+            startIfStartable(messageSource);
+        }
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
             asyncReplyMessageSource.start();

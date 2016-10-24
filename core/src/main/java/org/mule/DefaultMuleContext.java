@@ -8,6 +8,9 @@ package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 
+import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -16,6 +19,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
@@ -29,6 +33,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -36,6 +41,9 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.serialization.ObjectSerializer;
+import org.mule.api.service.Service;
+import org.mule.api.source.MessageSource;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
@@ -57,6 +65,8 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.service.Pausable;
+import org.mule.transport.ConnectException;
 import org.mule.transport.DefaultPollingController;
 import org.mule.transport.PollingController;
 import org.mule.util.ApplicationShutdownSplashScreen;
@@ -289,6 +299,7 @@ public class DefaultMuleContext implements MuleContext
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
         overridePollingController();
         overrideClusterConfiguration();
+        startMessageSources();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
@@ -298,6 +309,70 @@ public class DefaultMuleContext implements MuleContext
         {
             SplashScreen startupScreen = buildStartupSplash();
             logger.info(startupScreen.toString());
+        }
+    }
+
+    private void startMessageSources() throws LifecycleException
+    {
+        startPipelineMessageSources();
+        startServicesMessageSources();
+    }
+
+    private void startServicesMessageSources() throws LifecycleException
+    {
+        for (Service service : this.getRegistry().lookupObjects(Service.class))
+        {
+            if (service.isStarted() || service.isPaused())
+            {
+                MessageSource messageSource = service.getMessageSource();
+
+                startMessageSource(messageSource);
+
+                if (service.isPaused() && messageSource instanceof Pausable)
+                {
+                    try
+                    {
+                        ((Pausable) messageSource).pause();
+                    }
+                    catch (Exception e)
+                    {
+                        exceptionListener.handleException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void startPipelineMessageSources() throws LifecycleException
+    {
+        for (Pipeline pipeline : this.getRegistry().lookupObjects(Pipeline.class))
+        {
+            if (pipeline.getLifecycleState().isStarted())
+            {
+                MessageSource messageSource = pipeline.getMessageSource();
+
+                startMessageSource(messageSource);
+            }
+        }
+    }
+
+    private void startMessageSource(MessageSource messageSource) throws LifecycleException
+    {
+        try
+        {
+            startIfNeeded(messageSource);
+        }
+        catch (ConnectException e)
+        {
+            exceptionListener.handleException(e);
+        }
+        catch (LifecycleException le)
+        {
+            throw le;
+        }
+        catch (Exception e)
+        {
+            throw new LifecycleException(e, messageSource);
         }
     }
 
@@ -816,8 +891,8 @@ public class DefaultMuleContext implements MuleContext
     protected SplashScreen buildStartupSplash()
     {
         SplashScreen startupScreen = config.isContainerMode()
-                                         ? new ApplicationStartupSplashScreen()
-                                         : new ServerStartupSplashScreen();
+                                     ? new ApplicationStartupSplashScreen()
+                                     : new ServerStartupSplashScreen();
         startupScreen.setHeader(this);
         startupScreen.setFooter(this);
         return startupScreen;
@@ -826,8 +901,8 @@ public class DefaultMuleContext implements MuleContext
     protected SplashScreen buildShutdownSplash()
     {
         SplashScreen shutdownScreen = config.isContainerMode()
-                                         ? new ApplicationShutdownSplashScreen()
-                                         : new ServerShutdownSplashScreen();
+                                      ? new ApplicationShutdownSplashScreen()
+                                      : new ServerShutdownSplashScreen();
         shutdownScreen.setHeader(this);
         return shutdownScreen;
     }
@@ -919,7 +994,7 @@ public class DefaultMuleContext implements MuleContext
             defaultExceptionStrategy = getRegistry().lookupObject(config.getDefaultExceptionStrategyName());
             if (defaultExceptionStrategy == null)
             {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy named %s",config.getDefaultExceptionStrategyName())));
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy named %s", config.getDefaultExceptionStrategyName())));
             }
         }
         else
