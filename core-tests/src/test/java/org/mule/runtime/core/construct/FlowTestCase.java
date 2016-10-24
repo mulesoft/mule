@@ -240,6 +240,9 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void testFailStartingMessageSourceOnLifecycleShouldStopStartedPipelineProcesses() throws Exception {
+    // Need to start mule context to have endpoints started during flow start
+    muleContext.start();
+
     MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     doThrow(new LifecycleException(mock(I18nMessage.class), "Error starting component")).when(((Startable) mockMessageSource))
         .start();

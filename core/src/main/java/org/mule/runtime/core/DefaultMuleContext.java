@@ -39,7 +39,6 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
@@ -51,6 +50,7 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
@@ -64,6 +64,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -73,6 +74,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.util.StreamCloserService;
@@ -83,6 +85,7 @@ import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.connector.DefaultPollingController;
 import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -124,7 +127,6 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -342,6 +344,7 @@ public class DefaultMuleContext implements MuleContext {
     getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
     overridePollingController();
     overrideClusterConfiguration();
+    startMessageSources();
 
     fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));
 
@@ -350,6 +353,32 @@ public class DefaultMuleContext implements MuleContext {
     if (logger.isInfoEnabled()) {
       SplashScreen startupScreen = buildStartupSplash();
       logger.info(startupScreen.toString());
+    }
+  }
+
+  private void startMessageSources() throws LifecycleException {
+    startPipelineMessageSources();
+  }
+
+  private void startPipelineMessageSources() throws LifecycleException {
+    for (Pipeline pipeline : this.getRegistry().lookupObjects(Pipeline.class)) {
+      if (pipeline.getLifecycleState().isStarted()) {
+        MessageSource messageSource = pipeline.getMessageSource();
+
+        startMessageSource(messageSource);
+      }
+    }
+  }
+
+  private void startMessageSource(MessageSource messageSource) throws LifecycleException {
+    try {
+      startIfNeeded(messageSource);
+    } catch (ConnectException e) {
+      exceptionListener.handleException(e);
+    } catch (LifecycleException le) {
+      throw le;
+    } catch (Exception e) {
+      throw new LifecycleException(e, messageSource);
     }
   }
 
