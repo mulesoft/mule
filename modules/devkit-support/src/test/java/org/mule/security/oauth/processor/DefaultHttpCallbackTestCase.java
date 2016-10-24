@@ -116,6 +116,9 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withOldHttpTransport() throws Exception
     {
+        // Needs the context to be started so endpoints are available
+        muleContext.start();
+
         callback = createCallback(newOldHttpTransport());
         sendCallbackRequest();
     }

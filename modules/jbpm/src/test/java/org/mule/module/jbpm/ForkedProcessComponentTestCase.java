@@ -6,19 +6,20 @@
  */
 package org.mule.module.jbpm;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.module.bpm.BPMS;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import org.jbpm.api.ProcessInstance;
 import org.junit.Test;
 
 public class ForkedProcessComponentTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigFile()
     {
@@ -32,28 +33,51 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
         assertNotNull(bpms);
 
         // Create a new process.
-        MuleMessage response = muleContext.getClient().send("vm://fork", "data", null);
-        ProcessInstance process = (ProcessInstance) response.getPayload();
-        
-        // The process should be waiting for asynchronous responses from both services
-        String state = (String) bpms.getState(process);
-        assertTrue(state.contains("waitForResponseA"));
-        assertTrue(state.contains("waitForResponseB"));
+        final MuleMessage response = muleContext.getClient().send("vm://fork", "data", null);
+        String processId = ((ProcessInstance) response.getPayload()).getId();
 
-        Thread.sleep(2000);
+        // The process should be waiting for asynchronous responses from both services
+        assertProcessState(bpms, processId, "waitForResponseA / waitForResponseB");
 
         // ServiceA is initially stopped, so we're still waiting for a response from ServiceA
-        process = (ProcessInstance) bpms.lookupProcess(process.getId());
-        assertEquals("waitForResponseA", bpms.getState(process));
+        assertProcessState(bpms, processId, "waitForResponseA");
 
         // Start ServiceA
         muleContext.getRegistry().lookupService("ServiceA").resume();
-        Thread.sleep(2000);
-                    
+
         // The process should have ended.
-        process = (ProcessInstance) bpms.lookupProcess(process.getId());
-        assertTrue("Process should have ended, but is in state " + bpms.getState(process),
-                bpms.hasEnded(process));
+        assertProcessState(bpms, processId, "ended");
+    }
+
+    private void assertProcessState(final BPMS bpms, final String processId, final String state)
+    {
+        Prober prober = new PollingProber(RECEIVE_TIMEOUT, 50);
+        prober.check(new Probe()
+        {
+            private String processState;
+
+            @Override
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    ProcessInstance process = (ProcessInstance) bpms.lookupProcess(processId);
+                    processState = (String) bpms.getState(process);
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+
+                return state.equals(processState);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "process was in state: " + processState + " but expected to contain: " + state;
+            }
+        });
     }
 
 }
