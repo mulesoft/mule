@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 
@@ -26,5 +27,11 @@ public interface ArtifactContext {
    * @return a service to do connectivity testing over resources of the artifact.
    */
   ConnectivityTestingService getConnectivityTestingService();
+
+  /**
+   * @return the {@link MetadataService} for the current Artifact.
+   * @see MetadataService
+   */
+  MetadataService getMetadataService();
 
 }

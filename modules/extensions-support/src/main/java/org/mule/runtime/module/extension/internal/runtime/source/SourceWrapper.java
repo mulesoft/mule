@@ -165,6 +165,12 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     return Optional.of(new FieldSetter<>(fields.iterator().next()));
   }
 
+  Object getFieldValue(String fieldName) throws NoSuchFieldException, IllegalAccessException {
+    final Field declaredField = delegate.getClass().getDeclaredField(fieldName);
+    declaredField.setAccessible(true);
+    return declaredField.get(delegate);
+  }
+
   public String getName() {
     return IntrospectionUtils.getSourceName(delegate.getClass());
   }

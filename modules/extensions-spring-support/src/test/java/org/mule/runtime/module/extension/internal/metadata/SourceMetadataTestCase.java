@@ -13,6 +13,7 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.SourceId;
@@ -28,8 +29,6 @@ import org.junit.Test;
 
 public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
-  private static final String TYPE_PARAMETER_NAME = "type";
-
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;
@@ -42,7 +41,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
 
   @Test
   public void getSourceMetadataKeys() {
-    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(componentId);
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys.size(), is(3));
@@ -61,8 +60,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
 
   @Test
   public void getSourceDynamicOutputMetadata() throws Exception {
-    final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
+    final ComponentMetadataDescriptor componentMetadata = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, typeLoader.load(StringAttributes.class));
   }
-
 }

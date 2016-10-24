@@ -22,8 +22,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
-import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
-import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
+
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
@@ -182,7 +181,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(
                                                                                        of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory
                                                                                            .getDefault().createTypeLoader()
-                                                                                           .load(String.class))));
+                                                                                           .load(String.class), "someParam")));
     setRequires(operationModel, true, true);
     when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
 
@@ -268,39 +267,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected abstract OperationMessageProcessor createOperationMessageProcessor();
 
   @Test
-  public void getOperationDynamicMetadata() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());
-
-    assertThat(metadata.isSuccess(), is(true));
-
-    MetadataResult<OutputMetadataDescriptor> outputMetadataDescriptor = metadata.get().getOutputMetadata();
-
-    MetadataResult<TypeMetadataDescriptor> payloadMetadata = outputMetadataDescriptor.get().getPayloadMetadata();
-    assertThat(payloadMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
-
-    MetadataResult<TypeMetadataDescriptor> attributesMetadata = outputMetadataDescriptor.get().getAttributesMetadata();
-    assertThat(attributesMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
-
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("content").get().getType(),
-               is(TYPE_BUILDER.stringType().build()));
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("type").get().getType(), is(stringType));
-  }
-
-  @Test
-  public void getMetadataKeys() throws Exception {
-    MetadataResult<MetadataKeysContainer> metadataKeysResult = messageProcessor.getMetadataKeys();
-
-    verify(metadataResolverFactory).getKeyResolver();
-
-    assertThat(metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
-    assertThat(metadataKeys.size(), is(2));
-
-    assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(BOOLEAN.name())));
-    assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(STRING.name())));
-  }
-
-  @Test
   public void initialise() throws Exception {
     verify((MuleContextAware) operationExecutor, atLeastOnce()).setMuleContext(any(MuleContext.class));
     verify((Initialisable) operationExecutor).initialise();
@@ -322,9 +288,5 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   public void dispose() throws Exception {
     messageProcessor.dispose();
     verify((Disposable) operationExecutor).dispose();
-  }
-
-  private Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
-    return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
   }
 }

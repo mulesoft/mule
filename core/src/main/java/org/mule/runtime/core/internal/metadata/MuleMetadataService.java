@@ -18,7 +18,7 @@ import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -44,13 +44,13 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 
 /**
- * Default implementation of the {@link MetadataManager}, which provides access to the Metadata of any Component in the
+ * Default implementation of the {@link MetadataService}, which provides access to the Metadata of any Component in the
  * application, using it's {@link ComponentId}. Requires the injection of the {@link MuleContext}, to be able to lookup the
  * component inside the Mule App flows using the given {@link ComponentId}
  *
  * @since 4.0
  */
-public class MuleMetadataManager implements MetadataManager, Initialisable {
+public class MuleMetadataService implements MetadataService, Initialisable {
 
   private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
   private static final String FLOW_NOT_FOUND = "Flow [%s] doesn't exist";
@@ -69,7 +69,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
 
   private final LoadingCache<String, MetadataCache> caches;
 
-  public MuleMetadataManager() {
+  public MuleMetadataService() {
     caches = CacheBuilder.newBuilder().build(new CacheLoader<String, MetadataCache>() {
 
       @Override

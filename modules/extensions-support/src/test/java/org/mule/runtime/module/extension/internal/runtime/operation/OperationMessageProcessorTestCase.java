@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -16,33 +18,56 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.tck.size.SmallTest;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.metadata.api.annotation.DescriptionAnnotation;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
+import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
+import org.mule.tck.size.SmallTest;
+
+import java.util.Map;
+import java.util.Set;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -255,5 +280,79 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     assertThat(operationContext, is(instanceOf(OperationContextAdapter.class)));
     assertThat(operationContext.getConfiguration().get().getValue(), is(sameInstance(defaultConfigInstance)));
+  }
+
+
+  @Test
+  public void getExplicitOperationDynamicMetadata() throws Exception {
+    MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());
+
+    assertThat(metadata.isSuccess(), is(true));
+
+    MetadataResult<OutputMetadataDescriptor> outputMetadataDescriptor = metadata.get().getOutputMetadata();
+
+    MetadataResult<TypeMetadataDescriptor> payloadMetadata = outputMetadataDescriptor.get().getPayloadMetadata();
+    assertThat(payloadMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
+
+    MetadataResult<TypeMetadataDescriptor> attributesMetadata = outputMetadataDescriptor.get().getAttributesMetadata();
+    assertThat(attributesMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
+
+    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("content").get().getType(),
+               is(TYPE_BUILDER.stringType().build()));
+    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("type").get().getType(), is(stringType));
+  }
+
+  @Test
+  public void getDSLOperationDynamicMetadata() throws Exception {
+    final ObjectType objectType = BaseTypeBuilder
+        .create(JAVA).objectType()
+        .with(new DescriptionAnnotation(empty(), "Some Description"))
+        .build();
+    setUpValueResolvers();
+    final OutputTypeResolver outputTypeResolver = mock(OutputTypeResolver.class);
+    when(outputTypeResolver.getOutputType(any(), eq("person"))).thenReturn(objectType);
+    when(metadataResolverFactory.getOutputResolver()).thenReturn(outputTypeResolver);
+
+    final MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata();
+    assertThat(metadata.isSuccess(), is(true));
+    final MetadataResult<OutputMetadataDescriptor> outputMetadata = metadata.get().getOutputMetadata();
+    assertThat(outputMetadata.isSuccess(), is(true));
+    assertThat(outputMetadata.get().getPayloadMetadata().get().getType(), is(objectType));
+
+    verify(resolverSet.getResolvers(), times(1));
+  }
+
+  @Test
+  public void getMetadataKeyIdObjectValue() throws MetadataResolvingException, MuleException {
+    setUpValueResolvers();
+    final Object metadataKeyValue = messageProcessor.getMetadataKeyObjectResolver().getMetadataKeyValue();
+    assertThat(metadataKeyValue, is("person"));
+  }
+
+  @Test
+  public void getMetadataKeys() throws Exception {
+    MetadataResult<MetadataKeysContainer> metadataKeysResult = messageProcessor.getMetadataKeys();
+
+    verify(metadataResolverFactory).getKeyResolver();
+
+    assertThat(metadataKeysResult.isSuccess(), is(true));
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(metadataKeys.size(), is(2));
+
+    assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(BOOLEAN.name())));
+    assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(STRING.name())));
+  }
+
+  private Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
+    return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
+  }
+
+  private void setUpValueResolvers() throws MuleException {
+    final Map<String, ValueResolver> valueResolvers = mock(Map.class);
+    when(resolverSet.getResolvers()).thenReturn(valueResolvers);
+    final ValueResolver valueResolver = mock(ValueResolver.class);
+    when(valueResolvers.get(eq("someParam"))).thenReturn(valueResolver);
+    when(valueResolvers.containsKey(eq("someParam"))).thenReturn(true);
+    when(valueResolver.resolve(any(Event.class))).thenReturn("person");
   }
 }

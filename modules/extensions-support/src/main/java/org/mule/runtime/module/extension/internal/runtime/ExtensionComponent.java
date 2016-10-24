@@ -39,13 +39,15 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MetadataKeyIdObjectResolver;
+import org.mule.runtime.module.extension.internal.metadata.MetadataKeyObjectResolver;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
@@ -86,7 +88,7 @@ public abstract class ExtensionComponent
   protected ConnectionManagerAdapter connectionManager;
 
   @Inject
-  private MuleMetadataManager metadataManager;
+  private MuleMetadataService metadataService;
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                ComponentModel componentModel,
@@ -222,7 +224,8 @@ public abstract class ExtensionComponent
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException {
     MetadataContext context = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(context));
+    return withContextClassLoader(getClassLoader(this.extensionModel),
+                                  () -> metadataMediator.getMetadata(context, getMetadataKeyObjectResolver()));
   }
 
   /**
@@ -231,7 +234,9 @@ public abstract class ExtensionComponent
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException {
     MetadataContext context = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(context, key));
+    return withContextClassLoader(getClassLoader(this.extensionModel),
+                                  () -> metadataMediator
+                                      .getMetadata(context, () -> new MetadataKeyIdObjectResolver(componentModel).resolve(key)));
   }
 
   @Override
@@ -258,7 +263,7 @@ public abstract class ExtensionComponent
     String cacheId = configuration.map(ConfigurationInstance::getName)
         .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
 
-    return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId), typeLoader);
+    return new DefaultMetadataContext(configuration, connectionManager, metadataService.getMetadataCache(cacheId), typeLoader);
   }
 
   /**
@@ -323,4 +328,6 @@ public abstract class ExtensionComponent
   protected ConfigurationProvider getConfigurationProvider() {
     return configurationProvider;
   }
+
+  protected abstract MetadataKeyObjectResolver getMetadataKeyObjectResolver() throws MetadataResolvingException;
 }

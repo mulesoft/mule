@@ -12,9 +12,14 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getMetadata;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -22,7 +27,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
@@ -32,7 +37,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.test.metadata.extension.MetadataExtension;
@@ -40,13 +45,15 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 
-
+@RunWith(Parameterized.class)
 public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunctionalTestCase {
 
   protected static final String FIRST_PROCESSOR_INDEX = "0";
@@ -83,6 +90,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String SHOULD_INHERIT_EXTENSION_RESOLVERS = "shouldInheritExtensionResolvers";
   protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
   protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
+  protected static final String INCOMPLETE_MULTILEVEL_KEY_RESOLVER = "incompleteMultiLevelKeyResolver";
   protected static final String TYPE_WITH_DECLARED_SUBTYPES_METADATA = "typeWithDeclaredSubtypesMetadata";
   protected static final String RESOLVER_WITH_DYNAMIC_CONFIG = "resolverWithDynamicConfig";
   protected static final String RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG = "resolverWithImplicitDynamicConfig";
@@ -106,32 +114,60 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
+  private static final MetadataComponentDescriptorProvider EXPLICIT_METADATA_RESOLVER = MetadataService::getMetadata;
+  private static final MetadataComponentDescriptorProvider DSL_METADATA_RESOLVER =
+      (MetadataComponentDescriptorProvider) (metadataService, componentId, key) -> metadataService
+          .getMetadata(componentId);
+
 
   protected MetadataType personType;
   protected ComponentId componentId;
   protected Event event;
-  protected MetadataManager metadataManager;
+  protected MetadataService metadataService;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+
+  @Parameterized.Parameter
+  public ResolutionType resolutionType;
+
+  @Parameterized.Parameter(1)
+  public MetadataComponentDescriptorProvider provider;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
     return new Class<?>[] {MetadataExtension.class};
   }
 
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {EXPLICIT_RESOLUTION, EXPLICIT_METADATA_RESOLVER},
+        {DSL_RESOLUTION, DSL_METADATA_RESOLVER}
+    });
+  }
+
   @Before
   public void setup() throws Exception {
     event = eventBuilder().message(InternalMessage.of("")).build();
-    metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
+    metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 
-  protected ComponentMetadataDescriptor getComponentDynamicMetadata() {
-    return getComponentDynamicMetadata(PERSON_METADATA_KEY);
+  enum ResolutionType {
+    EXPLICIT_RESOLUTION, DSL_RESOLUTION
   }
 
-  protected ComponentMetadataDescriptor getComponentDynamicMetadata(MetadataKey key) {
-    MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
+  MetadataResult<ComponentMetadataDescriptor> getComponentDynamicMetadata(MetadataKey key) {
+    checkArgument(componentId != null, "Unable to resolve Metadata. The Component ID has not been configured.");
+    return provider.resolveDynamicMetadata(metadataService, componentId, key);
+  }
+
+  ComponentMetadataDescriptor getSuccessComponentDynamicMetadata() {
+    return getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
+  }
+
+  ComponentMetadataDescriptor getSuccessComponentDynamicMetadata(MetadataKey key) {
+    MetadataResult<ComponentMetadataDescriptor> componentMetadata = getComponentDynamicMetadata(key);
     assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure",
                componentMetadata.isSuccess(), is(true));
 
@@ -216,5 +252,11 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
 
       fail("Expected result to be success but it failed without error information");
     }
+  }
+
+  private interface MetadataComponentDescriptorProvider {
+
+    MetadataResult<ComponentMetadataDescriptor> resolveDynamicMetadata(MetadataService metadataService,
+                                                                       ComponentId componentId, MetadataKey key);
   }
 }

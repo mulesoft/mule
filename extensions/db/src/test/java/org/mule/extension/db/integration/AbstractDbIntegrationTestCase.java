@@ -33,7 +33,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
@@ -41,7 +41,7 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -192,8 +192,8 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
   }
 
   protected MetadataResult<ComponentMetadataDescriptor> getMetadata(String flow, String query) throws RegistrationException {
-    MetadataManager metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
-    return metadataManager.getMetadata(new ProcessorId(flow, "0"), newKey(query).build());
+    MetadataService metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
+    return metadataService.getMetadata(new ProcessorId(flow, "0"), newKey(query).build());
   }
 
   protected ParameterMetadataDescriptor getInputMetadata(String flow, String query) throws RegistrationException {

@@ -8,7 +8,7 @@ package org.mule.extension.file;
 
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.test.extension.file.common.FileMetadataResolverTestCommon;
 
@@ -17,7 +17,7 @@ import org.junit.Test;
 
 public class FileMetadataResolverTestCase extends FileConnectorTestCase {
 
-  private MetadataManager manager;
+  private MetadataService service;
   private FileMetadataResolverTestCommon testCommon;
 
   @Override
@@ -27,17 +27,17 @@ public class FileMetadataResolverTestCase extends FileConnectorTestCase {
 
   @Before
   public void setupManager() throws RegistrationException {
-    manager = muleContext.getRegistry().lookupObject(MetadataManager.class);
+    service = muleContext.getRegistry().lookupObject(MetadataService.class);
     testCommon = new FileMetadataResolverTestCommon();
   }
 
   @Test
   public void getReadAttributesMetadata() {
-    testCommon.testReadAttributesMetadata(manager, FileAttributes.class);
+    testCommon.testReadAttributesMetadata(service, FileAttributes.class);
   }
 
   @Test
   public void getListOperationOutputMetadata() {
-    testCommon.testTreeNodeType(manager, LocalFileAttributes.class);
+    testCommon.testTreeNodeType(service, LocalFileAttributes.class);
   }
 }

@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -34,6 +34,7 @@ import org.mule.runtime.extension.api.introspection.property.MetadataContentMode
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -46,6 +47,7 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -184,22 +186,35 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
   }
 
   private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
+    Optional<MetadataKeyIdModelProperty> metadataKeyModelProperty = getMetadataKeyModelProperty(component);
 
-    Optional<MetadataType> keyId = component.getParameters().stream()
-        .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))
-        .map(ParameterDeclaration::getType)
+    if (!metadataKeyModelProperty.isPresent() && component.getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
+      metadataKeyModelProperty =
+          getMetadataKeyModelProperty(component.getModelProperty(ParameterGroupModelProperty.class).get().getGroups());
+    }
+
+    if (metadataKeyModelProperty.isPresent()) {
+      component.addModelProperty(metadataKeyModelProperty.get());
+    }
+  }
+
+  private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(List<ParameterGroup> groups) {
+    final Optional<ParameterGroup> keyId = groups.stream()
+        .filter(g -> g.getContainer().isAnnotationPresent(MetadataKeyId.class))
         .findFirst();
 
-    if (!keyId.isPresent() && component.getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
-      keyId = component.getModelProperty(ParameterGroupModelProperty.class).get().getGroups().stream()
-          .filter(g -> g.getContainer().isAnnotationPresent(MetadataKeyId.class))
-          .map(g -> typeLoader.load(g.getType()))
-          .findFirst();
-    }
+    return keyId.isPresent()
+        ? Optional.of(new MetadataKeyIdModelProperty(typeLoader.load(keyId.get().getType()), keyId.get().getContainerName()))
+        : empty();
+  }
 
-    if (keyId.isPresent()) {
-      component.addModelProperty(new MetadataKeyIdModelProperty(keyId.get()));
-    }
+  private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(ComponentDeclaration<? extends ComponentDeclaration> component) {
+    Optional<ParameterDeclaration> keyId = component.getParameters().stream()
+        .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))
+        .findFirst();
+
+    return keyId.isPresent() ? Optional.of(new MetadataKeyIdModelProperty(keyId.get().getType(), keyId.get().getName()))
+        : empty();
   }
 
   /**

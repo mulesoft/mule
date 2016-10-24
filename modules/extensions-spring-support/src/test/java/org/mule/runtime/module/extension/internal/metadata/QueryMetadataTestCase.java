@@ -12,11 +12,13 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.CIRCLE_TYPE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.CIRCLE;
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.SQUARE;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
@@ -28,7 +30,6 @@ import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.shapes.Circle;
 
 import java.util.Set;
@@ -47,7 +48,7 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
   @Test
   public void getEntityKeys() throws Exception {
-    MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getEntityKeys(QUERY_ID);
+    MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getEntityKeys(QUERY_ID);
     assertThat(metadataKeysResult.isSuccess(), is(true));
     MetadataKeysContainer container = metadataKeysResult.get();
     Set<MetadataKey> metadataKeys = container.getKeys(container.getCategories().iterator().next()).get();
@@ -57,7 +58,7 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
   @Test
   public void getEntityMetadata() throws Exception {
-    MetadataResult<TypeMetadataDescriptor> entityMetadata = metadataManager.getEntityMetadata(QUERY_ID, CIRCLE_METADATA_KEY);
+    MetadataResult<TypeMetadataDescriptor> entityMetadata = metadataService.getEntityMetadata(QUERY_ID, CIRCLE_METADATA_KEY);
     assertThat(entityMetadata.isSuccess(), is(true));
     TypeMetadataDescriptor descriptor = entityMetadata.get();
     assertThat(descriptor.getType(), is(toMetadataType(Circle.class)));
@@ -65,8 +66,9 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
   @Test
   public void getDsqlQueryAutomaticGeneratedOutputMetadata() throws Exception {
+    componentId = QUERY_ID;
     MetadataKey dsqlKey = newKey(DSQL_QUERY).build();
-    MetadataResult<ComponentMetadataDescriptor> entityMetadata = metadataManager.getMetadata(QUERY_ID, dsqlKey);
+    MetadataResult<ComponentMetadataDescriptor> entityMetadata = getComponentDynamicMetadata(dsqlKey);
     assertThat(entityMetadata.isSuccess(), is(true));
 
     TypeMetadataDescriptor descriptor = entityMetadata.get().getOutputMetadata().get().getPayloadMetadata().get();
@@ -82,12 +84,12 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
   @Test
   public void getNativeQueryOutputMetadata() throws Exception {
+    componentId = new ProcessorId(NATIVE_QUERY_FLOW, FIRST_PROCESSOR_INDEX);
     MetadataKey nativeKey = newKey(NATIVE_QUERY).build();
-    MetadataResult<ComponentMetadataDescriptor> entityMetadata = metadataManager.getMetadata(QUERY_ID, nativeKey);
+    MetadataResult<ComponentMetadataDescriptor> entityMetadata = getComponentDynamicMetadata(nativeKey);
 
     assertThat(entityMetadata.isSuccess(), is(true));
     TypeMetadataDescriptor output = entityMetadata.get().getOutputMetadata().get().getPayloadMetadata().get();
-    assertThat(output.getType(), is(toMetadataType(Bear.class)));
+    assertThat(output.getType(), is(CIRCLE_TYPE));
   }
-
 }

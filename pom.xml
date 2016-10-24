@@ -141,6 +141,7 @@
         <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.5</antlrVersion>
+        <assertJVersion>3.5.2</assertJVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.39</asyncHttpClientVersion>
@@ -695,6 +696,16 @@
                 <groupId>ru.yandex.qatools.allure</groupId>
                 <artifactId>allure-junit-adaptor</artifactId>
                 <version>${allureJunitVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.yandex.qatools.allure</groupId>
+                <artifactId>allure-java-annotations</artifactId>
+                <version>${allureJunitVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertJVersion}</version>
             </dependency>
 
             <!--Logging-->

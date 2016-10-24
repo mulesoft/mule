@@ -33,11 +33,6 @@ import org.junit.runners.Parameterized;
 
 public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
-
   @Override
   protected String[] getFlowConfigurationResources() {
     return new String[] {"integration/select/select-metadata-config.xml"};
@@ -82,5 +77,4 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
     assertThat(name.isPresent(), is(true));
     assertThat(name.get().getValue(), equalTo(testDatabase.getNameFieldMetaDataType()));
   }
-
 }

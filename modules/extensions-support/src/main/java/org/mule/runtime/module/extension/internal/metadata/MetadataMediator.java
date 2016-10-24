@@ -10,6 +10,8 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.componentDescriptor;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -49,7 +51,6 @@ public class MetadataMediator {
 
   private final ComponentModel component;
   private final List<ParameterModel> metadataKeyParts;
-  private final MetadataKeyIdObjectResolver keyIdObjectResolver;
   private final MetadataKeysDelegate keysDelegate;
   private final MetadataOutputDelegate outputDelegate;
   private final MetadataInputDelegate inputDelegate;
@@ -57,7 +58,6 @@ public class MetadataMediator {
   public MetadataMediator(ComponentModel componentModel) {
     this.component = componentModel;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
-    this.keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel, metadataKeyParts);
     this.keysDelegate = new MetadataKeysDelegate(componentModel, metadataKeyParts);
 
     this.outputDelegate = new MetadataOutputDelegate(componentModel);
@@ -81,49 +81,6 @@ public class MetadataMediator {
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} without a key specified, this is
-   * for the cases when the {@link ComponentModel} doesn't have a {@link MetadataKeyId} associated or the cases when the
-   * {@link ComponentModel}s {@link MetadataKeyId} type has a default value to be built. (For multilevel {@link MetadataKey}s,
-   * all the part members must have a default value)
-   *
-   * @return a successful {@link MetadataResult} of {@link ComponentMetadataDescriptor} with the Metadata representation of the
-   * component, a failure {@link MetadataResult} if an error occur.
-   */
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context) {
-    try {
-      if (metadataKeyParts.isEmpty()) {
-        return getMetadata(context, new NullMetadataKey());
-      }
-      Object resolvedKey = keyIdObjectResolver.resolve();
-      return getMetadata(context, resolvedKey);
-    } catch (MetadataResolvingException e) {
-      return failure(e, e.getFailure());
-    }
-  }
-
-  /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} using the specified
-   * {@link MetadataKey}
-   * <p>
-   * If Component's {@link Content} parameter has a {@link InputTypeResolver} associated or its Output has a
-   * {@link OutputTypeResolver} associated that can be used to resolve dynamic {@link MetadataType}, then the
-   * {@link ComponentMetadataDescriptor} will contain those Dynamic types instead of the static type declaration.
-   *
-   * @param context current {@link MetadataContext} that will be used by the metadata resolvers.
-   * @param key     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
-   * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
-   * when the Metadata retrieval of any element fails for any reason
-   */
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key) {
-    try {
-      Object resolvedKey = keyIdObjectResolver.resolve(key);
-      return getMetadata(context, resolvedKey);
-    } catch (MetadataResolvingException e) {
-      return failure(e, e.getFailure());
-    }
-  }
-
-  /**
    * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} Component using static and
    * dynamic resolving of the Component parameters, attributes and output.
    * <p>
@@ -133,13 +90,20 @@ public class MetadataMediator {
    *
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
    *                {@link OutputTypeResolver}
-   * @param key     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
+   * @param metadataKeyResolver     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
    * when the Metadata retrieval of any element fails for any reason
    */
-  private MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, Object key) {
-    MetadataResult<OutputMetadataDescriptor> output = outputDelegate.getOutputMetadataDescriptor(context, key);
-    MetadataResult<InputMetadataDescriptor> input = inputDelegate.getInputMetadataDescriptors(context, key);
+  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context,
+                                                                 MetadataKeyObjectResolver metadataKeyResolver) {
+    final MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
+    if (!keyValueResult.isSuccess()) {
+      return keyValueResult;
+    }
+
+    Object keyValue = keyValueResult.get();
+    MetadataResult<OutputMetadataDescriptor> output = outputDelegate.getOutputMetadataDescriptor(context, keyValue);
+    MetadataResult<InputMetadataDescriptor> input = inputDelegate.getInputMetadataDescriptors(context, keyValue);
     ComponentMetadataDescriptor componentDescriptor = componentDescriptor(component.getName())
         .withInputDescriptor(input)
         .withOutputDescriptor(output)
@@ -148,10 +112,24 @@ public class MetadataMediator {
     return mergeResults(componentDescriptor, output, input);
   }
 
+  private MetadataResult<Object> getMetadataKeyObjectValue(MetadataKeyObjectResolver metadataKeyResolver) {
+    try {
+      Object keyValue = isKeyLess() ? null : metadataKeyResolver.getMetadataKeyValue();
+      return success(keyValue);
+    } catch (MetadataResolvingException e) {
+      return failure(e, e.getFailure());
+    } catch (Exception e) {
+      return failure(e);
+    }
+  }
+
+  private boolean isKeyLess() {
+    return metadataKeyParts.isEmpty();
+  }
+
   private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
     return componentModel.getParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
         .collect(toList());
   }
-
 }

@@ -42,5 +42,4 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
     }
     return connectivityTestingService.testConnection(identifier);
   }
-
 }

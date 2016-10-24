@@ -6,19 +6,27 @@
  */
 package org.mule.test.metadata.extension.query;
 
-import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.ArrayTypeBuilder;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.test.metadata.extension.model.animals.Bear;
+
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 
 public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
 
   public static final String NATIVE_QUERY = "SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18";
-  private static final ClassTypeLoader LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  public static final MetadataType CIRCLE_TYPE;
+  static {
+    final ArrayTypeBuilder<? extends BaseTypeBuilder<?>> arrayType = BaseTypeBuilder.create(JAVA).arrayType();
+    final ObjectTypeBuilder<?> objectType = arrayType.of().objectType();
+    objectType.addField().key("id").value().numberType();
+    CIRCLE_TYPE = arrayType.build();
+  }
 
   @Override
   public String getCategoryName() {
@@ -33,6 +41,6 @@ public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
       throw new IllegalArgumentException("Native Query Key was not the expected one");
     }
 
-    return LOADER.load(Bear.class);
+    return CIRCLE_TYPE;
   }
 }

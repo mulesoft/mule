@@ -7,10 +7,12 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
@@ -38,7 +40,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer {
 
-  private LazyConnectivityTestingService lazyConnectivityTestingService;
+  private ConnectivityTestingService lazyConnectivityTestingService;
+  private MetadataService metadataService;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -48,7 +51,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * @param artifactConfiguration     the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *                                  org.mule.runtime.config.spring.SpringRegistry
-   * @since 3.7.0
+   * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                  ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
@@ -122,4 +125,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     return lazyConnectivityTestingService;
   }
 
+  @Override
+  public MetadataService getMetadataService() {
+    if (metadataService == null) {
+      metadataService = new LazyMetadataService(this, muleContext.getRegistry().get(OBJECT_METADATA_SERVICE));
+    }
+    return metadataService;
+  }
 }

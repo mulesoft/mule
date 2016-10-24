@@ -59,8 +59,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
   @Parameterized.Parameter
   public String protocol;
 
-
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {{"imap"}, {"imaps"}});
   }
