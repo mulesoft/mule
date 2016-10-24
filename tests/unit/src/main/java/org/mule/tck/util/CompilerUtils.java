@@ -7,6 +7,7 @@
 
 package org.mule.tck.util;
 
+import static java.io.File.pathSeparator;
 import static java.util.stream.Collectors.toList;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
@@ -359,7 +360,7 @@ public class CompilerUtils {
         String classPath = System.getProperty("java.class.path");
         // Adds extra jars files required to compile the source classes
         for (File jarFile : jarFiles) {
-          classPath = classPath + ":" + jarFile.getAbsolutePath();
+          classPath = classPath + pathSeparator + jarFile.getAbsolutePath();
         }
         options.addAll(Arrays.asList("-classpath", classPath));
       }
