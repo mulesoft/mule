@@ -351,21 +351,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         super.doStart();
         startIfStartable(pipeline);
         canProcessMessage = true;
-        try
+        if (muleContext.isStarted())
         {
-            startIfStartable(messageSource);
-        }
-        // Let connection exceptions bubble up to trigger the reconnection strategy.
-        catch (ConnectException ce)
-        {
-            throw ce;
-        }
-        catch(MuleException e)
-        {
-            // If the messageSource couldn't be started we would need to stop the pipeline (if possible) in order to leave
-            // its LifeciclyManager also as initialise phase so the flow can be disposed later
-            doStop();
-            throw e;
+            try
+            {
+                startIfStartable(messageSource);
+            }
+            // Let connection exceptions bubble up to trigger the reconnection strategy.
+            catch (ConnectException ce)
+            {
+                throw ce;
+            }
+            catch (MuleException e)
+            {
+                // If the messageSource couldn't be started we would need to stop the pipeline (if possible) in order to leave
+                // its LifecycleManager also as initialise phase so the flow can be disposed later
+                doStop();
+                throw e;
+            }
         }
         createFlowMap();
     }
