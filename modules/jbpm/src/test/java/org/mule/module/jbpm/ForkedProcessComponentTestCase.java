@@ -39,6 +39,9 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
         // The process should be waiting for asynchronous responses from both services
         assertProcessState(bpms, processId, "waitForResponseA / waitForResponseB");
 
+        // Start service B
+        muleContext.getRegistry().lookupService("ServiceB").resume();
+
         // ServiceA is initially stopped, so we're still waiting for a response from ServiceA
         assertProcessState(bpms, processId, "waitForResponseA");
 
