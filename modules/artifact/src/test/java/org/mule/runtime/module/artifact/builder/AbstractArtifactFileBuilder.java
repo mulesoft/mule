@@ -89,6 +89,21 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   }
 
   /**
+   * Adds a class file to the artifact classes folder.
+   *
+   * @param classFile class file to include. Non null.
+   * @param alias path where the file must be added inside the app file
+   * @return the same builder instance
+   */
+  public T containingClass(File classFile, String alias) {
+    checkImmutable();
+    checkArgument(classFile != null, "Class file cannot be null");
+    resources.add(new ZipResource(classFile.getAbsolutePath(), "classes/" + alias));
+
+    return getThis();
+  }
+
+  /**
    * Indicates that the generated artifact file must be a corrupted ZIP.
    *
    * @return the same builder instance

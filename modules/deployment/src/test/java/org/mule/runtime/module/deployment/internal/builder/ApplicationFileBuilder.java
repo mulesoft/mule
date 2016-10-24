@@ -9,14 +9,13 @@ package org.mule.runtime.module.deployment.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
-
-import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
-import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
+import org.mule.tck.ZipUtils.ZipResource;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -108,20 +107,6 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
     checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
     checkArgument(propertyValue != null, "Property value cannot be null");
     deployProperties.put(propertyName, propertyValue);
-    return this;
-  }
-
-  /**
-   * Adds a class file to the application classes folder.
-   *
-   * @param classFile class file from a external file or test resource. Non empty.
-   * @return the same builder instance
-   */
-  public ApplicationFileBuilder containingClass(String classFile) {
-    checkImmutable();
-    checkArgument(!StringUtils.isEmpty(classFile), "Class file cannot be empty");
-    String alias = classFile.replace(".clazz", ".class");
-    resources.add(new ZipResource(classFile, "classes/" + alias));
     return this;
   }
 

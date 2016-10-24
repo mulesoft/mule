@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
-
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
@@ -73,20 +72,6 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
     checkArgument(!isEmpty(propertyName), "Property name cannot be empty");
     checkArgument(propertyValue != null, "Property value cannot be null");
     properties.put(propertyName, propertyValue);
-    return this;
-  }
-
-  /**
-   * Adds a class file to the application classes folder.
-   *
-   * @param classFile class file from a external file or test resource.
-   * @return the same builder instance
-   */
-  public ArtifactPluginFileBuilder containingClass(String classFile) {
-    checkImmutable();
-    checkArgument(!isEmpty(classFile), "Class file cannot be empty");
-    String alias = classFile.replace(".clazz", ".class");
-    resources.add(new ZipResource(classFile, "classes/" + alias));
     return this;
   }
 

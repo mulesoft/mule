@@ -59,7 +59,6 @@ import static org.mule.runtime.module.deployment.internal.application.Properties
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -93,6 +92,8 @@ import org.mule.runtime.module.deployment.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.internal.domain.TestDomainFactory;
+import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -154,24 +155,73 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     });
   }
 
+  // Dynamically compiled classes and jars
+  private static final File barUtils1_0JarFile =
+      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar");
+
+  private static final File barUtils2_0JarFile =
+      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
+
+  private static final File echoTestJarFile =
+      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
+
+  private static final File defaulServiceEchoJarFile = new CompilerUtils.JarCompiler()
+      .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
+                 getResourceFile("/org/mule/echo/EchoServiceProvider.java"))
+      .compile("mule-module-service-echo-default-4.0-SNAPSHOT.jar");
+
+  private static final File defaultFooServiceJarFile =
+      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/mule/service/foo/DefaultFooService.java"),
+                                                getResourceFile("/org/mule/service/foo/FooServiceProvider.java"))
+          .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
+          .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
+
+  private static final File helloExtensionJarFile = new CompilerUtils.ExtensionCompiler()
+      .compiling(
+                 getResourceFile("/org/foo/hello/HelloExtension.java"),
+                 getResourceFile("/org/foo/hello/HelloOperation.java"))
+      .compile("mule-module-hello-4.0-SNAPSHOT.jar", "1.0");
+
+  private static final File echoTestClassFile = new SingleClassCompiler()
+      .compile(getResourceFile("/org/foo/EchoTest.java"));
+
+  private static final File pluginEcho1TestClassFile = new SingleClassCompiler()
+      .dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+  private static final File pluginEcho2TestClassFile = new SingleClassCompiler()
+      .dependingOn(barUtils2_0JarFile).compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
+
+  private static final File pluginEcho3TestClassFile = new SingleClassCompiler()
+      .compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
+
+  private static final File resourceConsumerClassFile = new SingleClassCompiler()
+      .compile(getResourceFile("/org/foo/resource/ResourceConsumer.java"));
+
+  private static File getResourceFile(String resource) {
+    return new File(DeploymentServiceTestCase.class.getResource(resource).getFile());
+  }
+
   // Application plugin file builders
   private final ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin")
-      .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar");
+      .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary(echoTestJarFile.getAbsolutePath());
   private final ArtifactPluginFileBuilder echoPluginWithLib1 =
       new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-          .usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
+          .usingLibrary(barUtils1_0JarFile.getAbsolutePath())
+          .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   private final ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-      .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
+      .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+      .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   private final ArtifactPluginFileBuilder echoPluginWithLib2 =
       new ArtifactPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-          .usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
+          .usingLibrary(barUtils2_0JarFile.getAbsolutePath())
+          .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
   private final ArtifactPluginFileBuilder pluginWithResource =
       new ArtifactPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PROPERTY, "/pluginResource.properties")
           .containingResource("pluginResourceSource.properties", "pluginResource.properties");
 
   private final ArtifactPluginFileBuilder pluginUsingAppResource =
       new ArtifactPluginFileBuilder("appResourcePlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.resource")
-          .containingClass("org/foo/resource/ResourceConsumer.clazz");
+          .containingClass(resourceConsumerClassFile, "org/foo/resource/ResourceConsumer.class");
 
   // Application file builders
   private final ApplicationFileBuilder emptyAppFileBuilder =
@@ -179,7 +229,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private final ApplicationFileBuilder springPropertyAppFileBuilder =
       new ApplicationFileBuilder("property-app").definedBy("app-properties-config.xml");
   private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
-      .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/foo/EchoTest.clazz");
+      .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
+      .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   private final ApplicationFileBuilder waitAppFileBuilder =
       new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
   private final ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
@@ -189,13 +240,15 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPlugin);
   private final ApplicationFileBuilder differentLibPluginAppFileBuilder =
       new ApplicationFileBuilder("appWithLibDifferentThanPlugin").definedBy("app-plugin-different-lib-config.xml")
-          .containingPlugin(echoPluginWithLib1).usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
+          .containingPlugin(echoPluginWithLib1).usingLibrary(barUtils2_0JarFile.getAbsolutePath())
+          .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
   private final ApplicationFileBuilder multiLibPluginAppFileBuilder = new ApplicationFileBuilder("multiPluginLibVersion")
       .definedBy("multi-plugin-app-config.xml").containingPlugin(echoPluginWithLib1).containingPlugin(echoPluginWithLib2);
   private final ApplicationFileBuilder resourcePluginAppFileBuilder = new ApplicationFileBuilder("dummyWithPluginResource")
       .definedBy("plugin-resource-app-config.xml").containingPlugin(pluginWithResource);
   private final ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app")
-      .definedBy("app-with-echo1-plugin-config.xml").containingPlugin(echoPluginWithoutLib1).sharingLibrary("lib/bar-1.0.jar");
+      .definedBy("app-with-echo1-plugin-config.xml").containingPlugin(echoPluginWithoutLib1)
+      .sharingLibrary(barUtils1_0JarFile.getAbsolutePath());
   private final ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder =
       new ApplicationFileBuilder("broken-app+", brokenAppFileBuilder);
   private final ApplicationFileBuilder dummyDomainApp1FileBuilder =
@@ -1352,7 +1405,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void deploysAppZipWithContainerPluginBroken() throws Exception {
     ArtifactPluginFileBuilder echoPluginBroken = new ArtifactPluginFileBuilder("echoPlugin")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar").corrupted();
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary(echoTestJarFile.getAbsolutePath()).corrupted();
 
     installContainerPlugin(echoPluginBroken);
 
@@ -1425,21 +1478,20 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysAppZipWithExtensionPlugin() throws Exception {
-    // TODO(pablo.kraan): MULE-10148 - avoid using pre-compiled jars and classes
     final ServiceFileBuilder echoService =
         new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
-            .usingLibrary("lib/mule-module-service-echo-default-4.0-SNAPSHOT.jar");
+            .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
     File installedService = new File(services, echoService.getArtifactFile().getName());
     copyFile(echoService.getArtifactFile(), installedService);
 
     final ServiceFileBuilder fooService = new ServiceFileBuilder("fooService")
         .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.foo.FooServiceProvider")
-        .usingLibrary("lib/mule-module-service-foo-default-4.0-SNAPSHOT.jar");
+        .usingLibrary(defaultFooServiceJarFile.getAbsolutePath());
     installedService = new File(services, fooService.getArtifactFile().getName());
     copyFile(fooService.getArtifactFile(), installedService);
 
     ArtifactPluginFileBuilder extensionPlugin =
-        new ArtifactPluginFileBuilder("extensionPlugin").usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar")
+        new ArtifactPluginFileBuilder("extensionPlugin").usingLibrary(helloExtensionJarFile.getAbsolutePath())
             .configuredWith(EXPORTED_RESOURCE_PROPERTY,
                             "/, META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
@@ -1454,7 +1506,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void deploysAppWithPluginBootstrapProperty() throws Exception {
     final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
-        .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES).containingClass("org/foo/EchoTest.clazz");
+        .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES)
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("app-with-plugin-bootstrap")
         .definedBy("app-with-plugin-bootstrap.xml").containingPlugin(pluginFileBuilder);
@@ -1473,7 +1526,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void failsToDeployApplicationOnMissingService() throws Exception {
     ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
-        .usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar").configuredWith(EXPORTED_RESOURCE_PROPERTY, "/, META-INF");
+        .usingLibrary(helloExtensionJarFile.getAbsolutePath()).configuredWith(EXPORTED_RESOURCE_PROPERTY, "/, META-INF");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
         .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -1525,10 +1578,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void deploysDomainWithSharedLibPrecedenceOverApplicationSharedLib() throws Exception {
     final String domainId = "shared-lib";
     final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app")
-        .definedBy("app-shared-lib-precedence-config.xml").sharingLibrary("lib/bar-2.0.jar")
-        .containingClass("org/foo/Plugin1Echo.clazz").deployedWith(PROPERTY_DOMAIN, domainId);
+        .definedBy("app-shared-lib-precedence-config.xml").sharingLibrary(barUtils2_0JarFile.getAbsolutePath())
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+        .deployedWith(PROPERTY_DOMAIN, domainId);
     final DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
+        new DomainFileBuilder(domainId).usingLibrary(barUtils1_0JarFile.getAbsolutePath()).containing(applicationFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     startDeployment();
@@ -1544,9 +1598,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final String domainId = "shared-lib";
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
-            .usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin1Echo.clazz").deployedWith(PROPERTY_DOMAIN, domainId);
+            .usingLibrary(barUtils2_0JarFile.getAbsolutePath())
+            .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+            .deployedWith(PROPERTY_DOMAIN, domainId);
     final DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
+        new DomainFileBuilder(domainId).usingLibrary(barUtils1_0JarFile.getAbsolutePath()).containing(applicationFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     startDeployment();
@@ -1562,12 +1618,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final String domainId = "shared-lib";
     final ArtifactPluginFileBuilder pluginFileBuilder =
         new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-            .containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
+            .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+            .usingLibrary(barUtils2_0JarFile.getAbsolutePath());
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
             .containingPlugin(pluginFileBuilder).deployedWith(PROPERTY_DOMAIN, domainId);
     final DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
+        new DomainFileBuilder(domainId).usingLibrary(barUtils1_0JarFile.getAbsolutePath()).containing(applicationFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     startDeployment();
@@ -1594,7 +1651,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass("org/foo/echo/Plugin3Echo.clazz").dependingOn(echoPlugin.getId());
+            .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class")
+            .dependingOn(echoPlugin.getId());
 
     final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(echoPlugin).containingPlugin(dependantPlugin);
@@ -1612,7 +1670,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass("org/foo/echo/Plugin3Echo.clazz");
+            .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class");
 
     final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(echoPlugin).containingPlugin(dependantPlugin);

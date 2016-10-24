@@ -31,11 +31,13 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase;
 import org.mule.runtime.module.deployment.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
+import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,6 +54,16 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
+
+  private static final File echoTestJarFile =
+      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java"))
+          .including(getResourceFile("/test-resource.txt"), "META-INF/MANIFEST.MF")
+          .including(getResourceFile("/test-resource.txt"), "README.txt")
+          .compile("echo.jar");
+
+  private static File getResourceFile(String resource) {
+    return new File(DeploymentServiceTestCase.class.getResource(resource).getFile());
+  }
 
   public static final String APP_NAME = "testApp";
   public static final String JAR_FILE_NAME = "test.jar";
@@ -70,7 +82,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   public void readsPlugin() throws Exception {
     File pluginDir = getAppPluginsFolder(APP_NAME);
     pluginDir.mkdirs();
-    final File pluginFile = new ArtifactPluginFileBuilder("plugin").usingLibrary("lib/echo-test.jar").getArtifactFile();
+    final File pluginFile =
+        new ArtifactPluginFileBuilder("plugin").usingLibrary(echoTestJarFile.getAbsolutePath()).getArtifactFile();
     copyFile(pluginFile, new File(pluginDir, "plugin1.zip"));
     copyFile(pluginFile, new File(pluginDir, "plugin2.zip"));
 
@@ -104,7 +117,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     pluginLibDir.mkdirs();
 
     File sharedLibFile = new File(pluginLibDir, JAR_FILE_NAME);
-    copyResourceAs("lib/mule-module-service-echo-default-4.0-SNAPSHOT.jar", sharedLibFile);
+    copyResourceAs(echoTestJarFile.getAbsolutePath(), sharedLibFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
@@ -113,11 +126,10 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     assertThat(desc.getSharedRuntimeLibs().length, equalTo(1));
     assertThat(desc.getSharedRuntimeLibs()[0].getFile(), equalTo(sharedLibFile.toString()));
-    assertThat(desc.getClassLoaderFilter().getExportedClassPackages(), contains("org.mule.echo"));
+    assertThat(desc.getClassLoaderFilter().getExportedClassPackages(), contains("org.foo"));
     assertThat(desc.getClassLoaderFilter().getExportedResources(),
                containsInAnyOrder("META-INF/MANIFEST.MF",
-                                  "META-INF/maven/org.mule.modules/mule-module-service-echo-default/pom.properties",
-                                  "META-INF/maven/org.mule.modules/mule-module-service-echo-default/pom.xml"));
+                                  "README.txt"));
   }
 
   @Test
