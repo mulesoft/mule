@@ -9,6 +9,7 @@ package org.mule;
 import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -375,24 +376,21 @@ public class DefaultMuleContext implements MuleContext
 
     private void startMessageSource(MessageSource messageSource) throws LifecycleException
     {
-        if (messageSource instanceof Startable)
+        try
         {
-            try
-            {
-                ((Startable) messageSource).start();
-            }
-            catch (ConnectException e)
-            {
-                exceptionListener.handleException(e);
-            }
-            catch (LifecycleException le)
-            {
-                throw le;
-            }
-            catch (Exception e)
-            {
-                throw new LifecycleException(e, messageSource);
-            }
+            startIfNeeded(messageSource);
+        }
+        catch (ConnectException e)
+        {
+            exceptionListener.handleException(e);
+        }
+        catch (LifecycleException le)
+        {
+            throw le;
+        }
+        catch (Exception e)
+        {
+            throw new LifecycleException(e, messageSource);
         }
     }
 
