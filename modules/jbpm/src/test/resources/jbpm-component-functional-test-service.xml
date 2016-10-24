@@ -62,7 +62,7 @@
             </outbound>
         </service>
         
-        <service name="ServiceB">
+        <service name="ServiceB" initialState="paused">
             <inbound>
                 <vm:inbound-endpoint path="queueB" exchange-pattern="one-way"/>
             </inbound>
