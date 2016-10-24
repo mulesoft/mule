@@ -11,6 +11,7 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Stack;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 
 /**
@@ -166,6 +168,9 @@ abstract class ClassicFtpCommand extends FtpCommand<ClassicFtpFileSystem> {
    */
   @Override
   public RuntimeException exception(String message, Exception cause) {
+    if (cause instanceof FTPConnectionClosedException) {
+      cause = new ConnectionException(cause);
+    }
     return super.exception(enrichExceptionMessage(message), cause);
   }
 
