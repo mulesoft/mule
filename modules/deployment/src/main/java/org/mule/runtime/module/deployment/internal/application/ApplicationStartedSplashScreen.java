@@ -7,11 +7,13 @@
 package org.mule.runtime.module.deployment.internal.application;
 
 import static java.lang.String.format;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.toFile;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactStartedSplashScreen;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.deployment.internal.artifact.ArtifactStartedSplashScreen;
 
 import java.util.Set;
 
@@ -40,6 +42,6 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
   }
 
   protected void listLibraries(ApplicationDescriptor descriptor) {
-    listItems(getLibraries(getAppLibFolder(descriptor.getName())), "Application libraries:");
+    listItems(stream(descriptor.getRuntimeLibs()).map(url -> toFile(url).getName()).collect(toList()), "Application libraries:");
   }
 }

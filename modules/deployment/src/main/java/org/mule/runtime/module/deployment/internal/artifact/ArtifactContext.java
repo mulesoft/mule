@@ -27,7 +27,7 @@ public class ArtifactContext {
    * Creates an {@link ArtifactContext}.
    *
    * @param muleArtifactContext the artifact context.
-     */
+   */
   public ArtifactContext(MuleArtifactContext muleArtifactContext) {
     this.muleArtifactContext = muleArtifactContext;
   }

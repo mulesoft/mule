@@ -24,8 +24,7 @@ import java.util.Properties;
 public class DomainDescriptorParser {
 
   /**
-   * Parses an artifact descriptor and creates a {@link DeployableArtifactDescriptor} with
-   * the information from the descriptor.
+   * Parses an artifact descriptor and creates a {@link DeployableArtifactDescriptor} with the information from the descriptor.
    *
    * @param location the location of the artifact. This is the folder where the artifact content is stored.
    * @param descriptor file that contains the descriptor content

@@ -25,7 +25,8 @@ public class ApplicationClassLoaderBuilderFactory {
 
   /**
    * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
-   *  @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
+   * 
+   * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
    * @param artifactPluginRepository repository for artifact plugins provided by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders. Non null.
    */

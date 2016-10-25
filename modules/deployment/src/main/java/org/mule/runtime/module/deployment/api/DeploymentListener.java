@@ -35,7 +35,7 @@ public interface DeploymentListener {
    * Notifies that a deploy for a given application has finished with a failure.
    *
    * @param artifactName the name of the application being deployed
-   * @param cause        the cause of the failure
+   * @param cause the cause of the failure
    */
   default void onDeploymentFailure(String artifactName, Throwable cause) {
 
@@ -63,7 +63,7 @@ public interface DeploymentListener {
    * Notifies that an un-deployment for a given application has finished with a failure.
    *
    * @param artifactName the name of the application being un-deployed
-   * @param cause        the cause of the failure
+   * @param cause the cause of the failure
    */
   default void onUndeploymentFailure(String artifactName, Throwable cause) {
 
@@ -73,7 +73,7 @@ public interface DeploymentListener {
    * Notifies the creation of the {@link MuleContext} for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param context      mule context for the application being deployed
+   * @param context mule context for the application being deployed
    */
   default void onMuleContextCreated(String artifactName, MuleContext context) {
 
@@ -83,7 +83,7 @@ public interface DeploymentListener {
    * Notifies the initialization of the {@link MuleContext} for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param context      mule context for the application being deployed
+   * @param context mule context for the application being deployed
    */
   default void onMuleContextInitialised(String artifactName, MuleContext context) {
 
@@ -93,7 +93,7 @@ public interface DeploymentListener {
    * Notifies the configuration of the {@link MuleContext} for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param context      mule context for the application being deployed
+   * @param context mule context for the application being deployed
    */
   default void onMuleContextConfigured(String artifactName, MuleContext context) {
 

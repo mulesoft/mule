@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.deployment.model.internal.application;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 
 import java.net.URL;
 import java.util.List;
@@ -44,6 +44,7 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
 
   @Override
   protected String[] getLocalResourceLocations() {
-    return new String[] {MuleFoldersUtil.getAppClassesFolder(getArtifactName()).getAbsolutePath()};
+    ApplicationDescriptor applicationDescriptor = getArtifactDescriptor();
+    return new String[] {applicationDescriptor.getClassesFolder().getAbsolutePath()};
   }
 }

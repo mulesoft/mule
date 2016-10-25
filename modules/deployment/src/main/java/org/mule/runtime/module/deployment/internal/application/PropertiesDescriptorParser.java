@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.internal.application;
 
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppDir;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -30,8 +29,7 @@ public class PropertiesDescriptorParser {
   protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
 
   /**
-   * Parses an artifact descriptor and creates a {@link DeployableArtifactDescriptor} with
-   * the information from the descriptor.
+   * Parses an artifact descriptor and creates a {@link DeployableArtifactDescriptor} with the information from the descriptor.
    *
    * @param location the location of the artifact. This is the folder where the artifact content is stored.
    * @param descriptor file that contains the descriptor content
@@ -57,7 +55,7 @@ public class PropertiesDescriptorParser {
     }
     appDescriptor.setConfigResources(urls);
 
-    String[] absoluteResourcePaths = convertConfigResourcesToAbsolutePatch(urls, artifactName);
+    String[] absoluteResourcePaths = convertConfigResourcesToAbsolutePatch(urls, location);
     appDescriptor.setAbsoluteResourcePaths(absoluteResourcePaths);
     appDescriptor.setConfigResourcesFile(convertConfigResourcesToFile(absoluteResourcePaths));
 
@@ -79,11 +77,11 @@ public class PropertiesDescriptorParser {
     return configResourcesFile;
   }
 
-  private String[] convertConfigResourcesToAbsolutePatch(final String[] configResources, String appName) {
+  private String[] convertConfigResourcesToAbsolutePatch(final String[] configResources, File location) {
     String[] absoluteResourcePaths = new String[configResources.length];
     for (int i = 0; i < configResources.length; i++) {
       String resource = configResources[i];
-      absoluteResourcePaths[i] = toAbsoluteFile(resource, appName);
+      absoluteResourcePaths[i] = toAbsoluteFile(resource, location);
     }
     return absoluteResourcePaths;
   }
@@ -92,9 +90,10 @@ public class PropertiesDescriptorParser {
    * Resolve a resource relative to an application root.
    *
    * @param path the relative path to resolve
+   * @param location the location of the artifact
    * @return absolute path, may not actually exist (check with File.exists())
    */
-  protected String toAbsoluteFile(String path, String appName) {
-    return getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
+  protected String toAbsoluteFile(String path, File location) {
+    return location.getAbsolutePath() + File.separator + path;
   }
 }
