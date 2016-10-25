@@ -253,7 +253,7 @@ public class IsolatedClassLoaderFactory {
    */
   protected void logClassLoaderUrls(final String classLoaderName, final List<URL> urls) {
     StringBuilder builder = new StringBuilder(classLoaderName).append(" classloader urls: [");
-    urls.stream().forEach(e -> builder.append("\n").append(" ").append(e.getFile()));
+    urls.stream().forEach(e -> builder.append("\n").append(" ").append(e));
     builder.append("\n]");
     logClassLoadingTrace(builder.toString());
   }

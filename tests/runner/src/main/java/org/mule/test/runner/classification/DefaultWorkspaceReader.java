@@ -8,6 +8,7 @@
 package org.mule.test.runner.classification;
 
 import static java.util.Collections.emptyList;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.maven.MavenModelFactory;
@@ -72,7 +73,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    */
   public static File findClassPathURL(final Artifact artifact, final File workspaceArtifactPath, final List<URL> classPath) {
     final StringBuilder moduleFolder =
-        new StringBuilder(workspaceArtifactPath.getAbsolutePath()).append("/target/");
+        new StringBuilder(new File(workspaceArtifactPath.getAbsolutePath(), "target").toURI().getPath());
 
     // Fix to handle when running test during an install phase due to maven builds the classPath pointing out to packaged files
     // instead of classes folders.
@@ -86,7 +87,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
       packagedUrlSuffix.append("^(?!.*?(?:-tests.jar)).*.jar");
     }
     final Optional<URL> localFile = classPath.stream().filter(url -> {
-      String path = url.getFile();
+      String path = url.getPath();
       if (path.contains(moduleFolder)) {
         String pathSuffix = path.substring(path.lastIndexOf(moduleFolder.toString()) + moduleFolder.length(), path.length());
         return pathSuffix.matches(explodedUrlSuffix.toString()) || pathSuffix.matches(packagedUrlSuffix.toString());
@@ -96,7 +97,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
     if (!localFile.isPresent()) {
       return null;
     }
-    return new File(localFile.get().getFile());
+    return toFile(localFile.get());
   }
 
   /**

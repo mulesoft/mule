@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.io.File.pathSeparator;
 
 import com.google.common.collect.Lists;
 
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassPathUrlProvider {
 
-  public static final String CLASSPATH_SEPARATOR = ":";
   protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());
   private final List<URL> urls;
 
@@ -66,7 +66,7 @@ public class ClassPathUrlProvider {
 
     if (logger.isDebugEnabled()) {
       StringBuilder builder = new StringBuilder("ClassPath:");
-      urls.stream().forEach(url -> builder.append(File.pathSeparator).append(url));
+      urls.stream().forEach(url -> builder.append(pathSeparator).append(url));
       logger.debug(builder.toString());
     }
 
@@ -80,7 +80,7 @@ public class ClassPathUrlProvider {
   protected void addUrlsFromSystemProperty(final Collection<URL> urls, final String propertyName) {
     String property = System.getProperty(propertyName);
     if (property != null) {
-      for (String file : property.split(CLASSPATH_SEPARATOR)) {
+      for (String file : property.split(pathSeparator)) {
         try {
           urls.add(new File(file).toURI().toURL());
         } catch (MalformedURLException e) {

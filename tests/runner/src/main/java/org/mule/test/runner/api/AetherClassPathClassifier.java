@@ -13,6 +13,7 @@ import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
@@ -234,7 +235,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
     containerUrls = containerUrls.stream().filter(url -> {
-      String file = url.getFile();
+      String file = toFile(url).getAbsolutePath();
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
                                                                                                                   ZIP_EXTENSION));
     }).collect(toList());
@@ -777,7 +778,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     ListIterator<URL> listIterator = resolvedURLs.listIterator();
     while (listIterator.hasNext()) {
       final URL urlResolved = listIterator.next();
-      File artifactResolvedFile = new File(urlResolved.getFile());
+      File artifactResolvedFile = toFile(urlResolved);
       if (snapshotFileFilter.accept(artifactResolvedFile)) {
         File artifactResolvedFileParentFile = artifactResolvedFile.getParentFile();
         logger.debug("Checking if resolved SNAPSHOT artifact: '{}' has a timestamped version already in class path",
@@ -823,7 +824,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private Map<File, List<URL>> groupArtifactUrlsByFolder(List<URL> classpathURLs) {
     Map<File, List<URL>> classpathFolders = newHashMap();
     classpathURLs.forEach(url -> {
-      File folder = new File(url.getFile()).getParentFile();
+      File folder = toFile(url).getParentFile();
       if (classpathFolders.containsKey(folder)) {
         classpathFolders.get(folder).add(url);
       } else {
@@ -850,10 +851,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     // If more than one is found, we have to check for the case of a test-jar...
     Optional<URL> urlOpt;
     if (endsWithIgnoreCase(artifactResolvedFile.getName(), TESTS_JAR)) {
-      urlOpt = urls.stream().filter(url -> url.getFile().endsWith(TESTS_JAR)).findFirst();
+      urlOpt = urls.stream().filter(url -> toFile(url).getAbsolutePath().endsWith(TESTS_JAR)).findFirst();
     } else {
       urlOpt = urls.stream()
-          .filter(url -> !url.getFile().endsWith(TESTS_JAR) && url.getFile().endsWith(JAR_EXTENSION)).findFirst();
+          .filter(url -> {
+            String filePath = toFile(url).getAbsolutePath();
+            return !filePath.endsWith(TESTS_JAR) && filePath.endsWith(JAR_EXTENSION);
+          }).findFirst();
     }
     return urlOpt.orElse(null);
   }
