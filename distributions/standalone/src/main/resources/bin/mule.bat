@@ -63,7 +63,7 @@ goto :eof
 
 :validate
 rem Find the requested command.
-for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^pause$ ^resume$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
+for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^status$ ^pause$ ^resume$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
 
 if "%COMMAND%" == "" (
     rem ###############################################################
@@ -125,6 +125,10 @@ goto :eof
 
 :start
 "%_WRAPPER_EXE%" -t %_WRAPPER_CONF% %MULE_OPTS%
+goto :eof
+
+:status
+"%_WRAPPER_EXE%" -q %_WRAPPER_CONF% %MULE_OPTS%
 goto :eof
 
 :pause

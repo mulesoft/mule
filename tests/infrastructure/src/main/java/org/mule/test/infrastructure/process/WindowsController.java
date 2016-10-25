@@ -68,10 +68,8 @@ public class WindowsController extends Controller {
 
   @Override
   public int status(String[] args) {
-    String muleResult = executeCmd("sc queryex \"mule\" ");
-    String muleEEResult = executeCmd("sc queryex \"mule_ee\" ");
-    Boolean result = muleResult.contains("RUNNING") || muleEEResult.contains("RUNNING");
-    return result ? 0 : 1;
+    int exitValue = runSync("status", args);
+    return exitValue == 3 ? 0 : 1;
   }
 
   private String executeCmd(String cmd) {
