@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.json.transformers;
 
-import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+
+import static org.junit.Assert.fail;
 
 /**
  * For this test I picked difficult beans in that they are not real beans, so I could test how to use mixins to decorate the
@@ -25,7 +25,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase {
 
   // Note that Banana has been excluded
   public static final String JSON_STRING =
-      "{\"apple\":{\"bitten\":true,\"washed\":false,\"seed\":null},\"orange\":{\"brand\":\"JuicyFruit\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
+      "{\"apple\":{\"bitten\":true,\"washed\":false,\"seed\":null,\"muleContext\":null,\"peel\":null},\"orange\":{\"brand\":\"JuicyFruit\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
 
   // Note that Banana is null
   public static final FruitCollection JSON_OBJECT = new FruitCollection(new Apple(true), null, new Orange(8, 3.45, "JuicyFruit"));
