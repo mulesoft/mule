@@ -140,6 +140,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     if (!staticFieldsInjected) {
       injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+      injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
       injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
       staticFieldsInjected = true;
     }
@@ -295,6 +296,17 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     final Object valueToInject = artifactClassLoaderHolder.getPluginsClassLoaders();
     doFieldInjection(pluginClassLoadersAwareClass, method, valueToInject, expectedParamType);
+  }
+
+  private static void injectServicesClassLoaders(ArtifactClassLoaderHolder artifactClassLoaderHolder, Class<?> isolatedTestClass)
+      throws Throwable {
+    final Class<ServiceClassLoadersAware> serviceClassLoadersAwareClass = ServiceClassLoadersAware.class;
+    final String expectedParamType = "List<" + ArtifactClassLoader.class + ">";
+    final FrameworkMethod method =
+        getAnnotatedMethod(artifactClassLoaderHolder, isolatedTestClass, serviceClassLoadersAwareClass, expectedParamType);
+
+    final Object valueToInject = artifactClassLoaderHolder.getServicesClassLoaders();
+    doFieldInjection(serviceClassLoadersAwareClass, method, valueToInject, expectedParamType);
   }
 
   private static void injectContainerClassLoader(ArtifactClassLoaderHolder artifactClassLoaderHolder, Class<?> isolatedTestClass)

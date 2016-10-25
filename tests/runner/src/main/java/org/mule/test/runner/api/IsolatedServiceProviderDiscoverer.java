@@ -1,0 +1,90 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.test.runner.api;
+
+import static java.lang.String.format;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.service.ServiceProviderDiscoverer;
+import org.mule.runtime.module.service.ServiceResolutionError;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Discovers services artifacts using the {@link ArtifactClassLoader} already created.
+ *
+ * @since 4.0
+ */
+public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscoverer {
+
+  private final List<ArtifactClassLoader> serviceArtifactClassLoaders;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param serviceArtifactClassLoaders {@link List} of {@link ArtifactClassLoader}s created for services discovered
+   *        during classification process. The {@code artifactName} of each {@link ArtifactClassLoader} represents the
+   *        {@value AetherClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME} defined by the service in its
+   *        {@value AetherClassPathClassifier##SERVICE_PROPERTIES_FILE_NAME}and it is used for instantiating the {@link ServiceProvider}.
+   */
+  public IsolatedServiceProviderDiscoverer(final List<ArtifactClassLoader> serviceArtifactClassLoaders) {
+    checkNotNull(serviceArtifactClassLoaders, "serviceArtifactClassLoaders cannot be null");
+    this.serviceArtifactClassLoaders = serviceArtifactClassLoaders;
+  }
+
+  @Override
+  public List<ServiceProvider> discover() throws ServiceResolutionError {
+    List<ServiceProvider> serviceProviders = new LinkedList<>();
+    for (Object serviceArtifactClassLoader : serviceArtifactClassLoaders) {
+      try {
+        final ServiceProvider serviceProvider;
+        String artifactName =
+            (String) serviceArtifactClassLoader.getClass().getMethod("getArtifactName").invoke(serviceArtifactClassLoader);
+        ClassLoader classLoader =
+            (ClassLoader) serviceArtifactClassLoader.getClass().getMethod("getClassLoader").invoke(serviceArtifactClassLoader);
+
+        serviceProvider = instantiateServiceProvider(classLoader,
+                                                     artifactName);
+        serviceProviders.add(serviceProvider);
+      } catch (Exception e) {
+        throw new IllegalStateException("Couldn't discover service from class loader: " + serviceArtifactClassLoader, e);
+      }
+    }
+
+    return serviceProviders;
+  }
+
+  private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {
+    Object reflectedObject;
+    try {
+      reflectedObject = withContextClassLoader(classLoader, () -> {
+        try {
+          return instanciateClass(className);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
+        }
+      });
+    } catch (RuntimeException e) {
+      throw new ServiceResolutionError(e.getMessage());
+    }
+
+    if (!(reflectedObject instanceof ServiceProvider)) {
+      throw new ServiceResolutionError(format("Provided service class '%s' does not implement '%s'", className,
+                                              ServiceProvider.class.getName()));
+    }
+
+    return (ServiceProvider) reflectedObject;
+  }
+
+}

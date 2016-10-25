@@ -7,7 +7,6 @@
 package org.mule.test.service.scheduler;
 
 import static java.lang.Thread.currentThread;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -19,13 +18,11 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
-import org.junit.Ignore;
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
-@Ignore("MULE-10136")
+//@Ignore("MULE-10136")
 @Features("Scheduler Service")
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 

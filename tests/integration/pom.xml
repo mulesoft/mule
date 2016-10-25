@@ -63,11 +63,19 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-service</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.services</groupId>
-            <artifactId>mule-services-all</artifactId>
+            <artifactId>mule-service-scheduler</artifactId>
             <version>${project.version}</version>
-            <type>pom</type>
+            <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
 
