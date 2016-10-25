@@ -22,16 +22,18 @@ import java.io.File;
  */
 public class DefaultArtifactPlugin implements ArtifactPlugin {
 
+  private final String artifactId;
   private final ArtifactPluginDescriptor descriptor;
   private final ArtifactClassLoader classLoader;
 
   /**
    * Creates a new plugin
-   *
+   * @param artifactId
    * @param descriptor describes the plugin to create. Non null.
    * @param classLoader classloader to use on this plugin. Non null.
    */
-  public DefaultArtifactPlugin(ArtifactPluginDescriptor descriptor, ArtifactClassLoader classLoader) {
+  public DefaultArtifactPlugin(String artifactId, ArtifactPluginDescriptor descriptor, ArtifactClassLoader classLoader) {
+    this.artifactId = artifactId;
     this.descriptor = descriptor;
     this.classLoader = classLoader;
   }
@@ -44,6 +46,11 @@ public class DefaultArtifactPlugin implements ArtifactPlugin {
   @Override
   public String getArtifactName() {
     return descriptor.getName();
+  }
+
+  @Override
+  public String getArtifactId() {
+    return artifactId;
   }
 
   @Override

@@ -13,19 +13,19 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPlugin;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,7 +120,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
               .setArtifactId(artifactId).build();
 
           List<ArtifactPlugin> artifactPlugins = temporaryContextClassLoader.getArtifactPluginClassLoaders()
-              .stream().map(artifactClassLoader -> new DefaultArtifactPlugin(
+              .stream().map(artifactClassLoader -> new DefaultArtifactPlugin(artifactClassLoader.getArtifactId(),
                                                                              this.artifactPluginDescriptors.stream()
                                                                                  .filter(artifactDescriptor -> artifactDescriptor
                                                                                      .getName()

@@ -92,6 +92,11 @@ public class TestDomainWrapper implements Domain {
   }
 
   @Override
+  public String getArtifactId() {
+    return delegate.getArtifactId();
+  }
+
+  @Override
   public DomainDescriptor getDescriptor() {
     return delegate.getDescriptor();
   }

@@ -67,7 +67,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
 
     if (ownerClassLoader instanceof ArtifactClassLoader) {
       artifactClassloader = true;
-      artifactName = ((ArtifactClassLoader) ownerClassLoader).getArtifactName();
+      artifactName = getArtifactName((ArtifactClassLoader) ownerClassLoader);
       applicationClassloader = ownerClassLoader instanceof RegionClassLoader;
     } else {
       artifactClassloader = false;
@@ -84,6 +84,10 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     } else {
       loggersField = null;
     }
+  }
+
+  private String getArtifactName(ArtifactClassLoader ownerClassLoader) {
+    return ownerClassLoader.getArtifactDescriptor().getName();
   }
 
   @Override

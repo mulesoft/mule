@@ -43,6 +43,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   public static final String RESOURCE_NAME = "dummy.txt";
   public static final String APP_NAME = "testApp";
+  private static final String ARTIFACT_ID = "testAppId";
 
   public final URL APP_LOADED_RESOURCE;
   public final URL PLUGIN_LOADED_RESOURCE;
@@ -66,7 +67,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.loadClass(CLASS_NAME)).thenThrow(new ClassNotFoundException());
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -81,7 +82,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.loadClass(CLASS_NAME)).thenReturn(PARENT_LOADED_CLASS);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -96,7 +97,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.loadClass(CLASS_NAME)).thenReturn(PARENT_LOADED_CLASS);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(pluginClassLoader,
@@ -112,7 +113,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(null);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -127,7 +128,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -142,7 +143,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
     regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(emptySet(), emptySet()));
@@ -160,7 +161,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.getResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(singleton(PARENT_LOADED_RESOURCE)));
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader, lookupPolicy);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
     regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(emptySet(), singleton(RESOURCE_NAME)));
@@ -184,7 +185,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     RegionClassLoader regionClassLoader =
-        new RegionClassLoader(artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
+        new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
 
     final ArtifactClassLoader regionMember1 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
     final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
@@ -203,7 +204,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     RegionClassLoader regionClassLoader =
-        new RegionClassLoader(artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
+        new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
 
     final ArtifactClassLoader regionMember1 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
     doThrow(new RuntimeException()).when(regionMember1).dispose();

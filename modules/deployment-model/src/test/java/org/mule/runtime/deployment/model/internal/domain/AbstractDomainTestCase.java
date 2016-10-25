@@ -35,7 +35,8 @@ public class AbstractDomainTestCase extends AbstractMuleTestCase {
       new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
   protected final File muleHomeFolder;
   protected final ArtifactClassLoader containerClassLoader =
-      new MuleArtifactClassLoader(new ArtifactDescriptor("mule"), new URL[0], getClass().getClassLoader(),
+      new MuleArtifactClassLoader("mule", new ArtifactDescriptor("mule"), new URL[0],
+                                  getClass().getClassLoader(),
                                   new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
 
   public AbstractDomainTestCase() throws IOException {

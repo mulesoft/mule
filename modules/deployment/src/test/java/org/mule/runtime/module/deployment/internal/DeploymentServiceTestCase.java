@@ -40,7 +40,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
-import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
@@ -3182,7 +3181,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private DefaultMuleDomain createDefaultDomain() {
     return new DefaultMuleDomain(new DomainDescriptor(DEFAULT_DOMAIN_NAME),
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
-                                     .create(containerClassLoader, new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()));
+                                     .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
+                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()));
   }
 
   /**
@@ -3196,15 +3196,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation) {
     assertArtifactDir(appsDir, expectedZips, expectedApps, performValidation);
-  }
-
-  private void assertAppExplodedPluginsDir(String appDeployedPath, String[] expectedPlugins) {
-    File tmpAppFolder = new File(tmpAppsDir, appDeployedPath);
-    assertTrue("tmp folder for application doesn't exist or is not a directory", tmpAppFolder.exists());
-    assertTrue("tmp folder is not a directory", tmpAppFolder.isDirectory());
-    final String[] actualArtifacts = new File(tmpAppFolder, PLUGINS_FOLDER).list(DIRECTORY);
-    assertTrue("Invalid Mule plugins exploded for artifact",
-               isEqualCollection(asList(expectedPlugins), asList(actualArtifacts)));
   }
 
   /**

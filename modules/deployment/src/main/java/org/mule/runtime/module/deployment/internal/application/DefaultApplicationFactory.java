@@ -11,18 +11,19 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPlugin;
-import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactFactory;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -99,8 +100,8 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(applicationClassLoader, applicationPluginDescriptors);
 
     DefaultMuleApplication delegate =
-        new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository, serviceRepository,
-                                   descriptor.getArtifactLocation());
+        new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
+                                   serviceRepository, descriptor.getArtifactLocation());
 
     if (deploymentListener != null) {
       delegate.setDeploymentListener(deploymentListener);
@@ -112,10 +113,14 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader applicationClassLoader,
                                                         List<ArtifactPluginDescriptor> plugins) {
     return plugins.stream()
-        .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(artifactPluginDescriptor, applicationClassLoader
-            .getArtifactPluginClassLoaders().stream().filter(artifactClassLoader -> artifactClassLoader.getArtifactName()
-                .endsWith(artifactPluginDescriptor.getName()))
-            .findFirst().get()))
+        .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(applicationClassLoader.getArtifactId(),
+                                                                                       artifactPluginDescriptor.getName()),
+                                                                   artifactPluginDescriptor, applicationClassLoader
+                                                                       .getArtifactPluginClassLoaders().stream()
+                                                                       .filter(artifactClassLoader -> artifactClassLoader
+                                                                           .getArtifactId()
+                                                                           .endsWith(artifactPluginDescriptor.getName()))
+                                                                       .findFirst().get()))
         .collect(toList());
   }
 

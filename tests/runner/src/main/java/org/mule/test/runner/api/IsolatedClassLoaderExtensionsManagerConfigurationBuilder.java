@@ -69,7 +69,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
     final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
 
     for (Object pluginClassLoader : pluginsClassLoaders) {
-      String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactName").invoke(pluginClassLoader);
+      String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
       ClassLoader classLoader = (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
       URL manifestUrl = getExtensionManifest(classLoader);
       if (manifestUrl != null) {

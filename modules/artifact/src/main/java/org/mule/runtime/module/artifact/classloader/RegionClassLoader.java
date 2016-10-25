@@ -57,12 +57,14 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   /**
    * Creates a new region.
    *
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
+   * @param artifactId artifact unique ID for the artifact owning the created class loader instance. Non empty.
+   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance. Non null.
    * @param parent parent classloader for the region. Non null
    * @param lookupPolicy lookup policy to use on the region
    */
-  public RegionClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
-    super(artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+  public RegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parent,
+                           ClassLoaderLookupPolicy lookupPolicy) {
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
   }
 
   @Override
@@ -116,10 +118,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         try {
           return artifactClassLoader.findLocalClass(name);
         } catch (ClassNotFoundException e) {
-          throw new ClassNotFoundInRegionException(name, getArtifactName(), artifactClassLoader.getArtifactName(), e);
+          throw new ClassNotFoundInRegionException(name, getArtifactId(), artifactClassLoader.getArtifactId(), e);
         }
       } else {
-        throw new ClassNotFoundInRegionException(name, getArtifactName());
+        throw new ClassNotFoundInRegionException(name, getArtifactId());
       }
     }
   }
@@ -195,7 +197,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public String toString() {
-    return format("%s[%s] -> %s@%s", getClass().getName(), getArtifactName(), packageMapping.toString(),
+    return format("%s[%s] -> %s@%s", getClass().getName(), getArtifactId(), packageMapping.toString(),
                   toHexString(identityHashCode(this)));
   }
 }

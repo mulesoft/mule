@@ -33,19 +33,24 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
    * @inherited
    */
   @Override
-  public ArtifactClassLoader create(ArtifactClassLoader parent, ServiceDescriptor descriptor) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ServiceDescriptor descriptor) {
     File rootFolder = descriptor.getRootFolder();
     if (rootFolder == null || !rootFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
     }
 
-    List<URL> urls = new LinkedList<>();
+    List<URL> urls = getServiceUrls(rootFolder);
 
+    return new MuleArtifactClassLoader(artifactId, descriptor, urls.toArray(new URL[0]), parent.getClassLoader(),
+                                       parent.getClassLoaderLookupPolicy());
+  }
+
+  private List<URL> getServiceUrls(File rootFolder) {
+    List<URL> urls = new LinkedList<>();
     addDirectoryToClassLoader(urls, new File(rootFolder, CLASSES_DIR));
     loadJarsFromFolder(urls, new File(rootFolder, LIB_DIR));
 
-    return new MuleArtifactClassLoader(descriptor, urls.toArray(new URL[0]), parent.getClassLoader(),
-                                       parent.getClassLoaderLookupPolicy());
+    return urls;
   }
 
   private void loadJarsFromFolder(List<URL> urls, File folder) {

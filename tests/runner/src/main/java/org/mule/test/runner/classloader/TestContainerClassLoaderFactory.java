@@ -93,7 +93,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
                                                           ArtifactDescriptor artifactDescriptor) {
     final ArtifactDescriptor containerDescriptor = new ArtifactDescriptor("mule");
     final ArtifactClassLoader containerClassLoader =
-        new MuleArtifactClassLoader(containerDescriptor, urls, parentClassLoader,
+        new MuleArtifactClassLoader(containerDescriptor.getName(), containerDescriptor, urls, parentClassLoader,
                                     new MuleClassLoaderLookupPolicy(Collections.emptyMap(), getBootPackages()));
     return createContainerFilteringClassLoader(withContextClassLoader(classLoader, () -> discoverModules()),
                                                containerClassLoader);

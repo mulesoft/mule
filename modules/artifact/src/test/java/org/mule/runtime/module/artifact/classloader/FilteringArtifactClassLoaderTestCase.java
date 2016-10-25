@@ -65,7 +65,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    when(artifactClassLoader.getArtifactName()).thenReturn("mockArtifact");
+    when(artifactClassLoader.getArtifactId()).thenReturn("mockArtifact");
   }
 
   @Test

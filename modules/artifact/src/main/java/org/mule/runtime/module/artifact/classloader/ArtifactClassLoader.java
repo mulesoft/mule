@@ -17,7 +17,7 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
   /**
    * @return the artifact unique identifier
    */
-  String getArtifactName();
+  String getArtifactId();
 
   /**
    * @param <T> the generic type of the artifact descriptor.

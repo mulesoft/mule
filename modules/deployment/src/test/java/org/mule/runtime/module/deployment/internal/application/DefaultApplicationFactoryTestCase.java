@@ -49,6 +49,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private static final String DOMAIN_NAME = "test-domain";
   private static final String APP_NAME = "test-app";
   private static final String FAKE_ARTIFACT_PLUGIN = "fake-artifact-plugin";
+  public static final String APP_ID = "test-app-id";
 
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
       mock(ApplicationClassLoaderBuilderFactory.class);
@@ -82,7 +83,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPlugin appPlugin = mock(ArtifactPlugin.class);
     final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(appPlugin.getArtifactClassLoader()).thenReturn(artifactClassLoader);
-    when(artifactClassLoader.getArtifactName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
+    when(artifactClassLoader.getArtifactId()).thenReturn(FAKE_ARTIFACT_PLUGIN);
     final ArtifactClassLoaderFilter classLoaderFilter = mock(DefaultArtifactClassLoaderFilter.class);
     when(coreArtifactPluginDescriptor.getClassLoaderFilter()).thenReturn(classLoaderFilter);
     when(coreArtifactPluginDescriptor.getName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
@@ -95,6 +96,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
         .thenReturn(sharedLibLookupPolicy);
 
     final MuleApplicationClassLoader applicationArtifactClassLoader = mock(MuleApplicationClassLoader.class);
+    when(applicationArtifactClassLoader.getArtifactId()).thenReturn(APP_ID);
 
     ApplicationClassLoaderBuilder applicationClassLoaderBuilderMock = mock(ApplicationClassLoaderBuilder.class);
     when(applicationClassLoaderBuilderMock.setDomain(any())).thenReturn(applicationClassLoaderBuilderMock);

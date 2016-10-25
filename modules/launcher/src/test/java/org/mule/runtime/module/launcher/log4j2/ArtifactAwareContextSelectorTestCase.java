@@ -65,7 +65,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     selector = new ArtifactAwareContextSelector();
-    when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+    when(classLoader.getArtifactId()).thenReturn(getClass().getName());
     when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
   }
 
@@ -75,7 +75,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
 
     classLoader = mock(RegionClassLoader.class, RETURNS_DEEP_STUBS);
-    when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+    when(classLoader.getArtifactId()).thenReturn(getClass().getName());
     assertThat(context, not(sameInstance(selector.getContext(EMPTY, classLoader, true))));
   }
 

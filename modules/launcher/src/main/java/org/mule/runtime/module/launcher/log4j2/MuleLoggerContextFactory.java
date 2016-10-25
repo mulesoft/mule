@@ -64,7 +64,7 @@ public class MuleLoggerContextFactory {
   private NewContextParameters resolveContextParameters(ClassLoader classLoader) {
     if (classLoader instanceof ArtifactClassLoader) {
       ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoader;
-      return new NewContextParameters(getArtifactLoggingConfig(artifactClassLoader), artifactClassLoader.getArtifactName());
+      return new NewContextParameters(getArtifactLoggingConfig(artifactClassLoader), artifactClassLoader.getArtifactId());
     } else {
       // this is not an app init, use the top-level defaults
       if (MuleContainerBootstrapUtils.getMuleConfDir() != null) {
@@ -98,7 +98,7 @@ public class MuleLoggerContextFactory {
     }
 
     if (appLogConfig != null && ArtifactAwareContextSelector.logger.isInfoEnabled()) {
-      ArtifactAwareContextSelector.logger.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactName(),
+      ArtifactAwareContextSelector.logger.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactId(),
                                                appLogConfig);
     }
 
