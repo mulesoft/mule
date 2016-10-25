@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.deployment.model.internal.application;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -77,8 +79,15 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
     return this;
   }
 
+  /**
+   * @param domainId name of the domain where the application  is deployed. Non empty.
+   * @param applicationName name of the application. Non empty.
+   * @return the unique identifier for the application in the container.
+   */
   public static String getApplicationId(String domainId, String applicationName) {
+    checkArgument(!isEmpty(domainId), "domainId cannot be empty");
+    checkArgument(!isEmpty(applicationName), "applicationName cannot be empty");
+
     return domainId + "/app/" + applicationName;
   }
-
 }

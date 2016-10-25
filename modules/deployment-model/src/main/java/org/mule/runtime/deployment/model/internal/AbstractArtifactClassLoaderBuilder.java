@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.internal;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
@@ -181,7 +182,15 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     return classLoaders;
   }
 
+  /**
+   * @param parentArtifactId identifier of the artifact that owns the plugin. Non empty.
+   * @param pluginName name of the plugin. Non empty.
+   * @return the unique identifier for the plugin inside the parent artifact.
+   */
   public static String getArtifactPluginId(String parentArtifactId, String pluginName) {
+    checkArgument(!isEmpty(parentArtifactId), "parentArtifactId cannot be empty");
+    checkArgument(!isEmpty(pluginName), "pluginName cannot be empty");
+
     return parentArtifactId + "/plugin/" + pluginName;
   }
 }

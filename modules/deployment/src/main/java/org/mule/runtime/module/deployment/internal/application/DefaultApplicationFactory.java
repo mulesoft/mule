@@ -12,7 +12,6 @@ import static java.util.stream.Stream.concat;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
-import static org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder.getApplicationId;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -99,8 +98,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
             .collect(toList());
 
     List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(applicationClassLoader, applicationPluginDescriptors);
-
-    final String artifactId = getApplicationId(domain.getArtifactId(), descriptor.getName());
 
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,

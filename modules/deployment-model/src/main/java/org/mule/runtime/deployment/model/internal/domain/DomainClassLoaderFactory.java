@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
@@ -67,7 +69,13 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     this.jarExplorer = jarExplorer;
   }
 
+  /**
+   * @param domainName name of the domain. Non empty.
+   * @return the unique identifier for the domain in the container.
+   */
   public static String getDomainId(String domainName) {
+    checkArgument(!isEmpty(domainName), "domainName cannot be empty");
+
     return "domain/" + domainName;
   }
 
