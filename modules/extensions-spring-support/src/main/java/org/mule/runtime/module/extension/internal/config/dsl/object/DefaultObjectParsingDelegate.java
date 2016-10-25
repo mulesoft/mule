@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;

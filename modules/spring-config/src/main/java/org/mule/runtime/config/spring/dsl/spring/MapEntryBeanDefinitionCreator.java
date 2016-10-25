@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
-import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
+import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.MapEntry;
-import org.mule.runtime.config.spring.dsl.api.TypeDefinition.MapEntryType;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.MapEntry;
+import org.mule.runtime.dsl.api.component.TypeDefinition.MapEntryType;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 

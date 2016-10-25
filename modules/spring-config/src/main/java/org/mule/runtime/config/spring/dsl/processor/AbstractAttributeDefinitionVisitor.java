@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
+import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Optional;
 

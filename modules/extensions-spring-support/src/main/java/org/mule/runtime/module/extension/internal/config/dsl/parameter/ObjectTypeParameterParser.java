@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static java.util.Collections.emptySet;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import org.mule.metadata.api.model.ArrayType;
@@ -20,9 +20,9 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
@@ -50,7 +50,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String name;
   private final String namespace;
 
-  public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
+  public ObjectTypeParameterParser(ComponentBuildingDefinition.Builder definition, ObjectType type, ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
                                    MuleContext muleContext) {
     super(definition, dslResolver, context, muleContext);
@@ -61,7 +61,8 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     this.namespace = typeDsl.getNamespace();
   }
 
-  public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type, ClassLoader classLoader,
+  public ObjectTypeParameterParser(ComponentBuildingDefinition.Builder definition, String name, String namespace, ObjectType type,
+                                   ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
                                    MuleContext muleContext) {
     super(definition, dslResolver, context, muleContext);
@@ -73,7 +74,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   }
 
   @Override
-  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
+  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
     definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed().withTypeDefinition(fromType(ValueResolver.class))
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(type).build())

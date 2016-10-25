@@ -5,9 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.spring.dsl.api;
-
-import org.mule.runtime.config.spring.dsl.processor.TypeDefinitionVisitor;
+package org.mule.runtime.dsl.api.component;
 
 /**
  * Defines the actual {@code Class} for the domain object to be created.

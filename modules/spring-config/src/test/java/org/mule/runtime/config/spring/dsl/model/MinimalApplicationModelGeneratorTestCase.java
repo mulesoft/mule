@@ -12,7 +12,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -86,7 +86,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     CoreComponentBuildingDefinitionProvider coreComponentBuildingDefinitionProvider =
         new CoreComponentBuildingDefinitionProvider();
-    coreComponentBuildingDefinitionProvider.init(mockMuleContext);
+    coreComponentBuildingDefinitionProvider.init();
+    coreComponentBuildingDefinitionProvider.setMuleContext(mockMuleContext);
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);
     return new MinimalApplicationModelGenerator(new ApplicationModel(new ArtifactConfig.Builder().addConfigFile(configFile)

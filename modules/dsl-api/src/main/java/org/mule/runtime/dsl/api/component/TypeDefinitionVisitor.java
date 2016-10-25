@@ -4,13 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.processor;
-
-import org.mule.runtime.config.spring.dsl.api.TypeDefinition;
+package org.mule.runtime.dsl.api.component;
 
 /**
  * Visitor that will be invoked based on a
- * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition#getTypeDefinition()} configuration.
+ * {@link ComponentBuildingDefinition#getTypeDefinition()} configuration.
  *
  * @since 4.0
  */

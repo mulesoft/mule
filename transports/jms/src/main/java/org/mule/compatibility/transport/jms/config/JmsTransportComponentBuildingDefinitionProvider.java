@@ -7,12 +7,12 @@
 package org.mule.compatibility.transport.jms.config;
 
 import static org.mule.compatibility.transport.jms.config.JmsXmlNamespaceInfoProvider.JMS_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.compatibility.config.spring.TransportComponentBuildingDefinitionProvider;
@@ -28,8 +28,8 @@ import org.mule.compatibility.transport.jms.transformers.JMSMessageToObject;
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.compatibility.transport.jms.weblogic.WeblogicJmsConnector;
 import org.mule.compatibility.transport.jms.websphere.WebsphereJmsConnector;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 
@@ -51,8 +51,8 @@ public class JmsTransportComponentBuildingDefinitionProvider extends TransportCo
       new ComponentBuildingDefinition.Builder().withNamespace(JMS_NAMESPACE);
 
   @Override
-  public void init(MuleContext muleContext) {
-    super.init(muleContext);
+  public void init() {
+    super.init();
   }
 
 

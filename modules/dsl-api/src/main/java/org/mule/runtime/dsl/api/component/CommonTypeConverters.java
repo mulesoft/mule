@@ -4,14 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api;
+package org.mule.runtime.dsl.api.component;
 
-import static java.lang.Thread.*;
-import static org.springframework.util.ClassUtils.forName;
-
-import org.mule.runtime.core.api.MuleRuntimeException;
-
-import org.springframework.util.ClassUtils;
+import static java.lang.Thread.currentThread;
 
 /**
  * Set of common {@link TypeConverter}s to be reused in different {@link ComponentBuildingDefinitionProvider}s
@@ -26,9 +21,10 @@ public class CommonTypeConverters {
   public static TypeConverter<String, Class> stringToClassConverter() {
     return className -> {
       try {
-        return forName(className, currentThread().getContextClassLoader());
+        return currentThread().getContextClassLoader().loadClass(className);
       } catch (ClassNotFoundException e) {
-        throw new MuleRuntimeException(e);
+        //TODO MULE-10835 use MuleRuntimeException once it's moved to the API.
+        throw new RuntimeException(e);
       }
     };
   }

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api;
+package org.mule.runtime.dsl.api.component;
 
 /**
  * Converter from one type to another. Meant to be used for converting plain values from the mule configuration to specific types

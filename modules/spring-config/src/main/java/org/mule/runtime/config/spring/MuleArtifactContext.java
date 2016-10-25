@@ -25,12 +25,12 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOW
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -54,7 +54,7 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -63,6 +63,8 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 
@@ -152,7 +154,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class)
         .forEach(componentBuildingDefinitionProvider -> {
-          componentBuildingDefinitionProvider.init(muleContext);
+          //TODO MULE-9637 remove support for MuleContextAware injection.
+          if (componentBuildingDefinitionProvider instanceof MuleContextAware) {
+            ((MuleContextAware) componentBuildingDefinitionProvider).setMuleContext(muleContext);
+          }
+          componentBuildingDefinitionProvider.init();
           componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream()
               .forEach(componentBuildingDefinitionRegistry::register);
         });
@@ -484,7 +490,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return muleContext.getRegistry().lookupObject(OBJECT_CONNECTIVITY_TESTING_SERVICE);
   }
 
-  private class XmlServiceRegistry implements ServiceRegistry {
+  private class XmlServiceRegistry extends AbstractServiceRegistry {
 
     private final ServiceRegistry delegate;
     private final XmlNamespaceInfoProvider extensionsXmlInfoProvider;
@@ -510,18 +516,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     }
 
     @Override
-    public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader loader) {
-      Collection<T> providers = delegate.lookupProviders(providerClass, loader);
+    protected <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {
+      Collection<T> providers = delegate.lookupProviders(providerClass, classLoader);
       if (XmlNamespaceInfoProvider.class.equals(providerClass)) {
         providers = ImmutableList.<T>builder().addAll(providers).add((T) extensionsXmlInfoProvider).build();
       }
 
       return providers;
-    }
-
-    @Override
-    public <T> Collection<T> lookupProviders(Class<T> providerClass) {
-      return lookupProviders(providerClass, Thread.currentThread().getContextClassLoader());
     }
   }
 }

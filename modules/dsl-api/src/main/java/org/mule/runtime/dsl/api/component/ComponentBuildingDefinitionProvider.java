@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api;
-
-import org.mule.runtime.core.api.MuleContext;
+package org.mule.runtime.dsl.api.component;
 
 import java.util.List;
 
@@ -23,10 +21,8 @@ public interface ComponentBuildingDefinitionProvider {
 
   /**
    * Initialization method called once the extensions is discovered.
-   *
-   * @param muleContext the {@link org.mule.runtime.core.api.MuleContext} of the application being created.
    */
-  void init(MuleContext muleContext);
+  void init();
 
   /**
    * @return list of {@code ComponentBuildingDefinition} provided by the extension.

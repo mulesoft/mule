@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.spring;
+package org.mule.runtime.deployment.model.api.artifact;
 
 import org.mule.runtime.core.api.CustomizationService;
 

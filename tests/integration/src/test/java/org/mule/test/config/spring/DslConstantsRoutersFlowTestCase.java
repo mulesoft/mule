@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCase {
+public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase {
 
   @Override
   public String getConfigFile() {

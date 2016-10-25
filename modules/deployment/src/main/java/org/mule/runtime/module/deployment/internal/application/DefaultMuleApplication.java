@@ -11,6 +11,7 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -38,7 +39,7 @@ import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
@@ -169,7 +170,7 @@ public class DefaultMuleApplication implements Application {
 
     try {
       ArtifactContextBuilder artifactBuilder =
-          new ArtifactContextBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
+          newBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
               .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())

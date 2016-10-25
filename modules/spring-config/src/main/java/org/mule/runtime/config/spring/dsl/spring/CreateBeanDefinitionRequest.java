@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 /**
  * Bean definition creation request. Provides all the required content to build a

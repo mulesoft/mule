@@ -8,9 +8,10 @@ package org.mule.functional.config;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.testmodels.services.TestServiceComponent;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} for functional test web-service-component
+ * {@link ObjectFactory} for functional test web-service-component
  *
  * @since 4.0
  */

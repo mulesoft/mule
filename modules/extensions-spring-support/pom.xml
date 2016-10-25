@@ -44,6 +44,10 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-dsl-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-tls</artifactId>
             <version>${project.version}</version>
         </dependency>

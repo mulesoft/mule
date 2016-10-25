@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api.xml;
+package org.mule.runtime.dsl.api.xml;
 
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
 import java.util.Collection;
 

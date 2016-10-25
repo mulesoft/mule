@@ -30,7 +30,7 @@ public class AddVariablePropertyConfigurator implements ObjectFactoryCommonConfi
    *
    * @param propVarSetterInstance the transformar instance
    * @param parameters the set of parameters configured in the component model according to the
-   *        {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
    */
   @Override
   public void configure(AbstractAddVariablePropertyProcessor propVarSetterInstance, Map<String, Object> parameters) {

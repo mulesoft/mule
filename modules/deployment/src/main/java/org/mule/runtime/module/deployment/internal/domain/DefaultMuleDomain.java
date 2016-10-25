@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal.domain;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -27,7 +28,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.application.NullDeploymentListener;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
@@ -123,7 +124,7 @@ public class DefaultMuleDomain implements Domain {
       if (this.configResourceFile != null) {
         validateConfigurationFileDoNotUsesCoreNamespace();
 
-        ArtifactContextBuilder artifactBuilder = new ArtifactContextBuilder().setArtifactName(getArtifactName())
+        ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
             .setExecutionClassloader(deploymentClassLoader.getClassLoader())
             .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
             .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN)

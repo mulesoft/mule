@@ -20,17 +20,16 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttribut
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
-import org.mule.runtime.config.spring.dsl.api.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.processor.MessageProcessors;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;
 

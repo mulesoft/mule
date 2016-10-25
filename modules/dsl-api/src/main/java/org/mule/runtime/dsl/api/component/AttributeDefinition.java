@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api;
+package org.mule.runtime.dsl.api.component;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
 
 import java.util.Optional;
 
@@ -17,7 +16,7 @@ import java.util.Optional;
  * <p/>
  * An attribute may be configured to be set by using a constructor or a setter.
  * <p/>
- * The {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder} allows to create an {@code AttributeDefinition}
+ * The {@link AttributeDefinition.Builder} allows to create an {@code AttributeDefinition}
  * from many different sources.
  *
  * @since 4.0

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api;
+package org.mule.runtime.dsl.api.component;
 
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Holder for a pair of a map key and its value attribute definition.
  *
  * When
- * {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder#fromMultipleDefinitions(KeyAttributeDefinitionPair...)}
+ * {@link AttributeDefinition.Builder#fromMultipleDefinitions(KeyAttributeDefinitionPair...)}
  * is used, this class allows to define the {@link AttributeDefinition} and the key to be used for the generated map holding the
  * attribute value.
  *

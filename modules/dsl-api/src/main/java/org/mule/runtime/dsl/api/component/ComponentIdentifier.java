@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.config;
+package org.mule.runtime.dsl.api.component;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+
+import com.google.common.base.Preconditions;
 
 import javax.xml.namespace.QName;
 
@@ -44,16 +45,16 @@ public class ComponentIdentifier {
     return identifier;
   }
 
-  public static ComponentIdentifier parseComponentIdentifier(String errorTypeIdentifier) {
-    checkArgument(!isEmpty(errorTypeIdentifier), "error type identifier cannot be an empty string or null");
-    String[] values = errorTypeIdentifier.split(":");
+  public static ComponentIdentifier parseComponentIdentifier(String componentIdentifier) {
+    checkArgument(!isEmpty(componentIdentifier), "identifier cannot be an empty string or null");
+    String[] values = componentIdentifier.split(":");
     String namespace;
     String identifier;
     if (values.length == 2) {
       namespace = values[0];
       identifier = values[1];
     } else {
-      namespace = CORE_NAMESPACE_NAME;
+      namespace = CORE_NAMESPACE;
       identifier = values[0];
     }
     return new ComponentIdentifier.Builder().withNamespace(namespace).withName(identifier).build();
@@ -82,8 +83,8 @@ public class ComponentIdentifier {
     }
 
     public ComponentIdentifier build() {
-      checkState(componentIdentifier.namespace != null, "Namespace must be not null");
-      checkState(componentIdentifier.identifier != null, "Name must be not null");
+      Preconditions.checkState(componentIdentifier.namespace != null, "Namespace must be not null");
+      Preconditions.checkState(componentIdentifier.identifier != null, "Name must be not null");
       return componentIdentifier;
     }
   }

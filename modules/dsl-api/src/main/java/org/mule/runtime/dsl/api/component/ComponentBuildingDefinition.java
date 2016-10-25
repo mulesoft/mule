@@ -4,18 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.api;
+package org.mule.runtime.dsl.api.component;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
-import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.core.config.ComponentIdentifier;
-import org.mule.runtime.config.spring.dsl.processor.TypeDefinitionVisitor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -277,8 +274,8 @@ public class ComponentBuildingDefinition {
 
     /**
      * Mark configuration parameters to be ignored when building the component. This is mostly useful when
-     * {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} is used an there
-     * are certain configuration parameters that we don't want to included them.
+     * {@link AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} is used an there are certain configuration parameters
+     * that we don't want to included them.
      *
      * @param parameterName the configuration parameter name.
      * @return {@code this} builder.
@@ -313,22 +310,25 @@ public class ComponentBuildingDefinition {
     }
 
     /**
-     * Builds a {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} with the parameters set in the builder.
+     * Builds a {@link ComponentBuildingDefinition} with the parameters set in the builder.
      * <p/>
      * At least the identifier, namespace and type definition must be configured or this method will fail.
      *
-     * @return a fully configured {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+     * @return a fully configured {@link ComponentBuildingDefinition}
      */
     public ComponentBuildingDefinition build() {
       checkState(definition.typeDefinition != null, "You must specify the type");
       checkState(identifier != null, "You must specify the identifier");
       checkState(namespace != null, "You must specify the namespace");
       Optional<Class> componentType = getType();
-      checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && componentType.isPresent()),
+      checkState(!definition.typeConverter.isPresent()
+          || (definition.typeConverter.isPresent() && componentType.isPresent()),
                  TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
       checkState(!definition.typeConverter.isPresent()
-          || (definition.typeConverter.isPresent() && (isSimpleType(componentType.get()) || isMapType(componentType.get()))),
-                 format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
+          || (definition.typeConverter.isPresent()
+              && (DslSimpleType.isSimpleType(componentType.get()) || isMapType(componentType.get()))),
+                 format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE,
+                        componentType.orElse(Object.class).getName()));
       checkState(!definition.keyTypeConverter.isPresent()
           || (definition.keyTypeConverter.isPresent() && componentType.isPresent() && isMapType(componentType.get())),
                  KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE);

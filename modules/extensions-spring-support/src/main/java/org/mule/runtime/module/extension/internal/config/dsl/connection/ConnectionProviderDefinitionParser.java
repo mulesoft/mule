@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -34,7 +34,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
   private final ConnectionProviderModel providerModel;
   private final DslElementSyntax connectionDsl;
 
-  public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
+  public ConnectionProviderDefinitionParser(ComponentBuildingDefinition.Builder definition, ConnectionProviderModel providerModel,
                                             DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                             ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext, muleContext);
@@ -43,7 +43,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
   }
 
   @Override
-  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
+  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
     definitionBuilder.withIdentifier(connectionDsl.getElementName())
         .withTypeDefinition(fromType(ConnectionProviderResolver.class))
         .withObjectFactoryType(ConnectionProviderObjectFactory.class)

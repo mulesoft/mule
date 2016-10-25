@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.registry;
 
+import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 
 import com.google.common.collect.ImmutableList;
@@ -18,25 +19,11 @@ import java.util.ServiceLoader;
  *
  * @since 3.7.0
  */
-public class SpiServiceRegistry implements ServiceRegistry {
+public class SpiServiceRegistry extends AbstractServiceRegistry {
 
-  /**
-   * If {@code classLoader} is {@code null}, then the current {@link Thread#getContextClassLoader()} will be used {@inheritDoc}
-   */
   @Override
-  public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader classLoader) {
-    if (classLoader == null) {
-      classLoader = Thread.currentThread().getContextClassLoader();
-    }
-
+  protected <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {
     return ImmutableList.copyOf(ServiceLoader.load(providerClass, classLoader).iterator());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> Collection<T> lookupProviders(Class<T> providerClass) {
-    return ImmutableList.copyOf(ServiceLoader.load(providerClass).iterator());
-  }
 }

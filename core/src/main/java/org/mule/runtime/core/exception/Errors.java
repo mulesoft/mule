@@ -14,14 +14,15 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_I
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 /**
  * Provides the constants for the core error types
  */
 public abstract class Errors {
 
-  public static final String CORE_NAMESPACE_NAME = "MULE";
+  public static final String CORE_NAMESPACE_NAME = CORE_NAMESPACE.toUpperCase();
 
   public static final class Identifiers {
 

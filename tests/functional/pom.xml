@@ -137,6 +137,11 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-dsl-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>

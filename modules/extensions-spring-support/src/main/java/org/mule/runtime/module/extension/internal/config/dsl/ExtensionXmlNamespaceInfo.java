@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
+
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 
 /**
  * The {@link XmlNamespaceInfo} for the extension's namespace

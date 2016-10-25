@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.internal.artifact;
+package org.mule.runtime.config.spring.artifact;
 
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 /**
  * An artifact context contains all the information related to an {@link org.mule.runtime.module.artifact.Artifact} that contains
@@ -19,7 +20,7 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
  *
  * @since 4.0
  */
-public class ArtifactContext {
+public class SpringArtifactContext implements ArtifactContext {
 
   private MuleArtifactContext muleArtifactContext;
 
@@ -28,7 +29,7 @@ public class ArtifactContext {
    *
    * @param muleArtifactContext the artifact context.
    */
-  public ArtifactContext(MuleArtifactContext muleArtifactContext) {
+  public SpringArtifactContext(MuleArtifactContext muleArtifactContext) {
     this.muleArtifactContext = muleArtifactContext;
   }
 

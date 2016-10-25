@@ -9,11 +9,13 @@ package org.mule.runtime.config.spring.dsl.api;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE;
-import static org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE;
+import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE;
+import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

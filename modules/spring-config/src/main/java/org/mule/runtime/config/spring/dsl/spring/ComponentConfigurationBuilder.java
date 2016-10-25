@@ -11,13 +11,13 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseProcessingStrategy;
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
-import org.mule.runtime.config.spring.dsl.api.SetterAttributeDefinition;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
+import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
 /**
- * Based on the object building definition provided by {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+ * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
  * and the user configuration defined in {@link org.mule.runtime.config.spring.dsl.model.ComponentModel} it populates all the
  * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
  * {@link org.mule.runtime.config.spring.dsl.spring.BeanDefinitionBuilderHelper}.

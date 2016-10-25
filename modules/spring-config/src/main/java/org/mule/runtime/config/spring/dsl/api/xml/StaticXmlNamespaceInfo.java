@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.dsl.api.xml;
 
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
+
 /**
  * A {@link XmlNamespaceInfo} which returns fix values obtained through the constructor
  *

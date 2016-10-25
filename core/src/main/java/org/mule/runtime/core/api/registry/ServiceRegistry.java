@@ -35,4 +35,13 @@ public interface ServiceRegistry {
    */
   <T> Collection<T> lookupProviders(Class<T> providerClass);
 
+  /**
+   * Searches for implementations of a particular service class. One and only one provider is expected to be find.
+   *
+   * @param providerClass a <code>Class</code>object indicating the class or interface of the service providers being detected.
+   * @return An implementation of the given service.
+   * @throws {@link IllegalStateException} if there's no provider found or there's more than one provider.
+   */
+  <T> T lookupProvider(Class<T> providerClass);
+
 }

@@ -8,7 +8,7 @@
 package org.mule.compatibility.transport.jms.config;
 
 import org.mule.compatibility.transport.jms.CustomCachingConnectionFactory;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import javax.jms.ConnectionFactory;
 

@@ -5,18 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.spring.dsl.processor;
-
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+package org.mule.runtime.dsl.api.component;
 
 import java.util.Optional;
 
 /**
- * An {code AttributeDefinitionVisitor} is in charge of handling an attribute configuration when building an object from a
- * {@link org.mule.runtime.config.spring.dsl.model.ComponentModel}.
+ * An {code AttributeDefinitionVisitor} allows to access an {@link AttributeDefinition} configuration.
  * <p>
- * Depending on the {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition} configuration a method and only one method
+ * Depending on the {@link AttributeDefinition} configuration a method and only one method
  * of this contract will be invoked.
  *
  * @since 4.0
@@ -39,7 +35,7 @@ public interface AttributeDefinitionVisitor {
 
   /**
    * To be called when the value to be set when building the object is fixed and provided by the definition of the
-   * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}.
+   * {@link ComponentBuildingDefinition}.
    *
    * @param value the fixed value
    */

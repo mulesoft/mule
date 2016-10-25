@@ -7,18 +7,16 @@
 package org.mule.test.config.dsl;
 
 import static java.lang.Integer.valueOf;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.test.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TEST_NAMESACE;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
 import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
 import org.mule.test.config.spring.parsers.beans.ParsersTestObject;
@@ -31,12 +29,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParserComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
   @Override
-  public void init(MuleContext muleContext) {}
+  public void init() {}
 
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {

@@ -18,8 +18,8 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;

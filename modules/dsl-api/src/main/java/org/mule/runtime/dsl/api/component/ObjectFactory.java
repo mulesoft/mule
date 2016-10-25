@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.spring.dsl.api;
+package org.mule.runtime.dsl.api.component;
 
 /**
  * Interface that must be implemented by those classes that are meant to be used as a factory to create complex domain objects.
  *
  * This object may have a complex construction with setters and constructor parameters which are going to be defined by the
- * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} that use them.
+ * {@link ComponentBuildingDefinition} that use them.
  *
  * @param <T> the type of the object to be created.
  *

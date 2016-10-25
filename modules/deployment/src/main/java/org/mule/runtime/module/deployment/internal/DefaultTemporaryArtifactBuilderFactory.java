@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -16,10 +15,11 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
@@ -129,7 +129,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
                                                                              artifactClassLoader))
               .collect(toList());
 
-          artifactContextBuilder = new ArtifactContextBuilder().setArtifactType(DOMAIN)
+          artifactContextBuilder = ArtifactContextBuilder.newBuilder().setArtifactType(DOMAIN)
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(temporaryContextClassLoader)
               .setArtifactConfiguration(artifactConfiguration).setMuleContextListener(createMuleContextListener());
 

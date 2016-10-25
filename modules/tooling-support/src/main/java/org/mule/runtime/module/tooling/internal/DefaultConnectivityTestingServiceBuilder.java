@@ -9,7 +9,7 @@ package org.mule.runtime.module.tooling.internal;
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
