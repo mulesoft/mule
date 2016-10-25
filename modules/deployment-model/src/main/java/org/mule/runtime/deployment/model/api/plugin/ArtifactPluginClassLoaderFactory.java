@@ -25,12 +25,13 @@ import java.util.Set;
 public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
 
   /**
+   * @param artifactId artifact unique ID. Non empty.
    * @param parent parent for the new artifact classloader.
    * @param descriptor descriptor of the artifact owner of the created classloader
    * @return an {@link ArtifactClassLoader} for the given {@link ArtifactPluginDescriptor}
    */
   @Override
-  public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
     URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
     urls[0] = descriptor.getRuntimeClassesDir();
     arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
@@ -50,7 +51,7 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
 
     final ClassLoaderLookupPolicy lookupPolicy = parent.getClassLoaderLookupPolicy().extend(pluginsLookupPolicies);
 
-    return new MuleArtifactClassLoader(descriptor, urls, parent.getClassLoader(), lookupPolicy);
+    return new MuleArtifactClassLoader(artifactId, descriptor, urls, parent.getClassLoader(), lookupPolicy);
   }
 
   private ClassLoaderLookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,

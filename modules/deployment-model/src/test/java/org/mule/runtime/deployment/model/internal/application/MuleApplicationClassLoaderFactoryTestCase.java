@@ -41,6 +41,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
   private static final String DOMAIN_NAME = "test-domain";
   private static final String APP_NAME = "test-app";
+  private static final String APP_ID = "test-app-id";
 
   @Rule
   public TemporaryFolder tempMuleHome = new TemporaryFolder();
@@ -49,7 +50,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
   private final ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
   private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
   private URL classesFolderUrl;
-  private URL appLibraryUrl;
 
   @Before
   public void createAppClassLoader() throws IOException {
@@ -66,7 +66,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
 
     classesFolderUrl = getAppClassesFolder(APP_NAME).toURI().toURL();
-    appLibraryUrl = appLibrary.toURI().toURL();
 
     when(classLoaderLookupPolicy.extend(anyMap())).thenReturn(classLoaderLookupPolicy);
   }
@@ -90,9 +89,10 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     descriptor.setClassesFolder(toFile(classesFolderUrl));
 
     final MuleApplicationClassLoader artifactClassLoader =
-        (MuleApplicationClassLoader) classLoaderFactory.create(parentArtifactClassLoader, descriptor, emptyList());
+        (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());
 
     verify(nativeLibraryFinderFactory).create(APP_NAME);
     assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
+    assertThat(artifactClassLoader.getArtifactId(), is(APP_ID));
   }
 }

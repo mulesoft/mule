@@ -19,17 +19,17 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.application.NullDeploymentListener;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
@@ -222,6 +222,11 @@ public class DefaultMuleDomain implements Domain {
   @Override
   public String getArtifactName() {
     return descriptor.getName();
+  }
+
+  @Override
+  public String getArtifactId() {
+    return deploymentClassLoader.getArtifactId();
   }
 
   @Override

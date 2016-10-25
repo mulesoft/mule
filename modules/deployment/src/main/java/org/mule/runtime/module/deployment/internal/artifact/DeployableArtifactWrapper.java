@@ -74,6 +74,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   }
 
   @Override
+  public String getArtifactId() {
+    return delegate.getArtifactId();
+  }
+
+  @Override
   public D getDescriptor() {
     return delegate.getDescriptor();
   }

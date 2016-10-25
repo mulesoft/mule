@@ -69,7 +69,8 @@ public class DefaultMuleApplication implements Application {
   private ServerNotificationListener<MuleContextNotification> statusListener;
   private ArtifactContext artifactContext;
 
-  public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleDeployableArtifactClassLoader deploymentClassLoader,
+  public DefaultMuleApplication(ApplicationDescriptor descriptor,
+                                MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
                                 ServiceRepository serviceRepository, File location) {
     this.descriptor = descriptor;
@@ -78,11 +79,11 @@ public class DefaultMuleApplication implements Application {
     this.deploymentListener = new NullDeploymentListener();
     this.artifactPlugins = artifactPlugins;
     this.location = location;
+    this.deploymentClassLoader = deploymentClassLoader;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
     }
-    this.deploymentClassLoader = deploymentClassLoader;
   }
 
   public void setDeploymentListener(DeploymentListener deploymentListener) {
@@ -295,6 +296,11 @@ public class DefaultMuleApplication implements Application {
   @Override
   public String getArtifactName() {
     return descriptor.getName();
+  }
+
+  @Override
+  public String getArtifactId() {
+    return deploymentClassLoader.getArtifactId();
   }
 
   @Override

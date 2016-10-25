@@ -39,13 +39,13 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
   }
 
   @Override
-  public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor,
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ApplicationDescriptor descriptor,
                                     List<ArtifactClassLoader> artifactPluginClassLoaders) {
     List<URL> urls = getApplicationResourceUrls(descriptor);
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, descriptor);
 
-    return new MuleApplicationClassLoader(descriptor, parent.getClassLoader(),
+    return new MuleApplicationClassLoader(artifactId, descriptor, parent.getClassLoader(),
                                           nativeLibraryFinderFactory.create(descriptor.getName()), urls,
                                           classLoaderLookupPolicy, artifactPluginClassLoaders);
   }

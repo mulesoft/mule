@@ -39,7 +39,7 @@ public class MuleLoggerContextFactoryTestCase {
 
   @Before
   public void before() throws Exception {
-    when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+    when(classLoader.getArtifactId()).thenReturn(getClass().getName());
     when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
     artifactDescriptor = mock(ApplicationDescriptor.class);
     when(classLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);

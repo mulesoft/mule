@@ -76,13 +76,18 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
       throws ServiceResolutionError {
     List<ServiceProvider> serviceProviders = new LinkedList<>();
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
-      final ArtifactClassLoader serviceClassLoader = serviceClassLoaderFactory.create(apiClassLoader, serviceDescriptor);
+      final ArtifactClassLoader serviceClassLoader =
+          serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), apiClassLoader, serviceDescriptor);
       final ServiceProvider serviceProvider =
           instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
 
       serviceProviders.add(serviceProvider);
     }
     return serviceProviders;
+  }
+
+  private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {
+    return "service/" + serviceDescriptor.getName();
   }
 
   private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {

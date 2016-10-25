@@ -82,7 +82,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPlugin appPlugin = mock(ArtifactPlugin.class);
     final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(appPlugin.getArtifactClassLoader()).thenReturn(artifactClassLoader);
-    when(artifactClassLoader.getArtifactName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
+    when(artifactClassLoader.getArtifactId()).thenReturn(FAKE_ARTIFACT_PLUGIN);
     final ArtifactClassLoaderFilter classLoaderFilter = mock(DefaultArtifactClassLoaderFilter.class);
     when(coreArtifactPluginDescriptor.getClassLoaderFilter()).thenReturn(classLoaderFilter);
     when(coreArtifactPluginDescriptor.getName()).thenReturn(FAKE_ARTIFACT_PLUGIN);

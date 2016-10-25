@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -14,19 +15,17 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
-
 import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.File;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -47,9 +46,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     MuleApplicationClassLoader parentArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     ArtifactContext mockArtifactContext = mock(ArtifactContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
-    application =
-        new DefaultMuleApplication(null, parentArtifactClassLoader, Collections.emptyList(), null,
-                                   mock(ServiceRepository.class), appLocation);
+    application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
+                                             null, mock(ServiceRepository.class), appLocation);
     application.setArtifactContext(mockArtifactContext);
   }
 
@@ -91,7 +89,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[] {});
 
     DefaultMuleApplication application =
-        new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), Collections.emptyList(), null,
+        new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
                                    null, appLocation);
     application.install();
     assertThat(application.deploymentClassLoader, is(notNullValue()));

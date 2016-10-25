@@ -46,7 +46,7 @@ public class ContainerClassLoaderFactory {
 
     private MuleContainerClassLoader(ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                      ClassLoaderLookupPolicy lookupPolicy) {
-      super(artifactDescriptor, urls, parent, lookupPolicy);
+      super("container", artifactDescriptor, urls, parent, lookupPolicy);
     }
 
     @Override

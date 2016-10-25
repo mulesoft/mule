@@ -19,9 +19,14 @@ import java.io.File;
 public interface Artifact<D extends ArtifactDescriptor> {
 
   /**
-   * @return the artifact identifier
+   * @return the artifact name
    */
   String getArtifactName();
+
+  /**
+   * @return the artifact unique identifier inside the container. Non empty.
+   */
+  String getArtifactId();
 
   /**
    * @return the artifact descriptor

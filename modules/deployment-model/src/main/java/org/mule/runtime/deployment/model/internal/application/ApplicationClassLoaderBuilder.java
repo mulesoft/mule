@@ -7,13 +7,14 @@
 package org.mule.runtime.deployment.model.internal.application;
 
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 
@@ -54,6 +55,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 
+  @Override
+  protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
+    return getApplicationId(domain.getArtifactId(), artifactDescriptor.getName());
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -69,6 +75,10 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
   public ApplicationClassLoaderBuilder setDomain(Domain domain) {
     this.domain = domain;
     return this;
+  }
+
+  public static String getApplicationId(String domainId, String applicationName) {
+    return domainId + "/app/" + applicationName;
   }
 
 }

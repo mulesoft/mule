@@ -59,7 +59,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     if (filter.exportsClass(name)) {
       return artifactClassLoader.getClassLoader().loadClass(name);
     } else {
-      throw new NotExportedClassException(name, getArtifactName(), filter);
+      throw new NotExportedClassException(name, getArtifactId(), filter);
     }
   }
 
@@ -68,8 +68,8 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     if (filter.exportsResource(name)) {
       return getResourceFromDelegate(artifactClassLoader, name);
     } else {
-      logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactName()));
-      logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactName()));
+      logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+      logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactId()));
       return null;
     }
   }
@@ -83,8 +83,8 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     if (filter.exportsResource(name)) {
       return getResourcesFromDelegate(artifactClassLoader, name);
     } else {
-      logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactName()));
-      logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactName()));
+      logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
+      logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
       return new EnumerationAdapter<>(emptyList());
     }
   }
@@ -122,12 +122,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   @Override
   public String toString() {
-    return format("%s[%s]@%s", getClass().getName(), artifactClassLoader.getArtifactName(), toHexString(identityHashCode(this)));
+    return format("%s[%s]@%s", getClass().getName(), artifactClassLoader.getArtifactId(), toHexString(identityHashCode(this)));
   }
 
   @Override
-  public String getArtifactName() {
-    return artifactClassLoader.getArtifactName();
+  public String getArtifactId() {
+    return artifactClassLoader.getArtifactId();
   }
 
   @Override

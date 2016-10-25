@@ -16,7 +16,7 @@ import java.util.Enumeration;
 public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader {
 
   @Override
-  public String getArtifactName() {
+  public String getArtifactId() {
     return null;
   }
 

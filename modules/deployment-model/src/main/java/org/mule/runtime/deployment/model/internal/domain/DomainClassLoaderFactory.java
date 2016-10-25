@@ -13,11 +13,12 @@ import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
@@ -26,8 +27,6 @@ import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarExplorer;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,26 +67,29 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     this.jarExplorer = jarExplorer;
   }
 
-  @Override
-  public ArtifactClassLoader create(ArtifactClassLoader parent, DomainDescriptor descriptor,
-                                    List<ArtifactClassLoader> artifactClassLoaders) {
-    String domain = descriptor.getName();
-    Preconditions.checkArgument(domain != null, "Domain name cannot be null");
+  public static String getDomainId(String domainName) {
+    return "domain/" + domainName;
+  }
 
-    ArtifactClassLoader domainClassLoader = domainArtifactClassLoaders.get(domain);
+  @Override
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, DomainDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactClassLoaders) {
+    String domainId = getDomainId(descriptor.getName());
+
+    ArtifactClassLoader domainClassLoader = domainArtifactClassLoaders.get(domainId);
     if (domainClassLoader != null) {
       return domainClassLoader;
     } else {
       synchronized (this) {
-        domainClassLoader = domainArtifactClassLoaders.get(domain);
+        domainClassLoader = domainArtifactClassLoaders.get(domainId);
         if (domainClassLoader == null) {
-          if (domain.equals(DEFAULT_DOMAIN_NAME)) {
+          if (descriptor.getName().equals(DEFAULT_DOMAIN_NAME)) {
             domainClassLoader = getDefaultDomainClassLoader(parent.getClassLoaderLookupPolicy());
           } else {
             domainClassLoader = getCustomDomainClassLoader(parent.getClassLoaderLookupPolicy(), descriptor);
           }
 
-          domainArtifactClassLoaders.put(domain, domainClassLoader);
+          domainArtifactClassLoaders.put(domainId, domainClassLoader);
         }
       }
     }
@@ -169,8 +171,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     return new ArtifactClassLoader() {
 
       @Override
-      public String getArtifactName() {
-        return classLoader.getArtifactName();
+      public String getArtifactId() {
+        return classLoader.getArtifactId();
       }
 
       @Override
@@ -205,7 +207,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
 
       @Override
       public void dispose() {
-        domainArtifactClassLoaders.remove(classLoader.getArtifactName());
+        domainArtifactClassLoaders.remove(classLoader.getArtifactId());
         classLoader.dispose();
       }
 

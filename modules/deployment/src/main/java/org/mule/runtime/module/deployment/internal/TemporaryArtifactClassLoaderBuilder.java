@@ -57,6 +57,11 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 
+  @Override
+  protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
+    return "temp/" + artifactDescriptor.getName();
+  }
+
   /**
    * {@inheritDoc}
    */
