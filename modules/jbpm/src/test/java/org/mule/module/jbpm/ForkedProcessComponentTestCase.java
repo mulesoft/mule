@@ -14,6 +14,8 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
+import java.util.Arrays;
+
 import org.jbpm.api.ProcessInstance;
 import org.junit.Test;
 
@@ -37,47 +39,109 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
         String processId = ((ProcessInstance) response.getPayload()).getId();
 
         // The process should be waiting for asynchronous responses from both services
-        assertProcessState(bpms, processId, "waitForResponseA / waitForResponseB");
+        assertProcessState(new MultipleStringStateProbe(bpms, processId, "waitForResponseA", "waitForResponseB"));
 
         // ServiceA is initially stopped, so we're still waiting for a response from ServiceA
-        assertProcessState(bpms, processId, "waitForResponseA");
+        assertProcessState(new EqualStateProbe(bpms, processId, "waitForResponseA"));
 
         // Start ServiceA
         muleContext.getRegistry().lookupService("ServiceA").resume();
 
         // The process should have ended.
-        assertProcessState(bpms, processId, "ended");
+        assertProcessState(new EqualStateProbe(bpms, processId, "ended"));
     }
 
-    private void assertProcessState(final BPMS bpms, final String processId, final String state)
+    private void assertProcessState(Probe probe)
     {
         Prober prober = new PollingProber(RECEIVE_TIMEOUT, 50);
-        prober.check(new Probe()
-        {
-            private String processState;
+        prober.check(probe);
+    }
 
-            @Override
-            public boolean isSatisfied()
+    private static class EqualStateProbe implements Probe
+    {
+
+        private final BPMS bpms;
+        private final String processId;
+        private final String state;
+        private String processState;
+
+        public EqualStateProbe(BPMS bpms, String processId, String state)
+        {
+            this.bpms = bpms;
+            this.processId = processId;
+            this.state = state;
+        }
+
+        @Override
+        public boolean isSatisfied()
+        {
+            try
             {
-                try
-                {
-                    ProcessInstance process = (ProcessInstance) bpms.lookupProcess(processId);
-                    processState = (String) bpms.getState(process);
-                }
-                catch (Exception e)
+                processState = getProcessState(bpms, processId);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return state.equals(processState);
+        }
+
+        @Override
+        public String describeFailure()
+        {
+            return "process was in state: " + processState + " but expected to contain: " + state;
+        }
+    }
+
+    private static  String getProcessState(BPMS bpms, String processId) throws Exception
+    {
+        ProcessInstance process = (ProcessInstance) bpms.lookupProcess(processId);
+        return (String) bpms.getState(process);
+    }
+
+    private static class MultipleStringStateProbe implements Probe
+    {
+
+        private final BPMS bpms;
+        private final String processId;
+        private final String[] states;
+        private String processState;
+
+        public MultipleStringStateProbe(BPMS bpms, String processId, String... states)
+        {
+            this.bpms = bpms;
+            this.processId = processId;
+            this.states = states;
+        }
+
+        @Override
+        public boolean isSatisfied()
+        {
+            try
+            {
+                processState = getProcessState(bpms, processId);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            for (String state : states)
+            {
+                if (!processState.contains(state))
                 {
                     return false;
                 }
-
-                return state.equals(processState);
             }
 
-            @Override
-            public String describeFailure()
-            {
-                return "process was in state: " + processState + " but expected to contain: " + state;
-            }
-        });
+            return true;
+        }
+
+        @Override
+        public String describeFailure()
+        {
+            return "process was in state: " + processState + " but expected to contain: " + Arrays.toString(states);
+        }
     }
-
 }
