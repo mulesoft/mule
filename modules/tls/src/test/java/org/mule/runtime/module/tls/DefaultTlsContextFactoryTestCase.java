@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.tls;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
@@ -21,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.hamcrest.core.Is;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -34,6 +37,10 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void createTlsPropertiesFile() throws Exception {
+
+    // TODO MULE-10805: It's ignored when Allure is used because it fails with the Allure Surefire listener
+    assumeThat(System.getProperty("allure.profile.is.activated", "false"), Is.is(equalTo("false")));
+
     PrintWriter writer = new PrintWriter(getTlsPropertiesFile(), "UTF-8");
     writer.println("enabledCipherSuites=" + getFileEnabledCipherSuites());
     writer.println("enabledProtocols=" + getFileEnabledProtocols());

@@ -236,7 +236,7 @@
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <muleCommonVersion>3.8.0</muleCommonVersion>
-        <allure.junit.version>1.4.23.HOTFIX1</allure.junit.version>
+        <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -275,6 +275,8 @@
         <aetherVersion>1.0.2.v20150114</aetherVersion>
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
         <powermockVersion>1.6.5</powermockVersion>
+        <allure.maven.plugin.version>2.5</allure.maven.plugin.version>
+        <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
@@ -284,6 +286,11 @@
             <groupId>com.googlecode.multithreadedtc</groupId>
             <artifactId>multithreadedtc</artifactId>
             <version>${multithreadedtcVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.yandex.qatools.allure</groupId>
+            <artifactId>allure-junit-adaptor</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -687,12 +694,7 @@
             <dependency>
                 <groupId>ru.yandex.qatools.allure</groupId>
                 <artifactId>allure-junit-adaptor</artifactId>
-                <version>${allure.junit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ru.yandex.qatools.allure</groupId>
-                <artifactId>allure-java-annotations</artifactId>
-                <version>${allure.junit.version}</version>
+                <version>${allureJunitVersion}</version>
             </dependency>
 
             <!--Logging-->
@@ -1597,6 +1599,7 @@
                                     <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
                                     <ignoredUsedUndeclaredDependency>commons-logging:commons-logging</ignoredUsedUndeclaredDependency>
                                     <ignoredUsedUndeclaredDependency>org.apache.ftpserver:ftpserver-core</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>ru.yandex.qatools.allure</ignoredUsedUndeclaredDependency>
 
                                     <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
                                     <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
@@ -2233,6 +2236,65 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>allure</id>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <testFailureIgnore>true</testFailureIgnore>
+                                <argLine>
+                                    -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
+                                </argLine>
+                                <properties>
+                                    <property>
+                                        <name>listener</name>
+                                        <value>ru.yandex.qatools.allure.junit.AllureRunListener</value>
+                                    </property>
+                                </properties>
+                                <systemPropertyVariables>
+                                    <allure.profile.is.activated>true</allure.profile.is.activated>
+                                </systemPropertyVariables>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.aspectj</groupId>
+                                    <artifactId>aspectjweaver</artifactId>
+                                    <version>${aspectjVersion}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+
+                        <!--Needed only to show reports locally. Run jetty:run and open localhost:8080 to show the report-->
+                        <plugin>
+                            <groupId>org.eclipse.jetty</groupId>
+                            <artifactId>jetty-maven-plugin</artifactId>
+                            <version>${jetty.maven.plugin.version}</version>
+                            <configuration>
+                                <webAppSourceDirectory>${project.build.directory}/site/allure-maven-plugin</webAppSourceDirectory>
+                                <stopKey>stop</stopKey>
+                                <stopPort>1234</stopPort>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+
+            <reporting>
+                <excludeDefaults>true</excludeDefaults>
+                <plugins>
+                    <plugin>
+                        <groupId>ru.yandex.qatools.allure</groupId>
+                        <artifactId>allure-maven-plugin</artifactId>
+                        <version>${allure.maven.plugin.version}</version>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
     </profiles>
 </project>

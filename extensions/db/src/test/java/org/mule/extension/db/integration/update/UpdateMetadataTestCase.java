@@ -21,7 +21,11 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("DB Extension")
+@Stories("Update Statement")
 public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
 
   @Override

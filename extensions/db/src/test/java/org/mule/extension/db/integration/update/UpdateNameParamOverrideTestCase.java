@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("DB Extension")
+@Stories("Update Statement")
 public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCase {
 
   @Override
