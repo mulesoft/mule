@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.client.i18n;
 
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 public class ClientMessages extends I18nMessageFactory {
 

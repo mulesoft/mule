@@ -10,8 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import javax.resource.spi.work.Work;

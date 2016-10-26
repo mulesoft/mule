@@ -23,6 +23,7 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.exception.MessagingException.PAYLOAD_INFO_KEY;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
@@ -33,7 +34,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.tck.SerializationTestUtils;
@@ -80,7 +81,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() {
-    originalVerboseExceptions = DefaultMuleConfiguration.verboseExceptions;
+    originalVerboseExceptions = MuleException.verboseExceptions;
 
     locationProvider.setMuleContext(mockContext);
 
@@ -92,7 +93,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   @After
   public void after() {
-    DefaultMuleConfiguration.verboseExceptions = originalVerboseExceptions;
+    MuleException.verboseExceptions = originalVerboseExceptions;
   }
 
   @Test
@@ -322,7 +323,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   @Ignore("MULE-10266 review how the transformationService is obtained when building an exception.")
   public void payloadInfoNonConsumable() throws Exception {
-    DefaultMuleConfiguration.verboseExceptions = true;
+    MuleException.verboseExceptions = true;
 
     Event testEvent = mock(Event.class);
     Object payload = mock(Object.class);
@@ -340,7 +341,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void payloadInfoConsumable() throws Exception {
-    DefaultMuleConfiguration.verboseExceptions = true;
+    MuleException.verboseExceptions = true;
 
     Event testEvent = mock(Event.class);
     final ByteArrayInputStream payload = new ByteArrayInputStream(new byte[] {});
@@ -356,7 +357,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   @Ignore("MULE-10266 review how the transformationService is obtained when building an exception.")
   public void payloadInfoException() throws Exception {
-    DefaultMuleConfiguration.verboseExceptions = true;
+    MuleException.verboseExceptions = true;
 
     Event testEvent = mock(Event.class);
     Object payload = mock(Object.class);
@@ -375,7 +376,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void payloadInfoNonVerbose() throws Exception {
-    DefaultMuleConfiguration.verboseExceptions = false;
+    MuleException.verboseExceptions = false;
 
     Event testEvent = mock(Event.class);
     InternalMessage muleMessage = spy(InternalMessage.builder().payload("").build());

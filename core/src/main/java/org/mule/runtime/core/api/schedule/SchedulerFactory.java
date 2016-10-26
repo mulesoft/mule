@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.schedule;
 import static org.mule.runtime.core.config.i18n.CoreMessages.couldNotRegisterNewScheduler;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.Map;

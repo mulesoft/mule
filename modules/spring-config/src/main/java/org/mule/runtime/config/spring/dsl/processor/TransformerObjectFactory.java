@@ -8,12 +8,12 @@ package org.mule.runtime.config.spring.dsl.processor;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.ClassUtils;

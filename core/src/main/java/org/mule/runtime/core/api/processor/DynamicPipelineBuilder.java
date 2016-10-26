@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import java.util.List;
 
@@ -60,7 +60,7 @@ public interface DynamicPipelineBuilder {
    * {@link #reset()}
    *
    * @return pipeline ID for future updates
-   * @throws org.mule.runtime.core.api.MuleException if the update fails
+   * @throws MuleException if the update fails
    */
   String resetAndUpdate() throws MuleException;
 
@@ -68,7 +68,7 @@ public interface DynamicPipelineBuilder {
    * Removes and disposes all injected message processors.
    *
    * @return pipeline ID for future updates
-   * @throws org.mule.runtime.core.api.MuleException if the update fails
+   * @throws MuleException if the update fails
    */
   String reset() throws MuleException;
 

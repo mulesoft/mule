@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.vm;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.transport.AbstractMessageRequesterFactory;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * <code>VMMessageDispatcherFactory</code> creates an in-memory event dispatcher

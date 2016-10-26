@@ -10,7 +10,7 @@ package org.mule.runtime.module.artifact.classloader;
 import static org.apache.commons.lang.ClassUtils.getPackageName;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.HashMap;
 import java.util.HashSet;

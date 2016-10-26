@@ -23,7 +23,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
   public static final String DASH = "-";
 
   /**
-   * Like {@link org.mule.runtime.core.util.StringUtils#split(String, String)}, but additionally trims whitespace from the result
+   * Like {@link StringUtils#split(String, String)}, but additionally trims whitespace from the result
    * tokens.
    */
   public static String[] splitAndTrim(String string, String delim) {
@@ -31,16 +31,16 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
       return null;
     }
 
-    if (isEmpty(string)) {
+    if (StringUtils.isEmpty(string)) {
       return ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
-    String[] rawTokens = split(string, delim);
+    String[] rawTokens = StringUtils.split(string, delim);
     List<String> tokens = new ArrayList<String>();
     if (rawTokens != null) {
       for (int i = 0; i < rawTokens.length; i++) {
-        String token = trim(rawTokens[i]);
-        if (isNotEmpty(token)) {
+        String token = StringUtils.trim(rawTokens[i]);
+        if (StringUtils.isNotEmpty(token)) {
           tokens.add(token);
         }
       }
@@ -50,7 +50,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 
   /**
    * Convert a hexadecimal string into its byte representation.
-   * 
+   *
    * @param hex The hexadecimal string.
    * @return The converted bytes or <code>null</code> if the hex String is null.
    */
@@ -80,7 +80,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
    * Like {@link #repeat(String, int)} but with a single character as argument.
    */
   public static String repeat(char c, int len) {
-    return repeat(CharUtils.toString(c), len);
+    return StringUtils.repeat(CharUtils.toString(c), len);
   }
 
   /**
@@ -92,7 +92,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 
   /**
    * Convert a byte array to a hexadecimal string.
-   * 
+   *
    * @param bytes The bytes to format.
    * @param uppercase When <code>true</code> creates uppercase hex characters instead of lowercase (the default).
    * @return A hexadecimal representation of the specified bytes.
@@ -117,7 +117,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 
   /**
    * Matches the given value to the given pattern. Then returns the group at matchIndex.
-   * 
+   *
    * @param pattern the pattern to use as regexp
    * @param value the value to evaluate
    * @param matchIndex the group index to be returned

@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
 
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.module.http.internal.HttpMessageLogger;

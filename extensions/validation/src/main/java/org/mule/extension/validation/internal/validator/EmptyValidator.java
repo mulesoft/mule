@@ -10,7 +10,7 @@ import static org.mule.extension.validation.internal.ImmutableValidationResult.o
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.Collection;

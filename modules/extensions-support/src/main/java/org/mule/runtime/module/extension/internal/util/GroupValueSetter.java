@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;

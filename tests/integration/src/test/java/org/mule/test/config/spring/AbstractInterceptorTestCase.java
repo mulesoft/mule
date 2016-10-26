@@ -9,7 +9,7 @@ package org.mule.test.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.test.AbstractIntegrationTestCase;
 
 public abstract class AbstractInterceptorTestCase extends AbstractIntegrationTestCase {

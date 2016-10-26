@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.domain.request;
 
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;

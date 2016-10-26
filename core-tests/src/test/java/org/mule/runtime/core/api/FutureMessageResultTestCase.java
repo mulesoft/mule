@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

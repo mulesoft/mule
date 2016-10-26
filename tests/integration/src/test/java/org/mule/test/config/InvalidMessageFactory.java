@@ -6,8 +6,8 @@
  */
 package org.mule.test.config;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 public class InvalidMessageFactory extends I18nMessageFactory {
 

@@ -9,7 +9,7 @@ package org.mule.test.runner.api;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
-import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.util.Collections;

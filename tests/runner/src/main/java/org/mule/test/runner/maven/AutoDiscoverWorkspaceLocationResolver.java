@@ -16,7 +16,7 @@ import static java.nio.file.Paths.get;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
 import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
 import org.mule.test.runner.api.WorkspaceLocationResolver;

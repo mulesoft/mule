@@ -8,7 +8,7 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 
 import java.util.Collection;

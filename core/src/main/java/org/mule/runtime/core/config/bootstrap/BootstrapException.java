@@ -7,7 +7,7 @@
 package org.mule.runtime.core.config.bootstrap;
 
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * Represents exceptions during the bootstrap configuration process

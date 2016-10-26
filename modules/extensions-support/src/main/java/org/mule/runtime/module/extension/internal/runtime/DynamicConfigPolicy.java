@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.core.time.TimeSupplier;
 

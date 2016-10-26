@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.internal.artifact;
 
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;

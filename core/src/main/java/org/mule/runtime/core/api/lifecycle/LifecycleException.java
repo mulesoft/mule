@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.core.api.LocatedMuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /** <code>LifecycleException</code> TODO */
 

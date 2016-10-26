@@ -10,7 +10,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.authDeniedOnEndpoin
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.retry;
 
 import org.mule.runtime.core.api.lifecycle.FatalException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * This exception is thrown when a Retry policy has made all the retry attempts it wants to make and is still failing.

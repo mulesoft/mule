@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>RoutePathNotFoundException</code> is thrown if a routing path for an event cannot be found. This can be caused if there

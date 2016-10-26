@@ -9,7 +9,7 @@ package org.mule.tck.testmodels.mule;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * A Test message dispatcher factory that is used for testing configuration loading since "test://" endpoints can be used instead

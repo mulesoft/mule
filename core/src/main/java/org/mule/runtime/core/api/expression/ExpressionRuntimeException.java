@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.expression;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * If thrown by the {@link org.mule.runtime.core.expression.DefaultExpressionManager} if an expression returns null and failIfNull

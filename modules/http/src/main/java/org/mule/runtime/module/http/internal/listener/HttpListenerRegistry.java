@@ -7,12 +7,12 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.base.Joiner;

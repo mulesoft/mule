@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport.service;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>TransportServiceException</code> is thrown if a ProviderServicedescriptor has a service error set. This is usually

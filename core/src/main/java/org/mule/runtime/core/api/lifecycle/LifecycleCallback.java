@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * This callback is used to execute lifecycle behaviour for an object being managed by a {@link LifecycleManager} The callback is

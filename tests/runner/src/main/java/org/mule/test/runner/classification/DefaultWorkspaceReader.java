@@ -9,7 +9,7 @@ package org.mule.test.runner.classification;
 
 import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.maven.MavenModelFactory;
 

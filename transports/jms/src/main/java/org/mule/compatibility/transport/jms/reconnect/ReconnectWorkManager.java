@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.jms.reconnect;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 

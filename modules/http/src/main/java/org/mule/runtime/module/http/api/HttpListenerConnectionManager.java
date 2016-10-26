@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.api;
 
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.lifecycle.Disposable;

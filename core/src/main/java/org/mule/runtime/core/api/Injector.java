@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.exception.MuleException;
+
 /**
  * Component capable of injecting dependencies into a given object
  *

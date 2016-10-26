@@ -6,22 +6,15 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.mule.runtime.config.spring.parsers.PreProcessor;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.runtime.config.spring.parsers.processors.IdAttribute;
-import org.mule.runtime.config.spring.parsers.processors.NameAttribute;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.ParserContext;
+
 import org.w3c.dom.Element;
 
 public class ExceptionStrategyDefinitionParser extends ParentContextDefinitionParser {

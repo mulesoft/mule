@@ -12,8 +12,8 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

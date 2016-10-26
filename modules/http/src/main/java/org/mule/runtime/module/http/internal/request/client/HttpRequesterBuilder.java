@@ -11,7 +11,7 @@ import static org.mule.runtime.module.http.internal.request.SuccessStatusCodeVal
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.ObjectNameHelper;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.requester.HttpRequestOperationConfig;

@@ -8,7 +8,7 @@ package org.mule.compatibility.core.component;
 
 import org.mule.compatibility.core.api.component.JavaWithBindingsComponent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.construct.FlowConstruct;

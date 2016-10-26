@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.service;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Adds a resume lifecycle method to an object. This should only be used with {@link org.mule.runtime.core.service.Pausable}

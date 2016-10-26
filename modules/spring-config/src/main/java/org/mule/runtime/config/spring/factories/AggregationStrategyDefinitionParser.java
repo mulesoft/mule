@@ -8,7 +8,7 @@
 package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttribute;

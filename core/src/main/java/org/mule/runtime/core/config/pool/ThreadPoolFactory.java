@@ -8,11 +8,11 @@ package org.mule.runtime.core.config.pool;
 
 import static java.lang.Thread.currentThread;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.PreferredObjectSelector;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;

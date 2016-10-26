@@ -8,7 +8,7 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.StreamCloser;
 import org.mule.runtime.core.api.util.StreamCloserService;
 

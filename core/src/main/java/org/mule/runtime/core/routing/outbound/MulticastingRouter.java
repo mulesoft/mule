@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.slf4j.Logger;

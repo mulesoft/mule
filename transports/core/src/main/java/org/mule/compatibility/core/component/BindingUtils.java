@@ -9,7 +9,7 @@ package org.mule.compatibility.core.component;
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.api.component.JavaWithBindingsComponent;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.runtime.core.model.resolvers.TooManySatisfiableMethodsException;

@@ -7,7 +7,7 @@
 package org.mule.test.integration.transaction.xa;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.atomic.AtomicInteger;

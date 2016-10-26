@@ -6,14 +6,15 @@
  */
 package org.mule.compatibility.core.endpoint.inbound;
 
+import static org.mule.runtime.core.config.ExceptionHelper.getErrorCodePropertyName;
+import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.util.ObjectUtils;
 
 import org.slf4j.Logger;
@@ -55,11 +56,11 @@ public class InboundExceptionDetailsMessageProcessor implements Processor, MuleC
    * @param exception
    */
   protected Event setExceptionDetails(Event event, Connector connector, Throwable exception) {
-    String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(), muleContext);
+    String propName = getErrorCodePropertyName(connector.getProtocol(), muleContext);
     // If we dont find a error code property we can assume there are not
     // error code mappings for this connector
     if (propName != null) {
-      String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass(), muleContext);
+      String code = getErrorMapping(connector.getProtocol(), exception.getClass(), muleContext);
       if (logger.isDebugEnabled()) {
         logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
       }

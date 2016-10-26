@@ -7,7 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 
 /**

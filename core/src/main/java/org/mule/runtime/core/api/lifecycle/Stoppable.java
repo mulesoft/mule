@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * <code>Stoppable</code> is a lifecycle interfaqce that introduces a {@link #stop()} method to an object.

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.util.ArrayUtils;
 

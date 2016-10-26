@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.connector;
 
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>DispatchException</code> is thrown when a connector operation dispatcher fails to send, dispatch or receive a message.

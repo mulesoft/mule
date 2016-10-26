@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.management.agent;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.module.management.ManagementException;
 
 import javax.management.ObjectName;

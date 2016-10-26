@@ -8,7 +8,7 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Extension of {@link FlowProcessingPhaseTemplate} for those {@link org.mule.runtime.core.api.source.MessageSource} that requires

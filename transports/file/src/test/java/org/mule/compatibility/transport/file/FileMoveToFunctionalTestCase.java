@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.file;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

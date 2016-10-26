@@ -11,9 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.compatibility.transport.file.FileMuleMessageFactory;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.model.streaming.DelegatingInputStream;

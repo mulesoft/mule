@@ -8,7 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
 import org.mule.test.runner.maven.MavenModelFactory;
 

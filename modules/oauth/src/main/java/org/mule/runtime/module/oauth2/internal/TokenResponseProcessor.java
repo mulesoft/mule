@@ -9,6 +9,7 @@ package org.mule.runtime.module.oauth2.internal;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
 import java.util.HashMap;
@@ -93,6 +94,6 @@ public class TokenResponseProcessor {
 
   private boolean isEmpty(String value) {
     // TODO remove "null" check when MULE-8281 gets fixed.
-    return value == null || org.mule.runtime.core.util.StringUtils.isEmpty(value) || "null".equals(value);
+    return value == null || StringUtils.isEmpty(value) || "null".equals(value);
   }
 }

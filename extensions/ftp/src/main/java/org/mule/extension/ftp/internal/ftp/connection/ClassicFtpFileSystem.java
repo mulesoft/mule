@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.command.CopyCommand;
@@ -34,7 +34,7 @@ import org.mule.extension.ftp.internal.ftp.command.FtpReadCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpRenameCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpWriteCommand;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

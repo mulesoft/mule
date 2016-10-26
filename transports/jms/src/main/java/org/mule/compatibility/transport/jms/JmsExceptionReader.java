@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.jms;
 
-import org.mule.runtime.core.api.config.ExceptionReader;
+import org.mule.runtime.api.legacy.exception.ExceptionReader;
 
 import java.util.HashMap;
 import java.util.Map;

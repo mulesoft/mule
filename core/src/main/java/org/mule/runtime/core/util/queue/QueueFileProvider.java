@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.queue;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;

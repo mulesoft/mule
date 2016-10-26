@@ -9,7 +9,7 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
 import org.mule.tck.probe.PollingProber;

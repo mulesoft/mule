@@ -10,8 +10,6 @@ import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
-import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;

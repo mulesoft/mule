@@ -6,8 +6,8 @@
  */
 package org.mule.extension.validation.api;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.MuleException;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * The exception to be thrown by default when a validation fails. It's a pretty simple {@link MuleException} with the added

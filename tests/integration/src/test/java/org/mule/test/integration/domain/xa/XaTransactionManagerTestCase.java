@@ -8,7 +8,7 @@ package org.mule.test.integration.domain.xa;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.runtime.core.config.ExceptionHelper.getRootException;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

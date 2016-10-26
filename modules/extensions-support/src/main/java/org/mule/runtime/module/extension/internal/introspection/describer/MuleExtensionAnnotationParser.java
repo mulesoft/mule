@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.OnException;

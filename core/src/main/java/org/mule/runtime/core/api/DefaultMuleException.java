@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
  * <code>MuleException</code> Is the base exception type for the Mule application any other exceptions thrown by Mule code will be

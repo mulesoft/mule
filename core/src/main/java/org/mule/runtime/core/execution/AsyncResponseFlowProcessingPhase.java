@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
@@ -14,11 +13,7 @@ import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutio
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;

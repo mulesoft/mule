@@ -10,7 +10,7 @@ package org.mule.extension.db.internal.result.resultset;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.result.row.RowHandler;
 import org.mule.runtime.core.api.Closeable;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

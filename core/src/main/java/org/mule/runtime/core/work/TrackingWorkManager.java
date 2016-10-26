@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.work;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 
 import javax.resource.spi.work.ExecutionContext;

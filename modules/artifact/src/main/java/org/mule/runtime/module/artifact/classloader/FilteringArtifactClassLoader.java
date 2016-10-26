@@ -14,7 +14,7 @@ import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.module.artifact.classloader.exception.NotExportedClassException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;

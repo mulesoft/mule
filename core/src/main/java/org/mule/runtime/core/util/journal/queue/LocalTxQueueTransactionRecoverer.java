@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.journal.queue;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.queue.QueueProvider;
 import org.mule.runtime.core.util.queue.RecoverableQueueStore;

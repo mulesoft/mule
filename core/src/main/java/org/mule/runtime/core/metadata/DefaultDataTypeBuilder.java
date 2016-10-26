@@ -9,7 +9,7 @@ package org.mule.runtime.core.metadata;
 import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
 
 import org.mule.runtime.api.message.Message;

@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableList;
 import com.jcraft.jsch.*;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ import java.util.Properties;
 import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * Wrapper around jsch sftp library which provides access to basic sftp commands.

@@ -8,10 +8,8 @@ package org.mule.compatibility.transport.file.transformers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.compatibility.transport.file.transformers.FileToByteArray;
-import org.mule.compatibility.transport.file.transformers.FileToString;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;

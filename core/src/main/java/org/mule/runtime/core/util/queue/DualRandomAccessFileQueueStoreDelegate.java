@@ -8,7 +8,7 @@ package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.io.File;
 import java.io.Serializable;

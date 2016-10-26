@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;

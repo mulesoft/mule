@@ -41,7 +41,7 @@ import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemp
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.validation.internal.CommonValidationOperations;
 import org.mule.extension.validation.internal.CustomValidatorOperation;
 import org.mule.extension.validation.internal.DefaultExceptionFactory;
@@ -15,7 +15,7 @@ import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.extension.validation.internal.ValidationStrategies;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.context.MuleContextAware;

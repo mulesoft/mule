@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.client;
 
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 /**
  * Cache key used to locate an object in a map based on an URL and operation options.

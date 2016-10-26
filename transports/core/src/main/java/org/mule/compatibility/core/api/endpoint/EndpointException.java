@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.core.api.endpoint;
 
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>EndpointException</code> is an abstract exception extended by endpoint specific exceptions.

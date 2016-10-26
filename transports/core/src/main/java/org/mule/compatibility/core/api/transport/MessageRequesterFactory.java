@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * A factory interface for managing the lifecycles of a transport's message requesters. The methods basically implement the

@@ -21,13 +21,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.transport.jms.CustomCachingConnectionFactory;
-import org.mule.compatibility.transport.jms.Jms11Support;
-import org.mule.compatibility.transport.jms.JmsConnector;
-import org.mule.compatibility.transport.jms.JmsSupport;
 import org.mule.compatibility.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;

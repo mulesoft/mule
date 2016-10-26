@@ -20,7 +20,7 @@ import org.mule.compatibility.transport.http.ntlm.NTLMScheme;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

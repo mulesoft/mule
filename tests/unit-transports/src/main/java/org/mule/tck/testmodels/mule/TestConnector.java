@@ -19,7 +19,7 @@ import org.mule.compatibility.core.transport.AbstractMessageRequesterFactory;
 import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPool;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

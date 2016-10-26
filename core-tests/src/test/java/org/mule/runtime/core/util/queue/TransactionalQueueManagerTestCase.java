@@ -9,7 +9,7 @@ package org.mule.runtime.core.util.queue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

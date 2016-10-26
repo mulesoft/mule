@@ -16,9 +16,9 @@ import static org.mule.functional.functional.InvocationCountMessageProcessor.get
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.construct.Flow;

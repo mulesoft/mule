@@ -7,8 +7,8 @@
 package org.mule.runtime.module.management.agent;
 
 import org.mule.runtime.core.AbstractAgent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -275,7 +275,7 @@ public abstract class AbstractJmxAgent extends AbstractAgent {
   /**
    * Register a Java Service Wrapper agent.
    *
-   * @throws org.mule.runtime.core.api.MuleException if registration failed
+   * @throws MuleException if registration failed
    */
   protected void registerWrapperService() throws MuleException {
     // WrapperManager to support restarts

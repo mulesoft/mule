@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.registry;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.schedule.Scheduler;
@@ -106,7 +106,7 @@ public interface MuleRegistry extends LifecycleRegistry {
    *
    * @param object the object to process
    * @return the same object with any processors and lifecycle methods called
-   * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change or process object
+   * @throws MuleException if the registry fails to perform the lifecycle change or process object
    *         processors for the object.
    */
   Object applyProcessorsAndLifecycle(Object object) throws MuleException;
@@ -119,7 +119,7 @@ public interface MuleRegistry extends LifecycleRegistry {
    *
    * @param object the object to process
    * @return the same object with any processors called
-   * @throws org.mule.runtime.core.api.MuleException if the registry fails to process object processors for the object.
+   * @throws MuleException if the registry fails to process object processors for the object.
    */
   Object applyProcessors(Object object) throws MuleException;
 

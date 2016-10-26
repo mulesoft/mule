@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 public class BasicUnauthorisedException extends UnauthorisedException implements ErrorMessageAwareException {
 

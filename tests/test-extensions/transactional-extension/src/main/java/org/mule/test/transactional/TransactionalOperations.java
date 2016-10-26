@@ -6,7 +6,7 @@
  */
 package org.mule.test.transactional;
 
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
 public class TransactionalOperations {

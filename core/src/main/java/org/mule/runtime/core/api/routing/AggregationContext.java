@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.util.Collections;
 import java.util.List;

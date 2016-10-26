@@ -18,13 +18,9 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.function.Function;
 

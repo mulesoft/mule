@@ -7,7 +7,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;

@@ -19,7 +19,7 @@ import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.ValueHolder;

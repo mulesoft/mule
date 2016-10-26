@@ -8,13 +8,10 @@ package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runner.RunWith;

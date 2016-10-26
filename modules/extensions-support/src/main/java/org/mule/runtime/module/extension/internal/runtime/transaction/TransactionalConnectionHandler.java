@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.internal.connection.ConnectionHandlerAdapter;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;

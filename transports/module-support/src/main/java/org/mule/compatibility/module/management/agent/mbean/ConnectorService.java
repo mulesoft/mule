@@ -8,7 +8,7 @@ package org.mule.compatibility.module.management.agent.mbean;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 public class ConnectorService implements ConnectorServiceMBean {

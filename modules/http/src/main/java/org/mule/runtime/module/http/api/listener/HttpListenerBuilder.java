@@ -10,7 +10,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
@@ -20,7 +20,7 @@ import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.runtime.module.http.internal.listener.HttpListenerConfigBuilder;
 import org.mule.runtime.module.http.internal.listener.HttpResponseBuilder;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.net.MalformedURLException;
 import java.net.URL;

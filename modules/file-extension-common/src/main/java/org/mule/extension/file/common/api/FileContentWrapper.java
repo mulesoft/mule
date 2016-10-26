@@ -8,7 +8,7 @@ package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;

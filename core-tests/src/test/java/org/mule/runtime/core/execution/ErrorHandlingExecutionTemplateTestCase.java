@@ -152,7 +152,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   public void testTransactionIsNotRollbackOnClassHierarchyPatternException() throws Exception {
     ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    configureExceptionListener(null, "org.mule.runtime.core.api.MuleException+");
+    configureExceptionListener(null, "org.mule.runtime.api.exception.MuleException+");
     try {
       executionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
       fail("MessagingException must be thrown");
@@ -182,7 +182,8 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   public void testTransactionIsRollbackOnPatternAppliesToRollbackAndCommit() throws Exception {
     ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    configureExceptionListener("org.mule.runtime.core.api.MuleException+", "org.mule.runtime.core.exception.MessagingException");
+    configureExceptionListener("org.mule.runtime.api.exception.MuleException+",
+                               "org.mule.runtime.core.exception.MessagingException");
     try {
       executionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
       fail("MessagingException must be thrown");

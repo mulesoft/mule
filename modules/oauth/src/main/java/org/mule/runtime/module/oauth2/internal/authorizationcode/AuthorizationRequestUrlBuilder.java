@@ -9,7 +9,7 @@ package org.mule.runtime.module.oauth2.internal.authorizationcode;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import org.mule.runtime.module.oauth2.internal.OAuthConstants;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

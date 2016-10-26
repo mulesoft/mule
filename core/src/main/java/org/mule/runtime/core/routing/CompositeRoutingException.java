@@ -8,11 +8,11 @@
 package org.mule.runtime.core.routing;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Collections;

@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.util;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.object.AbstractObjectFactory;
 
 import org.springframework.beans.BeansException;

@@ -8,7 +8,7 @@ package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.module.xml.transformer.datatype.CollectionDataTypeXStreamConverter;
 import org.mule.runtime.module.xml.transformer.datatype.SimpleDataTypeXStreamConverter;

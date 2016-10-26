@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api.security;
 
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>CryptoFailureException</code> is a generic exception thrown by an CryptoStrategy if encryption or decryption fails. The

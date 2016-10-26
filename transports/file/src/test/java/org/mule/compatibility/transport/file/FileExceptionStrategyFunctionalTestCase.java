@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;

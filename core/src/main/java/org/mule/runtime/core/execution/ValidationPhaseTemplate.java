@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Phase for validation of the incoming message.
@@ -29,7 +29,7 @@ public interface ValidationPhaseTemplate extends MessageProcessTemplate {
   /**
    * Discards the message because the validation failed
    *
-   * @throws org.mule.runtime.core.api.MuleException
+   * @throws MuleException
    */
   void discardInvalidMessage() throws MuleException;
 }

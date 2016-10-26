@@ -8,7 +8,7 @@ package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 

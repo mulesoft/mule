@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.module.cxf.CxfConstants.UNWRAP_MULE_EXCEPTIONS;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
-import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
 
@@ -96,7 +97,7 @@ public class MuleInvoker implements Invoker {
       // See MULE-6329
       String unwrapMuleExceptions = getVariableValueOrNull(UNWRAP_MULE_EXCEPTIONS, event);
       if (Boolean.valueOf(unwrapMuleExceptions)) {
-        cause = ExceptionHelper.getNonMuleException(e);
+        cause = getNonMuleException(e);
         // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a
         // ScriptException
         if (cause instanceof ScriptException && cause.getCause() != null) {

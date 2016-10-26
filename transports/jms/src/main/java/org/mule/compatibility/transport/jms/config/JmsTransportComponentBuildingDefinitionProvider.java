@@ -13,7 +13,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.compatibility.config.spring.TransportComponentBuildingDefinitionProvider;
 import org.mule.compatibility.transport.jms.JmsClientAcknowledgeTransactionFactory;
@@ -30,8 +30,7 @@ import org.mule.compatibility.transport.jms.weblogic.WeblogicJmsConnector;
 import org.mule.compatibility.transport.jms.websphere.WebsphereJmsConnector;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;

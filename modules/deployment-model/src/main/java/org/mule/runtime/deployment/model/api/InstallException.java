@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  *

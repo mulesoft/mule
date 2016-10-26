@@ -7,8 +7,8 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 public class FailingRouter extends AbstractFilteringMessageProcessor {

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.jndi;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

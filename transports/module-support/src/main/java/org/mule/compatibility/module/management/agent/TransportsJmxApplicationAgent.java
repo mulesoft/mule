@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.management.agent;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.management.agent.AbstractJmxAgentExtension;
 
 import javax.management.InstanceAlreadyExistsException;

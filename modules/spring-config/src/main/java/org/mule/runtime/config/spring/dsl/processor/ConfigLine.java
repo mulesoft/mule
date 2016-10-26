@@ -7,12 +7,8 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
-import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.core.util.Preconditions;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;

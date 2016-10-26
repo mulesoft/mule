@@ -9,7 +9,7 @@ package org.mule.runtime.core.registry;
 import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAction.ADDED;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;

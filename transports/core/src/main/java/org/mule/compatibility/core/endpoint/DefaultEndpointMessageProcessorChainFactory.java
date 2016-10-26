@@ -21,11 +21,11 @@ import org.mule.compatibility.core.endpoint.outbound.OutboundLoggingMessageProce
 import org.mule.compatibility.core.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundRootMessageIdPropertyMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.EndpointTransactionalInterceptingMessageProcessor;

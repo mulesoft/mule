@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;

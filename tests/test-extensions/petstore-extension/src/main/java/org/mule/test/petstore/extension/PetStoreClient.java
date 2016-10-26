@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 
 public class PetStoreClient {
 

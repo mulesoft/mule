@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.security;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>UnsupportedAuthenticationSchemeException</code> is thrown when a authentication scheme is being used on the message that

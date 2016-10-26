@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;

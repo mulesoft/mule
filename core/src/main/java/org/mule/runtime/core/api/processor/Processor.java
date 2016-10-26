@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import org.reactivestreams.Publisher;
 
