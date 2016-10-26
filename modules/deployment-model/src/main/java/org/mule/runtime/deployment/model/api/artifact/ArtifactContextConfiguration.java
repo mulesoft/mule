@@ -158,7 +158,9 @@ public class ArtifactContextConfiguration {
     }
 
     /**
-     * When the {@link ArtifactContext} is created lazily then
+     * When the {@link ArtifactContext} is created lazily then not all the services or configuration components are created. Only
+     * those requested by subsequent calls to {@link ArtifactContext} get created. This means components are created on demand
+     * based on request calls to each service exposed.
      *
      * @param enableLazyInitialization true if the {@link ArtifactContext} must be created lazily.
      * @return {@code this} builder
@@ -169,8 +171,8 @@ public class ArtifactContextConfiguration {
     }
 
     /**
-     * 
-     * @param serviceConfigurators
+     * @param serviceConfigurators list of {@link MuleContextServiceConfigurator} that register or override services in the
+     *        {@link MuleContext}.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setServiceConfigurators(List<MuleContextServiceConfigurator> serviceConfigurators) {
@@ -179,8 +181,7 @@ public class ArtifactContextConfiguration {
     }
 
     /**
-     * 
-     * @param parentContext
+     * @param parentContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setParentContext(MuleContext parentContext) {
@@ -188,6 +189,9 @@ public class ArtifactContextConfiguration {
       return this;
     }
 
+    /**
+     * @return creates a {@link ArtifactContextConfiguration} with te provided configuration.
+     */
     public ArtifactContextConfiguration build() {
       return artifactContextConfiguration;
     }
