@@ -40,7 +40,7 @@ public class SpringArtifactConfigurationProcessor implements ArtifactConfigurati
     artifactContextConfiguration.getParentContext()
         .ifPresent(parentMuleContext -> springXmlConfigurationBuilder.setParentContext(parentMuleContext));
     artifactContextConfiguration.getServiceConfigurators().stream()
-            .forEach(springXmlConfigurationBuilder::addServiceConfigurator);
+        .forEach(springXmlConfigurationBuilder::addServiceConfigurator);
     springXmlConfigurationBuilder.configure(artifactContextConfiguration.getMuleContext());
     return new SpringArtifactContext(springXmlConfigurationBuilder.getMuleArtifactContext());
   }
