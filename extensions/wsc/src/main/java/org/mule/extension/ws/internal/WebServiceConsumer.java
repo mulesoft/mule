@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
+//TODO: Remove when MULE-10839 it's fixed
 @Export(classes = WscException.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
