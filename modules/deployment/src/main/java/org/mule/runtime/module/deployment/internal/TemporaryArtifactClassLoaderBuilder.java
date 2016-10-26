@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
@@ -54,7 +55,7 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    */
   @Override
   public MuleDeployableArtifactClassLoader build() throws IOException {
-    setArtifactDescriptor(new ArtifactDescriptor("temp"));
+    setDeployableArtifactDescriptor(new DeployableArtifactDescriptor("temp"));
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 

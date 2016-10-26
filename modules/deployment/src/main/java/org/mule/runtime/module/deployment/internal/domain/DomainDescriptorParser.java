@@ -37,7 +37,6 @@ public class DomainDescriptorParser {
     final DomainDescriptor domainDescriptor = new DomainDescriptor(artifactName);
     domainDescriptor.setRedeploymentEnabled(toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, TRUE.toString())));
     domainDescriptor.setArtifactLocation(location);
-    domainDescriptor.setRootFolder(location.getParentFile());
     return domainDescriptor;
   }
 }

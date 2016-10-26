@@ -52,7 +52,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   public void setUp() throws IOException {
     System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
     when(artifactPluginDescriptorFactory.create(anyObject()))
-        .thenAnswer(invocation -> new ArtifactPluginDescriptor(((File) invocation.getArguments()[0]).getName()));
+        .thenAnswer(invocation -> new ArtifactPluginDescriptor(((File) invocation.getArguments()[0]).getName().replace(".zip",
+                                                                                                                       "")));
 
     pluginsLibFolder = createContainerAppPluginsFolder();
   }
@@ -64,7 +65,7 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void unzipPluginZipFileCreateDescriptor() throws Exception {
+  public void zipPluginZipFileCreateDescriptor() throws Exception {
     File zipPlugin = createPluginZipFile(pluginsLibFolder, PLUGIN_NAME);
 
     final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
@@ -73,8 +74,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
     ArtifactPluginDescriptor descriptor = descriptorList.get(0);
     assertThat(descriptor.getName(), is(PLUGIN_NAME));
 
-    assertThat(zipPlugin.exists(), is(false));
-    assertThat(new File(pluginsLibFolder, descriptor.getName()).exists(), is(true));
+    assertThat(zipPlugin.exists(), is(true));
+    assertThat(new File(pluginsLibFolder, descriptor.getName() + ".zip").exists(), is(true));
   }
 
   @Test

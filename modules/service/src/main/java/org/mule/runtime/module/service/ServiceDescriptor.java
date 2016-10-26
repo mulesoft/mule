@@ -12,6 +12,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
+import java.io.File;
+
 /**
  * Describes how to create a {@link Service} instance.
  */
@@ -20,6 +22,7 @@ public class ServiceDescriptor extends ArtifactDescriptor {
   public static final String SERVICE_PROPERTIES = "service.properties";
 
   private String serviceProviderClassName;
+  private File rootFolder;
 
   /**
    * Creates a new service descriptor
@@ -28,6 +31,18 @@ public class ServiceDescriptor extends ArtifactDescriptor {
    */
   public ServiceDescriptor(String name) {
     super(name);
+  }
+
+  public File getRootFolder() {
+    return rootFolder;
+  }
+
+  public void setRootFolder(File rootFolder) {
+    if (rootFolder == null) {
+      throw new IllegalArgumentException("Root folder cannot be null");
+    }
+
+    this.rootFolder = rootFolder;
   }
 
   public String getServiceProviderClassName() {

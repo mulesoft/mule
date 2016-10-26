@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
@@ -45,7 +46,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
-  private ArtifactDescriptor artifactDescriptor;
+  private DeployableArtifactDescriptor deployableArtifactDescriptor;
   private ArtifactClassLoader parentClassLoader;
   private List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
 
@@ -97,11 +98,11 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   }
 
   /**
-   * @param artifactDescriptor the descriptor of the artifact for which the class loader is going to be created.
+   * @param deployableArtifactDescriptor the descriptor of the artifact for which the class loader is going to be created.
    * @return the builder
    */
-  public T setArtifactDescriptor(ArtifactDescriptor artifactDescriptor) {
-    this.artifactDescriptor = artifactDescriptor;
+  public T setDeployableArtifactDescriptor(DeployableArtifactDescriptor deployableArtifactDescriptor) {
+    this.deployableArtifactDescriptor = deployableArtifactDescriptor;
     return (T) this;
   }
 
@@ -113,12 +114,12 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
   public ArtifactClassLoader build() throws IOException {
-    checkState(artifactDescriptor != null, "artifact descriptor cannot be null");
+    checkState(deployableArtifactDescriptor != null, "artifact descriptor cannot be null");
     parentClassLoader = getParentClassLoader();
     checkState(parentClassLoader != null, "parent class loader cannot be null");
-    final String artifactId = getArtifactId(artifactDescriptor);
+    final String artifactId = getArtifactId(deployableArtifactDescriptor);
     RegionClassLoader regionClassLoader =
-        new RegionClassLoader(artifactId, artifactDescriptor, parentClassLoader.getClassLoader(),
+        new RegionClassLoader(artifactId, deployableArtifactDescriptor, parentClassLoader.getClassLoader(),
                               parentClassLoader.getClassLoaderLookupPolicy());
 
     List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = createContainerApplicationPlugins();
@@ -129,8 +130,9 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         createPluginClassLoaders(artifactId, regionClassLoader, effectiveArtifactPluginDescriptors);
 
     final ArtifactClassLoader artifactClassLoader =
-        artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
-    regionClassLoader.addClassLoader(artifactClassLoader, artifactDescriptor.getClassLoaderFilter());
+        artifactClassLoaderFactory.create(artifactId, regionClassLoader, deployableArtifactDescriptor,
+                                          artifactPluginClassLoaders);
+    regionClassLoader.addClassLoader(artifactClassLoader, deployableArtifactDescriptor.getClassLoaderFilter());
 
     for (int i = 0; i < effectiveArtifactPluginDescriptors.size(); i++) {
       final ArtifactClassLoaderFilter classLoaderFilter = effectiveArtifactPluginDescriptors.get(i).getClassLoaderFilter();

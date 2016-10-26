@@ -7,28 +7,22 @@
 
 package org.mule.runtime.module.deployment.internal.plugin;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
-
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.classloadermodel.ClassloaderModel;
+import org.mule.runtime.deployment.model.api.plugin.classloadermodel.MalformedClassloaderModelException;
+import org.mule.runtime.deployment.model.api.plugin.dependency.ArtifactDependency;
+import org.mule.runtime.deployment.model.api.plugin.loader.MalformedPluginException;
+import org.mule.runtime.deployment.model.api.plugin.loader.Plugin;
+import org.mule.runtime.deployment.model.internal.plugin.classloadermodel.ClassloaderModelLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.io.filefilter.SuffixFileFilter;
+import java.util.stream.Collectors;
 
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
@@ -49,57 +43,40 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   }
 
   @Override
-  public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {
-    final String pluginName = pluginFolder.getName();
-    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginName);
-    descriptor.setRootFolder(pluginFolder);
-
-    final File pluginPropsFile = new File(pluginFolder, PLUGIN_PROPERTIES);
-    if (pluginPropsFile.exists()) {
-      Properties props;
-      try {
-        props = loadProperties(pluginPropsFile.toURI().toURL());
-      } catch (IOException e) {
-        throw new ArtifactDescriptorCreateException("Cannot read plugin.properties file", e);
-      }
-
-      String exportedClasses = props.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY);
-      String exportedResources = props.getProperty(EXPORTED_RESOURCE_PROPERTY);
-
-      final ArtifactClassLoaderFilter classLoaderFilter = classLoaderFilterFactory.create(exportedClasses, exportedResources);
-      descriptor.setClassLoaderFilter(classLoaderFilter);
-
-      String pluginDependencies = props.getProperty(PLUGIN_DEPENDENCIES);
-      if (!isEmpty(pluginDependencies)) {
-        descriptor.setPluginDependencies(getPluginDependencies(pluginDependencies));
-      }
-    }
-
+  public ArtifactPluginDescriptor create(File pluginLocation) throws ArtifactDescriptorCreateException {
+    Plugin plugin;
     try {
-      descriptor.setRuntimeClassesDir(new File(pluginFolder, "classes").toURI().toURL());
-      final File libDir = new File(pluginFolder, "lib");
-      URL[] urls = new URL[0];
-      if (libDir.exists()) {
-        final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(".jar"));
-        urls = new URL[jars.length];
-        for (int i = 0; i < jars.length; i++) {
-          urls[i] = jars[i].toURI().toURL();
-        }
-      }
-      descriptor.setRuntimeLibs(urls);
-    } catch (MalformedURLException e) {
-      throw new ArtifactDescriptorCreateException("Failed to create plugin descriptor " + pluginFolder);
+      plugin = Plugin.from(pluginLocation);
+    } catch (MalformedPluginException e) {
+      throw new ArtifactDescriptorCreateException(format("There was an issue loading the plugin descriptor for %s",
+                                                         pluginLocation.getName()),
+                                                  e);
     }
-
+    ClassloaderModel classloaderModel;
+    try {
+      classloaderModel = ClassloaderModelLoader.from(plugin);
+    } catch (MalformedClassloaderModelException e) {
+      throw new ArtifactDescriptorCreateException(format("There was an issue loading the deployment model for %s",
+                                                         plugin.getPluginDescriptor().getName()),
+                                                  e);
+    }
+    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(plugin.getPluginDescriptor().getName());
+    //TODO MULE-10875 temporary workaround, neither /classes nor /lib/some.jar should be in the current descriptor
+    if (classloaderModel.getRuntimeClasses().isPresent()) {
+      descriptor.setRuntimeClassesDir(classloaderModel.getRuntimeClasses().get());
+    }
+    descriptor.setRuntimeLibs(classloaderModel.getRuntimeLibs());
+    //TODO MULE-10875 temporary workaround until the factory is removed from the ArtifactPluginDescriptor. the classloader filter must be generated when needed and no beforehand
+    descriptor.setClassLoaderFilter(classLoaderFilterFactory.create(String.join(",", classloaderModel.getExportedPackages()),
+                                                                    String.join(",", classloaderModel.getExportedResources())));
+    descriptor.setPluginDependencies(getPluginDependencies(classloaderModel.getDependencies()));
     return descriptor;
   }
 
-  private Set<String> getPluginDependencies(String pluginDependencies) {
-    Set<String> plugins = new HashSet<>();
-    final String[] split = pluginDependencies.split(",");
-    for (String plugin : split) {
-      plugins.add(plugin.trim());
-    }
-    return plugins;
+  private Set<String> getPluginDependencies(Set<ArtifactDependency> dependencies) {
+    return dependencies.stream()
+        .filter(dependency -> "mule-plugin".equals(dependency.getClassifier()))
+        .map(dependency -> dependency.getArtifactId()) //TODO MULE-10440 until the plugin.properties identifies all dependencies better, we will work with this
+        .collect(Collectors.toSet());
   }
 }

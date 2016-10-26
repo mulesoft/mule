@@ -81,7 +81,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
 
   @Test
   public void createClassLoaderFromDomainDescriptor() {
-    final String domainName = "descriptor-domain";
+    final String domainName = "classloadermodel-domain";
     final String artifactId = getDomainId(domainName);
     DomainDescriptor descriptor = getTestDescriptor(domainName);
     createDomainDir(MULE_DOMAIN_FOLDER, domainName);
