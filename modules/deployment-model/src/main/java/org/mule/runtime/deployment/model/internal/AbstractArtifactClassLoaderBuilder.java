@@ -15,11 +15,11 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.plugin.NamePluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
@@ -42,7 +42,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
-  private final ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory;
+  private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
   private ArtifactDescriptor artifactDescriptor;
@@ -58,7 +58,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    */
   public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                             ArtifactPluginRepository artifactPluginRepository,
-                                            ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory) {
+                                            ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
     checkArgument(artifactClassLoaderFactory != null, "artifact class loader factory cannot be null");
     checkArgument(artifactPluginRepository != null, "artifact plugin repository cannot be null");
     checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");

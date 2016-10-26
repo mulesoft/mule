@@ -13,6 +13,7 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
@@ -46,10 +48,14 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
   @Rule
   public TemporaryFolder tempMuleHome = new TemporaryFolder();
 
-  private String previousMuleHome;
   private final ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
   private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+  private final NativeLibraryFinderFactory nativeLibraryFinderFactory = mock(NativeLibraryFinderFactory.class);
+  private final MuleApplicationClassLoaderFactory classLoaderFactory =
+      new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
+  private String previousMuleHome;
   private URL classesFolderUrl;
+  private ApplicationDescriptor descriptor;
 
   @Before
   public void createAppClassLoader() throws IOException {
@@ -62,12 +68,16 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     final File appLibrary = new File(libDir, "appLibrary.jar");
     stringToFile(appLibrary.getAbsolutePath(), "Some text");
 
+    when(classLoaderLookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(classLoaderLookupPolicy);
     when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
 
     classesFolderUrl = getAppClassesFolder(APP_NAME).toURI().toURL();
 
     when(classLoaderLookupPolicy.extend(anyMap())).thenReturn(classLoaderLookupPolicy);
+    descriptor = new ApplicationDescriptor(APP_NAME);
+    descriptor.setDomain(DOMAIN_NAME);
+    descriptor.setClassesFolder(toFile(classesFolderUrl));
   }
 
   @After
@@ -80,13 +90,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
   @Test
   public void createsClassLoader() throws Exception {
-    final NativeLibraryFinderFactory nativeLibraryFinderFactory = mock(NativeLibraryFinderFactory.class);
-
-    MuleApplicationClassLoaderFactory classLoaderFactory = new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
-
-    final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
-    descriptor.setDomain(DOMAIN_NAME);
-    descriptor.setClassesFolder(toFile(classesFolderUrl));
 
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());

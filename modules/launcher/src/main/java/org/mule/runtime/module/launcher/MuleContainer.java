@@ -70,7 +70,7 @@ public class MuleContainer {
   private final RepositoryService repositoryService;
   private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
-  private MuleArtifactResourcesRegistry artifactResourcesRegistry;
+  private MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry();
 
   static {
     if (System.getProperty(MuleProperties.MULE_SIMPLE_LOG) == null) {
@@ -95,8 +95,6 @@ public class MuleContainer {
 
   public MuleContainer(String[] args) {
     init(args);
-
-    artifactResourcesRegistry = new MuleArtifactResourcesRegistry();
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
 
@@ -177,6 +175,7 @@ public class MuleContainer {
 
       coreExtensionManager.setDeploymentService(deploymentService);
       coreExtensionManager.setRepositoryService(repositoryService);
+      coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
       coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.initialise();
       coreExtensionManager.start();

@@ -7,9 +7,11 @@
 package org.mule.runtime.deployment.model.internal.application;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -34,7 +36,14 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
 
+  /**
+   * Creates a new factory
+   *
+   * @param nativeLibraryFinderFactory creates {@link NativeLibraryFinder} for the created applications. Non null
+   */
   public MuleApplicationClassLoaderFactory(NativeLibraryFinderFactory nativeLibraryFinderFactory) {
+
+    checkArgument(nativeLibraryFinderFactory != null, "nativeLibraryFinderFactory cannot be null");
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
   }
 

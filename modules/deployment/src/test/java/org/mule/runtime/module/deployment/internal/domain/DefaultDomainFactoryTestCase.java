@@ -6,34 +6,33 @@
  */
 package org.mule.runtime.module.deployment.internal.domain;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.deployment.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
-
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
-import static org.mule.runtime.module.deployment.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Set;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
-  private DomainFactory domainFactory = new DefaultDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                                                                 new DefaultDomainManager(), containerClassLoader);
+  private final ArtifactClassLoaderManager artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
+  private final DomainFactory domainFactory = new DefaultDomainFactory(
+                                                                       new DomainClassLoaderFactory(getClass().getClassLoader()),
+                                                                       new DefaultDomainManager(), containerClassLoader);
 
   public DefaultDomainFactoryTestCase() throws IOException {}
 
@@ -41,7 +40,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   public void createDefaultDomain() throws IOException {
     createDomainDir(MULE_DOMAIN_FOLDER, DEFAULT_DOMAIN_NAME);
 
-    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true, is(empty()));
+    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true);
   }
 
   @Test
@@ -49,7 +48,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     String domainName = "custom-domain";
     createDomainDir(MULE_DOMAIN_FOLDER, domainName);
 
-    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true, is(empty()));
+    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true);
   }
 
   @Test
@@ -58,10 +57,10 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     createDomainDir(MULE_DOMAIN_FOLDER, domainName);
     createDeployPropertiesFile(domainName);
 
-    createAndVerifyDomain(domainName, false, containsInAnyOrder("org.mycom.MyClass", "org.yourcom"));
+    createAndVerifyDomain(domainName, false);
   }
 
-  private void createAndVerifyDomain(String name, boolean redeployment, Matcher<? super Set<String>> loaderOverridesMatcher)
+  private void createAndVerifyDomain(String name, boolean redeployment)
       throws IOException {
     Domain domain = domainFactory.createArtifact(new File(name));
     assertThat(domain.getArtifactName(), is(name));

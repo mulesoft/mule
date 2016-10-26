@@ -20,6 +20,7 @@ import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 public class FileSystemServiceProviderDiscoverer implements ServiceProviderDiscoverer {
 
   private final ArtifactClassLoader apiClassLoader;
-  private ServiceClassLoaderFactory serviceClassLoaderFactory = new ServiceClassLoaderFactory();
+  private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory;
 
   /**
    * Creates a new instance.
@@ -43,7 +44,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
-                                             ServiceClassLoaderFactory serviceClassLoaderFactory) {
+                                             ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory) {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
     checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
     this.apiClassLoader = containerClassLoader;
@@ -72,7 +73,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   private List<ServiceProvider> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
-                                                       ServiceClassLoaderFactory serviceClassLoaderFactory)
+                                                       ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
       throws ServiceResolutionError {
     List<ServiceProvider> serviceProviders = new LinkedList<>();
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {

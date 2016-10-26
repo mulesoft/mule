@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
@@ -36,6 +38,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private RepositoryService repositoryService;
   private ToolingService toolingService;
   private List<MuleCoreExtension> orderedCoreExtensions;
+  private ArtifactClassLoaderManager artifactClassLoaderManager;
 
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
@@ -117,6 +120,10 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         ((CoreExtensionsAware) extension).setCoreExtensions(orderedCoreExtensions);
       }
 
+      if (extension instanceof ArtifactClassLoaderManagerAware) {
+        ((ArtifactClassLoaderManagerAware) extension).setArtifactClassLoaderManager(artifactClassLoaderManager);
+      }
+
       extension.initialise();
     }
   }
@@ -133,5 +140,10 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   public void setToolingService(ToolingService toolingService) {
     this.toolingService = toolingService;
+  }
+
+  @Override
+  public void setArtifactClassLoaderManager(ArtifactClassLoaderManager artifactClassLoaderManager) {
+    this.artifactClassLoaderManager = artifactClassLoaderManager;
   }
 }
