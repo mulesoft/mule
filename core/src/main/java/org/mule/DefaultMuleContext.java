@@ -7,10 +7,6 @@
 package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
-
-import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -41,7 +37,6 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
-import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.api.store.ListableObjectStore;
@@ -360,7 +355,10 @@ public class DefaultMuleContext implements MuleContext
     {
         try
         {
-            startIfNeeded(messageSource);
+            if (messageSource instanceof Startable)
+            {
+                ((Startable) messageSource).start();
+            }
         }
         catch (ConnectException e)
         {
