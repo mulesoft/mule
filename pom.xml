@@ -235,7 +235,7 @@
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <muleCommonVersion>3.8.0</muleCommonVersion>
-        <allure.junit.version>1.4.23.HOTFIX1</allure.junit.version>
+        <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -274,6 +274,8 @@
         <aetherVersion>1.0.2.v20150114</aetherVersion>
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
         <powermockVersion>1.6.5</powermockVersion>
+        <allure.maven.plugin.version>2.5</allure.maven.plugin.version>
+        <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
@@ -691,7 +693,7 @@
             <dependency>
                 <groupId>ru.yandex.qatools.allure</groupId>
                 <artifactId>allure-junit-adaptor</artifactId>
-                <version>${allure.junit.version}</version>
+                <version>${allureJunitVersion}</version>
             </dependency>
 
             <!--Logging-->
@@ -2232,10 +2234,6 @@
         <profile>
             <id>allure</id>
 
-            <properties>
-                <allure.aspectj.version>${aspectjVersion}</allure.aspectj.version>
-            </properties>
-
             <build>
                 <pluginManagement>
                     <plugins>
@@ -2245,7 +2243,7 @@
                             <configuration>
                                 <testFailureIgnore>true</testFailureIgnore>
                                 <argLine>
-                                    -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${allure.aspectj.version}/aspectjweaver-${allure.aspectj.version}.jar
+                                    -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
                                 </argLine>
                                 <properties>
                                     <property>
@@ -2261,7 +2259,7 @@
                                 <dependency>
                                     <groupId>org.aspectj</groupId>
                                     <artifactId>aspectjweaver</artifactId>
-                                    <version>${allure.aspectj.version}</version>
+                                    <version>${aspectjVersion}</version>
                                 </dependency>
                             </dependencies>
                         </plugin>
@@ -2270,7 +2268,7 @@
                         <plugin>
                             <groupId>org.eclipse.jetty</groupId>
                             <artifactId>jetty-maven-plugin</artifactId>
-                            <version>9.2.10.v20150310</version>
+                            <version>${jetty.maven.plugin.version}</version>
                             <configuration>
                                 <webAppSourceDirectory>${project.build.directory}/site/allure-maven-plugin</webAppSourceDirectory>
                                 <stopKey>stop</stopKey>
@@ -2287,7 +2285,7 @@
                     <plugin>
                         <groupId>ru.yandex.qatools.allure</groupId>
                         <artifactId>allure-maven-plugin</artifactId>
-                        <version>2.5</version>
+                        <version>${allure.maven.plugin.version}</version>
                     </plugin>
                 </plugins>
             </reporting>
