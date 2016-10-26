@@ -20,6 +20,8 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
@@ -33,11 +35,11 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory {
+public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory implements AutoCloseable {
 
   private final Set<String> extraBootPackages;
   private final URL[] urls;
-  private final ClassLoader classLoader;
+  private final URLClassLoader classLoader;
 
   /**
    * Factory class that extends the default way to create a container {@link ArtifactClassLoader} in order to support the
@@ -123,4 +125,15 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
     return new ContainerModuleDiscoverer(Thread.currentThread().getContextClassLoader()).discover();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close() {
+    try {
+      classLoader.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 }

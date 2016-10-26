@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
@@ -58,37 +59,37 @@ public class PluginResourcesResolver {
     Set<String> exportPackages;
     Set<String> exportResources;
 
-    URLClassLoader pluginCL = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null);
-    URL manifestUrl = pluginCL.findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
-    if (manifestUrl != null) {
-      logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
-                   pluginUrlClassification.getName());
-      ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-      exportPackages = newHashSet(extensionManifest.getExportedPackages());
-      exportResources = newHashSet(extensionManifest.getExportedResources());
-    } else {
-      logger.debug("Plugin '{}' will be handled as standard plugin", pluginUrlClassification.getName());
-      ClassLoader pluginArtifactClassLoader =
-          new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null);
-      URL pluginPropertiesUrl = pluginArtifactClassLoader.getResource(PLUGIN_PROPERTIES);
-      if (pluginPropertiesUrl == null) {
-        throw new IllegalStateException(PLUGIN_PROPERTIES + " couldn't be found for plugin: " +
-            pluginUrlClassification.getName());
+    try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
+      URL manifestUrl = classLoader.findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
+      if (manifestUrl != null) {
+        logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
+                     pluginUrlClassification.getName());
+        ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
+        exportPackages = newHashSet(extensionManifest.getExportedPackages());
+        exportResources = newHashSet(extensionManifest.getExportedResources());
+      } else {
+        logger.debug("Plugin '{}' will be handled as standard plugin", pluginUrlClassification.getName());
+        URL pluginPropertiesUrl = classLoader.getResource(PLUGIN_PROPERTIES);
+        if (pluginPropertiesUrl == null) {
+          throw new IllegalStateException(PLUGIN_PROPERTIES + " couldn't be found for plugin: " +
+              pluginUrlClassification.getName());
+        }
+        Properties pluginProperties;
+        try {
+          pluginProperties = PropertiesUtils.loadProperties(pluginPropertiesUrl);
+        } catch (IOException e) {
+          throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
+        }
+        exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY).split(COMMA_CHARACTER));
+        exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY).split(COMMA_CHARACTER));
       }
-      Properties pluginProperties;
-      try {
-        pluginProperties = PropertiesUtils.loadProperties(pluginPropertiesUrl);
-      } catch (IOException e) {
-        throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
-      }
-      exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY).split(COMMA_CHARACTER));
-      exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY).split(COMMA_CHARACTER));
+
+      return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
+                                         pluginUrlClassification.getExportClasses(),
+                                         pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-
-    return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
-                                       pluginUrlClassification.getExportClasses(),
-                                       pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources);
-
   }
 
 }
