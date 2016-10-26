@@ -12,7 +12,6 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
 /**
  * Enables injection of container's {@link ArtifactClassLoaderManager}.
  */
-
 public interface ArtifactClassLoaderManagerAware {
 
   /**

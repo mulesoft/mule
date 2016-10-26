@@ -13,7 +13,8 @@ package org.mule.runtime.module.artifact.classloader;
 public interface ArtifactClassLoaderManager {
 
   /**
-   * Registers a new class loaderDefaultDomainFactoryTestCas
+   * Registers a new class loader
+   *
    * @param artifactClassLoader created classloader. Non null
    */
   void register(ArtifactClassLoader artifactClassLoader);
