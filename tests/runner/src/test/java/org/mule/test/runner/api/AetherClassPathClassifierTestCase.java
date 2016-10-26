@@ -36,8 +36,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -65,6 +67,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @SmallTest
 public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
+  private static final String SERVICE_PROPERTIES = "service.properties";
+  private static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
+
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Rule
@@ -81,6 +86,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   private Dependency fooTestsSupportDep;
   private Dependency guavaDep;
   private Dependency derbyDriverDep;
+  private Dependency fooServiceDep;
 
   private List<Dependency> directDependencies;
 
@@ -93,6 +99,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     this.fooTestsSupportDep = new Dependency(new DefaultArtifact("org.foo.tests:foo-tests-support:1.0-SNAPSHOT"), TEST);
     this.derbyDriverDep = new Dependency(new DefaultArtifact("org.apache.derby:derby:10.11.1.1"), TEST);
     this.guavaDep = new Dependency(new DefaultArtifact("org.google:guava:18.0"), COMPILE);
+    this.fooServiceDep = new Dependency(new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0-SNAPSHOT"), PROVIDED);
 
     this.dependencyResolver = mock(DependencyResolver.class);
     this.context = mock(ClassPathClassifierContext.class);
@@ -142,10 +149,10 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 argThat(instanceOf(DependencyFilter.class))))
                                                     .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
-    ArtifactUrlClassification classification = classifier.classify(context);
+    ArtifactsUrlClassification classification = classifier.classify(context);
 
     assertThat(classification.getApplicationUrls(), is(empty()));
-    assertThat(classification.getPluginClassificationUrls(), is(empty()));
+    assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getPluginSharedLibUrls(), is(empty()));
     assertThat(classification.getContainerUrls(), hasSize(3));
     assertThat(classification.getContainerUrls(),
@@ -214,11 +221,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
 
-    ArtifactUrlClassification classification = classifier.classify(context);
+    ArtifactsUrlClassification classification = classifier.classify(context);
 
     assertThat(classification.getApplicationUrls(), hasSize(1));
     assertThat(classification.getApplicationUrls(), hasItem(rootArtifactFile.toURI().toURL()));
-    assertThat(classification.getPluginClassificationUrls(), is(empty()));
+    assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getPluginSharedLibUrls(), hasSize(1));
     assertThat(classification.getPluginSharedLibUrls(), hasItem(derbyDriverFile.toURI().toURL()));
     assertThat(classification.getContainerUrls(), is(empty()));
@@ -229,6 +236,60 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
   }
 
+  @Test
+  public void serviceClassification() throws Exception {
+    this.directDependencies =
+        newArrayList(fooCoreDep, fooToolsArtifactDep, fooTestsSupportDep, derbyDriverDep, guavaDep, fooServiceDep);
+    when(dependencyResolver.getDirectDependencies(rootArtifact)).thenReturn(directDependencies);
+
+    when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
+        .thenReturn(APPLICATION);
+
+    File fooServiceArtifactFile = temporaryFolder.newFile();
+    File metaInfFolder = temporaryFolder.newFolder("META-INF");
+    File fooServicePropertyFile = new File(metaInfFolder, SERVICE_PROPERTIES);
+    Properties fooServiceProperties = new Properties();
+    fooServiceProperties.put(SERVICE_PROVIDER_CLASS_NAME, "org.foo.ServiceProvider");
+    fooServiceProperties.store(new FileWriter(fooServicePropertyFile), "Writing " + SERVICE_PROPERTIES);
+
+    List<File> fooServiceUrls = newArrayList(fooServiceArtifactFile, metaInfFolder);
+    when(dependencyResolver.resolveDependencies(argThat(equalTo(new Dependency(fooServiceDep.getArtifact(), COMPILE))),
+                                                argThat(equalTo(Collections.<Dependency>emptyList())),
+                                                argThat(equalTo(Collections.<Dependency>emptyList())),
+                                                argThat(instanceOf(DependencyFilter.class)))).thenReturn(fooServiceUrls);
+
+    File rootArtifactFile = temporaryFolder.newFile();
+
+    Artifact jarRootArtifact = rootArtifact.setFile(rootArtifactFile);
+    ArtifactResult rootArtifactResult = mock(ArtifactResult.class);
+    when(rootArtifactResult.getArtifact()).thenReturn(jarRootArtifact);
+
+    when(dependencyResolver
+        .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
+            .thenReturn(rootArtifactResult);
+
+
+    ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
+
+    ArtifactsUrlClassification classification = classifier.classify(context);
+
+    assertThat(classification.getApplicationUrls(), hasSize(1));
+    assertThat(classification.getApplicationUrls(), hasItem(rootArtifactFile.toURI().toURL()));
+    assertThat(classification.getPluginUrlClassifications(), is(empty()));
+    assertThat(classification.getPluginSharedLibUrls(), is(empty()));
+    assertThat(classification.getContainerUrls(), is(empty()));
+    assertThat(classification.getServiceUrlClassifications(), hasSize(1));
+    assertThat(classification.getServiceUrlClassifications().get(0).getUrls(), hasItem(fooServiceArtifactFile.toURI().toURL()));
+
+    verify(defaultArtifactDescriptorResult, atLeastOnce()).getManagedDependencies();
+    verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class));
+    verify(dependencyResolver, atLeastOnce())
+        .resolveDependencies(argThat(equalTo(new Dependency(fooServiceDep.getArtifact(), COMPILE))),
+                             argThat(equalTo(Collections.<Dependency>emptyList())),
+                             argThat(equalTo(Collections.<Dependency>emptyList())),
+                             argThat(instanceOf(DependencyFilter.class)));
+    verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
+  }
 
   private ArtifactDescriptorResult noManagedDependencies() throws ArtifactDescriptorException {
     ArtifactDescriptorResult artifactDescriptorResult = mock(ArtifactDescriptorResult.class);

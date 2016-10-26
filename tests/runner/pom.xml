@@ -47,18 +47,13 @@
             <version>${aetherVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-artifact</artifactId>
+            <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

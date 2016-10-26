@@ -85,4 +85,8 @@ public class PluginUrlClassification {
   public Set<String> getExportedResources() {
     return exportedResources;
   }
+
+  public String getArtifactId() {
+    return this.getName();
+  }
 }

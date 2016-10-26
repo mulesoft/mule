@@ -7,14 +7,26 @@
 
 package org.mule.functional.junit4;
 
+import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
+import static org.junit.Assert.assertThat;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.service.DefaultServiceDiscoverer;
+import org.mule.runtime.module.service.MuleServiceManager;
+import org.mule.runtime.module.service.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.service.ReflectionServiceResolver;
 import org.mule.test.runner.ArtifactClassLoaderRunner;
 import org.mule.test.runner.ContainerClassLoaderAware;
 import org.mule.test.runner.PluginClassLoadersAware;
 import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.test.runner.ServiceClassLoadersAware;
+import org.mule.test.runner.api.ClassPathClassifier;
 import org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
+import org.mule.test.runner.api.IsolatedServiceProviderDiscoverer;
 
 import java.util.List;
 
@@ -55,7 +67,10 @@ import org.junit.runner.RunWith;
 public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static List<ArtifactClassLoader> pluginClassLoaders;
+  private static List<ArtifactClassLoader> serviceClassLoaders;
   private static ClassLoader containerClassLoader;
+
+  private static MuleServiceManager serviceRepository;
 
   /**
    * @return thread context class loader has to be the application {@link ClassLoader} created by the runner.
@@ -77,6 +92,18 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     pluginClassLoaders = artifactClassLoaders;
   }
 
+  @ServiceClassLoadersAware
+  private static final void setServiceClassLoaders(List<ArtifactClassLoader> artifactClassLoaders) {
+    if (artifactClassLoaders == null) {
+      throw new IllegalArgumentException("A null value cannot be set as the services class loaders");
+    }
+
+    if (serviceClassLoaders != null) {
+      throw new IllegalStateException("Service class loaders were already set, it cannot be set again");
+    }
+    serviceClassLoaders = artifactClassLoaders;
+  }
+
   @ContainerClassLoaderAware
   private static final void setContainerClassLoader(ClassLoader containerClassLoader) {
     if (containerClassLoader == null) {
@@ -90,6 +117,28 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     ArtifactFunctionalTestCase.containerClassLoader = containerClassLoader;
   }
 
+  @Override
+  protected ConfigurationBuilder getBuilder() throws Exception {
+    ConfigurationBuilder builder = super.getBuilder();
+    assertThat(builder.getClass(), typeCompatibleWith(SpringXmlConfigurationBuilder.class));
+    configureSpringXmlConfigurationBuilder((SpringXmlConfigurationBuilder) builder);
+    return builder;
+  }
+
+  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
+    if (serviceRepository == null) {
+      serviceRepository =
+          new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(serviceClassLoaders),
+                                                              new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+      try {
+        serviceRepository.start();
+      } catch (MuleException e) {
+        throw new IllegalStateException("Couldn't start service manager", e);
+      }
+    }
+
+    builder.addServiceConfigurator(new TestServicesMuleContextConfigurator(serviceRepository));
+  }
 
   /**
    * Adds a {@link ConfigurationBuilder} that sets the {@link org.mule.runtime.extension.api.ExtensionManager} into the

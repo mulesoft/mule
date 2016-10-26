@@ -271,8 +271,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
       throw new RuntimeException("Error while creating the classification context", e);
     }
 
-    ArtifactUrlClassification artifactUrlClassification = classPathClassifier.classify(context);
-    return isolatedClassLoaderFactory.createArtifactClassLoader(context.getExtraBootPackages(), artifactUrlClassification);
+    ArtifactsUrlClassification artifactsUrlClassification = classPathClassifier.classify(context);
+    return isolatedClassLoaderFactory.createArtifactClassLoader(context.getExtraBootPackages(), artifactsUrlClassification);
   }
 
   /**
