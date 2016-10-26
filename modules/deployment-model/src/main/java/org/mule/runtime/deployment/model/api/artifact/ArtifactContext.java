@@ -23,8 +23,7 @@ public interface ArtifactContext {
   MuleContext getMuleContext();
 
   /**
-   *
-   * @return
+   * @return a service to do connectivity testing over resources of the artifact.
    */
   ConnectivityTestingService getConnectivityTestingService();
 

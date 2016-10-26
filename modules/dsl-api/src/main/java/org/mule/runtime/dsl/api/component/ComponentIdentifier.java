@@ -7,6 +7,7 @@
 package org.mule.runtime.dsl.api.component;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 
@@ -83,8 +84,8 @@ public class ComponentIdentifier {
     }
 
     public ComponentIdentifier build() {
-      Preconditions.checkState(componentIdentifier.namespace != null, "Namespace must be not null");
-      Preconditions.checkState(componentIdentifier.identifier != null, "Name must be not null");
+      checkState(componentIdentifier.namespace != null, "Namespace must be not null");
+      checkState(componentIdentifier.identifier != null, "Name must be not null");
       return componentIdentifier;
     }
   }
@@ -100,7 +101,7 @@ public class ComponentIdentifier {
 
     ComponentIdentifier that = (ComponentIdentifier) o;
 
-    if (!namespace.equals(that.namespace)) {
+    if (!namespace.equalsIgnoreCase(that.namespace)) {
       return false;
     }
     return identifier.equals(that.identifier);
@@ -109,7 +110,7 @@ public class ComponentIdentifier {
 
   @Override
   public int hashCode() {
-    int result = namespace.hashCode();
+    int result = namespace.toLowerCase().hashCode();
     result = 31 * result + identifier.hashCode();
     return result;
   }

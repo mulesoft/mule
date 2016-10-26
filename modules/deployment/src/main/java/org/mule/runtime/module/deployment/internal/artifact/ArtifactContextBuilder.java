@@ -27,6 +27,7 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.deployment.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.internal.application.ApplicationMuleContextBuilder;
@@ -78,8 +79,11 @@ public class ArtifactContextBuilder {
 
   private ArtifactContextBuilder() {}
 
+  /**
+   * @return a new builder to create a {@linke ArtifactContext} instance.
+   */
   public static ArtifactContextBuilder newBuilder() {
-    return new SpiServiceRegistry().lookupProvider(ArtifactContextBuilder.class);
+    return new ArtifactContextBuilder();
   }
 
   /**
@@ -259,11 +263,20 @@ public class ArtifactContextBuilder {
 
           @Override
           public void configure(MuleContext muleContext) throws ConfigurationException {
-            artifactContext.set(artifactConfigurationProcessor.createArtifactContext(muleContext, configurationFiles,
-                                                                                     artifactConfiguration, artifactProperties,
-                                                                                     artifactType, enableLazyInit,
-                                                                                     asList(new ContainerServicesMuleContextConfigurator(serviceRepository)),
-                                                                                     Optional.ofNullable(parentContext)));
+            ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
+                ArtifactContextConfiguration.builder()
+                    .setMuleContext(muleContext)
+                    .setConfigResources(configurationFiles)
+                    .setArtifactConfiguration(artifactConfiguration)
+                    .setArtifactProperties(artifactProperties)
+                    .setArtifactType(artifactType)
+                    .setEnableLazyInitialization(enableLazyInit)
+                    .setServiceConfigurators(asList(new ContainerServicesMuleContextConfigurator(serviceRepository)));
+            if (parentContext != null) {
+              artifactContextConfigurationBuilder.setParentContext(parentContext);
+            }
+            artifactContext
+                .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
             isConfigured = true;
           }
 

@@ -63,7 +63,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
     if (providers.size() > 1) {
       List<String> providersNames =
           providers.stream().map(provider -> provider.getClass().getName()).collect(Collectors.toList());
-      throw new IllegalStateException(format("More than one provided found for class %s, providers found are %s",
+      throw new IllegalStateException(format("More than one provided found for class %s, providers found are: %s",
                                              providerClass.getName(), join(providersNames, ",")));
     }
     return providers.iterator().next();

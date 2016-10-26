@@ -6,18 +6,11 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
- * Implementation of this interface are responsible of processing the configuration files of a mule artifact and create an
+ * Implementation of this interface are responsible of processing the configuration files of a Mule artifact and create an
  * {@link ArtifactContext}.
  * 
  * @since 4.0
@@ -25,29 +18,22 @@ import java.util.Optional;
 public interface ArtifactConfigurationProcessor {
 
   /**
-   * Discovers a {@link ArtifactConfigurationProcessor} from the classpath. One and only one must be present in the classpath.
+   * Discovers a {@link ArtifactConfigurationProcessor} using SPI. One and only one must be present in the classpath.
    * 
-   * @return an {@link ArtifactConfigurationProcessor} discovered from the classpath.
+   * @return an {@link ArtifactConfigurationProcessor} discovered using SPI.
    */
   static ArtifactConfigurationProcessor discover() {
     return new SpiServiceRegistry().lookupProvider(ArtifactConfigurationProcessor.class);
   }
 
   /**
-   * Creates an {@link ArtifactContext} for an artifact based on the configuraiton files of the artifact.
+   * Creates an {@link ArtifactContext} for an artifact based on the configuration files of the artifact.
    * 
-   * @param muleContext the {@link MuleContext} of the artifact.
-   * @param configResources the list of configuration files of the artifact
-   * @param artifactProperties the artifact properties
-   * @param artifactType the artifact type
+   * @param artifactContextConfiguration the configuration of the artifact.
    * @return an {@link ArtifactContext}
    * @throws ConfigurationException if there was a problem processing the configuration of the artifact.
    */
-  ArtifactContext createArtifactContext(MuleContext muleContext, String[] configResources,
-                                        ArtifactConfiguration artifactConfiguration, Map<String, String> artifactProperties,
-                                        ArtifactType artifactType, boolean enableLazyInitialization,
-                                        List<MuleContextServiceConfigurator> serviceConfigurators,
-                                        Optional<MuleContext> parentContext)
+  ArtifactContext createArtifactContext(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException;
 
 }

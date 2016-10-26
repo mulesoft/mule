@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.registry;
 
+import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.emptyList;
 import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
@@ -23,7 +27,12 @@ public class SpiServiceRegistry extends AbstractServiceRegistry {
 
   @Override
   protected <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {
-    return ImmutableList.copyOf(ServiceLoader.load(providerClass, classLoader).iterator());
+    Iterator<T> iterator = ServiceLoader.load(providerClass, classLoader).iterator();
+    if (iterator.hasNext()) {
+      return copyOf(iterator);
+    } else {
+      return emptyList();
+    }
   }
 
 }

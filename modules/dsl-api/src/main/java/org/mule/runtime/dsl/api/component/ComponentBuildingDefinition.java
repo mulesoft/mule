@@ -274,8 +274,8 @@ public class ComponentBuildingDefinition {
 
     /**
      * Mark configuration parameters to be ignored when building the component. This is mostly useful when
-     * {@link AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} is used an there are certain configuration parameters
-     * that we don't want to included them.
+     * {@link AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} there are certain configuration parameters
+     * that we don't want to included them in the process of building the object.
      *
      * @param parameterName the configuration parameter name.
      * @return {@code this} builder.

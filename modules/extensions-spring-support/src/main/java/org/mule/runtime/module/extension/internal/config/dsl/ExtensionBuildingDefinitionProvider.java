@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
@@ -95,8 +96,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
    */
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
-    ComponentBuildingDefinition.Builder baseDefinition =
-        new ComponentBuildingDefinition.Builder().withNamespace(EXTENSION_NAMESPACE);
+    Builder baseDefinition =
+        new Builder().withNamespace(EXTENSION_NAMESPACE);
     definitions.add(
                     baseDefinition.copy().withIdentifier("extensions-config").withTypeDefinition(fromType(ExtensionConfig.class))
                         .withObjectFactoryType(ExtensionConfigObjectFactory.class)
@@ -133,8 +134,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
-    final ComponentBuildingDefinition.Builder definitionBuilder =
-        new ComponentBuildingDefinition.Builder().withNamespace(xmlDslModel.getNamespace());
+    final Builder definitionBuilder =
+        new Builder().withNamespace(xmlDslModel.getNamespace());
     final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel, new DefaultDslContext(extensionManager));
 
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
@@ -180,7 +181,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     });
   }
 
-  private void registerSubTypes(MetadataType type, ComponentBuildingDefinition.Builder definitionBuilder,
+  private void registerSubTypes(MetadataType type, Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
     type.accept(new MetadataTypeVisitor() {
@@ -217,7 +218,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     }
   }
 
-  private void registerTopLevelParameter(final MetadataType parameterType, ComponentBuildingDefinition.Builder definitionBuilder,
+  private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder,
                                          ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                          ExtensionParsingContext parsingContext) {
     Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
@@ -264,7 +265,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
   }
 
   private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel,
-                                                    ComponentBuildingDefinition.Builder definitionBuilder,
+                                                    Builder definitionBuilder,
                                                     ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                                     ExtensionParsingContext parsingContext) {
     extensionModel.getModelProperty(ExportModelProperty.class)
@@ -276,7 +277,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                                                parsingContext));
   }
 
-  private void registerSubTypes(ComponentBuildingDefinition.Builder definitionBuilder,
+  private void registerSubTypes(Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
 
@@ -291,7 +292,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                parsingContext);
   }
 
-  private void registerTopLevelParameters(Stream<MetadataType> parameters, ComponentBuildingDefinition.Builder definitionBuilder,
+  private void registerTopLevelParameters(Stream<MetadataType> parameters, Builder definitionBuilder,
                                           ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                           ExtensionParsingContext parsingContext) {
 

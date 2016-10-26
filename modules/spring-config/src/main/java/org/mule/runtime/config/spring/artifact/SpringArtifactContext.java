@@ -41,8 +41,7 @@ public class SpringArtifactContext implements ArtifactContext {
   }
 
   /**
-   *
-   * @return
+   * {@inheritDoc}
    */
   public ConnectivityTestingService getConnectivityTestingService() {
     return muleArtifactContext.getConnectivityTestingService();
