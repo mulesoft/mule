@@ -8,20 +8,13 @@
         <wsc:connection wsdlLocation="http://localhost:${port}/testService?wsdl" service="TestService" port="TestPort"/>
     </wsc:config>
 
-    <flow name="echoOperation">
-        <wsc:consume config-ref="config" operation="echo" body="#[payload]"/>
+    <flow name="failOperation">
+        <wsc:consume config-ref="config" operation="fail" body="#[payload]"/>
     </flow>
 
-    <flow name="echoAccountOperation">
-        <wsc:consume config-ref="config" operation="echoAccount" body="#[payload]"/>
-    </flow>
-
-    <flow name="echoWithHeadersOperation">
+    <flow name="echoMissingHeaders">
         <wsc:consume config-ref="config" operation="echoWithHeaders" body="#[payload]">
-            <wsc:headers>
-                <wsc:header value="#[flowVars.headerIn]"/>
-                <wsc:header value="#[flowVars.headerInOut]"/>
-            </wsc:headers>
+            <!-- Missing headers make it fail -->
         </wsc:consume>
     </flow>
 

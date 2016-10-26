@@ -28,8 +28,8 @@ public class TestService {
 
   @WebResult(name = "text")
   @WebMethod(action = "fail")
-  public String fail(@WebParam(name = "text") String s) throws Exception {
-    throw new Exception(s);
+  public String fail(@WebParam(name = "text") String s) throws EchoException {
+    throw new EchoException(s);
   }
 
   @WebResult(name = "text")
@@ -38,7 +38,13 @@ public class TestService {
                                 @WebParam(name = "headerOut", header = true, mode = WebParam.Mode.OUT) Holder<String> headerOut,
                                 @WebParam(name = "headerInOut", header = true,
                                     mode = WebParam.Mode.INOUT) Holder<String> headerInOut,
-                                @WebParam(name = "text") String s) {
+                                @WebParam(name = "text") String s)
+      throws EchoException {
+
+    if (headerIn == null || headerInOut == null) {
+      throw new EchoException("Missing Required Headers");
+    }
+
     headerOut.value = headerIn + " OUT";
     headerInOut.value = headerInOut.value + " INOUT";
     return echo(s);

@@ -8,6 +8,7 @@ package org.mule.extension.ws.internal.interceptor;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
+import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.WscConnection;
 import org.mule.extension.ws.internal.transport.HttpDispatcher;
 
@@ -75,6 +76,7 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
       messageObserver.onMessage(inMessage);
     } else {
       exchange.put(ClientImpl.FINISHED, Boolean.TRUE);
+      throw new WscException("Web Service Response is blank, cannot consume web service");
     }
   }
 }

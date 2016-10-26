@@ -50,9 +50,11 @@ public class WscTestUtils {
   public static final String FAIL_XML = FAIL + XML;
 
   public static final String HEADER_INOUT = "headerInOut";
+  public static final String HEADER_IN = "headerIn";
   public static final String HEADER_OUT = "headerOut";
 
   public static final String HEADER_INOUT_XML = HEADER_INOUT + XML;
+  public static final String HEADER_IN_XML = HEADER_IN + XML;
   public static final String HEADER_OUT_XML = HEADER_OUT + XML;
 
   public static final String[] OPERATIONS = {ECHO, ECHO_ACCOUNT, ECHO_HEADERS, FAIL, NO_PARAMS_HEADER, NO_PARAMS};

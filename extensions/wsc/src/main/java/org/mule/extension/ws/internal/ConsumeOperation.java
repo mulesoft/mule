@@ -13,6 +13,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.WsAttachment;
 import org.mule.extension.ws.api.WscAttributes;
+import org.mule.extension.ws.api.exception.SoapFaultException;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.introspection.RequestBodyGenerator;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
@@ -45,11 +46,13 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.message.Attachment;
@@ -79,14 +82,20 @@ public class ConsumeOperation {
   public OperationResult<String, WscAttributes> consume(@Connection WscConnection connection,
                                                         @MetadataKeyId(OperationKeysResolver.class) String operation,
                                                         @Optional @Content @TypeResolver(InputBodyResolver.class) String body,
-                                                        @Optional @TypeResolver(InputHeadersResolver.class) Map<String, String> headers,
-                                                        @Optional List<WsAttachment> attachments)
-      throws Exception {
+                                                        @Optional @TypeResolver(InputHeadersResolver.class) List<String> headers,
+                                                        @Optional List<WsAttachment> attachments) {
     Map<String, Object> ctx = getContext(headers, attachments, operation);
     Exchange exchange = new ExchangeImpl();
     XMLStreamReader request = stringToXmlStreamReader(body, connection, operation);
-    Object[] response = connection.invoke(request, ctx, exchange);
-    return asResult(processOutput(response), processAttributes(exchange));
+    Object[] response;
+    try {
+      response = connection.invoke(request, ctx, exchange);
+      return asResult(processOutput(response), processAttributes(exchange));
+    } catch (SoapFault sf) {
+      throw new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), sf.getMessage(), sf.getDetail());
+    } catch (Exception e) {
+      throw new WscException(e);
+    }
   }
 
   private WscAttributes processAttributes(Exchange exchange) {
@@ -94,12 +103,11 @@ public class ConsumeOperation {
     return new WscAttributes(headers, emptyMap());
   }
 
-  private Map<String, Object> getContext(Map<String, String> headers, List<WsAttachment> attachments, String operation) {
+  private Map<String, Object> getContext(List<String> headers, List<WsAttachment> attachments, String operation) {
     Map<String, Object> props = new HashMap<>();
     props.put(MULE_ATTACHMENTS_KEY, transformAttachments(attachments));
     props.put(MULE_HEADERS_KEY, transformHeaders(headers));
     props.put(MULE_SOAP_ACTION, operation);
-
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(Client.REQUEST_CONTEXT, props);
     return ctx;
@@ -109,24 +117,29 @@ public class ConsumeOperation {
     return OperationResult.<String, WscAttributes>builder().output(output).attributes(attributes).build();
   }
 
-  private String processOutput(Object[] response) throws Exception {
+  private String processOutput(Object[] response) {
     XMLStreamReader xmlStreamReader = (XMLStreamReader) response[0];
     StaxSource staxSource = new StaxSource(xmlStreamReader);
     StringWriter writer = new StringWriter();
     StreamResult result = new StreamResult(writer);
     TransformerFactory idTransformer = new SaxonTransformerFactory();
-    Transformer transformer = idTransformer.newTransformer();
-    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-    transformer.transform(staxSource, result);
+    try {
+      Transformer transformer = idTransformer.newTransformer();
+      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      transformer.transform(staxSource, result);
+    } catch (TransformerException e) {
+      throw new WscException("Error while processing output web service response", e);
+    }
     return writer.getBuffer().toString();
   }
 
-  private List<SoapHeader> transformHeaders(Map<String, String> headers) {
+  private List<SoapHeader> transformHeaders(List<String> headers) {
     if (headers == null) {
       return emptyList();
     }
-    return headers.entrySet().stream()
-        .map(h -> new SoapHeader(new QName(null, h.getKey()), stringToDocument(h.getValue())))
+    return headers.stream()
+        .map(this::stringToDocument)
+        .map(h -> new SoapHeader(new QName(null, h.getNodeName()), h))
         .collect(new ImmutableListCollector<>());
   }
 

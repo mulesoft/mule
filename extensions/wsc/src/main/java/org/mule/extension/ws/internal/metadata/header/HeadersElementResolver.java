@@ -49,13 +49,12 @@ abstract class HeadersElementResolver extends NodeElementResolver {
     BindingOperation bindingOperation = introspecter.getBindingOperation(operationName);
     ElementExtensible bindingType = delegate.getBindingType(bindingOperation);
     List<SOAPHeader> headers = getHeaders(bindingType);
-    if (headers.isEmpty()) {
-      return getNullType();
+    if (!headers.isEmpty()) {
+      Message message = delegate.getMessage(introspecter.getOperation(operationName));
+      XmlTypeLoader loader = new XmlTypeLoader(introspecter.getSchemas());
+      return buildHeaderType(headers, message, loader);
     }
-
-    Message message = delegate.getMessage(introspecter.getOperation(operationName));
-    XmlTypeLoader loader = new XmlTypeLoader(introspecter.getSchemas());
-    return buildHeaderType(headers, message, loader);
+    return getNullType();
   }
 
   private MetadataType buildHeaderType(List<SOAPHeader> headers, Message message, XmlTypeLoader loader)

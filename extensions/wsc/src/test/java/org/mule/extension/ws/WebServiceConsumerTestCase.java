@@ -8,6 +8,10 @@ package org.mule.extension.ws;
 
 import static javax.xml.ws.Endpoint.publish;
 import static org.junit.Assert.assertTrue;
+import static org.mule.extension.ws.WscTestUtils.HEADER_IN;
+import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
+import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT_XML;
+import static org.mule.extension.ws.WscTestUtils.HEADER_IN_XML;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
 import static org.mule.extension.ws.WscTestUtils.resourceAsString;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -23,8 +27,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 public abstract class WebServiceConsumerTestCase extends MuleArtifactFunctionalTestCase {
 
@@ -32,10 +34,6 @@ public abstract class WebServiceConsumerTestCase extends MuleArtifactFunctionalT
   public static DynamicPort port = new DynamicPort("port");
 
   public static final String SERVICE_URL = "http://localhost:" + port.getValue() + "/testService";
-  public static final String WSDL_URL = SERVICE_URL + "?wsdl";
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private static Endpoint service;
 
@@ -52,7 +50,12 @@ public abstract class WebServiceConsumerTestCase extends MuleArtifactFunctionalT
   }
 
   protected Message runFlowWithRequest(String name, String bodyRequestFileName) throws Exception {
-    return flowRunner(name).withPayload(resourceAsString("request/" + bodyRequestFileName)).run().getMessage();
+    return flowRunner(name)
+        .withPayload(resourceAsString("request/" + bodyRequestFileName))
+        .withVariable(HEADER_IN, resourceAsString("request/" + HEADER_IN_XML))
+        .withVariable(HEADER_INOUT, resourceAsString("request/" + HEADER_INOUT_XML))
+        .run()
+        .getMessage();
   }
 
   protected void assertSoapResponse(String expectedResponseResourceName, String outputResponse) throws Exception {

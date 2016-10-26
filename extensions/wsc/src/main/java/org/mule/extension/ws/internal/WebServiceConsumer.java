@@ -6,6 +6,8 @@
  */
 package org.mule.extension.ws.internal;
 
+import org.mule.extension.ws.api.exception.WscException;
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -17,6 +19,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
+//TODO: Remove when MULE-10839 it's fixed
+@Export(classes = WscException.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
 @Extension(name = "wsc")
