@@ -19,7 +19,6 @@
 
     <properties>
         <cxfVersion>2.7.15</cxfVersion>
-        <cxfRtFrontendSimpleVersion>2.7.18</cxfRtFrontendSimpleVersion>
         <metadataModelXmlVersion>1.0.0-SNAPSHOT</metadataModelXmlVersion>
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <muleXmlModuleVersion>4.0-SNAPSHOT</muleXmlModuleVersion>
@@ -84,11 +83,25 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-core</artifactId>
             <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use the one bundled with the JDK -->
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-simple</artifactId>
-            <version>${cxfRtFrontendSimpleVersion}</version>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use the one bundled with the JDK -->
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>

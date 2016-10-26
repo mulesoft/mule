@@ -6,6 +6,10 @@
  */
 package org.mule.extension.ws.api.exception;
 
+import static java.util.Optional.ofNullable;
+
+import java.util.Optional;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -31,21 +35,19 @@ public class SoapFaultException extends RuntimeException {
     this.detail = detail;
   }
 
-  public SoapFaultException(QName faultCode,
-                            String message,
-                            Element detail) {
+  public SoapFaultException(QName faultCode, String message, Element detail) {
     super(message);
     this.faultCode = faultCode;
-    this.detail = detail;
     this.subCode = null;
+    this.detail = detail;
   }
 
   public QName getFaultCode() {
     return faultCode;
   }
 
-  public QName getSubCode() {
-    return subCode;
+  public Optional<QName> getSubCode() {
+    return ofNullable(subCode);
   }
 
   public Element getDetail() {
