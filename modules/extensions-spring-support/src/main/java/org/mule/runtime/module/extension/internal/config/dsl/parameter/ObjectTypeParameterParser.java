@@ -10,6 +10,7 @@ import static java.util.Collections.emptySet;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.*;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
@@ -50,7 +51,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String name;
   private final String namespace;
 
-  public ObjectTypeParameterParser(ComponentBuildingDefinition.Builder definition, ObjectType type, ClassLoader classLoader,
+  public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
                                    MuleContext muleContext) {
     super(definition, dslResolver, context, muleContext);
@@ -61,7 +62,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     this.namespace = typeDsl.getNamespace();
   }
 
-  public ObjectTypeParameterParser(ComponentBuildingDefinition.Builder definition, String name, String namespace, ObjectType type,
+  public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type,
                                    ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
                                    MuleContext muleContext) {
@@ -74,7 +75,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   }
 
   @Override
-  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
+  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
     definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed().withTypeDefinition(fromType(ValueResolver.class))
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(type).build())

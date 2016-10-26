@@ -20,8 +20,6 @@ import java.util.Collection;
  */
 public class CoreXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-  public static final String CORE_NAMESPACE_NAME = CORE_NAMESPACE;
-
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
     return asList(new XmlNamespaceInfo() {
@@ -33,7 +31,7 @@ public class CoreXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
       @Override
       public String getNamespace() {
-        return CORE_NAMESPACE_NAME;
+        return CORE_NAMESPACE;
       }
     });
   }

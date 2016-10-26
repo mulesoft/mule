@@ -11,7 +11,7 @@ import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import java.util.Map;
 
 /**
- * Implementations of this interface are used configuration common attribute across a set of {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s.
+ * Implementations of this interface are used to define common configuration attribute across a set of {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s.
  * For instance, all transports support attributes like encoding, returnClass, mimeType and the creation of those attributes
  * depend on the some logic around the values of those parameters.
  * <p>
