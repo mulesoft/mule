@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.config.pool;
 
+import static java.lang.Thread.currentThread;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -29,7 +30,7 @@ public abstract class ThreadPoolFactory implements MuleContextAware {
    */
   public static ThreadPoolFactory newInstance() {
     final Iterable<ThreadPoolFactory> threadPoolFactoryServices =
-        new SpiServiceRegistry().lookupProviders(ThreadPoolFactory.class);
+        new SpiServiceRegistry().lookupProviders(ThreadPoolFactory.class, currentThread().getContextClassLoader());
 
     PreferredObjectSelector<ThreadPoolFactory> selector = new PreferredObjectSelector<>();
     ThreadPoolFactory threadPoolFactory = selector.select(threadPoolFactoryServices.iterator());

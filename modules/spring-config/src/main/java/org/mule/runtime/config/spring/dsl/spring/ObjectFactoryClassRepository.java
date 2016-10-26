@@ -15,8 +15,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.cglib.proxy.Callback;

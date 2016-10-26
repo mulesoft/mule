@@ -10,15 +10,15 @@ import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -37,11 +37,11 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
+import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -152,7 +152,8 @@ public abstract class ExtensionDefinitionParser {
    * @param dslSyntaxResolver     a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
    * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
-  protected ExtensionDefinitionParser(Builder baseDefinitionBuilder, DslSyntaxResolver dslSyntaxResolver,
+  protected ExtensionDefinitionParser(Builder baseDefinitionBuilder,
+                                      DslSyntaxResolver dslSyntaxResolver,
                                       ExtensionParsingContext parsingContext, MuleContext muleContext) {
     this.baseDefinitionBuilder = baseDefinitionBuilder;
     this.dslResolver = dslSyntaxResolver;
@@ -429,10 +430,11 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         protected void visitBasicType(MetadataType metadataType) {
-          Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
-              .withTypeDefinition(fromType(getType(metadataType)))
-              .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
-                                                     getExpressionSupport(metadataType), false, modelProperties));
+          Builder itemDefinitionBuilder =
+              baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
+                  .withTypeDefinition(fromType(getType(metadataType)))
+                  .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
+                                                         getExpressionSupport(metadataType), false, modelProperties));
 
           addDefinition(itemDefinitionBuilder.build());
         }

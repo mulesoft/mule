@@ -14,11 +14,12 @@ import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.List;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} that constructs {@link ExpressionTransformer} from the mule
+ * {@link ObjectFactory} that constructs {@link ExpressionTransformer} from the mule
  * configuration.
  *
  * @since 4.0

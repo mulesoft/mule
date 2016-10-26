@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.extension.internal.config.DefaultExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 

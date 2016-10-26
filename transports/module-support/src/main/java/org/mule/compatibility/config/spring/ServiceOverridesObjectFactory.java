@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_SESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS;
 import static org.mule.runtime.core.api.config.MuleProperties.SERVICE_FINDER;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;

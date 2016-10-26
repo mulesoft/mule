@@ -7,9 +7,9 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,7 +22,7 @@ import java.util.Set;
  * dependencies.
  * <p/>
  * Based on the requested component, the {@link ComponentModel} configuration associated is
- * introspected to find it dependencies based on it's {@link ComponentBuildingDefinition}.
+ * introspected to find it dependencies based on it's {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}.
  * This process is recursively done for each of the dependencies in order to find all the required
  * {@link ComponentModel}s that must be created for the requested {@link ComponentModel} to
  * work properly.
@@ -39,7 +39,7 @@ public class MinimalApplicationModelGenerator {
    * Creates a new instance associated to a complete {@link ApplicationModel}.
    *
    * @param applicationModel the artifact {@link ApplicationModel}.
-   * @param componentBuildingDefinitionRegistry the registry to find the {@link ComponentBuildingDefinition}s  associated to each {@link ComponentModel} that must be resolved.
+   * @param componentBuildingDefinitionRegistry the registry to find the {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s  associated to each {@link ComponentModel} that must be resolved.
      */
   public MinimalApplicationModelGenerator(ApplicationModel applicationModel,
                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {

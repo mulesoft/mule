@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
+import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 

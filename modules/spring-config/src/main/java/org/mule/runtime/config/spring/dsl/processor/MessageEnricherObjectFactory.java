@@ -8,7 +8,7 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} to create a
+ * {@link ObjectFactory} to create a
  * {@link org.mule.runtime.core.enricher.MessageEnricher}.
  */
 public class MessageEnricherObjectFactory

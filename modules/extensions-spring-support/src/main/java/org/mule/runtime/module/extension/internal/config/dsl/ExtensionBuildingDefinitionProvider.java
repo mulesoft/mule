@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -27,12 +27,13 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -70,7 +71,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
+public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider, MuleContextAware {
 
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
   private ExtensionManager extensionManager;
@@ -82,8 +83,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
    * @throws java.lang.IllegalStateException if no extension manager could be found
    */
   @Override
-  public void init(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public void init() {
     extensionManager = muleContext.getExtensionManager();
     if (extensionManager != null) {
       extensionManager.getExtensions().forEach(this::registerExtensionParsers);
@@ -96,7 +96,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
    */
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
-    Builder baseDefinition = new Builder().withNamespace(EXTENSION_NAMESPACE);
+    Builder baseDefinition =
+        new Builder().withNamespace(EXTENSION_NAMESPACE);
     definitions.add(
                     baseDefinition.copy().withIdentifier("extensions-config").withTypeDefinition(fromType(ExtensionConfig.class))
                         .withObjectFactoryType(ExtensionConfigObjectFactory.class)
@@ -133,7 +134,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
-    final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getNamespace());
+    final Builder definitionBuilder =
+        new Builder().withNamespace(xmlDslModel.getNamespace());
     final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel, new DefaultDslContext(extensionManager));
 
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
@@ -262,7 +264,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     });
   }
 
-  private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel, Builder definitionBuilder,
+  private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel,
+                                                    Builder definitionBuilder,
                                                     ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                                     ExtensionParsingContext parsingContext) {
     extensionModel.getModelProperty(ExportModelProperty.class)
@@ -308,5 +311,10 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     parsingContext.setSubTypesMapping(new SubTypesMappingContainer(extensionModel.getSubTypes()));
 
     return parsingContext;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

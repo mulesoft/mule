@@ -8,6 +8,7 @@
 package org.mule.test.runner.infrastructure;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
@@ -133,11 +134,11 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   private List<GeneratedResourceFactory> getResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class));
+    return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, currentThread().getContextClassLoader()));
   }
 
   private List<DslResourceFactory> getDslResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(DslResourceFactory.class));
+    return copyOf(serviceRegistry.lookupProviders(DslResourceFactory.class, currentThread().getContextClassLoader()));
   }
 
   private void loadExtensionsFromDescribers(ExtensionManagerAdapter extensionManager, Describer[] describers) {

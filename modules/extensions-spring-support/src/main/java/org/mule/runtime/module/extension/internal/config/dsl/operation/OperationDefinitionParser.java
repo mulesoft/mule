@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
@@ -35,7 +35,8 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
   private final OperationModel operationModel;
   private final DslElementSyntax operationDsl;
 
-  public OperationDefinitionParser(Builder definition, ExtensionModel extensionModel, OperationModel operationModel,
+  public OperationDefinitionParser(Builder definition, ExtensionModel extensionModel,
+                                   OperationModel operationModel,
                                    DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                    ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext, muleContext);

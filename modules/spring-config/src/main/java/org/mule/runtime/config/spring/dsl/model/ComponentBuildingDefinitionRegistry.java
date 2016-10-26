@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * Registry with all {@link ComponentBuildingDefinition} that where discovered in the classpath.
  * <p/>
  * {@code ComponentBuildingDefinition}s are located using SPI class
- * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider}.
+ * {@link ComponentBuildingDefinitionProvider}.
  *
  * @since 4.0
  */

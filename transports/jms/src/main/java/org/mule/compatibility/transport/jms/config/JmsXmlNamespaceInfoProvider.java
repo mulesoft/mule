@@ -7,8 +7,8 @@
 package org.mule.compatibility.transport.jms.config;
 
 import static java.util.Arrays.asList;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
 import java.util.Collection;
 

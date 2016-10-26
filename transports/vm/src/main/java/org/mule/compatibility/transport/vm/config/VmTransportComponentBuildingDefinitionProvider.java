@@ -7,20 +7,20 @@
 package org.mule.compatibility.transport.vm.config;
 
 import static org.mule.compatibility.transport.vm.config.VmXmlNamespaceInfoProvider.VM_TRANSPORT_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.compatibility.config.spring.TransportComponentBuildingDefinitionProvider;
 import org.mule.compatibility.transport.vm.VMConnector;
 import org.mule.compatibility.transport.vm.VMTransactionFactory;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class VmTransportComponentBuildingDefinitionProvider extends TransportCom
   private ComponentBuildingDefinition.Builder baseDefinition;
 
   @Override
-  public void init(MuleContext muleContext) {
+  public void init() {
     baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(VM_TRANSPORT_NAMESPACE);
   }
 

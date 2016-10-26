@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.AttributeDefinition;
 
 /**
  * Specialization of {@link ParsingDelegate} that only accepts instances represented by a {@link ObjectType} and produces

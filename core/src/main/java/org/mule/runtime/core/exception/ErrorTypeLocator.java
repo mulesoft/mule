@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
 import java.util.Optional;

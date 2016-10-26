@@ -198,6 +198,7 @@
         <log4jVersion>2.5</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
+        <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
@@ -1221,6 +1222,11 @@
                         <artifactId>javax.annotation-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.modules</groupId>
+                <artifactId>mule-module-dsl-api</artifactId>
+                <version>${muleDslApiVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.extensions</groupId>

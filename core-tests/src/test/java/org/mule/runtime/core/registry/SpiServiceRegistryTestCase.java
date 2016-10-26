@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.registry;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -27,7 +28,8 @@ public class SpiServiceRegistryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void lookupProviders() throws Exception {
-    Collection<TestDiscoverableObject> discoveredObjects = serviceRegistry.lookupProviders(TestDiscoverableObject.class);
+    Collection<TestDiscoverableObject> discoveredObjects =
+        serviceRegistry.lookupProviders(TestDiscoverableObject.class, currentThread().getContextClassLoader());
     assertProvidersFound(discoveredObjects);
   }
 

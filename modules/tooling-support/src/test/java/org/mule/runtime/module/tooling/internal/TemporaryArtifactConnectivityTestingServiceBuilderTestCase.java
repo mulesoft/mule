@@ -8,11 +8,12 @@ package org.mule.runtime.module.tooling.internal;
 
 import static java.util.Arrays.asList;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
-import org.mule.runtime.config.spring.dsl.api.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
@@ -53,7 +54,7 @@ public class TemporaryArtifactConnectivityTestingServiceBuilderTestCase extends 
 
   @Test
   public void buildArtifact() {
-    when(mockServiceRegistry.lookupProviders(ConnectivityTestingStrategy.class))
+    when(mockServiceRegistry.lookupProviders(ConnectivityTestingStrategy.class, any()))
         .thenReturn(asList(mock(ConnectivityTestingStrategy.class)));
     addExtension().setArtifactConfiguration(getArtifactConfiguration());
 

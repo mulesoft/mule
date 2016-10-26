@@ -21,35 +21,30 @@ import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.config.spring.dsl.api.CommonTypeConverters.stringToClassConverter;
-import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
+import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
+import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
+import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
@@ -81,6 +76,7 @@ import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
@@ -117,6 +113,8 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.CallableEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
@@ -181,11 +179,15 @@ import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
 import org.mule.runtime.core.transformer.simple.CopyPropertiesProcessor;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.dsl.api.component.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.TypeConverter;
+import org.mule.runtime.dsl.api.xml.DslConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -195,12 +197,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} definitions for the components provided by the core
- * runtime.
+ * {@link ComponentBuildingDefinition} definitions for the components provided by the core runtime.
  *
  * @since 4.0
  */
-public class CoreComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
+public class CoreComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider, MuleContextAware {
 
   private static final String MESSAGE_PROCESSORS = "messageProcessors";
   private static final String NAME = "name";
@@ -244,13 +245,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_TYPE = "transactionType";
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
-      new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE_NAME);
+      new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE);
   private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
   private MuleContext muleContext;
 
   @Override
-  public void init(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public void init() {
     transactionManagerBaseDefinition = baseDefinition.copy();
   }
 
@@ -1228,4 +1228,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(transactionManagerClass));
   }
 
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

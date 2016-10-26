@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} for reconnection configuration.
+ * {@link ObjectFactory} for reconnection configuration.
  *
  * It will return a {@link org.mule.runtime.core.api.retry.RetryPolicyTemplate} that may run synchronously or asynchronously based
  * on the {@code blocking} configuration.

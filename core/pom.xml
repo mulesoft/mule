@@ -76,6 +76,10 @@
             <artifactId>mule-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-dsl-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mule.extensions</groupId>
             <artifactId>mule-extensions-api</artifactId>
         </dependency>

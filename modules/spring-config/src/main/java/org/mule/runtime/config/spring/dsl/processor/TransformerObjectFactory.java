@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;

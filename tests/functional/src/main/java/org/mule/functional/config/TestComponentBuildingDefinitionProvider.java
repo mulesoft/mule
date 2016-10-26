@@ -7,13 +7,13 @@
 package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromTextContent;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilder;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.functional.functional.AssertionMessageProcessor;
@@ -21,10 +21,10 @@ import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.InvocationCountMessageProcessor;
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
 import org.mule.functional.transformer.NoActionTransformer;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.tck.processor.TestNonBlockingProcessor;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
   private ComponentBuildingDefinition.Builder baseDefinition;
 
   @Override
-  public void init(MuleContext muleContext) {
+  public void init() {
     baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(TEST_NAMESPACE);
   }
 

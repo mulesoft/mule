@@ -7,16 +7,17 @@
 
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_CONTEXT_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLineProvider;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -37,8 +38,8 @@ import org.w3c.dom.NodeList;
  * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.spring.dsl.processor.ConfigLine}
  * objects.
  * <p>
- * It uses the SPI interface {@link org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider} to locate for all
- * namespace info provided and normalize the namespace from the XML document.
+ * It uses the SPI interface {@link XmlNamespaceInfoProvider} to locate for all namespace info provided and normalize the
+ * namespace from the XML document.
  *
  * @since 4.0
  */
@@ -56,7 +57,8 @@ public class XmlApplicationParser {
   }
 
   public XmlApplicationParser(ServiceRegistry serviceRegistry) {
-    namespaceInfoProviders = ImmutableList.copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class));
+    namespaceInfoProviders = ImmutableList
+        .copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, currentThread().getContextClassLoader()));
     namespaceCache = CacheBuilder.newBuilder().build();
   }
 
@@ -131,7 +133,7 @@ public class XmlApplicationParser {
   }
 
   private String parseNamespace(Node node) {
-    String namespace = CORE_NAMESPACE_NAME;
+    String namespace = CORE_NAMESPACE;
     if (node.getNodeType() != Node.CDATA_SECTION_NODE) {
       namespace = getNormalizedNamespace(node.getNamespaceURI(), node.getPrefix());
       if (namespace.equals(UNDEFINED_NAMESPACE)) {

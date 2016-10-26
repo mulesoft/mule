@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVIT
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;

@@ -10,9 +10,9 @@ package org.mule.runtime.module.deployment.internal.artifact;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.config.spring.MuleContextServiceConfigurator;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 import org.mule.runtime.module.service.ServiceRepository;
 
 /**

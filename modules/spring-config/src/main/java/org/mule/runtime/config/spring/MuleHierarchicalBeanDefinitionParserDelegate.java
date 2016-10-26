@@ -16,15 +16,15 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOM
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.XMLSecureFactories;
@@ -313,7 +313,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   }
 
   private String getNamespace(Node parentNode) {
-    return parentNode.getPrefix() != null ? parentNode.getPrefix() : CORE_NAMESPACE_NAME;
+    return parentNode.getPrefix() != null ? parentNode.getPrefix() : CORE_NAMESPACE;
   }
 
   private void validate(Element element) {

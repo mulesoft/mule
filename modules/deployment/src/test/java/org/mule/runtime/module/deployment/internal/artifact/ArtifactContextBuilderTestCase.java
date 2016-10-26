@@ -17,6 +17,7 @@ import static org.mule.runtime.module.deployment.internal.artifact.ArtifactConte
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
+import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.newBuilder;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -38,7 +39,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void emptyBuilder() throws Exception {
     MuleContext muleContext =
-        new ArtifactContextBuilder().setExecutionClassloader(currentThread().getContextClassLoader()).build().getMuleContext();
+        newBuilder().setExecutionClassloader(currentThread().getContextClassLoader()).build().getMuleContext();
     assertThat(muleContext, notNullValue());
     assertThat(muleContext.isInitialised(), is(true));
     muleContext.start();
@@ -48,25 +49,25 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void buildWithoutClassloader() throws Exception {
     expectedException.expectMessage(EXECUTION_CLASSLOADER_WAS_NOT_SET);
-    new ArtifactContextBuilder().build();
+    newBuilder().build();
   }
 
   @Test
   public void setNullArtifactProperties() throws Exception {
     expectedException.expectMessage(MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL);
-    new ArtifactContextBuilder().setArtifactProperties(null);
+    newBuilder().setArtifactProperties(null);
   }
 
   @Test
   public void setRegularFileInstallationLocation() throws Exception {
     expectedException.expectMessage(INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY);
-    new ArtifactContextBuilder().setArtifactInstallationDirectory(temporaryFolder.newFile());
+    newBuilder().setArtifactInstallationDirectory(temporaryFolder.newFile());
   }
 
   @Test
   public void buildUsingDomainAndParentContext() throws Exception {
     expectedException.expectMessage(ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
-    new ArtifactContextBuilder().setArtifactType(DOMAIN)
+    newBuilder().setArtifactType(DOMAIN)
         .setExecutionClassloader(Thread.currentThread().getContextClassLoader()).setParentContext(mock(MuleContext.class))
         .build();
   }
@@ -74,6 +75,6 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void setNullServiceRepository() throws Exception {
     expectedException.expectMessage(SERVICE_REPOSITORY_CANNOT_BE_NULL);
-    new ArtifactContextBuilder().setServiceRepository(null);
+    newBuilder().setServiceRepository(null);
   }
 }

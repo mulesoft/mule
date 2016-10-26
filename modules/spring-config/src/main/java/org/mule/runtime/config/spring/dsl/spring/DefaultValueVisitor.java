@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Optional.empty;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 
 import java.util.Optional;

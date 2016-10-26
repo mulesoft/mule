@@ -7,8 +7,9 @@
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
 import static java.util.Arrays.asList;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
-import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
 import java.util.Collection;
 
@@ -18,8 +19,6 @@ import java.util.Collection;
  * @since 4.0
  */
 public class CoreXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
-
-  public static final String CORE_NAMESPACE_NAME = "mule";
 
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
@@ -32,7 +31,7 @@ public class CoreXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
       @Override
       public String getNamespace() {
-        return CORE_NAMESPACE_NAME;
+        return CORE_NAMESPACE;
       }
     });
   }

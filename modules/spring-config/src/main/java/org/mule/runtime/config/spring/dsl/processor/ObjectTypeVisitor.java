@@ -9,10 +9,10 @@ package org.mule.runtime.config.spring.dsl.processor;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.config.spring.dsl.api.TypeDefinition;
+import org.mule.runtime.dsl.api.component.TypeDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
 
 import java.util.ArrayList;
 import java.util.Collection;

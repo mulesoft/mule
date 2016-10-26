@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;

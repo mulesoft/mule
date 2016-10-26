@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.artifact;
 
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 
 import java.io.File;
 

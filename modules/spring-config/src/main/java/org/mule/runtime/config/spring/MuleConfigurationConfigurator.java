@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;

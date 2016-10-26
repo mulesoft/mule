@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.artifact;
 
+import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
@@ -13,8 +14,6 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.UUID.getUUID;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -25,6 +24,11 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.deployment.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.internal.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -39,6 +43,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext} and a
@@ -70,6 +76,15 @@ public class ArtifactContextBuilder {
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
   private boolean enableLazyInit;
+
+  private ArtifactContextBuilder() {}
+
+  /**
+   * @return a new builder to create a {@linke ArtifactContext} instance.
+   */
+  public static ArtifactContextBuilder newBuilder() {
+    return new ArtifactContextBuilder();
+  }
 
   /**
    * The {@code ArtifactType} defines the set of services that will be available in the {@code MuleContext}. For instance
@@ -240,14 +255,36 @@ public class ArtifactContextBuilder {
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
-        SpringXmlConfigurationBuilder mainBuilder =
-            new SpringXmlConfigurationBuilder(configurationFiles, artifactConfiguration, artifactProperties, artifactType,
-                                              enableLazyInit);
-        mainBuilder.addServiceConfigurator(new ContainerServicesMuleContextConfigurator(serviceRepository));
-        if (parentContext != null) {
-          mainBuilder.setParentContext(parentContext);
-        }
-        builders.add(mainBuilder);
+        ArtifactConfigurationProcessor artifactConfigurationProcessor = ArtifactConfigurationProcessor.discover();
+        AtomicReference<ArtifactContext> artifactContext = new AtomicReference<ArtifactContext>();
+        builders.add(new ConfigurationBuilder() {
+
+          public boolean isConfigured;
+
+          @Override
+          public void configure(MuleContext muleContext) throws ConfigurationException {
+            ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
+                ArtifactContextConfiguration.builder()
+                    .setMuleContext(muleContext)
+                    .setConfigResources(configurationFiles)
+                    .setArtifactConfiguration(artifactConfiguration)
+                    .setArtifactProperties(artifactProperties)
+                    .setArtifactType(artifactType)
+                    .setEnableLazyInitialization(enableLazyInit)
+                    .setServiceConfigurators(asList(new ContainerServicesMuleContextConfigurator(serviceRepository)));
+            if (parentContext != null) {
+              artifactContextConfigurationBuilder.setParentContext(parentContext);
+            }
+            artifactContext
+                .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
+            isConfigured = true;
+          }
+
+          @Override
+          public boolean isConfigured() {
+            return isConfigured;
+          }
+        });
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         if (muleContextListener != null) {
           muleContextFactory.addListener(muleContextListener);
@@ -260,7 +297,7 @@ public class ArtifactContextBuilder {
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
         try {
           muleContextFactory.createMuleContext(builders, muleContextBuilder);
-          return new ArtifactContext(mainBuilder.getMuleArtifactContext());
+          return artifactContext.get();
         } catch (InitialisationException e) {
           throw new ConfigurationException(e);
         }

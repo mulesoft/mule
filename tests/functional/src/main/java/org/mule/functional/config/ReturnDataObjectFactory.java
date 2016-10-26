@@ -7,7 +7,7 @@
 package org.mule.functional.config;
 
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.io.IOException;
 

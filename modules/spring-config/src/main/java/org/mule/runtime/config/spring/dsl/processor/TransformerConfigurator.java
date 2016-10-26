@@ -44,7 +44,7 @@ public class TransformerConfigurator implements ObjectFactoryCommonConfigurator<
    *
    * @param transformerInstance the transformar instance
    * @param parameters the set of parameters configured in the component model according to the
-   *        {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
    */
   @Override
   public void configure(AbstractTransformer transformerInstance, Map<String, Object> parameters) {

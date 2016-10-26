@@ -8,7 +8,7 @@ package org.mule.functional.config;
 
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

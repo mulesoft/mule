@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
+import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

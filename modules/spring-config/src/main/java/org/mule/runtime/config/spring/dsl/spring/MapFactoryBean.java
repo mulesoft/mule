@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import org.mule.runtime.config.spring.dsl.api.MapEntry;
+import org.mule.runtime.dsl.api.component.MapEntry;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.List;

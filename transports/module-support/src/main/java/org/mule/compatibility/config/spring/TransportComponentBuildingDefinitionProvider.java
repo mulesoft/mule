@@ -7,13 +7,13 @@
 package org.mule.compatibility.config.spring;
 
 import static org.mule.compatibility.config.spring.TransportXmlNamespaceInfoProvider.TRANSPORTS_NAMESPACE_NAME;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromUndefinedSimpleAttributes;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromUndefinedSimpleAttributes;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
@@ -25,9 +25,9 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.processor.simple.AddAttachmentProcessor;
 import org.mule.compatibility.core.processor.simple.CopyAttachmentsProcessor;
 import org.mule.compatibility.core.processor.simple.RemoveAttachmentProcessor;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -38,7 +38,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
       new ComponentBuildingDefinition.Builder().withNamespace(TRANSPORTS_NAMESPACE_NAME);
 
   @Override
-  public void init(MuleContext muleContext) {}
+  public void init() {}
 
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {

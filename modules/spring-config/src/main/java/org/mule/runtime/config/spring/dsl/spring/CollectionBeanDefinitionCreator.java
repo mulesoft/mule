@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.Collection;
 

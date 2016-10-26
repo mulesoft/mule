@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.config.builders;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.config.ConfigResource;

@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.core.registry;
 
+import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.emptyList;
+import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
@@ -18,25 +23,16 @@ import java.util.ServiceLoader;
  *
  * @since 3.7.0
  */
-public class SpiServiceRegistry implements ServiceRegistry {
+public class SpiServiceRegistry extends AbstractServiceRegistry {
 
-  /**
-   * If {@code classLoader} is {@code null}, then the current {@link Thread#getContextClassLoader()} will be used {@inheritDoc}
-   */
   @Override
-  public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader classLoader) {
-    if (classLoader == null) {
-      classLoader = Thread.currentThread().getContextClassLoader();
+  protected <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {
+    Iterator<T> iterator = ServiceLoader.load(providerClass, classLoader).iterator();
+    if (iterator.hasNext()) {
+      return copyOf(iterator);
+    } else {
+      return emptyList();
     }
-
-    return ImmutableList.copyOf(ServiceLoader.load(providerClass, classLoader).iterator());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> Collection<T> lookupProviders(Class<T> providerClass) {
-    return ImmutableList.copyOf(ServiceLoader.load(providerClass).iterator());
-  }
 }

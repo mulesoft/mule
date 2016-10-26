@@ -8,19 +8,18 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map.Entry;
 import java.util.Optional;
