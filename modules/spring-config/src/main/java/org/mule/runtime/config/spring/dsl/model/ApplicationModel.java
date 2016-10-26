@@ -14,10 +14,10 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -124,43 +124,43 @@ public class ApplicationModel {
   public static final String INTERCEPTOR_STACK_ELEMENT = "interceptor-stack";
 
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ERROR_HANDLER).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ERROR_HANDLER).build();
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier MULE_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier SPRING_PROPERTY_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROPERTY_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTIES_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROPERTIES_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANNOTATION_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ANNOTATION_ELEMENT).build();
   public static final ComponentIdentifier MESSAGE_FILTER_ELEMENT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MESSAGE_FILTER_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MESSAGE_FILTER_ELEMENT).build();
   public static final ComponentIdentifier DEFAULT_ES_ELEMENT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DEFAULT_EXCEPTION_STRATEGY).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(DEFAULT_EXCEPTION_STRATEGY).build();
   public static final ComponentIdentifier PROCESSOR_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROCESSOR_REFERENCE_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(PROCESSOR_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMER_REFERENCE_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(TRANSFORMER_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier QUEUE_STORE_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(QUEUE_STORE).build();
   public static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONFIGURATION_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(CONFIGURATION_ELEMENT).build();
   public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CUSTOM_TRANSFORMER).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(CUSTOM_TRANSFORMER).build();
   public static final ComponentIdentifier SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(SPRING_CONTEXT_NAMESPACE).withName(PROPERTY_PLACEHOLDER_ELEMENT).build();
   public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(DOC_NAMESPACE).withName(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANNOTATIONS).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ANNOTATIONS).build();
   public static final ComponentIdentifier SPRING_ENTRY_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName(SPRING_ENTRY_ELEMENT).build();
   public static final ComponentIdentifier SPRING_LIST_IDENTIFIER =
@@ -170,15 +170,15 @@ public class ApplicationModel {
   public static final ComponentIdentifier SPRING_VALUE_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName(SPRING_VALUE_ELEMENT).build();
   public static final ComponentIdentifier PROTOTYPE_OBJECT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROTOTYPE_OBJECT_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(PROTOTYPE_OBJECT_ELEMENT).build();
   public static final ComponentIdentifier SINGLETON_OBJECT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(SINGLETON_OBJECT_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(SINGLETON_OBJECT_ELEMENT).build();
   public static final ComponentIdentifier INTERCEPTOR_STACK_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(INTERCEPTOR_STACK_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(INTERCEPTOR_STACK_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(FLOW_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(FLOW_ELEMENT).build();
   public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_POLICY_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(REDELIVERY_POLICY_ELEMENT).build();
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -605,7 +605,7 @@ public class ApplicationModel {
   private List<ComponentModel> extractComponentDefinitionModel(List<ConfigLine> configLines, String configFileName) {
     List<ComponentModel> models = new ArrayList<>();
     for (final ConfigLine configLine : configLines) {
-      String namespace = configLine.getNamespace() == null ? CORE_NAMESPACE_NAME : configLine.getNamespace();
+      String namespace = configLine.getNamespace() == null ? CORE_NAMESPACE : configLine.getNamespace();
       ComponentModel.Builder builder = new ComponentModel.Builder()
           .setIdentifier(new ComponentIdentifier.Builder().withNamespace(namespace).withName(configLine.getIdentifier()).build())
           .setTextContent(configLine.getTextContent());

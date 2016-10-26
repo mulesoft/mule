@@ -22,7 +22,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_E
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_LIST_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_MAP_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_VALUE_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
@@ -31,6 +30,7 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -41,6 +41,7 @@ import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.dsl.api.xml.DslConstants;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -89,7 +90,7 @@ public class BeanDefinitionFactory {
    * them in the parsing API.
    */
   private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build())
+      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(QUEUE_STORE).build())
       .add(MULE_PROPERTIES_IDENTIFIER)
       .add(MULE_PROPERTY_IDENTIFIER)
       .add(SPRING_ENTRY_IDENTIFIER)

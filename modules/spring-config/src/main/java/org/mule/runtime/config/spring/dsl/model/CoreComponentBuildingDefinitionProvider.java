@@ -23,7 +23,6 @@ import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
@@ -40,6 +39,7 @@ import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseCompon
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
@@ -187,6 +187,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
+import org.mule.runtime.dsl.api.xml.DslConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -244,7 +245,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_TYPE = "transactionType";
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
-      new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE_NAME);
+      new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE);
   private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
   private MuleContext muleContext;
 

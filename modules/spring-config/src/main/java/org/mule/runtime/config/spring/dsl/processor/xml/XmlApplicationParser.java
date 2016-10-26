@@ -9,8 +9,8 @@ package org.mule.runtime.config.spring.dsl.processor.xml;
 
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_CONTEXT_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLineProvider;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -131,7 +131,7 @@ public class XmlApplicationParser {
   }
 
   private String parseNamespace(Node node) {
-    String namespace = CORE_NAMESPACE_NAME;
+    String namespace = CORE_NAMESPACE;
     if (node.getNodeType() != Node.CDATA_SECTION_NODE) {
       namespace = getNormalizedNamespace(node.getNamespaceURI(), node.getPrefix());
       if (namespace.equals(UNDEFINED_NAMESPACE)) {

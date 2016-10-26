@@ -9,8 +9,8 @@ package org.mule.runtime.config.spring.dsl.spring;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_REFERENCE_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final ComponentIdentifier FILTER_REFERENCE_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(FILTER_REFERENCE_ELEMENT).build();
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(FILTER_REFERENCE_ELEMENT).build();
 
   @Override
   public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
