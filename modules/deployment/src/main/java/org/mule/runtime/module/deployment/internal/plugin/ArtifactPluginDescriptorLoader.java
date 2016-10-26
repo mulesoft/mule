@@ -38,6 +38,10 @@ public class ArtifactPluginDescriptorLoader {
    *         location
    */
   public ArtifactPluginDescriptor load(File pluginZip, File unpackDestination) throws IOException {
+    //TODO MULE-10785 the unzipping must be avoided, ideal code below (senders of this method should not unzip either)
+    //checkArgument(pluginZip != null, "plugin zip cannot be null");
+    //return artifactPluginDescriptorFactory.create(pluginZip);
+
     checkArgument(pluginZip != null, "plugin zip cannot be null");
     checkArgument(unpackDestination != null, "unpack destination cannot be null");
     checkArgument(pluginZip.getName().endsWith("zip"),

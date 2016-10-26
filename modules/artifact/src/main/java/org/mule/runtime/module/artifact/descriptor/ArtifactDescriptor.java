@@ -39,6 +39,7 @@ public class ArtifactDescriptor {
     return rootFolder;
   }
 
+  //TODO MULE-10785 check if the rootFolder is needed for every ArtifactDescriptor
   public void setRootFolder(File rootFolder) {
     if (rootFolder == null) {
       throw new IllegalArgumentException("Root folder cannot be null");

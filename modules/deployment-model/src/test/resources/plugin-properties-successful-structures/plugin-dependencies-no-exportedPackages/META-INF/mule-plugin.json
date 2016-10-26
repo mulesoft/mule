@@ -1,0 +1,7 @@
+{
+  "name": "plugin-dependencies-no-exportedPackages",
+  "minMuleVersion": "4.0.0",
+  "classloaderDescriptor": {
+    "id": "pluginproperties"
+  }
+}

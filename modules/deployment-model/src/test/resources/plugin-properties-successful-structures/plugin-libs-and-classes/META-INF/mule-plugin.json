@@ -1,0 +1,7 @@
+{
+  "name": "plugin-libs-and-classes",
+  "minMuleVersion": "4.0.0",
+  "classloaderDescriptor": {
+    "id": "pluginproperties"
+  }
+}

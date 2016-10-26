@@ -1,0 +1,23 @@
+{
+  "name": "plugin-name",
+  "minMuleVersion": "4.0.0",
+  "classloaderDescriptor": {
+    "id": "maven",
+    "attributes": {
+      "exportedPackages": [
+        "org.mule.extension.api",
+        "org.mule.extension.api.exception"
+      ],
+      "exportedResources": [
+        "/META-INF/some.file",
+        "/META-INF/other.file"
+      ]
+    }
+  },
+  "extensionModelDescriptor": {
+    "id": "annotationsExtensionModelLoader",
+    "attributes": {
+      "class": "org.mule.extension.internal.ExtensionConnector"
+    }
+  }
+}

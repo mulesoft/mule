@@ -59,7 +59,6 @@ import static org.mule.runtime.module.deployment.internal.application.Properties
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -85,6 +84,7 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactor
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.net.MulePluginUrlStreamHandler;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.application.TestApplicationFactory;
 import org.mule.runtime.module.deployment.internal.builder.ApplicationFileBuilder;
@@ -132,6 +132,12 @@ import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
+
+  static {
+    //TODO MULE-10785 if not registered, tests of plugins in zip format will break as the protocol will be unkown
+    //Registering protocol
+    MulePluginUrlStreamHandler.register();
+  }
 
   private static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
   protected static final int DEPLOYMENT_TIMEOUT = 10000;
@@ -1454,7 +1460,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void deploysAppWithPluginBootstrapProperty() throws Exception {
     final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
-        .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES).containingClass("org/foo/EchoTest.clazz");
+        .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES).containingClass("org/foo/EchoTest.clazz")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo");
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("app-with-plugin-bootstrap")
         .definedBy("app-with-plugin-bootstrap.xml").containingPlugin(pluginFileBuilder);
@@ -1591,7 +1598,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysApplicationWithPluginDependingOnPlugin() throws Exception {
-
+    //TODO MULE-10785 this is one of the test to play with (no unzipping should be needed)
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
             .containingClass("org/foo/echo/Plugin3Echo.clazz").dependingOn(echoPlugin.getId());
