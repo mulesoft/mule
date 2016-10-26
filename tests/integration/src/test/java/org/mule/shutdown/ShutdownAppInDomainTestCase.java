@@ -35,7 +35,7 @@ import org.junit.Test;
  * Tests that threads in pools defined in a domain do not hold references to objects of the application in their thread locals.
  */
 @Ignore("MULE-10335")
-public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
+public class /ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
 
   private static final int PROBER_POLLING_INTERVAL = 100;
   private static final int PROBER_POLIING_TIMEOUT = 5000;

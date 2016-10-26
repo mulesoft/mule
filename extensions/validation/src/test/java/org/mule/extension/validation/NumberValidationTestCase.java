@@ -61,7 +61,7 @@ public class NumberValidationTestCase extends ValidationTestCase {
   @Test
   public void validateNumber() throws Exception {
 
-    // This test will be ignored when the Allure framework is used because of this issue MULE-10805
+    // TODO MULE-10805: It's ignored when Allure is used because it fails with the Allure Surefire listener
     assumeThat(System.getProperty("allure.profile.is.activated", "false"), is(equalTo("false")));
 
     assertValid(configureNumberValidationRunner(flowRunner(FLOW_NAME), value, minValue, maxValue));
