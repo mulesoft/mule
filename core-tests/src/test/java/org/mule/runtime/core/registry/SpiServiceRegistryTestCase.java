@@ -28,7 +28,8 @@ public class SpiServiceRegistryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void lookupProviders() throws Exception {
-    Collection<TestDiscoverableObject> discoveredObjects = serviceRegistry.lookupProviders(TestDiscoverableObject.class, currentThread().getContextClassLoader());
+    Collection<TestDiscoverableObject> discoveredObjects =
+        serviceRegistry.lookupProviders(TestDiscoverableObject.class, currentThread().getContextClassLoader());
     assertProvidersFound(discoveredObjects);
   }
 

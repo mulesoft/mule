@@ -38,8 +38,8 @@ import org.w3c.dom.NodeList;
  * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.spring.dsl.processor.ConfigLine}
  * objects.
  * <p>
- * It uses the SPI interface {@link XmlNamespaceInfoProvider} to locate for all
- * namespace info provided and normalize the namespace from the XML document.
+ * It uses the SPI interface {@link XmlNamespaceInfoProvider} to locate for all namespace info provided and normalize the
+ * namespace from the XML document.
  *
  * @since 4.0
  */
@@ -57,7 +57,8 @@ public class XmlApplicationParser {
   }
 
   public XmlApplicationParser(ServiceRegistry serviceRegistry) {
-    namespaceInfoProviders = ImmutableList.copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, currentThread().getContextClassLoader()));
+    namespaceInfoProviders = ImmutableList
+        .copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, currentThread().getContextClassLoader()));
     namespaceCache = CacheBuilder.newBuilder().build();
   }
 
