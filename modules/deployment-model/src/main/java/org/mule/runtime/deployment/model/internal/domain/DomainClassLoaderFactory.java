@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -15,6 +14,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
@@ -51,8 +51,8 @@ import org.slf4j.LoggerFactory;
 public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFactory<DomainDescriptor> {
 
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
-  private final ClassLoader parentClassLoader;
 
+  private final ClassLoader parentClassLoader;
   private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
   private JarExplorer jarExplorer = new FileJarExplorer();
 
@@ -62,6 +62,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
    * @param parentClassLoader parent classLoader of the created instance. Can be null.
    */
   public DomainClassLoaderFactory(ClassLoader parentClassLoader) {
+    checkArgument(parentClassLoader != null, "parentClassLoader cannot be null");
     this.parentClassLoader = parentClassLoader;
   }
 

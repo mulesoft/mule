@@ -145,6 +145,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
+  private DefaultArtifactClassLoaderManager artifactClassLoaderManager;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Object[]> parameters() {
@@ -336,6 +337,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
+    artifactClassLoaderManager = muleArtifactResourcesRegistry.getArtifactClassLoaderManager();
+
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                   muleArtifactResourcesRegistry.getApplicationFactory());
     deploymentService.addDeploymentListener(applicationDeploymentListener);
@@ -2281,7 +2284,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()), containerClassLoader);
+        new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
+                              containerClassLoader);
     testDomainFactory.setFailOnStopApplication();
 
     deploymentService.setDomainFactory(testDomainFactory);
@@ -2301,7 +2305,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()), containerClassLoader);
+        new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
+                              containerClassLoader);
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
     startDeployment();

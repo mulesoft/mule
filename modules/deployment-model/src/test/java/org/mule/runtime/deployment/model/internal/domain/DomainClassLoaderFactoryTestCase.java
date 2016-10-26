@@ -63,7 +63,9 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     DomainDescriptor descriptor = getTestDescriptor(domainName);
 
     final ArtifactClassLoader domainClassLoader =
-        new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader, descriptor, emptyList());
+        new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
+                                                                         descriptor,
+                                                                         emptyList());
 
     assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     assertThat(domainClassLoader.getArtifactId(), equalTo(artifactId));
@@ -73,7 +75,8 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
   public void validateDomainBeforeCreatingClassLoader() {
     DomainDescriptor descriptor = getTestDescriptor("someDomain");
 
-    new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader, descriptor, emptyList());
+    new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
+                                                                     descriptor, emptyList());
   }
 
   @Test
@@ -83,7 +86,9 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     DomainDescriptor descriptor = getTestDescriptor(domainName);
     createDomainDir(MULE_DOMAIN_FOLDER, domainName);
     ArtifactClassLoader domainClassLoader =
-        new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader, descriptor, emptyList());
+        new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
+                                                                         descriptor,
+                                                                         emptyList());
 
     assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     assertThat(domainClassLoader.getArtifactId(), equalTo(artifactId));

@@ -7,7 +7,9 @@
 package org.mule.runtime.module.deployment.internal;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 
 /**
  * Factory for {@code ArtifactClassLoaderBuilder} instances.
@@ -17,7 +19,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 public class TemporaryArtifactClassLoaderBuilderFactory {
 
   private ArtifactPluginRepository applicationPluginRepository;
-  private final ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory;
+  private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
 
   /**
    * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
@@ -26,7 +28,7 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
    */
   public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
-                                                    ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory) {
+                                                    ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
     this.applicationPluginRepository = applicationPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
   }

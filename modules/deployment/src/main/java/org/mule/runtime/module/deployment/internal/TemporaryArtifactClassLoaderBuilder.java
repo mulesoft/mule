@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    * @param artifactPluginClassLoaderFactory factory for creating class loaders for artifact plugins. Must be not null.
    */
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
-                                             ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory) {
+                                             ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
     super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository,
           artifactPluginClassLoaderFactory);
   }

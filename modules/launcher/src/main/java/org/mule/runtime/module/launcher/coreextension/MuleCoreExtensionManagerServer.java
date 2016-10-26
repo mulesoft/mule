@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
@@ -16,6 +17,6 @@ import org.mule.runtime.module.tooling.api.ToolingServiceAware;
  * Manages lifecycle and dependency injection for {@link MuleCoreExtension}
  */
 public interface MuleCoreExtensionManagerServer
-    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware {
+    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware, ArtifactClassLoaderManagerAware {
 
 }

@@ -110,5 +110,4 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
     verify(lookupPolicy).getLookupStrategy(className);
   }
-
 }
