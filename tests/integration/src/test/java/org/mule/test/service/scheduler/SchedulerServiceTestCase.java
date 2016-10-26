@@ -22,7 +22,6 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
-//@Ignore("MULE-10136")
 @Features("Scheduler Service")
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
