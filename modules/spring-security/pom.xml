@@ -31,6 +31,7 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--TODO: MULE-10837-->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-service</artifactId>

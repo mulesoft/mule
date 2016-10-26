@@ -51,6 +51,7 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!--TODO: MULE-10837-->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-service</artifactId>

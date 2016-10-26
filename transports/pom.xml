@@ -38,6 +38,7 @@
     </build>
 
     <dependencies>
+        <!--TODO: MULE-10837-->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-service</artifactId>
