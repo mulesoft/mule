@@ -14,9 +14,9 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.TAR
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
@@ -35,7 +35,7 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
   private final OperationModel operationModel;
   private final DslElementSyntax operationDsl;
 
-  public OperationDefinitionParser(ComponentBuildingDefinition.Builder definition, ExtensionModel extensionModel,
+  public OperationDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                    OperationModel operationModel,
                                    DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                    ExtensionParsingContext parsingContext) {
@@ -46,7 +46,7 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
   }
 
   @Override
-  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
+  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
     definitionBuilder.withIdentifier(operationDsl.getElementName()).withTypeDefinition(fromType(OperationMessageProcessor.class))
         .withObjectFactoryType(OperationMessageProcessorObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())

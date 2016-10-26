@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
+import static java.lang.Thread.currentThread;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
@@ -23,7 +24,7 @@ public interface ArtifactConfigurationProcessor {
    * @return an {@link ArtifactConfigurationProcessor} discovered using SPI.
    */
   static ArtifactConfigurationProcessor discover() {
-    return new SpiServiceRegistry().lookupProvider(ArtifactConfigurationProcessor.class);
+    return new SpiServiceRegistry().lookupProvider(ArtifactConfigurationProcessor.class, currentThread().getContextClassLoader());
   }
 
   /**

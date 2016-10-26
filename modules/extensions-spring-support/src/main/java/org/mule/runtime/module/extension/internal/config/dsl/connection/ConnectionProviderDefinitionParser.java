@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
@@ -34,7 +35,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
   private final ConnectionProviderModel providerModel;
   private final DslElementSyntax connectionDsl;
 
-  public ConnectionProviderDefinitionParser(ComponentBuildingDefinition.Builder definition, ConnectionProviderModel providerModel,
+  public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
                                             DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                             ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext, muleContext);
@@ -43,7 +44,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
   }
 
   @Override
-  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
+  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
     definitionBuilder.withIdentifier(connectionDsl.getElementName())
         .withTypeDefinition(fromType(ConnectionProviderResolver.class))
         .withObjectFactoryType(ConnectionProviderObjectFactory.class)

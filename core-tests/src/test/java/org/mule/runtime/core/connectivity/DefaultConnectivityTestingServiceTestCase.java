@@ -48,7 +48,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
     connectivityTestingService = new DefaultConnectivityTestingService();
     connectivityTestingService.setServiceRegistry(mockServiceRegistry);
     connectivityTestingService.setMuleContext(mockMuleContext);
-    when(mockServiceRegistry.lookupProviders(any())).thenReturn(asList(mockConnectivityTestingStrategy));
+    when(mockServiceRegistry.lookupProviders(any(), any())).thenReturn(asList(mockConnectivityTestingStrategy));
     when(mockConnectivityTestingStrategy.accepts(fakeConnectivityTestingObject)).thenReturn(true);
     when(mockMuleContext.getRegistry().get(TEST_IDENTIFIER)).thenReturn(fakeConnectivityTestingObject);
     connectivityTestingService.initialise();

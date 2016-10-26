@@ -33,8 +33,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
   }
 
   /**
-   * Retrieves a collection of providers. This method will be reused to actually implement {@code {@link #lookupProviders(Class)},
-   * and {@code {@link #lookupProvider(Class)}}}.
+   * Retrieves a collection of providers. This method will be reused to actually implement {@code {@link #lookupProviders(Class, ClassLoader)},
+   * and {@code {@link #lookupProvider(Class, ClassLoader)}}}.
    *
    * @param providerClass a <code>Class</code>object indicating the class or interface of the service providers being detected.
    * @param loader the class loader to be used to load provider/configuration files and instantiate provider instances. If
@@ -47,16 +47,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
    * {@inheritDoc}
    */
   @Override
-  public final <T> Collection<T> lookupProviders(Class<T> providerClass) {
-    return copyOf(ServiceLoader.load(providerClass).iterator());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public final <T> T lookupProvider(Class<T> providerClass) {
-    Collection<T> providers = lookupProviders(providerClass, Thread.currentThread().getContextClassLoader());
+  public final <T> T lookupProvider(Class<T> providerClass, ClassLoader classLoader) {
+    Collection<T> providers = lookupProviders(providerClass, classLoader);
     if (providers.isEmpty()) {
       throw new IllegalStateException("No provider found for class " + providerClass.getName());
     }

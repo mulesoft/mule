@@ -39,6 +39,7 @@ import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.core.api.Event;
@@ -133,7 +134,7 @@ public abstract class ExtensionDefinitionParser {
           new FixedTypeParsingDelegate(TlsContextFactory.class), new FixedTypeParsingDelegate(ThreadingProfile.class),
           new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslResolver;
-  protected final ComponentBuildingDefinition.Builder baseDefinitionBuilder;
+  protected final Builder baseDefinitionBuilder;
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private final ConversionService conversionService = new DefaultConversionService();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -147,11 +148,11 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Creates a new instance
    *
-   * @param baseDefinitionBuilder a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder} used as a prototype to generate new defitintions
+   * @param baseDefinitionBuilder a {@link Builder} used as a prototype to generate new defitintions
    * @param dslSyntaxResolver     a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
    * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
-  protected ExtensionDefinitionParser(ComponentBuildingDefinition.Builder baseDefinitionBuilder,
+  protected ExtensionDefinitionParser(Builder baseDefinitionBuilder,
                                       DslSyntaxResolver dslSyntaxResolver,
                                       ExtensionParsingContext parsingContext, MuleContext muleContext) {
     this.baseDefinitionBuilder = baseDefinitionBuilder;
@@ -168,7 +169,7 @@ public abstract class ExtensionDefinitionParser {
    * @throws ConfigurationException if a parsing error occurs
    */
   public final List<ComponentBuildingDefinition> parse() throws ConfigurationException {
-    final ComponentBuildingDefinition.Builder builder = baseDefinitionBuilder.copy();
+    final Builder builder = baseDefinitionBuilder.copy();
     doParse(builder);
 
     AttributeDefinition parametersDefinition = fromFixedValue(new HashMap<>()).build();
@@ -188,10 +189,10 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Implementations place their custom parsing logic here.
    *
-   * @param definitionBuilder the {@link ComponentBuildingDefinition.Builder} on which implementation are to define their stuff
+   * @param definitionBuilder the {@link Builder} on which implementation are to define their stuff
    * @throws ConfigurationException if a parsing error occurs
    */
-  protected abstract void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException;
+  protected abstract void doParse(Builder definitionBuilder) throws ConfigurationException;
 
   /**
    * Parsers the given {@code parameters} and generates matching definitions
@@ -429,7 +430,7 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         protected void visitBasicType(MetadataType metadataType) {
-          ComponentBuildingDefinition.Builder itemDefinitionBuilder =
+          Builder itemDefinitionBuilder =
               baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
                   .withTypeDefinition(fromType(getType(metadataType)))
                   .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),

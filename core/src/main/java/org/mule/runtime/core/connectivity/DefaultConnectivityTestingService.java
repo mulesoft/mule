@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.connectivity;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
@@ -52,7 +53,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
   @Override
   public void initialise() throws InitialisationException {
     connectivityTestingStrategies =
-        serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class);
+        serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class, currentThread().getContextClassLoader());
 
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       try {

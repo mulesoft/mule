@@ -7,6 +7,7 @@
 
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_CONTEXT_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
@@ -56,7 +57,7 @@ public class XmlApplicationParser {
   }
 
   public XmlApplicationParser(ServiceRegistry serviceRegistry) {
-    namespaceInfoProviders = ImmutableList.copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class));
+    namespaceInfoProviders = ImmutableList.copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, currentThread().getContextClassLoader()));
     namespaceCache = CacheBuilder.newBuilder().build();
   }
 

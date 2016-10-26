@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.join;
@@ -152,7 +153,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactType = artifactType;
     this.artifactConfiguration = artifactConfiguration;
 
-    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class)
+    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
           //TODO MULE-9637 remove support for MuleContextAware injection.
           if (componentBuildingDefinitionProvider instanceof MuleContextAware) {

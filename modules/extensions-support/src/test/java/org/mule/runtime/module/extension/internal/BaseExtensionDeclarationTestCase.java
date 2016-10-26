@@ -60,7 +60,6 @@ abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase {
   @Before
   public void buildExtension() throws Exception {
     Collection<ModelEnricher> emptyList = Collections.emptyList();
-    when(serviceRegistry.lookupProviders(same(ModelEnricher.class))).thenReturn(emptyList);
     when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class))).thenReturn(emptyList);
 
     factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
