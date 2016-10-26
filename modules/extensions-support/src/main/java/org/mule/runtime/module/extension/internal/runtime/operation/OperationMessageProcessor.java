@@ -44,8 +44,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
-import org.mule.runtime.module.extension.internal.metadata.MetadataKeyObjectResolver;
-import org.mule.runtime.module.extension.internal.metadata.OperationMetadataKeyObjectResolver;
+import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
@@ -232,8 +231,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   }
 
   @Override
-  protected MetadataKeyObjectResolver getMetadataKeyObjectResolver() throws MetadataResolvingException {
+  protected ParameterValueResolver getParameterValueResolver() {
     final Event event = getInitialiserEvent(muleContext);
-    return new OperationMetadataKeyObjectResolver(new LazyOperationContext(resolverSet, operationModel, extensionModel, event));
+    return new OperationParameterValueResolver(new LazyOperationContext(resolverSet, operationModel, extensionModel, event));
   }
 }

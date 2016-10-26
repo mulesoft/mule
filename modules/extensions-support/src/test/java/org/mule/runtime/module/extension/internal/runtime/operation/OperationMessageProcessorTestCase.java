@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -61,17 +62,22 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
+
+  private static final String SOME_PARAM_NAME = "someParam";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -323,9 +329,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
-  public void getMetadataKeyIdObjectValue() throws MetadataResolvingException, MuleException {
+  public void getMetadataKeyIdObjectValue() throws MetadataResolvingException, MuleException, ValueResolvingException {
     setUpValueResolvers();
-    final Object metadataKeyValue = messageProcessor.getMetadataKeyObjectResolver().getMetadataKeyValue();
+    final Object metadataKeyValue = messageProcessor.getParameterValueResolver().getParameterValue(SOME_PARAM_NAME);
     assertThat(metadataKeyValue, is("person"));
   }
 
@@ -348,11 +354,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpValueResolvers() throws MuleException {
+    final Optional<ParameterGroupModelProperty> modelProperty = Optional.of(new ParameterGroupModelProperty(emptyList()));
+    when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(modelProperty);
     final Map<String, ValueResolver> valueResolvers = mock(Map.class);
     when(resolverSet.getResolvers()).thenReturn(valueResolvers);
     final ValueResolver valueResolver = mock(ValueResolver.class);
-    when(valueResolvers.get(eq("someParam"))).thenReturn(valueResolver);
-    when(valueResolvers.containsKey(eq("someParam"))).thenReturn(true);
+    when(valueResolvers.get(eq(SOME_PARAM_NAME))).thenReturn(valueResolver);
+    when(valueResolvers.containsKey(eq(SOME_PARAM_NAME))).thenReturn(true);
     when(valueResolver.resolve(any(Event.class))).thenReturn("person");
   }
 }

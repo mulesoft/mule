@@ -22,8 +22,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -43,25 +41,24 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.execution.NullCompletionHandler;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MetadataKeyObjectResolver;
+import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -347,19 +344,13 @@ public class ExtensionMessageSource extends ExtensionComponent
   }
 
   @Override
-  protected MetadataKeyObjectResolver getMetadataKeyObjectResolver() {
-    return () -> {
-      Object keyValue = null;
-      final Optional<MetadataKeyIdModelProperty> keyIdModelProperty =
-          sourceModel.getModelProperty(MetadataKeyIdModelProperty.class);
-      if (keyIdModelProperty.isPresent()) {
-        try {
-          keyValue = source.getFieldValue(keyIdModelProperty.get().getParameterName());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-          throw new MetadataResolvingException(e.getMessage(), FailureCode.UNKNOWN, e);
-        }
+  protected ParameterValueResolver getParameterValueResolver() {
+    return (fieldName) -> {
+      try {
+        return source.getFieldValue(fieldName);
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        throw new ValueResolvingException(e.getMessage(), e);
       }
-      return keyValue;
     };
   }
 

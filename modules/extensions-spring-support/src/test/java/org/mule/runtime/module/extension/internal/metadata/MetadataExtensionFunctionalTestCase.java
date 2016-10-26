@@ -114,11 +114,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
-  private static final MetadataComponentDescriptorProvider EXPLICIT_METADATA_RESOLVER = MetadataService::getMetadata;
-  private static final MetadataComponentDescriptorProvider DSL_METADATA_RESOLVER =
-      (MetadataComponentDescriptorProvider) (metadataService, componentId, key) -> metadataService
-          .getMetadata(componentId);
-
+  private static final MetadataComponentDescriptorProvider explicitMetadataResolver =
+      (metadataService, componentId, key) -> metadataService.getMetadata(componentId, key);
+  private static final MetadataComponentDescriptorProvider dslMetadataResolver =
+      (metadataService, componentId, key) -> metadataService.getMetadata(componentId);
 
   protected MetadataType personType;
   protected ComponentId componentId;
@@ -141,8 +140,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        {EXPLICIT_RESOLUTION, EXPLICIT_METADATA_RESOLVER},
-        {DSL_RESOLUTION, DSL_METADATA_RESOLVER}
+        {EXPLICIT_RESOLUTION, explicitMetadataResolver},
+        {DSL_RESOLUTION, dslMetadataResolver}
     });
   }
 

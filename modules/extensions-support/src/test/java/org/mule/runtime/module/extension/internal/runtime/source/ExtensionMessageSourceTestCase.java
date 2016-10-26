@@ -80,6 +80,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
@@ -107,6 +108,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private static final String CONFIG_NAME = "myConfig";
   private static final String ERROR_MESSAGE = "ERROR";
   private static final String SOURCE_NAME = "source";
+  private static final String METADATA_KEY = "metadataKey";
   private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
 
@@ -185,6 +187,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         .thenReturn(new ImmutableOutputModel("Output", BaseTypeBuilder.create(JAVA).stringType().build(), true, emptySet()));
     when(sourceModel.getOutputAttributes())
         .thenReturn(new ImmutableOutputModel("Output", BaseTypeBuilder.create(JAVA).stringType().build(), false, emptySet()));
+    when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class))
+        .thenReturn(Optional.of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), METADATA_KEY)));
 
     messageSource = getNewExtensionMessageSourceInstance();
   }
@@ -402,14 +406,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void getMetadataKeyIdObjectValue() throws InitialisationException, MetadataResolvingException {
+  public void getMetadataKeyIdObjectValue() throws InitialisationException, MetadataResolvingException, ValueResolvingException {
     final String person = "person";
     when(sourceFactory.createSource()).thenReturn(new DummySource(person));
     messageSource.doInitialise();
-    when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class))
-        .thenReturn(Optional.of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), "metadataKey")));
-
-    final Object metadataKeyValue = messageSource.getMetadataKeyObjectResolver().getMetadataKeyValue();
+    final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
     assertThat(metadataKeyValue, is(person));
   }
 
