@@ -50,7 +50,7 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
       try {
         final ServiceProvider serviceProvider;
         String artifactName =
-            (String) serviceArtifactClassLoader.getClass().getMethod("getArtifactName").invoke(serviceArtifactClassLoader);
+            (String) serviceArtifactClassLoader.getClass().getMethod("getArtifactId").invoke(serviceArtifactClassLoader);
         ClassLoader classLoader =
             (ClassLoader) serviceArtifactClassLoader.getClass().getMethod("getClassLoader").invoke(serviceArtifactClassLoader);
 
