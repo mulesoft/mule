@@ -41,7 +41,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer {
         } else if (src instanceof String) {
           data = ((String) src).getBytes(outputEncoding);
         } else {
-          data = muleContext.getObjectSerializer().serialize(src);
+          data = muleContext.getObjectSerializer().getExternalProtocol().serialize(src);
         }
         return getStrategy().compressByteArray(data);
       }

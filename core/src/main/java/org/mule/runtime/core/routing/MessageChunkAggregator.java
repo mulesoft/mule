@@ -67,7 +67,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
 
           // try to deserialize message, since ChunkingRouter might have serialized the object...
           try {
-            builder.payload(muleContext.getObjectSerializer().deserialize(baos.toByteArray()));
+            builder.payload(muleContext.getObjectSerializer().getInternalProtocol().deserialize(baos.toByteArray()));
           } catch (SerializationException e) {
             builder.payload(baos.toByteArray());
           }

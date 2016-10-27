@@ -56,7 +56,8 @@ public class ObjectToInputStreamTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTransformSerializable() {
     Apple apple = new Apple();
-    InputStream serializedApple = new ByteArrayInputStream(muleContext.getObjectSerializer().serialize(apple));
+    InputStream serializedApple =
+        new ByteArrayInputStream(muleContext.getObjectSerializer().getExternalProtocol().serialize(apple));
     try {
       assertTrue(compare(serializedApple, (InputStream) transformer.transform(apple)));
     } catch (Exception e) {

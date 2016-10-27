@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -113,8 +114,9 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     }
     Event testEvent = eventBuilder().message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
-    byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
-    testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
+    SerializationProtocol serializationProtocol = muleContext.getObjectSerializer().getExternalProtocol();
+    byte[] serializedEvent = serializationProtocol.serialize(testEvent);
+    testEvent = serializationProtocol.deserialize(serializedEvent);
 
     assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }

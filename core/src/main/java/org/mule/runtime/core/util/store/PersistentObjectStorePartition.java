@@ -321,7 +321,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     try {
       out = new FileOutputStream(outputFile);
       ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
-      serializer.serialize(storeValue, objectOutputStream);
+      serializer.getInternalProtocol().serialize(storeValue, objectOutputStream);
     } catch (Exception se) {
       throw new ObjectStoreException(se);
     } finally {
@@ -340,7 +340,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     ObjectInputStream objectInputStream = null;
     try {
       objectInputStream = new ObjectInputStream(new FileInputStream(file));
-      StoreValue<T> storedValue = serializer.deserialize(objectInputStream);
+      StoreValue<T> storedValue = serializer.getInternalProtocol().deserialize(objectInputStream);
       if (storedValue.getValue() instanceof DeserializationPostInitialisable) {
         DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
       }

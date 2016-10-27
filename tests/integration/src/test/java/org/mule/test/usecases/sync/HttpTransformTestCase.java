@@ -63,7 +63,8 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     payload.add(42);
     InternalMessage message =
         client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
-                    InternalMessage.of(muleContext.getObjectSerializer().serialize(payload)), HTTP_REQUEST_OPTIONS)
+                    InternalMessage.of(muleContext.getObjectSerializer().getExternalProtocol().serialize(payload)),
+                    HTTP_REQUEST_OPTIONS)
             .getRight();
     assertNotNull(message);
     ByteArrayToSerializable bas = new ByteArrayToSerializable();

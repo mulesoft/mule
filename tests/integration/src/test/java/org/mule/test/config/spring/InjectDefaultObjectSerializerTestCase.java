@@ -12,11 +12,10 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.serialization.internal.AbstractObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -67,15 +66,16 @@ public class InjectDefaultObjectSerializerTestCase extends AbstractIntegrationTe
     }
   }
 
-  public static class TestObjectSerializer extends AbstractObjectSerializer {
+  public static class TestSerializationProtocol implements ObjectSerializer {
+
 
     @Override
-    protected byte[] doSerialize(Object object) throws Exception {
-      return new byte[0];
+    public SerializationProtocol getInternalProtocol() {
+      return null;
     }
 
     @Override
-    protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception {
+    public SerializationProtocol getExternalProtocol() {
       return null;
     }
   }

@@ -13,7 +13,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
@@ -65,12 +64,12 @@ public class VMUsersDefaultObjectSerializerTestCase extends CompatibilityFunctio
     assertThat(getPayloadAsString(response), is(payload));
 
     ArgumentCaptor<InternalMessage> messageArgumentCaptor = ArgumentCaptor.forClass(InternalMessage.class);
-    verify(objectSerializer, atLeastOnce()).serialize(messageArgumentCaptor.capture());
+    verify(objectSerializer, atLeastOnce()).getExternalProtocol().serialize(messageArgumentCaptor.capture());
     InternalMessage capturedMessage = messageArgumentCaptor.getValue();
     assertThat(capturedMessage, is(notNullValue()));
     assertThat(getPayloadAsString(capturedMessage), is(payload));
 
-    verify(objectSerializer, atLeastOnce()).deserialize(any(byte[].class));
+    verify(objectSerializer, atLeastOnce()).getExternalProtocol().deserialize(any(byte[].class));
   }
 
 }

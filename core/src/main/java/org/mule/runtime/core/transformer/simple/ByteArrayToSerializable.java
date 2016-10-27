@@ -37,9 +37,9 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
     try {
       final Object result;
       if (src instanceof byte[]) {
-        result = serializer.deserialize((byte[]) src);
+        result = serializer.getExternalProtocol().deserialize((byte[]) src);
       } else {
-        result = serializer.deserialize((InputStream) src);
+        result = serializer.getExternalProtocol().deserialize((InputStream) src);
       }
       return result;
     } catch (Exception e) {

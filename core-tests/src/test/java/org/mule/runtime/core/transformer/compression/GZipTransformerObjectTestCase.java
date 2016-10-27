@@ -22,7 +22,7 @@ public class GZipTransformerObjectTestCase extends GZipTransformerTestCase {
   @Override
   public Object getResultData() {
     try {
-      return strat.compressByteArray(muleContext.getObjectSerializer().serialize(TEST_OBJECT));
+      return strat.compressByteArray(muleContext.getObjectSerializer().getExternalProtocol().serialize(TEST_OBJECT));
     } catch (Exception e) {
       fail(e.getMessage());
       return null;

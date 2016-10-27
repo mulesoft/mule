@@ -28,7 +28,7 @@ public abstract class AbstractSessionHandler implements SessionHandler {
 
   protected <T> T deserialize(InternalMessage message, byte[] bytes, MuleContext muleContext) {
     T object = objectSerializerLocator.getObjectSerializer(message, muleContext)
-        .deserialize(bytes, muleContext.getExecutionClassLoader());
+        .getExternalProtocol().deserialize(bytes, muleContext.getExecutionClassLoader());
     if (object instanceof DeserializationPostInitialisable) {
       try {
         DeserializationPostInitialisable.Implementation.init(object, muleContext);
@@ -41,7 +41,7 @@ public abstract class AbstractSessionHandler implements SessionHandler {
   }
 
   protected byte[] serialize(InternalMessage message, Object object, MuleContext muleContext) {
-    return objectSerializerLocator.getObjectSerializer(message, muleContext).serialize(object);
+    return objectSerializerLocator.getObjectSerializer(message, muleContext).getExternalProtocol().serialize(object);
   }
 
   @Inject

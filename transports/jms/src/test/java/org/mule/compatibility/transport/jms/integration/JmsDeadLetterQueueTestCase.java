@@ -79,7 +79,7 @@ public class JmsDeadLetterQueueTestCase extends AbstractJmsFunctionalTestCase {
       if (message instanceof BytesMessage) {
         byte[] messageBytes = new byte[(int) ((BytesMessage) message).getBodyLength()];
         ((BytesMessage) message).readBytes(messageBytes);
-        obj = muleContext.getObjectSerializer().deserialize(messageBytes);
+        obj = muleContext.getObjectSerializer().getExternalProtocol().deserialize(messageBytes);
       }
       // ExceptionMessage did not get serialized by JMS provider
       else if (message instanceof ObjectMessage) {

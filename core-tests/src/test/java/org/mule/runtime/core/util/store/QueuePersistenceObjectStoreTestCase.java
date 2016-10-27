@@ -199,7 +199,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     storeFile.getParentFile().mkdir();
 
     FileOutputStream fos = new FileOutputStream(storeFile);
-    muleContext.getObjectSerializer().serialize(payload, fos);
+    muleContext.getObjectSerializer().getExternalProtocol().serialize(payload, fos);
 
     return storeFile;
   }

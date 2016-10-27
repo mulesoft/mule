@@ -22,6 +22,6 @@ public class MuleMessageToByteArray extends AbstractMessageTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) {
-    return muleContext.getObjectSerializer().serialize(event.getMessage());
+    return muleContext.getObjectSerializer().getExternalProtocol().serialize(event.getMessage());
   }
 }

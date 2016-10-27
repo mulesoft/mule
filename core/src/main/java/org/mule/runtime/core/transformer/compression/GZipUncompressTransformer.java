@@ -45,14 +45,14 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer {
           return new String(buffer, outputEncoding);
         } else if (!DataType.OBJECT.isCompatibleWith(returnDataType) && !DataType.BYTE_ARRAY.isCompatibleWith(returnDataType)) {
           try {
-            return muleContext.getObjectSerializer().deserialize(buffer);
+            return muleContext.getObjectSerializer().getExternalProtocol().deserialize(buffer);
           } catch (SerializationException e) {
             throw new TransformerException(this, e);
           }
         } else {
           // First try to deserialize the byte array. If it can be deserialized, then it was originally serialized.
           try {
-            return muleContext.getObjectSerializer().deserialize(buffer);
+            return muleContext.getObjectSerializer().getExternalProtocol().deserialize(buffer);
           } catch (SerializationException e) {
             // If it fails, ignore it. We assume it was not serialized in the first place and return the buffer as it is.
             return buffer;

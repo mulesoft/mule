@@ -328,7 +328,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         final Event eventFromContext = getCurrentEvent();
         postMethod.setRequestEntity(new StreamPayloadRequestEntity((OutputHandler) src, eventFromContext));
       } else {
-        final byte[] buffer = muleContext.getObjectSerializer().serialize(src);
+        final byte[] buffer = muleContext.getObjectSerializer().getExternalProtocol().serialize(src);
         postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, outboundMimeType));
       }
     } else if (msg.getOutboundAttachmentNames() != null && msg.getOutboundAttachmentNames().size() > 0) {

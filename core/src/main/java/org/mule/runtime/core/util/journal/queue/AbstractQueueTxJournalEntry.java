@@ -78,7 +78,7 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> 
     byte[] valueAsBytes = new byte[valueSize];
     inputStream.read(valueAsBytes, 0, valueSize);
     queueName = new String(queueNameAsBytes);
-    value = muleContext.getObjectSerializer().deserialize(valueAsBytes);
+    value = muleContext.getObjectSerializer().getInternalProtocol().deserialize(valueAsBytes);
   }
 
   public void write(DataOutputStream outputStream, MuleContext muleContext) {
@@ -91,7 +91,7 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> 
       }
       outputStream.write(queueName.length());
       outputStream.write(queueName.getBytes());
-      byte[] serializedValue = muleContext.getObjectSerializer().serialize(value);
+      byte[] serializedValue = muleContext.getObjectSerializer().getInternalProtocol().serialize(value);
       outputStream.writeInt(serializedValue.length);
       outputStream.write(serializedValue);
       outputStream.flush();
