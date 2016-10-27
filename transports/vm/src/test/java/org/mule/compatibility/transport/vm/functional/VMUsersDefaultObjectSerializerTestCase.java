@@ -14,10 +14,12 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
@@ -36,13 +38,7 @@ public class VMUsersDefaultObjectSerializerTestCase extends CompatibilityFunctio
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
 
-    objectSerializer = new JavaObjectSerializer();
-    try {
-      LifecycleUtils.initialiseIfNeeded(objectSerializer);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-    objectSerializer = spy(objectSerializer);
+    objectSerializer = new CustomObjectSerializer();
 
     Map<String, Object> serializerMap = new HashMap<>();
     serializerMap.put("customSerializer", objectSerializer);
@@ -64,12 +60,45 @@ public class VMUsersDefaultObjectSerializerTestCase extends CompatibilityFunctio
     assertThat(getPayloadAsString(response), is(payload));
 
     ArgumentCaptor<InternalMessage> messageArgumentCaptor = ArgumentCaptor.forClass(InternalMessage.class);
-    verify(objectSerializer, atLeastOnce()).getExternalProtocol().serialize(messageArgumentCaptor.capture());
+    verify(objectSerializer.getInternalProtocol(), atLeastOnce()).serialize(messageArgumentCaptor.capture());
     InternalMessage capturedMessage = messageArgumentCaptor.getValue();
     assertThat(capturedMessage, is(notNullValue()));
     assertThat(getPayloadAsString(capturedMessage), is(payload));
 
-    verify(objectSerializer, atLeastOnce()).getExternalProtocol().deserialize(any(byte[].class));
+    verify(objectSerializer.getInternalProtocol(), atLeastOnce()).deserialize(any(byte[].class));
+  }
+
+  private static class CustomObjectSerializer implements ObjectSerializer, MuleContextAware {
+
+    private final JavaObjectSerializer objectSerializer;
+    private SerializationProtocol internalProtocol;
+    private SerializationProtocol externalProtocol;
+
+    public CustomObjectSerializer() {
+      objectSerializer = new JavaObjectSerializer();
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context) {
+      objectSerializer.setMuleContext(context);
+    }
+
+    @Override
+    public SerializationProtocol getInternalProtocol() {
+      if (internalProtocol == null) {
+        internalProtocol = spy(objectSerializer.getInternalProtocol());
+      }
+
+      return internalProtocol;
+    }
+
+    @Override
+    public SerializationProtocol getExternalProtocol() {
+      if (externalProtocol == null) {
+        externalProtocol = spy(objectSerializer.getExternalProtocol());
+      }
+      return externalProtocol;
+    }
   }
 
 }
