@@ -80,7 +80,7 @@ public class MuleDeployment extends MuleInstallation {
   private static final String DEBUG_PORT = "5005";
   private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
   private static PollingProber prober;
-  protected String locationSuffix = "";
+  private String locationSuffix = "";
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
   private List<String> applications = new ArrayList<>();
   private List<String> domains = new ArrayList<>();
