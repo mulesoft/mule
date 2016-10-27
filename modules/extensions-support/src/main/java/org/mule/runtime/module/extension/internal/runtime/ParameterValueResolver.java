@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 /**
- * Contract for extension components that knows how to single parameter values
+ * Contract for extension components that knows how to resolve parameter values
  *
  * @since 4.0
  */

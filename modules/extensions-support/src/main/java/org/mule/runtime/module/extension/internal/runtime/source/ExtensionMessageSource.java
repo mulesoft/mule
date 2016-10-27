@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
@@ -347,7 +348,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   protected ParameterValueResolver getParameterValueResolver() {
     return (fieldName) -> {
       try {
-        return source.getFieldValue(fieldName);
+        return getFieldValue(source.getDelegate(), fieldName);
       } catch (NoSuchFieldException | IllegalAccessException e) {
         throw new ValueResolvingException(e.getMessage(), e);
       }

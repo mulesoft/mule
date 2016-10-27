@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -166,8 +165,8 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     return Optional.of(new FieldSetter<>(fields.iterator().next()));
   }
 
-  Object getFieldValue(String fieldName) throws NoSuchFieldException, IllegalAccessException {
-    return IntrospectionUtils.getFieldValue(delegate, fieldName);
+  Source getDelegate() {
+    return delegate;
   }
 
   public String getName() {
