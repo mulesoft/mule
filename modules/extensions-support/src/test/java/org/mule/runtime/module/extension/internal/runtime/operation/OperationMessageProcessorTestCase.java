@@ -288,7 +288,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(operationContext.getConfiguration().get().getValue(), is(sameInstance(defaultConfigInstance)));
   }
 
-
   @Test
   public void getExplicitOperationDynamicMetadata() throws Exception {
     MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());

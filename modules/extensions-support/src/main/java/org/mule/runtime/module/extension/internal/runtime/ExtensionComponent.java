@@ -46,7 +46,6 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MetadataKeyIdObjectResolver;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
@@ -233,8 +232,7 @@ public abstract class ExtensionComponent
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException {
     MetadataContext context = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel),
-                                  () -> metadataMediator.getMetadata(context, getMetadataKeyValueResolver(key)));
+    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(context, key));
   }
 
   @Override
@@ -325,16 +323,6 @@ public abstract class ExtensionComponent
 
   protected ConfigurationProvider getConfigurationProvider() {
     return configurationProvider;
-  }
-
-  private ParameterValueResolver getMetadataKeyValueResolver(MetadataKey key) {
-    return (p) -> {
-      try {
-        return new MetadataKeyIdObjectResolver(componentModel).resolve(key);
-      } catch (MetadataResolvingException e) {
-        throw new ValueResolvingException(e.getMessage(), e);
-      }
-    };
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();

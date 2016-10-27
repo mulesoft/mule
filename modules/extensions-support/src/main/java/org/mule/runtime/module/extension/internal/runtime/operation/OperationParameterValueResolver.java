@@ -40,26 +40,17 @@ public class OperationParameterValueResolver implements ParameterValueResolver {
     if (parameterGroup.isPresent()) {
       return new ParameterGroupArgumentResolver<>(parameterGroup.get()).resolve(operationContext);
     } else {
-      return resolveSingleLevelMetadataKey(containerName);
+      return operationContext.getParameter(containerName);
     }
   }
 
   private Optional<ParameterGroup> getParameterGroup(String parameterGroupName) {
     final AtomicReference<ParameterGroup> atomicReference = new AtomicReference<>();
-
     operationModel.getModelProperty(ParameterGroupModelProperty.class)
         .ifPresent(paraGroup -> paraGroup.getGroups()
             .stream().filter(paramGroup -> paramGroup.getContainerName().equals(parameterGroupName))
             .findFirst()
             .ifPresent(atomicReference::set));
     return Optional.ofNullable(atomicReference.get());
-  }
-
-  /**
-   * @param parameterName the name of the parameter to resolve
-   * @return the value of the parameter
-   */
-  private Object resolveSingleLevelMetadataKey(String parameterName) {
-    return operationContext.getParameter(parameterName);
   }
 }

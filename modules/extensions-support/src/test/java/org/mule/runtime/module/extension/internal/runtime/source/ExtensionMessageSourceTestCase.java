@@ -114,39 +114,57 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
   @Mock
   private ExtensionModel extensionModel;
+
   @Mock
   private SourceModel sourceModel;
+
   @Mock
   private SourceFactory sourceFactory;
+
   @Mock
   private ThreadingProfile threadingProfile;
+
   @Mock
   private WorkManager workManager;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Processor messageProcessor;
+
   @Mock
   private FlowConstruct flowConstruct;
+
   @Mock(extraInterfaces = Lifecycle.class)
   private Source source;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionManagerAdapter extensionManager;
+
   @Mock
   private MessageProcessingManager messageProcessingManager;
+
   @Mock
   private ExceptionEnricherFactory enricherFactory;
+
   @Mock
   private InternalMessage muleMessage;
+
   @Mock
   private ConfigurationProvider configurationProvider;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel configurationModel;
+
   @Mock
   private ConfigurationInstance configurationInstance;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Event event;
+
   private ExtensionMessageSource messageSource;
+
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
 

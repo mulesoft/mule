@@ -50,7 +50,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class MetadataKeyIdObjectResolver {
+final class MetadataKeyIdObjectResolver {
 
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
   private final ComponentModel component;

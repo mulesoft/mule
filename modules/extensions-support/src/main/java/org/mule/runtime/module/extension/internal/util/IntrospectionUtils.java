@@ -260,6 +260,17 @@ public final class IntrospectionUtils {
     return CollectionUtils.isEmpty(candidates) ? Optional.empty() : Optional.of(candidates.iterator().next());
   }
 
+  public static Object getFieldValue(Object object, String fieldName) throws IllegalAccessException, NoSuchFieldException {
+    final Optional<Field> fieldOptional = getField(object.getClass(), fieldName);
+    if (fieldOptional.isPresent()) {
+      final Field field = fieldOptional.get();
+      field.setAccessible(true);
+      return field.get(object);
+    } else {
+      throw new NoSuchFieldException();
+    }
+  }
+
   public static Optional<Field> getFieldByAlias(Class<?> clazz, String alias) {
     Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class));
     Optional<Field> field = candidates.stream().filter(f -> alias.equals(f.getAnnotation(Alias.class).value())).findFirst();

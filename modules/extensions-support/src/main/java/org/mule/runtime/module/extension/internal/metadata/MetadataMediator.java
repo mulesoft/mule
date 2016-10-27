@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.componentDescriptor;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataProvider;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -55,13 +57,14 @@ public class MetadataMediator {
   private final MetadataKeysDelegate keysDelegate;
   private final MetadataOutputDelegate outputDelegate;
   private final MetadataInputDelegate inputDelegate;
+  private final MetadataKeyIdObjectResolver keyIdObjectResolver;
   private String keyContainerName = null;
 
   public MetadataMediator(ComponentModel componentModel) {
     this.component = componentModel;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
     this.keysDelegate = new MetadataKeysDelegate(componentModel, metadataKeyParts);
-
+    this.keyIdObjectResolver = new MetadataKeyIdObjectResolver(component);
     this.outputDelegate = new MetadataOutputDelegate(componentModel);
     this.inputDelegate = new MetadataInputDelegate(componentModel);
 
@@ -86,6 +89,28 @@ public class MetadataMediator {
    */
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
     return keysDelegate.getMetadataKeys(context);
+  }
+
+  /**
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} using the specified
+   * {@link MetadataKey}
+   * <p>
+   * If Component's {@link Content} parameter has a {@link InputTypeResolver} associated or its Output has a
+   * {@link OutputTypeResolver} associated that can be used to resolve dynamic {@link MetadataType}, then the
+   * {@link ComponentMetadataDescriptor} will contain those Dynamic types instead of the static type declaration.
+   *
+   * @param context current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
+   * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
+   * when the Metadata retrieval of any element fails for any reason
+   */
+  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key) {
+    try {
+      Object resolvedKey = keyIdObjectResolver.resolve(key);
+      return getMetadata(context, (p) -> resolvedKey);
+    } catch (MetadataResolvingException e) {
+      return failure(e, e.getFailure());
+    }
   }
 
   /**
@@ -138,6 +163,6 @@ public class MetadataMediator {
   }
 
   private Optional<String> getContainerName() {
-    return Optional.ofNullable(keyContainerName);
+    return ofNullable(keyContainerName);
   }
 }

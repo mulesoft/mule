@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+
 /**
  * A lazy version of a {@link OperationContext} which resolves the values of the parameters
  * of the operation on demand.
@@ -91,7 +93,7 @@ public class LazyOperationContext implements OperationContext {
    */
   @Override
   public Optional<ConfigurationInstance> getConfiguration() {
-    return Optional.empty();
+    return empty();
   }
 
   /**
