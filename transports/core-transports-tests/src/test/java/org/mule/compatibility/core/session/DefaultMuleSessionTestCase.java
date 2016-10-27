@@ -7,13 +7,13 @@
 package org.mule.compatibility.core.session;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleSession;
@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.DefaultSecurityContextFactory;
@@ -61,7 +62,7 @@ public class DefaultMuleSessionTestCase {
   @Test
   public void copy() throws Exception {
     DefaultMuleSession original = new DefaultMuleSession();
-    original.setSecurityContext(Mockito.mock(SecurityContext.class));
+    original.setSecurityContext(mock(SecurityContext.class));
     original.setProperty("foo", "bar");
 
     DefaultMuleSession copy = new DefaultMuleSession(original);
@@ -142,21 +143,22 @@ public class DefaultMuleSessionTestCase {
 
   @Test
   public void serialization() throws MuleException {
-    Flow flow = new Flow("flow", Mockito.mock(MuleContext.class, RETURNS_DEEP_STUBS));
+    Flow flow = new Flow("flow", mock(MuleContext.class, RETURNS_DEEP_STUBS));
     DefaultMuleSession before = new DefaultMuleSession();
     before.setSecurityContext(createTestAuthentication());
     before.setProperty("foo", "bar");
 
     // Create mock muleContext
-    MuleContext muleContext = Mockito.mock(MuleContext.class);
-    MuleRegistry registry = Mockito.mock(MuleRegistry.class);
+    MuleContext muleContext = mock(MuleContext.class);
+    MuleRegistry registry = mock(MuleRegistry.class);
     Mockito.when(muleContext.getRegistry()).thenReturn(registry);
     Mockito.when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
     Mockito.when(registry.lookupFlowConstruct("flow")).thenReturn(flow);
 
     ((MuleContextAware) serializer).setMuleContext(muleContext);
     // Serialize and then deserialize
-    DefaultMuleSession after = serializer.deserialize(serializer.serialize(before));
+    SerializationProtocol serializationProtocol = serializer.getExternalProtocol();
+    DefaultMuleSession after = serializationProtocol.deserialize(serializationProtocol.serialize(before));
 
     // assertions
     assertEquals((Object) before.getProperty("foo"), after.getProperty("foo"));
@@ -182,7 +184,8 @@ public class DefaultMuleSessionTestCase {
     before.setProperty("foo", nonSerializable);
     before.setProperty("foo2", "bar2");
 
-    MuleSession after = serializer.deserialize(serializer.serialize(before), getClass().getClassLoader());
+    SerializationProtocol serializationProtocol = serializer.getExternalProtocol();
+    MuleSession after = serializationProtocol.deserialize(serializationProtocol.serialize(before), getClass().getClassLoader());
 
     assertNotNull(after);
     assertNotSame(after, before);

@@ -193,19 +193,19 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
     @Override
     public void store(Serializable key, AtomicInteger value) throws ObjectStoreException {
-      store.put(key, serializer.serialize(value));
+      store.put(key, serializer.getExternalProtocol().serialize(value));
     }
 
     @Override
     public AtomicInteger retrieve(Serializable key) throws ObjectStoreException {
       Serializable serializable = store.get(key);
-      return serializer.deserialize((byte[]) serializable);
+      return serializer.getExternalProtocol().deserialize((byte[]) serializable);
     }
 
     @Override
     public AtomicInteger remove(Serializable key) throws ObjectStoreException {
       Serializable serializable = store.remove(key);
-      return serializer.deserialize((byte[]) serializable);
+      return serializer.getExternalProtocol().deserialize((byte[]) serializable);
     }
 
     @Override

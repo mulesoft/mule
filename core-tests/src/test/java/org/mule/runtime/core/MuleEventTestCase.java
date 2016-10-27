@@ -107,8 +107,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
         .exchangePattern(REQUEST_RESPONSE)
         .build();
     setCurrentEvent(testEvent);
-    byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
-    testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
+    byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
+    testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
 
     assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }

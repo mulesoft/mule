@@ -13,10 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.el.datetime.DateTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -27,34 +26,34 @@ import java.util.Locale;
 
 import org.junit.Test;
 
-public abstract class AbstractObjectSerializerContractTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractSerializerProtocolContractTestCase extends AbstractMuleContextTestCase {
 
   private static final String STRING_MESSAGE = "Hello World";
 
-  protected ObjectSerializer serializer;
+  protected SerializationProtocol serializerProtocol;
 
   @Test(expected = IllegalArgumentException.class)
   public final void nullBytes() throws Exception {
-    serializer.deserialize((byte[]) null);
+    serializerProtocol.deserialize((byte[]) null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public final void nullStream() throws Exception {
-    serializer.deserialize((InputStream) null);
+    serializerProtocol.deserialize((InputStream) null);
   }
 
   @Test
   public final void nullObject() throws Exception {
-    byte[] bytes = serializer.serialize(null);
-    Object object = serializer.deserialize(bytes);
+    byte[] bytes = serializerProtocol.serialize(null);
+    Object object = serializerProtocol.deserialize(bytes);
     assertNull(object);
   }
 
   @Test
   public final void inputStreamClosed() throws Exception {
-    final byte[] bytes = serializer.serialize(STRING_MESSAGE);
+    final byte[] bytes = serializerProtocol.serialize(STRING_MESSAGE);
     InputStream inputStream = spy(new ByteArrayInputStream(bytes));
-    String output = serializer.deserialize(inputStream);
+    String output = serializerProtocol.deserialize(inputStream);
 
     verify(inputStream, atLeastOnce()).close();
     assertThat(output, equalTo(STRING_MESSAGE));
@@ -69,9 +68,9 @@ public abstract class AbstractObjectSerializerContractTestCase extends AbstractM
     dateTime.changeTimeZone("Pacific/Midway");
 
     Event event = eventBuilder().message(InternalMessage.of(dateTime)).build();
-    byte[] bytes = serializer.serialize(event.getMessage());
+    byte[] bytes = serializerProtocol.serialize(event.getMessage());
 
-    InternalMessage message = serializer.deserialize(bytes);
+    InternalMessage message = serializerProtocol.deserialize(bytes);
     DateTime deserealized = (DateTime) message.getPayload().getValue();
 
     assertEquals(calendar, deserealized.toCalendar());

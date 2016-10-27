@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -100,7 +101,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
     event.getSession().setProperty("key", "value");
 
     ObjectSerializer serializer = muleContext.getObjectSerializer();
-    Event deserializedEvent = serializer.deserialize(serializer.serialize(event));
+    SerializationProtocol serializationProtocol = serializer.getExternalProtocol();
+    Event deserializedEvent = serializationProtocol.deserialize(serializationProtocol.serialize(event));
 
     // Event and session are both copied
     assertNotSame(deserializedEvent, event);
@@ -170,7 +172,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
     event.getSession().setProperty("key2", "value2");
 
     ObjectSerializer serializer = muleContext.getObjectSerializer();
-    Event deserialized = serializer.deserialize(serializer.serialize(event));
+    SerializationProtocol serializationProtocol = serializer.getExternalProtocol();
+    Event deserialized = serializationProtocol.deserialize(serializationProtocol.serialize(event));
 
     // Serialization no longer fails as in 3.1.x/3.2.x
 

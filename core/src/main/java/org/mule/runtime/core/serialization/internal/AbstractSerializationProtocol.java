@@ -9,8 +9,8 @@ package org.mule.runtime.core.serialization.internal;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -20,12 +20,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Base class for implementations of {@link org.mule.runtime.core.api.serialization.ObjectSerializer} This class implements all
- * the base behavioral contract allowing its extensions to only care about the actual serialization/deserialization part.
- *
- * @since 3.7.0
+ * Base class for implementations of {@link SerializationProtocol} This class implements all the base behavioral
+ * contract allowing its extensions to only care about the actual serialization/deserialization part.
  */
-public abstract class AbstractObjectSerializer implements ObjectSerializer, MuleContextAware {
+public abstract class AbstractSerializationProtocol implements SerializationProtocol, MuleContextAware {
 
   protected MuleContext muleContext;
 

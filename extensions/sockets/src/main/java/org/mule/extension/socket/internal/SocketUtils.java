@@ -53,14 +53,14 @@ public final class SocketUtils {
         return getByteArray(((Message) data).getPayload().getValue(), payloadOnly, streamingIsAllowed, encoding,
                             objectSerializer);
       } else {
-        return objectSerializer.serialize(data);
+        return objectSerializer.getExternalProtocol().serialize(data);
       }
     } else if (data instanceof byte[]) {
       return (byte[]) data;
     } else if (data instanceof String) {
       return ((String) data).getBytes(encoding);
     } else if (data instanceof Serializable) {
-      return objectSerializer.serialize(data);
+      return objectSerializer.getExternalProtocol().serialize(data);
     }
 
     throw new IllegalArgumentException(format("Cannot serialize data: '%s'", data));

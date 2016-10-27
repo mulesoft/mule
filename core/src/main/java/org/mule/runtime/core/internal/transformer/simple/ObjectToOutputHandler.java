@@ -71,7 +71,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
 
         @Override
         public void write(Event event, OutputStream out) throws IOException {
-          muleContext.getObjectSerializer().serialize(src, out);
+          muleContext.getObjectSerializer().getExternalProtocol().serialize(src, out);
         }
       };
     } else {

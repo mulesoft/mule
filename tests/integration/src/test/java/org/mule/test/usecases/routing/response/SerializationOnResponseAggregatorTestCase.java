@@ -58,14 +58,14 @@ public class SerializationOnResponseAggregatorTestCase extends AbstractIntegrati
 
     @Override
     protected void doStore(Serializable key, Serializable value) throws ObjectStoreException {
-      byte[] serialized = serializer.serialize(value);
+      byte[] serialized = serializer.getExternalProtocol().serialize(value);
       super.doStore(key, serialized);
     }
 
     @Override
     protected Serializable doRetrieve(Serializable key) {
       Serializable serialized = super.doRetrieve(key);
-      return serializer.deserialize((byte[]) serialized);
+      return serializer.getExternalProtocol().deserialize((byte[]) serialized);
     }
   }
 }

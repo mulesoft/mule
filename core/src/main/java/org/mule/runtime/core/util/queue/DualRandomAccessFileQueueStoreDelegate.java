@@ -98,14 +98,14 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   @Override
   protected void addFirst(Serializable item) throws InterruptedException {
     switchWriteFileIfFull();
-    byte[] serialiazedObject = serializer.serialize(item);
+    byte[] serialiazedObject = serializer.getInternalProtocol().serialize(item);
     readFile.addFirst(serialiazedObject);
   }
 
   @Override
   protected void add(Serializable item) {
     switchWriteFileIfFull();
-    byte[] serialiazedObject = serializer.serialize(item);
+    byte[] serialiazedObject = serializer.getInternalProtocol().serialize(item);
     writeFile.addLast(serialiazedObject);
   }
 
@@ -209,7 +209,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   }
 
   private Serializable deserialize(byte[] valuesAsBytes) {
-    return serializer.deserialize(valuesAsBytes);
+    return serializer.getInternalProtocol().deserialize(valuesAsBytes);
   }
 
   public void remove(Serializable value) {

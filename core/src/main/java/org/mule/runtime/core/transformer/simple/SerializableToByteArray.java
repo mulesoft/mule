@@ -53,7 +53,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
      */
 
     try {
-      return muleContext.getObjectSerializer().serialize(src);
+      return muleContext.getObjectSerializer().getExternalProtocol().serialize(src);
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }

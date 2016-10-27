@@ -78,7 +78,7 @@ public abstract class AbstractByteProtocol implements TcpProtocol {
       // a separate "stringEncoding" property on the protocol
       writeByteArray(os, ((String) data).getBytes());
     } else if (data instanceof Serializable) {
-      writeByteArray(os, objectSerializer.serialize(data));
+      writeByteArray(os, objectSerializer.getExternalProtocol().serialize(data));
     } else {
       throw new IllegalArgumentException("Cannot serialize data: " + data);
     }

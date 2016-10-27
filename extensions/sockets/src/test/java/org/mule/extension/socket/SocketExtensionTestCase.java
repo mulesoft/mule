@@ -112,7 +112,8 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
   }
 
   protected Object deserializeMessage(Message message) throws Exception {
-    return muleContext.getObjectSerializer().deserialize(IOUtils.toByteArray((InputStream) message.getPayload().getValue()));
+    return muleContext.getObjectSerializer().getExternalProtocol()
+        .deserialize(IOUtils.toByteArray((InputStream) message.getPayload().getValue()));
   }
 
   protected Message receiveConnection() {

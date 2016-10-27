@@ -41,7 +41,8 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler {
   @Override
   public InternalMessage storeSessionInfoToMessage(MuleSession session, InternalMessage message, MuleContext context)
       throws MuleException {
-    byte[] serializedSession = context.getObjectSerializer().serialize(removeNonSerializableProperties(session, context));
+    byte[] serializedSession =
+        context.getObjectSerializer().getExternalProtocol().serialize(removeNonSerializableProperties(session, context));
 
     if (logger.isDebugEnabled()) {
       logger.debug("Adding serialized Session header to message: " + serializedSession);

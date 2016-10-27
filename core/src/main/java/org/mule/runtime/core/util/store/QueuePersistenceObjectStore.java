@@ -225,7 +225,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
   protected void serialize(T value, File outputFile) throws ObjectStoreException {
     try {
       FileOutputStream out = new FileOutputStream(outputFile);
-      out.write(muleContext.getObjectSerializer().serialize(value));
+      out.write(muleContext.getObjectSerializer().getInternalProtocol().serialize(value));
       out.flush();
     } catch (SerializationException se) {
       throw new ObjectStoreException(se);
@@ -264,7 +264,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
   protected T deserialize(File file) throws ObjectStoreException {
     try {
       FileInputStream in = new FileInputStream(file);
-      return muleContext.getObjectSerializer().deserialize(in);
+      return muleContext.getObjectSerializer().getInternalProtocol().deserialize(in);
     } catch (SerializationException se) {
       throw new ObjectStoreException(se);
     } catch (FileNotFoundException fnfe) {
