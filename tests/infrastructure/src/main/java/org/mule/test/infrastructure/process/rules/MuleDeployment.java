@@ -80,6 +80,7 @@ public class MuleDeployment extends MuleInstallation {
   private static final String DEBUG_PORT = "5005";
   private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
   private static PollingProber prober;
+  private String locationSuffix = "";
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
   private List<String> applications = new ArrayList<>();
   private List<String> domains = new ArrayList<>();
@@ -153,6 +154,17 @@ public class MuleDeployment extends MuleInstallation {
     }
 
     /**
+     * Configure the server location suffix.
+     *
+     * @param suffix
+     * @return
+     */
+    public Builder locationSuffix(String suffix) {
+      deployment.locationSuffix = suffix;
+      return this;
+    }
+
+    /**
      * Specifies domains or domain-bundles to be deployed to the domains folder.
      * 
      * @param domains
@@ -180,7 +192,7 @@ public class MuleDeployment extends MuleInstallation {
     return new Builder();
   }
 
-  private MuleDeployment() {
+  protected MuleDeployment() {
     super();
   }
 
@@ -192,7 +204,7 @@ public class MuleDeployment extends MuleInstallation {
 
   @Override
   public Statement apply(final Statement base, final Description description) {
-    testname = description.getTestClass().getSimpleName();
+    location = description.getTestClass().getSimpleName() + locationSuffix;
     return new Statement() {
 
       @Override
