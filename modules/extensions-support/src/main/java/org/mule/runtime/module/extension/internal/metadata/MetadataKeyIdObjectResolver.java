@@ -12,7 +12,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
+import static org.objectweb.asm.tree.InsnList.check;
+
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -29,6 +32,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;
@@ -52,9 +56,10 @@ final class MetadataKeyIdObjectResolver {
   private final ComponentModel component;
   private final List<ParameterModel> keyParts;
 
-  public MetadataKeyIdObjectResolver(ComponentModel component, List<ParameterModel> keyParts) {
+  public MetadataKeyIdObjectResolver(ComponentModel component) {
+    checkArgument(component != null, "The ComponentModel cannot be null");
     this.component = component;
-    this.keyParts = keyParts;
+    this.keyParts = getMetadataKeyParts(component);
   }
 
   /**
@@ -254,5 +259,11 @@ final class MetadataKeyIdObjectResolver {
       }
       return keyValueHolder.get();
     }
+  }
+
+  private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
+    return componentModel.getParameterModels().stream()
+        .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .collect(toList());
   }
 }

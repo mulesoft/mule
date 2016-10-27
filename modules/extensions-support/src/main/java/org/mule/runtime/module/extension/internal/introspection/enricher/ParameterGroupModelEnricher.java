@@ -116,7 +116,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
   private ParameterGroup toParameterGroup(ParameterElement parameterElement) {
     final Type paramGroupType = parameterElement.getType();
     final ParameterGroup parameterGroup =
-        new ParameterGroup<>(paramGroupType.getDeclaringClass(), parameterElement.getParameter());
+        new ParameterGroup<>(paramGroupType.getDeclaringClass(), parameterElement.getParameter(), parameterElement.getName());
     populateParameterGroup(parameterGroup, paramGroupType);
 
     return parameterGroup;
@@ -133,7 +133,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
     final Type paramGroupType = fieldElement.getType();
     final Field field = fieldElement.getField();
     field.setAccessible(true);
-    final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaringClass(), field);
+    final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaringClass(), field, fieldElement.getName());
     populateParameterGroup(parameterGroup, paramGroupType);
 
     return parameterGroup;

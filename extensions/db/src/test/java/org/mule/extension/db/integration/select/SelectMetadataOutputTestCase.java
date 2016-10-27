@@ -91,5 +91,4 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
     ArrayType output = (ArrayType) metadata.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
     return (ObjectType) output.getType();
   }
-
 }

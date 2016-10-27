@@ -165,6 +165,10 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     return Optional.of(new FieldSetter<>(fields.iterator().next()));
   }
 
+  Source getDelegate() {
+    return delegate;
+  }
+
   public String getName() {
     return IntrospectionUtils.getSourceName(delegate.getClass());
   }

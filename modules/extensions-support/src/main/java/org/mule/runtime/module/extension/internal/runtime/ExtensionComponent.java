@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
@@ -86,7 +86,7 @@ public abstract class ExtensionComponent
   protected ConnectionManagerAdapter connectionManager;
 
   @Inject
-  private MuleMetadataManager metadataManager;
+  private MuleMetadataService metadataService;
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                ComponentModel componentModel,
@@ -222,7 +222,8 @@ public abstract class ExtensionComponent
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException {
     MetadataContext context = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(context));
+    return withContextClassLoader(getClassLoader(this.extensionModel),
+                                  () -> metadataMediator.getMetadata(context, getParameterValueResolver()));
   }
 
   /**
@@ -258,7 +259,7 @@ public abstract class ExtensionComponent
     String cacheId = configuration.map(ConfigurationInstance::getName)
         .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
 
-    return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId), typeLoader);
+    return new DefaultMetadataContext(configuration, connectionManager, metadataService.getMetadataCache(cacheId), typeLoader);
   }
 
   /**
@@ -323,4 +324,6 @@ public abstract class ExtensionComponent
   protected ConfigurationProvider getConfigurationProvider() {
     return configurationProvider;
   }
+
+  protected abstract ParameterValueResolver getParameterValueResolver();
 }

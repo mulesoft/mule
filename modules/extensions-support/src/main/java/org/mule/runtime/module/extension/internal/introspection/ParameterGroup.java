@@ -6,26 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
+import com.google.common.collect.ImmutableSet;
+
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 
 /**
  * A metadata class that groups a set of parameters together. It caches reflection objects necessary for handling those parameters
@@ -47,14 +49,16 @@ public class ParameterGroup<T extends AnnotatedElement> implements EnrichableMod
   private final Class<?> type;
 
   /**
-   * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroup} used as fields of a
-   * class, this container should be parameterized as a {@link Field}. And if it is used as an argument of an operation it should
-   * the corresponding {@link Method}'s {@link java.lang.reflect.Parameter}.
+   * The member in which the generated value of {@link #type} is to be assigned. For {@link
+   * ParameterGroup} used as fields of a class, this container should be parameterized as a {@link
+   * Field}. And if it is used as an argument of an operation it should the corresponding {@link
+   * Method}'s {@link Parameter}.
    */
   private final T container;
 
   /**
-   * A {@link Map} in which the keys are parameter names and the values are their corresponding setter methods
+   * A {@link Map} in which the keys are parameter names and the values are their corresponding
+   * setter methods
    */
   private final Set<Field> parameters = new HashSet<>();
 
@@ -63,14 +67,19 @@ public class ParameterGroup<T extends AnnotatedElement> implements EnrichableMod
    */
   private Map<Class<? extends ModelProperty>, ModelProperty> modelProperties = new HashMap<>();
 
+  /**
+   * The name of the Container {@link T} that holds the {@link ParameterGroup}
+   */
+  private String containerName;
 
-  public ParameterGroup(Class<?> type, T container) {
+  public ParameterGroup(Class<?> type, T container, String containerName) {
     checkArgument(type != null, "type cannot be null");
     checkArgument(container != null, "container cannot be null");
+    checkArgument(containerName != null, "containerName cannot be null");
 
     this.type = type;
     this.container = container;
-
+    this.containerName = containerName;
   }
 
   /**
@@ -98,6 +107,14 @@ public class ParameterGroup<T extends AnnotatedElement> implements EnrichableMod
 
   public Set<Field> getParameters() {
     return ImmutableSet.copyOf(parameters);
+  }
+
+  /**
+   *
+   * @return The name of the container that holds the {@link ParameterGroup}
+   */
+  public String getContainerName() {
+    return containerName;
   }
 
   /**

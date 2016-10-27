@@ -13,12 +13,14 @@ import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import org.mule.extension.ws.WebServiceConsumerTestCase;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 
 import org.junit.Before;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+
 import ru.yandex.qatools.allure.annotations.Step;
 
 public abstract class AbstractMetadataTestCase extends WebServiceConsumerTestCase {
@@ -31,11 +33,11 @@ public abstract class AbstractMetadataTestCase extends WebServiceConsumerTestCas
   protected static final String NO_PARAMS_FLOW = "getNoParams";
   protected static final String ECHO_HEADERS_FLOW = "getEchoHeadersMetadata";
 
-  protected MuleMetadataManager manager;
+  protected MetadataService service;
 
   @Before
   public void init() throws Exception {
-    manager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
+    service = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
   }
 
   @Override
@@ -45,7 +47,7 @@ public abstract class AbstractMetadataTestCase extends WebServiceConsumerTestCas
 
   @Step("Retrieve Dynamic Metadata")
   protected MetadataResult<ComponentMetadataDescriptor> getMetadata(String flow, String key) {
-    MetadataResult<ComponentMetadataDescriptor> result = manager.getMetadata(id(flow), newKey(key).build());
+    MetadataResult<ComponentMetadataDescriptor> result = service.getMetadata(id(flow), newKey(key).build());
     assertThat(result.isSuccess(), is(true));
     return result;
   }

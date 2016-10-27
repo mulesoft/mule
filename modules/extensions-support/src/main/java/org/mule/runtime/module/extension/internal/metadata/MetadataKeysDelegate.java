@@ -10,9 +10,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -63,13 +61,14 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * Dynamic keys are a available or the retrieval fails for any reason
    */
   MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
-    final String componentResolverName = getAliasName(getMetadataResolverFactory(component).getClass());
+    final TypeKeysResolver keyResolver = resolverFactory.getKeyResolver();
+    final String componentResolverName = keyResolver.getCategoryName();
     final MetadataKeysContainerBuilder keysContainer = MetadataKeysContainerBuilder.getInstance();
     if (keyParts.isEmpty()) {
       return success(keysContainer.add(componentResolverName, ImmutableSet.of(new NullMetadataKey())).build());
     }
     try {
-      final Set<MetadataKey> metadataKeys = resolverFactory.getKeyResolver().getKeys(context);
+      final Set<MetadataKey> metadataKeys = keyResolver.getKeys(context);
       final Map<Integer, String> partOrder = getPartOrderMapping(keyParts);
       final Set<MetadataKey> enrichedMetadataKeys = metadataKeys.stream()
           .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder))
@@ -119,5 +118,4 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
     key.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMetadataKey(childKey, partOrderMapping, level + 1)));
     return keyBuilder;
   }
-
 }

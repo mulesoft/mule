@@ -8,7 +8,7 @@ package org.mule.extension.ftp;
 
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.test.extension.file.common.FileMetadataResolverTestCommon;
 
@@ -17,7 +17,7 @@ import org.junit.Test;
 
 public class FtpMetadataResolverTestCase extends FtpConnectorTestCase {
 
-  private MetadataManager manager;
+  private MetadataService service;
   private FileMetadataResolverTestCommon testCommon;
 
   public FtpMetadataResolverTestCase(String name, FtpTestHarness testHarness) {
@@ -31,17 +31,17 @@ public class FtpMetadataResolverTestCase extends FtpConnectorTestCase {
 
   @Before
   public void setupManager() throws RegistrationException {
-    manager = muleContext.getRegistry().lookupObject(MetadataManager.class);
+    service = muleContext.getRegistry().lookupObject(MetadataService.class);
     testCommon = new FileMetadataResolverTestCommon();
   }
 
   @Test
   public void getReadAttributesMetadata() {
-    testCommon.testReadAttributesMetadata(manager, FileAttributes.class);
+    testCommon.testReadAttributesMetadata(service, FileAttributes.class);
   }
 
   @Test
   public void getListOperationOutputMetadata() {
-    testCommon.testTreeNodeType(manager, testHarness.getAttributesType());
+    testCommon.testTreeNodeType(service, testHarness.getAttributesType());
   }
 }

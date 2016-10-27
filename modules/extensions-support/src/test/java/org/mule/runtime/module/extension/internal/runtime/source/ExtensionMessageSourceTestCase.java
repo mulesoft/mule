@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
@@ -27,20 +28,26 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
+
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -60,8 +67,12 @@ import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -69,6 +80,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
@@ -88,6 +100,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -95,42 +108,65 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private static final String CONFIG_NAME = "myConfig";
   private static final String ERROR_MESSAGE = "ERROR";
   private static final String SOURCE_NAME = "source";
+  private static final String METADATA_KEY = "metadataKey";
   private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
+  private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
   @Mock
   private ExtensionModel extensionModel;
+
   @Mock
   private SourceModel sourceModel;
+
   @Mock
   private SourceFactory sourceFactory;
+
   @Mock
   private ThreadingProfile threadingProfile;
+
   @Mock
   private WorkManager workManager;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Processor messageProcessor;
+
   @Mock
   private FlowConstruct flowConstruct;
+
   @Mock(extraInterfaces = Lifecycle.class)
   private Source source;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionManagerAdapter extensionManager;
+
   @Mock
   private MessageProcessingManager messageProcessingManager;
+
   @Mock
   private ExceptionEnricherFactory enricherFactory;
+
   @Mock
   private InternalMessage muleMessage;
+
   @Mock
   private ConfigurationProvider configurationProvider;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel configurationModel;
+
   @Mock
   private ConfigurationInstance configurationInstance;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Event event;
+
   private ExtensionMessageSource messageSource;
+
+  @Mock
+  protected MetadataResolverFactory metadataResolverFactory;
 
   @Before
   public void before() throws Exception {
@@ -157,6 +193,20 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(configurationProvider.get(any())).thenReturn(configurationInstance);
     when(configurationProvider.getConfigurationModel()).thenReturn(configurationModel);
     when(configurationProvider.getName()).thenReturn(CONFIG_NAME);
+
+    mockMetadataResolverFactory(sourceModel, metadataResolverFactory);
+    when(metadataResolverFactory.getKeyResolver()).thenReturn(new TestNoConfigMetadataResolver());
+    when(metadataResolverFactory.getInputResolver("content")).thenReturn(new TestNoConfigMetadataResolver());
+    when(metadataResolverFactory.getInputResolver("type")).thenReturn(new NullMetadataResolver());
+    when(metadataResolverFactory.getOutputResolver()).thenReturn(new TestNoConfigMetadataResolver());
+    when(metadataResolverFactory.getOutputAttributesResolver()).thenReturn(new TestNoConfigMetadataResolver());
+
+    when(sourceModel.getOutput())
+        .thenReturn(new ImmutableOutputModel("Output", BaseTypeBuilder.create(JAVA).stringType().build(), true, emptySet()));
+    when(sourceModel.getOutputAttributes())
+        .thenReturn(new ImmutableOutputModel("Output", BaseTypeBuilder.create(JAVA).stringType().build(), false, emptySet()));
+    when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class))
+        .thenReturn(Optional.of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), METADATA_KEY)));
 
     messageSource = getNewExtensionMessageSourceInstance();
   }
@@ -371,6 +421,35 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     messageSource.dispose();
 
     verify((Disposable) source).dispose();
+  }
+
+  @Test
+  public void getMetadataKeyIdObjectValue() throws InitialisationException, MetadataResolvingException, ValueResolvingException {
+    final String person = "person";
+    when(sourceFactory.createSource()).thenReturn(new DummySource(person));
+    messageSource.doInitialise();
+    final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
+    assertThat(metadataKeyValue, is(person));
+  }
+
+  private class DummySource extends Source {
+
+    DummySource(String metadataKey) {
+
+      this.metadataKey = metadataKey;
+    }
+
+    private String metadataKey;
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+
+    }
   }
 
   private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {

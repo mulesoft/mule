@@ -18,7 +18,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
-import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
@@ -29,8 +29,8 @@ import java.util.List;
 
 public class FileMetadataResolverTestCommon {
 
-  public void testTreeNodeType(MetadataManager manager, Class type) {
-    MetadataResult<ComponentMetadataDescriptor> list = manager.getMetadata(new ProcessorId("list", "0"), new NullMetadataKey());
+  public void testTreeNodeType(MetadataService service, Class type) {
+    MetadataResult<ComponentMetadataDescriptor> list = service.getMetadata(new ProcessorId("list", "0"));
     assertThat(list.isSuccess(), is(true));
     TypeMetadataDescriptor payload = list.get().getOutputMetadata().get().getPayloadMetadata().get();
     List<ObjectFieldType> fields = copyOf(((ObjectType) payload.getType()).getFields());
@@ -41,8 +41,9 @@ public class FileMetadataResolverTestCommon {
     assertThat(fields.get(2).getValue(), instanceOf(ArrayType.class));
   }
 
-  public void testReadAttributesMetadata(MetadataManager manager, Class type) {
-    MetadataResult<ComponentMetadataDescriptor> read = manager.getMetadata(new ProcessorId("read", "0"), new NullMetadataKey());
+  public void testReadAttributesMetadata(MetadataService service, Class type) {
+    MetadataResult<ComponentMetadataDescriptor> read = service.getMetadata(new ProcessorId("read", "0"));
+
     assertThat(read.isSuccess(), is(true));
     TypeMetadataDescriptor attributes = read.get().getOutputMetadata().get().getAttributesMetadata().get();
     assertAttributesMetadata(attributes.getType(), type);

@@ -42,7 +42,7 @@ public class BundleDescriptor {
   }
 
   public String toString() {
-    return format("BundleDescriptor { %s:%s:%s:$s }", groupId, artifactId, version, type);
+    return format("BundleDescriptor { %s:%s:%s:%s }", groupId, artifactId, version, type);
   }
 
   /**
@@ -126,6 +126,4 @@ public class BundleDescriptor {
     }
 
   }
-
-
 }

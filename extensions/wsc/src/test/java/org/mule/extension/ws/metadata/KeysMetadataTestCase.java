@@ -25,10 +25,9 @@ public class KeysMetadataTestCase extends AbstractMetadataTestCase {
   @Test
   @Description("Checks the MetadataKeys for the WSC")
   public void getOperationKeys() {
-    MetadataResult<MetadataKeysContainer> result = manager.getMetadataKeys(id(ECHO_ACCOUNT_FLOW));
+    MetadataResult<MetadataKeysContainer> result = service.getMetadataKeys(id(ECHO_ACCOUNT_FLOW));
     assertThat(result.isSuccess(), is(true));
-    //TODO: change the category name once the issue is fixed.
-    Set<MetadataKey> keys = result.get().getKeys("DefaultMetadataResolverFactory").get();
+    Set<MetadataKey> keys = result.get().getKeys("WebServiceConsumerCategory").get();
     assertThat(keys, hasSize(OPERATIONS.length));
     keys.forEach(key -> assertThat(key.getId(), isIn(OPERATIONS)));
   }

@@ -33,7 +33,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
@@ -91,7 +91,7 @@ import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.locator.DefaultConfigurationComponentLocator;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.MuleSecurityManager;
@@ -161,7 +161,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
       .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(TimeSupplier.class))
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class))
-      .put(OBJECT_METADATA_MANAGER, getBeanDefinition(MuleMetadataManager.class))
+      .put(OBJECT_METADATA_SERVICE, getBeanDefinition(MuleMetadataService.class))
       .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
       .put(OBJECT_SERIALIZER,
            getBeanDefinitionBuilder(DefaultObjectSerializerFactoryBean.class).addDependsOn(OBJECT_MULE_CONFIGURATION)

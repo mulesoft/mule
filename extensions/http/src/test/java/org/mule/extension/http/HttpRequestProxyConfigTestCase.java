@@ -56,7 +56,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
   private Latch latch = new Latch();
   private Latch proxyReadyLatch = new Latch();
 
-  @Parameter(0)
+  @Parameter()
   public String flowName;
 
   @Parameter(1)
@@ -162,5 +162,4 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
       }
     }
   }
-
 }

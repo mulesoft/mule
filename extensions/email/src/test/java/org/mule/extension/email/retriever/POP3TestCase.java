@@ -28,7 +28,7 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase {
   @Parameter
   public String protocol;
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {{"pop3"}, {"pop3s"}});
   }

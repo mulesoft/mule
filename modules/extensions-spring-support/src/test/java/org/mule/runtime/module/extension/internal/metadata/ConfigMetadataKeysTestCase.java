@@ -13,7 +13,7 @@ import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
 
-  private MuleMetadataManager metadataManager;
+  private MuleMetadataService metadataManager;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -39,7 +39,7 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
+    metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
   }
 
   @Test

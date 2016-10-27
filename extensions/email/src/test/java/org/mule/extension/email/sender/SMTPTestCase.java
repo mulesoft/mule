@@ -42,7 +42,7 @@ public abstract class SMTPTestCase extends EmailConnectorTestCase {
   @Parameter
   public String protocol;
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {{"smtp"}, {"smtps"}});
   }

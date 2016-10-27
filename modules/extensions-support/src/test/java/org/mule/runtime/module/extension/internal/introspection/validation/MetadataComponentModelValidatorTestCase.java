@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +55,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,6 +68,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  public static final String EMPTY = "";
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -141,20 +142,21 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
 
-    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(String.class), false, emptySet()));
     when(operationModel.getOutputAttributes())
-        .thenReturn(new ImmutableOutputModel(EMPTY, create(JAVA).voidType().build(), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel(StringUtils.EMPTY, create(JAVA).voidType().build(), false, emptySet()));
     when(operationModel.getName()).thenReturn("operation");
     mockMetadataResolverFactory(operationModel, null);
 
-    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(String.class), false, emptySet()));
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(String.class), false, emptySet()));
     when(sourceModel.getOutputAttributes())
-        .thenReturn(new ImmutableOutputModel(EMPTY, create(JAVA).voidType().build(), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel(StringUtils.EMPTY, create(JAVA).voidType().build(), false, emptySet()));
 
     when(sourceModel.getName()).thenReturn("source");
     mockMetadataResolverFactory(sourceModel, null);
 
-    MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class));
+    MetadataKeyIdModelProperty keyIdModelProperty =
+        new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
 
@@ -179,9 +181,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
                                                                                    SimpleOutputResolver.class));
 
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
-    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
     when(operationModel.getOutputAttributes())
-        .thenReturn(new ImmutableOutputModel("", toMetadataType(void.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(void.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 
@@ -189,7 +191,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void operationReturnsObjectType() {
     exception.expect(IllegalModelDefinitionException.class);
 
-    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 
@@ -214,7 +216,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Test
   public void sourceReturnsObjectType() {
     exception.expect(IllegalModelDefinitionException.class);
-    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 
@@ -230,13 +232,13 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(MockResolver.class, emptyMap(), MockResolver.class,
                                                                    NullMetadataResolver.class));
-    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Apple.class), false, emptySet()));
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Apple.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 
   @Test
   public void sourceReturnsObjectTypeWithDefinedOutputResolver() {
-    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+    when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
     mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolver.class, emptyMap(),
                                                                                 SimpleOutputResolver.class,
                                                                                 NullMetadataResolver.class));
@@ -301,7 +303,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void metadataKeyWithValidDefaultValues() {
     ParameterModel param1 = getMockKeyPartParam("Value", 1);
     ParameterModel param2 = getMockKeyPartParam("SomeValue", 2);
-    MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class));
+    MetadataKeyIdModelProperty keyIdModelProperty =
+        new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(sourceModel.getParameterModels()).thenReturn(asList(param1, param2));
     validator.validate(extensionModel);
@@ -312,7 +315,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void metadataKeyWithoutDefaultValues() {
     ParameterModel param1 = getMockKeyPartParam(null, 1);
     ParameterModel param2 = getMockKeyPartParam(null, 2);
-    MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class));
+    MetadataKeyIdModelProperty keyIdModelProperty =
+        new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(sourceModel.getParameterModels()).thenReturn(asList(param1, param2));
     validator.validate(extensionModel);
@@ -329,7 +333,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Test
   public void stringMetadataKeyWithDefaultValue() {
     ParameterModel param = getMockKeyPartParam("default", 1);
-    MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(String.class));
+    MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(String.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(sourceModel.getParameterModels()).thenReturn(singletonList(param));
     validator.validate(extensionModel);

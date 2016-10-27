@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.api;
 
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.artifact.Artifact;
@@ -65,4 +66,10 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
    */
   ConnectivityTestingService getConnectivityTestingService();
 
+  /**
+   * @return the {@link MetadataService} which can resolve the metadata of the components inside
+   * the current {@link DeployableArtifact}
+   * @see MetadataService
+   */
+  MetadataService getMetadataService();
 }

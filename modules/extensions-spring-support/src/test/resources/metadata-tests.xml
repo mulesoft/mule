@@ -153,6 +153,10 @@
         <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA" city="SFO"/>
     </flow>
 
+    <flow name="incompleteMultiLevelKeyResolver">
+        <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA"/>
+    </flow>
+
     <flow name="sourceMetadataWithMultilevel" initialState="stopped">
         <metadata:metadata-source-with-multilevel continent="AMERICA" country="ARGENTINA" city="BA"/>
         <logger/>
@@ -161,7 +165,7 @@
     <flow name="typeWithDeclaredSubtypesMetadata">
         <metadata:type-with-declared-subtypes-metadata plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
                                                        rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
-                                                       animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
+                                                       animal="#[new org.mule.test.metadata.extension.model.animals.Bear()]"/>
     </flow>
 
     <flow name="resolverWithDynamicConfig">
@@ -178,7 +182,7 @@
 
     <flow name="pagedOperationMetadata">
         <metadata:paged-operation-metadata config-ref="config"
-                                           animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
+                                           animal="#[new org.mule.test.metadata.extension.model.animals.Bear()]"/>
     </flow>
 
     <flow name="queryOperation">

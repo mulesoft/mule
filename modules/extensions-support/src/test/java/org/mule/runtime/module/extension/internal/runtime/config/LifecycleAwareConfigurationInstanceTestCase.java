@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -257,7 +257,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
-    MuleMetadataManager muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
+    MuleMetadataService muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     muleMetadataManager.getMetadataCache(NAME);
     interceptable.stop();
     new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));

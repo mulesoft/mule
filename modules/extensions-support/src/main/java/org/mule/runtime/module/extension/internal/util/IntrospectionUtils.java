@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -258,6 +259,26 @@ public final class IntrospectionUtils {
   public static Optional<Field> getField(Class<?> clazz, String name) {
     Collection<Field> candidates = getAllFields(clazz, withName(name));
     return CollectionUtils.isEmpty(candidates) ? Optional.empty() : Optional.of(candidates.iterator().next());
+  }
+
+  /**
+   * Resolves and returns the field value of an object instance
+   *
+   * @param object    The object where grab the field value
+   * @param fieldName The name of the field to obtain the value
+   * @return The value of the field with the given fieldName and object instance
+   * @throws IllegalAccessException if is unavailable to access to the field
+   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
+   */
+  public static Object getFieldValue(Object object, String fieldName) throws IllegalAccessException, NoSuchFieldException {
+    final Optional<Field> fieldOptional = getField(object.getClass(), fieldName);
+    if (fieldOptional.isPresent()) {
+      final Field field = fieldOptional.get();
+      field.setAccessible(true);
+      return field.get(object);
+    } else {
+      throw new NoSuchFieldException();
+    }
   }
 
   public static Optional<Field> getFieldByAlias(Class<?> clazz, String alias) {

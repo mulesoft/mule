@@ -7,6 +7,8 @@
 package org.mule.runtime.module.deployment.internal.artifact;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
@@ -53,6 +55,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   @Override
   public ConnectivityTestingService getConnectivityTestingService() {
     return getDelegate().getConnectivityTestingService();
+  }
+
+  @Override
+  public MetadataService getMetadataService() {
+    return getDelegate().getMetadataService();
   }
 
   public void init() {

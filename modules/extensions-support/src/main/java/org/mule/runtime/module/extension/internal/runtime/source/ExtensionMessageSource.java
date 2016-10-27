@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
@@ -47,17 +48,18 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -340,6 +342,17 @@ public class ExtensionMessageSource extends ExtensionComponent
                                                         flowConstruct.getName(), sourceModel.getName(),
                                                         configurationProvider.getName()));
     }
+  }
+
+  @Override
+  protected ParameterValueResolver getParameterValueResolver() {
+    return (fieldName) -> {
+      try {
+        return getFieldValue(source.getDelegate(), fieldName);
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        throw new ValueResolvingException(e.getMessage(), e);
+      }
+    };
   }
 
   private CompletionHandler downCast(CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> handler) {

@@ -28,7 +28,7 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
@@ -47,7 +47,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     implements MetadataKeyProvider {
 
   @Inject
-  private MuleMetadataManager metadataManager;
+  private MuleMetadataService metadataService;
 
   @Inject
   protected ConnectionManagerAdapter connectionManager;
@@ -90,7 +90,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     Event fakeEvent = getInitialiserEvent(muleContext);
     return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,
-                                      metadataManager.getMetadataCache(getName()),
+                                      metadataService.getMetadataCache(getName()),
                                       ExtensionsTypeLoaderFactory.getDefault()
                                           .createTypeLoader(getClassLoader(getExtensionModel())));
   }
