@@ -9,6 +9,7 @@ package org.mule.runtime.module.tooling.internal;
 import static java.util.Arrays.asList;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,7 +55,7 @@ public class TemporaryArtifactConnectivityTestingServiceBuilderTestCase extends 
 
   @Test
   public void buildArtifact() {
-    when(mockServiceRegistry.lookupProviders(ConnectivityTestingStrategy.class, any()))
+    when(mockServiceRegistry.lookupProviders(eq(ConnectivityTestingStrategy.class), any()))
         .thenReturn(asList(mock(ConnectivityTestingStrategy.class)));
     addExtension().setArtifactConfiguration(getArtifactConfiguration());
 
