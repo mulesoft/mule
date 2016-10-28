@@ -36,6 +36,7 @@ import com.google.common.base.Joiner;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,14 +104,17 @@ abstract class BaseDbOperations {
 
 
   protected void validateNoParameterTypeIsUnused(Query query, List<ParameterType> parameterTypes) {
-    Set<String> params = query.getQueryTemplate().getParams().stream().map(QueryParam::getName).collect(toSet());
-    Set<String> unusedTypes =
-        parameterTypes.stream().map(type -> type.getKey()).filter(type -> !params.contains(type)).collect(toSet());
+    Set<String> params = query.getQueryTemplate().getParams().stream().map(QueryParam::getName).collect(Collectors.toSet());
+    Set<ParameterType> unusedTypes =
+        parameterTypes.stream().filter(type -> !params.contains(type.getKey())).collect(Collectors.toSet());
 
     if (!unusedTypes.isEmpty()) {
-      throw new IllegalArgumentException(format("Query defines parameters %s but they aren't present in the query",
-                                                Joiner.on(", ").join(unusedTypes)));
-
+      throw new IllegalArgumentException(format("Query parameters [%s] were unused during query resolution, please remove them",
+                                                Joiner.on(", ")
+                                                    .join(unusedTypes.stream()
+                                                        .map(type -> format("('%s' of %s type)", type.getKey(),
+                                                                            type.getDbType().getName()))
+                                                        .collect(Collectors.toList()))));
     }
   }
 
