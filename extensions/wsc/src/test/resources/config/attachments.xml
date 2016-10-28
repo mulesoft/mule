@@ -1,0 +1,23 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <!-- MTOM must be enabled -->
+    <wsc:config name="attachmentsConfig">
+        <wsc:connection wsdlLocation="http://localhost:${attachmentPort}/testAttachments?wsdl" service="TestAttachmentsService" port="TestAttachmentsPort" mtomEnabled="true"/>
+    </wsc:config>
+
+    <flow name="download">
+        <wsc:consume config-ref="attachmentsConfig" operation="downloadAttachment" body="#[payload]"/>
+    </flow>
+
+    <flow name="upload">
+        <wsc:consume config-ref="attachmentsConfig" operation="uploadAttachment" body="#[payload]">
+            <wsc:attachments>
+                <wsc:ws-attachment id="testAttachment" content="#[flowVars.att]" contentType="text/plain"/>
+            </wsc:attachments>
+        </wsc:consume>
+    </flow>
+</mule>

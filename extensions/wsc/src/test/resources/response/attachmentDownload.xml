@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:downloadAttachmentResponse xmlns:ns2="http://consumer.ws.extension.mule.org/">
+    <attachment>
+        <xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include"
+                     href="cid:%s"/>
+    </attachment>
+</ns2:downloadAttachmentResponse>

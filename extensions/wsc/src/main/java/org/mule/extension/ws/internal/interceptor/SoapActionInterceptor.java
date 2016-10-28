@@ -6,12 +6,12 @@
  */
 package org.mule.extension.ws.internal.interceptor;
 
+import static org.apache.cxf.phase.Phase.PRE_LOGICAL;
 import static org.mule.extension.ws.internal.ConsumeOperation.MULE_SOAP_ACTION;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
 /**
  * CXF interceptor that adds the SOAP action to the outgoing request message.
@@ -20,9 +20,8 @@ import org.apache.cxf.phase.Phase;
  */
 public class SoapActionInterceptor extends AbstractPhaseInterceptor<Message> {
 
-
   public SoapActionInterceptor() {
-    super(Phase.PRE_LOGICAL);
+    super(PRE_LOGICAL);
   }
 
   @Override

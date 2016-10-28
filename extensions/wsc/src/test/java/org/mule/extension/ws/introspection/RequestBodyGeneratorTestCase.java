@@ -16,9 +16,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
-import static org.mule.extension.ws.WscTestUtils.NO_PARAMS_XML;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
-import static org.mule.extension.ws.WscTestUtils.resourceAsString;
+import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.consumer.TestService;
 import org.mule.extension.ws.internal.WscConnection;
@@ -42,7 +41,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 public class RequestBodyGeneratorTestCase {
 
   @ClassRule
-  public static DynamicPort port = new DynamicPort("port");
+  public static DynamicPort port = new DynamicPort("servicePort");
 
   public static final String TEST_URL = "http://localhost:" + port.getValue() + "/testService";
 
@@ -70,7 +69,7 @@ public class RequestBodyGeneratorTestCase {
   @Description("Checks the generation of a body request for an operation that don't require any parameters")
   public void noParams() throws Exception {
     String request = generator.generateRequest(connection, NO_PARAMS);
-    assertSimilarXml(request, resourceAsString("request/" + NO_PARAMS_XML));
+    assertSimilarXml(request, getRequestResource(NO_PARAMS));
   }
 
   @Test

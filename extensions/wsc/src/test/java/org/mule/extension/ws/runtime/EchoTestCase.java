@@ -9,12 +9,13 @@ package org.mule.extension.ws.runtime;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT_XML;
-import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS_XML;
-import static org.mule.extension.ws.WscTestUtils.ECHO_XML;
-import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT_XML;
-import static org.mule.extension.ws.WscTestUtils.HEADER_OUT_XML;
-import org.mule.extension.ws.WebServiceConsumerTestCase;
+import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
+import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
+import static org.mule.extension.ws.WscTestUtils.ECHO;
+import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
+import static org.mule.extension.ws.WscTestUtils.HEADER_OUT;
+import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
+import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.runtime.api.message.Message;
 
@@ -24,7 +25,7 @@ import java.util.List;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 
-public class EchoTestCase extends WebServiceConsumerTestCase {
+public class EchoTestCase extends AbstractSoapServiceTestCase {
 
   // Flow Names
   private static final String ECHO_FLOW = "echoOperation";
@@ -39,32 +40,32 @@ public class EchoTestCase extends WebServiceConsumerTestCase {
   @Test
   @Description("Consumes an operation that expects a simple type and returns a simple type")
   public void echoOperation() throws Exception {
-    Message message = runFlowWithRequest(ECHO_FLOW, ECHO_XML);
+    Message message = runFlowWithRequest(ECHO_FLOW, ECHO);
     String out = (String) message.getPayload().getValue();
-    assertSoapResponse(ECHO_XML, out);
+    assertSoapResponse(ECHO, out);
   }
 
   @Test
   @Description("Consumes an operation that expects an input and a set of headers and returns a simple type and a set of headers")
   public void echoWithHeadersOperation() throws Exception {
-    Message message = runFlowWithRequest(ECHO_HEADERS_FLOW, ECHO_HEADERS_XML);
+    Message message = runFlowWithRequest(ECHO_HEADERS_FLOW, ECHO_HEADERS);
 
     String out = (String) message.getPayload().getValue();
-    assertSoapResponse(ECHO_HEADERS_XML, out);
+    assertSoapResponse(ECHO_HEADERS, out);
 
     WscAttributes attributes = (WscAttributes) message.getAttributes();
     List<String> headers = new ArrayList<>(attributes.getSoapHeaders().values());
     assertThat(headers, hasSize(2));
-    assertSoapResponse(HEADER_INOUT_XML, headers.get(0));
-    assertSoapResponse(HEADER_OUT_XML, headers.get(1));
+    assertSoapResponse(HEADER_INOUT, headers.get(0));
+    assertSoapResponse(HEADER_OUT, headers.get(1));
   }
 
   @Test
   @Description("Consumes an operation that expects 2 parameters (a simple one and a complex one) and returns a complex type")
   public void echoAccountOperation() throws Exception {
-    Message message = runFlowWithRequest(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT_XML);
+    Message message = runFlowWithRequest(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
     String out = (String) message.getPayload().getValue();
-    assertSoapResponse(ECHO_ACCOUNT_XML, out);
+    assertSoapResponse(ECHO_ACCOUNT, out);
     WscAttributes attributes = (WscAttributes) message.getAttributes();
     assertThat(attributes.getSoapHeaders().isEmpty(), is(true));
   }

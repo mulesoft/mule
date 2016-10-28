@@ -7,6 +7,7 @@
 package org.mule.extension.ws.consumer;
 
 
+import static java.lang.String.format;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
@@ -30,17 +31,16 @@ public class TestAttachments {
 
   @WebResult(name = "result")
   @WebMethod(action = "uploadAttachment")
-  public String uploadAttachment(@WebParam(mode = WebParam.Mode.IN, name = "fileName") String fileName,
-                                 @WebParam(mode = WebParam.Mode.IN, name = "attachment") DataHandler attachment) {
+  public String uploadAttachment(@WebParam(mode = WebParam.Mode.IN, name = "attachment") DataHandler attachment) {
     try {
       String received = IOUtils.toString(attachment.getInputStream());
-      if (received.contains("some content")) {
-        return "OK";
+      if (received.contains("Some Content")) {
+        return "Ok";
       } else {
-        return "UNEXPECTED CONTENT: " + received;
+        return format("Unexpected Content: [%s], was expecting [Some Content]", received);
       }
     } catch (IOException e) {
-      return "ERROR " + e.getMessage();
+      return "Error: " + e.getMessage();
     }
   }
 
@@ -58,5 +58,4 @@ public class TestAttachments {
       throw new RuntimeException(e);
     }
   }
-
 }

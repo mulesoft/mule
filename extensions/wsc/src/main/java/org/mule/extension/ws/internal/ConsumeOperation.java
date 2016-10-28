@@ -7,9 +7,11 @@
 package org.mule.extension.ws.internal;
 
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.WsAttachment;
 import org.mule.extension.ws.api.WscAttributes;
@@ -21,6 +23,8 @@ import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
 import org.mule.extension.ws.internal.metadata.body.InputBodyResolver;
 import org.mule.extension.ws.internal.metadata.body.OutputBodyResolver;
 import org.mule.extension.ws.internal.metadata.header.InputHeadersResolver;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -30,6 +34,8 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.xml.stax.StaxSource;
+
+import com.google.common.collect.ImmutableList;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -79,31 +85,25 @@ public class ConsumeOperation {
   public static final String MULE_SOAP_ACTION = "mule.wsc.soap.action";
 
   @OutputResolver(output = OutputBodyResolver.class, attributes = WscAttributesResolver.class)
-  public OperationResult<String, WscAttributes> consume(@Connection WscConnection connection,
+  public OperationResult<Object, WscAttributes> consume(@Connection WscConnection connection,
                                                         @MetadataKeyId(OperationKeysResolver.class) String operation,
                                                         @Optional @Content @TypeResolver(InputBodyResolver.class) String body,
                                                         @Optional @TypeResolver(InputHeadersResolver.class) List<String> headers,
                                                         @Optional List<WsAttachment> attachments) {
-    Map<String, Object> ctx = getContext(headers, attachments, operation);
-    Exchange exchange = new ExchangeImpl();
+    Map<String, Object> ctx = getInvocationContext(headers, attachments, operation);
     XMLStreamReader request = stringToXmlStreamReader(body, connection, operation);
-    Object[] response;
     try {
-      response = connection.invoke(request, ctx, exchange);
-      return asResult(processOutput(response), processAttributes(exchange));
+      Exchange exchange = new ExchangeImpl();
+      Object[] response = connection.invoke(request, ctx, exchange);
+      return buildResult(response, exchange);
     } catch (SoapFault sf) {
       throw new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), sf.getMessage(), sf.getDetail());
     } catch (Exception e) {
-      throw new WscException(e);
+      throw new WscException(format("An unexpected error occur while consuming the [%s] web service operation", operation), e);
     }
   }
 
-  private WscAttributes processAttributes(Exchange exchange) {
-    Map<String, String> headers = (Map<String, String>) exchange.get(MULE_HEADERS_KEY);
-    return new WscAttributes(headers, emptyMap());
-  }
-
-  private Map<String, Object> getContext(List<String> headers, List<WsAttachment> attachments, String operation) {
+  private Map<String, Object> getInvocationContext(List<String> headers, List<WsAttachment> attachments, String operation) {
     Map<String, Object> props = new HashMap<>();
     props.put(MULE_ATTACHMENTS_KEY, transformAttachments(attachments));
     props.put(MULE_HEADERS_KEY, transformHeaders(headers));
@@ -113,8 +113,31 @@ public class ConsumeOperation {
     return ctx;
   }
 
-  private OperationResult<String, WscAttributes> asResult(String output, WscAttributes attributes) {
-    return OperationResult.<String, WscAttributes>builder().output(output).attributes(attributes).build();
+  private OperationResult<Object, WscAttributes> buildResult(Object[] invocationResponse, Exchange exchange) {
+    String response = processOutput(invocationResponse);
+    WscAttributes attributes = processAttributes(exchange);
+    List<Message> receivedAttachments = (List<Message>) exchange.get(MULE_ATTACHMENTS_KEY);
+
+    Object output;
+    if (!receivedAttachments.isEmpty()) {
+      ImmutableList<Message> parts = ImmutableList.<Message>builder()
+          .add(Message.builder().payload(response).attributes(BODY_ATTRIBUTES).build())
+          .addAll(receivedAttachments)
+          .build();
+      output = new DefaultMultiPartPayload(parts);
+    } else {
+      output = response;
+    }
+
+    return OperationResult.<Object, WscAttributes>builder()
+        .output(output)
+        .attributes(attributes)
+        .build();
+  }
+
+  private WscAttributes processAttributes(Exchange exchange) {
+    Map<String, String> headers = (Map<String, String>) exchange.get(MULE_HEADERS_KEY);
+    return new WscAttributes(headers, emptyMap());
   }
 
   private String processOutput(Object[] response) {
@@ -151,7 +174,7 @@ public class ConsumeOperation {
       try {
         return new AttachmentImpl(a.getId(), toDataHandler(a.getId(), a.getContent(), a.getContentType()));
       } catch (IOException e) {
-        throw new WscException("Error while preparing attachments", e);
+        throw new WscException("Error while preparing attachments for upload", e);
       }
     }).collect(new ImmutableListCollector<>());
   }
@@ -163,7 +186,7 @@ public class ConsumeOperation {
       is.setCharacterStream(new StringReader(xml));
       return db.parse(is).getDocumentElement();
     } catch (Exception e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new WscException(e.getMessage(), e);
     }
   }
 
@@ -174,7 +197,7 @@ public class ConsumeOperation {
       }
       return XMLInputFactory.newInstance().createXMLStreamReader(new ByteArrayInputStream(body.getBytes()));
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new WscException(e);
     }
   }
 }

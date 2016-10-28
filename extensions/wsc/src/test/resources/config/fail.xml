@@ -5,17 +5,11 @@
       http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="config">
-        <wsc:connection wsdlLocation="http://localhost:${port}/testService?wsdl" service="TestService" port="TestPort"/>
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/testService?wsdl" service="TestService" port="TestPort"/>
     </wsc:config>
 
     <flow name="failOperation">
         <wsc:consume config-ref="config" operation="fail" body="#[payload]"/>
-    </flow>
-
-    <flow name="echoMissingHeaders">
-        <wsc:consume config-ref="config" operation="echoWithHeaders" body="#[payload]">
-            <!-- Missing headers make it fail -->
-        </wsc:consume>
     </flow>
 
 </mule>

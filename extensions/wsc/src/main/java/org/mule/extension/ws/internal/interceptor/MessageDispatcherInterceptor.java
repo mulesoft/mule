@@ -6,15 +6,22 @@
  */
 package org.mule.extension.ws.internal.interceptor;
 
+import static java.lang.Boolean.TRUE;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.cxf.message.Message.CONTENT_TYPE;
+import static org.apache.cxf.message.Message.ENCODING;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.WscConnection;
 import org.mule.extension.ws.internal.transport.HttpDispatcher;
+import org.mule.runtime.core.util.IOUtils;
+
+import com.squareup.okhttp.Response;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.interceptor.Fault;
@@ -44,39 +51,44 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
 
   // TODO: MULE-10783
   @Override
-  public void handleMessage(Message msg) throws Fault {
+  public void handleMessage(Message message) throws Fault {
 
     // Performs all the remaining interceptions before sending.
-    msg.getInterceptorChain().doIntercept(msg);
+    message.getInterceptorChain().doIntercept(message);
 
-    OutputStream content = msg.getContent(OutputStream.class);
-    String dispatched = new HttpDispatcher().dispatch(address, content);
+    Response response = new HttpDispatcher().dispatch(address, message);
 
-    Exchange exchange = msg.getExchange();
-    if (isNotBlank(dispatched)) {
+    // We wipe the request attachment list, so don't get mixed with the response ones.
+    message.setAttachments(emptyList());
+
+    String body;
+    try {
+      body = IOUtils.toString(response.body().byteStream());
+    } catch (IOException e) {
+      throw new WscException("Error while getting body response content");
+    }
+
+    Exchange exchange = message.getExchange();
+    if (isNotBlank(body)) {
 
       // This needs to be set because we want the wsc closes the final stream,
       // otherwise cxf will close it too early when handling message in the StaxInEndingInterceptor.
-      exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
+      exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, TRUE);
 
-      InputStream is = new ByteArrayInputStream(dispatched.getBytes());
+      InputStream is = new ByteArrayInputStream(body.getBytes());
       Message inMessage = new MessageImpl();
 
-      String encoding = "UTF-8";
-      inMessage.put(Message.ENCODING, encoding);
+      // TODO make encoding policy
+      inMessage.put(ENCODING, "UTF-8");
 
-      String contentType = "text/xml";
-      if (!contentType.contains("charset")) {
-        contentType += "; charset=" + encoding;
-      }
-
-      inMessage.put(Message.CONTENT_TYPE, contentType);
+      String contentType = response.header(CONTENT_TYPE);
+      inMessage.put(CONTENT_TYPE, contentType);
       inMessage.setContent(InputStream.class, is);
       inMessage.setExchange(exchange);
       messageObserver.onMessage(inMessage);
     } else {
-      exchange.put(ClientImpl.FINISHED, Boolean.TRUE);
-      throw new WscException("Web Service Response is blank, cannot consume web service");
+      exchange.put(ClientImpl.FINISHED, TRUE);
+      throw new WscException("Web Service Response is blank");
     }
   }
 }

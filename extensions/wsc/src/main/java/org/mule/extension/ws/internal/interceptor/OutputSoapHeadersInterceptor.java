@@ -7,8 +7,10 @@
 package org.mule.extension.ws.internal.interceptor;
 
 import static java.util.stream.Collectors.toMap;
-import org.mule.extension.ws.internal.ConsumeOperation;
+import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
+import static org.mule.extension.ws.internal.ConsumeOperation.MULE_HEADERS_KEY;
 import org.mule.extension.ws.api.WscAttributes;
+import org.mule.extension.ws.internal.ConsumeOperation;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -26,7 +28,6 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
-import org.apache.cxf.phase.Phase;
 import org.w3c.dom.Node;
 
 /**
@@ -38,7 +39,7 @@ import org.w3c.dom.Node;
 public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
 
   public OutputSoapHeadersInterceptor() {
-    super(Phase.PRE_PROTOCOL);
+    super(PRE_PROTOCOL);
   }
 
   /**
@@ -50,7 +51,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
         .filter(header -> header instanceof SoapHeader)
         .collect(toMap(h -> h.getName().getLocalPart(), this::nodeToString));
 
-    message.getExchange().put(ConsumeOperation.MULE_HEADERS_KEY, result);
+    message.getExchange().put(MULE_HEADERS_KEY, result);
   }
 
   private String nodeToString(Header header) {

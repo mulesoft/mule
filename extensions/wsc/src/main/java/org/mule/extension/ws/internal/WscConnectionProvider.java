@@ -47,6 +47,13 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   private String address;
 
   /**
+   * If should use the MTOM protocol to manage the attachments or not.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  private boolean mtomEnabled;
+
+  /**
    * The soap version of the WSDL.
    */
   @Parameter
@@ -55,7 +62,7 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
 
   @Override
   public WscConnection connect() throws ConnectionException {
-    return new WscConnection(wsdlLocation, address, service, port, soapVersion);
+    return new WscConnection(wsdlLocation, address, service, port, soapVersion, mtomEnabled);
   }
 
   @Override

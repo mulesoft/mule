@@ -49,13 +49,14 @@ final class WscConduit extends AbstractConduit {
   @Override
   @SuppressWarnings("unchecked")
   public void prepare(Message message) throws IOException {
+    // Set a new OutputStream where the message is going to be handled.
     message.setContent(OutputStream.class, new ByteArrayOutputStream());
     addHeaders(message);
     addAttachments(message);
-    addInterceptors(message);
+    addMessageDispatcher(message);
   }
 
-  private void addInterceptors(Message message) {
+  private void addMessageDispatcher(Message message) {
     message.getInterceptorChain().add(new MessageDispatcherInterceptor(target.getAddress().getValue(), getMessageObserver()));
   }
 
