@@ -57,11 +57,17 @@ public class QueryStatementFactory implements ConfigurableStatementFactory
         {
             DatabaseMetaData metadata = connection.getMetaData();
             int resultSetType;
-            if (metadata.supportsResultSetType(TYPE_SCROLL_INSENSITIVE)) {
+            // MULE-10854: some DBs need scrolling for fetching CLOBs, but others don't support it so we check
+            if (metadata.supportsResultSetType(TYPE_SCROLL_INSENSITIVE))
+            {
                 resultSetType = TYPE_SCROLL_INSENSITIVE;
-            } else if (metadata.supportsResultSetType(TYPE_SCROLL_SENSITIVE)) {
+            }
+            else if (metadata.supportsResultSetType(TYPE_SCROLL_SENSITIVE))
+            {
                 resultSetType = TYPE_SCROLL_SENSITIVE;
-            } else {
+            }
+            else
+            {
                 resultSetType = TYPE_FORWARD_ONLY;
             }
             result = connection.prepareCall(queryTemplate.getSqlText(), resultSetType, ResultSet.CONCUR_READ_ONLY);
