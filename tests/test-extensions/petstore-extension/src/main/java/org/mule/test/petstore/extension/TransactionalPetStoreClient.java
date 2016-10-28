@@ -10,15 +10,18 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 public class TransactionalPetStoreClient extends PetStoreClient implements TransactionalConnection {
 
   private boolean begun, commited, rolledback = false;
 
   public TransactionalPetStoreClient(String username, String password, TlsContextFactory tlsContextFactory,
-                                     ThreadingProfile threadingProfile, String configName, Date openingDate) {
-    super(username, password, tlsContextFactory, threadingProfile, configName, openingDate);
+                                     ThreadingProfile threadingProfile, String configName, Date openingDate,
+                                     List<Date> closedForHolidays, List<LocalDateTime> discountDates) {
+    super(username, password, tlsContextFactory, threadingProfile, configName, openingDate, closedForHolidays, discountDates);
   }
 
   @Override

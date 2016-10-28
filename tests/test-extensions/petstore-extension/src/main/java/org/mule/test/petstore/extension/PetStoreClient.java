@@ -10,6 +10,7 @@ package org.mule.test.petstore.extension;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -25,15 +26,20 @@ public class PetStoreClient {
   private ThreadingProfile threadingProfile;
   private int disconnectCount;
   private Date openingDate;
+  private List<Date> closedForHolidays;
+
+  private List<LocalDateTime> discountDates;
 
   public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile,
-                        String configName, Date openingDate) {
+                        String configName, Date openingDate, List<Date> closedForHolidays, List<LocalDateTime> discountDates) {
     this.username = username;
     this.password = password;
     this.tlsContext = tlsContextFactory;
     this.threadingProfile = threadingProfile;
     this.configName = configName;
     this.openingDate = openingDate;
+    this.closedForHolidays = closedForHolidays;
+    this.discountDates = discountDates;
   }
 
   public List<String> getPets(String ownerName, PetStoreConnector config) {
@@ -76,5 +82,13 @@ public class PetStoreClient {
 
   public Date getOpeningDate() {
     return openingDate;
+  }
+
+  public List<Date> getClosedForHolidays() {
+    return closedForHolidays;
+  }
+
+  public List<LocalDateTime> getDiscountDates() {
+    return discountDates;
   }
 }

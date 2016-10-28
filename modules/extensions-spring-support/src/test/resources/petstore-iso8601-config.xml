@@ -25,6 +25,22 @@
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15+05:00"/>
     </petstore:config>
 
+    <petstore:config name="petstoreClosedForHolidays" cashierName="jim">
+        <petstore:connection username="john" password="doe">
+          <petstore:closed-for-holidays>
+              <petstore:closed-for-holiday value="2008-09-15"/>
+          </petstore:closed-for-holidays>
+        </petstore:connection>
+    </petstore:config>
+
+    <petstore:config name="petstoreDiscountDates" cashierName="jim">
+        <petstore:connection username="john" password="doe">
+            <petstore:discount-dates>
+                <petstore:discount-date value="2008-09-15T15:53:23"/>
+            </petstore:discount-dates>
+        </petstore:connection>
+    </petstore:config>
+
     <flow name="getWithTimeZone">
         <petstore:get-client config-ref="petstoreWithTimeZone" />
     </flow>
@@ -43,6 +59,14 @@
 
     <flow name="getWithTimeZoneNoMinutes">
         <petstore:get-client config-ref="petstoreWithTimeZoneNoMinutes" />
+    </flow>
+
+    <flow name="getDateList">
+        <petstore:get-client config-ref="petstoreClosedForHolidays" />
+    </flow>
+
+    <flow name="getDateTimeList">
+        <petstore:get-client config-ref="petstoreDiscountDates" />
     </flow>
 
 
