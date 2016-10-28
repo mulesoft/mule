@@ -6,20 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.connector;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Test;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class PetStoreISO8601DateParsingTestCase extends ExtensionFunctionalTestCase {
+
+  public static final int YEAR = 2008;
+  public static final int MONTH = 9;
+  public static final int DAY = 15;
+  public static final int HOUR = 15;
+  public static final int MINUTE = 53;
+  public static final int SECOND = 23;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -72,40 +80,69 @@ public class PetStoreISO8601DateParsingTestCase extends ExtensionFunctionalTestC
     assertDate(calendar);
   }
 
+  @Test
+  public void testDateList() throws Exception {
+    Calendar calendar = Calendar.getInstance();
+    PetStoreClient client = getClient("getDateList");
+    List<Date> dates = client.getClosedForHolidays();
+    calendar.setTime(dates.get(0));
+    assertEquals(dates.size(), 1);
+    assertDate(calendar);
+  }
+
+  @Test
+  public void testDateTimeList() throws Exception {
+    PetStoreClient client = getClient("getDateTimeList");
+    List<LocalDateTime> dates = client.getDiscountDates();
+    assertEquals(dates.size(), 1);
+    assertDateTime(dates.get(0));
+  }
 
   public Date getDate(String flowName) throws Exception {
-    PetStoreClient client = (PetStoreClient) flowRunner(flowName).run().getMessage().getPayload().getValue();
-
+    PetStoreClient client = getClient(flowName);
     return client.getOpeningDate(); // 2008-09-15T15:53:23+05:00
   }
 
+  public PetStoreClient getClient(String flowName) throws Exception {
+    return ((PetStoreClient) flowRunner(flowName).run().getMessage().getPayload().getValue());
+  }
+
   private void assertDate(Calendar openingDate) {
-    assertEquals(openingDate.get(Calendar.YEAR), 2008);
-    assertEquals(openingDate.get(Calendar.MONTH) + 1, 9);
-    assertEquals(openingDate.get(Calendar.DAY_OF_MONTH), 15);
+    assertEquals(openingDate.get(Calendar.YEAR), YEAR);
+    assertEquals(openingDate.get(Calendar.MONTH) + 1, MONTH);
+    assertEquals(openingDate.get(Calendar.DAY_OF_MONTH), DAY);
+  }
+
+  private void assertDateTime(LocalDateTime localDateTime) {
+    assertEquals(localDateTime.getYear(), YEAR);
+    assertEquals(localDateTime.getMonthValue(), MONTH);
+    assertEquals(localDateTime.getDayOfMonth(), DAY);
+    assertEquals(localDateTime.getHour(), HOUR);
+    assertEquals(localDateTime.getMinute(), MINUTE);
+    assertEquals(localDateTime.getSecond(), SECOND);
   }
 
   private void assertTime(Calendar openingDate) {
-    assertEquals(openingDate.get(Calendar.HOUR_OF_DAY), 15);
-    assertEquals(openingDate.get(Calendar.MINUTE), 53);
-    assertEquals(openingDate.get(Calendar.SECOND), 23);
+    assertEquals(openingDate.get(Calendar.HOUR_OF_DAY), HOUR);
+    assertEquals(openingDate.get(Calendar.MINUTE), MINUTE);
+    assertEquals(openingDate.get(Calendar.SECOND), SECOND);
   }
 
   private void assertTimeZoneDate(ZonedDateTime openingDate) {
-    assertEquals(openingDate.getYear(), 2008);
-    assertEquals(openingDate.getMonthValue(), 9);
-    assertEquals(openingDate.getDayOfMonth(), 15);
+    assertEquals(openingDate.getYear(), YEAR);
+    assertEquals(openingDate.getMonthValue(), MONTH);
+    assertEquals(openingDate.getDayOfMonth(), DAY);
   }
 
   private void assertTimeZoneDateTime(ZonedDateTime openingDate) {
-    assertEquals(openingDate.getHour(), 15);
-    assertEquals(openingDate.getMinute(), 53);
-    assertEquals(openingDate.getSecond(), 23);
+    assertEquals(openingDate.getHour(), HOUR);
+    assertEquals(openingDate.getMinute(), MINUTE);
+    assertEquals(openingDate.getSecond(), SECOND);
   }
 
   private void assertTimeZoneWithoutSeconds(ZonedDateTime openingDate) {
-    assertEquals(openingDate.getHour(), 15);
-    assertEquals(openingDate.getMinute(), 53);
+    assertEquals(openingDate.getHour(), HOUR);
+    assertEquals(openingDate.getMinute(), MINUTE);
   }
 
   private void assertTimeZoneHour(ZonedDateTime openingDate) {

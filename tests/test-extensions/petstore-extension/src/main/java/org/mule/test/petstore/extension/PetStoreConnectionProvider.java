@@ -20,9 +20,10 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
-import java.util.Date;
-
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle {
 
@@ -44,11 +45,18 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
   @Optional
   @Parameter
   protected Date openingDate;
+  @Optional
+  @Parameter
+  protected List<Date> closedForHolidays;
+  @Optional
+  @Parameter
+  protected List<LocalDateTime> discountDates;
   private int initialise, start, stop, dispose = 0;
 
   @Override
   public T connect() {
-    return (T) new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
+    return (T) new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate, closedForHolidays,
+                                  discountDates);
   }
 
   @Override
