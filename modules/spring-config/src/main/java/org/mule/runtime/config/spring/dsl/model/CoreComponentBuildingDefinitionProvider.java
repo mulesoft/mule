@@ -29,6 +29,7 @@ import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -38,6 +39,7 @@ import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToCl
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -63,6 +65,7 @@ import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
+import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
@@ -193,6 +196,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
@@ -390,6 +394,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
+    addModuleOperationChainParser(componentBuildingDefinitions);
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SUB_FLOW)
         .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
@@ -1231,4 +1236,33 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
+
+  /**
+   * Parser for the expanded operations, generated dynamically by the {@link ApplicationModel} by reading the extensions
+   * @param componentBuildingDefinitions
+   */
+  private void addModuleOperationChainParser(LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions) {
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("module-operation-chain")
+        .withTypeDefinition(fromType(Processor.class))
+        .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
+        .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
+            .withWrapperIdentifier("module-operation-properties").build())
+        .withSetterParameterDefinition("parameters", fromChildMapConfiguration(String.class, String.class)
+            .withWrapperIdentifier("module-operation-parameters").build())
+        .withSetterParameterDefinition("returnsVoid", fromSimpleParameter("returnsVoid").build())
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .asPrototype().build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("module-operation-properties")
+        .withTypeDefinition(fromType(TreeMap.class)).build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("module-operation-property-entry")
+        .withTypeDefinition(fromMapEntryType(String.class, String.class))
+        .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("module-operation-parameters")
+        .withTypeDefinition(fromType(TreeMap.class)).build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("module-operation-parameter-entry")
+        .withTypeDefinition(fromMapEntryType(String.class, String.class))
+        .build());
+  }
+
 }

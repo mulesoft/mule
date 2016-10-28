@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-properties-types"
+        namespace="http://www.mulesoft.org/schema/mule/module-properties-types"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd">
+
+    <!-- shows that the xsd will have a global element called config, for the following properties-->
+    <property name="integerParam" type="integer"/>
+    <property name="booleanParam" type="boolean"/>
+    <property name="dateParam" type="date"/>
+    <property name="datetimeParam" type="datetime"/>
+    <property name="stringParam" type="string"/>
+    <property name="timeParam" type="time"/>
+
+</module>

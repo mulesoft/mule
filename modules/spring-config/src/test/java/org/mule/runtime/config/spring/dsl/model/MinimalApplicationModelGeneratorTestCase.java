@@ -91,7 +91,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);
     return new MinimalApplicationModelGenerator(new ApplicationModel(new ArtifactConfig.Builder().addConfigFile(configFile)
-        .build(), new ArtifactConfiguration(emptyList()), Optional.of(componentBuildingDefinitionRegistry)),
+        .build(), new ArtifactConfiguration(emptyList()), Optional.empty(), Optional.of(componentBuildingDefinitionRegistry)),
                                                 componentBuildingDefinitionRegistry);
   }
 

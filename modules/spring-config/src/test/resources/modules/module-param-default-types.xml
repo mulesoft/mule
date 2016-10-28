@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-param-default-types"
+        namespace="http://www.mulesoft.org/schema/mule/module-param-default-types"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <operation name="integer-param-operation">
+        <parameters>
+            <parameter name="integerParam" type="integer" defaultValue="11"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="boolean-param-operation">
+        <parameters>
+            <parameter name="booleanParam" type="boolean" defaultValue="false"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="date-param-operation">
+        <parameters>
+            <parameter name="dateParam" type="date" defaultValue="1959-09-07T00:00:00"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="datetime-param-operation">
+        <parameters>
+            <parameter name="datetimeParam" type="datetime" defaultValue="1959-09-07T00:00:00"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="string-param-operation">
+        <parameters>
+            <parameter name="stringParam" type="string" defaultValue="hello world"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="time-param-operation">
+        <parameters>
+            <parameter name="timeParam" type="time" defaultValue="1959-09-07T00:00:00"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

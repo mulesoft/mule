@@ -26,12 +26,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
-import org.mule.mvel2.util.Make;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
@@ -39,6 +34,7 @@ import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
+import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -55,10 +51,11 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -67,10 +64,12 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 
 import com.google.common.collect.ImmutableList;
 
@@ -203,13 +202,17 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     try {
       ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
       applicationConfigBuilder.setApplicationProperties(this.artifactProperties);
+      //looks for every module in the current classpath ONCE per app, and caches them in the moduleExtensionStore object
+      ModuleExtensionStore moduleExtensionStore = new ModuleExtensionStore();
       for (Resource springResource : artifactConfigResources) {
-        Document document = xmlConfigurationDocumentLoader.loadDocument(springResource.getInputStream());
+        Document document =
+            xmlConfigurationDocumentLoader.loadDocument(Optional.of(moduleExtensionStore), springResource.getInputStream());
         ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
         applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
       }
       applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
       applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration,
+                                              Optional.of(moduleExtensionStore),
                                               Optional.of(componentBuildingDefinitionRegistry));
     } catch (Exception e) {
       throw new MuleRuntimeException(e);

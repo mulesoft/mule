@@ -1,0 +1,14 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-single-operation"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        targetNamespace="http://www.mulesoft.org/schema/mule/module-single-operation">
+    <import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+    <element name="some-operation" substitutionGroup="mule:abstract-message-processor" type="tns:some-operation-type"/>
+    <complexType name="some-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType"/>
+        </complexContent>
+    </complexType>
+</schema>
