@@ -16,7 +16,6 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.setUpServer;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -49,10 +48,6 @@ public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestC
   protected void doTearDownAfterMuleContextDispose() throws Exception {
     assertThat(server, is(not(nullValue())));
     server.stop();
-  }
-
-  protected void assertBodyContent(MultiPartPayload content) {
-    assertBodyContent((String) content.getParts().get(0).getPayload().getValue());
   }
 
   protected void assertBodyContent(String content) {

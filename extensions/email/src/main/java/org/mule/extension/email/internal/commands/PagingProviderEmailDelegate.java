@@ -10,6 +10,7 @@ import static java.lang.Math.min;
 import static java.util.Collections.emptyList;
 import static javax.mail.Folder.READ_ONLY;
 import static javax.mail.Folder.READ_WRITE;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
@@ -18,7 +19,6 @@ import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
@@ -41,7 +41,7 @@ import javax.mail.MessagingException;
  * @since 4.0
  */
 public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
-    implements PagingProvider<MailboxConnection, OperationResult<MultiPartPayload, T>> {
+    implements PagingProvider<MailboxConnection, OperationResult<Object, T>> {
 
   private final MailboxAccessConfiguration configuration;
   private final int pageSize;
@@ -88,12 +88,12 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
    * ({@code shouldReadContent} = false) the SEEN flag is not going to be set. If {@code deleteAfterRead} flag is set to true, the
    * callback {@code deleteAfterReadCallback} is applied to each email.
    */
-  private <T extends BaseEmailAttributes> List<OperationResult<MultiPartPayload, T>> list(int startIndex, int endIndex) {
+  private <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(int startIndex, int endIndex) {
     Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
-      List<OperationResult<MultiPartPayload, T>> retrievedEmails = new LinkedList<>();
+      List<OperationResult<Object, T>> retrievedEmails = new LinkedList<>();
       for (javax.mail.Message m : folder.getMessages(startIndex, endIndex)) {
-        MultiPartPayload emailContent = new DefaultMultiPartPayload();
+        Object emailContent = EMPTY;
         T attributes = configuration.parseAttributesFromMessage(m, folder);
         if (matcher.test(attributes)) {
           if (configuration.isEagerlyFetchContent()) {
@@ -101,7 +101,7 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
             // Attributes are parsed again since they may change after the email has been read.
             attributes = configuration.parseAttributesFromMessage(m, folder);
           }
-          OperationResult<MultiPartPayload, T> operationResult = OperationResult.<MultiPartPayload, T>builder()
+          OperationResult<Object, T> operationResult = OperationResult.<Object, T>builder()
               .output(emailContent)
               .attributes(attributes)
               .build();
@@ -120,22 +120,25 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
     }
   }
 
-  private MultiPartPayload readContent(javax.mail.Message m) {
+  private Object readContent(javax.mail.Message m) {
+    Object emailContent;
     EmailContentProcessor processor = EmailContentProcessor.getInstance(m);
     String body = processor.getBody();
     List<Message> parts = new ArrayList<>();
     List<Message> attachments = processor.getAttachments();
-    parts.add(Message.builder().payload(body).attributes(BODY_ATTRIBUTES).build());
 
     if (!attachments.isEmpty()) {
+      parts.add(Message.builder().payload(body).attributes(BODY_ATTRIBUTES).build());
       parts.addAll(attachments);
+      emailContent = new DefaultMultiPartPayload(parts);
+    } else {
+      emailContent = body;
     }
-
-    return new DefaultMultiPartPayload(parts);
+    return emailContent;
   }
 
   @Override
-  public List<OperationResult<MultiPartPayload, T>> getPage(MailboxConnection connection) {
+  public List<OperationResult<Object, T>> getPage(MailboxConnection connection) {
     try {
       folder = connection.getFolder(folderName, deleteAfterRetrieve ? READ_WRITE : READ_ONLY);
       if (folder.getMessageCount() == 0) {
@@ -145,7 +148,7 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
       endIndex = min(endIndex, folder.getMessageCount());
 
       while (startIndex <= endIndex) {
-        List<OperationResult<MultiPartPayload, T>> emails = list(startIndex, endIndex);
+        List<OperationResult<Object, T>> emails = list(startIndex, endIndex);
         startIndex += pageSize;
         endIndex = min(endIndex + pageSize, folder.getMessageCount());
 

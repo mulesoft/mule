@@ -14,6 +14,9 @@ import static org.mule.extension.email.internal.util.EmailConnectorConstants.DEF
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.PAGE_SIZE_ERROR_MESSAGE;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import org.mule.extension.email.api.EmailMetadataKey;
+import org.mule.extension.email.api.EmailMetadataResolver;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
@@ -23,11 +26,13 @@ import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -60,15 +65,19 @@ public class IMAPOperations {
    *         content and it's corresponding {@link IMAPEmailAttributes}.
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
-  public PagingProvider<MailboxConnection, Result<MultiPartPayload, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
-                                                                                                            @Connection MailboxConnection connection,
-                                                                                                            @Optional(
-                                                                                                                defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                                                            @DisplayName("Match with") @Optional IMAPEmailPredicateBuilder imapMatcher,
-                                                                                                            @Optional(
-                                                                                                                defaultValue = "false") boolean deleteAfterRetrieve,
-                                                                                                            @Optional(
-                                                                                                                defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+  @OutputResolver(output = EmailMetadataResolver.class)
+  public PagingProvider<MailboxConnection, Result<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
+                                                                                                  @Connection MailboxConnection connection,
+                                                                                                  @Optional(
+                                                                                                      defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                                                                                  @DisplayName("Match with") @Optional IMAPEmailPredicateBuilder imapMatcher,
+                                                                                                  @Optional(
+                                                                                                      defaultValue = "false") boolean deleteAfterRetrieve,
+                                                                                                  @MetadataKeyId @Optional(
+                                                                                                      defaultValue = "ANY") @Placement(
+                                                                                                          tab = ADVANCED) EmailMetadataKey outputType,
+                                                                                                  @Optional(
+                                                                                                      defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
     checkArgument(pageSize > 0, format(PAGE_SIZE_ERROR_MESSAGE, pageSize));
     return new PagingProviderEmailDelegate<>(config, mailboxFolder, imapMatcher, pageSize, deleteAfterRetrieve,
                                              attributes -> setFlagCommand.setByUID(connection, mailboxFolder, DELETED,

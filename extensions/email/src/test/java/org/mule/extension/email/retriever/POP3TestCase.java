@@ -49,7 +49,7 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase {
     ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     int count = 0;
     while (messages.hasNext()) {
-      assertBodyContent((MultiPartPayload) messages.next().getOutput());
+      assertBodyContent((String) messages.next().getOutput());
       count++;
     }
     assertThat(count, is(pageSize));

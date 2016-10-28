@@ -28,7 +28,6 @@ import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -81,7 +80,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
     while (messages.hasNext()) {
       size++;
       Result m = messages.next();
-      assertBodyContent((MultiPartPayload) m.getOutput());
+      assertBodyContent((String) m.getOutput());
       assertThat(((IMAPEmailAttributes) m.getAttributes().get()).getFlags().isSeen(), is(true));
     }
 
