@@ -9,12 +9,14 @@ package org.mule.extension.db.integration.insert;
 
 import static java.sql.Statement.SUCCESS_NO_INFO;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,9 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected String[] getFlowConfigurationResources() {
@@ -41,6 +48,13 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
   public void bulkInsertWithOverriddenType() throws Exception {
     Message response = flowRunner("bulkInsertWithOverriddenType").withPayload(values()).run().getMessage();
     assertBulkInsert(response.getPayload().getValue());
+  }
+
+  @Test
+  public void bulkInsertUnusedParameterType() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    Message response = flowRunner("bulkInsertWithUnusedParameterType").withPayload(values()).run().getMessage();
   }
 
   private List<Map<String, Object>> values() {

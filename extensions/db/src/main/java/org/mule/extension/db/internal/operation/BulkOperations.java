@@ -167,7 +167,7 @@ public class BulkOperations extends BaseDbOperations {
   private Query resolveQuery(BulkQueryDefinition query, DbConnector connector, DbConnection connection, QueryType... validTypes) {
     final Query resolvedQuery = bulkQueryResolver.resolve(query, connector, connection);
     validateQueryType(resolvedQuery.getQueryTemplate(), asList(validTypes));
-
+    validateNoParameterTypeIsUnused(resolvedQuery, query.getParameterTypes());
     return resolvedQuery;
   }
 
