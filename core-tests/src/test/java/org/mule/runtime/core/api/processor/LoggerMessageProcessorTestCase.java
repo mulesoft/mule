@@ -17,10 +17,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -34,8 +35,11 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   private Flow flow;
 
   @Before
-  public void before() {
-    flow = new Flow("flow", mock(MuleContext.class, RETURNS_DEEP_STUBS));
+  public void before() throws RegistrationException {
+    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    registerServices(muleContext);
+
+    flow = new Flow("flow", muleContext);
   }
 
   @Test

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
@@ -45,7 +46,9 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   private Flow flow;
 
   @Before
-  public void setUp() {
+  public void setUp() throws RegistrationException {
+    registerServices(mockMuleContext);
+
     when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }

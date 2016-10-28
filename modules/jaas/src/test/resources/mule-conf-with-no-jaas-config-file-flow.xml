@@ -17,7 +17,7 @@
 
     <flow name="TestUMO">
         <jaas:jaas-security-filter />
-        <custom-processor class="org.mule.runtime.module.jaas.JaasAuthenticationNoJaasConfigFileTestCase$AddNotSerializableProperty"/>
+        <custom-processor class="org.mule.test.module.jaas.JaasAuthenticationNoJaasConfigFileTestCase$AddNotSerializableProperty"/>
         <flow-ref name="flowWithPropagatedSecurityContext"/>
     </flow>
 

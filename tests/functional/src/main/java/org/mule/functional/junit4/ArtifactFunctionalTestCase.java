@@ -148,7 +148,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    */
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    super.addBuilders(builders);
     Class<?> runner = getAnnotationAttributeFrom(this.getClass(), RunWith.class, "value");
     if (runner == null || !runner.equals(ArtifactClassLoaderRunner.class)) {
       throw new IllegalStateException(this.getClass().getName() + " extends " + ArtifactFunctionalTestCase.class.getName()

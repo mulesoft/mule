@@ -7,11 +7,13 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -50,8 +52,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
   public static final String REF_ATTRIBUTE_NAME = "ref";
   public static final String NAME_ATTRIBUTE_NAME = "name";
 
-  private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
-  private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
+  private Map<MuleArtifact, ConfigurationBuilder> builders = new HashMap<>();
+  private Map<MuleArtifact, MuleContext> contexts = new HashMap<>();
 
   @Override
   public MuleArtifact getArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback)
@@ -68,7 +70,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
   protected String getArtifactMuleConfig(String flowName, org.w3c.dom.Element element, final XmlConfigurationCallback callback,
                                          boolean embedInFlow)
       throws MuleArtifactFactoryException {
-    Map<String, String> schemaLocations = new HashMap<String, String>();
+    Map<String, String> schemaLocations = new HashMap<>();
     schemaLocations.put("http://www.mulesoft.org/schema/mule/core", "http://www.mulesoft.org/schema/mule/core/current/mule.xsd");
 
     Document document = DocumentHelper.createDocument();
@@ -200,10 +202,10 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     InputStream xmlConfig = IOUtils.toInputStream(getArtifactMuleConfig(flowName, element, callback, embedInFlow));
 
     MuleContext muleContext = null;
-    SpringXmlConfigurationBuilder builder = null;
+    ConfigurationBuilder builder = null;
     Map<String, String> environmentProperties = callback.getEnvironmentProperties();
     Properties systemProperties = System.getProperties();
-    Map<Object, Object> originalSystemProperties = new HashMap<Object, Object>(systemProperties);
+    Map<Object, Object> originalSystemProperties = new HashMap<>(systemProperties);
 
     try {
       ConfigResource config = new ConfigResource("embedded-datasense.xml", xmlConfig);
@@ -213,7 +215,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
       }
       MuleContextFactory factory = new DefaultMuleContextFactory();
 
-      builder = new SpringXmlConfigurationBuilder(new ConfigResource[] {config}, environmentProperties, APP);
+      builder =
+          wrapConfigurationBuilder(new SpringXmlConfigurationBuilder(new ConfigResource[] {config}, environmentProperties, APP));
       muleContext = factory.createMuleContext(builder);
       muleContext.start();
 
@@ -247,6 +250,10 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
       systemProperties.putAll(originalSystemProperties);
       IOUtils.closeQuietly(xmlConfig);
     }
+  }
+
+  protected ConfigurationBuilder wrapConfigurationBuilder(ConfigurationBuilder configBuilder) {
+    return configBuilder;
   }
 
   protected void addSchemaLocation(org.w3c.dom.Element element, XmlConfigurationCallback callback,
@@ -290,12 +297,12 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
   @Override
   public void returnArtifact(MuleArtifact artifact) {
-    SpringXmlConfigurationBuilder builder = builders.remove(artifact);
+    ConfigurationBuilder builder = builders.remove(artifact);
     MuleContext context = contexts.remove(artifact);
     dispose(builder, context);
   }
 
-  protected void dispose(SpringXmlConfigurationBuilder builder, MuleContext context) {
+  protected void dispose(ConfigurationBuilder builder, MuleContext context) {
     try {
       if (context != null) {
         context.dispose();

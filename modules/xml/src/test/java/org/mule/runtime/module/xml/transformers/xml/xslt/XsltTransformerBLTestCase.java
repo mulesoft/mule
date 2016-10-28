@@ -9,6 +9,7 @@ package org.mule.runtime.module.xml.transformers.xml.xslt;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

@@ -23,9 +23,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -55,6 +55,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
 
   @Before
   public void setup() throws Exception {
+    registerServices(muleContext);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
     when(transformationService.transform(any(InternalMessage.class), any(DataType.class)))
         .thenAnswer(inv -> (InternalMessage) inv.getArguments()[0]);

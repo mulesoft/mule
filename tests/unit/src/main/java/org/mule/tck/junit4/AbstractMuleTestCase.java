@@ -9,6 +9,7 @@ package org.mule.tck.junit4;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -19,10 +20,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
+import org.mule.tck.UnitTestSchedulerService;
 import org.mule.tck.junit4.rule.WarningTimeout;
 
 import java.util.ArrayList;
@@ -221,7 +226,10 @@ public abstract class AbstractMuleTestCase {
    * @return a basic event builder with its context already set.
    */
   protected static Builder eventBuilder() throws MuleException {
-    FlowConstruct flowConstruct = getTestFlow(mock(MuleContext.class, RETURNS_DEEP_STUBS));
+    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    registerServices(muleContext);
+
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR));
   }
 
@@ -254,6 +262,12 @@ public abstract class AbstractMuleTestCase {
     if (testCaseName == null) {
       testCaseName = this.getClass().getName();
     }
+  }
+
+  public static void registerServices(MuleContext muleContext) throws RegistrationException {
+    final MuleRegistry muleRegistry = mock(MuleRegistry.class);
+    when(muleRegistry.lookupObject(SchedulerService.class)).thenReturn(new UnitTestSchedulerService());
+    when(muleContext.getRegistry()).thenReturn(muleRegistry);
   }
 
   private Event _testEvent;

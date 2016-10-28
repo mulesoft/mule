@@ -9,14 +9,13 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase {
+public class ProxyPortMatchingSoapVersionTest extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final String SOAP_REQUEST_PATTERN =
       "<soap:Envelope xmlns:soap=\"%s\" xmlns:web=\"http://www.webserviceX.NET/\">\n" + "   <soap:Header/>\n" + "   <soap:Body>\n"

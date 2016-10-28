@@ -7,10 +7,14 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.io.File.separator;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -44,6 +48,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPlug
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
@@ -58,11 +63,11 @@ import static org.mule.runtime.module.deployment.internal.application.Properties
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -91,8 +96,6 @@ import org.mule.runtime.module.deployment.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.internal.domain.TestDomainFactory;
-import org.mule.tck.util.CompilerUtils;
-import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -105,6 +108,8 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
+import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -311,11 +316,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
 
     if (parallelDeployment) {
-      System.setProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
+      setProperty(PARALLEL_DEPLOYMENT_PROPERTY, "");
     }
 
-    final String tmpDir = System.getProperty("java.io.tmpdir");
-    muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + System.currentTimeMillis());
+    final String tmpDir = getProperty("java.io.tmpdir");
+    muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + currentTimeMillis());
     appsDir = new File(muleHome, "apps");
     appsDir.mkdirs();
     containerAppPluginsDir = new File(muleHome, CONTAINER_APP_PLUGINS);
@@ -324,13 +329,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     tmpAppsDir.mkdirs();
     domainsDir = new File(muleHome, "domains");
     domainsDir.mkdirs();
-    System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
+    setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
 
     final File domainFolder = getDomainFolder(DEFAULT_DOMAIN_NAME);
     assertThat(domainFolder.mkdirs(), is(true));
 
     services = getServicesFolder();
     services.mkdirs();
+    copyFileToDirectory(new File(getProperty("scheduler.service")), services);
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);

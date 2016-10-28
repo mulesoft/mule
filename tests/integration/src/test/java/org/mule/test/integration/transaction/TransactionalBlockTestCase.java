@@ -9,15 +9,16 @@ package org.mule.test.integration.transaction;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.DelegateTransactionFactory;
 import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class TransactionalBlockTestCase extends FunctionalTestCase {
+public class TransactionalBlockTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {

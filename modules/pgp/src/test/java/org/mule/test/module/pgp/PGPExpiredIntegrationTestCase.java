@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -24,7 +24,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
+public class PGPExpiredIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
   private static Throwable exceptionFromFlow = null;
 

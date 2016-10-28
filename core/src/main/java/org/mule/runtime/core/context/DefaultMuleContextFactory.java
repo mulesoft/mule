@@ -8,6 +8,7 @@ package org.mule.runtime.core.context;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -41,6 +42,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   /**
    * Use default ConfigurationBuilder, default MuleContextBuilder
    */
+  @Override
   public MuleContext createMuleContext() throws InitialisationException, ConfigurationException {
     // Configure with defaults needed for a feasible/startable MuleContext
     return createMuleContext(new DefaultsConfigurationBuilder(), createMuleContextBuilder());
@@ -53,6 +55,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   /**
    * Use default MuleContextBuilder
    */
+  @Override
   public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder)
       throws InitialisationException, ConfigurationException {
     // Create MuleContext using default MuleContextBuilder
@@ -60,8 +63,19 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   }
 
   /**
+   * Use default MuleContextBuilder
+   */
+  @Override
+  public MuleContext createMuleContext(List<ConfigurationBuilder> configurationBuilders)
+      throws InitialisationException, ConfigurationException {
+    // Create MuleContext using default MuleContextBuilder
+    return createMuleContext(configurationBuilders, createMuleContextBuilder());
+  }
+
+  /**
    * Use default ConfigurationBuilder
    */
+  @Override
   public MuleContext createMuleContext(MuleContextBuilder muleContextBuilder)
       throws InitialisationException, ConfigurationException {
     // Configure with defaults needed for a feasible/startable MuleContext
@@ -71,6 +85,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   /**
    * {@inheritDoc}
    */
+  @Override
   public MuleContext createMuleContext(final List<ConfigurationBuilder> configurationBuilders,
                                        MuleContextBuilder muleContextBuilder)
       throws InitialisationException, ConfigurationException {
@@ -90,6 +105,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   /**
    * {@inheritDoc}
    */
+  @Override
   public MuleContext createMuleContext(final ConfigurationBuilder configurationBuilder, MuleContextBuilder muleContextBuilder)
       throws InitialisationException, ConfigurationException {
     return doCreateMuleContext(muleContextBuilder, new ContextConfigurator() {

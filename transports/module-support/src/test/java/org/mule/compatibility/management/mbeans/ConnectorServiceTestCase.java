@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.management.AbstractMuleJmxTestCase;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.test.management.AbstractMuleJmxTestCase;
 
 import java.util.Set;
 

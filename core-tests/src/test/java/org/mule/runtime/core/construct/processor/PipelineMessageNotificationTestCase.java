@@ -26,6 +26,7 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
@@ -49,8 +50,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.registry.DefaultRegistryBroker;
-import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -88,9 +87,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Before
   public void createMocks() throws Exception {
     muleContext = mock(MuleContext.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+    registerServices(muleContext);
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getRegistry()).thenReturn(new MuleRegistryHelper(new DefaultRegistryBroker(muleContext), muleContext));
     when(muleContext.getDefaultThreadingProfile()).thenReturn(new ChainedThreadingProfile());
     notificationManager = mock(ServerNotificationManager.class);
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);

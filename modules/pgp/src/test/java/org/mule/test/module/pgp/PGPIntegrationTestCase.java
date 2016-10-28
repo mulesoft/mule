@@ -7,13 +7,14 @@
 package org.mule.test.module.pgp;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class PGPIntegrationTestCase extends FunctionalTestCase {
+public class PGPIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

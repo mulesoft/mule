@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
@@ -46,7 +46,8 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   private Flow flow;
 
   @Before
-  public void setUp() {
+  public void setUp() throws MuleException {
+    registerServices(mockMuleContext);
     when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }

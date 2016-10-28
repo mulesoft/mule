@@ -44,6 +44,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.config.RegisterServicesConfigurationBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -222,7 +223,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   // This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    // No op
+    builders.add(new RegisterServicesConfigurationBuilder());
   }
 
   /**

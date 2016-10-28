@@ -22,9 +22,9 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -77,6 +77,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     if (currentTransaction != null) {
       TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
     }
+
+    registerServices(muleContext);
+
     flow = getTestFlow(muleContext);
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setMuleContext(mockMuleContext);

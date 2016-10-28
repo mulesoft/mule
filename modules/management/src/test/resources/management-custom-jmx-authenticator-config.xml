@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
 
-    <spring:bean name="customJMXAuthenticator" class="org.mule.runtime.management.config.ManagementCustomJMXAuthenticatorTestCase$CustomJMXAuthenticator" />
+    <spring:bean name="customJMXAuthenticator" class="org.mule.test.management.config.ManagementCustomJMXAuthenticatorTestCase$CustomJMXAuthenticator" />
 
     <management:jmx-default-config jmxAuthenticator-ref="customJMXAuthenticator"/>
 

@@ -21,9 +21,9 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
@@ -52,6 +52,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() throws Exception {
+    registerServices(muleContext);
     flow = getTestFlow(muleContext);
     messageContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
     muleEvent = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();

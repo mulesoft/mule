@@ -9,8 +9,8 @@ package org.mule.runtime.module.xml.transformers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.xml.util.XMLTestUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
