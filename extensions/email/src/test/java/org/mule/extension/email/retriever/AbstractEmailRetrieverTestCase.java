@@ -88,14 +88,14 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
 
   @Test
   public void retrieveMatchingSubjectAndFromAddress() throws Exception {
-    for (int i = 0; i < pageSize / 2; i++) {
+    for (int i = 0; i < pageSize; i++) {
       String fromAddress = format("address.%s@enterprise.com", i);
       MimeMessage mimeMessage = getMimeMessage(ESTEBAN_EMAIL, ALE_EMAIL, EMAIL_CONTENT, "Non Matching Subject", fromAddress);
       user.deliver(mimeMessage);
     }
 
     ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
-    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize + pageSize / 2));
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 2));
     assertThat(paginationSize(messages), is(pageSize));
   }
 

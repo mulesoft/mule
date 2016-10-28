@@ -136,9 +136,7 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
 
   @Override
   public List<OperationResult<MultiPartPayload, T>> getPage(MailboxConnection connection) {
-
     try {
-
       folder = connection.getFolder(folderName, deleteAfterRetrieve ? READ_WRITE : READ_ONLY);
       if (folder.getMessageCount() == 0) {
         return emptyList();
@@ -152,17 +150,19 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
         endIndex = min(endIndex + pageSize, folder.getMessageCount());
 
         if (!emails.isEmpty()) {
-          if (deleteAfterRetrieve) {
-            expungeCommand.expunge(connection, folderName);
-          }
           return emails;
         }
       }
     } catch (MessagingException e) {
       throw new EmailException("Error while retrieving emails: ", e);
+    } finally {
+      if (deleteAfterRetrieve) {
+        expungeCommand.expunge(connection, folderName);
+      } else {
+        connection.closeFolder(false);
+      }
     }
 
-    connection.closeFolder(false);
     return emptyList();
   }
 
