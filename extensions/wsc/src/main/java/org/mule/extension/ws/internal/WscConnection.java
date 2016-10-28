@@ -6,10 +6,12 @@
  */
 package org.mule.extension.ws.internal;
 
+import static org.apache.cxf.message.Message.MTOM_ENABLED;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.ws.api.SoapVersion;
 import org.mule.extension.ws.internal.interceptor.NamespaceRestorerStaxInterceptor;
 import org.mule.extension.ws.internal.interceptor.NamespaceSaverStaxInterceptor;
+import org.mule.extension.ws.internal.interceptor.OutputSoapAttachmentsInterceptor;
 import org.mule.extension.ws.internal.interceptor.OutputSoapHeadersInterceptor;
 import org.mule.extension.ws.internal.interceptor.SoapActionInterceptor;
 import org.mule.extension.ws.internal.interceptor.StreamClosingInterceptor;
@@ -51,13 +53,13 @@ public class WscConnection {
   private final String wsdlLocation;
   private final SoapVersion soapVersion;
   private final WsdlIntrospecter wsdlIntrospecter;
-  private final String address;
 
   public WscConnection(String wsdlLocation,
                        String address,
                        String serviceName,
                        String portName,
-                       SoapVersion soapVersion)
+                       SoapVersion soapVersion,
+                       boolean mtomEnabled)
       throws ConnectionException {
     this.wsdlIntrospecter = new WsdlIntrospecter(wsdlLocation, serviceName, portName);
     this.wsdlLocation = wsdlLocation;
@@ -65,8 +67,7 @@ public class WscConnection {
     if (address == null) {
       address = getSoapAddress();
     }
-    this.address = address;
-    this.client = createClient(address, soapVersion);
+    this.client = createClient(address, soapVersion, mtomEnabled);
   }
 
   public Object[] invoke(Object payload, Map<String, Object> ctx, Exchange exchange) throws Exception {
@@ -96,9 +97,11 @@ public class WscConnection {
     return bop;
   }
 
-  private Client createClient(String address, SoapVersion soapVersion) {
+  private Client createClient(String address, SoapVersion soapVersion, boolean mtomEnabled) {
     WscTransportFactory factory = new WscTransportFactory();
     Client client = factory.createClient(address, soapVersion.getVersion());
+
+    client.getEndpoint().put(MTOM_ENABLED, mtomEnabled);
 
     // Request Interceptors
     client.getOutInterceptors().add(new SoapActionInterceptor());
@@ -109,9 +112,8 @@ public class WscConnection {
     client.getInInterceptors().add(new StreamClosingInterceptor());
     client.getInInterceptors().add(new CheckFaultInterceptor());
     client.getInInterceptors().add(new OutputSoapHeadersInterceptor());
-
-    //client.getInInterceptors().add(new CopyAttachmentInInterceptor());
-    //client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
+    client.getInInterceptors().add(new OutputSoapAttachmentsInterceptor());
+    client.getInInterceptors().add(new SoapActionInterceptor());
 
     Binding binding = client.getEndpoint().getBinding();
     removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());

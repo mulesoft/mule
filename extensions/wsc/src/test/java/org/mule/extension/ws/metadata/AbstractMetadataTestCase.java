@@ -10,20 +10,19 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
-import org.mule.extension.ws.WebServiceConsumerTestCase;
+import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-
-import org.junit.Before;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 
+import org.junit.Before;
 import ru.yandex.qatools.allure.annotations.Step;
 
-public abstract class AbstractMetadataTestCase extends WebServiceConsumerTestCase {
+public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCase {
 
   protected static final String BODY_PARAM = "body";
   protected static final String HEADERS_PARAM = "headers";
@@ -32,6 +31,8 @@ public abstract class AbstractMetadataTestCase extends WebServiceConsumerTestCas
   protected static final String ECHO_FLOW = "getEchoMetadata";
   protected static final String NO_PARAMS_FLOW = "getNoParams";
   protected static final String ECHO_HEADERS_FLOW = "getEchoHeadersMetadata";
+  protected static final String UPLOAD_ATT_FLOW = "uploadAttachment";
+  protected static final String DOWNLOAD_ATT_FLOW = "downloadAttachment";
 
   protected MetadataService service;
 

@@ -6,15 +6,16 @@
  */
 package org.mule.extension.ws.runtime;
 
-import static org.mule.extension.ws.WscTestUtils.ECHO_XML;
-import static org.mule.extension.ws.WscTestUtils.resourceAsString;
-import org.mule.extension.ws.WebServiceConsumerTestCase;
+import static org.mule.extension.ws.WscTestUtils.ECHO;
+import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
+import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 
-public class WscConnectionTestCase extends WebServiceConsumerTestCase {
+public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
 
   private static final String SAME_INSTANCE_FLOW = "operationShareInstance";
 
@@ -26,9 +27,9 @@ public class WscConnectionTestCase extends WebServiceConsumerTestCase {
   @Test
   @Description("Consumes 2 operations sharing the same connection instance")
   public void sameConnection() throws Exception {
-    Message msg = flowRunner(SAME_INSTANCE_FLOW).withVariable("req", resourceAsString("request/" + ECHO_XML)).run().getMessage();
+    Message msg = flowRunner(SAME_INSTANCE_FLOW).withVariable("req", getRequestResource(ECHO)).run().getMessage();
     String out = (String) msg.getPayload().getValue();
-    assertSoapResponse(ECHO_XML, out);
+    assertSoapResponse(ECHO, out);
   }
 
 }

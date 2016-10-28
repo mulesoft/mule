@@ -5,11 +5,18 @@
       http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <ws:config name="config">
-        <ws:connection address="http://localhost:${port}/testService"
+        <ws:connection address="http://localhost:${servicePort}/testService"
                        soapVersion="SOAP11"
                        service="TestService"
                        port="TestPort"
-                       wsdlLocation="http://localhost:${port}/testService?wsdl"/>
+                       wsdlLocation="http://localhost:${servicePort}/testService?wsdl"/>
+    </ws:config>
+
+    <ws:config name="attachmentsConfig">
+        <ws:connection soapVersion="SOAP11"
+                       service="TestAttachmentsService"
+                       port="TestAttachmentsPort"
+                       wsdlLocation="http://localhost:${attachmentPort}/testAttachments?wsdl"/>
     </ws:config>
 
     <flow name="getEchoMetadata">
@@ -26,5 +33,13 @@
 
     <flow name="getEchoAccountMetadata">
         <ws:consume config-ref="config" operation="echoAccount" body="#[payload]"/>
+    </flow>
+
+    <flow name="downloadAttachment">
+        <ws:consume config-ref="attachmentsConfig" operation="downloadAttachment" body="#[payload]"/>
+    </flow>
+
+    <flow name="uploadAttachment">
+        <ws:consume config-ref="attachmentsConfig" operation="uploadAttachment" body="#[payload]"/>
     </flow>
 </mule>

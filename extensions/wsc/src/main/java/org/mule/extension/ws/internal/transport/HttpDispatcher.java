@@ -7,8 +7,6 @@
 package org.mule.extension.ws.internal.transport;
 
 
-import org.mule.runtime.core.util.IOUtils;
-
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -18,23 +16,25 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.cxf.message.Message;
+
 // TODO: MULE-10783 remove
 public class HttpDispatcher {
 
-  public String dispatch(String address, OutputStream os) {
+  public Response dispatch(String address, Message message) {
+
+    OutputStream os = message.getContent(OutputStream.class);
     OkHttpClient client = new OkHttpClient();
-    MediaType mediaType = MediaType.parse("text/xml");
+    MediaType mediaType = MediaType.parse((String) message.get(Message.CONTENT_TYPE));
     RequestBody body = RequestBody.create(mediaType, os.toString());
     Request request = new Request.Builder()
         .url(address)
         .post(body)
-        .addHeader("content-type", "text/xml")
         .addHeader("cache-control", "no-cache")
         .build();
 
     try {
-      Response response = client.newCall(request).execute();
-      return IOUtils.toString(response.body().byteStream());
+      return client.newCall(request).execute();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

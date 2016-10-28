@@ -34,30 +34,37 @@ import org.xml.sax.SAXException;
 
 public class WscTestUtils {
 
+  public static final String SIMPLE_ATTACHMENT = "simpleAttachment.txt";
+
+  public static final String XML = ".xml";
+
+  // Operations
   public static final String ECHO = "echo";
   public static final String ECHO_HEADERS = "echoWithHeaders";
   public static final String ECHO_ACCOUNT = "echoAccount";
   public static final String NO_PARAMS = "noParams";
   public static final String NO_PARAMS_HEADER = "noParamsWithHeader";
   public static final String FAIL = "fail";
+  public static final String UPLOAD_SINGLE_ATT = "attachmentUpload";
+  public static final String DOWNLOAD_ATT = "attachmentDownload";
 
-  public static final String XML = ".xml";
-  public static final String ECHO_XML = ECHO + XML;
-  public static final String ECHO_HEADERS_XML = ECHO_HEADERS + XML;
-  public static final String ECHO_ACCOUNT_XML = ECHO_ACCOUNT + XML;
-  public static final String NO_PARAMS_XML = NO_PARAMS + XML;
-  public static final String NO_PARAMS_HEADER_XML = NO_PARAMS_HEADER + XML;
-  public static final String FAIL_XML = FAIL + XML;
-
+  // Headers
   public static final String HEADER_INOUT = "headerInOut";
   public static final String HEADER_IN = "headerIn";
   public static final String HEADER_OUT = "headerOut";
 
-  public static final String HEADER_INOUT_XML = HEADER_INOUT + XML;
-  public static final String HEADER_IN_XML = HEADER_IN + XML;
-  public static final String HEADER_OUT_XML = HEADER_OUT + XML;
+  public static void assertSoapResponse(String expectedResponseResourceName, String outputResponse) throws Exception {
+    String expected = getResponseResource(expectedResponseResourceName);
+    assertSimilarXml(expected, outputResponse);
+  }
 
-  public static final String[] OPERATIONS = {ECHO, ECHO_ACCOUNT, ECHO_HEADERS, FAIL, NO_PARAMS_HEADER, NO_PARAMS};
+  public static String getResponseResource(final String responseResourceName) throws IOException, XMLStreamException {
+    return resourceAsString("response/" + responseResourceName + XML);
+  }
+
+  public static String getRequestResource(final String requestResourceName) throws IOException, XMLStreamException {
+    return resourceAsString("request/" + requestResourceName + XML);
+  }
 
   public static String resourceAsString(final String resource) throws XMLStreamException, IOException {
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
@@ -71,7 +78,7 @@ public class WscTestUtils {
     if (!diff.similar()) {
       System.out.println("Expected xml is: \n");
       System.out.println(prettyPrint(expected));
-      System.out.println("\n\n\n But got: \n");
+      System.out.println("\n\n But got: \n");
       System.out.println(prettyPrint(result));
     }
     assertThat(diff.similar(), is(true));
