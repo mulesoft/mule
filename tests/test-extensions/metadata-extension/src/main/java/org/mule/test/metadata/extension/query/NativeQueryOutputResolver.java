@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension.query;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -15,15 +16,13 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-
 public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
 
   public static final String NATIVE_QUERY = "SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18";
   public static final MetadataType CIRCLE_TYPE;
   static {
-    final ArrayTypeBuilder<? extends BaseTypeBuilder<?>> arrayType = BaseTypeBuilder.create(JAVA).arrayType();
-    final ObjectTypeBuilder<?> objectType = arrayType.of().objectType();
+    final ArrayTypeBuilder arrayType = BaseTypeBuilder.create(JAVA).arrayType();
+    final ObjectTypeBuilder objectType = arrayType.of().objectType();
     objectType.addField().key("id").value().numberType();
     CIRCLE_TYPE = arrayType.build();
   }

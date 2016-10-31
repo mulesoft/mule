@@ -48,7 +48,7 @@ public class HttpMetadataResolver implements OutputTypeResolver<HttpMetadataKey>
     MetadataType formPart = TYPE_LOADER.load(ParameterMap.class);
     types.put(FORM, formPart);
     //Create default union type
-    UnionTypeBuilder builder = new BaseTypeBuilder<>(JAVA).unionType();
+    UnionTypeBuilder builder = new BaseTypeBuilder(JAVA).unionType();
     types.values().forEach(builder::of);
     types.put(ANY, builder.build());
   }
