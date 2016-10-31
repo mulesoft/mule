@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.rules.ExpectedException.none;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
@@ -31,7 +32,7 @@ import org.junit.rules.ExpectedException;
 public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   @Override
   protected String[] getFlowConfigurationResources() {
@@ -54,6 +55,8 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
   public void bulkInsertUnusedParameterType() throws Exception {
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException
+        .expectMessage(is("Query parameters [('unused' of INTEGER type)] were unused during query resolution, please remove them."));
     Message response = flowRunner("bulkInsertWithUnusedParameterType").withPayload(values()).run().getMessage();
   }
 
