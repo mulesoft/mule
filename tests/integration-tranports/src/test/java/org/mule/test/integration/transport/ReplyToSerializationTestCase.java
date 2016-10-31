@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointReplyToHandler;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.tck.junit4.rule.DynamicPort;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.PoolingListener;
 

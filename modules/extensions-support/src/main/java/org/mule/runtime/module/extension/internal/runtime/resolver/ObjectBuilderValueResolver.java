@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
 

@@ -10,7 +10,7 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 

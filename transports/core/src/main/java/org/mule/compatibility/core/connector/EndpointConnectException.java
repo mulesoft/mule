@@ -9,7 +9,7 @@ package org.mule.compatibility.core.connector;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.AbstractTransportMessageHandler;
 import org.mule.runtime.core.api.connector.Connectable;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.connector.ConnectException;
 
 import javax.resource.spi.work.Work;

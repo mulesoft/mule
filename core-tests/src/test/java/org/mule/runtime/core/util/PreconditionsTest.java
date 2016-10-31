@@ -10,6 +10,8 @@ package org.mule.runtime.core.util;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
+import org.mule.runtime.api.util.Preconditions;
+
 import org.junit.Test;
 
 public class PreconditionsTest {

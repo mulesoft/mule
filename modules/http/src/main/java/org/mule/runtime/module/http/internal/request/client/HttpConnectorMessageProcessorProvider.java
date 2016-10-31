@@ -10,7 +10,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Defines a task to be executed inside a poll.

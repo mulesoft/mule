@@ -43,7 +43,7 @@ import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
 import org.mule.compatibility.core.transport.service.DefaultTransportServiceDescriptor;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.ServiceException;

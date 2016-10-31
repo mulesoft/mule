@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 

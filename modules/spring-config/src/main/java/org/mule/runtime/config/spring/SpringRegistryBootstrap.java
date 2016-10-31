@@ -12,7 +12,7 @@ import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.Registry;

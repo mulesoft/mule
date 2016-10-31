@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.internal.builder;
 
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.runtime.core.util.StringUtils;

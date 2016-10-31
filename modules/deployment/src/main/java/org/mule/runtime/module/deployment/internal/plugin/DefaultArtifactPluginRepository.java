@@ -16,7 +16,7 @@ import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.core.util.FileUtils.unzip;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;

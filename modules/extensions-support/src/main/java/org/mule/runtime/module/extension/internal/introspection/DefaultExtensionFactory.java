@@ -28,7 +28,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;

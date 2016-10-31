@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 

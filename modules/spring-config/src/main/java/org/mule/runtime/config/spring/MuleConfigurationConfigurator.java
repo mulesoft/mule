@@ -10,7 +10,7 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
 import java.util.List;

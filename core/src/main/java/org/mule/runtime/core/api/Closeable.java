@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.exception.MuleException;
+
 /**
  * Marking interface to identity resources that need to be closed in order to release resources.
  */

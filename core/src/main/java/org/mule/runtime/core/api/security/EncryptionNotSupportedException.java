@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>EncryptionNotSupportedException</code> is thrown if an algorithm is set in the MULE_USER header but it doesn't match the

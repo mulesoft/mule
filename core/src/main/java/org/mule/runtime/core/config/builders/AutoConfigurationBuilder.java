@@ -9,7 +9,7 @@ package org.mule.runtime.core.config.builders;
 import static org.mule.runtime.core.util.ClassUtils.getResource;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;

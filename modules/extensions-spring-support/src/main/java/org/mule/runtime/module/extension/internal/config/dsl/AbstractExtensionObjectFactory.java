@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;

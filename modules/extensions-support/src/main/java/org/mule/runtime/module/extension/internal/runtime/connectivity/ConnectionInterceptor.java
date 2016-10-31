@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;

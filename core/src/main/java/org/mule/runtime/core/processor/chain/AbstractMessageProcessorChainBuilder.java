@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;

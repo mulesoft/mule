@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Creates a HttpClientMessageDispatcher to make client requests

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.db.api.param;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 
 /**

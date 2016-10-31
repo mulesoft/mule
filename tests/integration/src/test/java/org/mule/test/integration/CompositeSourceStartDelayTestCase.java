@@ -7,7 +7,7 @@
 package org.mule.test.integration;
 
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

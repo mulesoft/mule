@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
@@ -71,7 +72,7 @@ public class RegistryDelegatingInjectorTestCase extends AbstractMuleTestCase {
     new RegistryDelegatingInjector(null);
   }
 
-  private void assertNoinjection() throws org.mule.runtime.core.api.MuleException {
+  private void assertNoinjection() throws MuleException {
     Object target = mock(Object.class);
 
     assertThat(injector.inject(target), is(sameInstance(target)));

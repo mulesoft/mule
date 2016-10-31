@@ -11,7 +11,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext
 import static org.mule.runtime.core.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>NotPermittedException</code> is thrown if the user isn't authorized to perform an action.

@@ -7,8 +7,8 @@
 package org.mule.runtime.core.exception;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util.journal.queue;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.journal.JournalEntry;
 

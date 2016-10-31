@@ -12,7 +12,7 @@ import static org.mule.test.integration.exceptions.OnErrorContinueTestCase.JSON_
 import static org.mule.test.integration.exceptions.OnErrorContinueTestCase.JSON_RESPONSE;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;

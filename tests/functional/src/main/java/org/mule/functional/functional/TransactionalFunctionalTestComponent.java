@@ -9,7 +9,7 @@ package org.mule.functional.functional;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
  * This service is useful for unit tests involving transactionality because it will roll back the current transaction upon message

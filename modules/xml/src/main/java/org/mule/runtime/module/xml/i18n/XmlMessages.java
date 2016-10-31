@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.xml.i18n;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 public class XmlMessages extends I18nMessageFactory {
 

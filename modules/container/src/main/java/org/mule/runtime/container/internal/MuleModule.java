@@ -8,7 +8,7 @@
 package org.mule.runtime.container.internal;
 
 import static java.util.Collections.unmodifiableSet;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.util.StringUtils;
 

@@ -7,8 +7,8 @@
 package org.mule.compatibility.transport.file.i18n;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 import java.io.File;
 

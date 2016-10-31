@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 

@@ -12,7 +12,7 @@ import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.api.exception.ExceptionHelper;
 
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;

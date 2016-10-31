@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 

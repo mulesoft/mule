@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.executor;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;

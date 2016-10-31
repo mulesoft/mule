@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.pgp;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 public class InvalidPublicKeyException extends MuleRuntimeException {
 

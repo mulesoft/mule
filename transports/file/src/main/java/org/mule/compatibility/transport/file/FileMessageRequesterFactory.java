@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.transport.AbstractMessageRequesterFactory;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Creates a requester responsible for reading files from disk

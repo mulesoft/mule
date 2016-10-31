@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.management.agent;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;

@@ -7,28 +7,20 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
-import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;

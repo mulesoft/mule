@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.feature;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.runtime.core.util.StringUtils;
 

@@ -8,7 +8,7 @@
 package org.mule.runtime.container.api;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.util.StringUtils;
 

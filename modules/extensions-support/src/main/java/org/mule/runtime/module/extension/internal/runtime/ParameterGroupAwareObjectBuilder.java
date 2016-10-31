@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;

@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;

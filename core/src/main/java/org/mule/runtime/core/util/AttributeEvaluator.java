@@ -8,7 +8,7 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultTypedValue;

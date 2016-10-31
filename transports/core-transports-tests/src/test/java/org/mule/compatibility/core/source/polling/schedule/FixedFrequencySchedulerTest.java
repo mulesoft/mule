@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.core.transport.PollingReceiverWorker;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;

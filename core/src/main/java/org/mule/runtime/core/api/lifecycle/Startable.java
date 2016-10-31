@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * <code>Startable</code> provides an object with a {@link #start()} method which gets called when the Mule instance gets started.

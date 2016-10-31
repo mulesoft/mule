@@ -10,7 +10,7 @@ import static java.util.Collections.sort;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.connector.ConnectorOperationProvider;

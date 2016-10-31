@@ -8,11 +8,13 @@ package org.mule.runtime.module.extension.internal.introspection;
 
 import com.google.common.collect.ImmutableSet;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import java.lang.reflect.AnnotatedElement;
@@ -26,8 +28,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 
 /**
  * A metadata class that groups a set of parameters together. It caches reflection objects necessary for handling those parameters

@@ -10,7 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -99,7 +99,7 @@ public class DefaultMuleEventContext implements MuleEventContext {
    * Returns the message contents as a string
    *
    * @return the message contents as a string
-   * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
+   * @throws MuleException if the message cannot be converted into a string
    */
   @Override
   public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
@@ -124,7 +124,7 @@ public class DefaultMuleEventContext implements MuleEventContext {
    *
    * @param muleContext the Mule node.
    * @return the message contents as a string
-   * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
+   * @throws MuleException if the message cannot be converted into a string
    */
   @Override
   public String getMessageAsString(MuleContext muleContext) throws MuleException {

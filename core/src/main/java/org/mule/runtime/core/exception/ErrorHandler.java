@@ -12,7 +12,7 @@ import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_E
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
@@ -25,7 +25,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

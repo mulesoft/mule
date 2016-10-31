@@ -7,13 +7,12 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.command.FileCommand;
 

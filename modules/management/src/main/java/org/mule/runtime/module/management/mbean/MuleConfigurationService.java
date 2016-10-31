@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.management.mbean;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.fullStackTraces;
+import static org.mule.runtime.api.exception.ExceptionHelper.stackTraceFilter;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.api.exception.ExceptionHelper;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as a management service.
@@ -56,7 +58,7 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean {
      * Sacrifice the code quality for the sake of keeping things simple - the alternative would be to pass MuleContext into every
      * exception constructor.
      */
-    return DefaultMuleConfiguration.fullStackTraces;
+    return fullStackTraces;
   }
 
   public void setFullStackTraces(boolean flag) {
@@ -64,14 +66,14 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean {
      * Sacrifice the code quality for the sake of keeping things simple - the alternative would be to pass MuleContext into every
      * exception constructor.
      */
-    DefaultMuleConfiguration.fullStackTraces = flag;
+    ExceptionHelper.fullStackTraces = flag;
   }
 
   public String getStackTraceFilter() {
-    return StringUtils.join(DefaultMuleConfiguration.stackTraceFilter, ',');
+    return StringUtils.join(stackTraceFilter, ',');
   }
 
   public void setStackTraceFilter(String filterAsString) {
-    DefaultMuleConfiguration.stackTraceFilter = filterAsString.split(",");
+    stackTraceFilter = filterAsString.split(",");
   }
 }

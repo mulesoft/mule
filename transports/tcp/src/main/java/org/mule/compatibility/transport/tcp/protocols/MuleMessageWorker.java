@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.tcp.protocols;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 

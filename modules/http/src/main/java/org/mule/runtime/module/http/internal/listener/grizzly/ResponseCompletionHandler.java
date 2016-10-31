@@ -7,9 +7,9 @@
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.tls.internal;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.MuleContext;

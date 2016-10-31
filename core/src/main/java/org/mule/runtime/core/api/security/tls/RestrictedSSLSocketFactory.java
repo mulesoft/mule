@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.security.tls;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.ArrayUtils;
 
 import java.io.IOException;

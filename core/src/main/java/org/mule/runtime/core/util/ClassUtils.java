@@ -8,11 +8,9 @@ package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 import com.google.common.primitives.Primitives;
@@ -20,7 +18,6 @@ import com.google.common.primitives.Primitives;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;

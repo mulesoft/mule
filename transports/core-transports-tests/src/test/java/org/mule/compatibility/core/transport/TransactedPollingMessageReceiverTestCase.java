@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 

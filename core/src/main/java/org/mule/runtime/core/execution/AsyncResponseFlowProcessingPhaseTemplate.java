@@ -8,7 +8,7 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Template methods for {@link org.mule.runtime.core.api.source.MessageSource} specific behavior during flow execution.
@@ -25,7 +25,7 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
    *
    * @param muleEvent {@link org.mule.runtime.core.api.Event} created from the raw message of this context
    * @return the response {@link org.mule.runtime.core.api.Event}
-   * @throws org.mule.runtime.core.api.MuleException
+   * @throws MuleException
    */
   Event routeEvent(Event muleEvent) throws MuleException;
 

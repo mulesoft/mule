@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_PREFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;

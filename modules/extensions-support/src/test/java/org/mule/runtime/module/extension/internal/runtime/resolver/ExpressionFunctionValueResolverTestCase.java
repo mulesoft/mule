@@ -18,7 +18,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

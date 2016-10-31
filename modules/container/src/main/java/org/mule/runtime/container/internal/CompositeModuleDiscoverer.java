@@ -7,7 +7,7 @@
 
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;

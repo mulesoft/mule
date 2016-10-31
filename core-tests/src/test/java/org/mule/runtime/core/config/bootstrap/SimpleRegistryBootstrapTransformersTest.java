@@ -13,7 +13,7 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.registry.TransformerResolver;

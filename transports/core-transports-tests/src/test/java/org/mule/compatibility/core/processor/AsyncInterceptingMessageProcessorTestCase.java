@@ -18,7 +18,7 @@ import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.processor.Processor;
@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 

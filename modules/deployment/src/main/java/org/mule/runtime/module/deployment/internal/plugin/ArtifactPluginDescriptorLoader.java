@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.internal.plugin;
 
 import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.mule.runtime.core.util.FileUtils.unzip;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 

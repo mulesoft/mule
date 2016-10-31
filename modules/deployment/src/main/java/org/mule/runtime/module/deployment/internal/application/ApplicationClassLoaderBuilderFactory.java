@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;

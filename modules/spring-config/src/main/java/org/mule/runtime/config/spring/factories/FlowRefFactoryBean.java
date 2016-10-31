@@ -16,8 +16,8 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -34,7 +34,6 @@ import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
-import org.mule.runtime.core.util.rx.Exceptions;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

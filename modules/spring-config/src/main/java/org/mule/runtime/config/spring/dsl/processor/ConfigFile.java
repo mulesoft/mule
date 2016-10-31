@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.core.util.Preconditions;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import java.util.List;
 

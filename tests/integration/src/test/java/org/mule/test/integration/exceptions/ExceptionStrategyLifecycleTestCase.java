@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;

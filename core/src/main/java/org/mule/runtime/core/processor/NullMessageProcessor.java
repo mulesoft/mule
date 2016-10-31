@@ -7,13 +7,9 @@
 package org.mule.runtime.core.processor;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.util.ObjectUtils;
-
-import java.util.Collections;
-import java.util.List;
 
 
 public class NullMessageProcessor implements Processor {

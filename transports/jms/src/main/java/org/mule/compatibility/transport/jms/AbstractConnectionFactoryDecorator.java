@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms;
 
 import org.mule.compatibility.transport.jms.xa.XAConnectionFactoryWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.XAConnectionFactory;

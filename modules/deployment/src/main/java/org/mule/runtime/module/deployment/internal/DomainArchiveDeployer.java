@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.deployment.model.api.application.Application;

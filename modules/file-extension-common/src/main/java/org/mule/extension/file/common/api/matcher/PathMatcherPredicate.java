@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.common.api.matcher;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;

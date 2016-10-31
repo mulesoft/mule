@@ -13,12 +13,12 @@ import static org.apache.commons.lang.StringUtils.abbreviate;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.routing.filters.RegExFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
@@ -133,7 +133,7 @@ public class MessagingException extends MuleException {
     }
 
     if (muleMessage != null) {
-      if (DefaultMuleConfiguration.isVerboseExceptions()) {
+      if (MuleException.isVerboseExceptions()) {
         Object payload = muleMessage.getPayload().getValue();
 
         if (muleMessage.getPayload().getDataType().isStreamType()) {

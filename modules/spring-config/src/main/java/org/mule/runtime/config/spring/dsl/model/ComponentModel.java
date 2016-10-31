@@ -11,7 +11,7 @@ import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.util.ArrayList;
 import java.util.HashMap;

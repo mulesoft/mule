@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;

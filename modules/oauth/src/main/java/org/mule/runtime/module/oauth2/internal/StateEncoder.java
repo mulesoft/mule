@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal;
 
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
 
 /**

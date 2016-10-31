@@ -8,15 +8,16 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_ENTRY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_LIST_IDENTIFIER;
@@ -29,19 +30,17 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.COLLE
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.dsl.api.component.AttributeDefinition;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.dsl.api.xml.DslConstants;
+import org.mule.runtime.dsl.api.component.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
 import com.google.common.collect.ImmutableSet;
 

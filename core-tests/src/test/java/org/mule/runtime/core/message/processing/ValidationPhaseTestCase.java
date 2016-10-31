@@ -11,7 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.PhaseResultNotifier;
 import org.mule.runtime.core.execution.ValidationPhase;

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.registry;
 
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * An exception that is thrown by resolver classes responsible for finding objects in the registry based on particular criteria

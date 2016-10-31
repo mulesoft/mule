@@ -8,7 +8,7 @@ package org.mule.extension.db.internal.resolver.query;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.db.api.param.StatementDefinition;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
@@ -32,8 +32,8 @@ import org.mule.extension.db.internal.parser.QueryTemplateParser;
 import org.mule.extension.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.extension.db.internal.resolver.param.GenericParamTypeResolverFactory;
 import org.mule.extension.db.internal.resolver.param.ParamTypeResolverFactory;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

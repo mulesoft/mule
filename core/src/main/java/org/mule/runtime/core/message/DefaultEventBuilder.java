@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -398,7 +398,7 @@ public class DefaultEventBuilder implements Event.Builder {
      * @param encoding the encoding to use when converting bytes to a string, if necessary
      * @param muleContext the Mule node.
      * @return the message contents as a string
-     * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
+     * @throws MuleException if the message cannot be converted into a string
      */
     @Override
     public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {

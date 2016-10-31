@@ -7,8 +7,8 @@
 package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>ConnectorException</code> Is thrown in the context of a Connector, usually some sort of transport level error where the

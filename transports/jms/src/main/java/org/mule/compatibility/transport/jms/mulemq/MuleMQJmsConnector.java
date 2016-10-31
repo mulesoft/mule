@@ -11,7 +11,7 @@ import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;

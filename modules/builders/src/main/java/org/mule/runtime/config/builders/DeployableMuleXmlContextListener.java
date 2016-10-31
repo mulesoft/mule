@@ -8,7 +8,7 @@ package org.mule.runtime.config.builders;
 
 import org.mule.runtime.core.MuleServer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;

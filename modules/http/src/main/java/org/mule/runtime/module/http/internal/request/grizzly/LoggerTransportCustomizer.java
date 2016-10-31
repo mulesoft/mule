@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request.grizzly;
 
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.REQUESTER;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.http.internal.HttpMessageLogger;
 
 import com.ning.http.client.providers.grizzly.TransportCustomizer;

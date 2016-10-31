@@ -11,10 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.compatibility.core.transport.ConnectorLifecycleManager;
-import org.mule.compatibility.core.transport.MessageDispatcherUtils;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;

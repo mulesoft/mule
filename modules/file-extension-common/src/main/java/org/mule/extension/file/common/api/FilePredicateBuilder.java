@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import java.util.function.Predicate;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
  * Builds a {@link Predicate} which verifies that a {@link FileAttributes} instance is compliant with a number of criterias. This

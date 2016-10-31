@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.Optional;

@@ -16,7 +16,7 @@
     <!-- Project -->
     <name>Mule Kernel</name>
     <description>
-        Mule is the runtime engine of Anypoint™ Platform. It is the industry’s only unified platform that combines data and application integration across legacy systems, SaaS applications, and APIs with hybrid deployment options for maximum flexibility.
+        Mule is the runtime enaine of Anypoint™ Platform. It is the industry’s only unified platform that combines data and application integration across legacy systems, SaaS applications, and APIs with hybrid deployment options for maximum flexibility.
     </description>
     <url>https://developer.mulesoft.com/</url>
     <inceptionYear>2003</inceptionYear>

@@ -8,7 +8,7 @@ package org.mule.runtime.module.tomcat;
 
 import org.mule.runtime.config.builders.DeployableMuleXmlContextListener;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 
 import org.apache.catalina.Lifecycle;

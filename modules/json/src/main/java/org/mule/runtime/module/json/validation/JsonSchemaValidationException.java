@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.json.validation;
 
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
  * Exception to signal that a given json did not pass validation against a json schema

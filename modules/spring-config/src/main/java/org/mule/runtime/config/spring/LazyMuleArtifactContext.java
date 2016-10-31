@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 
 import java.util.List;
 import java.util.Map;

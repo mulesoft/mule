@@ -23,7 +23,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.NotificationHelper;

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
 
 import java.io.IOException;

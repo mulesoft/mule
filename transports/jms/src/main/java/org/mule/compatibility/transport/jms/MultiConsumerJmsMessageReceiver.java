@@ -18,7 +18,7 @@ import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.reconnect.ReconnectWorkManager;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.lifecycle.CreateException;

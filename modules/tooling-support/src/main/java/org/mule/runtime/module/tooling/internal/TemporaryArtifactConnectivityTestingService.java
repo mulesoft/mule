@@ -8,10 +8,10 @@ package org.mule.runtime.module.tooling.internal;
 
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;

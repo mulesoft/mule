@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.journal;
 
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;

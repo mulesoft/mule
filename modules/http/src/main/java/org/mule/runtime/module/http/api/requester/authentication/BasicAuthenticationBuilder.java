@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.api.requester.authentication;
 import static org.mule.runtime.module.http.internal.request.HttpAuthenticationType.BASIC;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.internal.request.DefaultHttpAuthentication;

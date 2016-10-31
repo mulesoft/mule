@@ -7,13 +7,13 @@
 package org.mule.runtime.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
@@ -255,7 +255,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
    *
    * @param object the object to process
    * @return the same object with lifecycle methods called (if it has any)
-   * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change for the object.
+   * @throws MuleException if the registry fails to perform the lifecycle change for the object.
    */
   @Override
   public Object applyLifecycle(Object object) throws MuleException {

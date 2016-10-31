@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.context;
 
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>MuleContextException</code> is thrown when an exception occurs with Mule Context objects

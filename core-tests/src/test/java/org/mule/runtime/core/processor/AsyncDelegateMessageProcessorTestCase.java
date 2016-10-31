@@ -21,7 +21,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.processor.Processor;

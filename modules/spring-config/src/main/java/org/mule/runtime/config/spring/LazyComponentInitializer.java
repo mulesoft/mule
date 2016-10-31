@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
+
 /**
  * Initializer for the creation of lazy resources.
  *
@@ -20,7 +22,7 @@ public interface LazyComponentInitializer {
    * The requested component must exists in the configuration.
    *
    * @param componentIdentifier the identifier of the configuration component.
-   * @throws org.mule.runtime.core.api.MuleRuntimeException if there's a problem creating the component or the component does not exists.
+   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponent(String componentIdentifier);
 

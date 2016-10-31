@@ -7,9 +7,12 @@
 
 package org.mule.runtime.core.api;
 
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import org.mule.runtime.api.exception.ExceptionHelper;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
@@ -79,5 +82,12 @@ public class LocatedMuleException extends MuleException {
       return LocationExecutionContextProvider.resolveProcessorRepresentation("app", ObjectUtils.toString(component, "null"),
                                                                              component);
     }
+  }
+
+  @Override
+  protected void appendSummaryMessage(StringBuilder builder) {
+    builder.append("Element               : ")
+        .append(ExceptionHelper.getExceptionInfo(this).get(INFO_LOCATION_KEY))
+        .append(LINE_SEPARATOR);
   }
 }

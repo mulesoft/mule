@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>ResponseTimeoutException</code> is thrown when a response is not received in a given timeout in the Response Router.

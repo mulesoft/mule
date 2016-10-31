@@ -13,13 +13,12 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.api.exception.ExceptionHelper;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 

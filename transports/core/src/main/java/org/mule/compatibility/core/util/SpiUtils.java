@@ -6,11 +6,11 @@
  */
 package org.mule.compatibility.core.util;
 
-import static org.mule.runtime.core.config.ExceptionHelper.SERVICE_ROOT;
+import static org.mule.runtime.api.exception.ExceptionHelper.SERVICE_ROOT;
 import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.runtime.core.api.registry.ServiceType;
-import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;

@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -252,7 +252,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
      * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param muleContext the current muleContext instance
-     * @throws org.mule.runtime.core.api.MuleException if there is an error initializing
+     * @throws MuleException if there is an error initializing
      */
     @SuppressWarnings({"unused"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {

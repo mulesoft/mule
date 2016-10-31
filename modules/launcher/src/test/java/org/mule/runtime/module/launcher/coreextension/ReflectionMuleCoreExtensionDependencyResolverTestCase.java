@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.container.api.MuleCoreExtensionDependency;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;

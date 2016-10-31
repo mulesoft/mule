@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.transport.service;
 
 import org.mule.compatibility.core.api.endpoint.EndpointException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>TransportFactoryException</code> is thrown by the endpoint factory if the endpoint service cannot be found in the

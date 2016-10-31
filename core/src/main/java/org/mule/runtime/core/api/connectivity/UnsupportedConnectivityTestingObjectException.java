@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.connectivity;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * Exception type that represents a failure when there's no {@link ConnectivityTestingService} that can do connectivity testing

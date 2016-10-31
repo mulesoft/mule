@@ -6,12 +6,12 @@
  */
 package org.mule.extension.db.internal.domain.xa;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.type.DbType;
 import org.mule.extension.db.internal.result.resultset.ResultSetHandler;
 import org.mule.extension.db.internal.result.statement.StatementResultIteratorFactory;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 

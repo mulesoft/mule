@@ -9,7 +9,7 @@ package org.mule.extension.ftp.internal.sftp.connection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
@@ -32,7 +32,7 @@ import org.mule.extension.ftp.internal.sftp.command.SftpReadCommand;
 import org.mule.extension.ftp.internal.sftp.command.SftpRenameCommand;
 import org.mule.extension.ftp.internal.sftp.command.SftpWriteCommand;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;

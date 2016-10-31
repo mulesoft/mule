@@ -7,7 +7,7 @@
 package org.mule.runtime.core.registry;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.registry.PreInitProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
@@ -177,7 +177,7 @@ public class TransientRegistry extends AbstractRegistry {
    *
    * @param object the object to process
    * @return the same object with lifecycle methods called (if it has any)
-   * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change for the object.
+   * @throws MuleException if the registry fails to perform the lifecycle change for the object.
    */
   Object applyLifecycle(Object object) throws MuleException {
     getLifecycleManager().applyCompletedPhases(object);

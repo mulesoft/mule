@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.serialization;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
  * Exception to signal an error during serialization/deserialization process

@@ -8,7 +8,7 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 public final class UnsupportedMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
 

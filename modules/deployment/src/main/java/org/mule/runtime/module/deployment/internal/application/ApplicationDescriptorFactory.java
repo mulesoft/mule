@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import org.mule.runtime.container.api.MuleFoldersUtil;

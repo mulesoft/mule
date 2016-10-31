@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManager;
 
 import java.net.ServerSocket;

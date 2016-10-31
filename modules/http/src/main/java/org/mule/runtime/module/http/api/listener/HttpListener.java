@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.http.api.listener;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 
 /**

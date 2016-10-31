@@ -10,8 +10,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
@@ -23,7 +22,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SimpleRegistry;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Map;
 

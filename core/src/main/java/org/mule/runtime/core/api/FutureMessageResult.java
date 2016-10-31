@@ -9,6 +9,7 @@ package org.mule.runtime.core.api;
 import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.functional.Either;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * A {@link Processor} that routes messages to zero or more destination message processors. Implementations determine exactly how

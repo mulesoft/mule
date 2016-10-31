@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
 
 import org.mule.runtime.core.api.CoreEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.Processor;

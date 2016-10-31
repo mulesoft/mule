@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.debug;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
  * Represents an execution frame with the current debugging state.

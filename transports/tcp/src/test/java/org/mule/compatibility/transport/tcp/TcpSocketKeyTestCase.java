@@ -15,9 +15,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.compatibility.transport.tcp.TcpConnector;
-import org.mule.compatibility.transport.tcp.TcpSocketKey;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import org.junit.Test;
 

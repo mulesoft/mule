@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

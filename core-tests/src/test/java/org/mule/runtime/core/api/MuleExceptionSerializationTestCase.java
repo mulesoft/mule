@@ -8,6 +8,7 @@ package org.mule.runtime.core.api;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

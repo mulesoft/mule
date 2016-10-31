@@ -9,7 +9,7 @@ package org.mule.compatibility.core.routing;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.routing.UntilSuccessful;
 
 public class EndpointDlqUntilSuccessful extends UntilSuccessful {

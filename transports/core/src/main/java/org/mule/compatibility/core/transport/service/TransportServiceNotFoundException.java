@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport.service;
 
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
  * <code>TransportServiceNotFoundException</code> is thorown if no matching service endpoint descriptor is found for the connector

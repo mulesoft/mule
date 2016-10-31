@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;

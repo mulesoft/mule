@@ -8,7 +8,7 @@ package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>NoReceiverForEndpointException</code> is thrown when an enpoint is specified for a receiver but no such receiver exists.

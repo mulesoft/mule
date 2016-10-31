@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.api.listener;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.lifecycle.Startable;

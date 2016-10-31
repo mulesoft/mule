@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>EndpointNotFoundException</code> is thrown when an endpoint name or protocol is specified but a matching endpoint is not

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.message;
 
-import static org.mule.runtime.core.config.ExceptionHelper.getRootMuleException;
-import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 
 /**

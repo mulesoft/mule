@@ -7,10 +7,10 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

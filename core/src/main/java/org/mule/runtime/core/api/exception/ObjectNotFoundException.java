@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 /**
  * Exception type for representing a failure due to object not found.

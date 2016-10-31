@@ -10,7 +10,7 @@ import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.api.Event;

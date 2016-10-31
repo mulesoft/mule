@@ -21,7 +21,7 @@ import org.mule.compatibility.core.api.transport.MessageRequesterFactory;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.fruit.Apple;

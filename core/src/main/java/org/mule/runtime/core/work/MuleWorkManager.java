@@ -7,7 +7,7 @@
 package org.mule.runtime.core.work;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;

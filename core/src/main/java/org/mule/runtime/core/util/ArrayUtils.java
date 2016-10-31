@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.api.util.Preconditions;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -114,7 +114,8 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils {
       return 0;
     }
 
-    checkArgument(array.getClass().isArray(), String.format("Object of type %s is not an array", array.getClass().getName()));
+    Preconditions.checkArgument(array.getClass().isArray(),
+                                String.format("Object of type %s is not an array", array.getClass().getName()));
 
     Class<?> componentType = array.getClass().getComponentType();
     if (!componentType.isPrimitive()) {

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.config.bootstrap;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
  * Base class to define bootstrap properties

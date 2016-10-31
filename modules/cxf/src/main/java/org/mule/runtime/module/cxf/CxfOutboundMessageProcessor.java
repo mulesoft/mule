@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf;
 import static java.util.Arrays.asList;
 import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.cxf.CxfConstants.OPERATION;
@@ -18,17 +18,17 @@ import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAP
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
 import org.mule.runtime.module.cxf.security.WebServiceSecurityException;
 

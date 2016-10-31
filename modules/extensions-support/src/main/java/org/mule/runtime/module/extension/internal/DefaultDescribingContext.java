@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 

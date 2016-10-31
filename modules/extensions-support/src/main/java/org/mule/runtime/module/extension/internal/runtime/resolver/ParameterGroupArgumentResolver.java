@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.api.meta.model.EnrichableModel;

@@ -10,10 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.mule.compatibility.transport.jms.JmsExceptionReader;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.ExceptionHelper;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

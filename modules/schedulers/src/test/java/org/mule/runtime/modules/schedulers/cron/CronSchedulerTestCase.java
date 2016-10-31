@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.source.polling.PollingTask;
 import org.mule.runtime.core.source.polling.PollingWorker;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

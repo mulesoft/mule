@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.journal.queue;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.util.journal.JournalEntry;
 import org.mule.runtime.core.util.journal.JournalEntrySerializer;
 import org.mule.runtime.core.util.journal.TransactionCompletePredicate;

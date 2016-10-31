@@ -20,7 +20,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_X_FORWA
 
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.WorkManager;

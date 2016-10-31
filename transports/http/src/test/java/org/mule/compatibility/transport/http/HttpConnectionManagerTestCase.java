@@ -14,11 +14,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.compatibility.transport.http.HttpConnectionManager;
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpRequestDispatcher;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.tck.junit4.AbstractMuleTestCase;

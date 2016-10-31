@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.internal.plugin;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;

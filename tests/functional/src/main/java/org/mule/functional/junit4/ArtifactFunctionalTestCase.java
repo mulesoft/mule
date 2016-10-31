@@ -11,8 +11,8 @@ import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;

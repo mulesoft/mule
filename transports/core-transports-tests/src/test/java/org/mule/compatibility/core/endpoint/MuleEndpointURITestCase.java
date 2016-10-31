@@ -11,8 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.net.URI;

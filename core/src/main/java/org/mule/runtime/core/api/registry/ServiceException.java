@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.registry;
 
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * Any service-related exception: service not found, service lookup error, etc.

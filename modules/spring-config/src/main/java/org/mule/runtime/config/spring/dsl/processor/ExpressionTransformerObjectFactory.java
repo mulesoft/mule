@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.expression.ExpressionConfig;

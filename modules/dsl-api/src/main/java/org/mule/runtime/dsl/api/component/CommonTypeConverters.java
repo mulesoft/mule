@@ -23,7 +23,7 @@ public class CommonTypeConverters {
       try {
         return currentThread().getContextClassLoader().loadClass(className);
       } catch (ClassNotFoundException e) {
-        //TODO MULE-10835 use MuleRuntimeException once it's moved to the API.
+        // TODO MULE-10835 use MuleRuntimeException once it's moved to the API.
         throw new RuntimeException(e);
       }
     };

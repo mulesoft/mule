@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.SplashScreen.RUNTIME_VERBOSE;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.tck.junit4.AbstractMuleTestCase;

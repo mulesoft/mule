@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transaction.lookup;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;

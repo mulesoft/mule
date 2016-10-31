@@ -14,7 +14,7 @@ import static org.mule.runtime.core.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.util.FileUtils.readFileToString;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.store.ListableObjectStore;
@@ -23,8 +23,8 @@ import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 import java.io.File;
 import java.io.FileFilter;

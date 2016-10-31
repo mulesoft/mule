@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 /**

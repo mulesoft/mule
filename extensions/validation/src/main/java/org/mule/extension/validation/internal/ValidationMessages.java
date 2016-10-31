@@ -6,15 +6,18 @@
  */
 package org.mule.extension.validation.internal;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.validation.api.Validator;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.config.i18n.I18nMessage;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.slf4j.Logger;
 
 /**
  * A {@link I18nMessageFactory} that provides the feedback messages for the {@link Validator}s that are provided out of the box.
@@ -24,6 +27,8 @@ import java.util.ResourceBundle;
  * @since 3.7.0
  */
 public final class ValidationMessages extends I18nMessageFactory {
+
+  private static final Logger logger = getLogger(ValidationMessages.class);
 
   private final String bundlePath;
   private final java.util.Locale locale;

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.component;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 import java.util.List;
 

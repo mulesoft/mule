@@ -6,22 +6,17 @@
  */
 package org.mule.runtime.core.config;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.config.ExceptionReader;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
-import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.api.legacy.exception.ExceptionReader;
 
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,11 +36,9 @@ import org.slf4j.LoggerFactory;
  * by providing the the protocol to map to and the Mule exception.
  */
 
-public final class ExceptionHelper {
+public final class ExceptionHelper extends org.mule.runtime.api.exception.ExceptionHelper {
 
   public static final String SERVICE_ROOT = "META-INF/services/";
-
-  private static final String MULE_PACKAGE_REGEXP = "(?:org|com)\\.mule(?:soft)?\\.(?!mvel2)(?!el).*";
 
   /**
    * This is the property to set the error code to no the message it is the property name the Transport provider uses set the set
@@ -56,7 +49,7 @@ public final class ExceptionHelper {
   /**
    * logger used by this class
    */
-  protected static final Logger logger = LoggerFactory.getLogger(ExceptionHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExceptionHelper.class);
 
   private static String J2SE_VERSION = "";
 
@@ -67,24 +60,10 @@ public final class ExceptionHelper {
 
   private static Properties errorDocs = new Properties();
   private static Properties errorCodes = new Properties();
-  private static Map reverseErrorCodes = null;
   private static Map<String, Properties> errorMappings = new HashMap<String, Properties>();
   private static Map<String, Boolean> disposeListenerRegistered = new HashMap<String, Boolean>();
 
-  private static final int EXCEPTION_THRESHOLD = 3;
-  private static boolean verbose = true;
-
   private static boolean initialised = false;
-
-  /**
-   * A list of the exception readers to use for different types of exceptions
-   */
-  private static List<ExceptionReader> exceptionReaders = new ArrayList<ExceptionReader>();
-
-  /**
-   * The default ExceptionReader which will be used for most types of exceptions
-   */
-  private static ExceptionReader defaultExceptionReader = new DefaultExceptionReader();
 
   static {
     initialise();
@@ -94,7 +73,7 @@ public final class ExceptionHelper {
    * Do not instanciate.
    */
   private ExceptionHelper() {
-    // no-op
+    super();
   }
 
   private static void initialise() {
@@ -103,8 +82,6 @@ public final class ExceptionHelper {
         return;
       }
 
-      registerExceptionReader(new MuleExceptionReader());
-      registerExceptionReader(new NamingExceptionReader());
       J2SE_VERSION = System.getProperty("java.specification.version");
 
       String name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/mule-exception-codes.properties";
@@ -114,8 +91,6 @@ public final class ExceptionHelper {
       }
       errorCodes.load(in);
       in.close();
-
-      reverseErrorCodes = MapUtils.invertMap(errorCodes);
 
       name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/mule-exception-config.properties";
       in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
@@ -132,27 +107,8 @@ public final class ExceptionHelper {
   }
 
   public static int getErrorCode(Class exception) {
-    String code = errorCodes.getProperty(exception.getName(), "-1");
-    return Integer.parseInt(code);
-  }
-
-  public static Class getErrorClass(int code) {
-    String key = String.valueOf(code);
-    Object clazz = reverseErrorCodes.get(key);
-    if (clazz == null) {
-      return null;
-    } else if (clazz instanceof Class) {
-      return (Class) clazz;
-    } else {
-      try {
-        clazz = ClassUtils.loadClass(clazz.toString(), ExceptionHelper.class);
-      } catch (ClassNotFoundException e) {
-        logger.error(e.getMessage(), e);
-        return null;
-      }
-      reverseErrorCodes.put(key, clazz);
-      return (Class) clazz;
-    }
+    // TODO MULE-10834 - We won't be using error code for now.
+    return -1;
   }
 
   private static Properties getErrorMappings(String protocol, final MuleContext muleContext) {
@@ -313,81 +269,8 @@ public final class ExceptionHelper {
     return url;
   }
 
-  public static Throwable getRootException(Throwable t) {
-    Throwable cause = t;
-    Throwable root = null;
-    while (cause != null) {
-      root = cause;
-      cause = getExceptionReader(cause).getCause(cause);
-      // address some misbehaving exceptions, avoid endless loop
-      if (t == cause) {
-        break;
-      }
-    }
-
-    return DefaultMuleConfiguration.fullStackTraces ? root : sanitize(root);
-  }
-
   public static Throwable sanitizeIfNeeded(Throwable t) {
-    return DefaultMuleConfiguration.fullStackTraces ? t : sanitize(t);
-  }
-
-  /**
-   * Removes some internal Mule entries from the stacktrace. Modifies the passed-in throwable stacktrace.
-   */
-  public static Throwable sanitize(Throwable t) {
-    if (t == null) {
-      return null;
-    }
-    StackTraceElement[] trace = t.getStackTrace();
-    List<StackTraceElement> newTrace = new ArrayList<StackTraceElement>();
-    for (StackTraceElement stackTraceElement : trace) {
-      if (!isMuleInternalClass(stackTraceElement.getClassName())) {
-        newTrace.add(stackTraceElement);
-      }
-    }
-
-    StackTraceElement[] clean = new StackTraceElement[newTrace.size()];
-    newTrace.toArray(clean);
-    t.setStackTrace(clean);
-
-    Throwable cause = t.getCause();
-    while (cause != null) {
-      sanitize(cause);
-      cause = cause.getCause();
-    }
-
-    return t;
-  }
-
-
-  /**
-   * Removes some internal Mule entries from the stacktrace. Modifies the passed-in throwable stacktrace.
-   */
-  public static Throwable summarise(Throwable t, int depth) {
-    t = sanitize(t);
-    StackTraceElement[] trace = t.getStackTrace();
-
-    int newStackDepth = Math.min(trace.length, depth);
-    StackTraceElement[] newTrace = new StackTraceElement[newStackDepth];
-
-    System.arraycopy(trace, 0, newTrace, 0, newStackDepth);
-    t.setStackTrace(newTrace);
-
-    return t;
-  }
-
-  private static boolean isMuleInternalClass(String className) {
-    /*
-     * Sacrifice the code quality for the sake of keeping things simple - the alternative would be to pass MuleContext into every
-     * exception constructor.
-     */
-    for (String mulePackage : DefaultMuleConfiguration.stackTraceFilter) {
-      if (className.startsWith(mulePackage)) {
-        return true;
-      }
-    }
-    return false;
+    return fullStackTraces ? t : sanitize(t);
   }
 
   public static Throwable getRootParentException(Throwable t) {
@@ -407,108 +290,6 @@ public final class ExceptionHelper {
     return t;
   }
 
-  public static MuleException getRootMuleException(Throwable t) {
-    Throwable cause = t;
-    MuleException exception = null;
-    // Info is added to the wrapper exceptions. We add them to the root mule exception so the gotten info is
-    // properly logged.
-    Map muleExceptionInfo = new HashMap<>();
-    while (cause != null) {
-      if (cause instanceof MuleException) {
-        exception = (MuleException) cause;
-        muleExceptionInfo.putAll(exception.getInfo());
-      }
-      final Throwable tempCause = getExceptionReader(cause).getCause(cause);
-      if (DefaultMuleConfiguration.fullStackTraces) {
-        cause = tempCause;
-      } else {
-        cause = ExceptionHelper.sanitize(tempCause);
-      }
-      // address some misbehaving exceptions, avoid endless loop
-      if (t == cause) {
-        break;
-      }
-    }
-    if (exception != null) {
-      exception.getInfo().putAll(muleExceptionInfo);
-    }
-    return exception;
-  }
-
-  public static List<Throwable> getExceptionsAsList(Throwable t) {
-    List<Throwable> exceptions = new ArrayList<Throwable>();
-    Throwable cause = t;
-    while (cause != null) {
-      exceptions.add(0, cause);
-      cause = getExceptionReader(cause).getCause(cause);
-      // address some misbehaving exceptions, avoid endless loop
-      if (t == cause) {
-        break;
-      }
-    }
-    return exceptions;
-  }
-
-  public static Map getExceptionInfo(Throwable t) {
-    Map info = new HashMap();
-    Throwable cause = t;
-    while (cause != null) {
-      info.putAll(getExceptionReader(cause).getInfo(cause));
-      cause = getExceptionReader(cause).getCause(cause);
-      // address some misbehaving exceptions, avoid endless loop
-      if (t == cause) {
-        break;
-      }
-    }
-    return info;
-  }
-
-  public static String getExceptionStack(Throwable t) {
-    Throwable root = getRootException(t);
-    MuleException rootMule = getRootMuleException(t);
-
-    StringBuilder buf = new StringBuilder();
-
-    ExceptionReader rootMuleReader = getExceptionReader(rootMule);
-    buf.append(rootMuleReader.getMessage(rootMule)).append(" (").append(rootMule.getClass().getName()).append(")")
-        .append(SystemUtils.LINE_SEPARATOR);
-
-    if (verbose) {
-      int processedElements = 0;
-      int processedMuleElements = 1;
-      for (StackTraceElement stackTraceElement : root.getStackTrace()) {
-        if (processedMuleElements > EXCEPTION_THRESHOLD) {
-          break;
-        }
-
-        ++processedElements;
-        if (stackTraceElement.getClassName().matches(MULE_PACKAGE_REGEXP)) {
-          ++processedMuleElements;
-        }
-
-        buf.append("  ").append(stackTraceElement.getClassName()).append(".").append(stackTraceElement.getMethodName())
-            .append("(").append(stackTraceElement.getFileName()).append(":").append(stackTraceElement.getLineNumber()).append(")")
-            .append(SystemUtils.LINE_SEPARATOR);
-      }
-
-      if (root.getStackTrace().length - processedElements > 0) {
-        buf.append("  (").append(root.getStackTrace().length - processedElements).append(" more...)")
-            .append(SystemUtils.LINE_SEPARATOR);
-      }
-    }
-
-    return buf.toString();
-  }
-
-  /**
-   * Registers an exception reader with Mule
-   *
-   * @param reader the reader to register.
-   */
-  public static void registerExceptionReader(ExceptionReader reader) {
-    exceptionReaders.add(reader);
-  }
-
   public static <T> T traverseCauseHierarchy(Throwable e, ExceptionEvaluator<T> evaluator) {
     LinkedList<Throwable> exceptions = new LinkedList<Throwable>();
     exceptions.add(e);
@@ -525,21 +306,6 @@ public final class ExceptionHelper {
     return null;
   }
 
-  /**
-   * Gets an exception reader for the exception
-   *
-   * @param t the exception to get a reader for
-   * @return either a specific reader or an instance of DefaultExceptionReader. This method never returns null;
-   */
-  public static ExceptionReader getExceptionReader(Throwable t) {
-    for (ExceptionReader exceptionReader : exceptionReaders) {
-      if (exceptionReader.getExceptionType().isInstance(t)) {
-        return exceptionReader;
-      }
-    }
-    return defaultExceptionReader;
-  }
-
   public static String writeException(Throwable t) {
     ExceptionReader er = getExceptionReader(t);
     StringBuilder msg = new StringBuilder();
@@ -547,32 +313,9 @@ public final class ExceptionHelper {
     return msg.toString();
   }
 
-  public static <T extends Throwable> T unwrap(T t) {
-    if (t instanceof InvocationTargetException) {
-      return (T) ((InvocationTargetException) t).getTargetException();
-    }
-    return t;
-
-  }
-
   public static interface ExceptionEvaluator<T> {
 
     T evaluate(Throwable e);
-  }
-
-  public static Throwable getNonMuleException(Throwable t) {
-    if (!(t instanceof MuleException)) {
-      return t;
-    }
-    Throwable cause = t;
-    while (cause != null) {
-      cause = getExceptionReader(cause).getCause(cause);
-      // address some misbehaving exceptions, avoid endless loop
-      if (t == cause || !(cause instanceof MuleException)) {
-        break;
-      }
-    }
-    return cause instanceof MuleException ? null : cause;
   }
 
   private static void clearCacheFor(MuleContext muleContext) {

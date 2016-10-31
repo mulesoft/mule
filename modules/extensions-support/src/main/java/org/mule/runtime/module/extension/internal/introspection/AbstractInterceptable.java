@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeede
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.introspection.Interceptable;

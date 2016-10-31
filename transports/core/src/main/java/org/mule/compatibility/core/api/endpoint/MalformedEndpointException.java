@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI class if it fails to parse a Url

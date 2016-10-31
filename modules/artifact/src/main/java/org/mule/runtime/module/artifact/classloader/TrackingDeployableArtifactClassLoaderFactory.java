@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.util.List;

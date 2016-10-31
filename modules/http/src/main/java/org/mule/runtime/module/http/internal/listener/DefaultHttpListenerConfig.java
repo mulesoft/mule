@@ -15,7 +15,7 @@ import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketPr
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -33,7 +33,7 @@ import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.NetworkUtils;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 

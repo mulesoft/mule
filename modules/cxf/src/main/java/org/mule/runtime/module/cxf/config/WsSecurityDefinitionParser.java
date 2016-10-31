@@ -9,12 +9,10 @@ package org.mule.runtime.module.cxf.config;
 import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.config.spring.parsers.PreProcessor;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.runtime.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
 import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 
 import org.w3c.dom.Element;

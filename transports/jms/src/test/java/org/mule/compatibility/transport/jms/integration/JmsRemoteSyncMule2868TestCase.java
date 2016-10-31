@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 

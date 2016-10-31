@@ -9,7 +9,7 @@ package org.mule.compatibility.core.endpoint.inbound;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.Processor;

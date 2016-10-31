@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer.compression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.IOException;

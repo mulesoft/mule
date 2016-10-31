@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.payload;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  *

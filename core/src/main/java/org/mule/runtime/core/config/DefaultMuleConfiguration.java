@@ -47,37 +47,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware {
 
-  public static final String[] DEFAULT_STACKTRACE_FILTER =
-      ("org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor," + "org.mule.runtime.core.processor.chain")
-          .split(",");
-
-  /**
-   * When false (default), some internal Mule entries are removed from exception stacktraces for readability.
-   * 
-   * @see #stackTraceFilter
-   */
-  public static boolean fullStackTraces = false;
-
-  /**
-   * When false (default), only a summary of the root exception and trail is provided. If this flag is false, full exception
-   * information is reported. Switching on DEBUG level logging with automatically set this flag to true.
-   */
-  public static boolean verboseExceptions = false;
-
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
    * exception message if an exception occurs. Switching on DEBUG level logging with automatically set this flag to true.
    */
   public static boolean flowTrace = false;
-
-
-  /**
-   * A comma-separated list of internal packages/classes which are removed from sanitized stacktraces. Matching is done via
-   * string.startsWith().
-   * 
-   * @see #fullStackTraces
-   */
-  public static String[] stackTraceFilter = DEFAULT_STACKTRACE_FILTER;
 
   private boolean synchronous = false;
 
@@ -298,20 +272,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (p != null) {
       autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.full");
-    if (p != null) {
-      fullStackTraces = false;
-    }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.filter");
-    if (p != null) {
-      stackTraceFilter = p.split(",");
-    }
-
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "verbose.exceptions");
-    if (p != null) {
-      verboseExceptions = BooleanUtils.toBoolean(p);
-    }
-
     p = System.getProperty(MuleProperties.MULE_FLOW_TRACE);
     if (p != null) {
       flowTrace = BooleanUtils.toBoolean(p);
@@ -326,10 +286,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (p != null) {
       disableTimeouts = Boolean.valueOf(p);
     }
-  }
-
-  public static boolean isVerboseExceptions() {
-    return verboseExceptions || logger.isDebugEnabled();
   }
 
   /**

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;

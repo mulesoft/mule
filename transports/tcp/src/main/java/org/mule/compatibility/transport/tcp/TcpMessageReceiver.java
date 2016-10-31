@@ -16,7 +16,7 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.AbstractReceiverResourceWorker;
 import org.mule.compatibility.transport.tcp.i18n.TcpMessages;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.Disposable;

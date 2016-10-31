@@ -9,10 +9,10 @@ package org.mule.runtime.module.service;
 
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.service.LifecycleFilterServiceProxy.createServiceProxy;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;

@@ -18,7 +18,7 @@ import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.extension.file.common.api.FileWriteMode;
 

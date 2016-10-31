@@ -9,7 +9,7 @@ package org.mule.test.modules.schedulers.cron;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
 

@@ -25,7 +25,7 @@ import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleCon
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;

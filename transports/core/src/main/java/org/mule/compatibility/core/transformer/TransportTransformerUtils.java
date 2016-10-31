@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.transport.service.TransportFactoryException;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.TransformerUtils;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppsDir;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;

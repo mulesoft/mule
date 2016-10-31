@@ -8,7 +8,7 @@ package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.http.api.listener.HttpListener;

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;

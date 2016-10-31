@@ -7,7 +7,7 @@
 
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import java.net.URL;
 import java.util.Collections;

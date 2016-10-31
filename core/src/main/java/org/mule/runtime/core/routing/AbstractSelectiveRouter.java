@@ -17,8 +17,8 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
@@ -49,7 +48,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.ListUtils;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer {

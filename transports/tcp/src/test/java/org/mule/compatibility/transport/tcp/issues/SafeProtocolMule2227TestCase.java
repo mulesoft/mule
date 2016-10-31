@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.tcp.issues;
 
 import org.mule.compatibility.transport.tcp.protocols.SafeProtocolTestCase;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;

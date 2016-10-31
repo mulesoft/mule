@@ -8,7 +8,7 @@ package org.mule.compatibility.module.scripting.component;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.component.BindingInvocationHandler;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.scripting.component.ScriptComponent;

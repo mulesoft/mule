@@ -7,7 +7,7 @@
 package org.mule.runtime.core.source.polling;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Extension point for overriding MessageProcessorPolling functionality.

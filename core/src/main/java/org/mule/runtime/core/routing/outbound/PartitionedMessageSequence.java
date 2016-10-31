@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.ArrayList;

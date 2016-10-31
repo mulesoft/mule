@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.jms;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.transport.AbstractMessageRequesterFactory;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * <code>JmsMessageDispatcherFactory</code> creates a message adapter that will send JMS messages

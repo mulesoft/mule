@@ -13,7 +13,7 @@ import org.mule.compatibility.core.api.registry.ServiceDescriptor;
 import org.mule.compatibility.core.api.registry.ServiceDescriptorFactory;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.util.SpiUtils;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.ServiceException;

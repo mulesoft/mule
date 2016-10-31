@@ -17,7 +17,7 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.message.InternalMessage;

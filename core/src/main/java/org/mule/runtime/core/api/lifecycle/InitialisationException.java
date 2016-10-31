@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * <code>InitialisationException</code> is thrown by the initialise method defined in the

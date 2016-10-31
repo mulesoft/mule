@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.schedule;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 

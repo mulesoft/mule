@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 /**

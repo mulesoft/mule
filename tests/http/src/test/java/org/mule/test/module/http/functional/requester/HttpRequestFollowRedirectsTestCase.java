@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 
 import java.io.IOException;
 
