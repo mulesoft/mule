@@ -27,7 +27,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class BasicTypeMetadataVisitorTestCase extends AbstractMuleTestCase {
 
-  private static final BaseTypeBuilder<?> BUILDER = BaseTypeBuilder.create(JAVA);
+  private static final BaseTypeBuilder BUILDER = BaseTypeBuilder.create(JAVA);
 
   @Parameters(name = "isSimpleType({0})")
   public static Collection<Object[]> data() {

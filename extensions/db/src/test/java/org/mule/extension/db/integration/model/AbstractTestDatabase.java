@@ -38,7 +38,7 @@ public abstract class AbstractTestDatabase {
   public static final String NO_RESULSET_FROM_FUNCTION_SUPPORT_ERROR =
       "Database does not support returning a resultset from a function";
   public static final String NO_UDT_SUPPORT_ERROR = "Database does not support User Defined Data Types";
-  public final BaseTypeBuilder<?> typeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA);
+  public final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA);
 
   public void deletePlanetTable(Connection connection) throws SQLException {
     executeUpdate(connection, "DELETE FROM PLANET");

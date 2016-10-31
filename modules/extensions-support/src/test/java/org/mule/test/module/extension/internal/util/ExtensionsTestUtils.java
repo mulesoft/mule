@@ -74,7 +74,7 @@ import org.mockito.stubbing.Answer;
 public abstract class ExtensionsTestUtils {
 
   public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  public static final BaseTypeBuilder<?> TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+  public static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
 
   public static final String HELLO_WORLD = "Hello World!";
 
@@ -83,7 +83,7 @@ public abstract class ExtensionsTestUtils {
   }
 
   public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType) {
-    ArrayTypeBuilder<?> arrayTypeBuilder = TYPE_BUILDER.arrayType();
+    ArrayTypeBuilder arrayTypeBuilder = TYPE_BUILDER.arrayType();
     arrayTypeBuilder.id(clazz.getName());
     arrayTypeBuilder.of(itemType);
 

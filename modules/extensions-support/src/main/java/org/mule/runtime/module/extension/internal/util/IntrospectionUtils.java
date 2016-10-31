@@ -206,7 +206,7 @@ public final class IntrospectionUtils {
     return ResolvableType.forMethodReturnType(method);
   }
 
-  private static BaseTypeBuilder<?> typeBuilder() {
+  private static BaseTypeBuilder typeBuilder() {
     return BaseTypeBuilder.create(JAVA);
   }
 

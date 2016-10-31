@@ -69,7 +69,7 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
       DsqlQuery dsqlQuery = (DsqlQuery) query;
       MetadataType entityMetadata = entityResolver.getEntityMetadata(context, dsqlQuery.getType().getName());
 
-      BaseTypeBuilder<?> builder = BaseTypeBuilder.create(JAVA);
+      BaseTypeBuilder builder = BaseTypeBuilder.create(JAVA);
       final List<Field> fields = dsqlQuery.getFields();
       if (fields.size() == 1 && fields.get(0).getName().equals("*")) {
         return builder.arrayType().of(entityMetadata).build();
@@ -79,7 +79,7 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          ObjectTypeBuilder<?> objectTypeBuilder = builder.arrayType().of().objectType();
+          ObjectTypeBuilder objectTypeBuilder = builder.arrayType().of().objectType();
           objectType.getFields()
               .stream()
               .filter(p -> fields.stream().anyMatch(f -> f.getName().equalsIgnoreCase(p.getKey().getName().getLocalPart())))

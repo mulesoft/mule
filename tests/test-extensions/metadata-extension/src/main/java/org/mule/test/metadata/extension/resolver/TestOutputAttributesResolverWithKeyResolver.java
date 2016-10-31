@@ -36,7 +36,7 @@ public class TestOutputAttributesResolverWithKeyResolver
   @Override
   public MetadataType getAttributesType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-    DictionaryTypeBuilder<?> builder = BaseTypeBuilder.create(JAVA).dictionaryType();
+    DictionaryTypeBuilder builder = BaseTypeBuilder.create(JAVA).dictionaryType();
     builder.ofKey().dateType();
     builder.ofValue().stringType();
     return builder.build();

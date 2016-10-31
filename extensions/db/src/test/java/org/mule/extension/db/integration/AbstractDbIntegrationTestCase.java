@@ -70,7 +70,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
   @Parameterized.Parameter(2)
   public DbTestUtil.DbType dbType;
 
-  protected final BaseTypeBuilder<?> typeBuilder = BaseTypeBuilder.create(JAVA);
+  protected final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
   protected final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Parameterized.Parameters(name = "{2}")
