@@ -7,8 +7,10 @@
 
 package org.mule.runtime.core.processor.chain;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -68,8 +70,13 @@ import org.mule.tck.size.SmallTest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,6 +96,16 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   protected boolean synchronous;
   private int scheduledTasks;
   private int nonBlockingProcessorsExecuted;
+
+  private ExecutorService executorService =
+      new ThreadPoolExecutor(0, MAX_VALUE, 60L, SECONDS, new SynchronousQueue<>()) {
+
+        @Override
+        public Future<?> submit(Runnable task) {
+          scheduledTasks++;
+          return super.submit(task);
+        }
+      };
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
@@ -126,6 +143,11 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
     when(errorTypeLocator.lookupErrorType(any())).thenReturn(errorType);
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
+  }
+
+  @After
+  public void after() {
+    executorService.shutdown();
   }
 
   @Test
@@ -1013,7 +1035,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
-    when(mockFlow.getProcessingStrategy()).thenReturn(nonBlocking ? new NonBlockingProcessingStrategyFactory().create()
+    when(mockFlow.getProcessingStrategy())
+        .thenReturn(nonBlocking ? new NonBlockingProcessingStrategyFactory().create(executorService)
         : new DefaultFlowProcessingStrategyFactory().create());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));

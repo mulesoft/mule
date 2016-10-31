@@ -67,6 +67,32 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
     return processingStrategy;
   }
 
+  // TODO MULE-10544 use internal executor, do not allow it to be passed form outside
+  public ProcessingStrategy create(ExecutorService executorService) {
+    final NonBlockingProcessingStrategy processingStrategy = new NonBlockingProcessingStrategy(executorService);
+
+    if (maxThreads != null) {
+      processingStrategy.setMaxThreads(maxThreads);
+    }
+    if (minThreads != null) {
+      processingStrategy.setMinThreads(minThreads);
+    }
+    if (maxBufferSize != null) {
+      processingStrategy.setMaxBufferSize(maxBufferSize);
+    }
+    if (threadTTL != null) {
+      processingStrategy.setThreadTTL(threadTTL);
+    }
+    if (threadWaitTimeout != null) {
+      processingStrategy.setThreadWaitTimeout(threadWaitTimeout);
+    }
+    if (poolExhaustedAction != null) {
+      processingStrategy.setPoolExhaustedAction(poolExhaustedAction);
+    }
+
+    return processingStrategy;
+  }
+
   public Integer getMaxThreads() {
     return maxThreads;
   }
