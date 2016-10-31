@@ -11,12 +11,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
@@ -25,6 +23,7 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.DefaultEventContext;
@@ -86,8 +85,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Before
   public void createMocks() throws Exception {
-    muleContext = mock(MuleContext.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
-    registerServices(muleContext);
+    muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
     when(muleContext.getDefaultThreadingProfile()).thenReturn(new ChainedThreadingProfile());

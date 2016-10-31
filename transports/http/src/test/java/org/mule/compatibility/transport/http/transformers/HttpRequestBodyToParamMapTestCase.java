@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.http.transformers;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.DEFAULT_CONTENT_TYPE;
@@ -18,6 +17,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -46,8 +46,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockContextWithServices();
   @Mock
   private TransformationService transformationService;
   private Flow flow;
@@ -55,7 +54,6 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
 
   @Before
   public void setup() throws Exception {
-    registerServices(muleContext);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
     when(transformationService.transform(any(InternalMessage.class), any(DataType.class)))
         .thenAnswer(inv -> (InternalMessage) inv.getArguments()[0]);

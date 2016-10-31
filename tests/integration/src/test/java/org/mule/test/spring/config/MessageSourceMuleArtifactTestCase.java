@@ -16,13 +16,12 @@ import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.Testable;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.runtime.config.spring.SpringXmlConfigurationMuleArtifactFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.tck.config.RegisterServicesConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dom4j.DocumentException;
@@ -49,15 +48,9 @@ public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase {
     factory = new SpringXmlConfigurationMuleArtifactFactory() {
 
       @Override
-      protected ConfigurationBuilder wrapConfigurationBuilder(ConfigurationBuilder configBuilder) {
-        return new AbstractConfigurationBuilder() {
-
-          @Override
-          protected void doConfigure(MuleContext muleContext) throws Exception {
-            configBuilder.configure(muleContext);
-            new RegisterServicesConfigurationBuilder().configure(muleContext);
-          }
-        };
+      protected void addBuilders(List<ConfigurationBuilder> builders) {
+        super.addBuilders(builders);
+        builders.add(new TestServicesConfigurationBuilder());
       }
     };
   }

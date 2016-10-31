@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.config.spring.parsers.specific;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,7 +38,7 @@ import org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.tck.config.RegisterServicesConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 import org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding;
@@ -64,7 +63,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testDefaultJavaComponentShortcut() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service1");
     validateCorrectServiceCreation(flow);
     assertEquals(DefaultJavaWithBindingComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -85,7 +84,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testDefaultJavaComponentPrototype() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service2");
     validateCorrectServiceCreation(flow);
     assertEquals(DefaultJavaWithBindingComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -104,7 +103,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testDefaultJavaComponentSingleton() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service3");
     validateCorrectServiceCreation(flow);
     assertEquals(DefaultJavaWithBindingComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -124,7 +123,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testDefaultJavaComponentSpringBean() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service4");
     validateCorrectServiceCreation(flow);
     assertEquals(DefaultJavaWithBindingComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -156,7 +155,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testPooledJavaComponentShortcut() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service5");
     validateCorrectServiceCreation(flow);
     assertEquals(PooledJavaWithBindingsComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -177,7 +176,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testPooledJavaComponentPrototype() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service6");
     validateCorrectServiceCreation(flow);
     assertEquals(PooledJavaWithBindingsComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -198,7 +197,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testPooledJavaComponentSingleton() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service7");
     validateCorrectServiceCreation(flow);
     assertEquals(PooledJavaWithBindingsComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -219,7 +218,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
   public void testPooledJavaComponentSpringBean() throws Exception {
     ConfigurationBuilder configBuilder =
         new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-ok-test-flow.xml");
-    muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+    muleContext = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
     Flow flow = muleContext.getRegistry().lookupObject("service8");
     validateCorrectServiceCreation(flow);
     assertEquals(PooledJavaWithBindingsComponent.class, flow.getMessageProcessors().get(0).getClass());
@@ -235,7 +234,7 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
     try {
       ConfigurationBuilder configBuilder =
           new SpringXmlConfigurationBuilder("org/mule/config/spring/parsers/specific/component-with-binding-bad-test-flow.xml");
-      muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(), configBuilder));
+      muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), configBuilder);
       throw new IllegalStateException("Expected config to fail");
     } catch (Exception e) {
       // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined

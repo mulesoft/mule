@@ -24,7 +24,9 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.XMLSecureFactories;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -52,7 +54,6 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
   public static final String REF_ATTRIBUTE_NAME = "ref";
   public static final String NAME_ATTRIBUTE_NAME = "name";
 
-  private Map<MuleArtifact, ConfigurationBuilder> builders = new HashMap<>();
   private Map<MuleArtifact, MuleContext> contexts = new HashMap<>();
 
   @Override
@@ -202,7 +203,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     InputStream xmlConfig = IOUtils.toInputStream(getArtifactMuleConfig(flowName, element, callback, embedInFlow));
 
     MuleContext muleContext = null;
-    ConfigurationBuilder builder = null;
+    List<ConfigurationBuilder> builders = new ArrayList<>();
     Map<String, String> environmentProperties = callback.getEnvironmentProperties();
     Properties systemProperties = System.getProperties();
     Map<Object, Object> originalSystemProperties = new HashMap<>(systemProperties);
@@ -215,9 +216,9 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
       }
       MuleContextFactory factory = new DefaultMuleContextFactory();
 
-      builder =
-          wrapConfigurationBuilder(new SpringXmlConfigurationBuilder(new ConfigResource[] {config}, environmentProperties, APP));
-      muleContext = factory.createMuleContext(builder);
+      builders.add(new SpringXmlConfigurationBuilder(new ConfigResource[] {config}, environmentProperties, APP));
+      addBuilders(builders);
+      muleContext = factory.createMuleContext(builders.toArray(new ConfigurationBuilder[builders.size()]));
       muleContext.start();
 
       MuleArtifact artifact = null;
@@ -236,14 +237,13 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         artifact = new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(element.getAttribute("name")));
       }
 
-      builders.put(artifact, builder);
       contexts.put(artifact, muleContext);
       return artifact;
     } catch (ConfigurationException ce) {
-      dispose(builder, muleContext);
+      dispose(muleContext);
       throw new MuleArtifactFactoryException("There seems to be a problem in your XML configuration. Please fix and retry.", ce);
     } catch (Throwable t) {
-      dispose(builder, muleContext);
+      dispose(muleContext);
       throw new MuleArtifactFactoryException("Error starting minimal XML configuration.", t);
     } finally {
       systemProperties.clear();
@@ -252,8 +252,13 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     }
   }
 
-  protected ConfigurationBuilder wrapConfigurationBuilder(ConfigurationBuilder configBuilder) {
-    return configBuilder;
+  /**
+   * Provide additional builders to be used when creating the {@link MuleContext}.
+   * 
+   * @param builders the list to add the builders to.
+   */
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    // Nothiong to do
   }
 
   protected void addSchemaLocation(org.w3c.dom.Element element, XmlConfigurationCallback callback,
@@ -297,12 +302,11 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
   @Override
   public void returnArtifact(MuleArtifact artifact) {
-    ConfigurationBuilder builder = builders.remove(artifact);
     MuleContext context = contexts.remove(artifact);
-    dispose(builder, context);
+    dispose(context);
   }
 
-  protected void dispose(ConfigurationBuilder builder, MuleContext context) {
+  protected void dispose(MuleContext context) {
     try {
       if (context != null) {
         context.dispose();

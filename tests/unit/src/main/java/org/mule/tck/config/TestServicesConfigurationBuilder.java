@@ -10,19 +10,22 @@ package org.mule.tck.config;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.tck.UnitTestSchedulerService;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 /**
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.
+ * <p>
+ * This is to be used only in tests that do not leverage the service injection mechanism.
  * 
  * @since 4.0
  */
-public class RegisterServicesConfigurationBuilder extends AbstractConfigurationBuilder {
+public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
-    registry.registerObject("UnitTestSchedulerService", new UnitTestSchedulerService());
+    final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+    registry.registerObject(schedulerService.getName(), schedulerService);
   }
 
 }

@@ -22,13 +22,13 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -199,7 +199,8 @@ public class MuleClient implements Disposable {
             @Override
             public void doConfigure(MuleContext muleContext) throws Exception {
               MuleRegistry registry = muleContext.getRegistry();
-              registry.registerObject("StandaloneClientSchedulerService", new StandaloneClientSchedulerService());
+              final StandaloneClientSchedulerService schedulerService = new StandaloneClientSchedulerService();
+              registry.registerObject(schedulerService.getName(), schedulerService);
             }
           }), contextBuilder);
     } else {

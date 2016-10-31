@@ -22,7 +22,7 @@ import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.tck.config.RegisterServicesConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testConfigureSpring() throws ConfigurationException, InitialisationException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    MuleContext muleContext = muleContextFactory.createMuleContext(asList(new RegisterServicesConfigurationBuilder(),
+    MuleContext muleContext = muleContextFactory.createMuleContext(asList(new TestServicesConfigurationBuilder(),
                                                                           new SimpleConfigurationBuilder(null),
                                                                           new AutoConfigurationBuilder("org/mule/test/spring/config1/test-xml-mule2-config.xml",
                                                                                                        emptyMap(), APP)),

@@ -15,10 +15,9 @@ import static org.mockito.Mockito.when;
 
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.config.XmlConfigurationCallback;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.tck.config.RegisterServicesConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
-public class SpringXmlConfigurationMuleArtifactFactoryTest {
+public class SpringXmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTestCase {
 
   public static final String BEAN_PROPERTY_PLACEHOLDER_CLASS =
       "org.springframework.beans.factory.config.PropertyPlaceholderConfigurer";
@@ -109,7 +108,7 @@ public class SpringXmlConfigurationMuleArtifactFactoryTest {
 
   private XmlConfigurationCallback getXmlConfigurationCallbackMock() {
     XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     when(callback.getEnvironmentProperties()).thenReturn(map);
     when(callback.getSchemaLocation("http://www.mulesoft.org/schema/mule/core"))
         .thenReturn("http://www.mulesoft.org/schema/mule/core/current/mule.xsd");
@@ -131,15 +130,9 @@ public class SpringXmlConfigurationMuleArtifactFactoryTest {
     factoryTest = new SpringXmlConfigurationMuleArtifactFactory() {
 
       @Override
-      protected ConfigurationBuilder wrapConfigurationBuilder(ConfigurationBuilder configBuilder) {
-        return new AbstractConfigurationBuilder() {
-
-          @Override
-          protected void doConfigure(MuleContext muleContext) throws Exception {
-            configBuilder.configure(muleContext);
-            new RegisterServicesConfigurationBuilder().configure(muleContext);
-          }
-        };
+      protected void addBuilders(List<ConfigurationBuilder> builders) {
+        super.addBuilders(builders);
+        builders.add(new TestServicesConfigurationBuilder());
       }
     };
   }
@@ -150,7 +143,7 @@ public class SpringXmlConfigurationMuleArtifactFactoryTest {
     Properties properties = System.getProperties();
 
     XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("test", "test1");
     when(callback.getEnvironmentProperties()).thenReturn(map);
     when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});

@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -32,8 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleContext muleContext;
+  protected MuleContext muleContext = mockContextWithServices();
 
   @Mock
   private MuleConfiguration configuration;
@@ -42,7 +41,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws RegistrationException {
-    registerServices(muleContext);
     when(muleContext.getConfiguration()).thenReturn(configuration);
     createFlow();
   }

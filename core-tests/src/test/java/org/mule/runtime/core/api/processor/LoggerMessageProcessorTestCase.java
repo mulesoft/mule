@@ -9,16 +9,15 @@ package org.mule.runtime.core.api.processor;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -36,10 +35,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws RegistrationException {
-    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    registerServices(muleContext);
-
-    flow = new Flow("flow", muleContext);
+    flow = new Flow("flow", mockContextWithServices());
   }
 
   @Test

@@ -10,7 +10,7 @@ import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.util.ExceptionUtils;
-import org.mule.tck.config.RegisterServicesConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -70,7 +70,7 @@ public class HttpSamePortTestCase extends AbstractMuleTestCase {
     @Override
     protected void addBuilders(List<ConfigurationBuilder> builders) {
       super.addBuilders(builders);
-      builders.add(new RegisterServicesConfigurationBuilder());
+      builders.add(new TestServicesConfigurationBuilder());
     }
   }
 }

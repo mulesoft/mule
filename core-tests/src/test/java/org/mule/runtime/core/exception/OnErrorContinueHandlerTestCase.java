@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -48,6 +49,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 
   private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  protected MuleContext muleContext = mockContextWithServices();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -58,6 +60,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   private Event muleEvent;
 
   private InternalMessage muleMessage = InternalMessage.builder().payload("").build();
+
   @Mock
   private StreamCloserService mockStreamCloserService;
   @Spy
@@ -77,8 +80,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     if (currentTransaction != null) {
       TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
     }
-
-    registerServices(muleContext);
 
     flow = getTestFlow(muleContext);
     onErrorContinueHandler = new OnErrorContinueHandler();
@@ -102,9 +103,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     verify(mockTransaction, times(0)).rollback();
     verify(mockStreamCloserService).closeStream(any(Object.class));
   }
-
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleContext muleContext;
 
   @Test
   public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception {

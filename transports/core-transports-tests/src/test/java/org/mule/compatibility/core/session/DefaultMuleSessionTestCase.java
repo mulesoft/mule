@@ -12,10 +12,9 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.junit4.AbstractMuleTestCase.registerServices;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -31,15 +30,14 @@ import org.mule.runtime.core.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class DefaultMuleSessionTestCase {
-
-  private static final int LATCH_TIMEOUT = 1000;
+public class DefaultMuleSessionTestCase extends AbstractMuleTestCase {
 
   private ObjectSerializer serializer;
 
@@ -145,9 +143,7 @@ public class DefaultMuleSessionTestCase {
   @Test
   public void serialization() throws MuleException {
     // Create mock muleContext
-    MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-
-    registerServices(muleContext);
+    MuleContext muleContext = mockContextWithServices();
 
     Flow flow = new Flow("flow", muleContext);
     DefaultMuleSession before = new DefaultMuleSession();

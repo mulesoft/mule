@@ -6,23 +6,28 @@
  */
 package org.mule.tck;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
+
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 /**
- * {@link SchedulerService} implementation that provides a shared {@link UnitTestScheduler}.
+ * {@link SchedulerService} implementation that provides a shared {@link SimpleUnitTestSupportScheduler}.
  *
  * @since 4.0
  */
-public class UnitTestSchedulerService implements SchedulerService, Stoppable {
+public class SimpleUnitTestSupportSchedulerService implements SchedulerService, Stoppable {
 
-  private Scheduler scheduler = new UnitTestScheduler();
+  private Scheduler scheduler =
+      new SimpleUnitTestSupportScheduler(2, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
+                                         new AbortPolicy());
 
   @Override
   public String getName() {
-    return "UnitTestSchedulerService";
+    return this.getClass().getSimpleName();
   }
 
   @Override

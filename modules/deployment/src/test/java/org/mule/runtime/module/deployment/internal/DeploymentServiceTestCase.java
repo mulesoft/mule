@@ -64,10 +64,10 @@ import static org.mule.runtime.module.deployment.internal.application.TestApplic
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -169,6 +169,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private static final File echoTestJarFile =
       new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
+
+  private static final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+      .compiling(getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java"),
+                 getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java"))
+      .compile("mule-module-service-mock-scheduler-4.0-SNAPSHOT.jar");
 
   private static final File defaulServiceEchoJarFile = new CompilerUtils.JarCompiler()
       .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
@@ -336,7 +341,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     services = getServicesFolder();
     services.mkdirs();
-    copyFileToDirectory(new File(getProperty("scheduler.service")), services);
+    final ServiceFileBuilder schedulerService =
+        new ServiceFileBuilder("schedulerService")
+            .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.scheduler.MockSchedulerServiceProvider")
+            .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath());
+    copyFileToDirectory(schedulerService.getArtifactFile(), services);
+
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);

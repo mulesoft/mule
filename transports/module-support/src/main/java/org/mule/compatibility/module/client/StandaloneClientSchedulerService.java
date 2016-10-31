@@ -9,7 +9,7 @@ package org.mule.compatibility.module.client;
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -29,7 +29,7 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
 
   @Override
   public String getName() {
-    return "StandaloneClientSchedulerService";
+    return this.getClass().getSimpleName();
   }
 
   @Override
