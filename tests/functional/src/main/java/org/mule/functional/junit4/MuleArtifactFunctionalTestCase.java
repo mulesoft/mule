@@ -18,7 +18,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 @ArtifactClassLoaderRunnerConfig(
     providedExclusions = {"org.mule.tests:*:*:*"},
     testExclusions = {"org.mule:*:*:*", "org.mule.modules*:*:*:*", "org.mule.transports:*:*:*",
-        "org.mule.mvel:*:*:*", "org.mule.common:*:*:*", "org.mule.extensions:*:*:*", "com.mulesoft.muleesb*:*:*:*",
+        "org.mule.mvel:*:*:*", "org.mule.common:*:*:*", "org.mule.extensions:*:*:*", "com.mulesoft.mule*:*:*:*",
         "com.mulesoft.licm:*:*:*"
     },
     testInclusions = {"*:*:jar:tests:*"})
