@@ -8,7 +8,7 @@ package org.mule.extension.db.internal.operation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.api.param.ParameterType;
@@ -114,7 +114,7 @@ abstract class BaseDbOperations {
                                                     .join(unusedTypes.stream()
                                                         .map(type -> format("('%s' of %s type)", type.getKey(),
                                                                             type.getDbType().getName()))
-                                                        .collect(Collectors.toList()))));
+                                                        .collect(toList()))));
     }
   }
 

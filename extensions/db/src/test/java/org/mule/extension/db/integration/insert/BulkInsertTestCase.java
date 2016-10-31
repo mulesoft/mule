@@ -55,6 +55,8 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
   public void bulkInsertUnusedParameterType() throws Exception {
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException
+        .expectMessage(is("Query parameters [('unused' of INTEGER type)] were unused during query resolution, please remove them."));
     Message response = flowRunner("bulkInsertWithUnusedParameterType").withPayload(values()).run().getMessage();
   }
 
