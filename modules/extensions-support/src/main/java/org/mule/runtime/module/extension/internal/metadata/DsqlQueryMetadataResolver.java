@@ -84,7 +84,7 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
               .stream()
               .filter(p -> fields.stream().anyMatch(f -> f.getName().equalsIgnoreCase(p.getKey().getName().getLocalPart())))
               .forEach(p -> {
-                ObjectFieldTypeBuilder<?> field = objectTypeBuilder.addField();
+                ObjectFieldTypeBuilder field = objectTypeBuilder.addField();
                 field.key(p.getKey().getName());
                 field.value(p.getValue());
               });
