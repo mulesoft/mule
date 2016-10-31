@@ -258,7 +258,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
    * @param builders the list to add the builders to.
    */
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    // Nothiong to do
+    // Nothing to do
   }
 
   protected void addSchemaLocation(org.w3c.dom.Element element, XmlConfigurationCallback callback,
