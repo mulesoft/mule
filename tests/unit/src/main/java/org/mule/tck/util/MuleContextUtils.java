@@ -31,6 +31,10 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
  */
 public class MuleContextUtils {
 
+  private MuleContextUtils() {
+    // No instances of this calss allowed
+  }
+
   /**
    * Creates and configures a mock {@link MuleContext} to return testing services implementations.
    * 

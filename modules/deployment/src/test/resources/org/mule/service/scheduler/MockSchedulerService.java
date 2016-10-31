@@ -9,9 +9,6 @@ package org.mule.service.scheduler;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
-/**
- * @since 4.0
- */
 public class MockSchedulerService implements SchedulerService {
 
   @Override

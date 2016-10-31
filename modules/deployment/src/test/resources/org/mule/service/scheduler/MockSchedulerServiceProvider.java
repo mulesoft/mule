@@ -14,11 +14,6 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.List;
 
-/**
- * Provides a definition for {@link SchedulerService}.
- *
- * @since 4.0
- */
 public class MockSchedulerServiceProvider implements ServiceProvider {
 
   private final SchedulerService service = new MockSchedulerService();
