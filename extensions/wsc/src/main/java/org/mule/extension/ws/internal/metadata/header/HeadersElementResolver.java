@@ -61,7 +61,7 @@ abstract class HeadersElementResolver extends NodeElementResolver {
       throws MetadataResolvingException {
     ObjectTypeBuilder typeBuilder = BaseTypeBuilder.create(XML).objectType();
     for (SOAPHeader header : headers) {
-      ObjectFieldTypeBuilder<?> field = typeBuilder.addField();
+      ObjectFieldTypeBuilder field = typeBuilder.addField();
       String partName = header.getPart();
       field.key(partName);
       field.value(buildPartMetadataType(loader, message.getPart(partName)));
