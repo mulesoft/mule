@@ -32,7 +32,7 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 public class MuleContextUtils {
 
   private MuleContextUtils() {
-    // No instances of this calss allowed
+    // No instances of this class allowed
   }
 
   /**
