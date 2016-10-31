@@ -8,16 +8,20 @@ package org.mule.compatibility.transport.http.functional;
 
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.net.BindException;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class HttpSamePortTestCase {
+public class HttpSamePortTestCase extends AbstractMuleTestCase {
 
   public static final String PATH_PROPERTY = "path";
 
@@ -53,9 +57,20 @@ public class HttpSamePortTestCase {
   private MuleContext buildApp(String path) throws Exception {
     System.setProperty(PATH_PROPERTY, path);
     try {
-      return new ApplicationContextBuilder().setApplicationResources(new String[] {"http-same-port-config.xml"}).build();
+      return new WithServicesApplicationContextBuilder().setApplicationResources(new String[] {"http-same-port-config.xml"})
+          .build();
     } finally {
       System.clearProperty(PATH_PROPERTY);
+    }
+  }
+
+
+  private static class WithServicesApplicationContextBuilder extends ApplicationContextBuilder {
+
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders) {
+      super.addBuilders(builders);
+      builders.add(new TestServicesConfigurationBuilder());
     }
   }
 }

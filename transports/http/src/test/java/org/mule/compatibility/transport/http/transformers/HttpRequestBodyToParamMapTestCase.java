@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.http.transformers;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.DEFAULT_CONTENT_TYPE;
@@ -18,14 +17,15 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -46,8 +46,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockContextWithServices();
   @Mock
   private TransformationService transformationService;
   private Flow flow;

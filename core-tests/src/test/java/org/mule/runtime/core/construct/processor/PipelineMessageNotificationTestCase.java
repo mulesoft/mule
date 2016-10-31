@@ -11,12 +11,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
@@ -25,7 +23,9 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
@@ -49,8 +49,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.registry.DefaultRegistryBroker;
-import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -87,10 +85,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Before
   public void createMocks() throws Exception {
-    muleContext = mock(MuleContext.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+    muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getRegistry()).thenReturn(new MuleRegistryHelper(new DefaultRegistryBroker(muleContext), muleContext));
     when(muleContext.getDefaultThreadingProfile()).thenReturn(new ChainedThreadingProfile());
     notificationManager = mock(ServerNotificationManager.class);
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);

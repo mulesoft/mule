@@ -8,6 +8,7 @@ package org.mule.runtime.module.xml.el;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.InputStream;

@@ -9,8 +9,8 @@ package org.mule.runtime.module.xml.transformers.xml.xslt;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.instanceOf;
 
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.IOUtils;
 

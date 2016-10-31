@@ -13,6 +13,7 @@ import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class EmbeddedMuleTestCase extends AbstractMuleTestCase {
   public void testStartup() throws Exception {
     SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("org/mule/test/spring/mule-root-test.xml");
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    MuleContext context = muleContextFactory.createMuleContext(builder);
+    MuleContext context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), builder);
     // MuleContext must be started explicitly after MULE-1988
     assertFalse(context.isStarted());
     context.start();

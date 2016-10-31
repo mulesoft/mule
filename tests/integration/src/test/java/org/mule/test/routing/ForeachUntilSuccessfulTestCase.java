@@ -9,12 +9,13 @@ package org.mule.test.routing;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+
 import org.mule.runtime.core.api.Event;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase {
+public class ForeachUntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {

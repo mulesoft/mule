@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -151,7 +152,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
 
     SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
     builder.setParentContext(appContext);
-    context = new DefaultMuleContextFactory().createMuleContext(builder);
+    context = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(), builder);
 
     context.start();
 
@@ -167,7 +168,8 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
   @Test
   public void testAppContextTogetherWithMuleConfig() throws Exception {
     context = new DefaultMuleContextFactory()
-        .createMuleContext(new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}, false));
+        .createMuleContext(new TestServicesConfigurationBuilder(),
+                           new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}, false));
 
     context.start();
 

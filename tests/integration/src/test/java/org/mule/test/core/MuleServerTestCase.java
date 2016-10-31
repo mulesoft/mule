@@ -11,12 +11,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.MuleServer;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.core.util.JdkVersionUtils;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.IOException;
 import java.security.Permission;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -58,6 +62,11 @@ public class MuleServerTestCase extends AbstractMuleTestCase {
       public void shutdown() {
         doShutdown();
       }
+
+      @Override
+      protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException {
+        builders.add(new TestServicesConfigurationBuilder());
+      }
     };
     assertEquals("org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
     assertEquals(MuleServer.CLASSNAME_DEFAULT_CONFIG_BUILDER, MuleServer.getConfigBuilderClassName());
@@ -71,6 +80,11 @@ public class MuleServerTestCase extends AbstractMuleTestCase {
       @Override
       public void shutdown() {
         doShutdown();
+      }
+
+      @Override
+      protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException {
+        builders.add(new TestServicesConfigurationBuilder());
       }
     };
     assertEquals("org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
@@ -87,6 +101,11 @@ public class MuleServerTestCase extends AbstractMuleTestCase {
           public void shutdown() {
             doShutdown();
           }
+
+          @Override
+          protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException {
+            builders.add(new TestServicesConfigurationBuilder());
+          }
         };
     assertEquals("mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml",
                  muleServer.getConfigurationResources());
@@ -102,6 +121,11 @@ public class MuleServerTestCase extends AbstractMuleTestCase {
       public void shutdown() {
         doShutdown();
       }
+
+      @Override
+      protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException {
+        builders.add(new TestServicesConfigurationBuilder());
+      }
     };
     assertEquals(ClassUtils.getResource("mule-config.xml", MuleServer.class).toString(), muleServer.getConfigurationResources());
     assertEquals("org.mule.runtime.config.spring.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
@@ -115,6 +139,11 @@ public class MuleServerTestCase extends AbstractMuleTestCase {
       @Override
       public void shutdown() {
         doShutdown();
+      }
+
+      @Override
+      protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException {
+        builders.add(new TestServicesConfigurationBuilder());
       }
     };
     assertEquals(ClassUtils.getResource("mule-config.xml", MuleServer.class).toString(), muleServer.getConfigurationResources());
@@ -131,6 +160,11 @@ public class MuleServerTestCase extends AbstractMuleTestCase {
       @Override
       public void shutdown() {
         doShutdown();
+      }
+
+      @Override
+      protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException {
+        builders.add(new TestServicesConfigurationBuilder());
       }
     };
     muleServer.initialize();

@@ -9,6 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -66,7 +67,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected String getConfigResources() {
     return null;
   }
-
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {

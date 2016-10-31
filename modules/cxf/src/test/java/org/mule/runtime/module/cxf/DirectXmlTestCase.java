@@ -9,7 +9,6 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -28,7 +27,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-public class DirectXmlTestCase extends FunctionalTestCase {
+public class DirectXmlTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

@@ -252,6 +252,7 @@ public abstract class AbstractJmsFunctionalTestCase extends CompatibilityFunctio
 
       String[] configFiles = new String[] {resources, configFile};
       SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles, false);
+      configureSpringXmlConfigurationBuilder(builder);
       return builder;
     } else {
       return super.getBuilder();

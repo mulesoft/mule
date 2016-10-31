@@ -9,16 +9,16 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.test.AbstractIntegrationTestCase;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
 
-import org.mule.functional.junit4.FlowRunner;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.exception.MessagingException;
-
-public class ExceptionMappingTestCase extends FunctionalTestCase {
+public class ExceptionMappingTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {

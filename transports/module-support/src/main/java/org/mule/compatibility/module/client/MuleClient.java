@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.module.client;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
@@ -21,23 +22,25 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.security.MuleCredentials;
@@ -190,7 +193,16 @@ public class MuleClient implements Disposable {
       DefaultMuleConfiguration config = new DefaultMuleConfiguration();
       config.setClientMode(true);
       contextBuilder.setMuleConfiguration(config);
-      muleContext = muleContextFactory.createMuleContext(new TransportsConfigurationBuilder(), contextBuilder);
+      muleContext =
+          muleContextFactory.createMuleContext(asList(new TransportsConfigurationBuilder(), new AbstractConfigurationBuilder() {
+
+            @Override
+            public void doConfigure(MuleContext muleContext) throws Exception {
+              MuleRegistry registry = muleContext.getRegistry();
+              final StandaloneClientSchedulerService schedulerService = new StandaloneClientSchedulerService();
+              registry.registerObject(schedulerService.getName(), schedulerService);
+            }
+          }), contextBuilder);
     } else {
       logger.info("Using existing MuleContext: " + muleContext);
     }

@@ -16,9 +16,13 @@ import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.Testable;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.runtime.config.spring.SpringXmlConfigurationMuleArtifactFactory;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -41,7 +45,14 @@ public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    factory = new SpringXmlConfigurationMuleArtifactFactory();
+    factory = new SpringXmlConfigurationMuleArtifactFactory() {
+
+      @Override
+      protected void addBuilders(List<ConfigurationBuilder> builders) {
+        super.addBuilders(builders);
+        builders.add(new TestServicesConfigurationBuilder());
+      }
+    };
   }
 
   @After
@@ -54,7 +65,7 @@ public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase {
   @Test
   public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException {
     XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
-    HashMap<String, String> map = new HashMap<>();
+    Map<String, String> map = new HashMap<>();
     map.put("test", "test1");
     when(callback.getEnvironmentProperties()).thenReturn(map);
     when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});

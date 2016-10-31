@@ -46,7 +46,8 @@ public interface MuleContextFactory {
    * @throws InitialisationException
    * @throws ConfigurationException
    */
-  MuleContext createMuleContext(ConfigurationBuilder configurationBuilder) throws InitialisationException, ConfigurationException;
+  MuleContext createMuleContext(ConfigurationBuilder... configurationBuilders)
+      throws InitialisationException, ConfigurationException;
 
   /**
    * Creates a new MuleContext using the {@link MuleContextBuilder} provided and configures it with the list of configuration

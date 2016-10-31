@@ -10,8 +10,6 @@ package org.mule.runtime.core;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
@@ -21,9 +19,8 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
@@ -44,7 +41,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public static final String PROPERTY_NAME = "test";
   public static final String PROPERTY_VALUE = "foo";
 
-  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private InternalMessage muleMessage = InternalMessage.builder().payload("test-data").build();
   private Flow flow;
   private EventContext messageContext;

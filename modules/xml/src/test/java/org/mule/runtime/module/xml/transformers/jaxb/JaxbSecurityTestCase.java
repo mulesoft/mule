@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import static org.mule.runtime.core.util.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;

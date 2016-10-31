@@ -13,6 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
+
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -55,6 +59,7 @@ public class FakeMuleServer {
   private File domainsDir;
   private File logsDir;
   private File serverPluginsDir;
+  private File servicesDir;
 
   private final DeploymentService deploymentService;
   private final DeploymentListener domainDeploymentListener;
@@ -152,6 +157,7 @@ public class FakeMuleServer {
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new Probe() {
 
+      @Override
       public boolean isSatisfied() {
         try {
           verify(listener, times(1)).onDeploymentFailure(eq(appName), any(Throwable.class));
@@ -161,6 +167,7 @@ public class FakeMuleServer {
         }
       }
 
+      @Override
       public String describeFailure() {
         return "Failed to deploy application: " + appName;
       }
@@ -171,6 +178,7 @@ public class FakeMuleServer {
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new Probe() {
 
+      @Override
       public boolean isSatisfied() {
         try {
           verify(listener, times(1)).onDeploymentSuccess(appName);
@@ -180,6 +188,7 @@ public class FakeMuleServer {
         }
       }
 
+      @Override
       public String describeFailure() {
         return "Failed to deploy application: " + appName;
       }
@@ -190,6 +199,7 @@ public class FakeMuleServer {
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new Probe() {
 
+      @Override
       public boolean isSatisfied() {
         try {
           verify(listener, times(1)).onUndeploymentSuccess(appName);
@@ -199,6 +209,7 @@ public class FakeMuleServer {
         }
       }
 
+      @Override
       public String describeFailure() {
         return "Failed to deploy application: " + appName;
       }
@@ -206,11 +217,12 @@ public class FakeMuleServer {
   }
 
   private void setMuleFolders() throws IOException {
-    appsDir = createFolder("apps");
+    appsDir = createFolder(APPS_FOLDER);
     logsDir = createFolder("logs");
     serverPluginsDir = createFolder("server-plugins");
-    domainsDir = createFolder("domains");
-    createFolder("domains/default");
+    servicesDir = createFolder(SERVICES_FOLDER);
+    domainsDir = createFolder(DOMAINS_FOLDER);
+    createFolder(DOMAINS_FOLDER + "/default");
 
     File confDir = createFolder("conf");
     URL log4jFile = getClass().getResource("/log4j2-test.xml");
@@ -302,6 +314,28 @@ public class FakeMuleServer {
     copyURLToFile(resource, tempFile);
   }
 
+  /**
+   * Adds a service implementation file to the Mule server.
+   *
+   * @param service service file to add. Non null.
+   * @throws IOException if the servcie file cannot be accessed
+   */
+  public void addZippedService(File service) throws IOException {
+    addZippedService(service.toURI().toURL());
+  }
+
+  /**
+   * Adds a service implementation to the Mule server .
+   *
+   * @param resource points to the service to add. Non null.
+   * @throws IOException if the service URL cannot be accessed
+   */
+  public void addZippedService(URL resource) throws IOException {
+    String baseName = FilenameUtils.getName(resource.getPath());
+    File tempFile = new File(getServicesDir(), baseName);
+    copyURLToFile(resource, tempFile);
+  }
+
   public File getMuleHome() {
     return muleHome;
   }
@@ -320,6 +354,10 @@ public class FakeMuleServer {
 
   public File getServerPluginsDir() {
     return serverPluginsDir;
+  }
+
+  public File getServicesDir() {
+    return servicesDir;
   }
 
   public void resetDeploymentListener() {

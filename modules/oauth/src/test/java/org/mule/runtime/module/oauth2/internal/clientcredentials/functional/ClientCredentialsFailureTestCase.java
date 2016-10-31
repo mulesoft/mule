@@ -14,20 +14,23 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.oauth2.internal.TokenNotFoundException;
-import org.mule.tck.MuleTestUtils;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase {
 
@@ -47,33 +50,32 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase {
 
   @Test
   public void tokenUrlFailsDuringAppStartup() throws Exception {
-    testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, "http://unkownhost:9999" + TOKEN_PATH, new MuleTestUtils.TestCallback() {
-
-      @Override
-      public void run() throws Exception {
-        ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder()
-            .setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-        expectedException.expectCause(isA(IOException.class));
-        applicationContextBuilder.build();
-      }
+    testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, "http://unkownhost:9999" + TOKEN_PATH, () -> {
+      ApplicationContextBuilder applicationContextBuilder = new WithServicesApplicationContextBuilder()
+          .setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
+      expectedException.expectCause(isA(IOException.class));
+      applicationContextBuilder.build();
     });
   }
 
   @Test
   public void accessTokenNotRetrieve() throws Exception {
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(EMPTY)));
-    testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, format("http://localhost:%s%s", wireMockRule.port(), TOKEN_PATH),
-                           new MuleTestUtils.TestCallback() {
-
-                             @Override
-                             public void run() throws Exception {
-                               ApplicationContextBuilder applicationContextBuilder =
-                                   new ApplicationContextBuilder().setApplicationResources(new String[] {
-                                       "client-credentials/client-credentials-minimal-config.xml"});
-                               expectedException.expectCause(isA(TokenNotFoundException.class));
-                               applicationContextBuilder.build();
-                             }
-                           });
+    testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, format("http://localhost:%s%s", wireMockRule.port(), TOKEN_PATH), () -> {
+      ApplicationContextBuilder applicationContextBuilder =
+          new WithServicesApplicationContextBuilder().setApplicationResources(new String[] {
+              "client-credentials/client-credentials-minimal-config.xml"});
+      expectedException.expectCause(isA(TokenNotFoundException.class));
+      applicationContextBuilder.build();
+    });
   }
 
+  private static class WithServicesApplicationContextBuilder extends ApplicationContextBuilder {
+
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders) {
+      super.addBuilders(builders);
+      builders.add(new TestServicesConfigurationBuilder());
+    }
+  }
 }

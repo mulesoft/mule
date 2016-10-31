@@ -9,10 +9,12 @@ package org.mule.compatibility.core.construct;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
@@ -34,8 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class FlowValidationTestCase extends AbstractMuleTestCase {
 
   public static final String FLOW_NAME = "flowName";
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  public MuleContext mockMuleContext;
+  public MuleContext mockMuleContext = mockContextWithServices();
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   public InboundEndpoint inboundEndpoint;
   @Mock
@@ -45,7 +46,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   private Flow flow;
 
   @Before
-  public void setUp() {
+  public void setUp() throws RegistrationException {
     when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }
