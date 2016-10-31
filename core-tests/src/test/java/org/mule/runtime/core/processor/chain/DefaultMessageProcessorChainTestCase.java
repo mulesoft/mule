@@ -1037,7 +1037,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getExchangePattern()).thenReturn(exchangePattern);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategyFactory().create(executorService)
-        : new DefaultFlowProcessingStrategyFactory().create());
+            : new DefaultFlowProcessingStrategyFactory().create());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);
