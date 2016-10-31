@@ -50,7 +50,6 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
   protected void doSetUp() throws Exception {
     super.doSetUp();
     messageProcessor = createAsyncInterceptingMessageProcessor(target);
-    messageProcessor.start();
   }
 
   @Test
@@ -118,7 +117,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
-    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService());
+    AsyncInterceptingMessageProcessor mp =
+        new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);

@@ -55,12 +55,12 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
    */
   @Test
   public void asyncInterceptingProcessorSessionPropertyPropagation() throws Exception {
-    AsyncInterceptingMessageProcessor async = new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService());
+    AsyncInterceptingMessageProcessor async =
+        new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
     SensingNullMessageProcessor asyncListener = new SensingNullMessageProcessor();
     async.setMuleContext(muleContext);
     async.setFlowConstruct(flow);
     async.setListener(asyncListener);
-    async.start();
 
     InternalMessage message = InternalMessage.builder().payload("data").build();
     Event event = Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flow).build();

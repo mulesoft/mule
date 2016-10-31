@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 
@@ -24,88 +25,12 @@ import javax.resource.spi.work.WorkManager;
  */
 public class AsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  protected Integer maxThreads;
-  protected Integer minThreads;
-  protected Integer maxBufferSize;
-  protected Long threadTTL;
-  protected Long threadWaitTimeout;
-  protected Integer poolExhaustedAction;
-
   @Override
   public ProcessingStrategy create() {
-    final AsynchronousProcessingStrategy processingStrategy = new AsynchronousProcessingStrategy();
-
-    if (maxThreads != null) {
-      processingStrategy.setMaxThreads(maxThreads);
-    }
-    if (minThreads != null) {
-      processingStrategy.setMinThreads(minThreads);
-    }
-    if (maxBufferSize != null) {
-      processingStrategy.setMaxBufferSize(maxBufferSize);
-    }
-    if (threadTTL != null) {
-      processingStrategy.setThreadTTL(threadTTL);
-    }
-    if (threadWaitTimeout != null) {
-      processingStrategy.setThreadWaitTimeout(threadWaitTimeout);
-    }
-    if (poolExhaustedAction != null) {
-      processingStrategy.setPoolExhaustedAction(poolExhaustedAction);
-    }
-
-    return processingStrategy;
+    return new AsynchronousProcessingStrategy();
   }
 
-  public Integer getMaxThreads() {
-    return maxThreads;
-  }
-
-  public void setMaxThreads(Integer maxThreads) {
-    this.maxThreads = maxThreads;
-  }
-
-  public Integer getMinThreads() {
-    return minThreads;
-  }
-
-  public void setMinThreads(Integer minThreads) {
-    this.minThreads = minThreads;
-  }
-
-  public Integer getMaxBufferSize() {
-    return maxBufferSize;
-  }
-
-  public void setMaxBufferSize(Integer maxBufferSize) {
-    this.maxBufferSize = maxBufferSize;
-  }
-
-  public Long getThreadTTL() {
-    return threadTTL;
-  }
-
-  public void setThreadTTL(Long threadTTL) {
-    this.threadTTL = threadTTL;
-  }
-
-  public Long getThreadWaitTimeout() {
-    return threadWaitTimeout;
-  }
-
-  public void setThreadWaitTimeout(Long threadWaitTimeout) {
-    this.threadWaitTimeout = threadWaitTimeout;
-  }
-
-  public Integer getPoolExhaustedAction() {
-    return poolExhaustedAction;
-  }
-
-  public void setPoolExhaustedAction(Integer poolExhaustedAction) {
-    this.poolExhaustedAction = poolExhaustedAction;
-  }
-
-  public static class AsynchronousProcessingStrategy extends AbstractThreadingProfileProcessingStrategy {
+  public static class AsynchronousProcessingStrategy implements ProcessingStrategy {
 
     protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategyFactory().create();
 
@@ -113,13 +38,13 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
     public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
                                     MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
       if (processors.size() > 0) {
-        chainBuilder.chain(createAsyncMessageProcessor(schedulerService));
+        chainBuilder.chain(createAsyncMessageProcessor(schedulerService.ioScheduler()));
         synchronousProcessingStrategy.configureProcessors(processors, schedulerService, chainBuilder, muleContext);
       }
     }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(SchedulerService schedulerService) {
-      return new AsyncInterceptingMessageProcessor(schedulerService);
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(Scheduler scheduler) {
+      return new AsyncInterceptingMessageProcessor(scheduler);
     }
 
   }

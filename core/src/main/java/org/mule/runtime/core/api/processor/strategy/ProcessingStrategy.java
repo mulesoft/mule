@@ -32,4 +32,11 @@ public interface ProcessingStrategy {
     return publisher -> from(publisher).transform(publisherFunction);
   }
 
+  /**
+   * Whether the processing that has this instance is synchronous or not
+   */
+  default boolean isSynchronous() {
+    return false;
+  }
+
 }

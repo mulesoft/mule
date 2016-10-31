@@ -13,9 +13,10 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.connector.EndpointConnectException;
 import org.mule.compatibility.core.message.CompatibilityMessage;
-import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -23,11 +24,10 @@ import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -318,7 +318,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     this.endpoint = endpoint;
   }
 
-  abstract protected WorkManager getWorkManager() throws MuleException;
+  abstract protected WorkManager getWorkManager();
 
   public boolean isStarted() {
     return getLifecycleState().isStarted();

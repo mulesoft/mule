@@ -53,7 +53,6 @@ import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFa
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
@@ -188,7 +187,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   public boolean isSynchronous() {
-    return getProcessingStrategy().getClass().equals(SynchronousProcessingStrategy.class);
+    return getProcessingStrategy().isSynchronous();
   }
 
   public ProcessingStrategyFactory getProcessingStrategyFactory() {

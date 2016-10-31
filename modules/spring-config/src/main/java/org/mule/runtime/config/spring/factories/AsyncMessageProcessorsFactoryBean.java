@@ -15,19 +15,19 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
 
 import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
 public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean, MuleContextAware, NameableObject {
+    implements FactoryBean<Processor>, MuleContextAware, NameableObject {
 
   protected MuleContext muleContext;
 
   protected List messageProcessors;
-  protected ProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
+  // protected ProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
+  protected ProcessingStrategyFactory processingStrategyFactory;// = new AsynchronousProcessingStrategyFactory();
   protected String name;
 
   @Override
@@ -40,7 +40,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public AsyncDelegateMessageProcessor getObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'async' child chain");
 

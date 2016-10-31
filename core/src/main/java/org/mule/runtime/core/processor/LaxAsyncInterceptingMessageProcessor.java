@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 
 public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor {
 
@@ -18,8 +18,8 @@ public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessa
     super(workManagerSource);
   }
 
-  public LaxAsyncInterceptingMessageProcessor(SchedulerService schedulerService) {
-    super(schedulerService);
+  public LaxAsyncInterceptingMessageProcessor(Scheduler workScheduler) {
+    super(workScheduler);
   }
 
   @Override

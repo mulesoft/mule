@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
  */
 public class SimpleUnitTestSupportSchedulerService implements SchedulerService, Stoppable {
 
-  private Scheduler scheduler =
+  private SimpleUnitTestSupportScheduler scheduler =
       new SimpleUnitTestSupportScheduler(2, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
                                          new AbortPolicy());
 
@@ -48,5 +48,9 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   @Override
   public void stop() throws MuleException {
     scheduler.shutdownNow();
+  }
+
+  public int getScheduledTasks() {
+    return scheduler.getScheduledTasks();
   }
 }

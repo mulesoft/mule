@@ -8,7 +8,6 @@ package org.mule.runtime.core.management.stats.printers;
 
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.management.stats.RouterStatistics;
-import org.mule.runtime.core.management.stats.SedaServiceStatistics;
 import org.mule.runtime.core.management.stats.ServiceStatistics;
 
 import java.io.OutputStream;
@@ -36,47 +35,46 @@ public class AbstractTablePrinter extends PrintWriter {
 
   public String[] getHeaders() {
     String[] column = new String[41];
-    column[0] = "Name";
-    column[1] = "Service Pool Max Size";
-    column[2] = "Service Pool Size";
-    column[3] = "Thread Pool Size";
-    column[4] = "Current Queue Size";
-    column[5] = "Max Queue Size";
-    column[6] = "Avg Queue Size";
-    column[7] = "Sync Events Received";
-    column[8] = "Async Events Received";
-    column[9] = "Total Events Received";
-    column[10] = "Sync Events Sent";
-    column[11] = "Async Events Sent";
-    column[12] = "ReplyTo Events Sent";
-    column[13] = "Total Events Sent";
-    column[14] = "Executed Events";
-    column[15] = "Execution Messages";
-    column[16] = "Fatal Messages";
-    column[17] = "Min Execution Time";
-    column[18] = "Max Execution Time";
-    column[19] = "Avg Execution Time";
-    column[20] = "Total Execution Time";
-    column[21] = "Processed Events";
-    column[22] = "Min Processing Time";
-    column[23] = "Max Processing Time";
-    column[24] = "Avg Processing Time";
-    column[25] = "Total Processing Time";
-    column[26] = "In Router Statistics";
-    column[27] = "Total Received";
-    column[28] = "Total Routed";
-    column[29] = "Not Routed";
-    column[30] = "Caught Events";
-    column[31] = "By Provider";
-    column[32] = "";
-    column[33] = "Out Router Statistics";
-    column[34] = "Total Received";
-    column[35] = "Total Routed";
-    column[36] = "Not Routed";
-    column[37] = "Caught Events";
-    column[38] = "By Provider";
-    column[39] = "";
-    column[40] = "Sample Period";
+    int i = 0;
+    column[i++] = "Name";
+    column[i++] = "Thread Pool Size";
+    column[i++] = "Current Queue Size";
+    column[i++] = "Max Queue Size";
+    column[i++] = "Avg Queue Size";
+    column[i++] = "Sync Events Received";
+    column[i++] = "Async Events Received";
+    column[i++] = "Total Events Received";
+    column[i++] = "Sync Events Sent";
+    column[i++] = "Async Events Sent";
+    column[i++] = "ReplyTo Events Sent";
+    column[i++] = "Total Events Sent";
+    column[i++] = "Executed Events";
+    column[i++] = "Execution Messages";
+    column[i++] = "Fatal Messages";
+    column[i++] = "Min Execution Time";
+    column[i++] = "Max Execution Time";
+    column[i++] = "Avg Execution Time";
+    column[i++] = "Total Execution Time";
+    column[i++] = "Processed Events";
+    column[i++] = "Min Processing Time";
+    column[i++] = "Max Processing Time";
+    column[i++] = "Avg Processing Time";
+    column[i++] = "Total Processing Time";
+    column[i++] = "In Router Statistics";
+    column[i++] = "Total Received";
+    column[i++] = "Total Routed";
+    column[i++] = "Not Routed";
+    column[i++] = "Caught Events";
+    column[i++] = "By Provider";
+    column[i++] = "";
+    column[i++] = "Out Router Statistics";
+    column[i++] = "Total Received";
+    column[i++] = "Total Routed";
+    column[i++] = "Not Routed";
+    column[i++] = "Caught Events";
+    column[i++] = "By Provider";
+    column[i++] = "";
+    column[i++] = "Sample Period";
     return column;
   }
 
@@ -88,57 +86,57 @@ public class AbstractTablePrinter extends PrintWriter {
 
     Arrays.fill(col, "-");
 
-    col[0] = stats.getName();
+    int j = 0;
+    col[j++] = stats.getName();
 
     // TODO RM* Handling custom stats objects
-    if (stats instanceof SedaServiceStatistics) {
-      col[1] = ((SedaServiceStatistics) stats).getComponentPoolMaxSize() + "/"
-          + ((SedaServiceStatistics) stats).getComponentPoolAbsoluteMaxSize();
-      col[2] = String.valueOf(((SedaServiceStatistics) stats).getComponentPoolSize());
+    if (serviceStats != null) {
+      col[j++] = String.valueOf(serviceStats.getQueuedEvents());
+      col[j++] = String.valueOf(serviceStats.getMaxQueueSize());
+      col[j++] = String.valueOf(serviceStats.getAverageQueueSize());
     } else {
-      col[1] = "-";
-      col[2] = "-";
+      j += 3;
     }
-    col[3] = String.valueOf(stats.getThreadPoolSize());
+    col[j++] = String.valueOf(stats.getSyncEventsReceived());
+    col[j++] = String.valueOf(stats.getAsyncEventsReceived());
+    col[j++] = String.valueOf(stats.getTotalEventsReceived());
     if (serviceStats != null) {
-      col[4] = String.valueOf(serviceStats.getQueuedEvents());
-      col[5] = String.valueOf(serviceStats.getMaxQueueSize());
-      col[6] = String.valueOf(serviceStats.getAverageQueueSize());
-    }
-    col[7] = String.valueOf(stats.getSyncEventsReceived());
-    col[8] = String.valueOf(stats.getAsyncEventsReceived());
-    col[9] = String.valueOf(stats.getTotalEventsReceived());
-    if (serviceStats != null) {
-      col[10] = String.valueOf(serviceStats.getSyncEventsSent());
-      col[11] = String.valueOf(serviceStats.getAsyncEventsSent());
-      col[12] = String.valueOf(serviceStats.getReplyToEventsSent());
-      col[13] = String.valueOf(serviceStats.getTotalEventsSent());
+      col[j++] = String.valueOf(serviceStats.getSyncEventsSent());
+      col[j++] = String.valueOf(serviceStats.getAsyncEventsSent());
+      col[j++] = String.valueOf(serviceStats.getReplyToEventsSent());
+      col[j++] = String.valueOf(serviceStats.getTotalEventsSent());
+    } else {
+      j += 4;
     }
 
     if (serviceStats != null) {
-      col[14] = String.valueOf(serviceStats.getExecutedEvents());
+      col[j++] = String.valueOf(serviceStats.getExecutedEvents());
+    } else {
+      j++;
     }
-    col[15] = String.valueOf(stats.getExecutionErrors());
-    col[16] = String.valueOf(stats.getFatalErrors());
+    col[j++] = String.valueOf(stats.getExecutionErrors());
+    col[j++] = String.valueOf(stats.getFatalErrors());
     if (serviceStats != null) {
-      col[17] = String.valueOf(serviceStats.getMinExecutionTime());
-      col[18] = String.valueOf(serviceStats.getMaxExecutionTime());
-      col[19] = String.valueOf(serviceStats.getAverageExecutionTime());
-      col[20] = String.valueOf(serviceStats.getTotalExecutionTime());
+      col[j++] = String.valueOf(serviceStats.getMinExecutionTime());
+      col[j++] = String.valueOf(serviceStats.getMaxExecutionTime());
+      col[j++] = String.valueOf(serviceStats.getAverageExecutionTime());
+      col[j++] = String.valueOf(serviceStats.getTotalExecutionTime());
+    } else {
+      j += 4;
     }
 
-    col[21] = String.valueOf(stats.getProcessedEvents());
-    col[22] = String.valueOf(stats.getMinProcessingTime());
-    col[23] = String.valueOf(stats.getMaxProcessingTime());
-    col[24] = String.valueOf(stats.getAverageProcessingTime());
-    col[25] = String.valueOf(stats.getTotalProcessingTime());
+    col[j++] = String.valueOf(stats.getProcessedEvents());
+    col[j++] = String.valueOf(stats.getMinProcessingTime());
+    col[j++] = String.valueOf(stats.getMaxProcessingTime());
+    col[j++] = String.valueOf(stats.getAverageProcessingTime());
+    col[j++] = String.valueOf(stats.getTotalProcessingTime());
 
     if (serviceStats != null) {
       int i = getRouterInfo(serviceStats.getInboundRouterStat(), col, 26);
       i = getRouterInfo(serviceStats.getOutboundRouterStat(), col, i);
     }
 
-    col[40] = String.valueOf(stats.getSamplePeriod());
+    col[j++] = String.valueOf(stats.getSamplePeriod());
   }
 
   protected int getRouterInfo(RouterStatistics stats, String[] col, int index) {
@@ -195,7 +193,7 @@ public class AbstractTablePrinter extends PrintWriter {
     if (obj instanceof Collection) {
       print((Collection) obj);
     } else if (obj instanceof ServiceStatistics) {
-      List<ServiceStatistics> l = new ArrayList<ServiceStatistics>();
+      List<ServiceStatistics> l = new ArrayList<>();
       l.add((ServiceStatistics) obj);
       print(l);
     } else {

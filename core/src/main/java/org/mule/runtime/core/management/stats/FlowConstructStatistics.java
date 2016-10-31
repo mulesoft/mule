@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.management.stats;
 
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics {
@@ -16,7 +13,6 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
   private static final long serialVersionUID = 5337576392583767442L;
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
-  private int threadPoolSize = 0;
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
 
   // these can't sensibly converted to AtomicLong as they are processed together
@@ -27,28 +23,12 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
   private long totalQueuedEvent = 0;
 
 
-  public FlowConstructStatistics(String flowConstructType, String name, ProcessingStrategy processingStrategy) {
-    super(flowConstructType, name);
-    flowStatistics.setEnabled(enabled);
-    if (processingStrategy instanceof AsynchronousProcessingStrategy) {
-      this.threadPoolSize = ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads();
-    }
-    if (this.getClass() == FlowConstructStatistics.class) {
-      clear();
-    }
-  }
-
-  public FlowConstructStatistics(String flowConstructType, String name, int maxThreadSize) {
-    super(flowConstructType, name);
-    flowStatistics.setEnabled(enabled);
-    this.threadPoolSize = maxThreadSize;
-    if (this.getClass() == FlowConstructStatistics.class) {
-      clear();
-    }
-  }
-
   public FlowConstructStatistics(String flowConstructType, String name) {
-    this(flowConstructType, name, null);
+    super(flowConstructType, name);
+    flowStatistics.setEnabled(enabled);
+    if (this.getClass() == FlowConstructStatistics.class) {
+      clear();
+    }
   }
 
   /**
@@ -121,10 +101,6 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
 
   public long getFatalErrors() {
     return fatalError.get();
-  }
-
-  public int getThreadPoolSize() {
-    return threadPoolSize;
   }
 
   @Override

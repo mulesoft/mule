@@ -18,9 +18,9 @@ import org.mule.compatibility.transport.http.config.HttpNamespaceHandler;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.ntlm.NTLMScheme;
 import org.mule.compatibility.transport.tcp.TcpConnector;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -274,11 +274,7 @@ public class HttpConnector extends TcpConnector {
     // phase.
     // That's why it not manager only during stop/start phases and must be created also here.
     if (connectionManager == null) {
-      try {
-        connectionManager = new org.mule.compatibility.transport.http.HttpConnectionManager(this, getReceiverWorkManager());
-      } catch (MuleException e) {
-        throw new InitialisationException(CoreMessages.createStaticMessage("failed creating http connection manager"), this);
-      }
+      connectionManager = new org.mule.compatibility.transport.http.HttpConnectionManager(this, getReceiverWorkManager());
     }
   }
 

@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.StageNameSourceProvider;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -99,10 +98,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private void validateFlowConstruct() {
     if (flowConstruct == null) {
       throw new IllegalArgumentException("FlowConstruct cannot be null");
-    } else if (!(flowConstruct instanceof StageNameSourceProvider)) {
-      throw new IllegalArgumentException(String
-          .format("FlowConstuct must implement the %s interface. However, the type %s does not implement it",
-                  StageNameSourceProvider.class.getCanonicalName(), flowConstruct.getClass().getCanonicalName()));
     }
   }
 

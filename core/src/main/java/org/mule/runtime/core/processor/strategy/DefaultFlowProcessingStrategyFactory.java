@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
@@ -27,8 +27,8 @@ public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyF
   public static class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy {
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(SchedulerService schedulerService) {
-      return new LaxAsyncInterceptingMessageProcessor(schedulerService);
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(Scheduler scheduler) {
+      return new LaxAsyncInterceptingMessageProcessor(scheduler);
     }
 
   }

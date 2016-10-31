@@ -42,6 +42,11 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
       }
     }
 
+    @Override
+    public boolean isSynchronous() {
+      return true;
+    }
+
   }
 
 }

@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
-import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;
@@ -59,8 +58,6 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customAsynchronousFlow");
 
     assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
-
-    assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
   }
 
   @Test
@@ -68,8 +65,6 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customNonBlockingFlow");
 
     assertEquals(NonBlockingProcessingStrategy.class, processingStrategy.getClass());
-
-    assertAsynchronousStrategyConfig((AbstractThreadingProfileProcessingStrategy) processingStrategy);
   }
 
   @Test
@@ -95,8 +90,6 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customAsynchronousAsync");
 
     assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
-
-    assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
   }
 
   @Test
@@ -105,14 +98,6 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
 
     assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
-  }
-
-  private void assertAsynchronousStrategyConfig(AbstractThreadingProfileProcessingStrategy processingStrategy) {
-    assertEquals(10, processingStrategy.getMaxThreads().intValue());
-    assertEquals(5, processingStrategy.getMinThreads().intValue());
-    assertEquals(100, processingStrategy.getThreadTTL().intValue());
-    assertEquals(10, processingStrategy.getMaxBufferSize().intValue());
-
   }
 
   private ProcessingStrategy getFlowProcessingStrategy(String flowName) throws Exception {

@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -24,8 +23,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
@@ -175,26 +174,6 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
       directInboundMessageSource.process(testEvent());
       fail("exception expected");
     } catch (Exception e) {
-    }
-  }
-
-  @Test
-  public void testSequentialStageNames() throws Exception {
-    final int count = 10;
-
-    for (int i = 1; i <= count; i++) {
-      assertTrue(this.flow.getAsyncStageNameSource().getName().endsWith("." + i));
-    }
-  }
-
-  @Test
-  public void testStageNameSourceWithName() throws Exception {
-    final int count = 10;
-    final String stageName = "myStage";
-    final String EXPECTED = String.format("%s.%s", FLOW_NAME, stageName);
-
-    for (int i = 0; i < count; i++) {
-      assertEquals(EXPECTED, this.flow.getAsyncStageNameSource(stageName).getName());
     }
   }
 

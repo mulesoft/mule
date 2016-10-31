@@ -25,56 +25,48 @@ import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.work.AbstractMuleEventWork;
-import org.mule.runtime.core.work.MuleWorkManager;
 
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
 
 /**
- * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of the next
+ * Processes {@link Event}'s asynchronously using a {@link Scheduler} to schedule asynchronous processing of the next
  * {@link Processor}. The next {@link Processor} is therefore be executed in a different thread regardless of the exchange-pattern
  * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable, MessagingExceptionHandlerAware, InternalMessageProcessor {
+    implements Stoppable, MessagingExceptionHandlerAware, InternalMessageProcessor {
 
   public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
 
   protected WorkManagerSource workManagerSource;
-  protected SchedulerService schedulerService;
   protected Scheduler workScheduler;
 
   private MessagingExceptionHandler messagingExceptionHandler;
 
+  /**
+   * @deprecated TODO MULE-10869 Remove this
+   */
   @Deprecated
   public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource) {
     requireNonNull(workManagerSource);
     this.workManagerSource = workManagerSource;
   }
 
-  public AsyncInterceptingMessageProcessor(SchedulerService schedulerService) {
-    requireNonNull(schedulerService);
-    this.schedulerService = schedulerService;
-  }
-
-  @Override
-  public void start() throws MuleException {
-    if (schedulerService != null) {
-      this.workScheduler = schedulerService.ioScheduler();
-    }
+  public AsyncInterceptingMessageProcessor(Scheduler workScheduler) {
+    requireNonNull(workScheduler);
+    this.workScheduler = workScheduler;
   }
 
   @Override
@@ -166,11 +158,11 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
           Event response = null;
           try {
             response = processNextTimed(event);
-          } catch (MessagingException e1) {
-            exceptionThrown = e1;
-            throw e1;
-          } catch (Exception e2) {
-            exceptionThrown = new MessagingException(response != null ? response : event, e2, next);
+          } catch (MessagingException e) {
+            exceptionThrown = e;
+            throw e;
+          } catch (Exception e) {
+            exceptionThrown = new MessagingException(response != null ? response : event, e, next);
             throw exceptionThrown;
           } finally {
             firePipelineNotification(response != null ? response : event, exceptionThrown);

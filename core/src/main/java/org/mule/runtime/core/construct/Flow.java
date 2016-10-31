@@ -7,6 +7,7 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -22,11 +23,7 @@ import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.NamedStageNameSource;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.SequentialStageNameSource;
-import org.mule.runtime.core.api.processor.StageNameSource;
-import org.mule.runtime.core.api.processor.StageNameSourceProvider;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -34,9 +31,8 @@ import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageP
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
 import java.util.Optional;
@@ -54,36 +50,19 @@ import org.reactivestreams.Publisher;
  * from a one-way message source and there is no current transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
-public class Flow extends AbstractPipeline implements Processor, StageNameSourceProvider, DynamicPipeline {
+public class Flow extends AbstractPipeline implements Processor, DynamicPipeline {
 
-  private final StageNameSource sequentialStageNameSource;
   private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
 
   public Flow(String name, MuleContext muleContext) {
     super(name, muleContext);
-    this.sequentialStageNameSource = new SequentialStageNameSource(name);
     initialiseProcessingStrategy();
-  }
-
-  @Override
-  protected void doInitialise() throws MuleException {
-    super.doInitialise();
-  }
-
-  @Override
-  protected void doStart() throws MuleException {
-    if (processingStrategy instanceof NonBlockingProcessingStrategy) {
-      ((NonBlockingProcessingStrategy) processingStrategy).start();
-    }
-    super.doStart();
   }
 
   @Override
   protected void doStop() throws MuleException {
     super.doStop();
-    if (processingStrategy instanceof NonBlockingProcessingStrategy) {
-      ((NonBlockingProcessingStrategy) processingStrategy).stop();
-    }
+    stopIfNeeded(processingStrategy);
   }
 
   @Override
@@ -181,13 +160,7 @@ public class Flow extends AbstractPipeline implements Processor, StageNameSource
 
   @Override
   protected void configureStatistics() {
-    if (processingStrategy instanceof AsynchronousProcessingStrategy
-        && ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads() != null) {
-      statistics = new FlowConstructStatistics(getConstructType(), name,
-                                               ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads());
-    } else {
-      statistics = new FlowConstructStatistics(getConstructType(), name);
-    }
+    statistics = new FlowConstructStatistics(getConstructType(), name);
     statistics.setEnabled(muleContext.getStatistics().isEnabled());
     muleContext.getStatistics().add(statistics);
   }
@@ -195,22 +168,6 @@ public class Flow extends AbstractPipeline implements Processor, StageNameSource
   @Override
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
     getProcessingStrategy().configureProcessors(getMessageProcessors(), schedulerService, builder, muleContext);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public StageNameSource getAsyncStageNameSource() {
-    return this.sequentialStageNameSource;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public StageNameSource getAsyncStageNameSource(String asyncName) {
-    return new NamedStageNameSource(this.name, asyncName);
   }
 
   @Override

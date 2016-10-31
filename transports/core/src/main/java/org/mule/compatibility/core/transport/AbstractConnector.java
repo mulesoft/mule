@@ -1658,8 +1658,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   /**
    * Returns a work manager for message receivers.
    */
-  @Deprecated
-  protected WorkManager getReceiverWorkManager() throws MuleException {
+  protected WorkManager getReceiverWorkManager() {
     return receiverWorkManager.get();
   }
 
@@ -1668,7 +1667,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    *
    * @throws MuleException in case of error
    */
-  @Deprecated
   protected WorkManager getDispatcherWorkManager() {
     return dispatcherWorkManager.get();
   }
@@ -1678,8 +1676,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    *
    * @throws MuleException in case of error
    */
-  @Deprecated
-  protected WorkManager getRequesterWorkManager() throws MuleException {
+  protected WorkManager getRequesterWorkManager() {
     return requesterWorkManager.get();
   }
 
