@@ -22,16 +22,16 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.strategy.factory.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.NonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -113,7 +113,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getError()).thenReturn(empty());
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
-        .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());
+        .thenReturn(nonBlocking ? new NonBlockingProcessingStrategyFactory().create()
+            : new DefaultFlowProcessingStrategyFactory().create());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);

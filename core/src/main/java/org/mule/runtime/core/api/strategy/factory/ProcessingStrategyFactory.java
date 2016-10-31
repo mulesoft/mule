@@ -4,17 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.processor.factory;
+package org.mule.runtime.core.api.strategy.factory;
 
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 
+/**
+ * Abstract Factory for creating concrete {@link ProcessingStrategy}ies.
+ *
+ * @since 4.0
+ */
+public interface ProcessingStrategyFactory {
 
-public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyFactory {
-
-  @Override
-  public ProcessingStrategy create() {
-    return new DefaultFlowProcessingStrategy();
-  }
-
+  /**
+   * @return a new {@link ProcessingStrategy}.
+   */
+  ProcessingStrategy create();
 }

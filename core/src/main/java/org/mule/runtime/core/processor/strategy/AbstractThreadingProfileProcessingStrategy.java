@@ -8,20 +8,9 @@ package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
-import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
-import org.mule.runtime.core.work.MuleWorkManager;
-
-import java.util.List;
 
 /**
  * A abstract {@link org.mule.runtime.core.api.processor.ProcessingStrategy} implementation that provides a

@@ -30,15 +30,16 @@ import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.factory.AsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.factory.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.factory.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.factory.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
+import org.mule.runtime.core.api.strategy.factory.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.SynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
@@ -49,7 +50,6 @@ import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
@@ -179,7 +179,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return getProcessingStrategy().getClass().equals(SynchronousProcessingStrategy.class);
   }
 
-  @Override
   public ProcessingStrategyFactory getProcessingStrategyFactory() {
     return processingStrategyFactory;
   }
@@ -257,7 +256,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
-      processingStrategy = new SynchronousProcessingStrategy();
+      processingStrategy = new SynchronousProcessingStrategyFactory().create();
       if (LOGGER.isWarnEnabled()) {
         LOGGER
             .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");

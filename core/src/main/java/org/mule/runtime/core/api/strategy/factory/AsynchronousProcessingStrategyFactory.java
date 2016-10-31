@@ -4,13 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.processor.factory;
+package org.mule.runtime.core.api.strategy.factory;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
 
+import java.util.List;
 
-public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyFactory {
+import javax.resource.spi.work.WorkManager;
+
+/**
+ * This factory's strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors in a single
+ * worker thread.
+ */
+public class AsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   protected Integer maxThreads;
   protected Integer minThreads;
@@ -21,7 +32,7 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
 
   @Override
   public ProcessingStrategy create() {
-    final NonBlockingProcessingStrategy processingStrategy = new NonBlockingProcessingStrategy();
+    final AsynchronousProcessingStrategy processingStrategy = new AsynchronousProcessingStrategy();
 
     if (maxThreads != null) {
       processingStrategy.setMaxThreads(maxThreads);
@@ -91,5 +102,28 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
 
   public void setPoolExhaustedAction(Integer poolExhaustedAction) {
     this.poolExhaustedAction = poolExhaustedAction;
+  }
+
+  public static class AsynchronousProcessingStrategy extends AbstractThreadingProfileProcessingStrategy {
+
+    protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategyFactory().create();
+
+    @Override
+    public void configureProcessors(List<Processor> processors,
+                                    org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                                    MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+      if (processors.size() > 0) {
+        chainBuilder.chain(createAsyncMessageProcessor(nameSource, muleContext));
+        synchronousProcessingStrategy.configureProcessors(processors, nameSource, chainBuilder, muleContext);
+      }
+    }
+
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                                                                            MuleContext muleContext) {
+      return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext),
+                                                   getThreadPoolName(nameSource.getName(), muleContext),
+                                                   muleContext.getConfiguration().getShutdownTimeout());
+    }
+
   }
 }

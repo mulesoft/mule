@@ -13,7 +13,7 @@ import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCrea
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
 
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;

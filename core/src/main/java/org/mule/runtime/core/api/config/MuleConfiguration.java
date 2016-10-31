@@ -8,8 +8,8 @@ package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
 
 /**
