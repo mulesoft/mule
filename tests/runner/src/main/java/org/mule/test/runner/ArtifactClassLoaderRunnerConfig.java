@@ -37,26 +37,26 @@ public @interface ArtifactClassLoaderRunnerConfig {
 
   /**
    * Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
-   * {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
    * {@link #plugins()} Maven artifacts if declared will be considered to be excluded from being added as {@code provided} due to
    * they are going to be added to its class loaders.
    *
    * @return Maven artifacts to be excluded {@code provided} scope direct dependencies of the rootArtifact. In format
-   *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *         {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    */
   String[] providedExclusions() default {};
 
   /**
    * Maven artifacts to be included from the {@code provided} scope direct dependencies of the rootArtifact. In format
-   * {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
    * This artifacts have to be declared as {@code provided} scope in rootArtifact direct dependencies and no matter if they were
    * excluded or not from {@link #providedExclusions()} and {@link #plugins()}. Meaning that the same artifact could ended up
    * being added to the container class loader and as plugin.
    *
    * @return Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
-   *         format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   *         format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    */
   String[] providedInclusions() default {};
 
@@ -106,20 +106,20 @@ public @interface ArtifactClassLoaderRunnerConfig {
 
   /**
    * Maven artifacts to be excluded from the {@code test} scope direct dependencies of the rootArtifact. In format
-   * {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @return Maven artifacts to be excluded from the {@code test} scope direct dependencies of the rootArtifact. In format
-   *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *         {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    */
   String[] testExclusions() default {};
 
 
   /**
    * Maven artifacts to be included from the {@code test} scope direct dependencies of the rootArtifact. In format
-   * {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @return Maven artifacts to be included from the {@code test} scope direct dependencies of the rootArtifact. In format
-   *         {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   *         {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    */
   String[] testInclusions() default {};
 

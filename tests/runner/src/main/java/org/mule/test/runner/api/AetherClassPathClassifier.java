@@ -27,7 +27,9 @@ import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
+import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 
 import java.io.File;
@@ -55,7 +57,6 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.util.filter.PatternExclusionsDependencyFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +161,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * Finds direct dependencies declared with classifier {@value #MULE_SERVICE_CLASSIFIER} and {@code provided} scope.
    * Creates a List of {@link ArtifactUrlClassification} for each service including their {@code compile} scope dependencies.
    * <p/>
-   * {@value #SERVICE_PROVIDER_CLASS_NAME} will be used as {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader#getArtifactName()}
+   * {@value #SERVICE_PROVIDER_CLASS_NAME} will be used as {@link ArtifactClassLoader#getArtifactId()}
    * <p/>
    * Once identified and classified these Maven artifacts will be excluded from container classification.
    *

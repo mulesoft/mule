@@ -56,15 +56,17 @@ public class ClassPathClassifierContext {
    * @param pluginResourcesFolder {@link File} where resources for classification will be created.
    * @param classPathURLs the whole set of {@link URL}s that were loaded by IDE/Maven Surefire plugin when running the test. Not
    * @param excludedArtifacts Maven artifacts to be excluded from artifact class loaders created here due to they are going to be
-   *        added as boot packages. In format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *        added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
    *        container in addition to the pre-defined ones.
    * @param providedExclusions Maven artifacts to be excluded from the provided scope direct dependencies of rootArtifact. In
-   *        format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param providedInclusions Maven artifacts to be excluded from the provided scope direct dependencies of rootArtifact. In
-   *        format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
-   * @param testExclusions {@link List} of Maven coordinates to be excluded from application class loader.
-   * @param testInclusions {@link List} of Maven coordinates to be included in application class loader.
+   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   * @param testExclusions {@link List} of Maven coordinates to be excluded from application class loader. In format
+   *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   * @param testInclusions {@link List} of Maven coordinates to be included in application class loader. In format
+   *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param pluginCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to create plugin
    *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s
    * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be

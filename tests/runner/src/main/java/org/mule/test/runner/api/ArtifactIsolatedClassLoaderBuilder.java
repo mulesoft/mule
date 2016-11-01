@@ -131,10 +131,10 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets the Maven artifacts to be excluded from artifact class loaders created here due to they are going to be added as boot
-   * packages. In format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param excludedArtifacts Maven artifacts to be excluded from artifact class loaders created here due to they are going to be
-   *        added as boot packages. In format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *        added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(List<String> excludedArtifacts) {
@@ -157,13 +157,13 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
-   * {@code <groupId>:<artifactId>:<extension>:<version>}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
    * {@link #setPluginCoordinates(List)} Maven artifacts if declared will be considered to be excluded from being added as
    * {@code provided} due to they are going to be added to its class loaders.
    *
    * @param providedExclusions Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the
-   *        rootArtifact. In format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *        rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final List<String> providedExclusions) {
@@ -173,7 +173,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
-   * format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   * format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
    * This artifacts have to be declared as {@code provided} scope in rootArtifact direct dependencies and no matter if they were
    * excluded or not from {@link #setProvidedExclusions(List)} and {@link #setPluginCoordinates(List)}. Meaning that the same
@@ -189,10 +189,10 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets the {@link List} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In format
-   * {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param testExclusions {@link List} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
-   *        format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final List<String> testExclusions) {
@@ -202,10 +202,10 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets the {@link List} of inclusion Maven coordinates to be included from test dependencies of rootArtifact. In format
-   * {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param testInclusions {@link List} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
-   *        format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final List<String> testInclusions) {
