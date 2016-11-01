@@ -6,15 +6,17 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.commons.collections.CollectionUtils.exists;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_RELATIVE_PATH;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -25,8 +27,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -75,6 +79,10 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath = new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath","responseBuilderAndErrorResponseBuilderNotTheSamePath");
     @Rule
     public SystemProperty httpHeadersResponseBuilderPath = new SystemProperty("httpHeadersResponseBuilderPath","httpHeadersResponseBuilderPath");
+    @Rule
+    public SystemProperty httpContentTypeResponseBuilderPath = new SystemProperty("httpContentTypeResponseBuilderPath","twoContentTypeResponseBuilderFlow");
+    @Rule
+    public SystemProperty twoHeadersResponseBuilderPath = new SystemProperty("twoHeadersResponseBuilderPath","twoHeadersResponseBuilderFlow");
 
     @Override
     protected String getConfigFile()
@@ -210,6 +218,19 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         assertThat(requestPathHeaders[1].getValue(), isOneOf("requestPath1", "requestPath2"));
     }
 
+    @Test
+    public void twoHeadersResponseBuilder() throws Exception
+    {
+        final String url = getUrl(twoHeadersResponseBuilderPath);
+        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final HttpResponse httpResponse = response.returnResponse();
+        final List<Header> headers = Arrays.asList(httpResponse.getAllHeaders());
+
+        assertTrue(exists(headers, new HeaderPredicate("Content-Type", "application/json")));
+        assertFalse(exists(headers, new HeaderPredicate("Content-Type", "text/x-json")));
+        assertFalse(exists(headers, new HeaderPredicate("Content-Type", "text/javascript")));
+    }
+
     private String getUrl(SystemProperty pathSystemProperty)
     {
         return String.format("http://localhost:%s/%s", listenPort.getNumber(), pathSystemProperty.getValue());
@@ -271,5 +292,21 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
             return false;
         }
         return true;
+    }
+
+    private static class HeaderPredicate implements Predicate {
+
+        private String name;
+        private String value;
+
+        public HeaderPredicate(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override public boolean evaluate(Object o) {
+            final Header header = (Header) o;
+            return header.getName().equals(name) && header.getValue().equals(value);
+        }
     }
 }

@@ -17,6 +17,17 @@
         <echo-component/>
     </flow>
 
+    <flow name="twoHeadersResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${twoHeadersResponseBuilderPath}">
+            <http:response-builder >
+                <http:header headerName="Content-Type" value="application/json"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="somePayload"/>
+        <set-property propertyName="Content-Type" value="text/x-json"/>
+        <set-property propertyName="Content-Type" value="text/javascript"/>
+    </flow>
+
     <flow name="statusResponseBuilderFlow">
         <http:listener config-ref="listenerConfig" path="${statusResponseBuilderPath}">
             <http:response-builder statusCode="201" reasonPhrase="everything works!"/>

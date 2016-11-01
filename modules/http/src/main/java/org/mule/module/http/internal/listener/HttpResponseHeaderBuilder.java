@@ -9,6 +9,7 @@ package org.mule.module.http.internal.listener;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.CaseInsensitiveMapWrapper;
@@ -23,10 +24,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HttpResponseHeaderBuilder
 {
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
+    private List<String> uniqueHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH, CONTENT_TYPE);
 
     Multimap<String, String> headers =
             Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>(){
@@ -73,11 +79,36 @@ public class HttpResponseHeaderBuilder
         }
     }
 
+    /**
+     *
+     * Check if the given header allows multiple values. In case it doesn't and the header already has a value,
+     * a warn message is shown and the older values are removed from the map.
+     *
+     * @param headerName the header name to check if it has already a value set.
+     */
+    private void logIfHeaderDoesNotSupportMultipleValues(String headerName)
+    {
+        if (uniqueHeadersNames.contains(headerName))
+        {
+            final Collection<String> values = headers.removeAll(headerName);
+            logger.warn("Header: " + headerName + " does not support multiple values. Removing {}", values);
+        }
+    }
+
+    /**
+     * Adds the given header to the map. In case the header already has a value, {@link #logIfHeaderDoesNotSupportMultipleValues}
+     * is called instead of {@link #failIfHeaderDoesNotSupportMultipleValues(String)} to
+     * keep backwards compatibility.
+     * This behavior will change in Mule 4.
+     *
+     * @param headerName the header name to be added.
+     * @param headerValue the header value to be added.
+     */
     private void addSimpleValue(String headerName, String headerValue)
     {
-        if (headers.containsValue(headerName))
+        if (headers.containsKey(headerName))
         {
-            failIfHeaderDoesNotSupportMultipleValues(headerName);
+            logIfHeaderDoesNotSupportMultipleValues(headerName);
         }
         headers.put(headerName, headerValue);
     }
