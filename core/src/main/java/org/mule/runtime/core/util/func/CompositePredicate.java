@@ -34,11 +34,9 @@ public class CompositePredicate<T> implements Predicate<T> {
    * @return a new {@link CompositePredicate}
    */
   public static <T> CompositePredicate<T> of(Predicate<T>... predicates) {
-    if (predicates == null) {
-      return new CompositePredicate<>(ImmutableList.of());
-    } else {
-      return new CompositePredicate<>(copyOf(predicates));
-    }
+    return new CompositePredicate<>(predicates == null
+        ? ImmutableList.of()
+        : copyOf(predicates));
   }
 
   private CompositePredicate(List<Predicate<T>> predicates) {
@@ -48,7 +46,7 @@ public class CompositePredicate<T> implements Predicate<T> {
   /**
    * Tests the value with all the aggregated predicates.
    * <p>
-   * The predicaets will be evaluated in the same order as they were
+   * The predicates will be evaluated in the same order as they were
    * fed into the {@link #of(Predicate[])} method. If one predicate
    * returns {@code false}, then the subsequent ones will not be evaluated
    * and this method will return {@code false}.
