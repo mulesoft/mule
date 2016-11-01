@@ -20,9 +20,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 

@@ -28,8 +28,8 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.api.strategy.factory.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

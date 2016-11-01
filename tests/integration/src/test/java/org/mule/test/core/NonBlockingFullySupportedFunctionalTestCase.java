@@ -15,10 +15,10 @@ import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.strategy.factory.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.api.strategy.factory.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 

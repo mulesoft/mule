@@ -33,10 +33,10 @@ import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
-import org.mule.runtime.core.api.strategy.factory.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.lock.LockFactory;
 

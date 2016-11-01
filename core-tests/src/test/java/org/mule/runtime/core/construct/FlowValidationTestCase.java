@@ -17,12 +17,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
-import org.mule.runtime.core.api.strategy.factory.AsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.api.strategy.factory.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.strategy.factory.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;

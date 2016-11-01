@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.strategy.factory;
+package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static reactor.core.publisher.Flux.from;
@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

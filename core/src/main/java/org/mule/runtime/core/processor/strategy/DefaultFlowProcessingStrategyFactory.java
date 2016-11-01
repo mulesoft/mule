@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.strategy.factory;
+package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.StageNameSource;
-import org.mule.runtime.core.api.strategy.factory.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 
 /**
  * This factory's processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes

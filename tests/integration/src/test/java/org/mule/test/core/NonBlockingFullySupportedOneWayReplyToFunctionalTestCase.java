@@ -10,9 +10,9 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.strategy.factory.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.api.strategy.factory.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;

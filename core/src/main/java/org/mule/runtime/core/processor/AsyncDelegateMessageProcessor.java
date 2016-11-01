@@ -28,9 +28,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSourceProvider;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.strategy.factory.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.work.MuleWorkManager;
 
