@@ -8,13 +8,14 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 
 import java.io.InputStream;
 import java.util.Optional;
 
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -27,6 +28,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @since 4.0
  */
 public class XmlConfigurationDocumentLoader {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(XmlConfigurationDocumentLoader.class);
 
   /**
    * Indicates that XSD validation should be used (found no "DOCTYPE" declaration).
@@ -46,12 +49,10 @@ public class XmlConfigurationDocumentLoader {
 
   public Document loadDocument(Optional<ModuleExtensionStore> moduleExtensionStore, InputStream inputStream) {
     try {
-      MuleLoggerErrorHandler errorHandler = new MuleLoggerErrorHandler();
       Document document = new MuleDocumentLoader()
           .loadDocument(new InputSource(inputStream),
-                        new ModuleDelegatingEntityResolver(moduleExtensionStore), errorHandler,
+                        new ModuleDelegatingEntityResolver(moduleExtensionStore), new MuleLoggerErrorHandler(),
                         VALIDATION_XSD, true);
-      errorHandler.throwExceptionIfNeeded();
       return document;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
@@ -63,18 +64,10 @@ public class XmlConfigurationDocumentLoader {
    */
   private static class MuleLoggerErrorHandler extends DefaultHandler {
 
-    StringBuilder sb = new StringBuilder();
-
     @Override
     public void error(SAXParseException e) throws SAXException {
-      sb.append(format("\terror:%s\n", e.toString()));
-    }
-
-    public void throwExceptionIfNeeded() {
-      String errors = sb.toString();
-      if (StringUtils.isNotBlank(errors)) {
-        String errorOrErrors = "Gathered errors:";
-        throw new IllegalArgumentException(format(errorOrErrors + " \n %s", errors));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(format("Found exception parsing document, message '%s'", e.toString()), e);
       }
     }
   }
