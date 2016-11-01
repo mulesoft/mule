@@ -78,8 +78,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   public void testSingleEventNoTimeoutAsync() throws Exception {
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-    LaxAsyncInterceptingMessageProcessor asyncMP =
-        new LaxAsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
+    asyncMP.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
 
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);
@@ -98,8 +98,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setTimeout(1);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(3000);
-    LaxAsyncInterceptingMessageProcessor asyncMP =
-        new LaxAsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
+    asyncMP.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
 
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);
@@ -169,8 +169,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(50);
-    LaxAsyncInterceptingMessageProcessor asyncMP =
-        new LaxAsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
+    asyncMP.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
 
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);

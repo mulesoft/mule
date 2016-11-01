@@ -13,6 +13,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
@@ -39,7 +40,7 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
     return new NonBlockingProcessingStrategy();
   }
 
-  public static class NonBlockingProcessingStrategy implements ProcessingStrategy, Stoppable {
+  public static class NonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
     private SchedulerService schedulerService;
     private Scheduler scheduler;
@@ -58,12 +59,16 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
                                                                     Function<Publisher<Event>, Publisher<Event>> publisherFunction) {
-      this.scheduler = schedulerService.cpuLightScheduler();
       if (processor instanceof NonBlockingMessageProcessor) {
         return publisher -> from(publisher).transform(publisherFunction).publishOn(fromExecutorService(scheduler));
       } else {
         return publisher -> from(publisher).transform(publisherFunction);
       }
+    }
+
+    @Override
+    public void start() throws MuleException {
+      this.scheduler = schedulerService.cpuLightScheduler();
     }
 
     @Override

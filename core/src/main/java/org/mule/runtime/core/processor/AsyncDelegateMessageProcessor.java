@@ -9,6 +9,8 @@ package org.mule.runtime.core.processor;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
@@ -93,6 +95,18 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
     target = builder.build();
     super.initialise();
+  }
+
+  @Override
+  public void start() throws MuleException {
+    super.start();
+    startIfNeeded(processingStrategy);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(processingStrategy);
+    super.stop();
   }
 
   private void validateFlowConstruct() {

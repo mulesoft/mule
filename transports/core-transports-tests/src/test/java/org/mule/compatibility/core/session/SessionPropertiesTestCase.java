@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.construct.Flow;
@@ -36,6 +37,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,11 +45,18 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
 
   private Flow flow;
   private EventContext context;
+  private Scheduler scheduler;
 
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
+  }
+
+  @After
+  public void after() {
+    scheduler.shutdownNow();
   }
 
   /**
@@ -55,8 +64,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
    */
   @Test
   public void asyncInterceptingProcessorSessionPropertyPropagation() throws Exception {
-    AsyncInterceptingMessageProcessor async =
-        new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    AsyncInterceptingMessageProcessor async = new AsyncInterceptingMessageProcessor();
+    async.setScheduler(scheduler);
     SensingNullMessageProcessor asyncListener = new SensingNullMessageProcessor();
     async.setMuleContext(muleContext);
     async.setFlowConstruct(flow);
@@ -88,8 +97,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
     assertEquals("newValue", asyncEvent.getSession().getProperty("newKey"));
     assertEquals(1, event.getSession().getPropertyNamesAsSet().size());
     assertNull(event.getSession().getProperty("newKey"));
-
-    async.stop();
   }
 
   /**

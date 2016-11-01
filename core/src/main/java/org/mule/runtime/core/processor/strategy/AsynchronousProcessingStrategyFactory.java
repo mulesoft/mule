@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -30,22 +35,43 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
     return new AsynchronousProcessingStrategy();
   }
 
-  public static class AsynchronousProcessingStrategy implements ProcessingStrategy {
+  public static class AsynchronousProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+
+    private SchedulerService schedulerService;
+    private Scheduler scheduler;
+    private MuleContext muleContext;
+    private AsyncInterceptingMessageProcessor asyncMessageProcessor;
 
     protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategyFactory().create();
 
     @Override
     public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
                                     MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+      this.schedulerService = schedulerService;
+      this.muleContext = muleContext;
+      asyncMessageProcessor = createAsyncMessageProcessor();
       if (processors.size() > 0) {
-        chainBuilder.chain(createAsyncMessageProcessor(schedulerService.ioScheduler()));
+        chainBuilder.chain(asyncMessageProcessor);
         synchronousProcessingStrategy.configureProcessors(processors, schedulerService, chainBuilder, muleContext);
       }
     }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(Scheduler scheduler) {
-      return new AsyncInterceptingMessageProcessor(scheduler);
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor() {
+      return new AsyncInterceptingMessageProcessor();
     }
 
+    @Override
+    public void start() throws MuleException {
+      this.scheduler = schedulerService.ioScheduler();
+      asyncMessageProcessor.setScheduler(scheduler);
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      if (scheduler != null) {
+        scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+        asyncMessageProcessor.setScheduler(null);
+      }
+    }
   }
 }

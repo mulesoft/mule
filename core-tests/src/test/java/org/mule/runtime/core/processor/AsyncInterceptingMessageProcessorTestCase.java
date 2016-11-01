@@ -186,8 +186,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
 
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
-    AsyncInterceptingMessageProcessor mp =
-        new AsyncInterceptingMessageProcessor(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor();
+    mp.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);

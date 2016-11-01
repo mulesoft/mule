@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
@@ -25,7 +24,6 @@ import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -46,7 +44,7 @@ import reactor.core.publisher.Flux;
  * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Stoppable, MessagingExceptionHandlerAware, InternalMessageProcessor {
+    implements MessagingExceptionHandlerAware, InternalMessageProcessor {
 
   public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
 
@@ -64,17 +62,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     this.workManagerSource = workManagerSource;
   }
 
-  public AsyncInterceptingMessageProcessor(Scheduler workScheduler) {
-    requireNonNull(workScheduler);
-    this.workScheduler = workScheduler;
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    if (workScheduler != null) {
-      workScheduler.stop(getMuleContext().getConfiguration().getShutdownTimeout(), MILLISECONDS);
-      workScheduler = null;
-    }
+  public AsyncInterceptingMessageProcessor() {
+    // Need this while the deprecated constructor is around
   }
 
   @Override
@@ -206,4 +195,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         });
   }
 
+  public void setScheduler(Scheduler workScheduler) {
+    this.workScheduler = workScheduler;
+  }
 }

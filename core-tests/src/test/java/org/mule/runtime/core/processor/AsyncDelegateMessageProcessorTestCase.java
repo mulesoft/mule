@@ -21,17 +21,19 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -48,6 +50,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected TestListener target = new TestListener();
   protected Exception exceptionThrown;
   protected Latch latch = new Latch();
+  private Scheduler scheduler;
 
   @Rule
   public ExpectedException expected;
@@ -60,9 +63,16 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
+    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
     messageProcessor = createAsyncDelegatMessageProcessor(target);
     messageProcessor.initialise();
     messageProcessor.start();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    scheduler.shutdownNow();
+    super.doTearDown();
   }
 
   @Test

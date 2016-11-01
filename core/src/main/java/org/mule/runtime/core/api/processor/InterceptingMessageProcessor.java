@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * <p>

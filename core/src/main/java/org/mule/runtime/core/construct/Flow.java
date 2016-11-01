@@ -7,6 +7,7 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
@@ -57,6 +58,12 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
   public Flow(String name, MuleContext muleContext) {
     super(name, muleContext);
     initialiseProcessingStrategy();
+  }
+
+  @Override
+  protected void doStart() throws MuleException {
+    startIfNeeded(processingStrategy);
+    super.doStart();
   }
 
   @Override
@@ -163,11 +170,6 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
     statistics = new FlowConstructStatistics(getConstructType(), name);
     statistics.setEnabled(muleContext.getStatistics().isEnabled());
     muleContext.getStatistics().add(statistics);
-  }
-
-  @Override
-  protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    getProcessingStrategy().configureProcessors(getMessageProcessors(), schedulerService, builder, muleContext);
   }
 
   @Override

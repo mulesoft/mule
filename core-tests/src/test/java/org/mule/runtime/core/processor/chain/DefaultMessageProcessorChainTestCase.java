@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -50,6 +51,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
@@ -72,6 +74,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -113,7 +116,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   }
 
   @Before
-  public void before() throws InitialisationException {
+  public void before() throws MuleException {
     muleContext = mockContextWithServices();
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
     ErrorType errorType = mock(ErrorType.class);
@@ -130,6 +133,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     mockFlow.setProcessingStrategyFactory(nonBlocking ? new NonBlockingProcessingStrategyFactory()
         : new DefaultFlowProcessingStrategyFactory());
     mockFlow.initialise();
+    mockFlow.start();
+  }
+
+  @After
+  public void after() throws RegistrationException, MuleException {
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   @Test
@@ -140,7 +149,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   }
 
   /*
-   * Any MP returns null: - Processing doesn't proceed - Result of chain is Nnll
+   * Any MP returns null: - Processing doesn't proceed - Result of chain is Null
    */
   @Test
   public void testMPChainWithNullReturn() throws Exception {
