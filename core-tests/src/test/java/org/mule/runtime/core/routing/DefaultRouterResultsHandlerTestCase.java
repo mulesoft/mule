@@ -21,15 +21,15 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setupMocks() throws Exception {
-    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategy());
+    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));

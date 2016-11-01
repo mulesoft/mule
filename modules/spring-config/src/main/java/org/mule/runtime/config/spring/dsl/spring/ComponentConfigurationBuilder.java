@@ -10,16 +10,17 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseProcessingStrategy;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
+
+import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
+import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -265,9 +266,9 @@ class ComponentConfigurationBuilder {
       }
       simpleParameters.remove(configAttributeName);
       if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE) || configAttributeName.equals("defaultProcessingStrategy")) {
-        ProcessingStrategy processingStrategy = parseProcessingStrategy(reference);
-        if (processingStrategy != null) {
-          this.value = processingStrategy;
+        ProcessingStrategyFactory processingStrategyFactory = parseProcessingStrategy(reference);
+        if (processingStrategyFactory != null) {
+          this.value = processingStrategyFactory;
           return;
         }
       }

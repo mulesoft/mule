@@ -19,21 +19,21 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -58,8 +58,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   public void setupMocks() throws Exception {
     when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
     when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
-    when(endpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
-    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategy());
+    when(endpoint.getExchangePattern()).thenReturn(ONE_WAY);
+    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create());
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);

@@ -7,18 +7,20 @@
 package org.mule.test.config.spring.flow;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.List;
 
@@ -124,7 +126,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     return ((AsyncDelegateMessageProcessor) processor).getProcessingStrategy();
   }
 
-  public static class CustomProcessingStrategy implements ProcessingStrategy {
+  public static class CustomProcessingStrategy implements ProcessingStrategy, ProcessingStrategyFactory {
 
     String foo;
 
@@ -133,6 +135,11 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
                                     org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
       // Nothing to do
+    }
+
+    @Override
+    public ProcessingStrategy create() {
+      return this;
     }
 
     public void setFoo(String foo) {

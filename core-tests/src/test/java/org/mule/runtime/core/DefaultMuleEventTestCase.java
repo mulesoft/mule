@@ -23,8 +23,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
@@ -92,7 +92,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void defaultProcessingStrategyRequestResponse() throws Exception {
     Flow flow = spy(this.flow);
-    when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
+    when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategyFactory().create());
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
@@ -102,7 +102,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void defaultProcessingStrategyOneWay() throws Exception {
     Flow flow = spy(this.flow);
-    when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
+    when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategyFactory().create());
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
@@ -155,7 +155,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void nonBlockingProcessingStrategyRequestResponse() throws Exception {
     Flow flow = spy(this.flow);
     when(flow.isSynchronous()).thenReturn(false);
-    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategyFactory().create());
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
@@ -166,7 +166,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void nonBlockingProcessingStrategyOneWay() throws Exception {
     Flow flow = spy(this.flow);
     when(flow.isSynchronous()).thenReturn(false);
-    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategyFactory().create());
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));

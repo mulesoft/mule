@@ -4,12 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.processor;
+package org.mule.runtime.core.api.processor.strategy;
 
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.StageNameSource;
 
 import java.util.List;
 import java.util.function.Function;

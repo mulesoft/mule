@@ -6,19 +6,22 @@
  */
 package org.mule.test.config;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY;
+
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
@@ -30,10 +33,11 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
-    return Arrays
-        .asList(new Object[][] {{"Container level system property", new String[] {}, SynchronousProcessingStrategy.class},
-            {"Configuration overrides system property", new String[] {"configuration-processing-strategy-config.xml"},
-                NonBlockingProcessingStrategy.class}});
+    return asList(new Object[][] {
+        {"Container level system property", new String[] {}, SynchronousProcessingStrategy.class},
+        {"Configuration overrides system property", new String[] {"configuration-processing-strategy-config.xml"},
+            NonBlockingProcessingStrategy.class}
+    });
   }
 
   private final String[] configFiles;
@@ -41,11 +45,11 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
 
   @Rule
   public SystemProperty globalProcessingStrategy =
-      new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY);
+      new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, SYNC_PROCESSING_STRATEGY);
 
   @Rule
   public SystemProperty localProcessingStrategy =
-      new SystemProperty("processingStrategy", ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+      new SystemProperty(PROCESSING_STRATEGY_ATTRIBUTE, NON_BLOCKING_PROCESSING_STRATEGY);
 
   public SystemPropertyProcessingStrategyConfigTestCase(String name, String[] configFiles,
                                                         Class<? extends ProcessingStrategy> expectedStrategyType) {
@@ -60,6 +64,7 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
 
   @Test
   public void assertDefaultProcessingStrategy() throws Exception {
-    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategy(), is(instanceOf(expectedStrategyType)));
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(),
+               is(instanceOf(expectedStrategyType)));
   }
 }

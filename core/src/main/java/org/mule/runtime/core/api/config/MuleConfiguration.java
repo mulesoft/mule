@@ -7,7 +7,8 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.construct.Flow;
 
@@ -108,11 +109,12 @@ public interface MuleConfiguration {
   ObjectSerializer getDefaultObjectSerializer();
 
   /**
-   * The default {@link ProcessingStrategy} to be used by all {@link Flow}s which doesn't specify otherwise
+   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link Flow}s which
+   * doesn't specify otherwise
    *
-   * @return a {@link ProcessingStrategy}
+   * @return a {@link ProcessingStrategyFactory}
    * @since 3.7.0
    */
-  ProcessingStrategy getDefaultProcessingStrategy();
+  ProcessingStrategyFactory getDefaultProcessingStrategyFactory();
 
 }

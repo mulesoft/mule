@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.management.stats;
 
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,6 +54,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
   /**
    * Are statistics logged
    */
+  @Override
   public boolean isEnabled() {
     return enabled;
   }
@@ -69,11 +70,13 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
   /**
    * Enable statistics logs (this is a dynamic parameter)
    */
+  @Override
   public synchronized void setEnabled(boolean b) {
     super.setEnabled(b);
     flowStatistics.setEnabled(enabled);
   }
 
+  @Override
   public synchronized void clear() {
     super.clear();
 
@@ -124,6 +127,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     return threadPoolSize;
   }
 
+  @Override
   public synchronized void incQueuedEvent() {
     queuedEvent++;
     totalQueuedEvent++;
@@ -133,6 +137,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
   }
 
+  @Override
   public synchronized void decQueuedEvent() {
     queuedEvent--;
   }

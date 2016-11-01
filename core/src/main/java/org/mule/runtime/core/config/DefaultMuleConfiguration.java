@@ -14,7 +14,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
@@ -133,7 +134,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * Generic string/string map of properties in addition to standard Mule props. Used as an extension point e.g. in MMC.
    */
-  private Map<String, String> extendedProperties = new HashMap<String, String>();
+  private Map<String, String> extendedProperties = new HashMap<>();
 
   /**
    * Global exception strategy name to be used as default exception strategy for flows and services
@@ -153,11 +154,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   private ObjectSerializer defaultObjectSerializer;
 
   /**
-   * The default {@link ProcessingStrategy} to be used by all {@link Flow}s which doesn't specify otherwise
+   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link Flow}s which
+   * doesn't specify otherwise
    *
    * @since 3.7.0
    */
-  private ProcessingStrategy defaultProcessingStrategy;
+  private ProcessingStrategyFactory defaultProcessingStrategyFactory;
 
   /**
    * Maximum size (approximately) of the transaction log files. This applies to each set of files for local transactions and xa
@@ -586,12 +588,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * {@inheritDoc}
    */
   @Override
-  public ProcessingStrategy getDefaultProcessingStrategy() {
-    return defaultProcessingStrategy;
+  public ProcessingStrategyFactory getDefaultProcessingStrategyFactory() {
+    return defaultProcessingStrategyFactory;
   }
 
-  public void setDefaultProcessingStrategy(ProcessingStrategy defaultProcessingStrategy) {
-    this.defaultProcessingStrategy = defaultProcessingStrategy;
+  public void setDefaultProcessingStrategyFactory(ProcessingStrategyFactory defaultProcessingStrategy) {
+    this.defaultProcessingStrategyFactory = defaultProcessingStrategy;
   }
 
   public void setDefaultObjectSerializer(ObjectSerializer defaultObjectSerializer) {

@@ -31,11 +31,12 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static reactor.core.publisher.Flux.from;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -52,13 +53,13 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
@@ -743,6 +744,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     process(builder.build(), getTestEventUsingFlow("0"));
   }
 
+  @Override
   protected Event process(Processor messageProcessor, Event event) throws Exception {
     if (messageProcessor instanceof MuleContextAware) {
       ((MuleContextAware) messageProcessor).setMuleContext(muleContext);
@@ -1034,7 +1036,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
     when(mockFlow.getProcessingStrategy())
-        .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy(executorService) : new DefaultFlowProcessingStrategy());
+        .thenReturn(nonBlocking ? new NonBlockingProcessingStrategyFactory().create(executorService)
+            : new DefaultFlowProcessingStrategyFactory().create());
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);

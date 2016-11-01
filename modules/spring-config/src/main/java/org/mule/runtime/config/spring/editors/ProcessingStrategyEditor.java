@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.spring.editors;
 
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
+import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
+
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
@@ -21,6 +22,6 @@ public class ProcessingStrategyEditor extends PropertyEditorSupport {
 
   @Override
   public void setAsText(String text) throws IllegalArgumentException {
-    setValue(ProcessingStrategyUtils.parseProcessingStrategy(text));
+    setValue(parseProcessingStrategy(text));
   }
 }

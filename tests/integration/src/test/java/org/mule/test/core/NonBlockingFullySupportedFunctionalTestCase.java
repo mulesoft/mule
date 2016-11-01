@@ -11,16 +11,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
-import org.mule.functional.junit4.FunctionalTestCase;
+
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -29,7 +27,6 @@ import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -37,26 +34,27 @@ import org.junit.runners.Parameterized.Parameters;
 public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegrationTestCase {
 
   public static String FOO = "foo";
-  private ProcessingStrategy processingStrategy;
+  private ProcessingStrategyFactory processingStrategyFactory;
 
   @Override
   protected String getConfigFile() {
     return "non-blocking-fully-supported-test-config.xml";
   }
 
-  public NonBlockingFullySupportedFunctionalTestCase(ProcessingStrategy processingStrategy) {
-    this.processingStrategy = processingStrategy;
+  public NonBlockingFullySupportedFunctionalTestCase(ProcessingStrategyFactory processingStrategyFactory) {
+    this.processingStrategyFactory = processingStrategyFactory;
   }
 
   @Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{new DefaultFlowProcessingStrategy()}, {new NonBlockingProcessingStrategy()}});
+    return Arrays
+        .asList(new Object[][] {{new DefaultFlowProcessingStrategyFactory()}, {new NonBlockingProcessingStrategyFactory()}});
   }
 
   @Override
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {
     DefaultMuleConfiguration configuration = new DefaultMuleConfiguration();
-    configuration.setDefaultProcessingStrategy(processingStrategy);
+    configuration.setDefaultProcessingStrategyFactory(processingStrategyFactory);
     contextBuilder.setMuleConfiguration(configuration);
   }
 

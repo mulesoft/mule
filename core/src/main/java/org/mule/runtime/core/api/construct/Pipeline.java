@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.api.construct;
 
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
 
   public List<Processor> getMessageProcessors();
 
-  public void setProcessingStrategy(ProcessingStrategy processingStrategy);
+  public void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
 
   public ProcessingStrategy getProcessingStrategy();
 

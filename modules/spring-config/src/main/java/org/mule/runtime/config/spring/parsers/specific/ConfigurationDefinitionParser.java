@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
+import static org.mule.runtime.config.spring.util.ProcessingStrategyParserUtils.configureProcessingStrategy;
+
+import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -35,6 +36,7 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser {
     singleton = true;
   }
 
+  @Override
   protected Class getBeanClass(Element element) {
     return MuleConfiguration.class;
   }
@@ -43,7 +45,7 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser {
   protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
     parseExceptionStrategy(element, builder);
     parseObjectSerializer(element, builder);
-    ProcessingStrategyUtils.configureProcessingStrategy(element, builder, DEFAULT_PROCESSING_STRATEGY);
+    configureProcessingStrategy(element, builder, PROCESSING_STRATEGY_FACTORY_ATTRIBUTE);
 
     super.doParse(element, context, builder);
   }
