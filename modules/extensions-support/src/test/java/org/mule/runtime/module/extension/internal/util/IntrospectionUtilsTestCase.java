@@ -139,10 +139,11 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   public void getNoAnnotatedExposedPojoFields() {
     Collection<Field> exposedFields = getExposedFields(LifetimeInfo.class);
     assertThat(exposedFields, is(not(empty())));
-    assertThat(exposedFields.size(), is(3));
+    assertThat(exposedFields.size(), is(4));
     assertField("dateOfBirth", TYPE_LOADER.load(Date.class), exposedFields);
     assertField("dateOfDeath", TYPE_LOADER.load(Calendar.class), exposedFields);
     assertField("dateOfConception", TYPE_LOADER.load(LocalDateTime.class), exposedFields);
+    assertField("dateOfGraduation", TYPE_LOADER.load(Calendar.class), exposedFields);
   }
 
   @Test

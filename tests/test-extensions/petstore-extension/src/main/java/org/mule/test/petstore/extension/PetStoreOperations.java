@@ -33,6 +33,10 @@ public class PetStoreOperations {
     return cashier;
   }
 
+  public List<Pet> getForbiddenPets(List<Pet> forbiddenPets) {
+    return forbiddenPets;
+  }
+
   public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, Event event) throws Exception {
     CountDownLatch countDownLatch = (CountDownLatch) event.getVariable("testLatch").getValue();
     if (countDownLatch != null) {

@@ -133,11 +133,10 @@ public final class DefaultExtensionManager
   public void registerExtension(ExtensionManifest manifest, ClassLoader classLoader) {
     Describer describer = describerResolver.resolve(manifest, classLoader);
     final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
-
-    ExtensionModel extensionModel =
-        withContextClassLoader(classLoader, () -> extensionFactory.createFrom(describer.describe(context), context));
-
-    registerExtension(extensionModel);
+    withContextClassLoader(classLoader, () -> {
+      ExtensionModel extensionModel = extensionFactory.createFrom(describer.describe(context), context);
+      registerExtension(extensionModel);
+    });
   }
 
   /**

@@ -96,6 +96,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   private ExtendedPersonalInfo personalInfo = new ExtendedPersonalInfo();
 
   @Parameter
+  @Optional
+  private List<ExtendedPersonalInfo> familyInfo;
+
+  @Parameter
   private List<String> enemies = new LinkedList<>();
 
   @Parameter

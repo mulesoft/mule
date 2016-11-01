@@ -22,6 +22,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
@@ -324,6 +326,22 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
 
     when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter, parameterOfRepeatedEnumType));
+    extensionsManager.registerExtension(extensionModel1);
+
+    verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
+  }
+
+  @Test
+  public void enumCollectionTransformer() throws Exception {
+    DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
+    extensionsManager.setMuleContext(muleContext);
+    extensionsManager.initialise();
+
+    ParameterModel parameter = mock(ParameterModel.class);
+    when(parameter.getType())
+        .thenReturn(create(JAVA).arrayType().of(toMetadataType(TimeUnit.class)).build());
+
+    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter));
     extensionsManager.registerExtension(extensionModel1);
 
     verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));

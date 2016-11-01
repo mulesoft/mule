@@ -13,14 +13,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXT
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import com.google.common.collect.ImmutableSet;
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -31,7 +24,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.model.property.ExportModelProperty;
 
 import java.util.LinkedHashSet;
@@ -50,7 +42,7 @@ final class ExportedArtifactsCollector {
   private final Set<String> filteredPackages = ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.").build();
 
   private final ExtensionModel extensionModel;
-  private final Set<Class> exportedClasses = new LinkedHashSet<>();
+  private final Set<Class<?>> exportedClasses = new LinkedHashSet<>();
   private final ImmutableSet.Builder<String> exportedResources = ImmutableSet.builder();
   private final ClassLoader extensionClassloader;
 
@@ -77,7 +69,7 @@ final class ExportedArtifactsCollector {
     return exportedResources.build();
   }
 
-  /**
+  /**   
    * @return The {@link Set} of default java package names that the extension should export
    */
   Set<String> getExportedPackages() {
@@ -127,7 +119,7 @@ final class ExportedArtifactsCollector {
 
       @Override
       public void onParameter(ParameterizedModel owner, ParameterModel model) {
-        collectExportedClass(model.getType());
+        collectRelativeClasses(model.getType(), exportedClasses, extensionClassloader);
       }
 
       @Override
@@ -144,57 +136,7 @@ final class ExportedArtifactsCollector {
   }
 
   private void collectReturnTypes(ComponentModel model) {
-    collectExportedClass(model.getOutput().getType());
-    collectExportedClass(model.getOutputAttributes().getType());
-  }
-
-  private void collectExportedClass(MetadataType type) {
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        dictionaryType.getKeyType().accept(this);
-        dictionaryType.getValueType().accept(this);
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-
-      @Override
-      public void visitObjectField(ObjectFieldType objectFieldType) {
-        objectFieldType.getValue().accept(this);
-      }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (!exportedClasses.contains(getType(objectType))) {
-
-          Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
-          if (classInformation.isPresent()) {
-            classInformation.get().getGenericTypes().forEach(generic -> exportedClasses.add(loadClass(generic)));
-          }
-
-          exportedClasses.add(getType(objectType));
-          objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
-        }
-      }
-
-      @Override
-      public void visitString(StringType stringType) {
-        if (isEnum(stringType)) {
-          exportedClasses.add(getType(stringType));
-        }
-      }
-
-      private Class loadClass(String name) {
-        try {
-          return ClassUtils.loadClass(name, extensionClassloader);
-        } catch (ClassNotFoundException e) {
-          throw new IllegalArgumentException(e);
-        }
-      }
-    });
+    collectRelativeClasses(model.getOutput().getType(), exportedClasses, extensionClassloader);
+    collectRelativeClasses(model.getOutputAttributes().getType(), exportedClasses, extensionClassloader);
   }
 }
