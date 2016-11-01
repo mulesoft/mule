@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.util.Arrays.asList;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
@@ -19,7 +20,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
 
 public class HttpResponseHeaderBuilder
 {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpResponseHeaderBuilder.class);
 
-    private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
-    private List<String> uniqueHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH, CONTENT_TYPE);
+    private List<String> calculatedHeadersNames = asList(TRANSFER_ENCODING, CONTENT_LENGTH);
+    private List<String> uniqueHeadersNames = asList(TRANSFER_ENCODING.toLowerCase(), CONTENT_LENGTH.toLowerCase(), CONTENT_TYPE.toLowerCase());
 
     Multimap<String, String> headers =
             Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>(){
@@ -88,10 +88,10 @@ public class HttpResponseHeaderBuilder
      */
     private void logIfHeaderDoesNotSupportMultipleValues(String headerName)
     {
-        if (uniqueHeadersNames.contains(headerName))
+        if (uniqueHeadersNames.contains(headerName.toLowerCase()))
         {
             final Collection<String> values = headers.removeAll(headerName);
-            logger.warn("Header: " + headerName + " does not support multiple values. Removing {}", values);
+            LOGGER.warn("Header: " + headerName + " does not support multiple values. Removing {}", values);
         }
     }
 

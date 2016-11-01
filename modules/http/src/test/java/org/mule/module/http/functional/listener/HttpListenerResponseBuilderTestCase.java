@@ -6,13 +6,11 @@
  */
 package org.mule.module.http.functional.listener;
 
-import static org.apache.commons.collections.CollectionUtils.exists;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_RELATIVE_PATH;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
@@ -30,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -45,42 +42,58 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
+
     @Rule
-    public SystemProperty emptyResponseBuilderPath = new SystemProperty("emptyResponseBuilderPath","emptyResponseBuilderPath");
+    public SystemProperty emptyResponseBuilderPath = new SystemProperty("emptyResponseBuilderPath", "emptyResponseBuilderPath");
+
     @Rule
     public SystemProperty statusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath","statusResponseBuilderPath");
+
     @Rule
     public SystemProperty statusResponseBuilderOverridePath = new SystemProperty("statusResponseBuilderOverridePath", "statusResponseBuilderOverridePath");
+
     @Rule
     public SystemProperty reasonPhraseResponseBuilderOverridePath = new SystemProperty("reasonPhraseResponseBuilderOverridePath", "reasonPhraseResponseBuilderOverridePath");
+
     @Rule
     public SystemProperty statusReasonPhraseResponseBuilderWontOverridePath = new SystemProperty("statusReasonPhraseResponseBuilderWontOverridePath", "statusReasonPhraseResponseBuilderWontOverridePath");
+
     @Rule
     public SystemProperty headerResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
+
     @Rule
     public SystemProperty headersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
+
     @Rule
     public SystemProperty defaultReasonPhraseResponseBuilderPath = new SystemProperty("defaultReasonPhraseResponseBuilderPath", "defaultReasonPhraseResponseBuilderPath");
+
     @Rule
     public SystemProperty noReasonPhraseUnknownStatusCodeResponseBuilderPath = new SystemProperty("noReasonPhraseUnknownStatusCodeResponseBuilderPath", "noReasonPhraseUnknownStatusCodeResponseBuilderPath");
+
     @Rule
     public SystemProperty headerDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
+
     @Rule
     public SystemProperty errorEmptyResponseBuilderPath = new SystemProperty("emptyResponseBuilderPath","emptyResponseBuilderPath");
+
     @Rule
     public SystemProperty errorStatusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath","statusResponseBuilderPath");
+
     @Rule
     public SystemProperty errorHeaderResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
+
     @Rule
     public SystemProperty errorHeadersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
+
     @Rule
     public SystemProperty errorHeaderDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
+
     @Rule
     public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath = new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath","responseBuilderAndErrorResponseBuilderNotTheSamePath");
+
     @Rule
     public SystemProperty httpHeadersResponseBuilderPath = new SystemProperty("httpHeadersResponseBuilderPath","httpHeadersResponseBuilderPath");
-    @Rule
-    public SystemProperty httpContentTypeResponseBuilderPath = new SystemProperty("httpContentTypeResponseBuilderPath","twoContentTypeResponseBuilderFlow");
+
     @Rule
     public SystemProperty twoHeadersResponseBuilderPath = new SystemProperty("twoHeadersResponseBuilderPath","twoHeadersResponseBuilderFlow");
 
@@ -224,11 +237,10 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         final String url = getUrl(twoHeadersResponseBuilderPath);
         final Response response = Request.Get(url).connectTimeout(1000).execute();
         final HttpResponse httpResponse = response.returnResponse();
-        final List<Header> headers = Arrays.asList(httpResponse.getAllHeaders());
+        final List<Header> headers = Arrays.asList(httpResponse.getHeaders("Content-Type"));
 
-        assertTrue(exists(headers, new HeaderPredicate("Content-Type", "application/json")));
-        assertFalse(exists(headers, new HeaderPredicate("Content-Type", "text/x-json")));
-        assertFalse(exists(headers, new HeaderPredicate("Content-Type", "text/javascript")));
+        assertThat(headers, hasSize(1));
+        assertThat(headers.get(0).getValue(), is("application/json"));
     }
 
     private String getUrl(SystemProperty pathSystemProperty)
@@ -294,19 +306,4 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         return true;
     }
 
-    private static class HeaderPredicate implements Predicate {
-
-        private String name;
-        private String value;
-
-        public HeaderPredicate(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        @Override public boolean evaluate(Object o) {
-            final Header header = (Header) o;
-            return header.getName().equals(name) && header.getValue().equals(value);
-        }
-    }
 }
