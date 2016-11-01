@@ -6,13 +6,20 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 
 import java.io.InputStream;
+import java.util.Optional;
 
-import org.springframework.beans.factory.xml.DelegatingEntityResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -21,6 +28,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @since 4.0
  */
 public class XmlConfigurationDocumentLoader {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(XmlConfigurationDocumentLoader.class);
 
   /**
    * Indicates that XSD validation should be used (found no "DOCTYPE" declaration).
@@ -35,10 +44,14 @@ public class XmlConfigurationDocumentLoader {
    * @return a new {@link Document} object with the provided content.
    */
   public Document loadDocument(InputStream inputStream) {
+    return loadDocument(empty(), inputStream);
+  }
+
+  public Document loadDocument(Optional<ModuleExtensionStore> moduleExtensionStore, InputStream inputStream) {
     try {
       Document document = new MuleDocumentLoader()
           .loadDocument(new InputSource(inputStream),
-                        new DelegatingEntityResolver(Thread.currentThread().getContextClassLoader()), new DefaultHandler(),
+                        new ModuleDelegatingEntityResolver(moduleExtensionStore), new MuleLoggerErrorHandler(),
                         VALIDATION_XSD, true);
       return document;
     } catch (Exception e) {
@@ -46,4 +59,16 @@ public class XmlConfigurationDocumentLoader {
     }
   }
 
+  /**
+   * helper class to gather all errors while applying the found XSDs for the current input stream
+   */
+  private static class MuleLoggerErrorHandler extends DefaultHandler {
+
+    @Override
+    public void error(SAXParseException e) throws SAXException {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(format("Found exception parsing document, message '%s'", e.toString()), e);
+      }
+    }
+  }
 }

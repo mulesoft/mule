@@ -1,0 +1,17 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:tns="http://www.mulesoft.org/schema/mule/module-properties-default-types" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.mulesoft.org/schema/mule/module-properties-default-types">
+    <import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+    <element name="config" substitutionGroup="mule:abstract-extension" type="tns:config-type"/>
+    <complexType name="config-type">
+        <complexContent>
+            <extension base="mule:abstractExtensionType">
+                <attribute default="11" name="integerParam" type="mule:expressionInt" use="optional"/>
+                <attribute default="false" name="booleanParam" type="mule:expressionBoolean" use="optional"/>
+                <attribute default="1959-09-07T00:00:00" name="dateParam" type="mule:expressionDateTime" use="optional"/>
+                <attribute default="1959-09-07T00:00:00" name="datetimeParam" type="mule:expressionDateTime" use="optional"/>
+                <attribute default="hello world" name="stringParam" type="mule:expressionString" use="optional"/>
+                <attribute default="1959-09-07T00:00:00" name="timeParam" type="mule:expressionDateTime" use="optional"/>
+                <attribute name="name" type="string" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+</schema>

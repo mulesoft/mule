@@ -101,6 +101,21 @@ public class ComponentModel {
   }
 
   /**
+   * Marked as true if it's a top level configuration.
+   */
+  public void setRoot(boolean root) {
+    this.root = root;
+  }
+
+  /**
+   * @param parameterName name of the configuration parameter.
+   * @param value value contained by the configuration parameter.
+   */
+  public void setParameter(String parameterName, String value) {
+    this.parameters.put(parameterName, value);
+  }
+
+  /**
    * @return the {@code BeanDefinition} created based on the {@code ComponentModel} values.
    */
   public BeanDefinition getBeanDefinition() {

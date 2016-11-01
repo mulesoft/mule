@@ -68,7 +68,7 @@ public class XmlApplicationParser {
     }
     for (XmlNamespaceInfoProvider namespaceInfoProvider : namespaceInfoProviders) {
       Optional<XmlNamespaceInfo> matchingXmlNamespaceInfo = namespaceInfoProvider.getXmlNamespacesInfo().stream()
-          .filter(xmlNamespaceInfo -> namespaceUri.startsWith(xmlNamespaceInfo.getNamespaceUriPrefix())).findFirst();
+          .filter(xmlNamespaceInfo -> namespaceUri.equals(xmlNamespaceInfo.getNamespaceUriPrefix())).findFirst();
       if (matchingXmlNamespaceInfo.isPresent()) {
         return matchingXmlNamespaceInfo.get().getNamespace();
       }

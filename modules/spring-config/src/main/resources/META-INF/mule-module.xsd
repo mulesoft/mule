@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/module"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            targetNamespace="http://www.mulesoft.org/schema/mule/module"
+            attributeFormDefault="unqualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+
+    <xsd:element name="module" type="moduleConfigType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Root element of a module that contains either properties, operations, or mule global elements as child.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="operation" type="operationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An operation that will be exposed by the module, it behaves like a function as it has a set of input parameters and a single output
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="operationType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:element name="parameters" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Set of parameters that wil be used to feed a new event, that will be passed through the scope defined by the body
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="parameter" minOccurs="1" maxOccurs="unbounded">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            An named element that will be consumed only in the scope of the body element by the list of message processors.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="name"/>
+                                        <xsd:attribute name="defaultValue" use="optional"/>
+                                        <xsd:attribute name="type" type="inputType" use="required"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="body">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Collection of message processors that can be callable from a scope.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:group ref="mule:messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="output" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Defines the output of the operation if exists, void otherwise.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="type" type="outputSimpleType" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Every operation must be named so that it can be called in a mule application.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="moduleConfigType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A module is defined by three types of elements: properties, global elements and operations.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence maxOccurs="unbounded" minOccurs="1">
+                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                        <xsd:element name="property">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Parametrization of the module when being consumed (similarly to what an operation is).
+                                </xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:complexType>
+                                <xsd:attribute name="name" use="required"/>
+                                <xsd:attribute name="defaultValue" use="optional"/>
+                                <xsd:attribute name="type" type="inputType" use="required"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element ref="operation" />
+                        <xsd:group ref="mule:muleRootElements">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Any global element that can be used in a mule application must be able to put within a module.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:group>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:attribute name="name" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the module that identifies it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="namespace" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Expected namespace of the module to look for when generating the schemas.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="inputType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Set of defined primitive types inputs for any operation or property.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="string"/>
+            <xsd:enumeration value="boolean"/>
+            <xsd:enumeration value="datetime"/>
+            <xsd:enumeration value="date"/>
+            <xsd:enumeration value="integer"/>
+            <xsd:enumeration value="time"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="outputSimpleType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Set of defined primitive types output for any operation.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="string"/>
+            <xsd:enumeration value="boolean"/>
+            <xsd:enumeration value="datetime"/>
+            <xsd:enumeration value="date"/>
+            <xsd:enumeration value="integer"/>
+            <xsd:enumeration value="time"/>
+            <xsd:enumeration value="void"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

@@ -43,7 +43,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @since 3.8.0
  */
-final class MuleDocumentLoader implements DocumentLoader {
+final public class MuleDocumentLoader implements DocumentLoader {
 
   private static final String DEFER_NODE_EXPANSION_FEATURE_KEY = "http://apache.org/xml/features/dom/defer-node-expansion";
 

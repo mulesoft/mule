@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-simple"
+        namespace="http://www.mulesoft.org/schema/mule/module-simple"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <operation name="set-payload-hardcoded-value">
+        <body>
+            <mule:set-payload value="hardcoded value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-value">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-default-value">
+        <parameters>
+            <parameter name="value" type="string" defaultValue="15"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-no-side-effect">
+        <body>
+            <mule:set-payload value="10"/>
+            <mule:set-variable variableName="testVar" value="inside the operation value changed"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-nothing">
+        <body>
+            <mule:set-payload value="despite writing the payload, it won't be propagated because of the void return type" />
+        </body>
+        <output type="void"/>
+    </operation>
+
+    <operation name="set-payload-param-value-appender">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[param.value + ' from module']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-concat-params-values">
+        <parameters>
+            <parameter name="value1" type="string"/>
+            <parameter name="value2" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[param.value1 + param.value2]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-using-undefined-param">
+        <body>
+            <mule:set-payload value="#[param.value1]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-simple="http://www.mulesoft.org/schema/mule/module-simple"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core     http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/module-simple     http://www.mulesoft.org/schema/mule/module-simple/path-que-no-existe/module-simple/module-simple.xsd">
+
+    <flow name="testSetPayloadHardcodedFlow">
+        <module-simple:set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="testSetPayloadParamFlow">
+        <module-simple:set-payload-param-value value="new payload" />
+    </flow>
+
+    <flow name="testSetPayloadParamDefaultFlow">
+        <module-simple:set-payload-param-default-value  />
+    </flow>
+
+    <flow name="testSetPayloadNoSideEffectFlowVariable">
+        <set-variable variableName="testVar" value="unchanged value"/>
+        <module-simple:set-payload-no-side-effect />
+    </flow>
+
+    <flow name="testDoNothingFlow">
+        <set-variable variableName="variableBeforeCalling" value="value of flowvar before calling"/>
+        <set-payload value="before calling" />
+        <module-simple:do-nothing />
+    </flow>
+
+    <flow name="testSetPayloadParamValueAppender">
+        <module-simple:set-payload-param-value-appender value="new payload" />
+    </flow>
+
+    <flow name="testSetPayloadConcatParamsValues">
+        <module-simple:set-payload-concat-params-values value1="10" value2="5" />
+    </flow>
+
+    <flow name="testSetPayloadUsingUndefinedParam">
+        <module-simple:set-payload-using-undefined-param />
+    </flow>
+</mule>
