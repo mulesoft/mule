@@ -7,33 +7,40 @@
 package org.mule.runtime.core.context;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.runtime.core.api.registry.ServiceType.EXCEPTION;
+import static org.mule.runtime.core.config.ExceptionHelper.SERVICE_ROOT;
+import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DataTypeConversionResolver;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.registry.ServiceType;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.ClusterConfiguration;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.connector.PollingController;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -44,7 +51,6 @@ import java.net.URL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.verification.VerificationModeFactory;
 
 public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
 
@@ -76,20 +82,20 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception {
     URL baseUrl = DefaultMuleContextTestCase.class.getClassLoader().getResource(".");
-    File file = new File(baseUrl.getFile() + ExceptionHelper.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + TEST_PROTOCOL
-        + "-exception-mappings.properties");
+    File file =
+        new File(baseUrl.getFile() + SERVICE_ROOT + EXCEPTION.getPath() + "/" + TEST_PROTOCOL + "-exception-mappings.properties");
     createExceptionMappingFile(file, INITIAL_VALUE);
 
-    context = muleContextFactory.createMuleContext();
-    String value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, context);
+    createMuleContext();
+    String value = getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, context);
     assertThat(value, is(INITIAL_VALUE));
     context.dispose();
 
     createExceptionMappingFile(file, VALUE_AFTER_REDEPLOY);
 
-    context = muleContextFactory.createMuleContext();
+    createMuleContext();
     context.setExecutionClassLoader(getClass().getClassLoader());
-    value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, context);
+    value = getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, context);
     assertThat(value, is(VALUE_AFTER_REDEPLOY));
   }
 
@@ -107,22 +113,22 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void callSystemExceptionHandlerWhenExceptionIsMessagingException() throws Exception {
-    context = muleContextFactory.createMuleContext();
+    createMuleContext();
     context.setExceptionListener(mockSystemExceptionHandler);
     context.handleException(mockMessagingException);
-    verify(mockSystemExceptionHandler, VerificationModeFactory.times(1)).handleException(mockMessagingException, null);
+    verify(mockSystemExceptionHandler, times(1)).handleException(mockMessagingException, null);
   }
 
   @Test
   public void getObjectStoreManager() throws Exception {
-    context = muleContextFactory.createMuleContext();
+    createMuleContext();
     Object osManager = context.getObjectStoreManager();
     assertThat(osManager, instanceOf(MuleObjectStoreManager.class));
   }
 
   @Test
   public void defaultMuleClusterConfiguration() throws Exception {
-    context = muleContextFactory.createMuleContext();
+    createMuleContext();
     context.start();
     assertThat(context.getClusterId(), is(""));
     assertThat(context.getClusterNodeId(), is(0));
@@ -132,8 +138,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   public void overriddenClusterConfiguration() throws Exception {
     final int clusterNodeId = 22;
     final String clusterId = "some-id";
-    context = muleContextFactory.createMuleContext();
-    context.getRegistry().registerObject(MuleProperties.OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration() {
+    createMuleContext();
+    context.getRegistry().registerObject(OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration() {
 
       @Override
       public String getClusterId() {
@@ -153,42 +159,41 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void defaultMulePollingController() throws Exception {
-    context = muleContextFactory.createMuleContext();
+    createMuleContext();
     context.start();
     assertThat(context.isPrimaryPollingInstance(), is(true));
   }
 
   @Test
   public void overriddenMulePollingController() throws Exception {
-    context = muleContextFactory.createMuleContext();
-    context.getRegistry().registerObject(MuleProperties.OBJECT_POLLING_CONTROLLER, (PollingController) () -> false);
+    createMuleContext();
+    context.getRegistry().registerObject(OBJECT_POLLING_CONTROLLER, (PollingController) () -> false);
     context.start();
     assertThat(context.isPrimaryPollingInstance(), is(false));
   }
 
   @Test
   public void getStreamCloserService() throws Exception {
-    context = muleContextFactory.createMuleContext();
-    StreamCloserService serviceFromRegistry =
-        context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+    createMuleContext();
+    StreamCloserService serviceFromRegistry = context.getRegistry().lookupObject(OBJECT_MULE_STREAM_CLOSER_SERVICE);
     MuleRegistryHelper registry = spy((MuleRegistryHelper) context.getRegistry());
     ((DefaultMuleContext) context).setMuleRegistry(registry);
 
     StreamCloserService streamCloserService = context.getStreamCloserService();
-    assertNotNull(streamCloserService);
+    assertThat(streamCloserService, not(nullValue()));
 
-    assertSame(serviceFromRegistry, streamCloserService);
+    assertThat(streamCloserService, is(sameInstance(serviceFromRegistry)));
 
     // test that subsequent invocations consistently returns the same object
-    assertSame(streamCloserService, context.getStreamCloserService());
+    assertThat(context.getStreamCloserService(), is(sameInstance(streamCloserService)));
 
     // verify we're not fetching from registry many times
-    verify(registry, times(1)).lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+    verify(registry, times(1)).lookupObject(OBJECT_MULE_STREAM_CLOSER_SERVICE);
   }
 
   @Test
   public void cachesDataTypeConversionResolver() throws Exception {
-    context = new DefaultMuleContextFactory().createMuleContext();
+    createMuleContext();
     final MuleRegistryHelper muleRegistry = mock(MuleRegistryHelper.class);
     ((DefaultMuleContext) context).setMuleRegistry(muleRegistry);
 
@@ -198,5 +203,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     assertThat(dataTypeConverterResolver1, instanceOf(DynamicDataTypeConversionResolver.class));
     assertThat(dataTypeConverterResolver2, sameInstance(dataTypeConverterResolver1));
     verify(muleRegistry).lookupObject(OBJECT_CONVERTER_RESOLVER);
+  }
+
+  protected void createMuleContext() throws InitialisationException, ConfigurationException {
+    context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder());
   }
 }

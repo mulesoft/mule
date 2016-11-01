@@ -23,6 +23,7 @@ import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -159,10 +160,29 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   }
 
   /**
+   * Creates a new MuleContext using the given configurationBuilder. Properties if provided are used to replace "property
+   * placeholder" value in configuration files.
+   */
+  public MuleContext createMuleContext(List<ConfigurationBuilder> configurationBuilders, Properties properties)
+      throws InitialisationException, ConfigurationException {
+    return createMuleContext(configurationBuilders, properties, new DefaultMuleConfiguration());
+  }
+
+  /**
    * Creates a new MuleContext using the given configurationBuilder and configuration. Properties if provided are used to replace
    * "property placeholder" value in configuration files.
    */
   public MuleContext createMuleContext(final ConfigurationBuilder configurationBuilder, final Properties properties,
+                                       MuleConfiguration configuration)
+      throws InitialisationException, ConfigurationException {
+    return createMuleContext(Collections.singletonList(configurationBuilder), properties, configuration);
+  }
+
+  /**
+   * Creates a new MuleContext using the given configurationBuilder and configuration. Properties if provided are used to replace
+   * "property placeholder" value in configuration files.
+   */
+  public MuleContext createMuleContext(final List<ConfigurationBuilder> configurationBuilders, final Properties properties,
                                        MuleConfiguration configuration)
       throws InitialisationException, ConfigurationException {
     // Create MuleContext
@@ -178,7 +198,9 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
         }
 
         // Configure with configurationBuilder
-        configurationBuilder.configure(muleContext);
+        for (ConfigurationBuilder configurationBuilder : configurationBuilders) {
+          configurationBuilder.configure(muleContext);
+        }
 
         notifyMuleContextConfiguration(muleContext);
       }

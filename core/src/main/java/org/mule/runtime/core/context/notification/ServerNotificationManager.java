@@ -6,34 +6,33 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import static java.lang.Thread.currentThread;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkListener;
-
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off switches in the config.
@@ -61,16 +60,18 @@ import org.slf4j.LoggerFactory;
  * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
  * </ul>
  */
-public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler, MuleContextAware {
+public class ServerNotificationManager
+    implements Initialisable, Disposable, Startable, Stoppable, ServerNotificationHandler, MuleContextAware {
 
-  public static final String NULL_SUBSCRIPTION = "NULL";
-  protected Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = getLogger(ServerNotificationManager.class);
+
   private boolean dynamic = false;
   private Configuration configuration = new Configuration();
   private AtomicBoolean disposed = new AtomicBoolean(false);
-  private volatile Thread runningThread;
-  private BlockingDeque<ServerNotification> eventQueue = new LinkedBlockingDeque<ServerNotification>();
+  // private volatile Thread runningThread;
+  // private BlockingDeque<ServerNotification> eventQueue = new LinkedBlockingDeque<>();
   private MuleContext muleContext;
+  private Scheduler notificationsScheduler;
 
   @Override
   public boolean isNotificationDynamic() {
@@ -86,13 +87,31 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     this.dynamic = dynamic;
   }
 
-  public void start(WorkManager workManager, WorkListener workListener) throws LifecycleException {
+  @Override
+  public void initialise() throws InitialisationException {
+    // try {
+    // notificationsScheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).cpuLightScheduler();
+    // } catch (RegistrationException e) {
+    // throw new InitialisationException(e, this);
+    // }
+  }
+
+  @Override
+  public void start() throws InitialisationException {
     try {
-      workManager.scheduleWork(this, WorkManager.INDEFINITE, null, workListener);
-    } catch (WorkException e) {
-      throw new LifecycleException(e, this);
+      notificationsScheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).cpuLightScheduler();
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
     }
   }
+
+  // public void start(WorkManager workManager, WorkListener workListener) throws LifecycleException {
+  // try {
+  // workManager.scheduleWork(this, WorkManager.INDEFINITE, null, workListener);
+  // } catch (WorkException e) {
+  // throw new LifecycleException(e, this);
+  // }
+  // }
 
   public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event) {
     configuration.addInterfaceToType(iface, event);
@@ -152,13 +171,14 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
       if (notification instanceof BlockingServerEvent) {
         notifyListeners(notification);
       } else {
-        try {
-          eventQueue.put(notification);
-        } catch (InterruptedException e) {
-          if (!disposed.get()) {
-            logger.error("Failed to queue notification: " + notification, e);
-          }
-        }
+        notificationsScheduler.submit(() -> notifyListeners(notification));
+        // try {
+        // eventQueue.put(notification);
+        // } catch (InterruptedException e) {
+        // if (!disposed.get()) {
+        // logger.error("Failed to queue notification: " + notification, e);
+        // }
+        // }
       }
     } else {
       logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
@@ -178,12 +198,20 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
   }
 
   @Override
+  public void stop() {
+    if (notificationsScheduler != null) {
+      notificationsScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      notificationsScheduler = null;
+    }
+  }
+
+  @Override
   public void dispose() {
     disposed.set(true);
     configuration = null;
-    if (runningThread != null) {
-      runningThread.interrupt();
-    }
+    // if (runningThread != null) {
+    // runningThread.interrupt();
+    // }
   }
 
   protected void notifyListeners(ServerNotification notification) {
@@ -194,26 +222,26 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     }
   }
 
-  @Override
-  public void release() {
-    dispose();
-  }
-
-  @Override
-  public void run() {
-    runningThread = currentThread();
-    while (!disposed.get()) {
-      try {
-        int timeout = muleContext.getConfiguration().getDefaultQueueTimeout();
-        ServerNotification notification = eventQueue.poll(timeout, TimeUnit.MILLISECONDS);
-        if (notification != null) {
-          notifyListeners(notification);
-        }
-      } catch (InterruptedException e) {
-        currentThread().interrupt();
-      }
-    }
-  }
+  // @Override
+  // public void release() {
+  // dispose();
+  // }
+  //
+  // @Override
+  // public void run() {
+  // runningThread = currentThread();
+  // while (!disposed.get()) {
+  // try {
+  // int timeout = muleContext.getConfiguration().getDefaultQueueTimeout();
+  // ServerNotification notification = eventQueue.poll(timeout, TimeUnit.MILLISECONDS);
+  // if (notification != null) {
+  // notifyListeners(notification);
+  // }
+  // } catch (InterruptedException e) {
+  // currentThread().interrupt();
+  // }
+  // }
+  // }
 
   /**
    * Support string or class parameters
@@ -238,11 +266,11 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
   }
 
   public Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes() {
-    return Collections.unmodifiableMap(configuration.getInterfaceToTypes());
+    return unmodifiableMap(configuration.getInterfaceToTypes());
   }
 
   public Set<ListenerSubscriptionPair> getListeners() {
-    return Collections.unmodifiableSet(configuration.getListeners());
+    return unmodifiableSet(configuration.getListeners());
   }
 
 }

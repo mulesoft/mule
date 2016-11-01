@@ -13,8 +13,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.MuleAssert.assertTrue;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -27,10 +28,11 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.JdkVersionUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +57,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     lifecycleManager = new SensingLifecycleManager();
     ctxBuilder.setLifecycleManager(lifecycleManager);
     ctx = ctxBuilder.buildMuleContext();
+    new TestServicesConfigurationBuilder().configure(ctx);
   }
 
   @After
@@ -319,15 +322,12 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     ctx.initialise();
     new DefaultsConfigurationBuilder().configure(ctx);
 
-    final AtomicReference<MuleContext> contextFromNotification = new AtomicReference<MuleContext>();
-    final AtomicReference<String> resourceId = new AtomicReference<String>();
+    final AtomicReference<MuleContext> contextFromNotification = new AtomicReference<>();
+    final AtomicReference<String> resourceId = new AtomicReference<>();
     MuleContextNotificationListener<MuleContextNotification> listener =
-        new MuleContextNotificationListener<MuleContextNotification>() {
-
-          public void onNotification(MuleContextNotification notification) {
-            contextFromNotification.set(notification.getMuleContext());
-            resourceId.set(notification.getResourceIdentifier());
-          }
+        notification -> {
+          contextFromNotification.set(notification.getMuleContext());
+          resourceId.set(notification.getResourceIdentifier());
         };
     ctx.registerListener(listener);
     ctx.start();
@@ -366,7 +366,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
     public SensingLifecycleManager() {
       super();
-      appliedLifecyclePhases = new ArrayList<String>();
+      appliedLifecyclePhases = new ArrayList<>();
     }
 
     public boolean didApplyPhases(String... phaseNames) {
@@ -388,6 +388,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     final AtomicBoolean stoppingNotificationFired = new AtomicBoolean(false);
     final AtomicBoolean stoppedNotificationFired = new AtomicBoolean(false);
 
+    @Override
     public void onNotification(MuleContextNotification notification) {
       switch (notification.getAction()) {
         case MuleContextNotification.CONTEXT_STARTING:

@@ -82,4 +82,9 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
   public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     return task.get(timeout, unit);
   }
+
+  @Override
+  public String toString() {
+    return "RunnableFutureDecorator[" + task.toString() + "]";
+  }
 }

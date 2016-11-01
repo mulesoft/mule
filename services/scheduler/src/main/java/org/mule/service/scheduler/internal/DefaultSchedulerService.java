@@ -49,6 +49,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   // TODO MULE-10585 Externalize this timeout
   private static final int GRACEFUL_SHUTDOWN_TIMEOUT_SECS = 60;
 
+  private static final int TASK_QUEUE_SIZE = 2000;
+
   private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
   private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
   private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
@@ -86,11 +88,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     logger.info("Starting " + this.toString() + "...");
 
     // TODO MULE-10585 Externalize the threads configuration
-    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(2 * cores),
+    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(TASK_QUEUE_SIZE),
                                               new NamedThreadFactory(CPU_LIGHT_THREADS_NAME));
-    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new ArrayBlockingQueue<>(cores * cores),
+    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new ArrayBlockingQueue<>(TASK_QUEUE_SIZE),
                                         new NamedThreadFactory(IO_THREADS_NAME));
-    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(2 * cores),
+    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(TASK_QUEUE_SIZE),
                                                  new NamedThreadFactory(COMPUTATION_THREADS_NAME));
     scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(SCHEDULER_THREADS_NAME));
 

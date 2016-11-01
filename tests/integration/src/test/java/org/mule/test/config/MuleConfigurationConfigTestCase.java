@@ -11,7 +11,11 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
@@ -29,7 +33,7 @@ public class MuleConfigurationConfigTestCase extends AbstractMuleTestCase {
 
   @Test
   public void configurationQueueTxLogSizeExplicitValue() throws Exception {
-    muleContext = new ApplicationContextBuilder()
+    muleContext = new WithServicesApplicationContextBuilder()
         .setApplicationResources(new String[] {"org/mule/test/config/configuration-queue-tx-log-size-explict-config.xml"})
         .build();
     assertThat(muleContext.getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes(), is(100));
@@ -37,8 +41,16 @@ public class MuleConfigurationConfigTestCase extends AbstractMuleTestCase {
 
   @Test
   public void configurationQueueTxLogSizeDefaultValue() throws Exception {
-    muleContext = new ApplicationContextBuilder().setApplicationResources(new String[] {}).build();
+    muleContext = new WithServicesApplicationContextBuilder().setApplicationResources(new String[] {}).build();
     assertThat(muleContext.getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
   }
 
+  private static class WithServicesApplicationContextBuilder extends ApplicationContextBuilder {
+
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders) {
+      super.addBuilders(builders);
+      builders.add(new TestServicesConfigurationBuilder());
+    }
+  }
 }

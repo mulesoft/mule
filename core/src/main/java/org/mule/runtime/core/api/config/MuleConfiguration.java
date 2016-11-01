@@ -45,6 +45,7 @@ public interface MuleConfiguration {
 
   boolean isValidateExpressions();
 
+  @Deprecated
   int getDefaultQueueTimeout();
 
   int getShutdownTimeout();
