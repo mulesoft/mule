@@ -68,7 +68,9 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
 
     @Override
     public void stop() throws MuleException {
-      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      if (scheduler != null) {
+        scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      }
     }
   }
 }

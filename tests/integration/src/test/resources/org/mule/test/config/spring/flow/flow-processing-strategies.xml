@@ -23,14 +23,6 @@
         <echo-component />
     </flow>
 
-    <flow name="customAsynchronousFlow" processingStrategy="customAsynchronousStrategy">
-        <echo-component />
-    </flow>
-
-    <flow name="customNonBlockingFlow" processingStrategy="customNonBlockingStrategy">
-        <echo-component />
-    </flow>
-
     <flow name="customProcessingStrategyFlow" processingStrategy="customStrategy">
         <echo-component />
     </flow>
@@ -47,26 +39,12 @@
         </async>
     </flow>
 
-    <flow name="customAsynchronousAsync">
-        <async processingStrategy="customAsynchronousStrategy">
-            <echo-component />
-        </async>
-    </flow>
-
     <flow name="customProcessingStrategyAsync">
         <async processingStrategy="customStrategy">
             <echo-component />
         </async>
     </flow>
  
-    <asynchronous-processing-strategy name="customAsynchronousStrategy"
-        maxThreads="10" minThreads="5" threadTTL="100" maxBufferSize="10" threadWaitTimeout="1000"
-        poolExhaustedAction="WAIT" />
-
-    <non-blocking-processing-strategy name="customNonBlockingStrategy"
-                                      maxThreads="10" minThreads="5" threadTTL="100" maxBufferSize="10" threadWaitTimeout="1000"
-                                      poolExhaustedAction="WAIT" />
-
     <custom-processing-strategy name="customStrategy" class="org.mule.test.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
         <spring:property name="foo" value="bar" />
     </custom-processing-strategy>

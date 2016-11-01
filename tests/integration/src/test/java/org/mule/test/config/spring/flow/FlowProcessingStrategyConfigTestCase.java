@@ -6,7 +6,9 @@
  */
 package org.mule.test.config.spring.flow;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -35,69 +37,48 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
 
   @Test
   public void testDefault() throws Exception {
-    assertEquals(DefaultFlowProcessingStrategy.class, getFlowProcessingStrategy("defaultFlow").getClass());
+    assertThat(getFlowProcessingStrategy("defaultFlow"), instanceOf(DefaultFlowProcessingStrategy.class));
   }
 
   @Test
   public void testSynchronous() throws Exception {
-    assertEquals(SynchronousProcessingStrategy.class, getFlowProcessingStrategy("synchronousFlow").getClass());
+    assertThat(getFlowProcessingStrategy("synchronousFlow"), instanceOf(SynchronousProcessingStrategy.class));
   }
 
   @Test
   public void testAsynchronous() throws Exception {
-    assertEquals(AsynchronousProcessingStrategy.class, getFlowProcessingStrategy("asynchronousFlow").getClass());
+    assertThat(getFlowProcessingStrategy("asynchronousFlow"), instanceOf(AsynchronousProcessingStrategy.class));
   }
 
   @Test
   public void testNonBlocking() throws Exception {
-    assertEquals(NonBlockingProcessingStrategy.class, getFlowProcessingStrategy("nonBlockingFlow").getClass());
-  }
-
-  @Test
-  public void testCustomAsynchronous() throws Exception {
-    ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customAsynchronousFlow");
-
-    assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
-  }
-
-  @Test
-  public void testCustomNonBlocking() throws Exception {
-    ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customNonBlockingFlow");
-
-    assertEquals(NonBlockingProcessingStrategy.class, processingStrategy.getClass());
+    assertThat(getFlowProcessingStrategy("nonBlockingFlow"), instanceOf(NonBlockingProcessingStrategy.class));
   }
 
   @Test
   public void testCustom() throws Exception {
     ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customProcessingStrategyFlow");
-    assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
+    assertThat(processingStrategy, instanceOf(CustomProcessingStrategy.class));
 
-    assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
+    assertThat(((CustomProcessingStrategy) processingStrategy).foo, is("bar"));
   }
 
   @Test
   public void testDefaultAsync() throws Exception {
-    assertEquals(AsynchronousProcessingStrategy.class, getAsyncProcessingStrategy("defaultAsync").getClass());
+    assertThat(getFlowProcessingStrategy("defaultAsync"), instanceOf(AsynchronousProcessingStrategy.class));
   }
 
   @Test
   public void testAsynchronousAsync() throws Exception {
-    assertEquals(AsynchronousProcessingStrategy.class, getAsyncProcessingStrategy("asynchronousAsync").getClass());
-  }
-
-  @Test
-  public void testCustomAsynchronousAsync() throws Exception {
-    ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customAsynchronousAsync");
-
-    assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
+    assertThat(getFlowProcessingStrategy("asynchronousAsync"), instanceOf(AsynchronousProcessingStrategy.class));
   }
 
   @Test
   public void testCustomAsync() throws Exception {
     ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customProcessingStrategyAsync");
-    assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
+    assertThat(processingStrategy, instanceOf(CustomProcessingStrategy.class));
 
-    assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
+    assertThat(((CustomProcessingStrategy) processingStrategy).foo, is("bar"));
   }
 
   private ProcessingStrategy getFlowProcessingStrategy(String flowName) throws Exception {
@@ -108,7 +89,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
   private ProcessingStrategy getAsyncProcessingStrategy(String flowName) throws Exception {
     Flow flow = (Flow) getFlowConstruct(flowName);
     Processor processor = flow.getMessageProcessors().get(0);
-    assertEquals(AsyncDelegateMessageProcessor.class, processor.getClass());
+    assertThat(processor, instanceOf(AsyncDelegateMessageProcessor.class));
     return ((AsyncDelegateMessageProcessor) processor).getProcessingStrategy();
   }
 
