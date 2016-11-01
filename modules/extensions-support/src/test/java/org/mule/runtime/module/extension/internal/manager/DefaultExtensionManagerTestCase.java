@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -45,12 +46,22 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
+import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+<<<<<<< d7d7a49dde07104e75900a92a18114af16cb0f96
+=======
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
+>>>>>>> MULE-10654: Model Validator should not complain if the singularized name clashes with another parameter name, when the generic of the list is of the same as the parameter type
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -296,12 +307,23 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void registerFromManifest() throws Exception {
+    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
+    when(serviceRegistry.lookupProviders(anyObject(), anyObject())).thenReturn(asList(new XmlModelEnricher()));
+
     final String version = "4.0.0";
     ExtensionManifestBuilder builder =
         new ExtensionManifestBuilder().setName(HEISENBERG).setDescription(EXTENSION_DESCRIPTION).setVersion(version);
     builder.withDescriber().setId(DESCRIBER_ID).addProperty(TYPE_PROPERTY_NAME, HeisenbergExtension.class.getName());
 
-    extensionsManager.registerExtension(builder.build(), getClass().getClassLoader());
+    Describer describer = new DescriberResolver().resolve(builder.build(), classLoader);
+    final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
+
+    ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader());
+
+    ExtensionModel extensionModel =
+        withContextClassLoader(classLoader, () -> extensionFactory.createFrom(describer.describe(context), context));
+
+    extensionsManager.registerExtension(extensionModel);
 
     Optional<ExtensionModel> registered = extensionsManager.getExtension(HEISENBERG);
     assertThat(registered.isPresent(), is(true));
