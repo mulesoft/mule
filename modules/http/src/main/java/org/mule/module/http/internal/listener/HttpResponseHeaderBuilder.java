@@ -6,9 +6,13 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.util.Arrays.asList;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.util.CaseInsensitiveMapWrapper;
 
 import com.google.common.base.Supplier;
@@ -16,15 +20,19 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HttpResponseHeaderBuilder
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpResponseHeaderBuilder.class);
 
-    private List<String> calculatedHeadersNames = Arrays.asList(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Names.CONTENT_LENGTH);
+    private List<String> calculatedHeadersNames = asList(TRANSFER_ENCODING, CONTENT_LENGTH);
+    private List<String> uniqueHeadersNames = asList(TRANSFER_ENCODING.toLowerCase(), CONTENT_LENGTH.toLowerCase(), CONTENT_TYPE.toLowerCase());
 
     Multimap<String, String> headers =
             Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>(){
@@ -71,28 +79,53 @@ public class HttpResponseHeaderBuilder
         }
     }
 
+    /**
+     *
+     * Check if the given header allows multiple values. In case it doesn't and the header already has a value,
+     * a warn message is shown and the older values are removed from the map.
+     *
+     * @param headerName the header name to check if it has already a value set.
+     */
+    private void logIfHeaderDoesNotSupportMultipleValues(String headerName)
+    {
+        if (uniqueHeadersNames.contains(headerName.toLowerCase()))
+        {
+            final Collection<String> values = headers.removeAll(headerName);
+            LOGGER.warn("Header: " + headerName + " does not support multiple values. Removing {}", values);
+        }
+    }
+
+    /**
+     * Adds the given header to the map. In case the header already has a value, {@link #logIfHeaderDoesNotSupportMultipleValues}
+     * is called instead of {@link #failIfHeaderDoesNotSupportMultipleValues(String)} to
+     * keep backwards compatibility.
+     * This behavior will change in Mule 4.
+     *
+     * @param headerName the header name to be added.
+     * @param headerValue the header value to be added.
+     */
     private void addSimpleValue(String headerName, String headerValue)
     {
-        if (headers.containsValue(headerName))
+        if (headers.containsKey(headerName))
         {
-            failIfHeaderDoesNotSupportMultipleValues(headerName);
+            logIfHeaderDoesNotSupportMultipleValues(headerName);
         }
         headers.put(headerName, headerValue);
     }
 
     public String getContentType()
     {
-        return getSimpleValue(HttpHeaders.Names.CONTENT_TYPE);
+        return getSimpleValue(CONTENT_TYPE);
     }
 
     public String getTransferEncoding()
     {
-        return getSimpleValue(HttpHeaders.Names.TRANSFER_ENCODING);
+        return getSimpleValue(TRANSFER_ENCODING);
     }
 
     public String getContentLength()
     {
-        return getSimpleValue(HttpHeaders.Names.CONTENT_LENGTH);
+        return getSimpleValue(CONTENT_LENGTH);
     }
 
     private String getSimpleValue(String header)
@@ -106,12 +139,12 @@ public class HttpResponseHeaderBuilder
 
     public void addContentType(String multipartFormData)
     {
-        addSimpleValue(HttpHeaders.Names.CONTENT_TYPE, multipartFormData);
+        addSimpleValue(CONTENT_TYPE, multipartFormData);
     }
 
     public void addContentLenght(String calculatedContentLenght)
     {
-        addSimpleValue(HttpHeaders.Names.CONTENT_LENGTH, calculatedContentLenght);
+        addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
     }
 
     public Collection<String> getHeaderNames()
