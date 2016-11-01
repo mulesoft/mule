@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;

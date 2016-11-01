@@ -9,8 +9,9 @@ package org.mule.runtime.core.processor.strategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.List;
 

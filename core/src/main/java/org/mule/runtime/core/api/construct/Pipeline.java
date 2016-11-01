@@ -8,10 +8,10 @@ package org.mule.runtime.core.api.construct;
 
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.List;
 

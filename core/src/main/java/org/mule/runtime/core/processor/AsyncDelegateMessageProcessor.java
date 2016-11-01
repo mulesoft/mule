@@ -23,14 +23,14 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSourceProvider;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.work.MuleWorkManager;
 

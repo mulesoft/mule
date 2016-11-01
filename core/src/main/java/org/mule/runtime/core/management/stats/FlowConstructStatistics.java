@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.management.stats;
 
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 
 import java.util.concurrent.atomic.AtomicLong;

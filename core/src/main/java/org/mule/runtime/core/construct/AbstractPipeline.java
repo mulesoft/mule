@@ -28,8 +28,9 @@ import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -47,7 +48,6 @@ import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;

@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.editors;
 
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
 
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;

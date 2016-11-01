@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.processor.strategy;
-
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+package org.mule.runtime.core.api.processor.strategy;
 
 /**
  * Abstract Factory for creating concrete {@link ProcessingStrategy}ies.

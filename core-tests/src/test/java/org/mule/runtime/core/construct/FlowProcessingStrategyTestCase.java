@@ -16,9 +16,9 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

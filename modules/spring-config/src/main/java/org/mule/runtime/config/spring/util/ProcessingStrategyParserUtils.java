@@ -10,7 +10,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
 
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

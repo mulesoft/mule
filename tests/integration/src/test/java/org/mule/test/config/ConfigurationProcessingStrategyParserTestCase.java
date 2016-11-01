@@ -15,7 +15,7 @@ import static org.mule.runtime.core.util.ProcessingStrategyUtils.ASYNC_PROCESSIN
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY;
 
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;

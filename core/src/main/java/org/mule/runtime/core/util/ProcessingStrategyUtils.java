@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 
 public class ProcessingStrategyUtils {

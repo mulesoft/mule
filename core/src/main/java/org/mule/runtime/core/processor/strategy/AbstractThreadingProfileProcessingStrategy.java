@@ -8,12 +8,12 @@ package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 /**
- * A abstract {@link org.mule.runtime.core.api.processor.ProcessingStrategy} implementation that provides a
+ * A abstract {@link org.mule.runtime.core.api.processor.strategy.ProcessingStrategy} implementation that provides a
  * {@link org.mule.runtime.core.api.config.ThreadingProfile} for you in extensions configured via setters for each of the
  * threading profile attributes.
  */
