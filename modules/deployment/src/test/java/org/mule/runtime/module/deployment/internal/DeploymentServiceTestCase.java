@@ -171,7 +171,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
   private static final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
-      .compiling(getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java"),
+      .compiling(getResourceFile("/org/mule/service/scheduler/MockScheduler.java"),
+                 getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java"),
                  getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java"))
       .compile("mule-module-service-mock-scheduler-1.0-SNAPSHOT.jar");
 

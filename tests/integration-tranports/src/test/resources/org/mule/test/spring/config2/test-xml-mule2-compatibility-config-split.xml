@@ -12,10 +12,7 @@
 
     <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
 
-    <asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
-                                             poolExhaustedAction="DISCARD"/>
-
-    <flow name="appleComponent2" processingStrategy="customStrategy">
+    <flow name="appleComponent2" processingStrategy="asynchronous">
         <composite-source>
             <transports:inbound-endpoint address="test://endpoint.in3"
                               exchange-pattern="one-way"/>

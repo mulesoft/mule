@@ -18,16 +18,16 @@ public class MockSchedulerService implements SchedulerService {
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return null;
+    return new MockScheduler();
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return null;
+    return new MockScheduler();
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return null;
+    return new MockScheduler();
   }
 }

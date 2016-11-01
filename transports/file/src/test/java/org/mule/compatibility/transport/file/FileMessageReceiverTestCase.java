@@ -7,16 +7,11 @@
 package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,13 +37,9 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     read.newFile("empty.tmp");
     fmr.initialise();
     fmr.doInitialise();
-    fmr.setListener(new Processor() {
-
-      @Override
-      public Event process(Event event) throws MuleException {
-        fail("Should not process empty file");
-        return null;
-      }
+    fmr.setListener(event -> {
+      fail("Should not process empty file");
+      return null;
     });
     fmr.doConnect();
     fmr.poll();
@@ -59,8 +50,8 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     Connector connector = endpoint.getConnector();
     connector.start();
 
-    return new FileMessageReceiver(connector, mock(Flow.class), endpoint,
-                                   read.getRoot().getAbsolutePath(), move.getRoot().getAbsolutePath(), null, 1000);
+    return new FileMessageReceiver(connector, flow, endpoint, read.getRoot().getAbsolutePath(), move.getRoot().getAbsolutePath(),
+                                   null, 1000);
   }
 
   @Override

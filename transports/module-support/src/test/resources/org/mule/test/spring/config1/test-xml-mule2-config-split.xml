@@ -12,10 +12,7 @@
        http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-    <asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
-                                             poolExhaustedAction="DISCARD"/>
-
-    <flow name="appleComponent2" processingStrategy="customStrategy">
+    <flow name="appleComponent2" processingStrategy="asynchronous">
         <composite-source>
             <transports:inbound-endpoint address="test://endpoint.in3"
                               exchange-pattern="one-way"/>
