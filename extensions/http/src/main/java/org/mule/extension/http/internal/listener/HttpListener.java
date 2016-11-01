@@ -164,20 +164,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
                       SourceCallbackContext callbackContext,
                       Error error) {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
-    final HttpResponseBuilder failureResponseBuilder;
-    if (hasCustomResponse(ofNullable(error))) {
-      Message errorMessage = error.getErrorMessage();
-      checkArgument(errorMessage.getAttributes() instanceof HttpResponseAttributes, "Error message must be HTTP compliant.");
-      HttpResponseAttributes attributes = (HttpResponseAttributes) errorMessage.getAttributes();
-      failureResponseBuilder = new HttpResponseBuilder()
-          .setStatusCode(attributes.getStatusCode())
-          .setReasonPhrase(attributes.getReasonPhrase());
-      attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
-    } else if (error != null) {
-      failureResponseBuilder = createDefaultFailureResponseBuilder(error.getCause());
-    } else {
-      failureResponseBuilder = new HttpResponseBuilder();
-    }
+    final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
     if (errorResponseBuilder.getBody() == null) {
       errorResponseBuilder.setBody(error.getCause().getMessage());
@@ -196,6 +183,24 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     responseCallback.responseReady(response, getResponseFailureCallback(responseCallback));
+  }
+
+  private HttpResponseBuilder createFailureResponseBuilder(Error error) {
+    final HttpResponseBuilder failureResponseBuilder;
+    if (hasCustomResponse(ofNullable(error))) {
+      Message errorMessage = error.getErrorMessage();
+      checkArgument(errorMessage.getAttributes() instanceof HttpResponseAttributes, "Error message must be HTTP compliant.");
+      HttpResponseAttributes attributes = (HttpResponseAttributes) errorMessage.getAttributes();
+      failureResponseBuilder = new HttpResponseBuilder()
+          .setStatusCode(attributes.getStatusCode())
+          .setReasonPhrase(attributes.getReasonPhrase());
+      attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
+    } else if (error != null) {
+      failureResponseBuilder = createDefaultFailureResponseBuilder(error.getCause());
+    } else {
+      failureResponseBuilder = new HttpResponseBuilder();
+    }
+    return failureResponseBuilder;
   }
 
   @Override
