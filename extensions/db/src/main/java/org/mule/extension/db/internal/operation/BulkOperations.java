@@ -18,7 +18,6 @@ import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.BulkUpdateExecutor;
-import org.mule.extension.db.internal.domain.metadata.BaseDbMetadataResolver;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
@@ -32,9 +31,9 @@ import org.mule.extension.db.internal.resolver.query.FileBulkQueryFactory;
 import org.mule.extension.db.internal.util.DefaultFileReader;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -62,8 +61,8 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] bulkInsert(@ParameterGroup BulkQueryDefinition query,
-                          @XmlHints(allowReferences = false) List<Map<String, Object>> parameterValues,
+  public int[] bulkInsert(@XmlHints(allowReferences = false) @Placement(order = 1) List<Map<String, Object>> parameterValues,
+                          @ParameterGroup BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -84,8 +83,8 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] bulkUpdate(@ParameterGroup BulkQueryDefinition query,
-                          @XmlHints(allowReferences = false) List<Map<String, Object>> parameterValues,
+  public int[] bulkUpdate(@XmlHints(allowReferences = false) @Placement(order = 1) List<Map<String, Object>> parameterValues,
+                          @ParameterGroup BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -106,8 +105,8 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] bulkDelete(@ParameterGroup BulkQueryDefinition query,
-                          @XmlHints(allowReferences = false) List<Map<String, Object>> parameterValues,
+  public int[] bulkDelete(@XmlHints(allowReferences = false) @Placement(order = 1) List<Map<String, Object>> parameterValues,
+                          @ParameterGroup BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
