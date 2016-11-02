@@ -27,6 +27,7 @@ import java.util.Optional;
  * be isolated between each other, so when resolving a parameter value, does not matter if other
  * parameters have invalid values.
  *
+ * @param <M> the generic type of of the model which represents the component beign executed
  * @since 4.0
  */
 public class LazyExecutionContext<M extends ComponentModel> implements ExecutionContext<M> {
