@@ -7,6 +7,7 @@
 package org.mule.runtime.core.construct;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -35,6 +36,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -175,6 +178,33 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
       fail("exception expected");
     } catch (Exception e) {
     }
+  }
+
+  @Test
+  public void restartWithSynchronousProcessingStrategy() throws Exception {
+    flow.setProcessingStrategyFactory(new SynchronousProcessingStrategyFactory());
+    flow.initialise();
+    flow.start();
+
+    flow.stop();
+    flow.start();
+
+    Event response = directInboundMessageSource.process(testEvent());
+    assertThat(response, not(nullValue()));
+  }
+
+  @Test
+  public void restartWithAsynchronousProcessingStrategy() throws Exception {
+    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
+    flow.initialise();
+    flow.start();
+
+    flow.stop();
+    flow.start();
+
+    Event response =
+        directInboundMessageSource.process(eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
+    assertThat(response, not(nullValue()));
   }
 
   @Test
