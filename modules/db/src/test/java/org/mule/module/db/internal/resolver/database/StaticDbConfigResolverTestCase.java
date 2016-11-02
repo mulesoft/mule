@@ -10,8 +10,12 @@ package org.mule.module.db.internal.resolver.database;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleEvent;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
@@ -21,13 +25,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.junit.Test;
 
 public class StaticDbConfigResolverTestCase extends AbstractMuleTestCase
 {
 
     private final DbConfig dbConfig = mock(DbConfig.class);
-    private final DbConfigResolver dbConfigResolver = new StaticDbConfigResolver(dbConfig);
+    private final StaticDbConfigResolver dbConfigResolver = new StaticDbConfigResolver(dbConfig);
 
     @Test
     public void resolvesDbConfig() throws Exception
@@ -71,5 +77,20 @@ public class StaticDbConfigResolverTestCase extends AbstractMuleTestCase
         final Result<MetaData> metaData = dbConfigResolver.getMetaData(metaDataKey);
 
         assertThat(metaData, is(expectedMetaData));
+    }
+
+    @Test
+    public void disposesDisposableDbConfig() throws Exception
+    {
+        DisposableDataSource dataSource = mock(DisposableDataSource.class);
+        when(dbConfig.getDataSource()).thenReturn(dataSource);
+
+        dbConfigResolver.dispose();
+
+        verify(dataSource, times(1)).dispose();
+    }
+
+    private interface DisposableDataSource extends DataSource, Disposable {
+
     }
 }
