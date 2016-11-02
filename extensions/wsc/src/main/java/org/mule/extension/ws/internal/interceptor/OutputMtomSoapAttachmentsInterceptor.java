@@ -30,15 +30,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 /**
- * CXF out interceptor that collects the received SOAP attachments in the response, transforms it to message parts and stores
+ * CXF out interceptor that collects the received Mtom SOAP attachments in the response, transforms it to message parts and stores
  * them in the response message {@link Exchange} so then can be returned by the {@link ConsumeOperation} as a
  * {@link MultiPartPayload}, if no attachments are returned an empty list is set.
  *
  * @since 4.0
  */
-public class OutputSoapAttachmentsInterceptor extends AbstractPhaseInterceptor<Message> {
+public class OutputMtomSoapAttachmentsInterceptor extends AbstractPhaseInterceptor<Message> {
 
-  public OutputSoapAttachmentsInterceptor() {
+  public OutputMtomSoapAttachmentsInterceptor() {
     super(PRE_PROTOCOL);
   }
 

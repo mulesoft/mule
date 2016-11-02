@@ -9,6 +9,8 @@
     </wsc:config>
 
     <flow name="noParamsOperation">
-        <wsc:consume config-ref="config" operation="noParams" body="#[payload]"/>
+        <wsc:consume config-ref="config" operation="noParams">
+            <wsc:message body="#[payload]"/>
+        </wsc:consume>
     </flow>
 </mule>

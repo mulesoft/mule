@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.internal;
+package org.mule.extension.ws.internal.connection;
 
 import org.mule.extension.ws.api.SoapVersion;
 import org.mule.runtime.api.connection.ConnectionException;

@@ -11,9 +11,16 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isIn;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
+import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
+import static org.mule.extension.ws.WscTestUtils.HEADER_OUT;
+import static org.mule.extension.ws.internal.metadata.BaseWscResolver.ATTACHMENTS_FIELD;
+import static org.mule.extension.ws.internal.metadata.BaseWscResolver.BODY_FIELD;
+import static org.mule.extension.ws.internal.metadata.BaseWscResolver.HEADERS_FIELD;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -29,7 +36,11 @@ import java.util.Optional;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Web Service Consumer")
+@Stories("Metadata")
 public class OutputMetadataTestCase extends AbstractMetadataTestCase {
 
   @Test
@@ -87,13 +98,34 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
     assertThat(attributesFields, hasSize(2));
     Optional<ObjectFieldType> soapHeaders = attributesFields.stream().filter(e -> e.getValue() instanceof ObjectType).findFirst();
     assertThat(soapHeaders.isPresent(), is(true));
-    assertThat(soapHeaders.get().getKey().getName().getLocalPart(), is("soapHeaders"));
+    assertThat(soapHeaders.get().getKey().getName().getLocalPart(), is(HEADERS_FIELD));
     Collection<ObjectFieldType> soapHeadersElements = toObjectType(soapHeaders.get().getValue()).getFields();
     assertThat(soapHeadersElements, hasSize(2));
     soapHeadersElements.forEach(e -> {
-      assertThat(e.getKey().getName().getLocalPart(), isIn(new String[] {"headerOut", "headerInOut"}));
+      assertThat(e.getKey().getName().getLocalPart(), isIn(new String[] {HEADER_OUT, HEADER_INOUT}));
       MetadataType value = toObjectType(e.getValue()).getFields().iterator().next().getValue();
       assertThat(value, is(instanceOf(StringType.class)));
     });
+  }
+
+  @Test
+  @Description("Checks the Output Metadata of an operation that contains output attachments")
+  public void getDownloadAttachmentMetadata() {
+    MetadataResult<ComponentMetadataDescriptor> result = getMetadata(DOWNLOAD_ATTACHMENT, DOWNLOAD_ATTACHMENT);
+    MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
+    Collection<ObjectFieldType> attributesFields = toObjectType(type).getFields();
+    assertThat(attributesFields, hasSize(2));
+    Iterator<ObjectFieldType> iterator = attributesFields.iterator();
+
+    ObjectFieldType body = iterator.next();
+    assertThat(body.getKey().getName().getLocalPart(), is(BODY_FIELD));
+    Collection<ObjectFieldType> fields = toObjectType(body.getValue()).getFields();
+    assertThat(fields, hasSize(1));
+    MetadataType value = fields.iterator().next().getValue();
+    assertThat(toObjectType(value).getFields(), hasSize(0));
+
+    ObjectFieldType attachments = iterator.next();
+    assertThat(attachments.getKey().getName().getLocalPart(), is(ATTACHMENTS_FIELD));
+    assertThat(attachments.getValue(), is(instanceOf(ArrayType.class)));
   }
 }

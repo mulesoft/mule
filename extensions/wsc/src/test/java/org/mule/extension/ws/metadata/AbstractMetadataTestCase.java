@@ -24,15 +24,12 @@ import ru.yandex.qatools.allure.annotations.Step;
 
 public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCase {
 
-  protected static final String BODY_PARAM = "body";
-  protected static final String HEADERS_PARAM = "headers";
+  protected static final String MESSAGE_PARAM = "message";
 
   protected static final String ECHO_ACCOUNT_FLOW = "getEchoAccountMetadata";
   protected static final String ECHO_FLOW = "getEchoMetadata";
   protected static final String NO_PARAMS_FLOW = "getNoParams";
   protected static final String ECHO_HEADERS_FLOW = "getEchoHeadersMetadata";
-  protected static final String UPLOAD_ATT_FLOW = "uploadAttachment";
-  protected static final String DOWNLOAD_ATT_FLOW = "downloadAttachment";
 
   protected MetadataService service;
 
@@ -53,6 +50,12 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
     return result;
   }
 
+  @Step("Retrieve Dynamic Metadata for the Message Builder parameter")
+  protected ObjectType getMessageBuilderType(String flow, String key) {
+    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, key);
+    return toObjectType(metadata.get().getInputMetadata().get().getParameterMetadata(MESSAGE_PARAM).get().getType());
+  }
+
   protected ProcessorId id(String flow) {
     return new ProcessorId(flow, "0");
   }
@@ -60,5 +63,11 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
   protected ObjectType toObjectType(MetadataType type) {
     assertThat(type, is(instanceOf(ObjectType.class)));
     return (ObjectType) type;
+  }
+
+  protected MetadataType getMessageBuilderFieldType(MetadataType messageResult, String name) {
+    ObjectType objectType = toObjectType(messageResult);
+    return objectType.getFields().stream()
+        .filter(f -> f.getKey().getName().getLocalPart().equals(name)).findAny().get().getValue();
   }
 }

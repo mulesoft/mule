@@ -7,6 +7,8 @@
 package org.mule.extension.ws.api.exception;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.util.Optional;
 
@@ -19,7 +21,7 @@ import org.w3c.dom.Element;
  *
  * @since 4.0
  */
-public class SoapFaultException extends RuntimeException {
+public class SoapFaultException extends MuleRuntimeException {
 
   private final QName faultCode;
   private final QName subCode;
@@ -29,14 +31,14 @@ public class SoapFaultException extends RuntimeException {
                             QName subCode,
                             String message,
                             Element detail) {
-    super(message);
+    super(createStaticMessage(message));
     this.faultCode = faultCode;
     this.subCode = subCode;
     this.detail = detail;
   }
 
   public SoapFaultException(QName faultCode, String message, Element detail) {
-    super(message);
+    super(createStaticMessage(message));
     this.faultCode = faultCode;
     this.subCode = null;
     this.detail = detail;

@@ -6,26 +6,21 @@
  */
 package org.mule.extension.ws.internal.interceptor;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
 import static org.mule.extension.ws.internal.ConsumeOperation.MULE_HEADERS_KEY;
+import static org.mule.extension.ws.internal.util.TransformationUtils.nodeToString;
 import org.mule.extension.ws.api.WscAttributes;
+import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.ConsumeOperation;
+import org.mule.extension.ws.internal.util.WscTransformationException;
 
-import java.io.StringWriter;
 import java.util.Map;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
-import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.w3c.dom.Node;
@@ -49,25 +44,13 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
   public void handleMessage(SoapMessage message) throws Fault {
     Map<String, String> result = message.getHeaders().stream()
         .filter(header -> header instanceof SoapHeader)
-        .collect(toMap(h -> h.getName().getLocalPart(), this::nodeToString));
-
+        .collect(toMap(h -> h.getName().getLocalPart(), h -> {
+          try {
+            return nodeToString((Node) h.getObject());
+          } catch (WscTransformationException e) {
+            throw new WscException(format("Error while processing response header [%s]", h.getName()), e);
+          }
+        }));
     message.getExchange().put(MULE_HEADERS_KEY, result);
-  }
-
-  private String nodeToString(Header header) {
-    // TODO: review this transformation.
-    try {
-      StringWriter writer = new StringWriter();
-      Node node = (Node) header.getObject();
-      DOMSource source = new DOMSource(node);
-      StreamResult result = new StreamResult(writer);
-      TransformerFactory idTransformer = new SaxonTransformerFactory();
-      Transformer transformer = idTransformer.newTransformer();
-      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-      transformer.transform(source, result);
-      return writer.toString();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 }

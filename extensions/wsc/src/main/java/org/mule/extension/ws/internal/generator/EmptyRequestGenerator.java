@@ -4,20 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.internal.introspection;
+package org.mule.extension.ws.internal.generator;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.hasExposedFields;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isObjectType;
+import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getOperationType;
 import org.mule.extension.ws.api.exception.WscException;
-import org.mule.extension.ws.internal.WscConnection;
+import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
+import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.xml.XmlTypeLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +34,7 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0
  */
-public class RequestBodyGenerator {
+final class EmptyRequestGenerator {
 
   private static final String REQUIRED_PARAMS_ERROR_MASK =
       "Cannot build default body request for operation [%s]%s, the operation requires input parameters";
@@ -49,13 +47,10 @@ public class RequestBodyGenerator {
   /**
    * Generates a request body for an operation that don't require input parameters, if the required XML in the body is
    * just one constant element.
-   *
-   * @param connection the connection with the web service
-   * @param operation  the name of the operation which body needs to be created.
    */
-  public String generateRequest(WscConnection connection, String operation) {
+  String generateRequest(WsdlIntrospecter introspecter, TypeLoader loader, String operation) {
 
-    BindingOperation bindingOperation = connection.getWsdlIntrospecter().getBindingOperation(operation);
+    BindingOperation bindingOperation = introspecter.getBindingOperation(operation);
     Optional<List<String>> soapBodyParts = getSoapBodyParts(bindingOperation);
 
     if (!soapBodyParts.isPresent()) {
@@ -78,7 +73,7 @@ public class RequestBodyGenerator {
     }
 
     Part bodyPart = part.get();
-    if (isOperationWithNoParameters(connection, bodyPart)) {
+    if (isOperationWithRequiredParameters(loader, bodyPart)) {
       // operation has required parameters
       throw new WscException(format(REQUIRED_PARAMS_ERROR_MASK, operation, ""));
     }
@@ -88,20 +83,12 @@ public class RequestBodyGenerator {
     return format(NO_PARAMS_SOAP_BODY_CALL_MASK, element.getLocalPart(), element.getNamespaceURI());
   }
 
-  private boolean isOperationWithNoParameters(WscConnection connection, Part part) {
-    XmlTypeLoader loader = new XmlTypeLoader(connection.getWsdlIntrospecter().getSchemas());
-    String bodyPartQName = part.getElementName().toString();
-
+  private boolean isOperationWithRequiredParameters(TypeLoader loader, Part part) {
     // Find the body type
-    Optional<MetadataType> bodyType = loader.load(bodyPartQName);
+    Optional<MetadataType> bodyType = loader.load(part.getElementName().toString());
     if (bodyType.isPresent()) {
-      if (isObjectType(bodyType.get())) {
-        Collection<ObjectFieldType> bodyFields = ((ObjectType) bodyType.get()).getFields();
-        // Contains only one field which represents de operation
-        ObjectType operationType = (ObjectType) bodyFields.iterator().next().getValue();
-        // Check if the operation type has
-        return hasExposedFields(operationType);
-      }
+      Collection<ObjectFieldType> operationFields = getOperationType(bodyType.get()).getFields();
+      return !operationFields.isEmpty();
     }
     return false;
   }
@@ -130,11 +117,11 @@ public class RequestBodyGenerator {
   /**
    * Retrieves the list of SOAP body parts of a binding operation if defined.
    *
-   * @param bindingOperation the binding operation that we want to get the SOAP body parts from.
+   * @param operation the binding operation that we want to get the SOAP body parts from.
    */
   @SuppressWarnings("unchecked")
-  private static Optional<List<String>> getSoapBodyParts(BindingOperation bindingOperation) {
-    List elements = bindingOperation.getBindingInput().getExtensibilityElements();
+  private Optional<List<String>> getSoapBodyParts(BindingOperation operation) {
+    List elements = operation.getBindingInput().getExtensibilityElements();
     return elements.stream()
         .filter(e -> e instanceof SOAPBody || e instanceof SOAP12Body)
         .map(e -> e instanceof SOAPBody ? ((SOAPBody) e).getParts() : ((SOAP12Body) e).getParts())

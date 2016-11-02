@@ -9,71 +9,51 @@ package org.mule.extension.ws.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import static org.mule.extension.ws.internal.util.TransformationUtils.stringToDomElement;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
-import org.mule.extension.ws.api.WsAttachment;
+import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.api.WscAttributes;
-import org.mule.extension.ws.api.exception.SoapFaultException;
+import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.api.exception.WscException;
-import org.mule.extension.ws.internal.introspection.RequestBodyGenerator;
+import org.mule.extension.ws.internal.connection.WscConnection;
+import org.mule.extension.ws.internal.generator.SoapRequestGenerator;
+import org.mule.extension.ws.internal.generator.SoapResponseGenerator;
+import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
+import org.mule.extension.ws.internal.metadata.MessageBuilderResolver;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
 import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
-import org.mule.extension.ws.internal.metadata.body.InputBodyResolver;
-import org.mule.extension.ws.internal.metadata.body.OutputBodyResolver;
-import org.mule.extension.ws.internal.metadata.header.InputHeadersResolver;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.extension.ws.internal.util.WscTransformationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.xml.stax.StaxSource;
 
-import com.google.common.collect.ImmutableList;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
 
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.cxf.attachment.AttachmentImpl;
-import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 /**
- * The only {@link WebServiceConsumer} operation which consumes an operation of the connected web service and returns it's
- * response.
+ * The only {@link WebServiceConsumer} operation. the {@link ConsumeOperation} consumes an operation of the connected web service
+ * and returns it's response.
  * <p>
  * The consume operation expects an XML body and a set of headers and attachments if required.
  * <p>
- * For the cases where no input parameters are required the {@link RequestBodyGenerator} will generate a body to perform the
+ * For the cases where no input parameters are required the {@link SoapRequestGenerator} will generate a body to perform the
  * operation if a {@code null} value is passed.
  *
  * @since 4.0
@@ -83,121 +63,83 @@ public class ConsumeOperation {
   public static final String MULE_ATTACHMENTS_KEY = "mule.wsc.attachments";
   public static final String MULE_HEADERS_KEY = "mule.wsc.headers";
   public static final String MULE_SOAP_ACTION = "mule.wsc.soap.action";
+  public static final String MULE_WSC_ENCODING = "mule.wsc.encoding";
 
-  @OutputResolver(output = OutputBodyResolver.class, attributes = WscAttributesResolver.class)
-  public Result<Object, WscAttributes> consume(@Connection WscConnection connection,
+  private final SoapRequestGenerator requestGenerator = new SoapRequestGenerator();
+  private final SoapResponseGenerator responseGenerator = new SoapResponseGenerator();
+
+  /**
+   * Consumes an operation from a SOAP Web Service.
+   *
+   * @param connection the connection resolved to execute the operation.
+   * @param operation  the name of the web service operation that aims to invoke.
+   * @param message    the constructed SOAP message to perform the request.
+   */
+  @OnException(WscExceptionEnricher.class)
+  @OutputResolver(output = ConsumeOutputResolver.class, attributes = WscAttributesResolver.class)
+  public Result<Object, WscAttributes> consume(@UseConfig WebServiceConsumer config,
+                                               @Connection WscConnection connection,
                                                @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                               @Optional @Content @TypeResolver(InputBodyResolver.class) String body,
-                                               @Optional @TypeResolver(InputHeadersResolver.class) List<String> headers,
-                                               @Optional List<WsAttachment> attachments) {
-    Map<String, Object> ctx = getInvocationContext(headers, attachments, operation);
-    XMLStreamReader request = stringToXmlStreamReader(body, connection, operation);
-    try {
-      Exchange exchange = new ExchangeImpl();
-      Object[] response = connection.invoke(request, ctx, exchange);
-      return buildResult(response, exchange);
-    } catch (SoapFault sf) {
-      throw new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), sf.getMessage(), sf.getDetail());
-    } catch (Exception e) {
-      throw new WscException(format("An unexpected error occur while consuming the [%s] web service operation", operation), e);
-    }
+                                               @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message) {
+    Map<String, SoapAttachment> attachments = message.getAttachments();
+    Map<String, String> headers = message.getHeaders();
+    Map<String, Object> ctx = getInvocationContext(config, connection, headers, attachments, operation);
+    XMLStreamReader request = requestGenerator.generate(connection, operation, message.getBody(), attachments);
+    Exchange exchange = new ExchangeImpl();
+    Object[] response = connection.invoke(operation, request, ctx, exchange);
+    return responseGenerator.generate(connection, operation, response, exchange);
   }
 
-  private Map<String, Object> getInvocationContext(List<String> headers, List<WsAttachment> attachments, String operation) {
+  /**
+   * Sets up a request context where the attachments, headers and the soap action required by cxf are populated.
+   */
+  private Map<String, Object> getInvocationContext(WebServiceConsumer config,
+                                                   WscConnection connection,
+                                                   Map<String, String> headers,
+                                                   Map<String, SoapAttachment> attachments,
+                                                   String operation) {
     Map<String, Object> props = new HashMap<>();
-    props.put(MULE_ATTACHMENTS_KEY, transformAttachments(attachments));
-    props.put(MULE_HEADERS_KEY, transformHeaders(headers));
+
+    // If is NOT MTOM the attachments must not be touched by cxf, we create a custom request embedding the attachment in the xml.
+    if (connection.isMtomEnabled()) {
+      props.put(MULE_ATTACHMENTS_KEY, transformToCxfAttachments(attachments));
+    } else {
+      props.put(MULE_ATTACHMENTS_KEY, emptyList());
+    }
+
+    props.put(MULE_WSC_ENCODING, config.getEncoding());
+    props.put(MULE_HEADERS_KEY, transformToCxfHeaders(headers));
     props.put(MULE_SOAP_ACTION, operation);
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(Client.REQUEST_CONTEXT, props);
     return ctx;
   }
 
-  private Result<Object, WscAttributes> buildResult(Object[] invocationResponse, Exchange exchange) {
-    String response = processOutput(invocationResponse);
-    WscAttributes attributes = processAttributes(exchange);
-    List<Message> receivedAttachments = (List<Message>) exchange.get(MULE_ATTACHMENTS_KEY);
-
-    Object output;
-    if (!receivedAttachments.isEmpty()) {
-      ImmutableList<Message> parts = ImmutableList.<Message>builder()
-          .add(Message.builder().payload(response).attributes(BODY_ATTRIBUTES).build())
-          .addAll(receivedAttachments)
-          .build();
-      output = new DefaultMultiPartPayload(parts);
-    } else {
-      output = response;
-    }
-
-    return Result.<Object, WscAttributes>builder()
-        .output(output)
-        .attributes(attributes)
-        .build();
-  }
-
-  private WscAttributes processAttributes(Exchange exchange) {
-    Map<String, String> headers = (Map<String, String>) exchange.get(MULE_HEADERS_KEY);
-    return new WscAttributes(headers, emptyMap());
-  }
-
-  private String processOutput(Object[] response) {
-    XMLStreamReader xmlStreamReader = (XMLStreamReader) response[0];
-    StaxSource staxSource = new StaxSource(xmlStreamReader);
-    StringWriter writer = new StringWriter();
-    StreamResult result = new StreamResult(writer);
-    TransformerFactory idTransformer = new SaxonTransformerFactory();
-    try {
-      Transformer transformer = idTransformer.newTransformer();
-      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-      transformer.transform(staxSource, result);
-    } catch (TransformerException e) {
-      throw new WscException("Error while processing output web service response", e);
-    }
-    return writer.getBuffer().toString();
-  }
-
-  private List<SoapHeader> transformHeaders(List<String> headers) {
-    if (headers == null) {
-      return emptyList();
-    }
-    return headers.stream()
-        .map(this::stringToDocument)
-        .map(h -> new SoapHeader(new QName(null, h.getNodeName()), h))
+  /**
+   * Prepares the provided {@link Map} of headers in the {@link SoapMessageBuilder} to be processed by CXF.
+   */
+  private List<SoapHeader> transformToCxfHeaders(Map<String, String> headers) {
+    return headers.entrySet().stream()
+        .map(h -> {
+          try {
+            return new SoapHeader(new QName(null, h.getKey()), stringToDomElement(h.getValue()));
+          } catch (WscTransformationException e) {
+            throw new WscException(format("Error while preparing request header [%s] to be sent", h.getKey()), e);
+          }
+        })
         .collect(new ImmutableListCollector<>());
   }
 
-  private List<Attachment> transformAttachments(List<WsAttachment> attachments) {
-    if (attachments == null) {
-      return emptyList();
-    }
-    return attachments.stream().map(a -> {
+  /**
+   * Prepares the provided {@link Map} of attachments in the {@link SoapMessageBuilder} to be processed by CXF.
+   */
+  private List<Attachment> transformToCxfAttachments(Map<String, SoapAttachment> attachments) {
+    return attachments.values().stream().map(a -> {
       try {
         return new AttachmentImpl(a.getId(), toDataHandler(a.getId(), a.getContent(), a.getContentType()));
       } catch (IOException e) {
-        throw new WscException("Error while preparing attachments for upload", e);
+        throw new WscException(format("Error while preparing attachment [%s] for upload", a.getId()), e);
       }
     }).collect(new ImmutableListCollector<>());
-  }
-
-  private Element stringToDocument(String xml) {
-    try {
-      DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      InputSource is = new InputSource();
-      is.setCharacterStream(new StringReader(xml));
-      return db.parse(is).getDocumentElement();
-    } catch (Exception e) {
-      throw new WscException(e.getMessage(), e);
-    }
-  }
-
-  private XMLStreamReader stringToXmlStreamReader(String body, WscConnection connection, String operation) {
-    try {
-      if (isBlank(body)) {
-        body = new RequestBodyGenerator().generateRequest(connection, operation);
-      }
-      return XMLInputFactory.newInstance().createXMLStreamReader(new ByteArrayInputStream(body.getBytes()));
-    } catch (Exception e) {
-      throw new WscException(e);
-    }
   }
 }

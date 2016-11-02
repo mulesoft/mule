@@ -6,9 +6,12 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.xml.XmlTypeLoader.XML;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.extension.ws.internal.WscConnection;
+import org.mule.extension.ws.internal.connection.WscConnection;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -19,9 +22,15 @@ import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
  *
  * @since 4.0
  */
-abstract class BaseWscResolver implements NamedTypeResolver {
+public abstract class BaseWscResolver implements NamedTypeResolver {
 
+  static final MetadataType NULL_TYPE = create(XML).nullType().build();
   private static final String WSC_CATEGORY = "WebServiceConsumerCategory";
+  public static final String BODY_FIELD = "body";
+  public static final String HEADERS_FIELD = "headers";
+  public static final String ATTACHMENTS_FIELD = "attachments";
+
+
 
   @Override
   public String getCategoryName() {

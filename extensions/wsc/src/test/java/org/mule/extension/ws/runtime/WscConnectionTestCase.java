@@ -14,7 +14,11 @@ import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Web Service Consumer")
+@Stories("Connection")
 public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
 
   private static final String SAME_INSTANCE_FLOW = "operationShareInstance";
@@ -31,5 +35,4 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
     String out = (String) msg.getPayload().getValue();
     assertSoapResponse(ECHO, out);
   }
-
 }

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.internal.metadata;
+package org.mule.extension.ws.internal.introspection;
 
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Message;
@@ -12,21 +12,21 @@ import javax.wsdl.Operation;
 import javax.wsdl.extensions.ElementExtensible;
 
 /**
- * Output implementation of {@link TypeResolverDelegate}.
+ * Input implementation of {@link TypeIntrospecterDelegate}.
  * <p>
- * This class is responsible for returning the information of the messages that are used to resolve OUTPUT metadata.
+ * This class is resposible for returning the information of the messages that are used to resolve INPUT metadata.
  *
  * @since 4.0
  */
-public class OutputTypeResolverDelegate implements TypeResolverDelegate {
+public class InputTypeIntrospecterDelegate implements TypeIntrospecterDelegate {
 
   @Override
   public Message getMessage(Operation operation) {
-    return operation.getOutput().getMessage();
+    return operation.getInput().getMessage();
   }
 
   @Override
   public ElementExtensible getBindingType(BindingOperation operation) {
-    return operation.getBindingOutput();
+    return operation.getBindingInput();
   }
 }

@@ -7,12 +7,18 @@
 package org.mule.extension.ws.internal;
 
 import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.internal.connection.WscConnectionProvider;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+
+import javax.inject.Inject;
 
 /**
  * Web Service Consumer extension used to consume SOAP web services.
@@ -24,16 +30,27 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
 @Extension(name = "wsc")
-public class WebServiceConsumer {
+public class WebServiceConsumer implements Initialisable {
+
+  @Inject
+  private MuleContext muleContext;
 
   /**
-   * If should use the MTOM protocol to manage the attachments or not.
+   * Default character encoding to be used in all the messages. If not specified, the default charset in the mule configuration
+   * will be used
    */
   @Parameter
-  @Optional(defaultValue = "false")
-  private boolean mtomEnabled;
+  @Optional
+  private String encoding;
 
-  public boolean isMtomEnabled() {
-    return mtomEnabled;
+  public String getEncoding() {
+    return encoding;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (encoding == null) {
+      encoding = muleContext.getConfiguration().getDefaultEncoding();
+    }
   }
 }

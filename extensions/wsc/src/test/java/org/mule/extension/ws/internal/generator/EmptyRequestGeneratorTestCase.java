@@ -4,12 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.introspection;
+package org.mule.extension.ws.internal.generator;
 
 import static java.util.Collections.emptyList;
-import static javax.xml.ws.Endpoint.publish;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,57 +15,32 @@ import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import org.mule.extension.ws.AbstracWscUnitTestCase;
 import org.mule.extension.ws.api.exception.WscException;
-import org.mule.extension.ws.consumer.TestService;
-import org.mule.extension.ws.internal.WscConnection;
-import org.mule.extension.ws.internal.introspection.RequestBodyGenerator;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
-import javax.xml.ws.Endpoint;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-public class RequestBodyGeneratorTestCase {
-
-  @ClassRule
-  public static DynamicPort port = new DynamicPort("servicePort");
-
-  public static final String TEST_URL = "http://localhost:" + port.getValue() + "/testService";
+@Features("Web Service Consumer")
+@Stories("Request Generation")
+public class EmptyRequestGeneratorTestCase extends AbstracWscUnitTestCase {
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
-
-  private static WscConnection connection;
-  private static Endpoint service;
-  private RequestBodyGenerator generator = new RequestBodyGenerator();
-
-  @BeforeClass
-  public static void startService() {
-    service = publish(TEST_URL, new TestService());
-    assertThat(service.isPublished(), is(true));
-  }
-
-  @Before
-  public void setup() {
-    connection = mock(WscConnection.class);
-    when(connection.getWsdlIntrospecter()).thenReturn(new WsdlIntrospecter(TEST_URL + "?wsdl", "TestService", "TestPort"));
-  }
-
+  private EmptyRequestGenerator generator = new EmptyRequestGenerator();
 
   @Test
   @Description("Checks the generation of a body request for an operation that don't require any parameters")
   public void noParams() throws Exception {
-    String request = generator.generateRequest(connection, NO_PARAMS);
+    String request = generator.generateRequest(serviceIntrospecter, operationsTypeLoader, NO_PARAMS);
     assertSimilarXml(request, getRequestResource(NO_PARAMS));
   }
 
@@ -77,7 +49,7 @@ public class RequestBodyGeneratorTestCase {
   public void withParams() throws Exception {
     exception.expect(WscException.class);
     exception.expectMessage("Cannot build default body request for operation [echo], the operation requires input parameters");
-    generator.generateRequest(connection, ECHO);
+    generator.generateRequest(serviceIntrospecter, operationsTypeLoader, ECHO);
   }
 
   @Test
@@ -93,13 +65,7 @@ public class RequestBodyGeneratorTestCase {
     when(bi.getExtensibilityElements()).thenReturn(emptyList());
     when(bop.getBindingInput()).thenReturn(bi);
     when(introspecter.getBindingOperation(anyString())).thenReturn(bop);
-    when(connection.getWsdlIntrospecter()).thenReturn(introspecter);
 
-    generator.generateRequest(connection, FAIL);
-  }
-
-  @AfterClass
-  public static void shutDownService() {
-    service.stop();
+    generator.generateRequest(introspecter, operationsTypeLoader, FAIL);
   }
 }
