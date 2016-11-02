@@ -120,6 +120,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws MuleException {
+    nonBlockingProcessorsExecuted.set(0);
     muleContext = mockContextWithServices();
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
     ErrorType errorType = mock(ErrorType.class);
@@ -142,6 +143,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   @After
   public void after() throws RegistrationException, MuleException {
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    mockFlow.stop();
+    mockFlow.dispose();
   }
 
   @Test

@@ -68,7 +68,7 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
 
     @Override
     public void start() throws MuleException {
-      this.scheduler = schedulerService.cpuLightScheduler();
+      this.scheduler = schedulerService.ioScheduler();
     }
 
     @Override
