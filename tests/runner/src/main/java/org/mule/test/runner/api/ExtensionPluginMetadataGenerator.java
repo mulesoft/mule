@@ -22,6 +22,8 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapte
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -108,22 +110,27 @@ public class ExtensionPluginMetadataGenerator {
     logger.debug("Scanning plugin '{}' for annotated Extension class", plugin);
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
-    scanner.setResourceLoader(new PathMatchingResourcePatternResolver(new URLClassLoader(urls.toArray(new URL[0]), null)));
-    Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
-    if (!extensionsAnnotatedClasses.isEmpty()) {
-      if (extensionsAnnotatedClasses.size() > 1) {
-        logger.warn("While scanning class loader on plugin '{}' for discovering @Extension classes annotated, more than one " +
-            "found. It will pick up the first one, found: {}", plugin, extensionsAnnotatedClasses);
+    try (URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), null)) {
+      scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
+      Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
+      if (!extensionsAnnotatedClasses.isEmpty()) {
+        if (extensionsAnnotatedClasses.size() > 1) {
+          logger
+              .warn("While scanning class loader on plugin '{}' for discovering @Extension classes annotated, more than one " +
+                  "found. It will pick up the first one, found: {}", plugin, extensionsAnnotatedClasses);
+        }
+        String extensionClassName = extensionsAnnotatedClasses.iterator().next().getBeanClassName();
+        try {
+          return Class.forName(extensionClassName);
+        } catch (ClassNotFoundException e) {
+          throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + "'", e);
+        }
       }
-      String extensionClassName = extensionsAnnotatedClasses.iterator().next().getBeanClassName();
-      try {
-        return Class.forName(extensionClassName);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + "'", e);
-      }
+      logger.debug("No class found annotated with {}", Extension.class.getName());
+      return null;
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-    logger.debug("No class found annotated with {}", Extension.class.getName());
-    return null;
   }
 
   /**

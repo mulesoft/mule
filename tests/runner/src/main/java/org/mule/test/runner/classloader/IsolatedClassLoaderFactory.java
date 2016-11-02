@@ -79,14 +79,19 @@ public class IsolatedClassLoaderFactory {
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
-    final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
-        new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]));
+    ArtifactClassLoader containerClassLoader;
+    ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
+    try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
+        new TestContainerClassLoaderFactory(extraBootPackages,
+                                            artifactsUrlClassification.getContainerUrls().toArray(new URL[0]))) {
 
-    ArtifactClassLoader containerClassLoader =
-        createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
+      containerClassLoader =
+          createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
 
-    ClassLoaderLookupPolicy childClassLoaderLookupPolicy = testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy();
+      childClassLoaderLookupPolicy =
+          testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy();
 
+    }
     List<ArtifactClassLoader> serviceArtifactClassLoaders =
         createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
                                   artifactsUrlClassification);

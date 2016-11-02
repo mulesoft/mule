@@ -12,6 +12,8 @@ import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -54,15 +56,17 @@ public class ArtifactClassificationTypeResolver {
    * @return {@link ArtifactClassificationType} for the artifact given
    */
   public ArtifactClassificationType resolveArtifactClassificationType(Artifact artifact) {
-    URLClassLoader artifactClassLoader = createArtifactClassLoader(artifact);
-
-    if (isMulePlugin(artifact, artifactClassLoader)) {
-      return PLUGIN;
+    try (URLClassLoader artifactClassLoader = createArtifactClassLoader(artifact)) {
+      if (isMulePlugin(artifact, artifactClassLoader)) {
+        return PLUGIN;
+      }
+      if (isMuleModule(artifact, artifactClassLoader)) {
+        return MODULE;
+      }
+      return APPLICATION;
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-    if (isMuleModule(artifact, artifactClassLoader)) {
-      return MODULE;
-    }
-    return APPLICATION;
   }
 
   /**
