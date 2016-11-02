@@ -11,7 +11,6 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
@@ -58,7 +57,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
     LaxAsyncInterceptingMessageProcessor mp = new LaxAsyncInterceptingMessageProcessor();
-    mp.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    mp.setScheduler(scheduler);
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);

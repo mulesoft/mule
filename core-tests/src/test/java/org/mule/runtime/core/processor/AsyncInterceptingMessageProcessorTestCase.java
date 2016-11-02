@@ -32,7 +32,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -187,7 +186,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
     AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor();
-    mp.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
+    mp.setScheduler(scheduler);
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);

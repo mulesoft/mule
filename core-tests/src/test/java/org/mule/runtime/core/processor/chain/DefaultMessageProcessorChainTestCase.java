@@ -10,6 +10,7 @@ package org.mule.runtime.core.processor.chain;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -67,13 +68,15 @@ import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +95,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   protected MessageExchangePattern exchangePattern;
   protected boolean nonBlocking;
   protected boolean synchronous;
-  private int nonBlockingProcessorsExecuted;
+  private AtomicInteger nonBlockingProcessorsExecuted = new AtomicInteger(0);
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
@@ -123,7 +126,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     ExceptionContextProvider exceptionContextProvider = mock(ExceptionContextProvider.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
-    when(muleConfiguration.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
+    when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
     when(muleConfiguration.getShutdownTimeout()).thenReturn(1000);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
@@ -750,8 +753,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
         return messageProcessor.process(event);
       }
     } finally {
-      assertThat(((SimpleUnitTestSupportSchedulerService) (muleContext.getRegistry().lookupObject(SchedulerService.class)))
-          .getScheduledTasks(), greaterThanOrEqualTo(nonBlockingProcessorsExecuted));
+      final SimpleUnitTestSupportSchedulerService schedulerService =
+          (SimpleUnitTestSupportSchedulerService) (muleContext.getRegistry().lookupObject(SchedulerService.class));
+      new PollingProber().check(new JUnitLambdaProbe(() -> {
+        assertThat(schedulerService.getScheduledTasks(), greaterThanOrEqualTo(nonBlockingProcessorsExecuted.get()));
+        return true;
+      }));
     }
   }
 
@@ -784,15 +791,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     }
   }
 
-  private void assertLifecycle(AppendingMP mp) {
-    assertTrue(mp.flowConstuctInjected);
-    assertTrue(mp.muleContextInjected);
-    assertTrue(mp.initialised);
-    assertTrue(mp.started);
-    assertTrue(mp.stopped);
-    assertTrue(mp.disposed);
-  }
-
   private void assertLifecycle(AppendingInterceptingMP mp) {
     assertTrue(mp.flowConstuctInjected);
     assertTrue(mp.muleContextInjected);
@@ -810,7 +808,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
     @Override
     public Event process(Event event) throws MuleException {
-      nonBlockingProcessorsExecuted++;
+      nonBlockingProcessorsExecuted.incrementAndGet();
       return super.process(event);
     }
   }
