@@ -73,7 +73,6 @@ import org.mule.runtime.core.message.SessionHandler;
 import org.mule.runtime.core.model.streaming.DelegatingInputStream;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -2128,7 +2127,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     } else {
       DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
       builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
-      LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(() -> getDispatcherWorkManager());
+      DispatcherInterceptorMessageProcessor async = new DispatcherInterceptorMessageProcessor(() -> getDispatcherWorkManager());
       builder.chain(async);
       builder.chain(new DispatcherMessageProcessor(endpoint));
       return builder.build();
