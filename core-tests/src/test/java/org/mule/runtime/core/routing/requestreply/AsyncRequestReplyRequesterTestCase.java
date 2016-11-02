@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
@@ -102,6 +103,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncMP.setScheduler(new SimpleUnitTestSupportSchedulerService().computationScheduler());
 
     asyncMP.setListener(target);
+    asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
