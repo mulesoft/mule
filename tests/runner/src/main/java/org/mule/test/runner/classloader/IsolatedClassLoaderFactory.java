@@ -14,7 +14,6 @@ import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -38,8 +37,6 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -214,7 +211,7 @@ public class IsolatedClassLoaderFactory {
    */
   protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory,
                                                                    ArtifactsUrlClassification artifactsUrlClassification) {
-    MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader(artifactsUrlClassification);
+    MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
     final List<MuleModule> muleModules = Collections.<MuleModule>emptyList();
     ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
         .create(testContainerClassLoaderFactory.getBootPackages(), muleModules);
@@ -225,27 +222,13 @@ public class IsolatedClassLoaderFactory {
   }
 
   /**
-   * Creates the launcher application class loader to delegate from container class loader. It adds the {@link URL}s discovered
-   * for the container class loader and boot/launcher class loader that are not already present. This is needed due to while
-   * resolving the container class loader artifacts could be discovered that are not present in classpath due to they are not
-   * defined as dependencies.
+   * Creates the launcher application class loader to delegate from container class loader.
    *
-   * @param artifactsUrlClassification
    * @return an {@link ArtifactClassLoader} for the launcher, parent of container
    */
-  protected MuleArtifactClassLoader createLauncherArtifactClassLoader(ArtifactsUrlClassification artifactsUrlClassification) {
+  protected MuleArtifactClassLoader createLauncherArtifactClassLoader() {
     ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
 
-    Method method = findMethod(launcherClassLoader.getClass(), "addURL", URL.class);
-    method.setAccessible(true);
-
-    try {
-      for (URL url : artifactsUrlClassification.getContainerUrls()) {
-        method.invoke(launcherClassLoader, url);
-      }
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new RuntimeException("Error while appending URLs to launcher class loader", e);
-    }
     return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
                                        new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
   }
