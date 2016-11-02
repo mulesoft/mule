@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -29,18 +29,18 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class LazyOperationContext implements ExecutionContext<OperationModel> {
+public class LazyExecutionContext<M extends ComponentModel> implements ExecutionContext<M> {
 
   private final Map<String, ValueResolver> valueResolvers;
-  private final OperationModel operationModel;
+  private final M componentModel;
   private final ExtensionModel extensionModel;
   private final Event event;
 
-  public LazyOperationContext(ResolverSet resolverSet, OperationModel operationModel, ExtensionModel extensionModel,
+  public LazyExecutionContext(ResolverSet resolverSet, M componentModel, ExtensionModel extensionModel,
                               Event event) {
 
     this.valueResolvers = resolverSet.getResolvers();
-    this.operationModel = operationModel;
+    this.componentModel = componentModel;
     this.extensionModel = extensionModel;
     this.event = event;
   }
@@ -99,8 +99,8 @@ public class LazyOperationContext implements ExecutionContext<OperationModel> {
    * {@inheritDoc}
    */
   @Override
-  public OperationModel getComponentModel() {
-    return operationModel;
+  public M getComponentModel() {
+    return componentModel;
   }
 
   /**
