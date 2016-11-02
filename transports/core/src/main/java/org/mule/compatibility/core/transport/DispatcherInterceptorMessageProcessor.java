@@ -11,7 +11,9 @@ import static javax.resource.spi.work.WorkManager.INDEFINITE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AsyncWorkListener;
 import org.mule.runtime.core.processor.BaseAsyncInterceptingMessageProcessor;
 
@@ -19,6 +21,11 @@ import java.util.concurrent.Executor;
 
 import javax.resource.spi.work.Work;
 
+/**
+ * Legacy {@link AbstractInterceptingMessageProcessor} implementation that schedules asynchronous tasks in a {@link WorkManager}.
+ *
+ * @since 4.0
+ */
 public class DispatcherInterceptorMessageProcessor extends BaseAsyncInterceptingMessageProcessor {
 
   public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";

@@ -26,8 +26,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   protected MuleContext muleContext;
 
   protected List messageProcessors;
-  // protected ProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
-  protected ProcessingStrategyFactory processingStrategyFactory;// = new AsynchronousProcessingStrategyFactory();
+  protected ProcessingStrategyFactory processingStrategyFactory;
   protected String name;
 
   @Override

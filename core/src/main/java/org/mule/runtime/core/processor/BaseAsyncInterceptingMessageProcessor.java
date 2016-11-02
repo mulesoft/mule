@@ -35,6 +35,11 @@ import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
 
+/**
+ * Provides support for processing {@link Event}'s asynchronously.
+ *
+ * @since 4.0
+ */
 public abstract class BaseAsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
     implements MessagingExceptionHandlerAware, InternalMessageProcessor {
 

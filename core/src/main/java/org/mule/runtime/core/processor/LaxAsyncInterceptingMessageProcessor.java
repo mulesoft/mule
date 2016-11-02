@@ -11,10 +11,6 @@ import org.mule.runtime.core.api.Event;
 
 public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor {
 
-  public LaxAsyncInterceptingMessageProcessor() {
-    // Need this while the deprecated constructor is around
-  }
-
   @Override
   protected boolean isProcessAsync(Event event) throws MuleException {
     return canProcessAsync(event);

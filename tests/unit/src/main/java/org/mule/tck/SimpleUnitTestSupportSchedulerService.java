@@ -32,17 +32,17 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return scheduler;
+    return new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler);
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return scheduler;
+    return new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler);
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return scheduler;
+    return new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler);
   }
 
   @Override
