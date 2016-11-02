@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 /**
  * An implementation of {@link ArgumentResolver} which resolves to a parameter value of name {@link #parameterName}
@@ -25,13 +25,13 @@ public class ByParameterNameArgumentResolver<T> implements ArgumentResolver<T> {
   /**
    * {@inheritDoc}
    *
-   * @param operationContext an {@link OperationContext}
-   * @return the result of invoking {@link OperationContext#getParameter(String)} with {@link #parameterName}
+   * @param executionContext an {@link ExecutionContext}
+   * @return the result of invoking {@link ExecutionContext#getParameter(String)} with {@link #parameterName}
    */
   @Override
-  public T resolve(OperationContext operationContext) {
-    if (operationContext.hasParameter(parameterName)) {
-      return (T) operationContext.getParameter(parameterName);
+  public T resolve(ExecutionContext executionContext) {
+    if (executionContext.hasParameter(parameterName)) {
+      return (T) executionContext.getParameter(parameterName);
     } else {
       return null;
     }

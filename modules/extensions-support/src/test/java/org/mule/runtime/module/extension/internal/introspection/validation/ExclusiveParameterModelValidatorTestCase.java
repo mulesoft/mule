@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
+import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;

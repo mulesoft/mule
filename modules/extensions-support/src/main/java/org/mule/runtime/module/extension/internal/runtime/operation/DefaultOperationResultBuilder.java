@@ -10,26 +10,26 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Optional;
 
 /**
- * Default implementation of {@link OperationResult.Builder}
+ * Default implementation of {@link Result.Builder}
  *
  * @param <Output> the generic type of the output value
  * @param <A> the generic type of the message attributes
  * @since 4.0
  */
-final class DefaultOperationResultBuilder<Output, A extends Attributes> implements OperationResult.Builder<Output, A> {
+final class DefaultOperationResultBuilder<Output, A extends Attributes> implements Result.Builder<Output, A> {
 
-  private final DefaultOperationResult<Output, A> operationResult = new DefaultOperationResult<>();
+  private final DefaultResult<Output, A> operationResult = new DefaultResult<>();
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public OperationResult.Builder<Output, A> output(Output output) {
+  public Result.Builder<Output, A> output(Output output) {
     operationResult.output = output;
     return this;
   }
@@ -38,7 +38,7 @@ final class DefaultOperationResultBuilder<Output, A extends Attributes> implemen
    * {@inheritDoc}
    */
   @Override
-  public OperationResult.Builder<Output, A> attributes(A attributes) {
+  public Result.Builder<Output, A> attributes(A attributes) {
     operationResult.attributes = ofNullable(attributes);
     return this;
   }
@@ -47,7 +47,7 @@ final class DefaultOperationResultBuilder<Output, A extends Attributes> implemen
    * {@inheritDoc}
    */
   @Override
-  public OperationResult.Builder<Output, A> mediaType(MediaType dataType) {
+  public Result.Builder<Output, A> mediaType(MediaType dataType) {
     operationResult.mediaType = ofNullable(dataType);
     return this;
   }
@@ -56,11 +56,11 @@ final class DefaultOperationResultBuilder<Output, A extends Attributes> implemen
    * {@inheritDoc}
    */
   @Override
-  public OperationResult<Output, A> build() {
+  public Result<Output, A> build() {
     return operationResult;
   }
 
-  private final class DefaultOperationResult<Output, A extends Attributes> implements OperationResult<Output, A> {
+  private final class DefaultResult<Output, A extends Attributes> implements Result<Output, A> {
 
     private Output output;
     private Optional<A> attributes = empty();

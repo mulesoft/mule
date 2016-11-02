@@ -8,10 +8,12 @@ package org.mule.extension.socket;
 
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import org.mule.runtime.core.exception.MessagingException;
 
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 import org.junit.Test;
@@ -27,6 +29,8 @@ public class TcpConnectionTimeoutTestCase extends SocketExtensionTestCase {
   public void socketConnectionTimeout() throws Exception {
     final Throwable throwable = catchThrowable(() -> flowRunner("tcp-connection-timeout").withPayload(TEST_STRING).run());
     assertThat(throwable, is(instanceOf(MessagingException.class)));
-    assertThat(((MessagingException) throwable).getCauseException(), is(instanceOf(SocketTimeoutException.class)));
+    assertThat(((MessagingException) throwable).getCauseException(), is(anyOf(
+                                                                              instanceOf(SocketTimeoutException.class),
+                                                                              instanceOf(ConnectException.class))));
   }
 }

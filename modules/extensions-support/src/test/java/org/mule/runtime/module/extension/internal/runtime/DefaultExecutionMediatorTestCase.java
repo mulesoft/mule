@@ -40,8 +40,8 @@ import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -77,7 +77,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public ExpectedException expectedException = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private OperationContextAdapter operationContext;
+  private ExecutionContextAdapter operationContext;
 
   @Mock(extraInterfaces = Interceptable.class)
   private ConfigurationInstance configurationInstance;
@@ -325,7 +325,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public class DummyConnectionInterceptor implements Interceptor {
 
     @Override
-    public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception) {
+    public Throwable onError(ExecutionContext executionContext, RetryRequest retryRequest, Throwable exception) {
       retryRequest.request();
       return exception;
     }

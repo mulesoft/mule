@@ -6,9 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isObjectType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.getAllSuperTypes;
+import static org.reflections.ReflectionUtils.withName;
+import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -33,19 +46,21 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.param.Ignore;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
-import org.springframework.core.ResolvableType;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -54,6 +69,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -67,23 +83,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang.ArrayUtils.isEmpty;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isObjectType;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.getAllSuperTypes;
-import static org.reflections.ReflectionUtils.withAnnotation;
-import static org.reflections.ReflectionUtils.withName;
-import static org.springframework.core.ResolvableType.forType;
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -102,7 +102,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
    *
-   * @param type the {@link Class} being introspected
+   * @param type       the {@link Class} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
@@ -112,10 +112,10 @@ public final class IntrospectionUtils {
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Method}'s return type. If the {@code method} returns an
-   * {@link OperationResult}, then it returns the type of the {@code Output} generic. If the {@link OperationResult} type is being
+   * {@link Result}, then it returns the type of the {@code Output} generic. If the {@link Result} type is being
    * used in its raw form, then an {@link AnyType} will be returned.
    *
-   * @param method the {@link Method} being introspected
+   * @param method     the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -129,7 +129,7 @@ public final class IntrospectionUtils {
     }
 
     Type type = methodType.getType();
-    if (methodType.getRawClass().equals(OperationResult.class)) {
+    if (methodType.getRawClass().equals(Result.class)) {
       ResolvableType genericType = methodType.getGenerics()[0];
       if (genericType.getRawClass() != null) {
         type = genericType.getType();
@@ -142,13 +142,13 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Returns a {@link MetadataType} representing the {@link OperationResult#getAttributes()} that will be set after executing the
+   * Returns a {@link MetadataType} representing the {@link Result#getAttributes()} that will be set after executing the
    * given {@code method}.
    * <p>
-   * If the {@code method} returns a {@link OperationResult}, then it returns the type of the {@code Attributes} generic. In any
-   * other case (including raw uses of {@link OperationResult}) it will return a {@link VoidType}
+   * If the {@code method} returns a {@link Result}, then it returns the type of the {@code Attributes} generic. In any
+   * other case (including raw uses of {@link Result}) it will return a {@link VoidType}
    *
-   * @param method the {@link Method} being introspected
+   * @param method     the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -161,7 +161,7 @@ public final class IntrospectionUtils {
       methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
     }
 
-    if (methodType.getRawClass().equals(OperationResult.class)) {
+    if (methodType.getRawClass().equals(Result.class)) {
       ResolvableType genericType = methodType.getGenerics()[1];
       if (genericType.getRawClass() != null) {
         type = genericType.getType();
@@ -213,10 +213,10 @@ public final class IntrospectionUtils {
   /**
    * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument types.
    *
-   * @param method a not {@code null} {@link Method}
+   * @param method     a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   *         be empty
+   * be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -238,7 +238,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} describing the given {@link Field}'s type
    *
-   * @param field a not {@code null} {@link Field}
+   * @param field      a not {@code null} {@link Field}
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType} matching the field's type
    * @throws IllegalArgumentException if field is {@code null}
@@ -279,12 +279,6 @@ public final class IntrospectionUtils {
     } else {
       throw new NoSuchFieldException();
     }
-  }
-
-  public static Optional<Field> getFieldByAlias(Class<?> clazz, String alias) {
-    Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class));
-    Optional<Field> field = candidates.stream().filter(f -> alias.equals(f.getAnnotation(Alias.class).value())).findFirst();
-    return field.isPresent() ? field : getField(clazz, alias);
   }
 
   public static String getMemberName(EnrichableModel enrichableModel, String defaultName) {
@@ -351,8 +345,9 @@ public final class IntrospectionUtils {
   public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass) {
     Class<?> searchClass = type;
 
-    checkArgument(searchClass.getSuperclass().equals(superClass),
-                  format("Class '%s' does not extend the '%s' class", type.getName(), superClass.getName()));
+    checkArgument(searchClass.getSuperclass().equals(superClass), format(
+                                                                         "Class '%s' does not extend the '%s' class",
+                                                                         type.getName(), superClass.getName()));
 
     while (!Object.class.equals(searchClass)) {
       if (searchClass.getSuperclass().equals(superClass)) {
@@ -385,6 +380,17 @@ public final class IntrospectionUtils {
         && !declaringClass.isInterface() && !Modifier.isAbstract(declaringClass.getModifiers());
   }
 
+  /**
+   * Determines if the given {@code type} is assignable from any of the {@code matchingTypes}
+   *
+   * @param type          a {@link Class}
+   * @param matchingTypes a collection of {@link Class classes} to test against
+   * @return whether the type is assignable or not
+   */
+  public static boolean assignableFromAny(Class<?> type, Collection<Class<?>> matchingTypes) {
+    return matchingTypes.stream().anyMatch(t -> t.isAssignableFrom(type));
+  }
+
   public static boolean isRequired(AccessibleObject object) {
     return object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) == null;
   }
@@ -406,11 +412,28 @@ public final class IntrospectionUtils {
   }
 
   public static Collection<Method> getOperationMethods(Class<?> declaringClass) {
-    return getAllSuperTypes(declaringClass).stream()
-        .flatMap(type -> Stream.of(type.getDeclaredMethods()))
-        .filter(method -> isPublic(method.getModifiers()))
+    return getMethodsStream(declaringClass)
         .filter(method -> !method.isAnnotationPresent(Ignore.class))
         .collect(toCollection(LinkedHashSet::new));
+  }
+
+  /**
+   * Returns all the methods in the {@code declaringClass} which are annotated with {@code annotationType}
+   *
+   * @param declaringClass the type to introspect
+   * @param annotationType the annotation you're looking for
+   * @return a {@link Collection} of {@link Method}s
+   */
+  public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass, Class<? extends Annotation> annotationType) {
+    return getMethodsStream(declaringClass)
+        .filter(method -> method.getAnnotation(annotationType) != null)
+        .collect(toCollection(LinkedHashSet::new));
+  }
+
+  private static Stream<Method> getMethodsStream(Class<?> declaringClass) {
+    return getAllSuperTypes(declaringClass).stream()
+        .flatMap(type -> Stream.of(type.getDeclaredMethods()))
+        .filter(method -> isPublic(method.getModifiers()));
   }
 
   public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType) {
@@ -421,6 +444,19 @@ public final class IntrospectionUtils {
   public static List<Field> getFields(Class<?> clazz) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
         .collect(new ImmutableListCollector<>());
+  }
+
+  /**
+   * Returns the {@link Alias} name of the given {@code element}. If the element doesn't have
+   * an alias, then the default name is return
+   *
+   * @param element an annotated member
+   * @param <T>     the generic type of the element
+   * @return an alias name
+   */
+  public static <T extends AnnotatedElement & Member> String getAlias(T element) {
+    Alias alias = element.getAnnotation(Alias.class);
+    return alias != null ? alias.value() : element.getName();
   }
 
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
@@ -513,7 +549,7 @@ public final class IntrospectionUtils {
    * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter, indicates if the
    * parameter is considered as a multilevel {@link MetadataKeyId}
    *
-   * @param annotations of the parameter
+   * @param annotations   of the parameter
    * @param parameterType of the parameter
    * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
    */
@@ -527,7 +563,7 @@ public final class IntrospectionUtils {
    * <p>
    * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel {@link MetadataKeyId}.
    *
-   * @param annotations of the component parameter
+   * @param annotations   of the component parameter
    * @param parameterType of the component parameter
    * @return a boolean indicating if the parameter is considered as a parameter container
    */

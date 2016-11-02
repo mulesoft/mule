@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.core.execution.CompletionHandler;
+import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -40,11 +40,8 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
 
   abstract protected Event processBlocking(Event event) throws MuleException;
 
-  protected ExceptionCallback<Void, ? extends MessagingException> createCompletionExceptionCallback(Event event) {
-    return (ExceptionCallback<Void, MessagingException>) exception -> {
-      messagingExceptionHandler.handleException(exception, event);
-      return null;
-    };
+  protected ExceptionCallback<? extends MessagingException> createCompletionExceptionCallback(Event event) {
+    return (ExceptionCallback<MessagingException>) exception -> messagingExceptionHandler.handleException(exception, event);
   }
 
 }

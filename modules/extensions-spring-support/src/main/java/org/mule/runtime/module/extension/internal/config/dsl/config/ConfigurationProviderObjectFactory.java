@@ -42,7 +42,6 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
   private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
-  private final MuleContext muleContext;
 
   private DynamicConfigPolicy dynamicConfigPolicy;
   private Optional<ValueResolver<ConnectionProvider>> connectionProviderResolver = empty();
@@ -52,15 +51,14 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   @Inject
   private TimeSupplier timeSupplier;
 
-
   ConfigurationProviderObjectFactory(String name,
                                      ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
                                      MuleContext muleContext) {
+    super(muleContext);
     this.name = name;
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
-    this.muleContext = muleContext;
   }
 
   @Override

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.request.validator;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
  * Base status code validator that can be extended to create custom validations.

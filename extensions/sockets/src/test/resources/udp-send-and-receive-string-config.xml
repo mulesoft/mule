@@ -6,7 +6,9 @@
        http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
 
     <sockets:request-config name="udp-requester">
-        <sockets:udp-requester-connection host="localhost" port="${port}"/>
+        <sockets:udp-requester-connection host="localhost" port="${port}">
+            <reconnect blocking="false" />
+        </sockets:udp-requester-connection>
     </sockets:request-config>
 
     <sockets:listener-config name="udp-listener">

@@ -10,7 +10,7 @@ import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 /**
  * Abstract implementation of a {@link PoolingConnectionProvider} for email sender connection providers.

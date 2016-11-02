@@ -89,8 +89,8 @@ import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 import org.mule.tck.size.SmallTest;
@@ -182,9 +182,9 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
   public void configurationsOrder() {
     ConfigurationFactory mockInstantiator = mock(ConfigurationFactory.class);
 
-    final String defaultConfiguration = "default";
-    final String beta = "beta";
     final String alpha = "alpha";
+    final String beta = "beta";
+    final String gamma = "gamma";
 
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named("test")
@@ -194,8 +194,8 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         .withMinMuleVersion(MIN_MULE_VERSION)
         .withXmlDsl(XmlDslModel.builder().build());
 
-    extensionDeclarer.withConfig(defaultConfiguration)
-        .describedAs(defaultConfiguration)
+    extensionDeclarer.withConfig(gamma)
+        .describedAs(gamma)
         .withModelProperty(new ConfigurationFactoryModelProperty(mockInstantiator));
     withConfigurationFactory(extensionDeclarer.withConfig(beta).describedAs(beta), mockInstantiator);
     withConfigurationFactory(extensionDeclarer.withConfig(alpha).describedAs(alpha), mockInstantiator);
@@ -203,8 +203,9 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     ExtensionModel extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
     List<ConfigurationModel> configurationModels = extensionModel.getConfigurationModels();
     assertThat(configurationModels, hasSize(3));
-    assertThat(configurationModels.get(1).getName(), equalTo(alpha));
-    assertThat(configurationModels.get(2).getName(), equalTo(beta));
+    assertThat(configurationModels.get(0).getName(), equalTo(alpha));
+    assertThat(configurationModels.get(1).getName(), equalTo(beta));
+    assertThat(configurationModels.get(2).getName(), equalTo(gamma));
   }
 
   @Test

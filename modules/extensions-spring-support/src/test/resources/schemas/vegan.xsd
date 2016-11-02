@@ -5,6 +5,15 @@
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="pear-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="apple-config">
         <xs:complexType>
             <xs:complexContent>
@@ -99,7 +108,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="key"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -139,15 +148,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="pear-config">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="banana-config">
         <xs:complexType>
             <xs:complexContent>
@@ -331,6 +331,35 @@
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ApplyPolicyType" substitutionGroup="mule:abstract-message-processor" name="apply-policy"></xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ApplyPolicyType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="policy">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="policy"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
             </xs:extension>

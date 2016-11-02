@@ -6,8 +6,10 @@
  */
 package org.mule.test.subtypes.extension;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.message.StringAttributes;
 
 public class SubtypesSource extends Source<String, StringAttributes> {
@@ -16,7 +18,7 @@ public class SubtypesSource extends Source<String, StringAttributes> {
   public Door doorParam;
 
   @Override
-  public void start() {
+  public void onStart(SourceCallback<String, StringAttributes> sourceCallback) throws MuleException {
     if (doorParam == null) {
       throw new RuntimeException("Door was null");
     }
@@ -29,5 +31,7 @@ public class SubtypesSource extends Source<String, StringAttributes> {
   }
 
   @Override
-  public void stop() {}
+  public void onStop() {
+
+  }
 }

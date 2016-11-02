@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -20,8 +22,8 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionalResource;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionalConnectionHandler;
@@ -32,7 +34,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * A bridge between the execution of an operation and the {@link ConnectionManager} which provides the connections that it needs.
+ * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides
+ * the connections that it needs.
  * <p>
  * It handles connection provisioning and transaction support
  *
@@ -48,24 +51,24 @@ public class ExtensionsConnectionAdapter {
    * <p>
    * It accounts for the possibility of the returned connection joining/belonging to an active transaction
    *
-   * @param operationContext an {@link OperationContextAdapter}
+   * @param executionContext an {@link ExecutionContextAdapter}
    * @return a {@link ConnectionHandler}
-   * @throws ConnectionException if connection could not be obtained
+   * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
-  public ConnectionHandler<?> getConnection(OperationContextAdapter operationContext)
+  public ConnectionHandler<?> getConnection(ExecutionContextAdapter<ComponentModel> executionContext)
       throws ConnectionException, TransactionException {
-    return operationContext.getTransactionConfig().isPresent()
-        ? getTransactedConnectionHandler(operationContext, operationContext.getTransactionConfig().get())
-        : getTransactionlessConnectionHandler(operationContext);
+    return executionContext.getTransactionConfig().isPresent()
+        ? getTransactedConnectionHandler(executionContext, executionContext.getTransactionConfig().get())
+        : getTransactionlessConnectionHandler(executionContext);
   }
 
 
-  private <T> ConnectionHandler<T> getTransactionlessConnectionHandler(OperationContext operationContext)
+  private <T> ConnectionHandler<T> getTransactionlessConnectionHandler(ExecutionContext executionContext)
       throws ConnectionException {
 
 
-    final Optional<ConfigurationInstance> configuration = operationContext.getConfiguration();
+    final Optional<ConfigurationInstance> configuration = executionContext.getConfiguration();
     Optional<ConnectionProvider> connectionProvider = configuration
         .map(config -> config.getConnectionProvider())
         .map(Optional::get);
@@ -75,28 +78,30 @@ public class ExtensionsConnectionAdapter {
           .map(config -> format("with config '%s' which is not associated to a connection provider", config.getName()))
           .orElse("without a config");
 
-      throw new IllegalStateException(format("Operation '%s' of extension '%s' requires a connection but was executed %s",
-                                             operationContext.getOperationModel().getName(),
-                                             operationContext.getExtensionModel().getName(),
+      throw new IllegalStateException(format("%s '%s' of extension '%s' requires a connection but was executed %s",
+                                             getComponentModelTypeName(executionContext.getComponentModel()),
+                                             executionContext.getComponentModel().getName(),
+                                             executionContext.getExtensionModel().getName(),
                                              configRef));
     }
 
     return connectionManager.getConnection(configuration.get().getValue());
   }
 
-  private <T extends TransactionalConnection> ConnectionHandler<T> getTransactedConnectionHandler(OperationContextAdapter operationContext,
+  private <T extends TransactionalConnection> ConnectionHandler<T> getTransactedConnectionHandler(
+                                                                                                  ExecutionContextAdapter<ComponentModel> executionContext,
                                                                                                   TransactionConfig transactionConfig)
       throws ConnectionException, TransactionException {
 
     if (transactionConfig.getAction() == ACTION_NOT_SUPPORTED) {
-      return getTransactionlessConnectionHandler(operationContext);
+      return getTransactionlessConnectionHandler(executionContext);
     }
 
-    ConfigurationInstance configuration = operationContext.getConfiguration()
-        .orElseThrow(() -> new IllegalStateException(format("Operation '%s' of extension '%s' cannot participate in a transaction because"
-            + "it doesn't have a config",
-                                                            operationContext.getOperationModel().getName(),
-                                                            operationContext.getExtensionModel().getName())));
+    ConfigurationInstance configuration = executionContext.getConfiguration()
+        .orElseThrow(() -> new IllegalStateException(format(
+                                                            "Operation '%s' of extension '%s' cannot participate in a transaction because it doesn't have a config",
+                                                            executionContext.getComponentModel().getName(),
+                                                            executionContext.getExtensionModel().getName())));
 
 
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
@@ -107,7 +112,7 @@ public class ExtensionsConnectionAdapter {
         return new TransactionalConnectionHandler((ExtensionTransactionalResource) currentTx.getResource(txKey));
       }
 
-      ConnectionHandler<T> connectionHandler = getTransactionlessConnectionHandler(operationContext);
+      ConnectionHandler<T> connectionHandler = getTransactionlessConnectionHandler(executionContext);
       T connection = connectionHandler.getConnection();
       ExtensionTransactionalResource<T> txResource = createTransactionalResource(currentTx, connectionHandler, connection);
       boolean bound = false;
@@ -117,9 +122,13 @@ public class ExtensionsConnectionAdapter {
           bound = true;
           return new TransactionalConnectionHandler(txResource);
         } else if (transactionConfig.isTransacted()) {
-          throw new TransactionException(createStaticMessage(format("Operation '%s' of extension '%s' is transactional but current transaction doesn't "
-              + "support connections of type '%s'", operationContext.getOperationModel().getName(),
-                                                                    operationContext.getExtensionModel().getName(),
+          throw new TransactionException(
+                                         createStaticMessage(format("%s '%s' of extension '%s' is transactional but current transaction doesn't "
+                                             + "support connections of type '%s'",
+                                                                    getComponentModelTypeName(executionContext
+                                                                        .getComponentModel()),
+                                                                    executionContext.getComponentModel().getName(),
+                                                                    executionContext.getExtensionModel().getName(),
                                                                     connectionHandler.getClass().getName())));
         }
       } finally {
@@ -129,7 +138,7 @@ public class ExtensionsConnectionAdapter {
       }
     }
 
-    return getTransactionlessConnectionHandler(operationContext);
+    return getTransactionlessConnectionHandler(executionContext);
   }
 
   private <T extends TransactionalConnection> ExtensionTransactionalResource<T> createTransactionalResource(Transaction currentTx,

@@ -22,12 +22,17 @@ import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 public class ExtensionProperties {
 
   /**
-   * The key of an operation's variable on which the connection to be used was set
+   * The key of an execution context variable on which the connection to be used was set
    */
   public static final String CONNECTION_PARAM = PROPERTY_PREFIX + "CONNECTION_PARAM";
 
   /**
-   * The key of an operation's variable on which the {@link InterceptingCallback} is stored
+   * The key of an execution context variable on which the connection to be used was set
+   */
+  public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
+
+  /**
+   * The key of an execution context variable on which the {@link InterceptingCallback} is stored
    */
   public static final String INTERCEPTING_CALLBACK_PARAM = PROPERTY_PREFIX + "INTERCEPTING_CALLBACK_PARAM";
 

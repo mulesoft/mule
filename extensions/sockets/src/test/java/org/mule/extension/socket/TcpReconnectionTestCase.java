@@ -18,10 +18,9 @@ import org.mule.extension.socket.api.socket.factory.TcpServerSocketFactory;
 import org.mule.extension.socket.api.socket.factory.TcpSocketFactory;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
-import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.MessageHandler;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -58,7 +57,7 @@ public class TcpReconnectionTestCase extends AbstractMuleTestCase {
   private ConnectionSettings connectionSettings;
 
   @Mock
-  private MessageHandler handler;
+  private SourceCallback sourceCallback;
 
   private TcpServerSocketProperties serverSocketProperties;
   private TcpClientSocketProperties clientSocketProperties;
@@ -133,6 +132,6 @@ public class TcpReconnectionTestCase extends AbstractMuleTestCase {
       return false;
     }));
 
-    SocketWorker worker = listenerConnection.listen(handler);
+    listenerConnection.listen(sourceCallback);
   }
 }

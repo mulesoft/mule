@@ -49,7 +49,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -107,7 +107,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private OperationModel extension1OperationModel;
 
   @Mock
-  private OperationContextAdapter extension1OperationContext;
+  private ExecutionContextAdapter extension1OperationContext;
 
   @Mock
   private ConfigurationProvider extension1ConfigurationProvider;

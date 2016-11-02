@@ -63,7 +63,7 @@ public class AsyncResponseFlowProcessingPhase
                                                 : messageProcessContext.getTransactionConfig()),
                                             exceptionHandler);
             final Event response = transactionTemplate.execute(() -> {
-              Event muleEvent = template.getMuleEvent();
+              Event muleEvent = template.getEvent();
               fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
               return template.routeEvent(muleEvent);
             });

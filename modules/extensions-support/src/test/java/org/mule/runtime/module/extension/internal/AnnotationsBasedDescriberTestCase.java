@@ -60,19 +60,19 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
-import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.message.IntegerAttributes;
@@ -125,6 +125,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
   private static final String SOURCE_NAME = "ListenPayments";
   private static final String SOURCE_PARAMETER = "initialBatchNumber";
+  private static final String SOURCE_CALLBACK_PARAMETER = "payment";
   private static final String SAY_MY_NAME_OPERATION = "sayMyName";
   private static final String GET_ENEMY_OPERATION = "getEnemy";
   private static final String KILL_OPERATION = "kill";
@@ -399,7 +400,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertParameter(parameters, "deathsBySeasons", "",
                     TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                         .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.arrayType()
-                            .id(List.class.getName()).of(TYPE_BUILDER.stringType().id(String.class.getName())))
+                            .id(List.class.getName())
+                            .of(TYPE_BUILDER.stringType()
+                                .id(String.class
+                                    .getName())))
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "weaponValueMap", "",
@@ -573,7 +577,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     operation = getOperation(extensionDeclaration, PROCESS_INFO);
     assertThat(operation, is(notNullValue()));
-    assertParameter(operation.getParameters(), "sales", "", TYPE_LOADER.load(new TypeToken<Map<String, SaleInfo>>() {}.getType()),
+    assertParameter(operation.getParameters(), "sales", "", TYPE_LOADER.load(new TypeToken<Map<String, SaleInfo>>() {
+
+    }.getType()),
                     true, SUPPORTED, null);
 
     operation = getOperation(extensionDeclaration, PROCESS_WEAPON);
@@ -609,9 +615,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertThat(source.getName(), is(SOURCE_NAME));
 
     List<ParameterDeclaration> parameters = source.getParameters();
-    assertThat(parameters, hasSize(2));
+    assertThat(parameters, hasSize(3));
 
-    assertParameter(parameters, SOURCE_PARAMETER, "", toMetadataType(int.class), true, SUPPORTED, null);
+    assertParameter(parameters, SOURCE_PARAMETER, "", toMetadataType(int.class), true, NOT_SUPPORTED, null);
+    assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");
     ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.class).get();
     assertThat(typeModelProperty.getType(), equalTo(HeisenbergSource.class));
   }
@@ -691,7 +698,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     @ParameterGroup
     private RecursiveParameterGroup group;
-
   }
 
   @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
@@ -729,7 +735,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
   public static class GenericlessMessageOperation {
 
-    public OperationResult noGenerics() {
+    public Result noGenerics() {
       return null;
     }
   }

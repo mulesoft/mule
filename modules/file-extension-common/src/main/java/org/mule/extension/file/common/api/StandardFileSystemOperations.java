@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -96,10 +96,10 @@ public class StandardFileSystemOperations {
    */
   @DataTypeParameters
   @Summary("Obtains the content and metadata of a file at a given path")
-  public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
-                                                           @Connection FileSystem fileSystem, Message message,
-                                                           @DisplayName("File Path") String path,
-                                                           @Optional(defaultValue = "false") boolean lock) {
+  public Result<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
+                                                  @Connection FileSystem fileSystem, Message message,
+                                                  @DisplayName("File Path") String path,
+                                                  @Optional(defaultValue = "false") boolean lock) {
     fileSystem.changeToBaseDir();
     return fileSystem.read(config, message, path, lock);
   }

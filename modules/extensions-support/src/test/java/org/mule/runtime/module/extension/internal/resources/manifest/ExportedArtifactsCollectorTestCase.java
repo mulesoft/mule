@@ -20,7 +20,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.vegan.extension.VeganAttributes;
@@ -65,7 +65,7 @@ public class ExportedArtifactsCollectorTestCase {
     OperationModel firstOperation = mockOperationModel(appleList, mockOutputModel(List.class));
 
     ParameterModel parameter = mockParameterModel(Shape.class);
-    OutputModel resultList = mockOutputModel(new TypeToken<List<OperationResult<Apple, VeganAttributes>>>() {}.getType());
+    OutputModel resultList = mockOutputModel(new TypeToken<List<Result<Apple, VeganAttributes>>>() {}.getType());
     OperationModel secondOperation = mockOperationModel(resultList, mockOutputModel(List.class), parameter);
 
     when(extensionModel.getOperationModels()).thenReturn(asList(firstOperation, secondOperation));

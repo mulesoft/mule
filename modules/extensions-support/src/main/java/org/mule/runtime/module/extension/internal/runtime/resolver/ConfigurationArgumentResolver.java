@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 /**
  * An implementation of {@link ArgumentResolver} which returns the value obtained through
- * {@link OperationContext#getConfiguration()}
+ * {@link ExecutionContext#getConfiguration()}
  *
  * @since 3.7.1
  */
 public final class ConfigurationArgumentResolver implements ArgumentResolver<Object> {
 
   @Override
-  public Object resolve(OperationContext operationContext) {
-    return operationContext.getConfiguration().get().getValue();
+  public Object resolve(ExecutionContext executionContext) {
+    return ((ConfigurationInstance) executionContext.getConfiguration().get()).getValue();
   }
 }

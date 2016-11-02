@@ -26,8 +26,10 @@ import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.extension.file.internal.command.DirectoryListenerCommand;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -35,19 +37,21 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableSet;
@@ -204,11 +208,11 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private boolean started = false;
 
   @Override
-  public void start() throws Exception {
+  public void onStart(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) throws MuleException {
     if (!muleContext.isPrimaryPollingInstance()) {
       LOGGER.debug("{} source on flow {} not started because this is a secondary cluster node", DIRECTORY_LISTENER,
                    flowConstruct.getName());
-      initialiseClusterListener();
+      initialiseClusterListener(sourceCallback);
       return;
     }
 
@@ -221,14 +225,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
                                                 format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
     started = true;
     stopRequested.set(false);
-    executorService.execute(this::listen);
+    executorService.execute(() -> listen(sourceCallback));
   }
 
-  private synchronized void initialiseClusterListener() {
+  private synchronized void initialiseClusterListener(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
     if (clusterListener == null) {
       clusterListener = new PrimaryNodeLifecycleNotificationListener(() -> {
         try {
-          start();
+          onStart(sourceCallback);
         } catch (Exception e) {
           throw new MuleRuntimeException(e);
         }
@@ -238,7 +242,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     }
   }
 
-  private void listen() {
+  private void listen(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
     try {
       for (;;) {
         if (isRequestedToStop()) {
@@ -253,17 +257,18 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         }
 
         try {
-          key.pollEvents().forEach(event -> processEvent(event, key));
+          key.pollEvents().forEach(event -> processEvent(event, key, sourceCallback));
         } finally {
           resetWatchKey(key);
         }
       }
     } catch (Exception e) {
-      sourceContext.getExceptionCallback().onException(e);
+      sourceCallback.onSourceException(e);
     }
   }
 
-  private void processEvent(WatchEvent<?> watchEvent, WatchKey key) {
+  private void processEvent(WatchEvent<?> watchEvent, WatchKey key,
+                            SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
     WatchEvent<Path> event = (WatchEvent<Path>) watchEvent;
 
     Path watchPath = keyPaths.get(key);
@@ -300,7 +305,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
       return;
     }
 
-    sourceContext.getMessageHandler().handle(createMessage(path, attributes));
+    sourceCallback.handle(createResult(path, attributes));
     createAdditionalWatchers(attributes);
   }
 
@@ -320,8 +325,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     return stopRequested.get() || Thread.currentThread().isInterrupted();
   }
 
-  private Message createMessage(Path path, ListenerFileAttributes attributes) {
-    Object payload = null;
+  private Result<InputStream, ListenerFileAttributes> createResult(Path path, ListenerFileAttributes attributes) {
+    InputStream payload = null;
     MediaType mediaType = MediaType.ANY;
 
     if (attributes.getEventType().equals(DELETE.name())) {
@@ -331,11 +336,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
       payload = new FileInputStream(path, new NullPathLock());
     }
 
-    return Message.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+    return Result.<InputStream, ListenerFileAttributes>builder()
+        .output(payload)
+        .mediaType(mediaType)
+        .attributes(attributes).build();
   }
 
   @Override
-  public void stop() {
+  public void onStop() {
     stopRequested.set(true);
     started = false;
 
@@ -398,7 +406,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     }
   }
 
-  private void createWatcherService() throws IOException {
+  private void createWatcherService() throws MuleException {
     try {
       watcher = FileSystems.getDefault().newWatchService();
     } catch (Exception e) {
@@ -406,19 +414,24 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     }
 
     final Path rootPath = resolveRootPath();
-    registerPath(rootPath);
 
-    if (recursive) {
-      walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+    try {
+      registerPath(rootPath);
 
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          if (!dir.equals(rootPath)) {
-            registerPath(dir);
+      if (recursive) {
+        walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+
+          @Override
+          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            if (!dir.equals(rootPath)) {
+              registerPath(dir);
+            }
+            return CONTINUE;
           }
-          return CONTINUE;
-        }
-      });
+        });
+      }
+    } catch (IOException e) {
+      throw new DefaultMuleException(e);
     }
   }
 

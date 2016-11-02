@@ -17,9 +17,9 @@ import org.mule.runtime.core.api.source.MessageSource;
 public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate {
 
   /**
-   * @return a {@link org.mule.runtime.core.api.Event} created from the original message
+   * @return a {@link Event} created from the original message
    */
-  Event getMuleEvent() throws MuleException;
+  Event getEvent() throws MuleException;
 
   /**
    * @return the original message

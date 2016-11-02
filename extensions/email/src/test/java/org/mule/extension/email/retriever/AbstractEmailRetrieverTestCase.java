@@ -33,7 +33,7 @@ import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
@@ -81,7 +81,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveNothing() throws Exception {
     server.purgeEmailFromAllMailboxes();
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    List<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(0));
   }
 
@@ -93,7 +93,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
       user.deliver(mimeMessage);
     }
 
-    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    List<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(15));
     assertThat(messages, hasSize(10));
   }
@@ -112,7 +112,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveEmailWithAttachments() throws Exception {
     server.purgeEmailFromAllMailboxes();
     user.deliver(getMultipartTestMessage());
-    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+    List<Result> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
     assertThat(messages, hasSize(1));
     assertThat(messages.get(0).getOutput(), instanceOf(MultiPartPayload.class));
@@ -133,8 +133,8 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
   }
 
-  protected List<OperationResult> runFlowAndGetMessages(String flowName) throws Exception {
-    return (List<OperationResult>) flowRunner(flowName).run().getMessage().getPayload().getValue();
+  protected List<Result> runFlowAndGetMessages(String flowName) throws Exception {
+    return (List<Result>) flowRunner(flowName).run().getMessage().getPayload().getValue();
   }
 
   protected void assertFlag(MimeMessage m, Flag flag, boolean contains) {

@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
@@ -33,6 +32,6 @@ public interface HttpClient extends Startable, Stoppable {
    * CompletionHandler will be invoked.
    */
   void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
-            final CompletionHandler<HttpResponse, Exception, Void> handler);
+            final CompletionHandler<HttpResponse, Exception> handler);
 
 }

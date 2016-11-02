@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
-import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -91,7 +91,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private InternalMessage dispatchMessage(Event event, boolean doSend,
-                                          final CompletionHandler<InternalMessage, Exception, Void> completionHandler)
+                                          final CompletionHandler<InternalMessage, Exception> completionHandler)
       throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("dispatching on endpoint: " + endpoint.getEndpointURI() + ". MuleEvent id is: " + event

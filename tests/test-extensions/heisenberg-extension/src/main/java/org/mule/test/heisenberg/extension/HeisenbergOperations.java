@@ -15,16 +15,16 @@ import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.OnException;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Ignore;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -76,13 +76,13 @@ public class HeisenbergOperations {
   }
 
   @DataTypeParameters
-  public OperationResult<String, IntegerAttributes> getEnemy(@UseConfig HeisenbergExtension config,
-                                                             @Optional(defaultValue = "0") int index) {
+  public Result<String, IntegerAttributes> getEnemy(@UseConfig HeisenbergExtension config,
+                                                    @Optional(defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
     org.mule.runtime.api.metadata.DataType dt =
         DataType.builder().type(String.class).mediaType("dead/dead").charset(lastSupportedEncoding.toString()).build();
 
-    return OperationResult.<String, IntegerAttributes>builder().output(config.getEnemies().get(index))
+    return Result.<String, IntegerAttributes>builder().output(config.getEnemies().get(index))
         .mediaType(dt.getMediaType()).attributes(new IntegerAttributes(index)).build();
   }
 

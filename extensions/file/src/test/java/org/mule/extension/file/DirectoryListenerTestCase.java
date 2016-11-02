@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
-import org.mule.runtime.extension.api.runtime.source.SourceContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
   private DirectoryListener directoryListener;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private SourceContext sourceContext;
+  private SourceCallback sourceCallback;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private FlowConstruct flowConstruct;
@@ -47,7 +47,6 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     directoryListener = new DirectoryListener();
     directoryListener.setFlowConstruct(flowConstruct);
-    directoryListener.setSourceContext(sourceContext);
 
     when(mockMuleContext.isPrimaryPollingInstance()).thenReturn(false);
     muleContext.getRegistry().registerObject(OBJECT_MULE_CONTEXT, mockMuleContext);
@@ -57,7 +56,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
   @Override
   protected void doTearDown() throws Exception {
     if (directoryListener.isStarted()) {
-      directoryListener.stop();
+      directoryListener.onStop();
     }
   }
 
@@ -71,7 +70,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
     ArgumentCaptor<PrimaryNodeLifecycleNotificationListener> listenerCaptor =
         ArgumentCaptor.forClass(PrimaryNodeLifecycleNotificationListener.class);
 
-    directoryListener.start();
+    directoryListener.onStart(sourceCallback);
 
     verify(mockMuleContext).registerListener(listenerCaptor.capture());
     PrimaryNodeLifecycleNotificationListener listener = listenerCaptor.getValue();

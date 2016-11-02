@@ -7,16 +7,19 @@
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.assignableFromAny;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -30,15 +33,20 @@ import java.util.Set;
  */
 public interface ExtensionParameter extends WithType, WithAnnotations, NamedObject, WithAlias, WithOwner {
 
-  Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder().add(Event.class).add(Message.class)
-      .add(InternalMessage.class).build();
+  Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
+      .add(Event.class)
+      .add(Message.class)
+      .add(InternalMessage.class)
+      .add(Error.class)
+      .add(SourceCallbackContext.class)
+      .build();
 
   /**
    * @return A {@code boolean} indicating whether the parameter should be advertised and added as a {@link ParameterModel} in the
    *         {@link ExtensionModel}
    */
   default boolean shouldBeAdvertised() {
-    return !(IMPLICIT_ARGUMENT_TYPES.contains(getType().getDeclaringClass())
+    return !(assignableFromAny(getType().getDeclaringClass(), IMPLICIT_ARGUMENT_TYPES)
         || (isAnnotatedWith(UseConfig.class) || isAnnotatedWith(Connection.class)) || isAnnotatedWith(ParameterGroup.class));
   }
 

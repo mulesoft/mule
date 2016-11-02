@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.lang.String.format;
+import static java.time.Instant.ofEpochMilli;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -149,11 +150,10 @@ public abstract class ExtensionDefinitionParser {
    * Creates a new instance
    *
    * @param baseDefinitionBuilder a {@link Builder} used as a prototype to generate new defitintions
-   * @param dslSyntaxResolver a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
-   * @param parsingContext the {@link ExtensionParsingContext} in which {@code this} parser operates
+   * @param dslSyntaxResolver     a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
+   * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
-  protected ExtensionDefinitionParser(Builder baseDefinitionBuilder,
-                                      DslSyntaxResolver dslSyntaxResolver,
+  protected ExtensionDefinitionParser(Builder baseDefinitionBuilder, DslSyntaxResolver dslSyntaxResolver,
                                       ExtensionParsingContext parsingContext, MuleContext muleContext) {
     this.baseDefinitionBuilder = baseDefinitionBuilder;
     this.dslResolver = dslSyntaxResolver;
@@ -270,7 +270,7 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param parameter a {@link ParameterModel}
+   * @param parameter      a {@link ParameterModel}
    * @param dictionaryType a {@link DictionaryType}
    */
   protected void parseMapParameters(ParameterModel parameter, DictionaryType dictionaryType, DslElementSyntax paramDsl) {
@@ -281,12 +281,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param dictionaryType the parameter's {@link DictionaryType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param dictionaryType    the parameter's {@link DictionaryType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required
+   * @param required          whether the parameter is required
    */
   protected void parseMapParameters(String key, String name, DictionaryType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
@@ -395,12 +395,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ArrayType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param arrayType the parameter's {@link ArrayType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param arrayType         the parameter's {@link ArrayType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required
+   * @param required          whether the parameter is required
    */
   protected void parseCollectionParameter(String key, String name, ArrayType arrayType, Object defaultValue,
                                           ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl,
@@ -599,12 +599,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for parsing the given {@code parameterModel} as an element attribute
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param type the parameter's type
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param type              the parameter's type
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required or not
+   * @param required          whether the parameter is required or not
    * @return an {@link AttributeDefinition.Builder}
    */
   protected AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
@@ -617,10 +617,10 @@ public abstract class ExtensionDefinitionParser {
                                                               ExpressionSupport expressionSupport, boolean required,
                                                               boolean acceptsReferences, Set<ModelProperty> modelProperties) {
     AttributeDefinition.Builder definitionBuilder =
-        fromSimpleParameter(name,
-                            value -> resolverOf(name, type, value, defaultValue, expressionSupport, required, modelProperties,
-                                                acceptsReferences))
-                                                    .withDefaultValue(defaultValue);
+        fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required,
+                                                      modelProperties, acceptsReferences))
+                                                          .withDefaultValue(defaultValue);
+
     addParameter(key, definitionBuilder);
 
     return definitionBuilder;
@@ -640,13 +640,13 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ObjectType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param type an {@link ObjectType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param type              an {@link ObjectType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required or not
-   * @param modelProperties parameter's {@link ModelProperty}s
+   * @param required          whether the parameter is required or not
+   * @param modelProperties   parameter's {@link ModelProperty}s
    */
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
                                       ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences,
@@ -661,7 +661,7 @@ public abstract class ExtensionDefinitionParser {
       try {
         new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), elementName, elementNamespace, type, getContextClassLoader(),
                                       dslResolver, parsingContext, muleContext).parse()
-                                          .forEach(definition -> addDefinition(definition));
+                                          .forEach(this::addDefinition);
       } catch (Exception e) {
         throw new MuleRuntimeException(new ConfigurationException(e));
       }
@@ -721,7 +721,6 @@ public abstract class ExtensionDefinitionParser {
         .withTypeDefinition(fromType(NestedProcessorListValueResolver.class))
         .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
         .build());
-
   }
 
   private boolean isExpressionFunction(MetadataType metadataType) {
@@ -763,7 +762,7 @@ public abstract class ExtensionDefinitionParser {
       } else if (type.equals(Date.class)) {
         constructedValue = dateTime.toDate();
       } else if (type.equals(LocalDateTime.class)) {
-        Instant instant = Instant.ofEpochMilli(dateTime.getMillis());
+        Instant instant = ofEpochMilli(dateTime.getMillis());
         constructedValue = LocalDateTime.ofInstant(instant, ZoneId.of(dateTime.getZone().getID()));
       } else if (type.equals(Calendar.class)) {
         Calendar calendar = Calendar.getInstance();

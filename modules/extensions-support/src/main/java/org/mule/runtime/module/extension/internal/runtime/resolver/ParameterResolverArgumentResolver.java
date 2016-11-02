@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 /**
@@ -26,8 +26,8 @@ public final class ParameterResolverArgumentResolver<T> implements ArgumentResol
    * {@inheritDoc}
    */
   @Override
-  public ParameterResolver<T> resolve(OperationContext operationContext) {
-    Object value = argumentResolver.resolve(operationContext);
+  public ParameterResolver<T> resolve(ExecutionContext executionContext) {
+    Object value = argumentResolver.resolve(executionContext);
     return ParameterResolver.class.isInstance(value)
         ? (ParameterResolver<T>) value
         : new StaticParameterResolver<>((T) value);

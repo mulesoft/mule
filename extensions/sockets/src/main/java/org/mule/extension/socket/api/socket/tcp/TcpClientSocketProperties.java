@@ -7,7 +7,7 @@
 package org.mule.extension.socket.api.socket.tcp;
 
 import org.mule.runtime.extension.api.annotation.Extensible;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;

@@ -6,14 +6,16 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.testmodels.fruit.Apple;
 
 @Alias("harvest-apples")
@@ -30,12 +32,10 @@ public class HarvestApplesSource extends Source<Apple, Attributes> {
   private String key;
 
   @Override
-  public void start() {
+  public void onStart(SourceCallback<Apple, Attributes> sourceCallback) throws MuleException {
 
   }
 
   @Override
-  public void stop() {
-
-  }
+  public void onStop() {}
 }

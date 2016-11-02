@@ -13,16 +13,23 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.core.util.func.CompositePredicate;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -39,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create extension components.
@@ -50,7 +58,12 @@ import java.util.Set;
  */
 public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory<T> {
 
+  protected final MuleContext muleContext;
   private Map<String, Object> parameters = new HashMap<>();
+
+  public AbstractExtensionObjectFactory(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
   /**
    * @return the components parameters as {@link Map} which key is the parameter name and the value is the actual thingy
@@ -70,10 +83,32 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
    * @return a {@link ResolverSet}
    * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
    */
-  protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException {
+  protected ResolverSet getParametersAsResolverSet(ParameterizedModel model, Predicate<ParameterModel>... predicates)
+      throws ConfigurationException {
+
     ResolverSet resolverSet = new ResolverSet();
-    getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
-    checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
+    Map<String, Object> parameters = getParameters();
+    model.getParameterModels().stream()
+        .filter(CompositePredicate.of(predicates))
+        .forEach(p -> {
+          String parameterName = getMemberName(p, p.getName());
+          ValueResolver<?> resolver = null;
+          if (parameters.containsKey(parameterName)) {
+            resolver = toValueResolver(parameters.get(parameterName));
+          } else if (isNullSafe(p)) {
+            resolver = NullSafeValueResolverWrapper
+                .of(p.getType(), new StaticValueResolver<>(null), p.getModelProperties(), muleContext);
+          }
+
+          if (resolver != null) {
+            resolverSet.add(parameterName, resolver);
+          }
+        });
+
+    if (model instanceof EnrichableModel) {
+      checkParameterGroupExclusivenessForModel((EnrichableModel) model, getParameters().keySet());
+    }
+
     return resolverSet;
   }
 
@@ -135,7 +170,7 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
     return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
   }
 
-  private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys)
+  protected void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys)
       throws ConfigurationException {
     Optional<List<ParameterGroup>> exclusiveGroups =
         model.getModelProperty(ParameterGroupModelProperty.class).map(mp -> mp.getExclusiveGroups());
@@ -152,7 +187,7 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
    * <li>If there is more than one field set, the parameter group declaring those fields must be a nester parameter group</li>
    * <li>If set, the "one parameter should be present" condition must be honored</li>
    * </ul>
-   * 
+   *
    * @param model
    * @param exclusiveGroups
    * @param resolverKeys
@@ -184,7 +219,8 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
       }
 
       if (group.isOneRequired() && parametersFromGroup.isEmpty()) {
-        throw new ConfigurationException((createStaticMessage(format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing",
+        throw new ConfigurationException((createStaticMessage(
+                                                              format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing",
                                                                      group.getType().getName()))));
       }
     }
@@ -192,7 +228,8 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
 
   private ConfigurationException buildExclusiveParametersException(EnrichableModel model,
                                                                    Multimap<Class<?>, Field> parametersFromGroup) {
-    return new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+    return new ConfigurationException(
+                                      createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
                                                                  getComponentModelTypeName(model), getModelName(model),
                                                                  Joiner.on(", ")
                                                                      .join(getOffendingParameterNames(parametersFromGroup)))));

@@ -6,8 +6,8 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 @ExclusiveOptionals(isOneRequired = true)

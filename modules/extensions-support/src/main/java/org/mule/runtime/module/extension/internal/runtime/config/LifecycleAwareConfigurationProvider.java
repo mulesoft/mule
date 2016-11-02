@@ -16,7 +16,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -42,7 +41,7 @@ import org.slf4j.Logger;
  * generate and propagate lifecycle and IoC into them.
  * <p/>
  * It also implements the other common concerns of every {@link ConfigurationProvider}, leaving implementations with the need to
- * &quot;just&quot; implement {@link #get(Event)}
+ * &quot;just&quot; implement {@link #get(Object)}
  *
  * @since 4.0
  */

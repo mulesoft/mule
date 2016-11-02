@@ -13,13 +13,12 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -34,14 +33,14 @@ import java.lang.reflect.Field;
  *
  * @since 4.0
  */
-public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements MuleContextAware {
+public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> {
 
   private ObjectBuilder builder;
   private Class<Object> objectClass;
   private final ClassLoader classLoader;
-  private MuleContext muleContext;
 
-  public TopLevelParameterObjectFactory(ObjectType type, ClassLoader classLoader) {
+  public TopLevelParameterObjectFactory(ObjectType type, ClassLoader classLoader, MuleContext muleContext) {
+    super(muleContext);
     this.classLoader = classLoader;
     withContextClassLoader(classLoader, () -> {
       objectClass = getType(type);
@@ -81,10 +80,5 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
         builder.addPropertyResolver(field, toValueResolver(getParameters().get(key)));
       }
     }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 }

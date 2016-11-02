@@ -11,7 +11,7 @@ import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.extension.api.runtime.MessageHandler;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,12 +29,12 @@ public interface ListenerConnection extends SocketConnection {
   /**
    * This method blocks until a new connection is received or timeout exception is thrown.
    *
-   * @param messageHandler used in the {@link SocketWorker} to deliver the new received messages
+   * @param sourceCallback used in the {@link SocketWorker} to deliver the new received messages
    * @return a {@link Work} that will represent a new received connection. The {@link Work} should be scheduled with a
    *         {@link WorkManager} in it's own thread.
    * @throws IOException if the connection was suddenly closed
    * @throws ConnectionException if the connection was closed and the cause was the invocation of
    *         {@link SocketConnection#disconnect()}
    */
-  SocketWorker listen(MessageHandler<InputStream, SocketAttributes> messageHandler) throws IOException, ConnectionException;
+  SocketWorker listen(SourceCallback<InputStream, SocketAttributes> sourceCallback) throws IOException, ConnectionException;
 }

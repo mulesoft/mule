@@ -13,16 +13,16 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
-import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 
 
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}
  *
- * @param <Connection> the generic type for the connections that the created {@link ConnectionProvider providers} produce
+ * @param <C> the generic type for the connections that the created {@link ConnectionProvider providers} produce
  * @since 4.0
  */
-final class DefaultConnectionProviderFactory<Connection> implements ConnectionProviderFactory<Connection> {
+final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFactory<C> {
 
   private final Class<? extends ConnectionProvider> providerClass;
   private final ClassLoader extensionClassLoader;
@@ -51,7 +51,7 @@ final class DefaultConnectionProviderFactory<Connection> implements ConnectionPr
    * {@inheritDoc}
    */
   @Override
-  public ConnectionProvider<Connection> newInstance() {
+  public ConnectionProvider<C> newInstance() {
     try {
       return (ConnectionProvider) withContextClassLoader(extensionClassLoader, providerClass::newInstance);
     } catch (Exception e) {

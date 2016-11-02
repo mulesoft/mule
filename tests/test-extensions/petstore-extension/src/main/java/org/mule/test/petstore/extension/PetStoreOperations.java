@@ -8,7 +8,7 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 

@@ -32,16 +32,15 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
 
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
-  private final MuleContext muleContext;
 
   private ConfigurationProvider configurationProvider;
   private String target = EMPTY;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel, OperationModel operationModel,
                                                 MuleContext muleContext) {
+    super(muleContext);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
-    this.muleContext = muleContext;
   }
 
   @Override

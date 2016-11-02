@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
 
@@ -46,17 +46,17 @@ public class POP3Operations {
    * @param mailboxFolder       Mailbox folder where the emails are going to be fetched
    * @param pop3Matcher         Email Matcher which gives the capability of filter the retrieved emails
    * @param deleteAfterRetrieve Specifies if the returned emails must be deleted after being retrieved or not.
-   * @return an {@link OperationResult} {@link List} carrying all the emails content
+   * @return an {@link Result} {@link List} carrying all the emails content
    * and it's corresponding {@link BaseEmailAttributes}.
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
-  public List<OperationResult<Object, POP3EmailAttributes>> listPop3(@UseConfig POP3Configuration config,
-                                                                     @Connection MailboxConnection connection,
-                                                                     @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                     @DisplayName("Matcher") @Optional POP3EmailPredicateBuilder pop3Matcher,
-                                                                     @Optional(
-                                                                         defaultValue = "false") boolean deleteAfterRetrieve) {
-    List<OperationResult<Object, POP3EmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, pop3Matcher);
+  public List<Result<Object, POP3EmailAttributes>> listPop3(@UseConfig POP3Configuration config,
+                                                            @Connection MailboxConnection connection,
+                                                            @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                                            @DisplayName("Matcher") @Optional POP3EmailPredicateBuilder pop3Matcher,
+                                                            @Optional(
+                                                                defaultValue = "false") boolean deleteAfterRetrieve) {
+    List<Result<Object, POP3EmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, pop3Matcher);
     if (deleteAfterRetrieve) {
       emails.forEach(e -> {
         int number = e.getAttributes()

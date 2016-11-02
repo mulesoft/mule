@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
@@ -24,11 +24,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class OperationParameterValueResolver implements ParameterValueResolver {
 
   private final OperationModel operationModel;
-  private final OperationContext operationContext;
+  private final ExecutionContext<OperationModel> executionContext;
 
-  public OperationParameterValueResolver(OperationContext operationContext) {
-    this.operationContext = operationContext;
-    this.operationModel = operationContext.getOperationModel();
+  public OperationParameterValueResolver(ExecutionContext<OperationModel> executionContext) {
+    this.executionContext = executionContext;
+    this.operationModel = executionContext.getComponentModel();
   }
 
   /**
@@ -38,9 +38,9 @@ public class OperationParameterValueResolver implements ParameterValueResolver {
   public Object getParameterValue(String containerName) {
     final Optional<ParameterGroup> parameterGroup = getParameterGroup(containerName);
     if (parameterGroup.isPresent()) {
-      return new ParameterGroupArgumentResolver<>(parameterGroup.get()).resolve(operationContext);
+      return new ParameterGroupArgumentResolver<>(parameterGroup.get()).resolve(executionContext);
     } else {
-      return operationContext.getParameter(containerName);
+      return executionContext.getParameter(containerName);
     }
   }
 

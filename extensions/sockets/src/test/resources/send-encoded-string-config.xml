@@ -9,7 +9,9 @@
         <sockets:tcp-requester-connection host="localhost"
                                           port="${port}"
                                           failOnUnresolvedHost="true"
-                                          sendTcpNoDelay="true"/>
+                                          sendTcpNoDelay="true">
+            <reconnect blocking="false" />
+        </sockets:tcp-requester-connection>
     </sockets:request-config>
 
     <sockets:listener-config name="tcp-listener">

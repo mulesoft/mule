@@ -11,7 +11,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
-import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -236,7 +237,7 @@ public class GrizzlyHttpClient implements HttpClient {
 
   @Override
   public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
-                   final CompletionHandler<HttpResponse, Exception, Void> completionHandler) {
+                   final CompletionHandler<HttpResponse, Exception> completionHandler) {
     try {
       asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
                                      new WorkManagerSourceAsyncCompletionHandler(completionHandler));
@@ -247,24 +248,21 @@ public class GrizzlyHttpClient implements HttpClient {
 
   private class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> {
 
-    private CompletionHandler<HttpResponse, Exception, Void> completionHandler;
+    private CompletionHandler<HttpResponse, Exception> completionHandler;
 
-    WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception, Void> completionHandler) {
+    WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler) {
       this.completionHandler = completionHandler;
     }
 
     @Override
     public Response onCompleted(Response response) throws Exception {
-      completionHandler.onCompletion(createMuleResponse(response), exception -> {
-        onThrowable(exception);
-        return null;
-      });
+      completionHandler.onCompletion(createMuleResponse(response), this::onThrowable);
       return null;
     }
 
     @Override
     public void onThrowable(Throwable t) {
-      completionHandler.onFailure((Exception) t);
+      completionHandler.onFailure((MessagingException) t);
     }
 
   }

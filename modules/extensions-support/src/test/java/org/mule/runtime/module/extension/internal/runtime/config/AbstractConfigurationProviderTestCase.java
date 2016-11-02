@@ -15,7 +15,7 @@ import static org.mule.tck.MuleTestUtils.spyInjector;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
@@ -40,7 +40,7 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
   protected ConfigurationModel configurationModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  protected DefaultOperationContext operationContext;
+  protected DefaultExecutionContext operationContext;
 
   @Mock
   protected Event event;

@@ -8,7 +8,7 @@ package org.mule.test.metadata.extension;
 
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;

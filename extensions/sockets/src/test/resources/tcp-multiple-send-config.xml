@@ -7,7 +7,6 @@
        http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-
     <spring:beans>
         <spring:import resource="protocols.xml"/>
     </spring:beans>
@@ -17,7 +16,9 @@
                                           port="${port}"
                                           protocol="${protocol}"
                                           failOnUnresolvedHost="true"
-                                          sendTcpNoDelay="true"/>
+                                          sendTcpNoDelay="true">
+            <reconnect blocking="false" />
+        </sockets:tcp-requester-connection>
     </sockets:request-config>
 
     <sockets:listener-config name="tcp-listener">

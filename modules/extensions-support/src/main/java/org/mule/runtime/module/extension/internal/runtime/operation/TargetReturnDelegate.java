@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
  * An implementation of {@link AbstractReturnDelegate} which sets the output message on a variable which key is taken from the
@@ -37,7 +37,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   }
 
   @Override
-  public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext) {
+  public MuleEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return org.mule.runtime.core.api.Event.builder(operationContext.getEvent())
         .addVariable(target, toMessage(value, operationContext)).build();
   }

@@ -16,14 +16,16 @@
                                           port="${port}"
                                           protocol="${protocol}"
                                           failOnUnresolvedHost="true"
-                                          sendTcpNoDelay="true"/>
+                                          sendTcpNoDelay="true">
+            <reconnect blocking="false" />
+        </sockets:tcp-requester-connection>
     </sockets:request-config>
 
     <sockets:listener-config name="tcp-listener">
         <sockets:tcp-listener-connection host="localhost"
                                          port="${port}"
                                          protocol="${protocol}"
-                                         sendTcpNoDelay="true"/>
+                                         sendTcpNoDelay="true" />
     </sockets:listener-config>
 
     <flow name="tcp-send">

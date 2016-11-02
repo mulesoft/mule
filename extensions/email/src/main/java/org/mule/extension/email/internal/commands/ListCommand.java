@@ -16,7 +16,7 @@ import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -37,7 +37,7 @@ public final class ListCommand {
   /**
    * Retrieves all the emails in the specified {@code folderName}.
    * <p>
-   * A new {@link OperationResult} is created for each fetched email from the folder, where the payload is the text body of the email
+   * A new {@link Result} is created for each fetched email from the folder, where the payload is the text body of the email
    * and the other metadata is carried by an {@link BaseEmailAttributes} instance.
    * <p>
    * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
@@ -49,14 +49,14 @@ public final class ListCommand {
    * @param matcherBuilder      a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
    *                            {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
    */
-  public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxAccessConfiguration configuration,
-                                                                               MailboxConnection connection,
-                                                                               String folderName,
-                                                                               BaseEmailPredicateBuilder matcherBuilder) {
+  public <T extends BaseEmailAttributes> List<Result<Object, T>> list(MailboxAccessConfiguration configuration,
+                                                                      MailboxConnection connection,
+                                                                      String folderName,
+                                                                      BaseEmailPredicateBuilder matcherBuilder) {
     Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);
-      List<OperationResult<Object, T>> retrievedEmails = new LinkedList<>();
+      List<Result<Object, T>> retrievedEmails = new LinkedList<>();
       for (javax.mail.Message m : folder.getMessages()) {
         Object emailContent = "";
         T attributes = configuration.parseAttributesFromMessage(m, folder);
@@ -66,11 +66,11 @@ public final class ListCommand {
             // Attributes are parsed again since they may change after the email has been read.
             attributes = configuration.parseAttributesFromMessage(m, folder);
           }
-          OperationResult<Object, T> operationResult = OperationResult.<Object, T>builder()
+          Result<Object, T> result = Result.<Object, T>builder()
               .output(emailContent)
               .attributes(attributes)
               .build();
-          retrievedEmails.add(operationResult);
+          retrievedEmails.add(result);
         }
       }
       return retrievedEmails;

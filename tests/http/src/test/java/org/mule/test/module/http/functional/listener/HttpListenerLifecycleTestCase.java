@@ -6,17 +6,14 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -43,22 +40,6 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
   }
 
   @Test
-  public void stoppedListenerReturns503() throws Exception {
-    ExtensionMessageSource httpListener = (ExtensionMessageSource) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
-    httpListener.stop();
-    final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
-    final HttpResponse returnResponse = response.returnResponse();
-    assertThat(returnResponse.getEntity(), notNullValue());
-    assertThat(returnResponse.getStatusLine().getStatusCode(), is(SERVICE_UNAVAILABLE.getStatusCode()));
-    assertThat(returnResponse.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
-    assertThat(getHttpEntityContent(returnResponse), startsWith("Service not available for request uri: "));
-  }
-
-  private String getHttpEntityContent(HttpResponse returnResponse) throws IOException {
-    return IOUtils.toString(returnResponse.getEntity().getContent());
-  }
-
-  @Test
   public void stopOneListenerDoesNotAffectAnother() throws Exception {
     ExtensionMessageSource httpListener = (ExtensionMessageSource) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
     httpListener.stop();
@@ -78,10 +59,10 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
   }
 
   @Test
-  public void disposeListenerReturns404() throws Exception {
+  public void stopListenerReturns404() throws Exception {
     ExtensionMessageSource httpListener =
         (ExtensionMessageSource) ((Flow) getFlowConstruct("catchAllWithinTestPathFlow")).getMessageSource();
-    httpListener.dispose();
+    httpListener.stop();
     final Response response = Request.Get(getLifecycleConfigUrl("/path/somepath")).execute();
     final HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(404));

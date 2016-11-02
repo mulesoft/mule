@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -36,7 +36,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for annotated component
- * parameters with {@link org.mule.runtime.extension.api.annotation.ParameterGroup}
+ * parameters with {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup}
  * <p>
  * The containers of the parameters considered as parameter groups a {@link ParameterGroupModelProperty} will be added describing
  * the structure of this parameter group.
@@ -72,7 +72,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
   }
 
   /**
-   * For each {@link org.mule.runtime.extension.api.annotation.ParameterGroup} annotated parameter the
+   * For each {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup} annotated parameter the
    * {@link ParameterGroupModelProperty} will be added
    *
    * @param baseDeclaration declaration of a Source, Configuration or ConnectionProvider
@@ -81,7 +81,8 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
     baseDeclaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(implementingType -> {
       final Class<?> type = implementingType.getType();
       final List<FieldElement> parameterGroups =
-          new ParameterizableTypeWrapper(type).getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
+          new ParameterizableTypeWrapper(type)
+              .getAnnotatedFields(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class);
       if (!parameterGroups.isEmpty()) {
         baseDeclaration.addModelProperty(new ParameterGroupModelProperty(parameterGroups.stream().map(this::toParameterGroup)
             .collect(toList())));
@@ -90,7 +91,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
   }
 
   /**
-   * For each {@link org.mule.runtime.extension.api.annotation.ParameterGroup} annotated parameter the
+   * For each {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup} annotated parameter the
    * {@link ParameterGroupModelProperty} will be added
    *
    * @param operationDeclaration declaration of an Operation
@@ -166,7 +167,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher {
     annotatedFields.forEach(field -> parameterGroup.addParameter(field.getField()));
 
     final List<FieldElement> parameterGroups =
-        paramGroupType.getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
+        paramGroupType.getAnnotatedFields(org.mule.runtime.extension.api.annotation.param.ParameterGroup.class);
     if (!parameterGroups.isEmpty()) {
       parameterGroup.addModelProperty(new ParameterGroupModelProperty(parameterGroups.stream().map(this::toParameterGroup)
           .collect(toList())));

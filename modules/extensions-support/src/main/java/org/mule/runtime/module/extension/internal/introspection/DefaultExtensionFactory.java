@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.UncheckedExecutionException;
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -42,7 +49,7 @@ import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnriche
 import org.mule.runtime.extension.api.introspection.operation.ImmutableOperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.introspection.source.ImmutableSourceModel;
-import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderNameModelValidator;
@@ -56,22 +63,14 @@ import org.mule.runtime.module.extension.internal.introspection.validation.Opera
 import org.mule.runtime.module.extension.internal.introspection.validation.ParameterModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.SubtypesModelValidator;
 
-import java.util.ArrayList;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
-
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 
 /**
  * Default implementation of {@link ExtensionFactory}.
@@ -172,16 +171,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         return configurationModels;
       }
 
-      List<ConfigurationModel> sorted = new ArrayList<>(configurationModels.size());
-
-      // first one is kept as default while the rest are alpha sorted
-      sorted.add(configurationModels.get(0));
-
-      if (configurationModels.size() > 1) {
-        sorted.addAll(alphaSortDescribedList(configurationModels.subList(1, configurationModels.size())));
-      }
-
-      return sorted;
+      return alphaSortDescribedList(configurationModels);
     }
 
 
@@ -222,6 +212,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
     private SourceModel toMessageSource(SourceDeclaration declaration) {
       return fromCache(declaration,
                        () -> new ImmutableSourceModel(declaration.getName(), declaration.getDescription(),
+                                                      declaration.hasResponse(),
                                                       toParameters(declaration.getParameters()),
                                                       toOutputModel(declaration.getOutput()),
                                                       toOutputModel(declaration.getOutputAttributes()),

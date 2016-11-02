@@ -9,14 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.api.meta.model.EnrichableModel;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,7 +29,7 @@ import java.util.Optional;
  * <p/>
  * An implementation of {@link ArgumentResolver} which creates instances of a given
  * {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup#getType()} and maps the fields annotated with
- * {@link Parameter} to parameter values of a {@link OperationContext}.
+ * {@link Parameter} to parameter values of a {@link ExecutionContext}.
  * <p/>
  * It also looks for fields annotated with {@link ParameterGroup} and recursively populates them too.
  *
@@ -61,19 +60,19 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
    * {@inheritDoc}
    */
   @Override
-  public T resolve(OperationContext operationContext) {
+  public T resolve(ExecutionContext executionContext) {
     try {
       T parameterGroup = (T) group.getType().newInstance();
 
       for (Field parameterField : group.getParameters()) {
         final String parameterName = parameterField.getName();
-        if (operationContext.hasParameter(parameterName)) {
-          parameterField.set(parameterGroup, operationContext.getParameter(parameterName));
+        if (executionContext.hasParameter(parameterName)) {
+          parameterField.set(parameterGroup, executionContext.getParameter(parameterName));
         }
       }
 
       for (ParameterGroupArgumentResolver<?> childResolver : childResolvers) {
-        ((Field) childResolver.getContainer()).set(parameterGroup, childResolver.resolve(operationContext));
+        ((Field) childResolver.getContainer()).set(parameterGroup, childResolver.resolve(executionContext));
       }
 
       return parameterGroup;

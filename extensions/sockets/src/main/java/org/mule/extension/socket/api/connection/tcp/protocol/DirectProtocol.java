@@ -7,19 +7,14 @@
 package org.mule.extension.socket.api.connection.tcp.protocol;
 
 import static org.mule.extension.socket.internal.SocketUtils.getByteArray;
-
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This protocol is an application level {@link TcpProtocol} that does nothing. The socket reads until no more bytes are
@@ -37,15 +32,8 @@ public class DirectProtocol extends AbstractByteProtocol {
 
   protected static final int UNLIMITED = -1;
 
-  private static final Log LOGGER = LogFactory.getLog(DirectProtocol.class);
   private static final int DEFAULT_BUFFER_SIZE = 8192;
   protected int bufferSize;
-  /**
-   * Indicates if the data to transfer is just the Payload or the entire Mule Message
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  private boolean payloadOnly = true;
 
   public DirectProtocol() {
     this(STREAM_OK, DEFAULT_BUFFER_SIZE);
@@ -54,10 +42,6 @@ public class DirectProtocol extends AbstractByteProtocol {
   public DirectProtocol(boolean streamOk, int bufferSize) {
     super(streamOk);
     this.bufferSize = bufferSize;
-  }
-
-  public void setPayloadOnly(boolean payloadOnly) {
-    this.payloadOnly = payloadOnly;
   }
 
   /**
@@ -113,6 +97,6 @@ public class DirectProtocol extends AbstractByteProtocol {
 
   @Override
   public void write(OutputStream os, Object data, String encoding) throws IOException {
-    this.writeByteArray(os, getByteArray(data, payloadOnly, streamOk, encoding, objectSerializer));
+    this.writeByteArray(os, getByteArray(data, streamOk, encoding, objectSerializer));
   }
 }

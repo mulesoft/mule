@@ -29,7 +29,7 @@ import org.mule.extension.db.internal.resolver.query.BulkQueryResolver;
 import org.mule.extension.db.internal.resolver.query.DefaultBulkQueryFactory;
 import org.mule.extension.db.internal.resolver.query.FileBulkQueryFactory;
 import org.mule.extension.db.internal.util.DefaultFileReader;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;

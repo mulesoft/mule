@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
  * A delegate interface to decouple a {@link OperationExecutor}'s return value from the format in which it is to be handed back
@@ -22,8 +22,8 @@ interface ReturnDelegate {
    * Adapts the {@code value} to another format
    *
    * @param value the value to be returned
-   * @param operationContext the {@link OperationContextAdapter} on which the operation was executed
+   * @param operationContext the {@link ExecutionContextAdapter} on which the operation was executed
    * @return a {@link MuleEvent} carrying the operation's result
    */
-  MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext);
+  MuleEvent asReturnValue(Object value, ExecutionContextAdapter operationContext);
 }

@@ -140,8 +140,8 @@ public class HttpMessageProcessTemplateTestCase {
   @Test
   public void getMuleEventCachesEvent() throws Exception {
     HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
-    template.getMuleEvent();
-    template.getMuleEvent();
+    template.getEvent();
+    template.getEvent();
     verify(messageReceiver, times(1)).createMuleMessage(any(), any());
   }
 }

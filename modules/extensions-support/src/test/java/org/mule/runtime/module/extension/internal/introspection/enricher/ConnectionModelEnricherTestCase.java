@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getDeclaration;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -42,7 +43,8 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
@@ -239,26 +241,22 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
     public TransactionalConnection conn;
 
     @Override
-    public void start() throws Exception {
+    public void onStart(SourceCallback sourceCallback) throws MuleException {
 
     }
 
     @Override
-    public void stop() throws Exception {
-
-    }
+    public void onStop() {}
   }
 
   public static class NotConnectedSource extends Source {
 
     @Override
-    public void start() throws Exception {
+    public void onStart(SourceCallback sourceCallback) throws MuleException {
 
     }
 
     @Override
-    public void stop() throws Exception {
-
-    }
+    public void onStop() {}
   }
 }

@@ -79,7 +79,8 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed().withTypeDefinition(fromType(ValueResolver.class))
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(type).build())
-        .withConstructorParameterDefinition(fromFixedValue(classLoader).build());
+        .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
+        .withConstructorParameterDefinition(fromFixedValue(muleContext).build());
 
     type.getFields().forEach(this::parseField);
   }

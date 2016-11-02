@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -102,8 +102,8 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
-                                                           boolean lock) {
+  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
+                                                  boolean lock) {
     return getReadCommand().read(config, message, filePath, lock);
   }
 

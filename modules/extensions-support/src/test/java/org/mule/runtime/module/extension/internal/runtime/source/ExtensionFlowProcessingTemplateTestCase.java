@@ -17,8 +17,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.core.execution.CompletionHandler;
+import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -45,13 +45,13 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   private Processor messageProcessor;
 
   @Mock
-  private CompletionHandler completionHandler;
+  private CompletionHandler<Event, MessagingException> completionHandler;
 
   @Mock
   private ResponseCompletionCallback responseCompletionCallback;
 
   @Mock
-  private ExceptionCallback<org.mule.runtime.api.message.MuleEvent, Exception> exceptionCallback;
+  private ExceptionCallback<MessagingException> exceptionCallback;
 
   @Mock
   private MessagingException messagingException;
@@ -67,7 +67,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Test
   public void getMuleEvent() throws Exception {
-    assertThat(template.getMuleEvent(), is(sameInstance(event)));
+    assertThat(template.getEvent(), is(sameInstance(event)));
   }
 
   @Test
@@ -88,7 +88,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     doThrow(runtimeException).when(completionHandler).onCompletion(same(event), any(ExtensionSourceExceptionCallback.class));
     template.sendResponseToClient(event, responseCompletionCallback);
 
-    verify(completionHandler, never()).onFailure(any(Exception.class));
+    verify(completionHandler, never()).onFailure(any(MessagingException.class));
     verify(responseCompletionCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
 
       @Override

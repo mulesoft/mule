@@ -25,7 +25,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
@@ -50,7 +50,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
   private static final String PASSWORD = "doe";
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private OperationContextAdapter operationContext;
+  private ExecutionContextAdapter operationContext;
 
   @Mock
   private ConfigurationInstance configurationInstance;

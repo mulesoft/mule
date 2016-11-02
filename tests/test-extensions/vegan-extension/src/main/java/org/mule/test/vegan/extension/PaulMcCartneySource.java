@@ -6,9 +6,11 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.testmodels.fruit.Fruit;
 
 public class PaulMcCartneySource extends Source<Fruit, Attributes> {
@@ -17,12 +19,12 @@ public class PaulMcCartneySource extends Source<Fruit, Attributes> {
   private Object config;
 
   @Override
-  public void start() throws Exception {
+  public void onStart(SourceCallback<Fruit, Attributes> sourceCallback) throws MuleException {
 
   }
 
   @Override
-  public void stop() throws Exception {
+  public void onStop() {
 
   }
 }

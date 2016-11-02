@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.operation.OperationResultBuilderFactory;
 
 /**
@@ -21,7 +21,7 @@ public final class DefaultOperationResultBuilderFactory extends OperationResultB
    * {@inheritDoc}
    */
   @Override
-  public <Output, A extends Attributes> OperationResult.Builder<Output, A> create() {
+  public <Output, A extends Attributes> Result.Builder<Output, A> create() {
     return new DefaultOperationResultBuilder<>();
   }
 

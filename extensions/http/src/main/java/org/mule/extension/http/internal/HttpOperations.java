@@ -6,14 +6,15 @@
  */
 package org.mule.extension.http.internal;
 
+import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.internal.component.ResourceNotFoundException;
 
 import javax.inject.Inject;
@@ -49,9 +50,9 @@ public class HttpOperations {
    *
    * @return the resource defined by the path of an HTTP request
    */
-  public OperationResult<?, ?> loadStaticResource(@ParameterGroup StaticResourceLoader resourceLoader, Event event)
+  public Result<?, ?> loadStaticResource(@ParameterGroup StaticResourceLoader resourceLoader, Event event)
       throws ResourceNotFoundException, InitialisationException {
-    return OperationResult.builder(resourceLoader.load(event)).build();
+    return builder(resourceLoader.load(event)).build();
   }
 
   private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders)

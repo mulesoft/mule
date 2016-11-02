@@ -7,19 +7,13 @@
 package org.mule.extension.socket.api.worker;
 
 import static java.lang.String.format;
-import static org.mule.extension.socket.internal.SocketUtils.createMuleMessage;
-
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
+import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.internal.TcpInputStream;
-import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Only one worker will be created per each new TCP connection accepted by the
- * {@link TcpListenerConnection#listen(MuleContext, MessageHandler)}, This class is responsible for reading from that connection
+ * {@link TcpListenerConnection#listen(SourceCallback)}, This class is responsible for reading from that connection
  * is closed by the sender, or {@link Source} is stopped.
  *
  * @since 4.0
@@ -51,9 +45,9 @@ public final class TcpWorker extends SocketWorker {
   private boolean dataInWorkFinished = false;
   private AtomicBoolean moreMessages = new AtomicBoolean(true); // can be set on completion's callback
 
-  public TcpWorker(Socket socket, TcpProtocol protocol, MessageHandler<InputStream, SocketAttributes> messageHandler)
+  public TcpWorker(Socket socket, TcpProtocol protocol, SourceCallback<InputStream, SocketAttributes> callback)
       throws IOException {
-    super(messageHandler);
+    super(callback);
     this.socket = socket;
     this.protocol = protocol;
 
@@ -140,30 +134,27 @@ public final class TcpWorker extends SocketWorker {
         break;
       }
 
-      SocketAttributes attributes = new ImmutableSocketAttributes(socket);
-      messageHandler.handle(createMuleMessage(content, attributes), new CompletionHandler<MuleEvent, Exception, MuleEvent>() {
-
-        @Override
-        public void onCompletion(MuleEvent muleEvent, ExceptionCallback<MuleEvent, Exception> exceptionCallback) {
-          try {
-            protocol.write(dataOut, muleEvent.getMessage().getPayload().getValue(), encoding);
-            dataOut.flush();
-          } catch (IOException e) {
-            exceptionCallback.onException(new IOException(format("An error occurred while sending TCP response to address '%s'",
-                                                                 socket.getRemoteSocketAddress().toString(), e)));
-          }
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-          LOGGER.error("TCP worker will not answer back due an exception was received", e);
-
-          // end worker's execution
-          moreMessages.set(false);
-        }
-      });
-
+      handle(content, new ImmutableSocketAttributes(socket));
     }
+  }
+
+  @Override
+  public void onComplete(Object result) {
+    try {
+      protocol.write(dataOut, result, encoding);
+      dataOut.flush();
+    } catch (IOException e) {
+      callback.onSourceException(new IOException(format("An error occurred while sending TCP response to address '%s'",
+                                                        socket.getRemoteSocketAddress().toString(), e)));
+    }
+  }
+
+  @Override
+  public void onError(Throwable e) {
+    LOGGER.error("TCP worker will not answer back due an exception was received", e);
+
+    // end worker's execution
+    moreMessages.set(false);
   }
 
   @Override

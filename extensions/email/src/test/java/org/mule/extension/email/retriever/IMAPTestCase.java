@@ -28,7 +28,7 @@ import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.File;
@@ -76,7 +76,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndRead() throws Exception {
-    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    List<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(10));
     messages.forEach(m -> {
       assertBodyContent((String) m.getOutput());
@@ -86,7 +86,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndDontRead() throws Exception {
-    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
+    List<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
     assertThat(messages, hasSize(10));
     messages.forEach(m -> assertThat(((IMAPEmailAttributes) m.getAttributes().get()).getFlags().isSeen(), is(false)));
   }
@@ -174,7 +174,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
       message.setFlag(flag, flagState);
     }
 
-    List<OperationResult> messages = runFlowAndGetMessages(flowName);
+    List<Result> messages = runFlowAndGetMessages(flowName);
     assertThat(server.getReceivedMessages(), arrayWithSize(10));
     assertThat(messages, hasSize(7));
   }

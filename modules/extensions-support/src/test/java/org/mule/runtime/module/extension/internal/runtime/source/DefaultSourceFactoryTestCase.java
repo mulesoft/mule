@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
@@ -58,12 +60,12 @@ public class DefaultSourceFactoryTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public void start() {
+    public void onStart(SourceCallback sourceCallback) throws MuleException {
 
     }
 
     @Override
-    public void stop() {
+    public void onStop() {
 
     }
   }
