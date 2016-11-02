@@ -6,6 +6,8 @@
  */
 package org.mule.processor;
 
+import static org.mule.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
+
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -58,6 +60,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {
+            @Override
             public WorkManager getWorkManager() throws MuleException
             {
                 return workManager;
@@ -65,6 +68,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         };
     }
 
+    @Override
     public void start() throws MuleException
     {
         if (workManager != null)
@@ -73,6 +77,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         if (workManager != null)
@@ -81,6 +86,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (next == null)
@@ -146,8 +152,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
         catch (Exception e)
         {
-            new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next),
-                event, e, this);
+            throw new MessagingException(errorSchedulingMessageProcessorForAsyncInvocation(next), event, e, this);
         }
     }
 
