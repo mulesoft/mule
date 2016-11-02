@@ -88,6 +88,7 @@ import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibrary
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.net.MulePluginUrlStreamHandler;
+import org.mule.runtime.module.artifact.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.application.TestApplicationFactory;
 import org.mule.runtime.module.deployment.internal.builder.ApplicationFileBuilder;
@@ -142,6 +143,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     //TODO MULE-10873 if not registered, tests of plugins in zip format will break as the protocol will be unkown
     //Registering protocol
     MulePluginUrlStreamHandler.register();
+    MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
   }
 
   private static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
