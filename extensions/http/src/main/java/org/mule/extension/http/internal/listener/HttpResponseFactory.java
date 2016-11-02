@@ -21,7 +21,6 @@ import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
@@ -160,14 +159,22 @@ public class HttpResponseFactory implements Startable {
         httpEntity = byteArrayHttpEntity;
       }
     } else {
-      try {
-        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity((byte[]) objectToByteArray.transform(payload));
-        resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                        byteArrayHttpEntity);
-        httpEntity = byteArrayHttpEntity;
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+      byte[] bytes;
+      if (payload instanceof byte[]) {
+        bytes = (byte[]) payload;
+      } else {
+        try {
+          bytes = (byte[]) objectToByteArray.transform(payload);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
       }
+
+      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(bytes);
+
+      resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                      byteArrayHttpEntity);
+      httpEntity = byteArrayHttpEntity;
     }
 
     Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();

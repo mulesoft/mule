@@ -49,7 +49,7 @@ import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediat
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.runtime.module.extension.internal.runtime.LazyOperationContext;
+import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -232,6 +232,6 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
     final Event event = getInitialiserEvent(muleContext);
-    return new OperationParameterValueResolver(new LazyOperationContext(resolverSet, operationModel, extensionModel, event));
+    return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel, event));
   }
 }
