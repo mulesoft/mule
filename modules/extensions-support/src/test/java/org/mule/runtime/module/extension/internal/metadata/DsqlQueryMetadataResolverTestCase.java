@@ -22,7 +22,7 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 

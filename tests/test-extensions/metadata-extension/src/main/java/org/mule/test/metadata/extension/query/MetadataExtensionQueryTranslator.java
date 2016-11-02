@@ -6,11 +6,11 @@
  */
 package org.mule.test.metadata.extension.query;
 
-import org.mule.runtime.extension.api.introspection.dsql.Direction;
-import org.mule.runtime.extension.api.introspection.dsql.EntityType;
-import org.mule.runtime.extension.api.introspection.dsql.Field;
-import org.mule.runtime.extension.api.introspection.dsql.QueryTranslator;
-import org.mule.runtime.extension.api.introspection.dsql.Value;
+import org.mule.runtime.extension.api.dsql.Direction;
+import org.mule.runtime.extension.api.dsql.EntityType;
+import org.mule.runtime.extension.api.dsql.Field;
+import org.mule.runtime.extension.api.dsql.QueryTranslator;
+import org.mule.runtime.extension.api.dsql.Value;
 
 import java.util.List;
 import java.util.StringJoiner;

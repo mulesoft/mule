@@ -13,7 +13,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeAliasAnnotation;
 
 import java.lang.reflect.Modifier;
 

@@ -23,7 +23,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -58,7 +58,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;

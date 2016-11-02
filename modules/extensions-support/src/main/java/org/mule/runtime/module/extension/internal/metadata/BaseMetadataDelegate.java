@@ -23,7 +23,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 
 import java.util.List;
 import java.util.stream.Stream;

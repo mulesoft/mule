@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 
 

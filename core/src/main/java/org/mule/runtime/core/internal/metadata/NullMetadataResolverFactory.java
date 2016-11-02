@@ -11,8 +11,8 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 
 /**
  * Null implementation of a {@link MetadataResolverFactory}, which returns a {@link NullMetadataResolver} for every resolver

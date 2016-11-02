@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_ELEMENT;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.PROCESSING_ENVIRONMENT;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.ROUND_ENVIRONMENT;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;

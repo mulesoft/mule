@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.model.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 
 /**
  * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models},

@@ -13,7 +13,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 
 /**
  * Implementation of {@link ConfigurationFactory} which creates instances based on a given {@link Class} which is assumed to have

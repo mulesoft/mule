@@ -24,7 +24,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 
 import java.util.Set;
 

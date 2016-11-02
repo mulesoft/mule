@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNB
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;

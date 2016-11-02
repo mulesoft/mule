@@ -6,7 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
-import org.mule.runtime.extension.api.annotation.metadata.Content;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;

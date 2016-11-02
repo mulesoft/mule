@@ -59,17 +59,19 @@ import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.spi.Describer;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
+import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
@@ -510,6 +512,10 @@ public final class AnnotationsBasedDescriber implements Describer {
                 : component.withOptionalParameter(extensionParameter.getAlias())
                     .defaultingTo(extensionParameter.defaultValue().isPresent() ? extensionParameter.defaultValue().get() : null);
         parameter.ofType(extensionParameter.getMetadataType(typeLoader));
+
+        if (extensionParameter.isAnnotatedWith(Content.class)) {
+          parameter.getDeclaration().addModelProperty(new ContentParameterModelProperty());
+        }
 
         parameter.describedAs(EMPTY);
         parseExpressionSupport(extensionParameter, parameter);

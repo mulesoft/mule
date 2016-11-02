@@ -9,7 +9,7 @@ package org.mule.runtime.core.streaming;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

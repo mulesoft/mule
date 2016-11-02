@@ -27,7 +27,7 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
+import org.mule.runtime.extension.api.model.property.ExportModelProperty;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;

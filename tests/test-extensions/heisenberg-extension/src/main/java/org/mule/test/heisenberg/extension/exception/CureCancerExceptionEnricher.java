@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.exception;
 
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 
 public class CureCancerExceptionEnricher implements ExceptionEnricher {
 

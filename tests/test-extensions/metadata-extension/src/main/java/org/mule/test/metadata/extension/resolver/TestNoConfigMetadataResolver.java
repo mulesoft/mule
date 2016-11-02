@@ -18,7 +18,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
+import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 
 import java.util.Arrays;
 import java.util.Set;

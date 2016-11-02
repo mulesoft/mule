@@ -53,7 +53,7 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
+import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.Bear;

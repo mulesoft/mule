@@ -17,11 +17,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
-import org.mule.runtime.extension.api.introspection.property.ConfigTypeModelProperty;
+import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.junit.Before;

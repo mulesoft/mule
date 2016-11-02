@@ -21,19 +21,18 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
-import org.mule.runtime.extension.api.annotation.param.Query;
-import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
@@ -218,17 +217,13 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
   }
 
   /**
-   * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link MetadataContentModelProperty}
-   * if the parsedParameter is annotated either as {@link MetadataKeyId}, {@link MetadataKeyPart} or {@link Content} respectively.
+   * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link ContentParameterModelProperty}
+   * if the parsedParameter is annotated either as {@link MetadataKeyId} or {@link MetadataKeyPart}
    *
    * @param element         the method annotated parameter parsed
    * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
    */
   private void parseMetadataAnnotations(AnnotatedElement element, BaseDeclaration baseDeclaration) {
-    if (element.isAnnotationPresent(Content.class)) {
-      baseDeclaration.addModelProperty(new MetadataContentModelProperty());
-    }
-
     if (element.isAnnotationPresent(MetadataKeyId.class)) {
       baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1));
     }

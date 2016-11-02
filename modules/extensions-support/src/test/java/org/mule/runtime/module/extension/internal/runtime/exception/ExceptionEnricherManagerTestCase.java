@@ -17,8 +17,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 

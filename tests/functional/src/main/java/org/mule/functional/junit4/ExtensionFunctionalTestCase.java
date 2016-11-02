@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;

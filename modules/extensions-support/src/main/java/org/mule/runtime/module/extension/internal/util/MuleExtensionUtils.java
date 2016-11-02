@@ -50,11 +50,11 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;

@@ -14,7 +14,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;

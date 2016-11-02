@@ -55,7 +55,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;

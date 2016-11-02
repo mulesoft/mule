@@ -42,7 +42,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;

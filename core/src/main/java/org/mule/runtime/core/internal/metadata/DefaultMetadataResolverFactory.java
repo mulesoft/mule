@@ -16,8 +16,8 @@ import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 
 import java.util.HashMap;
 import java.util.Map;

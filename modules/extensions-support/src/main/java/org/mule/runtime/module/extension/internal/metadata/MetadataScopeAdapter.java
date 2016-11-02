@@ -21,7 +21,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 

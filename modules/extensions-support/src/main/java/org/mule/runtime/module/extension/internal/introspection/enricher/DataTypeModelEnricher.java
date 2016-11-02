@@ -14,11 +14,11 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 

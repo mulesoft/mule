@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel.LayoutModelBuilder;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;

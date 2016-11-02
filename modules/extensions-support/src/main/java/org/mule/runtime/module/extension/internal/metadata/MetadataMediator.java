@@ -12,14 +12,12 @@ import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescripto
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
@@ -29,12 +27,11 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataKey;
+import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 
 import java.util.List;
@@ -92,12 +89,8 @@ public class MetadataMediator {
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} using the specified
-   * {@link MetadataKey}
-   * <p>
-   * If Component's {@link Content} parameter has a {@link InputTypeResolver} associated or its Output has a
-   * {@link OutputTypeResolver} associated that can be used to resolve dynamic {@link MetadataType}, then the
-   * {@link ComponentMetadataDescriptor} will contain those Dynamic types instead of the static type declaration.
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using the specified
+   * {@code key}
    *
    * @param context current {@link MetadataContext} that will be used by the metadata resolvers.
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
@@ -114,12 +107,8 @@ public class MetadataMediator {
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataProvider} Component using static and
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using static and
    * dynamic resolving of the Component parameters, attributes and output.
-   * <p>
-   * If Component's {@link Content} parameter has a {@link InputTypeResolver} associated or its Output has a
-   * {@link OutputTypeResolver} associated that can be used to resolve dynamic {@link MetadataType}, then the
-   * {@link ComponentMetadataDescriptor} will contain those Dynamic types instead of the static type declaration.
    *
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
    *                {@link OutputTypeResolver}
