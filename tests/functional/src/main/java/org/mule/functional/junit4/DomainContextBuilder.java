@@ -39,13 +39,18 @@ public class DomainContextBuilder {
   }
 
   public MuleContext build() throws Exception {
-    List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
+    List<ConfigurationBuilder> builders = new ArrayList<>(3);
     ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
     builders.add(cfgBuilder);
+    addBuilders(builders);
     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     domainContext.start();
     return domainContext;
+  }
+
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    // nothing to do
   }
 
   protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception {

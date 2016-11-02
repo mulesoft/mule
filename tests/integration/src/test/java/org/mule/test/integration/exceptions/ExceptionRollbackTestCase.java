@@ -8,7 +8,11 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
@@ -32,6 +36,8 @@ public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase {
     strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
     strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 
+    startIfNeeded(muleContext.getNotificationManager());
+
     initialiseObject(strategy);
     tx = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(tx);
@@ -40,6 +46,8 @@ public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase {
   @Override
   protected void doTearDown() throws Exception {
     TransactionCoordination.getInstance().unbindTransaction(tx);
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Test

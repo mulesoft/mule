@@ -25,21 +25,25 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.runtime.extension.api.runtime.Interceptable;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -47,8 +51,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +65,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.verification.VerificationMode;
+
+import com.google.common.collect.ImmutableList;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -122,6 +126,12 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private List<Interceptor> orderedInterceptors;
   private ExecutionMediator mediator;
 
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    startIfNeeded(muleContext.getNotificationManager());
+  }
+
   @Before
   public void before() throws Exception {
     when(configurationInstance.getStatistics()).thenReturn(configurationStats);
@@ -149,6 +159,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     setInterceptors((Interceptable) configurationInstance, configurationInterceptor1, configurationInterceptor2);
     setInterceptors((Interceptable) operationExecutor, operationInterceptor1, operationInterceptor2);
     defineOrder(configurationInterceptor1, configurationInterceptor2, operationInterceptor1, operationInterceptor2);
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Test

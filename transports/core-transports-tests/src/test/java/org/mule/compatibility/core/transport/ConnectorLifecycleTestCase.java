@@ -54,6 +54,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Override
   public void doSetUp() throws Exception {
+    muleContext.getNotificationManager().start();
     connector = new TestConnector(muleContext);
     connector.initialise();
   }
@@ -64,6 +65,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
       connector.dispose();
     }
     connector = null;
+    muleContext.getNotificationManager().stop();
   }
 
   /**

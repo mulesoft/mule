@@ -6,22 +6,39 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.api.context.notification.ServerNotification.TYPE_ERROR;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.context.notification.ExceptionNotification.EXCEPTION_ACTION;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
 public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase {
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    startIfNeeded(muleContext.getNotificationManager());
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(muleContext.getNotificationManager());
+  }
 
   // MULE-1404
   @Test
@@ -38,16 +55,12 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicInteger notificationCount = new AtomicInteger(0);
 
-    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-
-      @Override
-      public void onNotification(ExceptionNotification notification) {
-        if (notification.getAction() == ExceptionNotification.EXCEPTION_ACTION) {
-          assertEquals("exception", notification.getActionName());
-          assertEquals("Wrong info type", ServerNotification.TYPE_ERROR, notification.getType());
-          notificationCount.incrementAndGet();
-          latch.countDown();
-        }
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> {
+      if (notification.getAction() == EXCEPTION_ACTION) {
+        assertEquals("exception", notification.getActionName());
+        assertEquals("Wrong info type", TYPE_ERROR, notification.getType());
+        notificationCount.incrementAndGet();
+        latch.countDown();
       }
     });
 
@@ -57,7 +70,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
     strategy.handleException(new IllegalArgumentException("boom"));
 
     // Wait for the notifcation event to be fired as they are queue
-    latch.await(2000, TimeUnit.MILLISECONDS);
+    latch.await(2000, MILLISECONDS);
     assertEquals(1, notificationCount.get());
 
   }

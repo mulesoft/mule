@@ -10,14 +10,24 @@ package org.mule.runtime.config.spring;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertSame;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.List;
 
 import org.junit.Test;
 
 public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new TestServicesConfigurationBuilder());
+  }
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {

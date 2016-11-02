@@ -7,6 +7,7 @@
 
 package org.mule.tck.config;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
@@ -21,11 +22,16 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
  */
 public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder {
 
+  final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
-    final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
     registry.registerObject(schedulerService.getName(), schedulerService);
+  }
+
+  public void stopServices() throws MuleException {
+    schedulerService.stop();
   }
 
 }

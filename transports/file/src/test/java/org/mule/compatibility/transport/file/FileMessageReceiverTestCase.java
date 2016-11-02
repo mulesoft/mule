@@ -25,6 +25,18 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
   @Rule
   public TemporaryFolder move = new TemporaryFolder();
 
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    muleContext.getNotificationManager().start();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    muleContext.getNotificationManager().stop();
+    super.doTearDown();
+  }
+
   public void testReceiver() throws Exception {
     // FIX A bit hard testing receive from a unit simple as we need to reg
     // listener etc.

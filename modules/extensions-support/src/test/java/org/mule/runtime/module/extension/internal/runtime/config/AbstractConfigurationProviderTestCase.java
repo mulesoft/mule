@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
@@ -29,7 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
+public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
 
   protected static final String CONFIG_NAME = "config";
 

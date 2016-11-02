@@ -42,6 +42,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
@@ -130,6 +131,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.verification.VerificationMode;
@@ -173,12 +175,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private static final File echoTestJarFile =
       new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
-
-  private static final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
-      .compiling(getResourceFile("/org/mule/service/scheduler/MockScheduler.java"),
-                 getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java"),
-                 getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java"))
-      .compile("mule-module-service-mock-scheduler-1.0-SNAPSHOT.jar");
 
   private static final File defaulServiceEchoJarFile = new CompilerUtils.JarCompiler()
       .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
@@ -311,11 +307,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private ArtifactClassLoader containerClassLoader;
 
   @Rule
-  public SystemProperty changeChangeInterval =
-      new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "10");
+  public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "10");
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
+
+  @Rule
+  public TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+
   private File services;
 
   public DeploymentServiceTestCase(boolean parallelDeployment) {
@@ -346,12 +345,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     services = getServicesFolder();
     services.mkdirs();
-    final ServiceFileBuilder schedulerService =
-        new ServiceFileBuilder("schedulerService")
-            .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.scheduler.MockSchedulerServiceProvider")
-            .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath());
-    copyFileToDirectory(schedulerService.getArtifactFile(), services);
-
+    copyFileToDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")), services);
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);

@@ -18,6 +18,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.compatibility.transport.http.HttpConnector.DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY;
+import static org.mule.compatibility.transport.tcp.TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -29,14 +32,9 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.NoReceiverForEndpointException;
 import org.mule.compatibility.core.endpoint.DefaultOutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractConnectorTestCase;
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpMessageReceiver;
-import org.mule.compatibility.transport.http.HttpRequest;
-import org.mule.compatibility.transport.http.RequestLine;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.net.InetSocketAddress;
@@ -84,6 +82,13 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
   private Socket mockSocket;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private RequestLine mockRequestLine;
+
+  @Override
+  protected void doTearDown() throws Exception {
+    HttpConnector httpConnector = (HttpConnector) getConnector();
+    httpConnector.getReceivers().clear();
+    super.doTearDown();
+  }
 
   @Override
   public Connector createConnector() throws Exception {
@@ -213,7 +218,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
   }
 
   private Map<Object, MessageReceiver> createTestReceivers() {
-    Map<Object, MessageReceiver> receiversMap = new HashMap<Object, MessageReceiver>();
+    Map<Object, MessageReceiver> receiversMap = new HashMap<>();
     addAndMock(receiversMap, mockServiceOrderReceiverPort5555, "http://somehost:5555/service/order");
     addAndMock(receiversMap, mockServiceReceiverPort5555, "http://somehost:5555/service");
     addAndMock(receiversMap, mockReceiverPort5555, "http://somehost:5555/");
@@ -354,26 +359,14 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
 
   @Test
   public void tcpNoDelayDefaultSystemPropertyTrue() throws Exception {
-    testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "true", new TestCallback() {
-
-      @Override
-      public void run() throws Exception {
-        assertTrue(((HttpConnector) createConnector()).isSendTcpNoDelay());
-
-      }
-    });
+    testWithSystemProperty(SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "true",
+                           () -> assertTrue(((HttpConnector) createConnector()).isSendTcpNoDelay()));
   }
 
   @Test
   public void tcpNoDelayDefaultSystemPropertyFalse() throws Exception {
-    testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "false", new TestCallback() {
-
-      @Override
-      public void run() throws Exception {
-        assertFalse(((HttpConnector) createConnector()).isSendTcpNoDelay());
-
-      }
-    });
+    testWithSystemProperty(SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "false",
+                           () -> assertFalse(((HttpConnector) createConnector()).isSendTcpNoDelay()));
   }
 
   @Test
@@ -395,13 +388,8 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
 
   @Test
   public void httpClientDisableStaleConnectionSystemProperty() throws Exception {
-    testWithSystemProperty(HttpConnector.DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY, "true", new TestCallback() {
-
-      @Override
-      public void run() throws Exception {
-        assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), false);
-      }
-    });
+    testWithSystemProperty(DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY, "true",
+                           () -> assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), false));
   }
 
   protected HttpConnector getInitialisedHttpConnector() throws Exception, InitialisationException {
@@ -416,20 +404,16 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
   }
 
   public void singleDispatcherPerEndpointSyetemProperty() throws Exception {
-    testWithSystemProperty(HttpConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "true", new TestCallback() {
+    testWithSystemProperty(SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "true", () -> {
+      HttpConnector httpConnector = (HttpConnector) createConnector();
+      httpConnector.initialise();
 
-      @Override
-      public void run() throws Exception {
-        HttpConnector httpConnector = (HttpConnector) createConnector();
-        httpConnector.initialise();
+      OutboundEndpoint endpoint = getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
+      httpConnector.createDispatcherMessageProcessor(endpoint);
 
-        OutboundEndpoint endpoint = getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
-        httpConnector.createDispatcherMessageProcessor(endpoint);
-
-        assertNotNull(httpConnector.borrowDispatcher(endpoint));
-        assertEquals(httpConnector.borrowDispatcher(endpoint), httpConnector.borrowDispatcher(endpoint));
-        assertEquals(0, httpConnector.getDispatchers().getNumIdle());
-      }
+      assertNotNull(httpConnector.borrowDispatcher(endpoint));
+      assertEquals(httpConnector.borrowDispatcher(endpoint), httpConnector.borrowDispatcher(endpoint));
+      assertEquals(0, httpConnector.getDispatchers().getNumIdle());
     });
   }
 

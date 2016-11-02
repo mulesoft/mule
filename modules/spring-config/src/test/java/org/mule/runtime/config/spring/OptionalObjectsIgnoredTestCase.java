@@ -10,11 +10,12 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Calendar;
@@ -35,7 +36,8 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     muleContext =
-        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}, emptyMap(), APP));
+        new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                          new SpringXmlConfigurationBuilder(new String[] {}, emptyMap(), APP));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);
   }
@@ -43,7 +45,7 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
   @After
   public void after() throws Exception {
     if (muleContext != null) {
-      LifecycleUtils.disposeIfNeeded(muleContext, LOGGER);
+      disposeIfNeeded(muleContext, LOGGER);
     }
   }
 

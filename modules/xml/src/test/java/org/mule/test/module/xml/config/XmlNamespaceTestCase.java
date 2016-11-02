@@ -4,16 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.xml.config;
+package org.mule.test.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.jaxb.model.Person;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.jaxb.model.Person;
 import org.mule.runtime.module.xml.filters.SchemaValidationFilter;
 import org.mule.runtime.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
 import org.mule.runtime.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
@@ -26,7 +27,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class XmlNamespaceTestCase extends FunctionalTestCase {
+public class XmlNamespaceTestCase extends MuleArtifactFunctionalTestCase {
 
   public XmlNamespaceTestCase() {
     setDisposeContextPerClass(true);
@@ -78,6 +79,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase {
 
   private static class MockResourceResolver implements LSResourceResolver {
 
+    @Override
     public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
       return null;
     }
@@ -85,14 +87,17 @@ public class XmlNamespaceTestCase extends FunctionalTestCase {
 
   private static class MockErrorHandler implements ErrorHandler {
 
+    @Override
     public void error(SAXParseException exception) throws SAXException {
       // does nothing
     }
 
+    @Override
     public void fatalError(SAXParseException exception) throws SAXException {
       // does nothing
     }
 
+    @Override
     public void warning(SAXParseException exception) throws SAXException {
       // does nothing
     }

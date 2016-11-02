@@ -12,6 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -19,9 +21,10 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageDispatcherFactory;
 import org.mule.compatibility.core.api.transport.MessageRequesterFactory;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -41,6 +44,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
 
   @Override
   protected void doSetUp() throws Exception {
+    startIfNeeded(muleContext.getNotificationManager());
     Connector connector = createConnector();
     if (connector.getName() == null) {
       connector.setName("test");
@@ -56,6 +60,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
     if (connector != null && connector.isDisposed()) {
       fail("Connector has been disposed prematurely - lifecycle problem? Instance: " + connector);
     }
+    stopIfNeeded(muleContext.getNotificationManager());
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   /** Look up the connector from the Registry */

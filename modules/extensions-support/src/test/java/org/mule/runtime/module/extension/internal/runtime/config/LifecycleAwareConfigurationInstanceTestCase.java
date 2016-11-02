@@ -28,6 +28,9 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -39,6 +42,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -108,6 +112,12 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   private TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
 
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    startIfNeeded(muleContext.getNotificationManager());
+  }
+
   @Before
   @Override
   public void before() throws Exception {
@@ -119,6 +129,13 @@ public class LifecycleAwareConfigurationInstanceTestCase
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
 
     super.before();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Override

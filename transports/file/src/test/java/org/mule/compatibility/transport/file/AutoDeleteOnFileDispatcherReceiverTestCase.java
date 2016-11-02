@@ -9,12 +9,12 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
-import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -87,8 +87,9 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
+    muleContext.getNotificationManager().start();
     // The working directory is deleted on tearDown
-    tempDir = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory(), tempDirName);
+    tempDir = newFile(muleContext.getConfiguration().getWorkingDirectory(), tempDirName);
     tempDir.deleteOnExit();
     if (!tempDir.exists()) {
       tempDir.mkdirs();
@@ -103,7 +104,8 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   protected void doTearDown() throws Exception {
     // TestConnector dispatches events via the test: protocol to test://test
     // endpoints, which seems to end up in a directory called "test" :(
-    FileUtils.deleteTree(FileUtils.newFile(getTestConnector().getProtocol()));
+    deleteTree(newFile(getTestConnector().getProtocol()));
+    muleContext.getNotificationManager().stop();
     super.doTearDown();
   }
 

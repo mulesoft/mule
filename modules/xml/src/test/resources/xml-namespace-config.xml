@@ -25,8 +25,8 @@
     </spring:bean>
     -->
     
-    <spring:bean name="resourceResolver" class="org.mule.runtime.module.xml.config.XmlNamespaceTestCase$MockResourceResolver"/>
-    <spring:bean name="errorHandler" class="org.mule.runtime.module.xml.config.XmlNamespaceTestCase$MockErrorHandler"/>
+    <spring:bean name="resourceResolver" class="org.mule.test.module.xml.config.XmlNamespaceTestCase$MockResourceResolver"/>
+    <spring:bean name="errorHandler" class="org.mule.test.module.xml.config.XmlNamespaceTestCase$MockErrorHandler"/>
     
     <mulexml:schema-validation-filter name="SchemaValidationWithResourceResolver" 
         schemaLocations="schema1.xsd" resourceResolver-ref="resourceResolver" 
