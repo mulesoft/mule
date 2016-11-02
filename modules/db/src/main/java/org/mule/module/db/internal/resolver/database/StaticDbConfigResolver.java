@@ -8,12 +8,15 @@
 package org.mule.module.db.internal.resolver.database;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.module.db.internal.domain.database.DbConfig;
+
+import javax.sql.DataSource;
 
 /**
  * Resolves a {@link DbConfig} to a static value without using the current event
  */
-public class StaticDbConfigResolver implements DbConfigResolver
+public class StaticDbConfigResolver implements DbConfigResolver, Disposable
 {
 
     private final DbConfig dbConfig;
@@ -27,5 +30,15 @@ public class StaticDbConfigResolver implements DbConfigResolver
     public DbConfig resolve(MuleEvent muleEvent)
     {
         return dbConfig;
+    }
+
+    @Override
+    public void dispose()
+    {
+        DataSource dataSource = dbConfig.getDataSource();
+        if (dataSource instanceof Disposable)
+        {
+            ((Disposable) dataSource).dispose();
+        }
     }
 }
