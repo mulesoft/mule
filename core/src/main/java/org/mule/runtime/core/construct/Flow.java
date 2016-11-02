@@ -68,8 +68,8 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   protected void doStop() throws MuleException {
-    super.doStop();
     stopIfNeeded(processingStrategy);
+    super.doStop();
   }
 
   @Override

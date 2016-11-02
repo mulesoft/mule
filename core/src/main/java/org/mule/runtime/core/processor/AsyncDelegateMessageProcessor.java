@@ -99,8 +99,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    super.start();
     startIfNeeded(processingStrategy);
+    super.start();
   }
 
   @Override
