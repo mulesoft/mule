@@ -16,6 +16,7 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
@@ -25,8 +26,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
-
-import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
@@ -76,7 +75,6 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
-import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
 import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -124,6 +122,8 @@ import org.mule.runtime.module.extension.internal.model.property.SourceFactoryMo
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
+
+import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -515,15 +515,12 @@ public final class AnnotationsBasedDescriber implements Describer {
             extensionParameter.isRequired() ? component.withRequiredParameter(extensionParameter.getAlias())
                 : component.withOptionalParameter(extensionParameter.getAlias())
                     .defaultingTo(extensionParameter.defaultValue().isPresent() ? extensionParameter.defaultValue().get() : null);
-        parameter.ofType(extensionParameter.getMetadataType(typeLoader));
 
-        if (extensionParameter.isAnnotatedWith(Content.class)) {
-          parameter.getDeclaration().addModelProperty(new ContentParameterModelProperty());
-        }
+        parameter.ofType(extensionParameter.getMetadataType(typeLoader)).describedAs(EMPTY);
 
-        parameter.describedAs(EMPTY);
+        parseParameterRole(extensionParameter, parameter);
         parseExpressionSupport(extensionParameter, parameter);
-        parseNotNull(extensionParameter, parameter);
+        parseNullSafe(extensionParameter, parameter);
         addTypeRestrictions(extensionParameter, parameter);
         parseLayout(extensionParameter, parameter);
         addImplementingTypeModelProperty(extensionParameter, parameter);
@@ -607,6 +604,10 @@ public final class AnnotationsBasedDescriber implements Describer {
     return extensionType.getAnnotation(Extensible.class) != null;
   }
 
+  private void parseParameterRole(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+    parameter.withRole(roleOf(extensionParameter.getAnnotation(Content.class)));
+  }
+
   private void parseExpressionSupport(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     final Optional<Expression> annotation = extensionParameter.getAnnotation(Expression.class);
     if (annotation.isPresent()) {
@@ -614,7 +615,7 @@ public final class AnnotationsBasedDescriber implements Describer {
     }
   }
 
-  private void parseNotNull(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+  private void parseNullSafe(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     if (extensionParameter.isAnnotatedWith(NullSafe.class)) {
       if (extensionParameter.isRequired()) {
         throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is required but annotated with '@%s', which is redundant",

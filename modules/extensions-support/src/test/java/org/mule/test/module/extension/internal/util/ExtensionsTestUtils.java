@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PARAMETERIZATION;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -39,16 +40,16 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
@@ -141,6 +142,7 @@ public abstract class ExtensionsTestUtils {
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
     when(parameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
+    when(parameterModel.getRole()).thenReturn(PARAMETERIZATION);
     return parameterModel;
 
   }

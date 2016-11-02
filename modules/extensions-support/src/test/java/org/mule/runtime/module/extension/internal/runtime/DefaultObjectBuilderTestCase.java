@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -26,11 +26,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -97,8 +97,8 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void isDynamic() throws Exception {
-    builder.addPropertyResolver(nameField, getResolver(NAME, false));
-    builder.addPropertyResolver(ageField, getResolver(AGE, true));
+    builder.addPropertyResolver(nameField.getName(), getResolver(NAME, false));
+    builder.addPropertyResolver(ageField.getName(), getResolver(AGE, true));
 
     assertThat(builder.isDynamic(), is(true));
   }
@@ -128,9 +128,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private void populate(boolean dynamic) throws Exception {
-    builder.addPropertyResolver(nameField, getResolver(NAME, dynamic));
-    builder.addPropertyResolver(ageField, getResolver(AGE, dynamic));
-    builder.addPropertyResolver(lifetimeInfoField, getResolver(LIFETIME_INFO, dynamic));
+    builder.addPropertyResolver(nameField.getName(), getResolver(NAME, dynamic));
+    builder.addPropertyResolver(ageField.getName(), getResolver(AGE, dynamic));
+    builder.addPropertyResolver(lifetimeInfoField.getName(), getResolver(LIFETIME_INFO, dynamic));
   }
 
   private ValueResolver getResolver(Object value, boolean dynamic) throws Exception {

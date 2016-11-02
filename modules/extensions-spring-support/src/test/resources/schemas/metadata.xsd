@@ -234,12 +234,14 @@
     <xs:complexType name="ContentAndOutputMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -252,13 +254,15 @@
     <xs:complexType name="ContentMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -355,13 +359,15 @@
     <xs:complexType name="FailWithResolvingExceptionType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -406,13 +412,15 @@
     <xs:complexType name="MetadataKeyWithDefaultValueType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="CAR" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -463,13 +471,15 @@
     <xs:complexType name="OutputMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -482,12 +492,14 @@
     <xs:complexType name="OutputMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -536,13 +548,15 @@
     <xs:complexType name="ShouldInheritExtensionResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -550,13 +564,15 @@
     <xs:complexType name="ShouldInheritOperationParentResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -564,13 +580,15 @@
     <xs:complexType name="ShouldInheritOperationResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -639,7 +657,9 @@
     <xs:complexType name="ContentParameterShouldNotGenerateMapChildElementType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:expressionMap" use="required" name="mapContent"></xs:attribute>
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-contents"></xs:element>
+                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

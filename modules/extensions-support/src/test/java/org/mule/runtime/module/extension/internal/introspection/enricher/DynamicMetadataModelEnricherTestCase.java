@@ -9,22 +9,20 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.declaration.type.annotation.TypeAliasAnnotation;
-import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
 import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
@@ -114,9 +112,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
     SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
 
     assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
-            .with(new ClassInformationAnnotation(Object.class, null)).with(new TypeAliasAnnotation(Object.class.getSimpleName())))
-        .build(), true);
+        .ofKey(TYPE_LOADER.load(String.class)).ofValue(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
     assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class));
 
@@ -124,9 +120,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
     SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
 
     assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
-            .with(new ClassInformationAnnotation(Object.class, null)).with(new TypeAliasAnnotation(Object.class.getSimpleName())))
-        .build(), true);
+        .ofKey(TYPE_LOADER.load(String.class)).ofValue(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
     List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
@@ -141,7 +135,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
   }
 
   private void assertParameterIsMetadataContent(ParameterDeclaration param) {
-    checkIsPresent(param, ContentParameterModelProperty.class);
+    assertThat(param.getRole(), is(CONTENT));
   }
 
   private void assertParameterType(ParameterDeclaration param, MetadataType type) {

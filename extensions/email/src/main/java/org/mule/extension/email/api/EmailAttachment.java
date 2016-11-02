@@ -8,9 +8,9 @@ package org.mule.extension.email.api;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
  * Represents and enables the construction of an email attachment.
@@ -28,7 +28,7 @@ public class EmailAttachment {
    * the content of the attachment.
    */
   @Parameter
-  @XmlHints(allowReferences = false)
+  @Content
   private Object content;
   /**
    * the content type of the attachment content.

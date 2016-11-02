@@ -10,7 +10,9 @@
 
     <flow name="failOperation">
         <wsc:consume config-ref="config" operation="fail">
-            <wsc:message body="#[payload]"/>
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+            </wsc:message>
         </wsc:consume>
     </flow>
 

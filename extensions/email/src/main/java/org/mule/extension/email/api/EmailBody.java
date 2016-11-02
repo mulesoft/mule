@@ -8,16 +8,14 @@ package org.mule.extension.email.api;
 
 
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.TEXT_PLAIN;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 /**
  * Represents and enables the construction of the body of an email with a body of type "text/*" and a specific character
@@ -32,9 +30,8 @@ public class EmailBody {
    * Text body of the message content
    */
   @Parameter
-  @Optional(defaultValue = PAYLOAD)
+  @Content
   @Placement(order = 1)
-  @Text
   private String content;
 
   /**

@@ -6,18 +6,30 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import org.mule.runtime.module.extension.internal.runtime.BaseObjectBuilder;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
+import static org.springframework.util.ReflectionUtils.setField;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default implementation of {@link ObjectBuilder} which creates instances through a provided {@link Class}.
  *
  * @since 3.7.0
  */
-public final class DefaultObjectBuilder<T> extends BaseObjectBuilder<T> {
+public final class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
+  private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
 
   /**
    * Creates a new instance that will build instances of {@code prototypeClass}.
@@ -30,10 +42,46 @@ public final class DefaultObjectBuilder<T> extends BaseObjectBuilder<T> {
   }
 
   /**
-   * Creates a new instance by calling the default constructor on {@link #prototypeClass} {@inheritDoc}
+   * Adds a property which value is to be obtained from a {@link ValueResolver}
+   *
+   * @param propertyName the name of the property in which the value is to be assigned
+   * @param resolver a {@link ValueResolver} used to provide the actual value
+   * @return this builder
+   * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
+   */
+  public ObjectBuilder<T> addPropertyResolver(String propertyName, ValueResolver<? extends Object> resolver) {
+    checkArgument(!isBlank(propertyName), "property name cannot be blank");
+    checkArgument(resolver != null, "resolver cannot be null");
+
+    Field field = getField(prototypeClass, propertyName).orElseThrow(
+                                                                     () -> new IllegalArgumentException(String
+                                                                         .format("Class '%s' does not contain property '%s'",
+                                                                                 prototypeClass.getName(), propertyName)));
+
+    field.setAccessible(true);
+    resolvers.put(field, (ValueResolver<Object>) resolver);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
    */
   @Override
-  protected T instantiateObject() {
-    return createInstance(prototypeClass);
+  public boolean isDynamic() {
+    return hasAnyDynamic(resolvers.values());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public T build(Event event) throws MuleException {
+    T object = createInstance(prototypeClass);
+
+    for (Map.Entry<Field, ValueResolver<Object>> resolver : resolvers.entrySet()) {
+      setField(resolver.getKey(), object, resolver.getValue().resolve(event));
+    }
+
+    return object;
   }
 }

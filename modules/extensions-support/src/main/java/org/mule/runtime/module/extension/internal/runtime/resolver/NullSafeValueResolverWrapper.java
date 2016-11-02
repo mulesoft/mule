@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -75,9 +77,11 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
       public void visitObject(ObjectType objectType) {
         Class<?> clazz = getType(objectType);
         ResolverSet resolverSet = new ResolverSet();
+        //TODO MULE-10919 - I should be able to do this using the OBjectType and not the class.
         getAnnotatedFields(clazz, Parameter.class).forEach(field -> {
           Optional optional = field.getAnnotation(Optional.class);
-          if (optional == null) {
+          Content content = field.getAnnotation(Content.class);
+          if (optional == null && content == null) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields",
                                                                       clazz.getName(), NullSafe.class.getSimpleName()));
@@ -85,6 +89,11 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
           }
 
           String defaultValue = getDefaultValue(optional);
+          //TODO MULE-10919 - give me the tools to remove this shameful hack.
+          if (defaultValue == null && content != null && content.primary()) {
+            defaultValue = PAYLOAD;
+          }
+
           if (defaultValue != null) {
             resolverSet.add(getAlias(field),
                             new TypeSafeExpressionValueResolver(defaultValue, field.getType(), muleContext));

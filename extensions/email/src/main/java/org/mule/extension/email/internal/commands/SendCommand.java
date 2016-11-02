@@ -14,8 +14,6 @@ import org.mule.extension.email.internal.MessageBuilder;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Calendar;
 
 import javax.mail.Message;
@@ -39,10 +37,6 @@ public final class SendCommand {
    */
   public void send(SenderConnection connection, SMTPConfiguration configuration, EmailBuilder emailBuilder) {
     try {
-      ImmutableMap.Builder<String, String> headers = ImmutableMap.builder();
-      headers.putAll(configuration.getHeaders());
-      headers.putAll(emailBuilder.getHeaders());
-
       EmailBody body = emailBuilder.getBody();
 
       Message message = MessageBuilder.newMessage(connection.getSession())
@@ -55,7 +49,7 @@ public final class SendCommand {
           .withAttachments(emailBuilder.getAttachments())
           .withBody(body.getContent(), body.getContentType(),
                     body.getCharset() == null ? configuration.getDefaultCharset() : body.getCharset())
-          .withHeaders(headers.build())
+          .withHeaders(emailBuilder.getHeaders())
           .build();
 
       Transport.send(message);

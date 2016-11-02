@@ -10,19 +10,24 @@
 
     <flow name="echoOperation">
         <wsc:consume config-ref="config" operation="echo">
-            <wsc:message body="#[payload]"/>
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+            </wsc:message>
         </wsc:consume>
     </flow>
 
     <flow name="echoAccountOperation">
         <wsc:consume config-ref="config" operation="echoAccount">
-            <wsc:message body="#[payload]"/>
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+            </wsc:message>
         </wsc:consume>
     </flow>
 
     <flow name="echoWithHeadersOperation">
         <wsc:consume config-ref="config" operation="echoWithHeaders">
-            <wsc:message body="#[payload]">
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
                 <wsc:headers>
                     <wsc:header value="#[flowVars.headerIn]" key="headerIn"/>
                     <wsc:header value="#[flowVars.headerInOut]" key="headerInOut"/>

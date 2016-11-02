@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api;
 
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -24,6 +25,7 @@ public class HttpMessageBuilder {
    */
   @Parameter
   @Optional
+  @Content
   protected Map<String, String> headers = new HashMap<>();
 
   public Map<String, String> getHeaders() {

@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import java.lang.reflect.Field;
 
 /**
  * A builder capable of creating instances of a given {@link Class}, populating its attributes based on a list of
@@ -31,16 +29,6 @@ import java.lang.reflect.Field;
  * @since 3.7.0
  */
 public interface ObjectBuilder<T> {
-
-  /**
-   * Adds a property which value is to be obtained from a {@link ValueResolver}
-   *
-   * @param field the {@link Field} in which the value is to be assigned
-   * @param resolver a {@link ValueResolver} used to provide the actual value
-   * @return this builder
-   * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
-   */
-  ObjectBuilder<T> addPropertyResolver(Field field, ValueResolver<? extends Object> resolver);
 
   /**
    * Whether any of the registered {@link ValueResolver}s are dynamic

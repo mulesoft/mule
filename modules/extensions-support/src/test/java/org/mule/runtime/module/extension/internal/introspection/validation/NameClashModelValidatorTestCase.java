@@ -334,8 +334,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
-  //////
-
   @Test
   public void listSingularizeClashOnOperation() {
     exception.expect(IllegalModelDefinitionException.class);
@@ -417,7 +415,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validator.validate(extensionModel);
   }
 
-  @XmlHints(allowTopLevelDefinition = true, allowInlineDefinition = true)
+  @XmlHints(allowTopLevelDefinition = true)
   private static class TopLevelTest {
 
     public TopLevelTest() {
@@ -431,7 +429,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
-  @XmlHints(allowTopLevelDefinition = false, allowInlineDefinition = true)
   private static class ChildTest {
 
     public ChildTest() {

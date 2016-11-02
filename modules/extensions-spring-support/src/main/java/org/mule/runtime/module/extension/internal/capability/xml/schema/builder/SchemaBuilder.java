@@ -54,8 +54,10 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
@@ -259,7 +261,7 @@ public final class SchemaBuilder {
 
   void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels) {
     for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels)) {
-      parameterModel.getType().accept(getParameterDeclarationVisitor(type, choice, parameterModel));
+      declareAsParameter(parameterModel.getType(), type, choice, parameterModel);
     }
 
     if (!choice.getParticle().isEmpty()) {
@@ -494,8 +496,17 @@ public final class SchemaBuilder {
     return createRefElement(refQName, isRequired);
   }
 
-  MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
-                                                     final ParameterModel parameterModel) {
+  void declareAsParameter(MetadataType type, ExtensionType extensionType, ExplicitGroup all, ParameterModel parameterModel) {
+    if (ExtensionModelUtils.isContent(parameterModel) || TypeUtils.isContent(type)) {
+      DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
+      generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired(), all);
+    } else {
+      type.accept(getParameterDeclarationVisitor(extensionType, all, parameterModel));
+    }
+  }
+
+  private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
+                                                             final ParameterModel parameterModel) {
     final DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
     return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(),
                                           parameterModel.getExpressionSupport(), parameterModel.isRequired(),
@@ -525,7 +536,6 @@ public final class SchemaBuilder {
         defaultVisit(dictionaryType);
         if (paramDsl.supportsChildDeclaration()) {
           mapDelegate.generateMapElement(dictionaryType, paramDsl, description, false, all);
-
         }
       }
 

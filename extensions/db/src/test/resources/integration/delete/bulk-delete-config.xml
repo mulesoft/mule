@@ -6,13 +6,13 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="bulkDelete">
-        <db:bulk-delete parameterValues="#[payload]">
+        <db:bulk-delete>
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
         </db:bulk-delete>
     </flow>
 
     <flow name="bulkDeleteWithOverriddenType">
-        <db:bulk-delete parameterValues="#[payload]">
+        <db:bulk-delete>
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
             <db:parameter-types>
                 <db:parameter-type key="name" type="VARCHAR" />

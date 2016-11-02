@@ -6,17 +6,16 @@
  */
 package org.mule.extension.socket.api;
 
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.extension.socket.api.client.SocketClient;
 import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -46,7 +45,7 @@ public class SocketOperations {
    */
   @OutputResolver(output = SocketMetadataResolver.class)
   public Result<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
-                           @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
+                           @Content Object content,
                            @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
                            @MetadataKeyId boolean hasResponse, Message muleMessage)
       throws ConnectionException, IOException {

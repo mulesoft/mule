@@ -33,13 +33,21 @@ public class AttributeEvaluator {
   private AttributeType attributeType;
 
   public AttributeEvaluator(String attributeValue) {
-    this.attributeValue = attributeValue;
+    this.attributeValue = sanitize(attributeValue);
   }
 
   public AttributeEvaluator initialize(final ExtendedExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
     resolveAttributeType();
     return this;
+  }
+
+  private String sanitize(String attributeValue) {
+    if (attributeValue != null) {
+      attributeValue = attributeValue.trim().replaceAll("\n", "").replaceAll("\r", "").replaceAll("\t", "");
+    }
+
+    return attributeValue;
   }
 
   private void resolveAttributeType() {

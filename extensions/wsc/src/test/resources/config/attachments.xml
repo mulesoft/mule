@@ -6,18 +6,22 @@
 
     <!-- MTOM must be enabled -->
     <wsc:config name="attachmentsConfig">
-        <wsc:connection wsdlLocation="http://localhost:${attachmentPort}/testAttachments?wsdl" service="TestAttachmentsService" port="TestAttachmentsPort" mtomEnabled="${mtomEnabled}"/>
+        <wsc:connection wsdlLocation="http://localhost:${attachmentPort}/testAttachments?wsdl" service="TestAttachmentsService"
+                        port="TestAttachmentsPort" mtomEnabled="${mtomEnabled}"/>
     </wsc:config>
 
     <flow name="downloadAttachment">
         <wsc:consume config-ref="attachmentsConfig" operation="downloadAttachment">
-            <wsc:message body="#[payload]"/>
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+            </wsc:message>
         </wsc:consume>
     </flow>
 
     <flow name="uploadAttachment">
         <wsc:consume config-ref="attachmentsConfig" operation="uploadAttachment">
-            <wsc:message body="#[payload]">
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
                 <wsc:attachments>
                     <wsc:attachment key="attachment" value="#[flowVars.inAttachment]"/>
                 </wsc:attachments>

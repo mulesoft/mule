@@ -53,6 +53,7 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderNameModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.ContentParameterModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ExclusiveParameterModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ExportedTypesModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.MetadataComponentModelValidator;
@@ -110,6 +111,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         .add(new MetadataComponentModelValidator())
         .add(new ExclusiveParameterModelValidator())
         .add(new ConnectionProviderNameModelValidator())
+        .add(new ContentParameterModelValidator())
         .build();
   }
 
@@ -293,6 +295,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                          parameter.isRequired(),
                                          parameter.getExpressionSupport(),
                                          parameter.getDefaultValue(),
+                                         parameter.getRole(),
                                          parameter.getDslModel(),
                                          parameter.getDisplayModel(),
                                          parameter.getLayoutModel(),
