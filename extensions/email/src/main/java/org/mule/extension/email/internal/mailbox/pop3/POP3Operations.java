@@ -11,7 +11,7 @@ import static javax.mail.Flags.Flag.DELETED;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.DEFAULT_PAGE_SIZE;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.PAGE_SIZE_ERROR_MESSAGE;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.extension.email.api.EmailMetadataKey;
 import org.mule.extension.email.api.EmailMetadataResolver;
