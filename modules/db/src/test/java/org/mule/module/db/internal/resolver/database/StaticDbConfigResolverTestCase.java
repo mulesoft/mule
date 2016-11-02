@@ -33,7 +33,7 @@ public class StaticDbConfigResolverTestCase extends AbstractMuleTestCase
 {
 
     private final DbConfig dbConfig = mock(DbConfig.class);
-    private final DbConfigResolver dbConfigResolver = new StaticDbConfigResolver(dbConfig);
+    private final StaticDbConfigResolver dbConfigResolver = new StaticDbConfigResolver(dbConfig);
 
     @Test
     public void resolvesDbConfig() throws Exception
@@ -82,11 +82,15 @@ public class StaticDbConfigResolverTestCase extends AbstractMuleTestCase
     @Test
     public void disposesDisposableDbConfig() throws Exception
     {
-        DataSource dataSource = mock(DataSource.class, withSettings().extraInterfaces(Disposable.class));
+        DisposableDataSource dataSource = mock(DisposableDataSource.class);
         when(dbConfig.getDataSource()).thenReturn(dataSource);
 
-        ((StaticDbConfigResolver) dbConfigResolver).dispose();
+        dbConfigResolver.dispose();
 
-        ((Disposable) verify(dataSource, times(1))).dispose();
+        verify(dataSource, times(1)).dispose();
+    }
+
+    private interface DisposableDataSource extends DataSource, Disposable {
+
     }
 }
