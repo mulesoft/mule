@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 
 public final class DefaultExceptionEnricherFactory implements ExceptionEnricherFactory {
 

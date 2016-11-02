@@ -38,8 +38,8 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 

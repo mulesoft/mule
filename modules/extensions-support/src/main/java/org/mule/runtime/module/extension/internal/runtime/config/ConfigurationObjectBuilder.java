@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;

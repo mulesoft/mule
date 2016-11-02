@@ -11,7 +11,7 @@ import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionExcepti
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
 
 import java.lang.reflect.UndeclaredThrowableException;

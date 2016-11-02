@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.model.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 
 /**
  * A model property which gives access to a {@link ConfigurationFactory}

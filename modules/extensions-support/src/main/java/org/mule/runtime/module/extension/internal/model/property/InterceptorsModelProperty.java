@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.model.property;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.introspection.Interceptable;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 

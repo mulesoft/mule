@@ -10,9 +10,9 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXT
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.noClassLoaderException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
 /**

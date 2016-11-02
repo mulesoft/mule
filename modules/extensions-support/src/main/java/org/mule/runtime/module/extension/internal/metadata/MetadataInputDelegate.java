@@ -23,7 +23,6 @@ import org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilde
 import org.mule.runtime.api.metadata.descriptor.builder.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.extension.api.annotation.metadata.Content;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -94,13 +93,12 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   }
 
   /**
-   * Given a {@link MetadataKey} of a type and a {@link MetadataContext}, resolves the {@link MetadataType} of the {@link Content}
-   * parameter using the {@link InputTypeResolver} associated to the current component.
+   * Given a {@link MetadataKey} of a type and a {@link MetadataContext}, resolves the {@link MetadataType} of the
+   * {@code parameter} using the {@link InputTypeResolver} associated to the current component.
    *
    * @param context {@link MetadataContext} of the MetaData resolution
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
-   * @return a success {@link MetadataResult} with the {@link MetadataType} of the {@link Content} parameter. A failure
-   * {@link MetadataResult} if the component has no {@link Content} parameter
+   * @return a {@link MetadataResult} with the {@link MetadataType} of the {@code parameter}.
    */
   private MetadataResult<MetadataType> getParameterMetadata(ParameterModel parameter, MetadataContext context, Object key) {
     boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);

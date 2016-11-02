@@ -14,7 +14,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
+import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;

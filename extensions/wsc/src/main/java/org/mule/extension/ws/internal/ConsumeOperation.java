@@ -26,7 +26,7 @@ import org.mule.extension.ws.internal.metadata.header.InputHeadersResolver;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.annotation.metadata.Content;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;

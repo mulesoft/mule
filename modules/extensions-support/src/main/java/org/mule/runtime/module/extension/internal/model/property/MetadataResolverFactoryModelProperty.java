@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.model.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 
 /**
  * A model property which allows the enriched component to specify its

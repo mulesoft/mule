@@ -22,7 +22,7 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.work.SerialWorkManager;
-import org.mule.runtime.extension.api.introspection.Interceptable;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;

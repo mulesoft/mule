@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -38,12 +37,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -56,14 +49,14 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
-import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -75,11 +68,9 @@ import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -201,14 +192,14 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getType()).thenReturn(stringType);
     when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class))
         .thenReturn(of(new MetadataKeyPartModelProperty(0)));
-    when(keyParamMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(empty());
+    when(keyParamMock.getModelProperty(ContentParameterModelProperty.class)).thenReturn(empty());
     when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
     when(contentMock.hasDynamicType()).thenReturn(true);
     when(contentMock.getType()).thenReturn(stringType);
-    when(contentMock.getModelProperty(MetadataContentModelProperty.class))
-        .thenReturn(of(new MetadataContentModelProperty()));
+    when(contentMock.getModelProperty(ContentParameterModelProperty.class))
+        .thenReturn(of(new ContentParameterModelProperty()));
     when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
     when(contentMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 

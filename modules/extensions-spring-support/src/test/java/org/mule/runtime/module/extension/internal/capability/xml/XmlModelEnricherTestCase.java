@@ -14,7 +14,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;

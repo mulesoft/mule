@@ -11,9 +11,9 @@ import static java.util.Arrays.stream;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Export;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.model.property.ExportModelProperty;
 
 /**
  * Test the declaring class to be annotated with {@link Export}, in which case it adds an {@link ExportModelProperty} on the

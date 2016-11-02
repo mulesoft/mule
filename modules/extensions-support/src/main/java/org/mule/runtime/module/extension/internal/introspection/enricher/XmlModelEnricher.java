@@ -10,7 +10,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.createXmlLanguageModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 

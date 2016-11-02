@@ -23,9 +23,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
-import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeAliasAnnotation;
+import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
@@ -140,7 +140,7 @@ public class DynamicMetadataModelEnricherTestCase {
   }
 
   private void assertParameterIsMetadataContent(ParameterDeclaration param) {
-    checkIsPresent(param, MetadataContentModelProperty.class);
+    checkIsPresent(param, ContentParameterModelProperty.class);
   }
 
   private void assertParameterType(ParameterDeclaration param, MetadataType type) {

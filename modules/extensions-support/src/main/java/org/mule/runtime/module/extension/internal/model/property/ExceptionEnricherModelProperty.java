@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.model.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 
 /**
  * Model property to be used on components which support the use of an {@link ExceptionEnricher}.

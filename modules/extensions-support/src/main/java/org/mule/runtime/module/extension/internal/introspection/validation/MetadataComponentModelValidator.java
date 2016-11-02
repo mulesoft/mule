@@ -14,7 +14,7 @@ import static org.apache.commons.lang.StringUtils.join;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
+import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
@@ -36,10 +36,10 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 
 import com.google.common.collect.ImmutableList;
 

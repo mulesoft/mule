@@ -19,7 +19,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
-import org.mule.runtime.extension.api.introspection.dsql.Field;
+import org.mule.runtime.extension.api.dsql.Field;
 
 import java.util.List;
 
