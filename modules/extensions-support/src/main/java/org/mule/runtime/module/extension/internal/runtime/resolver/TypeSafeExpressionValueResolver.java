@@ -58,7 +58,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
   protected void initEvaluator(MuleContext muleContext) {
     if (!evaluatorInitted) {
       evaluatorInitted = true;
-      evaluator.initialize(muleContext.getExpressionLanguage());
+      evaluator.initialize(muleContext.getExpressionManager());
     }
   }
 

@@ -7,13 +7,15 @@
 
 package org.mule.runtime.core.processor.simple;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
@@ -32,7 +34,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     final org.mule.runtime.core.api.Event.Builder eventBuilder = Event.builder(event);
 
     if (dataType == null) {
-      final DefaultTypedValue typedValue = resolveTypedValue(event, eventBuilder);
+      final TypedValue typedValue = resolveTypedValue(event, eventBuilder);
       builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
     } else {
       Object value = resolveValue(event);
@@ -54,7 +56,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return value;
   }
 
-  private DefaultTypedValue resolveTypedValue(Event event, Event.Builder eventBuilder) {
+  private TypedValue resolveTypedValue(Event event, Event.Builder eventBuilder) {
     if (valueEvaluator.getRawValue() == null) {
       return new DefaultTypedValue(null, DataType.OBJECT);
     } else {
@@ -84,6 +86,6 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    valueEvaluator.initialize(muleContext.getExpressionLanguage());
+    valueEvaluator.initialize(muleContext.getExpressionManager());
   }
 }

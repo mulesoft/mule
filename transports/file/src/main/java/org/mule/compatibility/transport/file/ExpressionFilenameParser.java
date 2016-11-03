@@ -6,14 +6,12 @@
  */
 package org.mule.compatibility.transport.file;
 
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.util.TemplateParser;
-import org.mule.runtime.core.util.TemplateParser.TemplateCallback;
 
 import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicLong;
@@ -77,7 +75,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
   }
 
   protected String getFilename(final Event event, String expression, TemplateParser parser) {
-    return parser.parse((TemplateCallback) token -> muleContext.getExpressionLanguage().evaluate(token, event, null), expression);
+    return parser.parse(token -> muleContext.getExpressionManager().evaluate(token, event).getValue(), expression);
   }
 
   public static Long count() {

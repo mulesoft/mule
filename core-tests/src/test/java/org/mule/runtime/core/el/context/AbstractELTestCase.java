@@ -13,10 +13,11 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.construct.Flow;
@@ -35,7 +36,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
-  protected ExpressionLanguage expressionLanguage;
+  protected ExtendedExpressionLanguage expressionLanguage;
   protected Flow flowConstruct;
   protected EventContext context;
 
@@ -63,17 +64,18 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression) {
-    return expressionLanguage.evaluate(expression);
+    return evaluate(expression, null);
   }
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression, Event event) {
-    return expressionLanguage.evaluate(expression, event, flowConstruct);
+    return evaluate(expression, event, event != null ? Event.builder(event) : null);
   }
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression, Event event, Event.Builder eventBuilder) {
-    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct);
+    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, BindingContext.builder().build())
+        .getValue();
   }
 
   public static enum Variant {
@@ -85,7 +87,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     return Arrays.asList(new Object[][] {{OptimizerFactory.DYNAMIC}, {OptimizerFactory.SAFE_REFLECTIVE}});
   }
 
-  protected ExpressionLanguage getExpressionLanguage() {
+  protected ExtendedExpressionLanguage getExpressionLanguage() {
     final MVELExpressionLanguage el = new MVELExpressionLanguage(muleContext);
     return el;
   }

@@ -17,11 +17,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -31,14 +30,14 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   private static final String HELLO_WORLD = "Hello World!";
 
-  private MVELExpressionLanguage expressionLanguage;
+  private ExpressionManager expressionManager;
 
   @Override
   protected void doSetUp() throws Exception {
     muleContext = spy(muleContext);
-    expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
+    expressionManager = spy(muleContext.getExpressionManager());
 
-    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
+    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
   }
 
   @Test
@@ -94,7 +93,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   private void verifyExpressionManager(VerificationMode mode) {
-    verify(expressionLanguage, mode).parse(anyString(), any(Event.class), any(FlowConstruct.class));
+    verify(expressionManager, mode).parse(anyString(), any(Event.class), any(FlowConstruct.class));
   }
 
   private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception {

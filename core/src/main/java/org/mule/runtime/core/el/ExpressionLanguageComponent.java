@@ -45,7 +45,7 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject
   @Override
   public Event process(Event event) throws MuleException {
     Event.Builder eventBuilder = Event.builder(event);
-    muleContext.getExpressionLanguage().evaluate(expression, event, eventBuilder, flowConstruct);
+    muleContext.getExpressionManager().evaluate(expression, event, eventBuilder, flowConstruct);
     return eventBuilder.build();
   }
 

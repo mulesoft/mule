@@ -13,20 +13,19 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailu
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -69,7 +68,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
 
   protected Method method;
-  protected ExpressionLanguage expressionLanguage;
+  protected ExpressionManager expressionManager;
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
 
@@ -81,7 +80,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
     resolveMethodToInvoke();
 
-    expressionLanguage = muleContext.getExpressionLanguage();
+    expressionManager = muleContext.getExpressionManager();
   }
 
   protected void resolveMethodToInvoke() throws InitialisationException {
@@ -198,9 +197,9 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       // everything to a string
       if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())
           && expression.lastIndexOf(patternInfo.getPrefix()) == 0) {
-        arg = expressionLanguage.evaluate(expression, event, flowConstruct);
+        arg = expressionManager.evaluate(expression, event, flowConstruct).getValue();
       } else {
-        arg = expressionLanguage.parse(expression, event, flowConstruct);
+        arg = expressionManager.parse(expression, event, flowConstruct);
       }
 
       // If expression evaluates to a Message then use it's payload

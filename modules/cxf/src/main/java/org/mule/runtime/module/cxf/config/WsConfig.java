@@ -60,7 +60,7 @@ public class WsConfig implements MuleContextAware {
         for (Entry<String, Object> entry : map.entrySet()) {
           if (entry.getValue() instanceof String) {
             AttributeEvaluator evaluator = new AttributeEvaluator((String) entry.getValue());
-            evaluator.initialize(muleContext.getExpressionLanguage());
+            evaluator.initialize(muleContext.getExpressionManager());
             evaluatedMap.put(entry.getKey(), evaluator.resolveValue(event));
           } else {
             evaluatedMap.put(entry.getKey(), entry.getValue());

@@ -13,10 +13,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -34,13 +34,13 @@ import org.junit.Test;
 public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
   private CookieWrapper cookieWrapper;
-  private ExpressionLanguage mockExpressionLanguage;
+  private ExpressionManager mockExpressionManager;
   private Event mockMuleEvent;
 
   @Before
   public void setUp() {
     cookieWrapper = new CookieWrapper();
-    mockExpressionLanguage = mock(ExpressionLanguage.class);
+    mockExpressionManager = mock(ExpressionManager.class);
     mockMuleEvent = mock(Event.class);
   }
 
@@ -56,7 +56,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
     mockParse();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionLanguage);
+    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
 
     assertEquals("test", cookie.getName());
@@ -77,15 +77,15 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setSecure("#[secure]");
     cookieWrapper.setVersion("#[version]");
 
-    when(mockExpressionLanguage.parse("#[name]", mockMuleEvent, null)).thenReturn("test");
-    when(mockExpressionLanguage.parse("#[value]", mockMuleEvent, null)).thenReturn("test");
-    when(mockExpressionLanguage.parse("#[domain]", mockMuleEvent, null)).thenReturn("localhost");
-    when(mockExpressionLanguage.parse("#[path]", mockMuleEvent, null)).thenReturn("/");
-    when(mockExpressionLanguage.parse("#[maxAge]", mockMuleEvent, null)).thenReturn("3600");
-    when(mockExpressionLanguage.parse("#[secure]", mockMuleEvent, null)).thenReturn("true");
-    when(mockExpressionLanguage.parse("#[version]", mockMuleEvent, null)).thenReturn("1");
+    when(mockExpressionManager.parse("#[name]", mockMuleEvent, null)).thenReturn("test");
+    when(mockExpressionManager.parse("#[value]", mockMuleEvent, null)).thenReturn("test");
+    when(mockExpressionManager.parse("#[domain]", mockMuleEvent, null)).thenReturn("localhost");
+    when(mockExpressionManager.parse("#[path]", mockMuleEvent, null)).thenReturn("/");
+    when(mockExpressionManager.parse("#[maxAge]", mockMuleEvent, null)).thenReturn("3600");
+    when(mockExpressionManager.parse("#[secure]", mockMuleEvent, null)).thenReturn("true");
+    when(mockExpressionManager.parse("#[version]", mockMuleEvent, null)).thenReturn("1");
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionLanguage);
+    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
 
     assertEquals("test", cookie.getName());
@@ -103,7 +103,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
     mockParse();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionLanguage);
+    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
 
     assertEquals("test=test", cookie.toString());
@@ -116,7 +116,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setExpiryDate("Sun, 15 Dec 2013 16:00:00 GMT");
 
     mockParse();
-    cookieWrapper.parse(mockMuleEvent, mockExpressionLanguage);
+    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
     Date expiryDate = cookie.getExpiryDate();
 
@@ -134,7 +134,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setExpiryDate(now);
 
     mockParse();
-    cookieWrapper.parse(mockMuleEvent, mockExpressionLanguage);
+    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
 
     Date expiryDate = cookie.getExpiryDate();
@@ -148,11 +148,13 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setValue("test");
     cookieWrapper.setExpiryDate("#[expiryDate]");
 
-    when(mockExpressionLanguage.isExpression("#[expiryDate]")).thenReturn(true);
-    when(mockExpressionLanguage.evaluate("#[expiryDate]", mockMuleEvent, null)).thenReturn(now);
+    when(mockExpressionManager.isExpression("#[expiryDate]")).thenReturn(true);
+    TypedValue typedValue = mock(TypedValue.class);
+    when(typedValue.getValue()).thenReturn(now);
+    when(mockExpressionManager.evaluate("#[expiryDate]", mockMuleEvent)).thenReturn(typedValue);
     mockParse();
 
-    cookieWrapper.parse(mockMuleEvent, mockExpressionLanguage);
+    cookieWrapper.parse(mockMuleEvent, mockExpressionManager);
     Cookie cookie = cookieWrapper.createCookie();
 
     Date expiryDate = cookie.getExpiryDate();
@@ -161,7 +163,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
 
   private void mockParse() {
-    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
+    when(mockExpressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 

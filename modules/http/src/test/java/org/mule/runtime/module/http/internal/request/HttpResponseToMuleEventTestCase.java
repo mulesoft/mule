@@ -12,11 +12,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -45,7 +43,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     httpRequester = new DefaultHttpRequester();
     httpRequester.setConfig(new DefaultHttpRequesterConfig());
     final AttributeEvaluator attrEvaluator = new AttributeEvaluator("true");
-    attrEvaluator.initialize(new MVELExpressionLanguage(muleContext));
+    attrEvaluator.initialize(muleContext.getExpressionManager());
     httpResponseToMuleEvent = new HttpResponseToMuleEvent(httpRequester, muleContext, attrEvaluator);
 
     HttpResponseBuilder builder = new HttpResponseBuilder();

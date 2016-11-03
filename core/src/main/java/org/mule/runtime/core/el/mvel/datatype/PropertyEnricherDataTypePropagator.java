@@ -9,8 +9,8 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 /**
  * Propagates data type for inlined flow and session vars used for enrichment target
@@ -18,7 +18,7 @@ import org.mule.runtime.core.metadata.DefaultTypedValue;
 public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
   @Override
-  protected boolean doPropagate(Event event, Event.Builder builder, DefaultTypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(Event event, Event.Builder builder, TypedValue typedValue, ASTNode node) {
     if (node instanceof AssignmentNode) {
       String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
 

@@ -8,12 +8,11 @@ package org.mule.runtime.core.routing;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.routing.MapSplitter.MAP_ENTRY_KEY;
-
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.expression.ExpressionConfig;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import org.w3c.dom.NodeList;
  */
 public class ExpressionSplitter extends AbstractSplitter implements Initialisable {
 
-  protected ExpressionLanguage expressionLanguage;
+  protected ExpressionManager expressionManager;
   protected ExpressionConfig config = new ExpressionConfig();
 
   public ExpressionSplitter() {
@@ -46,14 +45,15 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
 
   @Override
   public void initialise() throws InitialisationException {
-    expressionLanguage = muleContext.getExpressionLanguage();
-    config.validate(expressionLanguage);
+    expressionManager = muleContext.getExpressionManager();
+    config.validate(expressionManager);
   }
 
   @Override
   protected List<Event> splitMessage(Event event) {
     Object result =
-        muleContext.getExpressionLanguage().evaluate(config.getFullExpression(expressionLanguage), event, flowConstruct);
+        muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), event, flowConstruct)
+            .getValue();
     if (result instanceof Object[]) {
       result = Arrays.asList((Object[]) result);
     }

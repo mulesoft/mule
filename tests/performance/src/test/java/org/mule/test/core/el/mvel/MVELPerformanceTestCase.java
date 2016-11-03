@@ -7,6 +7,7 @@
 package org.mule.test.core.el.mvel;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
@@ -47,12 +48,12 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() throws Exception {
-    ((MVELExpressionLanguage) muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
+    ((MVELExpressionLanguage) muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).setAutoResolveVariables(false);
     event = createMuleEvent();
     flow = getTestFlow(muleContext);
     // Warmup
     for (int i = 0; i < 5000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel, event, flow);
+      muleContext.getExpressionManager().evaluate(mel, event, flow);
     }
   }
 
@@ -64,7 +65,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Required(median = 1000)
   public void mvelColdStart() {
     for (int i = 0; i < 1000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel + new Random().nextInt(), createMuleEvent(), flow);
+      muleContext.getExpressionManager().evaluate(mel + new Random().nextInt(), createMuleEvent(), flow);
     }
   }
 
@@ -76,7 +77,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Required(median = 25)
   public void mvelWarmStart() {
     for (int i = 0; i < 1000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel, event, flow);
+      muleContext.getExpressionManager().evaluate(mel, event, flow);
     }
   }
 
@@ -88,7 +89,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Required(median = 25)
   public void mvelHotStart() {
     for (int i = 0; i < 1000; i++) {
-      muleContext.getExpressionLanguage().evaluate(mel, event, flow);
+      muleContext.getExpressionManager().evaluate(mel, event, flow);
     }
   }
 

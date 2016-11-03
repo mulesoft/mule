@@ -198,7 +198,7 @@ public class FunctionalTestComponent
    * @return a concatenated string of the current payload and the appendString
    */
   protected String append(String contents, Event event) {
-    return contents + muleContext.getExpressionLanguage().parse(appendString, event, flowConstruct);
+    return contents + muleContext.getExpressionManager().parse(appendString, event, flowConstruct);
   }
 
   /**
@@ -240,8 +240,8 @@ public class FunctionalTestComponent
 
     Object replyMessage;
     if (returnData != null) {
-      if (returnData instanceof String && muleContext.getExpressionLanguage().isExpression(returnData.toString())) {
-        replyMessage = muleContext.getExpressionLanguage().parse(returnData.toString(), context.getEvent(), flowConstruct);
+      if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString())) {
+        replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), context.getEvent(), flowConstruct);
       } else {
         replyMessage = returnData;
       }

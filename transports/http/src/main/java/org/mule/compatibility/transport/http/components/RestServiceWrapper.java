@@ -10,17 +10,18 @@ import static org.mule.compatibility.transport.http.HttpConnector.HTTP_METHOD_PR
 import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvokeRestService;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.transport.http.HttpConstants;
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -121,7 +122,7 @@ public class RestServiceWrapper extends AbstractComponent {
   protected void doInitialise() throws InitialisationException {
     if (serviceUrl == null) {
       throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
-    } else if (!muleContext.getExpressionLanguage().isExpression(serviceUrl)) {
+    } else if (!muleContext.getExpressionManager().isExpression(serviceUrl)) {
       try {
         new URL(serviceUrl);
       } catch (MalformedURLException e) {
@@ -144,9 +145,9 @@ public class RestServiceWrapper extends AbstractComponent {
     InternalMessage message = event.getMessage();
     Object request = message.getPayload().getValue();
     String tempUrl = serviceUrl;
-    if (muleContext.getExpressionLanguage().isExpression(serviceUrl)) {
-      muleContext.getExpressionLanguage().validate(serviceUrl);
-      tempUrl = muleContext.getExpressionLanguage().parse(serviceUrl, event, flowConstruct);
+    if (muleContext.getExpressionManager().isExpression(serviceUrl)) {
+      muleContext.getExpressionManager().validate(serviceUrl);
+      tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, flowConstruct);
     }
 
     StringBuilder urlBuffer = new StringBuilder(tempUrl);
@@ -237,9 +238,12 @@ public class RestServiceWrapper extends AbstractComponent {
       String exp = (String) entry.getValue();
       Object value = null;
 
-      if (muleContext.getExpressionLanguage().isExpression(exp)) {
-        muleContext.getExpressionLanguage().validate(exp);
-        value = muleContext.getExpressionLanguage().evaluate(exp, event, flowConstruct);
+      if (muleContext.getExpressionManager().isExpression(exp)) {
+        ValidationResult validation = muleContext.getExpressionManager().validate(exp);
+        if (!validation.isSuccess()) {
+          throw new InvalidExpressionException(exp, validation.errorMessage().orElse(""));
+        }
+        value = muleContext.getExpressionManager().evaluate(exp, event, flowConstruct).getValue();
       } else {
         value = exp;
       }

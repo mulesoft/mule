@@ -12,9 +12,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
@@ -68,12 +69,12 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
                          Event enrichmentEvent,
                          String sourceExpressionArg,
                          String targetExpressionArg,
-                         ExpressionLanguage expressionLanguage) {
+                         ExpressionManager expressionManager) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
       sourceExpressionArg = "#[payload:]";
     }
 
-    DefaultTypedValue typedValue = expressionLanguage.evaluateTyped(sourceExpressionArg, enrichmentEvent, flowConstruct);
+    TypedValue typedValue = expressionManager.evaluate(sourceExpressionArg, enrichmentEvent, flowConstruct);
 
     if (typedValue.getValue() instanceof InternalMessage) {
       InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
@@ -82,7 +83,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
       Event.Builder eventBuilder = Event.builder(currentEvent);
-      expressionLanguage.enrich(targetExpressionArg, currentEvent, eventBuilder, flowConstruct, typedValue);
+      expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, flowConstruct, typedValue);
       return eventBuilder.build();
     } else {
       return Event.builder(currentEvent).message(InternalMessage.builder(currentEvent.getMessage())
@@ -99,7 +100,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
   }
 
   protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {
-    final ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
+    final ExpressionManager expressionLanguage = muleContext.getExpressionManager();
 
     if (event != null) {
       for (EnrichExpressionPair pair : enrichExpressionPairs) {

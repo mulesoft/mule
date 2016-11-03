@@ -70,7 +70,6 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
       }
     }
     delegate = builder.build();
-    super.initialise();
   }
 
   protected TransactionFactory getTransactionFactory() {

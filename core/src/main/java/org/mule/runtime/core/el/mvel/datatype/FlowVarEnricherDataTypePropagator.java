@@ -9,8 +9,8 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 /**
  * Propagates data type for flow vars used for enrichment target
@@ -22,7 +22,7 @@ public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherD
   }
 
   @Override
-  protected void addVariable(Event event, Event.Builder builder, DefaultTypedValue typedValue, String propertyName) {
+  protected void addVariable(Event event, Event.Builder builder, TypedValue typedValue, String propertyName) {
     builder.addVariable(propertyName, typedValue.getValue(), typedValue.getDataType());
   }
 

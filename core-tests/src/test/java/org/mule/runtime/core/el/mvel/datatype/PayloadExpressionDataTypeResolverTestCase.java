@@ -46,7 +46,7 @@ public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleConte
   private void doPayloadDataTypeTest(String expression) throws Exception {
     final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 

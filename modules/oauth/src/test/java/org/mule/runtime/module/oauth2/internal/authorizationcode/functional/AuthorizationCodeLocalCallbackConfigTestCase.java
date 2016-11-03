@@ -28,7 +28,7 @@ public class AuthorizationCodeLocalCallbackConfigTestCase extends AbstractAuthor
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), "tokenManagerConfig")
         .assertAccessTokenIs(ACCESS_TOKEN).assertRefreshTokenIs(REFRESH_TOKEN);
   }
 }

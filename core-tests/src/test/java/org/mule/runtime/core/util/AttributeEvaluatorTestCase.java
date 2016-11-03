@@ -11,34 +11,28 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
 
-  @Mock
-  private ExpressionLanguage mockExpressionLanaguage;
-  @Mock
-  private Event mockMuleEvent;
+  private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
+  private Event mockMuleEvent = mock(Event.class);
 
   @Test
   public void plainTextValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("attributeEvaluator");
-    Mockito.when(mockExpressionLanaguage.isExpression("attributeEvaluator")).thenReturn(false);
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    when(mockExpressionManager.isExpression("attributeEvaluator")).thenReturn(false);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(false));
     assertThat(attributeEvaluator.isExpression(), is(false));
   }
@@ -46,9 +40,9 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void expressionValue() {
     String attributeValue = "#[eval:express]";
-    when(mockExpressionLanaguage.isExpression(attributeValue)).thenReturn(true);
+    when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(false));
     assertThat(attributeEvaluator.isExpression(), is(true));
   }
@@ -56,10 +50,10 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void expressionValueNoEvaluator() {
     String attributeValue = "#[express]";
-    when(mockExpressionLanaguage.isExpression(attributeValue)).thenReturn(true);
-    Mockito.when(mockExpressionLanaguage.isExpression(attributeValue)).thenReturn(true);
+    when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
+    when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(false));
     assertThat(attributeEvaluator.isExpression(), is(true));
   }
@@ -67,7 +61,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void parse() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("1#[2]3#[4]5");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(true));
     assertThat(attributeEvaluator.isExpression(), is(false));
   }
@@ -75,7 +69,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void testParseStartsWithExpression() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[1]234#[5]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(true));
     assertThat(attributeEvaluator.isExpression(), is(false));
   }
@@ -83,7 +77,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void parseStartsAndEndsWithExpression() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[1]#[2]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(true));
     assertThat(attributeEvaluator.isExpression(), is(false));
   }
@@ -91,7 +85,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void parenthesesInExpression() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[(1)]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     assertThat(attributeEvaluator.isParseExpression(), is(false));
     assertThat(attributeEvaluator.isExpression(), is(true));
   }
@@ -99,67 +93,72 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   @Test
   public void resolveStringWithObjectReturnValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "hi";
-    when(mockExpressionLanaguage.evaluate(anyString(), any(Event.class), any(FlowConstruct.class)))
-        .thenReturn(new StringBuilder(expectedValue));
+    doReturn(mockFor(new StringBuilder(expectedValue))).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     assertThat(attributeEvaluator.resolveStringValue(mockMuleEvent), is(expectedValue));
   }
 
   @Test
   public void resolveIntegerWithNumericStringValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "123";
-    when(mockExpressionLanaguage.evaluate(anyString(), any(Event.class), any(FlowConstruct.class))).thenReturn(expectedValue);
+    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is(Integer.parseInt(expectedValue)));
   }
 
   @Test
   public void resolveIntegerWithNumericValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     final long expectedValue = 1234l;
-    when(mockExpressionLanaguage.evaluate(anyString(), any(Event.class), any(FlowConstruct.class))).thenReturn(expectedValue);
+    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is((int) expectedValue));
   }
 
   @Test
   public void resolveBooleanWithBooleanStringValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "true";
-    when(mockExpressionLanaguage.evaluate(anyString(), any(Event.class), any(FlowConstruct.class))).thenReturn(expectedValue);
+    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
   }
 
   @Test
   public void resolveBooleanWithBooleanValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     final Boolean expectedValue = true;
-    when(mockExpressionLanaguage.evaluate(anyString(), any(Event.class), any(FlowConstruct.class))).thenReturn(expectedValue);
+    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
   }
 
   @Test(expected = NumberFormatException.class)
   public void resolveIntegerWithNoNumericValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
-    attributeEvaluator.initialize(mockExpressionLanaguage);
+    attributeEvaluator.initialize(mockExpressionManager);
     final String value = "abcd";
-    when(mockExpressionLanaguage.evaluate(anyString(), any(Event.class), any(FlowConstruct.class))).thenReturn(value);
+    doReturn(mockFor(value)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     attributeEvaluator.resolveIntegerValue(mockMuleEvent);
   }
 
   @Test
   public void nullAttributeValue() {
     final AttributeEvaluator nullAttributeEvaluator = new AttributeEvaluator(null);
-    nullAttributeEvaluator.initialize(mockExpressionLanaguage);
+    nullAttributeEvaluator.initialize(mockExpressionManager);
     assertThat(nullAttributeEvaluator.isExpression(), is(false));
     assertThat(nullAttributeEvaluator.isParseExpression(), is(false));
     assertThat(nullAttributeEvaluator.resolveValue(mockMuleEvent), nullValue());
     assertThat(nullAttributeEvaluator.resolveIntegerValue(mockMuleEvent), nullValue());
     assertThat(nullAttributeEvaluator.resolveStringValue(mockMuleEvent), nullValue());
+  }
+
+  private TypedValue mockFor(Object value) {
+    TypedValue mockTypedValue = mock(TypedValue.class);
+    when(mockTypedValue.getValue()).thenReturn(value);
+    return mockTypedValue;
   }
 
 }

@@ -39,7 +39,7 @@ public class SelectorWatermark extends Watermark implements Initialisable, MuleC
   @Override
   public void initialise() throws InitialisationException {
     try {
-      this.muleContext.getExpressionLanguage().validate(this.selectorExpression);
+      this.muleContext.getExpressionManager().validate(this.selectorExpression);
     } catch (InvalidExpressionException e) {
       throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
           .format("selector-expression requires a valid MEL expression. '%s' was found instead", this.selectorExpression)), e,

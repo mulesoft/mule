@@ -9,7 +9,7 @@ package org.mule.extension.db.internal.resolver.param;
 
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class DynamicParamValueResolver implements ParamValueResolver {
 
-  private final ExpressionLanguage expressionLanguage;
+  private final ExpressionManager expressionManager;
 
-  public DynamicParamValueResolver(ExpressionLanguage expressionLanguage) {
-    this.expressionLanguage = expressionLanguage;
+  public DynamicParamValueResolver(ExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 
   @Override
@@ -32,8 +32,8 @@ public class DynamicParamValueResolver implements ParamValueResolver {
     if (templateParams != null) {
       for (QueryParamValue templateParam : templateParams) {
         if (templateParam != null && templateParam.getValue() instanceof String
-            && expressionLanguage.isExpression((String) templateParam.getValue())) {
-          Object newValue = expressionLanguage.evaluate((String) templateParam.getValue(), muleEvent, null);
+            && expressionManager.isExpression((String) templateParam.getValue())) {
+          Object newValue = expressionManager.evaluate((String) templateParam.getValue(), muleEvent);
           QueryParamValue queryParamValue = new QueryParamValue(templateParam.getName(), newValue);
 
           params.add(queryParamValue);

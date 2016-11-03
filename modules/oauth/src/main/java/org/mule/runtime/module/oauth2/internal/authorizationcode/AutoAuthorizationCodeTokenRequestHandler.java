@@ -203,7 +203,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   private TokenResponseProcessor processTokenUrlResponse(Event tokenUrlResponse)
       throws TokenNotFoundException, TransformerException {
     final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor
-        .createAuthorizationCodeProcessor(tokenResponseConfiguration, getMuleContext().getExpressionLanguage());
+        .createAuthorizationCodeProcessor(tokenResponseConfiguration, getMuleContext().getExpressionManager());
     tokenResponseProcessor.process(tokenUrlResponse);
 
     if (logger.isDebugEnabled()) {

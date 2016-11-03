@@ -9,36 +9,40 @@ package org.mule.runtime.core.el.v2;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutor;
-import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MuleExpressionLanguage implements ExpressionLanguage {
+public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
 
   public static final String ATTRIBUTES = "attributes";
   public static final String PAYLOAD = "payload";
   public static final String ERROR = "error";
   public static final String VARIABLES = "variables";
+  public static final String FLOW = "flow";
 
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
 
   public MuleExpressionLanguage() {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class).iterator();
+
     while (executors.hasNext()) {
-      //TODO: MULE-10410 - define how to handle dw and mvel at the same time
       this.expressionExecutor = executors.next();
       break;
     }
@@ -47,57 +51,95 @@ public class MuleExpressionLanguage implements ExpressionLanguage {
   }
 
   @Override
-  public TypedValue evaluate(String expression) {
-    return evaluate(expression, BindingContext.builder().build());
-  }
-
-  @Override
-  public TypedValue evaluate(String expression, BindingContext context, MuleEvent event) {
-    BindingContext.Builder contextBuilder = BindingContext.builder();
-    contextBuilder.addAll(context);
-    addEventBindings(event, contextBuilder);
+  public TypedValue evaluate(String expression, Event event, BindingContext context) {
+    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
     return evaluate(expression, contextBuilder.build());
   }
 
   @Override
-  public TypedValue evaluate(String expression, BindingContext context) {
-    return expressionExecutor.evaluate(expression, context);
+  public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext) {
+    return evaluate(expression, event, null, flowConstruct, bindingContext);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType) {
-    return evaluate(expression, expectedOutputType, BindingContext.builder().build());
-  }
-
-  @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, MuleEvent event) {
-    BindingContext.Builder contextBuilder = BindingContext.builder();
-    contextBuilder.addAll(context);
-    addEventBindings(event, contextBuilder);
-    return evaluate(expression, expectedOutputType, contextBuilder.build());
-  }
-
-  @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context) {
-    return expressionExecutor.evaluate(expression, expectedOutputType, context);
+  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+                             BindingContext context) {
+    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
+    addFlowBindings(flowConstruct, contextBuilder);
+    return evaluate(expression, contextBuilder.build());
   }
 
   @Override
   public ValidationResult validate(String expression) {
-    return expressionExecutor.validate(expression);
+    return expressionExecutor.validate(sanitize(expression));
   }
 
-  private void addEventBindings(MuleEvent event, BindingContext.Builder contextBuilder) {
-    Message message = event.getMessage();
-    Attributes attributes = message.getAttributes();
-    contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
-    contextBuilder.addBinding(PAYLOAD, message.getPayload());
-    Error error = event.getError().isPresent() ? event.getError().get() : null;
-    contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
-    Map<String, TypedValue> flowVars = new HashMap<>();
-    event.getVariableNames().forEach(name -> flowVars.put(name, event.getVariable(name)));
-    contextBuilder.addBinding(VARIABLES,
-                              new DefaultTypedValue(unmodifiableMap(flowVars), DataType.fromType(flowVars.getClass())));
+  @Override
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object) {
+    throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
 
+  @Override
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+                     TypedValue value) {
+    throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
+  }
+
+  private TypedValue evaluate(String expression, BindingContext context) {
+    return expressionExecutor.evaluate(sanitize(expression), context);
+  }
+
+  private BindingContext.Builder addFlowBindings(FlowConstruct flow, BindingContext.Builder contextBuilder) {
+    if (flow != null) {
+      contextBuilder.addBinding(FLOW, new DefaultTypedValue(new FlowVariablesAccessor(flow.getName()),
+                                                            fromType(FlowVariablesAccessor.class)));
+    }
+    return contextBuilder;
+  }
+
+  private void addEventBindings(Event event, BindingContext.Builder contextBuilder) {
+    if (event != null) {
+      Message message = event.getMessage();
+      Attributes attributes = message.getAttributes();
+      contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
+      contextBuilder.addBinding(PAYLOAD, message.getPayload());
+      Error error = event.getError().isPresent() ? event.getError().get() : null;
+      contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
+      Map<String, TypedValue> flowVars = new HashMap<>();
+      event.getVariableNames().forEach(name -> flowVars.put(name, event.getVariable(name)));
+      contextBuilder.addBinding(VARIABLES,
+                                new DefaultTypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
+    }
+  }
+
+  private BindingContext.Builder bindingContextBuilderFor(Event event, BindingContext context) {
+    BindingContext.Builder contextBuilder = BindingContext.builder(context);
+    addEventBindings(event, contextBuilder);
+    return contextBuilder;
+  }
+
+  private String sanitize(String expression) {
+    String sanitizedExpression = expression.startsWith(DEFAULT_EXPRESSION_PREFIX)
+        ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
+        : expression;
+    //TODO: MULE-10410 - Remove once DW is the default language.
+    if (sanitizedExpression.startsWith(DW_PREFIX)) {
+      sanitizedExpression = sanitizedExpression.substring(DW_PREFIX.length());
+    }
+    return sanitizedExpression;
+  }
+
+  private class FlowVariablesAccessor {
+
+    private String name;
+
+    public FlowVariablesAccessor(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+  }
 }

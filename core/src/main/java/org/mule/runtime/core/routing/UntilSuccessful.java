@@ -96,7 +96,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
     failureExpressionFilter.setMuleContext(muleContext);
 
-    if ((ackExpression != null) && (!muleContext.getExpressionLanguage().isExpression(ackExpression))) {
+    if ((ackExpression != null) && (!muleContext.getExpressionManager().isExpression(ackExpression))) {
       throw new InitialisationException(I18nMessageFactory.createStaticMessage("Invalid ackExpression: " + ackExpression), this);
     }
 

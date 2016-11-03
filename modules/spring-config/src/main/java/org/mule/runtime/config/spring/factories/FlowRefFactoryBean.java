@@ -124,7 +124,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   public void initialise() throws InitialisationException {
     if (refName.isEmpty()) {
       throw new InitialisationException(CoreMessages.objectIsNull("flow reference is empty"), this);
-    } else if (!muleContext.getExpressionLanguage().isExpression(refName)) {
+    } else if (!muleContext.getExpressionManager().isExpression(refName)) {
       // No need to initialize because message processor will be injected into and managed by parent
       referencedMessageProcessor = lookupReferencedFlowInApplicationContext(refName);
     }
@@ -181,7 +181,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         private Processor resolveReferencedProcessor(Event event) throws MuleException {
           // Need to initialize because message processor won't be managed by parent
-          String flowName = muleContext.getExpressionLanguage().parse(refName, event, flowConstruct);
+          String flowName = muleContext.getExpressionManager().parse(refName, event, flowConstruct);
           final Processor dynamicMessageProcessor = getReferencedFlow(flowName, flowConstruct);
           setResolvedMessageProcessor(dynamicMessageProcessor);
           return dynamicMessageProcessor;

@@ -59,7 +59,7 @@ public final class EndpointMulticastingRouter extends MulticastingRouter {
 
       String newUriString = parser.parse(props, uri);
       if (parser.isContainsTemplate(newUriString)) {
-        newUriString = this.getMuleContext().getExpressionLanguage().parse(newUriString, event, flowConstruct);
+        newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, event, flowConstruct);
       }
       if (logger.isDebugEnabled()) {
         logger.debug("Uri after parsing is: " + uri);

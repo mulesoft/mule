@@ -33,7 +33,7 @@ public class CopyPropertiesProcessor implements Processor, MuleContextAware, Ini
 
   @Override
   public void initialise() throws InitialisationException {
-    this.propertyNameEvaluator.initialize(muleContext.getExpressionLanguage());
+    this.propertyNameEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override

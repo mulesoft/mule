@@ -9,6 +9,7 @@ package org.mule.functional.junit4;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;

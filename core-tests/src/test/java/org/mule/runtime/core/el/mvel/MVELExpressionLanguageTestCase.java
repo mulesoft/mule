@@ -11,29 +11,29 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
+import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -217,23 +217,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void testIsValid() {
-    assertTrue(mvel.isValid("2*2"));
-  }
-
-  @Test
-  public void testIsValidInvalid() {
-    assertFalse(mvel.isValid("2*'2"));
-  }
-
-  @Test
   public void testValidate() {
-    validate("2*2");
+    assertThat(validate("2*2").isSuccess(), is(true));
   }
 
-  @Test(expected = InvalidExpressionException.class)
+  @Test
   public void testValidateInvalid() {
-    validate("2*'2");
+    assertThat(validate("2*'2").isSuccess(), is(false));
   }
 
   @Test
@@ -418,7 +408,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
     Event event = createMockEvent(TEST_MESSAGE, dataType);
 
-    DefaultTypedValue typedValue = evaluateTyped("payload", event);
+    TypedValue typedValue = evaluateTyped("payload", event);
 
     assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
     assertThat(typedValue.getDataType(), like(String.class, JSON, UTF_16));
@@ -426,41 +416,41 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Object evaluate(String expression) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[" + expression + "]");
+      return mvel.evaluateUntyped("#[" + expression + "]", null, null, null, null);
     } else {
-      return mvel.evaluate(expression);
+      return mvel.evaluateUntyped(expression, null, null, null, null);
     }
   }
 
-  protected DefaultTypedValue evaluateTyped(String expression, Event event) throws Exception {
+  protected TypedValue evaluateTyped(String expression, Event event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateTyped("#[" + expression + "]", event, flowConstruct);
+      return mvel.evaluate("#[" + expression + "]", event, Event.builder(event), flowConstruct, BindingContext.builder().build());
     } else {
-      return mvel.evaluateTyped(expression, event, flowConstruct);
+      return mvel.evaluate(expression, event, Event.builder(event), flowConstruct, BindingContext.builder().build());
     }
   }
 
   protected Object evaluate(String expression, Map<String, Object> vars) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[" + expression + "]", vars);
+      return mvel.evaluateUntyped("#[" + expression + "]", vars);
     } else {
-      return mvel.evaluate(expression, vars);
+      return mvel.evaluateUntyped(expression, vars);
     }
   }
 
   protected Object evaluate(String expression, Event event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[" + expression + "]", event, flowConstruct);
+      return mvel.evaluateUntyped("#[" + expression + "]", event, Event.builder(event), flowConstruct, null);
     } else {
-      return mvel.evaluate(expression, event, flowConstruct);
+      return mvel.evaluateUntyped(expression, event, Event.builder(event), flowConstruct, null);
     }
   }
 
-  protected void validate(String expression) {
+  protected ValidationResult validate(String expression) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      mvel.validate("#[" + expression + "]");
+      return mvel.validate("#[" + expression + "]");
     } else {
-      mvel.validate(expression);
+      return mvel.validate(expression);
     }
   }
 
@@ -556,9 +546,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void collectionAccessPayloadChangedMULE7506() throws Exception {
     Event event = eventBuilder().message(InternalMessage.of(new String[] {"1", "2"})).build();
-    assertEquals("1", mvel.evaluate("payload[0]", event, flowConstruct));
+    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event), flowConstruct, null));
     event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(singletonList("1")).build()).build();
-    assertEquals("1", mvel.evaluate("payload[0]", event, flowConstruct));
+    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event), flowConstruct, null));
   }
 
 }

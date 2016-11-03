@@ -47,7 +47,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   @Override
   public void initialise() throws InitialisationException {
     if (value != null) {
-      value.initialize(muleContext.getExpressionLanguage());
+      value.initialize(muleContext.getExpressionManager());
     }
   }
 

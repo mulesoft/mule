@@ -8,27 +8,28 @@ package org.mule.runtime.config.spring.factories;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -61,14 +62,17 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private FlowConstruct targetFlow = mock(FlowConstruct.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private Processor targetSubFlow = mock(SubFlowMessageProcessor.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private ApplicationContext applicationContext = mock(ApplicationContext.class);
-  private ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
+  private ExpressionManager expressionManager;
+  private MuleContext mockMuleContext;
 
   public FlowRefFactoryBeanTestCase() throws MuleException {}
 
   @Before
   public void setup() throws MuleException {
-    muleContext.getRegistry().registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
-    when(expressionLanguage.isExpression(anyString())).thenReturn(true);
+    expressionManager = spy(muleContext.getExpressionManager());
+    mockMuleContext = spy(muleContext);
+    doReturn(expressionManager).when(mockMuleContext).getExpressionManager();
+    doReturn(true).when(expressionManager).isExpression(anyString());
     when(((Processor) targetFlow).process(any(Event.class))).thenReturn(result);
     when(targetSubFlow.process(any(Event.class))).thenReturn(result);
   }
@@ -141,7 +145,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean((Processor) targetMuleContextAwareAware);
     assertSame(result, getFlowRefProcessor(flowRefFactoryBean).process(event));
 
-    verify(targetMuleContextAwareAware).setMuleContext(muleContext);
+    verify(targetMuleContextAwareAware).setMuleContext(mockMuleContext);
   }
 
   @Test
@@ -166,26 +170,26 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     flowRefProcessor.process(event);
 
     verify((FlowConstructAware) targetSubFlowConstructAware).setFlowConstruct(flowConstruct);
-    verify((MuleContextAware) targetMuleContextAwareAware).setMuleContext(muleContext);
+    verify((MuleContextAware) targetMuleContextAwareAware).setMuleContext(mockMuleContext);
   }
 
   @Test(expected = MuleRuntimeException.class)
   public void staticFlowRefDoesNotExist() throws Exception {
-    when(expressionLanguage.isExpression(anyString())).thenReturn(false);
+    doReturn(false).when(expressionManager).isExpression(anyString());
 
     getFlowRefProcessor(createFlowRefFactoryBean(NON_EXISTANT));
   }
 
   private Processor getFlowRefProcessor(FlowRefFactoryBean factoryBean) throws Exception {
     Processor processor = factoryBean.getObject();
-    setMuleContextIfNeeded(processor, muleContext);
+    setMuleContextIfNeeded(processor, mockMuleContext);
     return processor;
   }
 
   @Test(expected = MessagingException.class)
   public void dynamicFlowRefDoesNotExist() throws Exception {
-    when(expressionLanguage.isExpression(anyString())).thenReturn(true);
-    when(expressionLanguage.parse(eq(DYNAMIC_NON_EXISTANT), any(Event.class), any(FlowConstruct.class))).thenReturn("other");
+    doReturn(true).when(expressionManager).isExpression(anyString());
+    doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(Event.class), any(FlowConstruct.class));
 
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
@@ -194,22 +198,22 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
     flowRefFactoryBean.setName(name);
     flowRefFactoryBean.setApplicationContext(applicationContext);
-    flowRefFactoryBean.setMuleContext(muleContext);
+    flowRefFactoryBean.setMuleContext(mockMuleContext);
     flowRefFactoryBean.initialise();
     return flowRefFactoryBean;
   }
 
   private FlowRefFactoryBean createStaticFlowRefFactoryBean(Processor target) throws InitialisationException {
-    when(expressionLanguage.isExpression(anyString())).thenReturn(false);
+    doReturn(false).when(expressionManager).isExpression(anyString());
     when(applicationContext.getBean(eq(STATIC_REFERENCED_FLOW))).thenReturn(target);
 
     return createFlowRefFactoryBean(STATIC_REFERENCED_FLOW);
   }
 
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target) throws InitialisationException {
-    when(expressionLanguage.isExpression(anyString())).thenReturn(true);
-    when(expressionLanguage.parse(eq(DYNAMIC_REFERENCED_FLOW), any(Event.class), any(FlowConstruct.class)))
-        .thenReturn(PARSED_DYNAMIC_REFERENCED_FLOW);
+    doReturn(true).when(expressionManager).isExpression(anyString());
+    doReturn(PARSED_DYNAMIC_REFERENCED_FLOW).when(expressionManager).parse(eq(DYNAMIC_REFERENCED_FLOW), any(Event.class),
+                                                                           any(FlowConstruct.class));
     when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
 
     return createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW);

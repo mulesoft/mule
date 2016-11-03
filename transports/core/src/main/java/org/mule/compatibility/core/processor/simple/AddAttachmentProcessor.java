@@ -33,9 +33,9 @@ public class AddAttachmentProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    nameEvaluator.initialize(muleContext.getExpressionLanguage());
-    valueEvaluator.initialize(muleContext.getExpressionLanguage());
-    contentTypeEvaluator.initialize(muleContext.getExpressionLanguage());
+    nameEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(muleContext.getExpressionManager());
+    contentTypeEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override

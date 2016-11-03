@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -63,55 +64,55 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void importClass() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("Calendar"), equalTo(Calendar.class));
+    assertThat(evaluate("Calendar"), equalTo(Calendar.class));
   }
 
   @Test
   public void importClassWithName() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("CAL"), equalTo(Calendar.class));
+    assertThat(evaluate("CAL"), equalTo(Calendar.class));
   }
 
   @Test
   public void importStaticMethod() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("dateFormat()"), is(DateFormat.getInstance()));
+    assertThat(evaluate("dateFormat()"), is(DateFormat.getInstance()));
   }
 
   @Test
   public void variable() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("a"), is("hi"));
+    assertThat(evaluate("a"), is("hi"));
   }
 
   @Test
   public void assignValueToVariable() throws RegistrationException, InitialisationException {
-    expressionLanguage.evaluate("a='1'");
+    evaluate("a='1'");
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void assignValueToFinalVariable() throws RegistrationException, InitialisationException {
-    expressionLanguage.evaluate("final='1'");
+    evaluate("final='1'");
   }
 
   @Test
   public void mutableVariable() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("b"), is("hi"));
+    assertThat(evaluate("b"), is("hi"));
   }
 
   @Test
   public void assignValueToMutableVariable() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("b='1'"), is("hi"));
+    assertThat(evaluate("b='1'"), is("hi"));
     assertThat(b, is("1"));
   }
 
   @Test
   public void testShortcutVariable() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("appShortcut.name"), is(muleContext.getConfiguration().getId()));
+    assertThat(evaluate("appShortcut.name"), is(muleContext.getConfiguration().getId()));
   }
 
   @Test
   public void testVariableAlias() throws Exception {
     Event event = Event.builder(context).message(InternalMessage.of("foo")).build();
 
-    assertThat(expressionLanguage.evaluate("p", event, flowConstruct), is("foo"));
+    assertThat(evaluate("p", event), is("foo"));
   }
 
   @Test
@@ -119,48 +120,49 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     Event event = Event.builder(context).message(InternalMessage.of("")).build();
 
     Event.Builder eventBuilder = Event.builder(event);
-    expressionLanguage.evaluate("p='bar'", event, eventBuilder, flowConstruct);
+    evaluate("p='bar'", event, eventBuilder);
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
   }
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
     Event event = Event.builder(context).message(InternalMessage.of("")).build();
-    expressionLanguage.evaluate("p=m.uniqueId", event, flowConstruct);
+    evaluate("p=m.uniqueId", event);
   }
 
   @Test
   public void testFunction() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("f('one','two')"),
+    assertThat(evaluate("f('one','two')"),
                is("called param[0]=one,param[1]=two,app.name=" + muleContext.getConfiguration().getId()));
   }
 
   @Test
   public void testMuleContextAvailableInFunction() throws RegistrationException, InitialisationException {
-    assertThat(expressionLanguage.evaluate("muleContext()"), is(muleContext));
+    assertThat(evaluate("muleContext()"), is(muleContext));
   }
 
   @Test
   public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException {
-    Event event = mock(Event.class);
+    Event event = mock(Event.class, RETURNS_DEEP_STUBS);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+
     when(event.getError()).thenReturn(empty());
     InternalMessage message = mock(InternalMessage.class);
     when(event.getMessage()).thenReturn(message);
 
-    assertThat(expressionLanguage.evaluate("muleMessage()", event, flowConstruct), is(message));
+    assertThat(evaluate("muleMessage()", event), is(message));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testFunctionInvalidParams() throws RegistrationException, InitialisationException {
-    expressionLanguage.evaluate("f('one')");
+    evaluate("f('one')");
   }
 
   @Test
   public void testParserContextThreadLocalCleared() throws RegistrationException, InitialisationException {
     // Ensure ParserContext ThreadLocal is cleared after initialization (occurs in deployment thread)
     assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
-    expressionLanguage.evaluate("f('one','two')");
+    evaluate("f('one','two')");
     // Ensure ParserContext ThreadLocal is cleared after evaluation (occurs in receiver/flow/dispatcher thread)
     assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
   }

@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.expression;
 
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
@@ -19,8 +21,8 @@ public class ExpressionConfig {
 
   private String fullExpression;
 
-  private String expressionPrefix = ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
-  private String expressionPostfix = ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
+  private String expressionPrefix = DEFAULT_EXPRESSION_PREFIX;
+  private String expressionPostfix = DEFAULT_EXPRESSION_POSTFIX;
   private volatile boolean parsed = false;
 
   public ExpressionConfig() {
@@ -28,7 +30,7 @@ public class ExpressionConfig {
   }
 
   public ExpressionConfig(String expression) {
-    this(expression, ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX, ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX);
+    this(expression, DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
 
   }
 
@@ -62,7 +64,7 @@ public class ExpressionConfig {
     this.expression = expressionString;
   }
 
-  public void validate(ExpressionLanguage expressionLanguage) {
+  public void validate(ExpressionManager expressionManager) {
     if (expression == null) {
       parse(unParsedExpression);
     }
@@ -71,12 +73,12 @@ public class ExpressionConfig {
     }
   }
 
-  public String getFullExpression(ExpressionLanguage expressionLanguage) {
+  public String getFullExpression(ExpressionManager expressionManager) {
     if (fullExpression == null) {
       if (expression == null) {
         parse(unParsedExpression);
       }
-      validate(expressionLanguage);
+      validate(expressionManager);
       fullExpression = expressionPrefix + expression + expressionPostfix;
     }
     return fullExpression;
