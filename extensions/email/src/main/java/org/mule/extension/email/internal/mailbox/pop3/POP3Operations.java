@@ -31,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
 
@@ -55,23 +56,23 @@ public class POP3Operations {
    * @param mailboxFolder Mailbox folder where the emails are going to be fetched
    * @param pop3Matcher Email Matcher which gives the capability of filter the retrieved emails
    * @param deleteAfterRetrieve Specifies if the returned emails must be deleted after being retrieved or not.
-   * @return an {@link PagingProvider} composed with an {@link OperationResult} with a {@link List} carrying all the emails
-   *         content and it's corresponding {@link IMAPEmailAttributes}.
+   * @return an {@link PagingProvider} composed with an {@link Result} with a {@link List} carrying all the emails content and
+   *         it's corresponding {@link IMAPEmailAttributes}.
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
   @OutputResolver(output = EmailMetadataResolver.class)
   public PagingProvider<MailboxConnection, Result<Object, POP3EmailAttributes>> listPop3(@UseConfig POP3Configuration config,
-                                                                                                  @Connection MailboxConnection connection,
-                                                                                                  @Optional(
-                                                                                                      defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                                                  @DisplayName("Match with") @Optional POP3EmailPredicateBuilder pop3Matcher,
-                                                                                                  @Optional(
-                                                                                                      defaultValue = "false") boolean deleteAfterRetrieve,
-                                                                                                  @MetadataKeyId @Optional(
-                                                                                                      defaultValue = "ANY") @Placement(
-                                                                                                          tab = ADVANCED) EmailMetadataKey outputType,
-                                                                                                  @Optional(
-                                                                                                      defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+                                                                                         @Connection MailboxConnection connection,
+                                                                                         @Optional(
+                                                                                             defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                                                                         @DisplayName("Match with") @Optional POP3EmailPredicateBuilder pop3Matcher,
+                                                                                         @Optional(
+                                                                                             defaultValue = "false") boolean deleteAfterRetrieve,
+                                                                                         @MetadataKeyId @Optional(
+                                                                                             defaultValue = "ANY") @Placement(
+                                                                                                 tab = ADVANCED) EmailMetadataKey outputType,
+                                                                                         @Optional(
+                                                                                             defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
     checkArgument(pageSize > 0, format(PAGE_SIZE_ERROR_MESSAGE, pageSize));
     return new PagingProviderEmailDelegate<>(config, mailboxFolder, pop3Matcher, pageSize, deleteAfterRetrieve,
                                              attributes -> setFlagCommand.setByNumber(connection, mailboxFolder, DELETED,

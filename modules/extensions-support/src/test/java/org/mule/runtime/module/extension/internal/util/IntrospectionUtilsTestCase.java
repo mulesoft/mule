@@ -32,9 +32,9 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -231,7 +231,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return new HashMap<>();
   }
 
-  public OperationResult<String, Attributes> operationResult() {
+  public Result<String, Attributes> operationResult() {
     return null;
   }
 
@@ -239,7 +239,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return null;
   }
 
-  public PagingProvider<Object, OperationResult<String, Attributes>> pagingProviderOperationResult() {
+  public PagingProvider<Object, Result<String, Attributes>> pagingProviderOperationResult() {
     return null;
   }
 

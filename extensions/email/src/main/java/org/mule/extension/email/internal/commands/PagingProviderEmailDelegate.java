@@ -20,8 +20,8 @@ import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
-import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ import javax.mail.MessagingException;
  * @since 4.0
  */
 public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
-    implements PagingProvider<MailboxConnection, OperationResult<Object, T>> {
+    implements PagingProvider<MailboxConnection, Result<Object, T>> {
 
   private final MailboxAccessConfiguration configuration;
   private final int pageSize;
@@ -81,17 +81,17 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
   /**
    * Retrieves emails numbered from {@code startIndex} up to {@code endIndex} in the specified {@code folderName}.
    * <p>
-   * A new {@link OperationResult} is created for each fetched email from the folder, where the payload is the text body of the
-   * email and the other metadata is carried by an {@link BaseEmailAttributes} instance.
+   * A new {@link Result} is created for each fetched email from the folder, where the payload is the text body of the email and
+   * the other metadata is carried by an {@link BaseEmailAttributes} instance.
    * <p>
    * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
    * ({@code shouldReadContent} = false) the SEEN flag is not going to be set. If {@code deleteAfterRead} flag is set to true, the
    * callback {@code deleteAfterReadCallback} is applied to each email.
    */
-  private <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(int startIndex, int endIndex) {
+  private <T extends BaseEmailAttributes> List<Result<Object, T>> list(int startIndex, int endIndex) {
     Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
-      List<OperationResult<Object, T>> retrievedEmails = new LinkedList<>();
+      List<Result<Object, T>> retrievedEmails = new LinkedList<>();
       for (javax.mail.Message m : folder.getMessages(startIndex, endIndex)) {
         Object emailContent = EMPTY;
         T attributes = configuration.parseAttributesFromMessage(m, folder);
@@ -101,12 +101,12 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
             // Attributes are parsed again since they may change after the email has been read.
             attributes = configuration.parseAttributesFromMessage(m, folder);
           }
-          OperationResult<Object, T> operationResult = OperationResult.<Object, T>builder()
+          Result<Object, T> result = Result.<Object, T>builder()
               .output(emailContent)
               .attributes(attributes)
               .build();
 
-          retrievedEmails.add(operationResult);
+          retrievedEmails.add(result);
         }
 
         if (deleteAfterRetrieve) {
@@ -138,7 +138,7 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
   }
 
   @Override
-  public List<OperationResult<Object, T>> getPage(MailboxConnection connection) {
+  public List<Result<Object, T>> getPage(MailboxConnection connection) {
     boolean shouldExpunge = false;
     try {
       folder = connection.getFolder(folderName, deleteAfterRetrieve ? READ_WRITE : READ_ONLY);
@@ -149,7 +149,7 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
       endIndex = min(endIndex, folder.getMessageCount());
 
       while (startIndex <= endIndex) {
-        List<OperationResult<Object, T>> emails = list(startIndex, endIndex);
+        List<Result<Object, T>> emails = list(startIndex, endIndex);
         startIndex += pageSize;
         endIndex = min(endIndex + pageSize, folder.getMessageCount());
 
