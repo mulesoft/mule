@@ -23,10 +23,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.util.IOUtils;
@@ -66,6 +69,7 @@ public class HttpResponseFactory implements Startable {
   private MuleContext muleContext;
   private boolean multipartEntityWithNoMultipartContentyTypeWarned;
   private boolean mapPayloadButNoUrlEncodedContentTypeWarned;
+  private TransformationService transformationService;
   private Transformer objectToByteArray;
 
   public HttpResponseFactory(HttpStreamingType responseStreaming, MuleContext muleContext) {
@@ -75,6 +79,7 @@ public class HttpResponseFactory implements Startable {
 
   @Override
   public void start() throws MuleException {
+    transformationService = muleContext.getTransformationService();
     objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
   }
 
@@ -159,18 +164,7 @@ public class HttpResponseFactory implements Startable {
         httpEntity = byteArrayHttpEntity;
       }
     } else {
-      byte[] bytes;
-      if (payload instanceof byte[]) {
-        bytes = (byte[]) payload;
-      } else {
-        try {
-          bytes = (byte[]) objectToByteArray.transform(payload);
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        }
-      }
-
-      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(bytes);
+      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(payload));
 
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                       byteArrayHttpEntity);
@@ -195,6 +189,14 @@ public class HttpResponseFactory implements Startable {
     }
     responseBuilder.setEntity(httpEntity);
     return responseBuilder.build();
+  }
+
+  private byte[] getMessageAsBytes(Object payload) {
+    try {
+      return (byte[]) transformationService.transform(InternalMessage.of(payload), BYTE_ARRAY).getPayload().getValue();
+    } catch (TransformerException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   public String resolveReasonPhrase(String builderReasonPhrase, Integer statusCode) {
