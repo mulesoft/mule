@@ -164,17 +164,6 @@ public class HttpResponseFactory implements Startable {
         httpEntity = byteArrayHttpEntity;
       }
     } else {
-      //byte[] bytes;
-      //if (payload instanceof byte[]) {
-      //  bytes = (byte[]) payload;
-      //} else {
-      //  try {
-      //    bytes = (byte[]) transformationService.transform(payload);
-      //  } catch (Exception e) {
-      //    throw new RuntimeException(e);
-      //  }
-      //}
-
       ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(payload));
 
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
