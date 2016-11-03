@@ -10,15 +10,16 @@ import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.CompletionHandler;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
@@ -36,6 +37,17 @@ import org.mule.runtime.module.http.internal.request.HttpClient;
 import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -49,17 +61,6 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient {
 
@@ -286,73 +287,80 @@ public class GrizzlyHttpClient implements HttpClient {
   private Request createGrizzlyRequest(HttpRequest request, int responseTimeout, boolean followRedirects,
                                        HttpRequestAuthentication authentication)
       throws IOException {
-    RequestBuilder builder = createRequestBuilder(request);
+    RequestBuilder reqBuilder = createRequestBuilder(request, builder -> {
+      builder.setMethod(request.getMethod());
+      builder.setFollowRedirects(followRedirects);
 
-    builder.setMethod(request.getMethod());
-    builder.setUrl(request.getUri());
-    builder.setFollowRedirects(followRedirects);
+      populateHeaders(request, builder);
 
-    populateHeaders(request, builder);
+      DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
 
-    DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
-
-    for (String queryParamName : defaultHttpRequest.getQueryParams().keySet()) {
-      for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName)) {
-        builder.addQueryParam(queryParamName, queryParamValue);
-      }
-    }
-
-    if (authentication != null) {
-      Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder().setPrincipal(authentication.getUsername())
-          .setPassword(authentication.getPassword()).setUsePreemptiveAuth(authentication.isPreemptive());
-
-      if (authentication.getType() == HttpAuthenticationType.BASIC) {
-        realmBuilder.setScheme(Realm.AuthScheme.BASIC);
-      } else if (authentication.getType() == HttpAuthenticationType.DIGEST) {
-        realmBuilder.setScheme(Realm.AuthScheme.DIGEST);
-      } else if (authentication.getType() == HttpAuthenticationType.NTLM) {
-        String domain = authentication.getDomain();
-        if (domain != null) {
-          realmBuilder.setNtlmDomain(domain);
+      for (String queryParamName : defaultHttpRequest.getQueryParams().keySet()) {
+        for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName)) {
+          builder.addQueryParam(queryParamName, queryParamValue);
         }
-        String workstation = authentication.getWorkstation();
-        String ntlmHost = workstation != null ? workstation : getHostName();
-        realmBuilder.setNtlmHost(ntlmHost).setScheme(NTLM);
       }
 
-      builder.setRealm(realmBuilder.build());
+      if (authentication != null) {
+        Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder().setPrincipal(authentication.getUsername())
+            .setPassword(authentication.getPassword()).setUsePreemptiveAuth(authentication.isPreemptive());
 
-    }
+        if (authentication.getType() == HttpAuthenticationType.BASIC) {
+          realmBuilder.setScheme(Realm.AuthScheme.BASIC);
+        } else if (authentication.getType() == HttpAuthenticationType.DIGEST) {
+          realmBuilder.setScheme(Realm.AuthScheme.DIGEST);
+        } else if (authentication.getType() == HttpAuthenticationType.NTLM) {
+          String domain = authentication.getDomain();
+          if (domain != null) {
+            realmBuilder.setNtlmDomain(domain);
+          }
+          String workstation = authentication.getWorkstation();
+          String ntlmHost = workstation != null ? workstation : getHostName();
+          realmBuilder.setNtlmHost(ntlmHost).setScheme(NTLM);
+        }
 
-    if (request.getEntity() != null) {
-      if (request.getEntity() instanceof InputStreamHttpEntity) {
-        builder.setBody(new InputStreamBodyGenerator(((InputStreamHttpEntity) request.getEntity()).getInputStream()));
-      } else if (request.getEntity() instanceof ByteArrayHttpEntity) {
-        builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
-      } else if (request.getEntity() instanceof MultipartHttpEntity) {
-        MultipartHttpEntity multipartHttpEntity = (MultipartHttpEntity) request.getEntity();
+        builder.setRealm(realmBuilder.build());
 
-        for (HttpPart part : multipartHttpEntity.getParts()) {
-          if (part.getFileName() != null) {
-            builder.addBodyPart(new ByteArrayPart(part.getName(), IOUtils.toByteArray(part.getInputStream()),
-                                                  part.getContentType(), null, part.getFileName()));
-          } else {
-            byte[] content = IOUtils.toByteArray(part.getInputStream());
-            builder.addBodyPart(new ByteArrayPart(part.getName(), content, part.getContentType(), null));
+      }
+
+      if (request.getEntity() != null) {
+        if (request.getEntity() instanceof InputStreamHttpEntity) {
+          builder.setBody(new InputStreamBodyGenerator(((InputStreamHttpEntity) request.getEntity()).getInputStream()));
+        } else if (request.getEntity() instanceof ByteArrayHttpEntity) {
+          builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
+        } else if (request.getEntity() instanceof MultipartHttpEntity) {
+          MultipartHttpEntity multipartHttpEntity = (MultipartHttpEntity) request.getEntity();
+
+          for (HttpPart part : multipartHttpEntity.getParts()) {
+            if (part.getFileName() != null) {
+              builder.addBodyPart(new ByteArrayPart(part.getName(), IOUtils.toByteArray(part.getInputStream()),
+                                                    part.getContentType(), null, part.getFileName()));
+            } else {
+              byte[] content = IOUtils.toByteArray(part.getInputStream());
+              builder.addBodyPart(new ByteArrayPart(part.getName(), content, part.getContentType(), null));
+            }
           }
         }
       }
-    }
 
-    // Set the response timeout in the request, this value is read by {@code CustomTimeoutThrottleRequestFilter}
-    // if the maxConnections attribute is configured in the requester.
-    builder.setRequestTimeout(responseTimeout);
+      // Set the response timeout in the request, this value is read by {@code CustomTimeoutThrottleRequestFilter}
+      // if the maxConnections attribute is configured in the requester.
+      builder.setRequestTimeout(responseTimeout);
+    });
 
-    return builder.build();
+    reqBuilder.setUrl(request.getUri());
+
+    return reqBuilder.build();
   }
 
-  protected RequestBuilder createRequestBuilder(HttpRequest request) {
+  protected RequestBuilder createRequestBuilder(HttpRequest request, RequestConfigurer requestConfigurer) {
     return new RequestBuilder();
+  }
+
+  @FunctionalInterface
+  protected interface RequestConfigurer {
+
+    void configure(RequestBuilder reqBuilder) throws IOException;
   }
 
   protected void populateHeaders(HttpRequest request, RequestBuilder builder) {
