@@ -117,6 +117,7 @@ public class MuleProperties {
   public static final String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";
   public static final String OBJECT_LIFECYCLE_MANAGER = "_muleLifecycleManager";
   public static final String OBJECT_SERIALIZER = "_muleDefaultObjectSerializer";
+  public static final String OBJECT_CLASSLOADER_REPOSITORY = "_muleClassLoaderRepository";
   public static final String OBJECT_SECURITY_MANAGER = "_muleSecurityManager";
   public static final String OBJECT_TRANSACTION_MANAGER = "_muleTransactionManager";
   public static final String OBJECT_QUEUE_MANAGER = "_muleQueueManager";

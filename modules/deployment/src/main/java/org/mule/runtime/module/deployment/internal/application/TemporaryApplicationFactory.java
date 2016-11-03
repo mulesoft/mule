@@ -26,7 +26,7 @@ public class TemporaryApplicationFactory extends DefaultApplicationFactory {
                                      ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
                                      ServiceRepository serviceRepository) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
-          serviceRepository);
+          serviceRepository, null);
   }
 
   @Override

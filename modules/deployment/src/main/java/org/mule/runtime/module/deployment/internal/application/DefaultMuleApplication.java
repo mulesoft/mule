@@ -33,14 +33,15 @@ import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
@@ -63,6 +64,7 @@ public class DefaultMuleApplication implements Application {
   private final DomainRepository domainRepository;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ServiceRepository serviceRepository;
+  private final ClassLoaderRepository classLoaderRepository;
   private final File location;
   private ApplicationStatus status;
 
@@ -74,10 +76,12 @@ public class DefaultMuleApplication implements Application {
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository, File location) {
+                                ServiceRepository serviceRepository, File location,
+                                ClassLoaderRepository classLoaderRepository) {
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
+    this.classLoaderRepository = classLoaderRepository;
     this.deploymentListener = new NullDeploymentListener();
     this.artifactPlugins = artifactPlugins;
     this.location = location;
@@ -175,7 +179,8 @@ public class DefaultMuleApplication implements Application {
               .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setEnableLazyInit(lazy).setServiceRepository(serviceRepository);
+              .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
+              .setClassLoaderRepository(classLoaderRepository);
 
       Domain domain = domainRepository.getDomain(descriptor.getDomain());
       if (domain.getMuleContext() != null) {

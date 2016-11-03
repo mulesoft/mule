@@ -32,7 +32,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   private final ArtifactClassLoaderManager artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
   private final DomainFactory domainFactory = new DefaultDomainFactory(
                                                                        new DomainClassLoaderFactory(getClass().getClassLoader()),
-                                                                       new DefaultDomainManager(), containerClassLoader);
+                                                                       new DefaultDomainManager(), containerClassLoader, null);
 
   public DefaultDomainFactoryTestCase() throws IOException {}
 

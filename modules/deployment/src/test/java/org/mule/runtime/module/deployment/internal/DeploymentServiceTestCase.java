@@ -150,7 +150,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
-  private DefaultArtifactClassLoaderManager artifactClassLoaderManager;
+  private DefaultClassLoaderManager artifactClassLoaderManager;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Object[]> parameters() {
@@ -2301,7 +2301,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestDomainFactory testDomainFactory =
         new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader);
+                              containerClassLoader, artifactClassLoaderManager);
     testDomainFactory.setFailOnStopApplication();
 
     deploymentService.setDomainFactory(testDomainFactory);
@@ -2322,7 +2322,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestDomainFactory testDomainFactory =
         new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader);
+                              containerClassLoader, artifactClassLoaderManager);
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
     startDeployment();
@@ -3203,7 +3203,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     return new DefaultMuleDomain(new DomainDescriptor(DEFAULT_DOMAIN_NAME),
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
-                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()));
+                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
+                                 null);
   }
 
   /**

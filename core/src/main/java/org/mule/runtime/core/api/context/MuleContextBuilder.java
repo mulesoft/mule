@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.context;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
 import javax.resource.spi.work.WorkListener;
@@ -39,4 +40,9 @@ public interface MuleContextBuilder {
    * @param executionClassLoader classloader to use on the created context. Non null.
    */
   void setExecutionClassLoader(ClassLoader executionClassLoader);
+
+  /**
+   * @param objectSerializer object serializer to use on the created context. Non null.
+   */
+  void setObjectSerializer(ObjectSerializer objectSerializer);
 }

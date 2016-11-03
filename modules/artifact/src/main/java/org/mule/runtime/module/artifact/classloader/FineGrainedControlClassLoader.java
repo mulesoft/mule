@@ -126,7 +126,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   private void logLoadedClass(String name, Class<?> result) {
     final boolean loadedFromChild = result.getClassLoader() == this;
-    final String message = format("Class '%s' loaded from %s: %s", name, (loadedFromChild ? "child" : "parent"),
+    final String message = format("Loaded class '%s' from %s: %s", name, (loadedFromChild ? "child" : "parent"),
                                   (loadedFromChild ? this : getParent()));
     doVerboseLogging(message);
   }

@@ -14,10 +14,12 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.UUID.getUUID;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -27,12 +29,13 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.internal.application.ApplicationMuleContextBuilder;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.deployment.internal.domain.DomainMuleContextBuilder;
-import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -59,6 +62,8 @@ public class ArtifactContextBuilder {
   protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT =
       "Only applications are allowed to have a parent context";
   protected static final String SERVICE_REPOSITORY_CANNOT_BE_NULL = "serviceRepository cannot be null";
+  protected static final String CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL = "classLoaderRepository cannot be null";
+  protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
@@ -74,11 +79,12 @@ public class ArtifactContextBuilder {
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
   private boolean enableLazyInit;
+  private ClassLoaderRepository classLoaderRepository;
 
   private ArtifactContextBuilder() {}
 
   /**
-   * @return a new builder to create a {@linke ArtifactContext} instance.
+   * @return a new builder to create a {@link ArtifactContext} instance.
    */
   public static ArtifactContextBuilder newBuilder() {
     return new ArtifactContextBuilder();
@@ -240,12 +246,25 @@ public class ArtifactContextBuilder {
   }
 
   /**
+   * Provides a {@link ClassLoaderRepository} containing all registered class loaders on the container.
+   *
+   * @param classLoaderRepository repository of available class loaders. Non null.
+   * @return the builder
+   */
+  public ArtifactContextBuilder setClassLoaderRepository(ClassLoaderRepository classLoaderRepository) {
+    checkState(classLoaderRepository != null, CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL);
+    this.classLoaderRepository = classLoaderRepository;
+    return this;
+  }
+
+  /**
    * @return the {@code MuleContext} created with the provided configuration
    * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
    */
   public ArtifactContext build() throws InitialisationException, ConfigurationException {
     checkState(executionClassLoader != null, EXECUTION_CLASSLOADER_WAS_NOT_SET);
+    checkState(classLoaderRepository != null, CLASS_LOADER_REPOSITORY_WAS_NOT_SET);
     checkState(APP.equals(artifactType) || parentContext == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
@@ -269,7 +288,10 @@ public class ArtifactContextBuilder {
                     .setArtifactProperties(artifactProperties)
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
-                    .setServiceConfigurators(asList(new ContainerServicesMuleContextConfigurator(serviceRepository)));
+                    .setServiceConfigurators(asList(new ContainerServicesMuleContextConfigurator(serviceRepository),
+                                                    customizationService -> customizationService
+                                                        .registerCustomServiceImpl(MuleProperties.OBJECT_CLASSLOADER_REPOSITORY,
+                                                                                   classLoaderRepository)));
             if (parentContext != null) {
               artifactContextConfigurationBuilder.setParentContext(parentContext);
             }
@@ -293,6 +315,9 @@ public class ArtifactContextBuilder {
           muleContextBuilder = new DomainMuleContextBuilder(artifactName);
         }
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
+        ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
+        muleContextBuilder.setObjectSerializer(objectSerializer);
+
         try {
           muleContextFactory.createMuleContext(builders, muleContextBuilder);
           return artifactContext.get();
@@ -319,5 +344,4 @@ public class ArtifactContextBuilder {
     artifactProperties.put(APP_NAME_PROPERTY, artifactName);
     return new SimpleConfigurationBuilder(artifactProperties);
   }
-
 }

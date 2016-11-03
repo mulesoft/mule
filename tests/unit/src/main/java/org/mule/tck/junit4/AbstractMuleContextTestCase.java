@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
@@ -37,6 +38,7 @@ import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
+import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -204,6 +206,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         muleConfiguration.setWorkingDirectory(workingDirectory);
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
+        contextBuilder.setObjectSerializer(getObjectSerializer());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
         if (!isGracefulShutdown()) {
@@ -214,6 +217,13 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
+  }
+
+  /**
+   * @return the {@link ObjectSerializer} to use on the test's {@link MuleContext}
+   */
+  protected ObjectSerializer getObjectSerializer() {
+    return new JavaObjectSerializer();
   }
 
   protected ClassLoader getExecutionClassLoader() {

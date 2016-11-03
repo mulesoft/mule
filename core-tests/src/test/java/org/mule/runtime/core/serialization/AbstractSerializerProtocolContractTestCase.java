@@ -30,30 +30,30 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
 
   private static final String STRING_MESSAGE = "Hello World";
 
-  protected SerializationProtocol serializerProtocol;
+  protected SerializationProtocol serializationProtocol;
 
   @Test(expected = IllegalArgumentException.class)
   public final void nullBytes() throws Exception {
-    serializerProtocol.deserialize((byte[]) null);
+    serializationProtocol.deserialize((byte[]) null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public final void nullStream() throws Exception {
-    serializerProtocol.deserialize((InputStream) null);
+    serializationProtocol.deserialize((InputStream) null);
   }
 
   @Test
   public final void nullObject() throws Exception {
-    byte[] bytes = serializerProtocol.serialize(null);
-    Object object = serializerProtocol.deserialize(bytes);
+    byte[] bytes = serializationProtocol.serialize(null);
+    Object object = serializationProtocol.deserialize(bytes);
     assertNull(object);
   }
 
   @Test
   public final void inputStreamClosed() throws Exception {
-    final byte[] bytes = serializerProtocol.serialize(STRING_MESSAGE);
+    final byte[] bytes = serializationProtocol.serialize(STRING_MESSAGE);
     InputStream inputStream = spy(new ByteArrayInputStream(bytes));
-    String output = serializerProtocol.deserialize(inputStream);
+    String output = serializationProtocol.deserialize(inputStream);
 
     verify(inputStream, atLeastOnce()).close();
     assertThat(output, equalTo(STRING_MESSAGE));
@@ -68,9 +68,9 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
     dateTime.changeTimeZone("Pacific/Midway");
 
     Event event = eventBuilder().message(InternalMessage.of(dateTime)).build();
-    byte[] bytes = serializerProtocol.serialize(event.getMessage());
+    byte[] bytes = serializationProtocol.serialize(event.getMessage());
 
-    InternalMessage message = serializerProtocol.deserialize(bytes);
+    InternalMessage message = serializationProtocol.deserialize(bytes);
     DateTime deserealized = (DateTime) message.getPayload().getValue();
 
     assertEquals(calendar, deserealized.toCalendar());

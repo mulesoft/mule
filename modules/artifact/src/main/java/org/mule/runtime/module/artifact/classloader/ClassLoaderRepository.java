@@ -8,9 +8,9 @@
 package org.mule.runtime.module.artifact.classloader;
 
 /**
- * Provides access to the {@link ArtifactClassLoader} registered on the container.
+ * Provides access to the {@link ClassLoader} registered on the container.
  */
-public interface ArtifactClassLoaderRepository {
+public interface ClassLoaderRepository {
 
   /**
    * Returns a class loader with a given ID.
@@ -18,6 +18,13 @@ public interface ArtifactClassLoaderRepository {
    * @param classLoaderId identifies the class loader to find. Non empty.
    * @return the classloader registered under the given ID, null if no class loader with that ID is registered.
    */
-  ArtifactClassLoader find(String classLoaderId);
+  ClassLoader find(String classLoaderId);
 
+  /**
+   * Returns the ID for a given class loader
+   *
+   * @param classLoader instance for which the ID is searched for.
+   * @return the class loader ID if the class loader is registered. Null otherwise
+   */
+  String getId(ClassLoader classLoader);
 }

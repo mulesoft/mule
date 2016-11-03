@@ -26,6 +26,7 @@ import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.application.NullDeploymentListener;
@@ -52,12 +53,15 @@ public class DefaultMuleDomain implements Domain {
   private final DomainDescriptor descriptor;
   private DeploymentListener deploymentListener;
   private ArtifactClassLoader deploymentClassLoader;
+  private final ClassLoaderRepository classLoaderRepository;
 
   private File configResourceFile;
   private ArtifactContext artifactContext;
 
-  public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader) {
+  public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
+                           ClassLoaderRepository classLoaderRepository) {
     this.deploymentClassLoader = deploymentClassLoader;
+    this.classLoaderRepository = classLoaderRepository;
     this.deploymentListener = new NullDeploymentListener();
     this.descriptor = descriptor;
     refreshClassLoaderAndLoadConfigResourceFile();
@@ -134,7 +138,7 @@ public class DefaultMuleDomain implements Domain {
             .setExecutionClassloader(deploymentClassLoader.getClassLoader())
             .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
             .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN)
-            .setEnableLazyInit(lazy);
+            .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository);
 
         if (deploymentListener != null) {
           artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
