@@ -14,6 +14,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.api.CompletionHandler;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -41,19 +42,6 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.ProxyServer;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -66,6 +54,19 @@ import javax.net.ssl.SSLContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.ProxyServer;
+import com.ning.http.client.Realm;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
 public class GrizzlyHttpClient implements HttpClient
 {
@@ -354,123 +355,138 @@ public class GrizzlyHttpClient implements HttpClient
         return responseBuilder.build();
     }
 
-    private Request createGrizzlyRequest(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                         HttpRequestAuthentication authentication) throws IOException
+    private Request createGrizzlyRequest(final HttpRequest request, final int responseTimeout, final boolean followRedirects,
+                                         final HttpRequestAuthentication authentication)
+            throws IOException
     {
-        RequestBuilder builder = createRequestBuilder(request);
+        RequestBuilder builder = createRequestBuilder(request, new RequestConfigurer()
+        {
+            @Override
+            public void configure(RequestBuilder builder) throws IOException
+            {
+                builder.setMethod(request.getMethod());
+                builder.setFollowRedirects(followRedirects);
 
-        builder.setMethod(request.getMethod());
+                populateHeaders(request, builder);
+
+                DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
+
+                for (String queryParamName : defaultHttpRequest.getQueryParams().keySet())
+                {
+                    for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName))
+                    {
+                        builder.addQueryParam(queryParamName, queryParamValue);
+                    }
+                }
+
+                if (authentication != null)
+                {
+                    Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder()
+                                                                              .setPrincipal(authentication.getUsername())
+                                                                              .setPassword(authentication.getPassword())
+                                                                              .setUsePreemptiveAuth(authentication.isPreemptive());
+
+                    if (authentication.getType() == HttpAuthenticationType.BASIC)
+                    {
+                        realmBuilder.setScheme(Realm.AuthScheme.BASIC);
+                    }
+                    else if (authentication.getType() == HttpAuthenticationType.DIGEST)
+                    {
+                        realmBuilder.setScheme(Realm.AuthScheme.DIGEST);
+                    }
+                    else if (authentication.getType() == HttpAuthenticationType.NTLM)
+                    {
+                        String domain = authentication.getDomain();
+                        if (domain != null)
+                        {
+                            realmBuilder.setNtlmDomain(domain);
+                        }
+                        String workstation = authentication.getWorkstation();
+                        String ntlmHost = workstation != null ? workstation : getHostName();
+                        realmBuilder.setNtlmHost(ntlmHost).setScheme(NTLM);
+                    }
+
+                    builder.setRealm(realmBuilder.build());
+                }
+
+                if (request.getEntity() != null)
+                {
+                    if (request.getEntity() instanceof InputStreamHttpEntity)
+                    {
+                        builder.setBody(new InputStreamBodyGenerator(((InputStreamHttpEntity) request.getEntity()).getInputStream()));
+                    }
+                    else if (request.getEntity() instanceof ByteArrayHttpEntity)
+                    {
+                        builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
+                    }
+                    else if (request.getEntity() instanceof MultipartHttpEntity)
+                    {
+                        MultipartHttpEntity multipartHttpEntity = (MultipartHttpEntity) request.getEntity();
+
+                        for (HttpPart part : multipartHttpEntity.getParts())
+                        {
+                            ByteArrayPart byteArrayPart;
+                            String encoding = null;
+                            String contentId = null;
+
+                            for (String headerName : part.getHeaderNames())
+                            {
+                                if (headerName.toLowerCase().equals(CONTENT_TRANSFER_ENCODING.toLowerCase()))
+                                {
+                                    encoding = part.getHeader(headerName);
+                                }
+                                else if (headerName.toLowerCase().equals(CONTENT_ID.toLowerCase()))
+                                {
+                                    contentId = part.getHeader(headerName);
+                                }
+                            }
+
+                            byte[] content = IOUtils.toByteArray(part.getInputStream());
+                            byteArrayPart = new ByteArrayPart(part.getName(), content, part.getContentType(), null, part.getFileName(), contentId, encoding);
+
+                            for (String headerName : part.getHeaderNames())
+                            {
+                                if (!SPECIAL_CUSTOM_HEADERS.contains(headerName.toLowerCase()))
+                                {
+                                    byteArrayPart.addCustomHeader(headerName + ": ", part.getHeader(headerName));
+                                }
+                                else if (headerName.toLowerCase().equals(CONTENT_DISPOSITION.toLowerCase()))
+                                {
+                                    byteArrayPart.setCustomContentDisposition(part.getHeader(headerName));
+                                }
+                                else if (headerName.toLowerCase().equals(CONTENT_TYPE.toLowerCase()))
+                                {
+                                    byteArrayPart.setCustomContentType(part.getHeader(headerName));
+                                }
+                            }
+
+                            builder.addBodyPart(byteArrayPart);
+                        }
+                    }
+                }
+
+                // Set the response timeout in the request, this value is read by {@code
+                // CustomTimeoutThrottleRequestFilter}
+                // if the maxConnections attribute is configured in the requester.
+                builder.setRequestTimeout(responseTimeout);
+            }
+        });
+
         builder.setUrl(request.getUri());
-        builder.setFollowRedirects(followRedirects);
-
-        populateHeaders(request, builder);
-
-        DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
-
-        for (String queryParamName : defaultHttpRequest.getQueryParams().keySet())
-        {
-            for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName))
-            {
-                builder.addQueryParam(queryParamName, queryParamValue);
-            }
-        }
-
-        if (authentication != null)
-        {
-            Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder()
-                        .setPrincipal(authentication.getUsername())
-                        .setPassword(authentication.getPassword())
-                        .setUsePreemptiveAuth(authentication.isPreemptive());
-
-            if (authentication.getType() == HttpAuthenticationType.BASIC)
-            {
-                realmBuilder.setScheme(Realm.AuthScheme.BASIC);
-            }
-            else if (authentication.getType() == HttpAuthenticationType.DIGEST)
-            {
-                realmBuilder.setScheme(Realm.AuthScheme.DIGEST);
-            }
-            else if (authentication.getType() == HttpAuthenticationType.NTLM)
-            {
-                String domain = authentication.getDomain();
-                if (domain != null)
-                {
-                    realmBuilder.setNtlmDomain(domain);
-                }
-                String workstation = authentication.getWorkstation();
-                String ntlmHost = workstation != null ? workstation : getHostName();
-                realmBuilder.setNtlmHost(ntlmHost).setScheme(NTLM);
-            }
-
-            builder.setRealm(realmBuilder.build());
-        }
-
-        if (request.getEntity() != null)
-        {
-            if (request.getEntity() instanceof InputStreamHttpEntity)
-            {
-                builder.setBody(new InputStreamBodyGenerator(((InputStreamHttpEntity) request.getEntity()).getInputStream()));
-            }
-            else if (request.getEntity() instanceof ByteArrayHttpEntity)
-            {
-                builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
-            }
-            else if (request.getEntity() instanceof MultipartHttpEntity)
-            {
-                MultipartHttpEntity multipartHttpEntity = (MultipartHttpEntity) request.getEntity();
-
-                for (HttpPart part : multipartHttpEntity.getParts())
-                {
-                    ByteArrayPart byteArrayPart;
-                    String encoding = null;
-                    String contentId = null;
-
-                    for (String headerName : part.getHeaderNames())
-                    {
-                        if (headerName.toLowerCase().equals(CONTENT_TRANSFER_ENCODING.toLowerCase()))
-                        {
-                            encoding = part.getHeader(headerName);
-                        }
-                        else if (headerName.toLowerCase().equals(CONTENT_ID.toLowerCase()))
-                        {
-                            contentId = part.getHeader(headerName);
-                        }
-                    }
-
-                    byte[] content = IOUtils.toByteArray(part.getInputStream());
-                    byteArrayPart = new ByteArrayPart(part.getName(), content, part.getContentType(), null, part.getFileName(), contentId, encoding);
-
-                    for (String headerName : part.getHeaderNames())
-                    {
-                        if (!SPECIAL_CUSTOM_HEADERS.contains(headerName.toLowerCase()))
-                        {
-                            byteArrayPart.addCustomHeader(headerName + ": ", part.getHeader(headerName));
-                        }
-                        else if (headerName.toLowerCase().equals(CONTENT_DISPOSITION.toLowerCase()))
-                        {
-                            byteArrayPart.setCustomContentDisposition(part.getHeader(headerName));
-                        }
-                        else if (headerName.toLowerCase().equals(CONTENT_TYPE.toLowerCase()))
-                        {
-                            byteArrayPart.setCustomContentType(part.getHeader(headerName));
-                        }
-                    }
-
-                    builder.addBodyPart(byteArrayPart);
-                }
-            }
-        }
-
-        // Set the response timeout in the request, this value is read by {@code CustomTimeoutThrottleRequestFilter}
-        // if the maxConnections attribute is configured in the requester.
-        builder.setRequestTimeout(responseTimeout);
 
         return builder.build();
     }
 
-    protected RequestBuilder createRequestBuilder(HttpRequest request)
+    protected RequestBuilder createRequestBuilder(HttpRequest request, RequestConfigurer requestConfigurer) throws IOException
     {
-        return new RequestBuilder();
+        final RequestBuilder requestBuilder = new RequestBuilder();
+        requestConfigurer.configure(requestBuilder);
+        return requestBuilder;
+    }
+
+    protected interface RequestConfigurer
+    {
+        void configure(RequestBuilder reqBuilder) throws IOException;
     }
 
     protected void populateHeaders(HttpRequest request, RequestBuilder builder)
