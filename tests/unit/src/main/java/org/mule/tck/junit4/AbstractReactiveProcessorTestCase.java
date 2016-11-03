@@ -8,9 +8,12 @@ package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.Collection;
 
@@ -28,6 +31,8 @@ import org.reactivestreams.Publisher;
 @RunWith(Parameterized.class)
 public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleContextTestCase {
 
+  protected Scheduler scheduler;
+
   private boolean reactive;
 
   public AbstractReactiveProcessorTestCase(boolean reactive) {
@@ -37,6 +42,18 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {{false}, {true}});
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    scheduler.shutdownNow();
+    super.doTearDown();
   }
 
   @Override

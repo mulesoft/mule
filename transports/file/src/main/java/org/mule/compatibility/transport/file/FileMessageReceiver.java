@@ -131,7 +131,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
     boolean synchronousProcessing = false;
     if (getFlowConstruct() instanceof Flow) {
-      synchronousProcessing = ((Flow) getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+      synchronousProcessing = ((Flow) getFlowConstruct()).getProcessingStrategy().isSynchronous();
     }
     this.poolOnPrimaryInstanceOnly =
         Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE, "false")) || !synchronousProcessing;

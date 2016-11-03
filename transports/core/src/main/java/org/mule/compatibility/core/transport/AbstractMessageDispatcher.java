@@ -9,6 +9,7 @@ package org.mule.compatibility.core.transport;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.core.api.Event;
@@ -129,12 +130,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
   @Override
   protected WorkManager getWorkManager() {
-    try {
-      return connector.getDispatcherWorkManager();
-    } catch (MuleException e) {
-      logger.error("Cannot access dispatcher work manager", e);
-      return null;
-    }
+    return connector.getDispatcherWorkManager();
   }
 
   @Override

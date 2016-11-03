@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_R
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
@@ -40,13 +39,14 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -124,6 +124,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -718,11 +719,6 @@ public class DefaultMuleContext implements MuleContext {
     return (ThreadingProfile) getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
   }
 
-  @Override
-  public ThreadingProfile getDefaultServiceThreadingProfile() {
-    return (ThreadingProfile) getRegistry().lookupObject(OBJECT_DEFAULT_SERVICE_THREADING_PROFILE);
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -1059,6 +1055,7 @@ public class DefaultMuleContext implements MuleContext {
     return customizationService;
   }
 
+  @Override
   public void setBootstrapServiceDiscoverer(BootstrapServiceDiscoverer bootstrapServiceDiscoverer) {
     this.bootstrapServiceDiscoverer = bootstrapServiceDiscoverer;
   }

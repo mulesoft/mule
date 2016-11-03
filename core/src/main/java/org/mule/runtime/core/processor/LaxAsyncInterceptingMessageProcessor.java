@@ -8,22 +8,12 @@ package org.mule.runtime.core.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 
 public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor {
 
-  public LaxAsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource) {
-    super(workManagerSource);
-  }
-
-  public LaxAsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile, String name, int shutdownTimeout) {
-    super(threadingProfile, name, shutdownTimeout);
-  }
-
   @Override
   protected boolean isProcessAsync(Event event) throws MuleException {
-    return doThreading && canProcessAsync(event);
+    return canProcessAsync(event);
   }
 
 }

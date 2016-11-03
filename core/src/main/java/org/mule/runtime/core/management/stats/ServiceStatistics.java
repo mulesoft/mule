@@ -32,11 +32,7 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
   private RouterStatistics outboundRouterStat = null;
 
   public ServiceStatistics(String name) {
-    this(name, 0);
-  }
-
-  public ServiceStatistics(String name, int threadPoolSize) {
-    super("Service", name, threadPoolSize);
+    super("Service", name);
     clear();
   }
 
@@ -70,6 +66,7 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
     sentReplyToEvent.addAndGet(1);
   }
 
+  @Override
   public synchronized void incQueuedEvent() {
     queuedEvent++;
     totalQueuedEvent++;
@@ -79,6 +76,7 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
     averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
   }
 
+  @Override
   public synchronized void decQueuedEvent() {
     queuedEvent--;
   }
@@ -87,6 +85,7 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
     return componentStat.getAverageExecutionTime();
   }
 
+  @Override
   public synchronized long getAverageQueueSize() {
     return averageQueueSize;
   }

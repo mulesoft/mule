@@ -20,7 +20,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public abstract class AbstractFlowConstuctTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextTestCase {
 
   public static class DirectInboundMessageSource implements MessageSource {
 

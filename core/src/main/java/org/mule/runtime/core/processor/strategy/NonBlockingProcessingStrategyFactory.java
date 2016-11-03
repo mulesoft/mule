@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -20,9 +20,10 @@ import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -34,131 +35,22 @@ import org.reactivestreams.Publisher;
  */
 public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  protected Integer maxThreads;
-  protected Integer minThreads;
-  protected Integer maxBufferSize;
-  protected Long threadTTL;
-  protected Long threadWaitTimeout;
-  protected Integer poolExhaustedAction;
-
   @Override
   public ProcessingStrategy create() {
-    final NonBlockingProcessingStrategy processingStrategy = new NonBlockingProcessingStrategy();
-
-    if (maxThreads != null) {
-      processingStrategy.setMaxThreads(maxThreads);
-    }
-    if (minThreads != null) {
-      processingStrategy.setMinThreads(minThreads);
-    }
-    if (maxBufferSize != null) {
-      processingStrategy.setMaxBufferSize(maxBufferSize);
-    }
-    if (threadTTL != null) {
-      processingStrategy.setThreadTTL(threadTTL);
-    }
-    if (threadWaitTimeout != null) {
-      processingStrategy.setThreadWaitTimeout(threadWaitTimeout);
-    }
-    if (poolExhaustedAction != null) {
-      processingStrategy.setPoolExhaustedAction(poolExhaustedAction);
-    }
-
-    return processingStrategy;
+    return new NonBlockingProcessingStrategy();
   }
 
-  // TODO MULE-10544 use internal executor, do not allow it to be passed form outside
-  public ProcessingStrategy create(ExecutorService executorService) {
-    final NonBlockingProcessingStrategy processingStrategy = new NonBlockingProcessingStrategy(executorService);
+  public static class NonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
-    if (maxThreads != null) {
-      processingStrategy.setMaxThreads(maxThreads);
-    }
-    if (minThreads != null) {
-      processingStrategy.setMinThreads(minThreads);
-    }
-    if (maxBufferSize != null) {
-      processingStrategy.setMaxBufferSize(maxBufferSize);
-    }
-    if (threadTTL != null) {
-      processingStrategy.setThreadTTL(threadTTL);
-    }
-    if (threadWaitTimeout != null) {
-      processingStrategy.setThreadWaitTimeout(threadWaitTimeout);
-    }
-    if (poolExhaustedAction != null) {
-      processingStrategy.setPoolExhaustedAction(poolExhaustedAction);
-    }
-
-    return processingStrategy;
-  }
-
-  public Integer getMaxThreads() {
-    return maxThreads;
-  }
-
-  public void setMaxThreads(Integer maxThreads) {
-    this.maxThreads = maxThreads;
-  }
-
-  public Integer getMinThreads() {
-    return minThreads;
-  }
-
-  public void setMinThreads(Integer minThreads) {
-    this.minThreads = minThreads;
-  }
-
-  public Integer getMaxBufferSize() {
-    return maxBufferSize;
-  }
-
-  public void setMaxBufferSize(Integer maxBufferSize) {
-    this.maxBufferSize = maxBufferSize;
-  }
-
-  public Long getThreadTTL() {
-    return threadTTL;
-  }
-
-  public void setThreadTTL(Long threadTTL) {
-    this.threadTTL = threadTTL;
-  }
-
-  public Long getThreadWaitTimeout() {
-    return threadWaitTimeout;
-  }
-
-  public void setThreadWaitTimeout(Long threadWaitTimeout) {
-    this.threadWaitTimeout = threadWaitTimeout;
-  }
-
-  public Integer getPoolExhaustedAction() {
-    return poolExhaustedAction;
-  }
-
-  public void setPoolExhaustedAction(Integer poolExhaustedAction) {
-    this.poolExhaustedAction = poolExhaustedAction;
-  }
-
-  public static class NonBlockingProcessingStrategy extends AbstractThreadingProfileProcessingStrategy
-      implements Startable, Stoppable {
-
-    private static final int DEFAULT_MAX_THREADS = 128;
-    private ExecutorService executorService;
-
-    public NonBlockingProcessingStrategy() {
-      maxThreads = DEFAULT_MAX_THREADS;
-    }
-
-    public NonBlockingProcessingStrategy(ExecutorService executorService) {
-      this.executorService = executorService;
-    }
+    private SchedulerService schedulerService;
+    private Scheduler scheduler;
+    private MuleContext muleContext;
 
     @Override
-    public void configureProcessors(List<Processor> processors,
-                                    org.mule.runtime.core.api.processor.StageNameSource nameSource,
+    public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
                                     MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+      this.schedulerService = schedulerService;
+      this.muleContext = muleContext;
       for (Processor processor : processors) {
         chainBuilder.chain(processor);
       }
@@ -168,20 +60,22 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
     public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
                                                                     Function<Publisher<Event>, Publisher<Event>> publisherFunction) {
       if (processor instanceof NonBlockingMessageProcessor) {
-        return publisher -> from(publisher).transform(publisherFunction).publishOn(fromExecutorService(executorService));
+        return publisher -> from(publisher).transform(publisherFunction).publishOn(fromExecutorService(scheduler));
       } else {
-        return super.onProcessor(processor, publisherFunction);
+        return publisher -> from(publisher).transform(publisherFunction);
       }
     }
 
     @Override
     public void start() throws MuleException {
-      executorService = newFixedThreadPool(maxThreads);
+      this.scheduler = schedulerService.ioScheduler();
     }
 
     @Override
     public void stop() throws MuleException {
-      executorService.shutdown();
+      if (scheduler != null) {
+        scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      }
     }
   }
 }

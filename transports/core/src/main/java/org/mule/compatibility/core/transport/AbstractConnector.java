@@ -34,14 +34,15 @@ import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.compatibility.core.transport.service.TransportServiceException;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.Connectable;
@@ -56,6 +57,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -65,14 +67,12 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.message.SessionHandler;
 import org.mule.runtime.core.model.streaming.DelegatingInputStream;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -1657,7 +1657,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   /**
    * Returns a work manager for message receivers.
    */
-  protected WorkManager getReceiverWorkManager() throws MuleException {
+  protected WorkManager getReceiverWorkManager() {
     return receiverWorkManager.get();
   }
 
@@ -1666,7 +1666,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    *
    * @throws MuleException in case of error
    */
-  protected WorkManager getDispatcherWorkManager() throws MuleException {
+  protected WorkManager getDispatcherWorkManager() {
     return dispatcherWorkManager.get();
   }
 
@@ -1675,7 +1675,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    *
    * @throws MuleException in case of error
    */
-  protected WorkManager getRequesterWorkManager() throws MuleException {
+  protected WorkManager getRequesterWorkManager() {
     return requesterWorkManager.get();
   }
 
@@ -2127,7 +2127,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     } else {
       DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
       builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
-      LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(() -> getDispatcherWorkManager());
+      DispatcherInterceptorMessageProcessor async = new DispatcherInterceptorMessageProcessor(() -> getDispatcherWorkManager());
       builder.chain(async);
       builder.chain(new DispatcherMessageProcessor(endpoint));
       return builder.build();

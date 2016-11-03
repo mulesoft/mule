@@ -21,7 +21,7 @@ import java.util.List;
 import org.springframework.beans.factory.FactoryBean;
 
 public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean, MuleContextAware, NameableObject {
+    implements FactoryBean<Processor>, MuleContextAware, NameableObject {
 
   protected MuleContext muleContext;
 
@@ -39,7 +39,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public AsyncDelegateMessageProcessor getObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'async' child chain");
 

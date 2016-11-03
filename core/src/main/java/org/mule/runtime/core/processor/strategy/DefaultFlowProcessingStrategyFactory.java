@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
@@ -29,11 +26,8 @@ public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyF
   public static class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy {
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource, MuleContext muleContext) {
-      ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
-      String stageName = nameSource.getName();
-      return new LaxAsyncInterceptingMessageProcessor(threadingProfile, getThreadPoolName(stageName, muleContext),
-                                                      muleContext.getConfiguration().getShutdownTimeout());
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor() {
+      return new LaxAsyncInterceptingMessageProcessor();
     }
 
   }

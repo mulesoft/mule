@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MES
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
@@ -162,6 +161,5 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
                    muleContext);
     registerObject(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
                    muleContext);
-    registerObject(OBJECT_DEFAULT_SERVICE_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile), muleContext);
   }
 }

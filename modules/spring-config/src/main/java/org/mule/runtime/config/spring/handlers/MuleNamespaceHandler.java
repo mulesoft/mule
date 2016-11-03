@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.handlers;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
+
 import org.mule.runtime.config.spring.factories.AggregationStrategyDefinitionParser;
 import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
@@ -85,7 +87,6 @@ import org.mule.runtime.config.spring.parsers.specific.TypedPropertyMapEntryDefi
 import org.mule.runtime.config.spring.parsers.specific.XaTransactionDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -224,11 +225,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
                                  new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
     registerBeanDefinitionParser("default-receiver-threading-profile",
                                  new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-    registerBeanDefinitionParser("default-service-threading-profile",
-                                 new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
     registerBeanDefinitionParser("threading-profile",
-                                 new ThreadingProfileDefinitionParser("threadingProfile",
-                                                                      MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
+                                 new ThreadingProfileDefinitionParser("threadingProfile", OBJECT_DEFAULT_THREADING_PROFILE));
     registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
     registerBeanDefinitionParser("expression-language", new ExpressionLanguageDefinitionParser());
     registerBeanDefinitionParser("global-functions", new GlobalFunctionsDefintionParser("globalFunctionsString"));
@@ -456,11 +454,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     // Processing Strategies
     registerMuleBeanDefinitionParser("asynchronous-processing-strategy",
                                      new OrphanDefinitionParser(AsynchronousProcessingStrategyFactory.class, false))
-                                         .addMapping("poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS)
                                          .addIgnored("name");
     registerMuleBeanDefinitionParser("non-blocking-processing-strategy",
                                      new OrphanDefinitionParser(NonBlockingProcessingStrategyFactory.class, false))
-                                         .addMapping("poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS)
                                          .addIgnored("name");
     registerMuleBeanDefinitionParser("custom-processing-strategy", new OrphanDefinitionParser(false)).addIgnored("name");
 

@@ -13,19 +13,22 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.beans.ExceptionListener;
@@ -40,17 +43,20 @@ import org.junit.Test;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase implements ExceptionListener {
 
+  private Scheduler scheduler;
+
   TestAsyncRequestReplyRequester asyncReplyMP;
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
+    muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
+    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
   }
-
 
   @Override
   protected void doTearDown() throws Exception {
+    scheduler.shutdownNow();
     if (asyncReplyMP != null) {
       asyncReplyMP.stop();
       asyncReplyMP.dispose();
@@ -77,7 +83,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   public void testSingleEventNoTimeoutAsync() throws Exception {
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(() -> muleContext.getWorkManager());
+    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
+    asyncMP.setScheduler(scheduler);
 
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);
@@ -96,9 +103,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setTimeout(1);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(3000);
-    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(() -> muleContext.getWorkManager());
+    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
+    asyncMP.setScheduler(scheduler);
 
     asyncMP.setListener(target);
+    asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
@@ -166,7 +175,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(50);
-    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(() -> muleContext.getWorkManager());
+    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
+    asyncMP.setScheduler(scheduler);
 
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);

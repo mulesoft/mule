@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
@@ -26,17 +27,18 @@ import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.ChainedThreadingProfile;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
@@ -57,6 +59,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -85,15 +88,20 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Before
   public void createMocks() throws Exception {
+    muleContext.dispose();
     muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getDefaultThreadingProfile()).thenReturn(new ChainedThreadingProfile());
     notificationManager = mock(ServerNotificationManager.class);
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);
     pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
     context = DefaultEventContext.create(pipeline, TEST_CONNECTOR);
+  }
+
+  @After
+  public void after() throws RegistrationException, MuleException {
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   @Test

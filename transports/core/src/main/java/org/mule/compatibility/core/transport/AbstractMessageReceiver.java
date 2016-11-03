@@ -22,12 +22,11 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -35,6 +34,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -311,12 +311,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   }
 
   private WorkManager getConnectorWorkManager() {
-    try {
-      return connector.getReceiverWorkManager();
-    } catch (MuleException e) {
-      logger.error("Cannot access receiver work manager", e);
-      return null;
-    }
+    return connector.getReceiverWorkManager();
   }
 
   @Override

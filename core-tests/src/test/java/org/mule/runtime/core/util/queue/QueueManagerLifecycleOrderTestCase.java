@@ -9,8 +9,8 @@ package org.mule.runtime.core.util.queue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -19,6 +19,7 @@ import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -41,6 +42,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws InitialisationException, ConfigurationException {
     muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+    new TestServicesConfigurationBuilder().configure(muleContext);
   }
 
   @After

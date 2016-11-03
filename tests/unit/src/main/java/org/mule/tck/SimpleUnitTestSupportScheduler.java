@@ -8,10 +8,13 @@ package org.mule.tck;
 
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link Scheduler} implementation to be used in unit tests. Provides a thread pool with just 2 threads.
@@ -22,6 +25,8 @@ import java.util.concurrent.TimeUnit;
  * @since 4.0
  */
 public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
+
+  private AtomicInteger scheduledTasks = new AtomicInteger(0);
 
   public SimpleUnitTestSupportScheduler(int corePoolSize,
                                         ThreadFactory threadFactory,
@@ -34,4 +39,19 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
     // Nothing to do. The lifecycle of this pool is managed by the UnitTestSchedulerService that instantiated this
   }
 
+  @Override
+  protected <V> RunnableScheduledFuture<V> decorateTask(Callable<V> callable, RunnableScheduledFuture<V> task) {
+    scheduledTasks.incrementAndGet();
+    return super.decorateTask(callable, task);
+  }
+
+  @Override
+  protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+    scheduledTasks.incrementAndGet();
+    return super.decorateTask(runnable, task);
+  }
+
+  int getScheduledTasks() {
+    return scheduledTasks.get();
+  }
 }

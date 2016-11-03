@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -24,12 +27,11 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.StageNameSource;
-import org.mule.runtime.core.api.processor.StageNameSourceProvider;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.work.MuleWorkManager;
@@ -83,28 +85,33 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     validateFlowConstruct();
 
-    StageNameSource nameSource = null;
-
-    if (name != null) {
-      nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource(name);
-    } else {
-      nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource();
-    }
-
     MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
-                                           muleContext);
+    try {
+      processingStrategy.configureProcessors(singletonList(delegate),
+                                             muleContext.getRegistry().lookupObject(SchedulerService.class), builder,
+                                             muleContext);
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
     target = builder.build();
     super.initialise();
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(processingStrategy);
+    super.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(processingStrategy);
+    super.stop();
   }
 
   private void validateFlowConstruct() {
     if (flowConstruct == null) {
       throw new IllegalArgumentException("FlowConstruct cannot be null");
-    } else if (!(flowConstruct instanceof StageNameSourceProvider)) {
-      throw new IllegalArgumentException(String
-          .format("FlowConstuct must implement the %s interface. However, the type %s does not implement it",
-                  StageNameSourceProvider.class.getCanonicalName(), flowConstruct.getClass().getCanonicalName()));
     }
   }
 

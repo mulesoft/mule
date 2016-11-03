@@ -15,7 +15,7 @@ public class ApplicationStatistics extends FlowConstructStatistics {
   private AllStatistics parent;
 
   public ApplicationStatistics(AllStatistics parent) {
-    super("Application", "application totals", 0);
+    super("Application", "application totals");
     this.parent = parent;
   }
 

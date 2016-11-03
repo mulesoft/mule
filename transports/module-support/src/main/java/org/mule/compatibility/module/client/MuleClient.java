@@ -93,6 +93,7 @@ public class MuleClient implements Disposable {
    * The local MuleContext instance.
    */
   private MuleContext muleContext;
+  private MuleClientFlowConstruct flowConstruct;
 
   private MuleCredentials user;
 
@@ -100,6 +101,7 @@ public class MuleClient implements Disposable {
 
   private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<>();
   private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<>();
+
 
   /**
    * Creates a Mule client that will use the default serverEndpoint when connecting to a remote server instance.
@@ -211,6 +213,7 @@ public class MuleClient implements Disposable {
       logger.info("Starting Mule...");
       muleContext.start();
     }
+    this.flowConstruct = new MuleClientFlowConstruct(muleContext);
   }
 
   /**
@@ -482,6 +485,7 @@ public class MuleClient implements Disposable {
         endpointBuilder.setResponseTimeout(responseTimeout.intValue());
       }
       endpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+      endpoint.setFlowConstruct(flowConstruct);
       OutboundEndpoint concurrentlyAddedEndpoint = outboundEndpointCache.putIfAbsent(key, endpoint);
       if (concurrentlyAddedEndpoint != null) {
         return concurrentlyAddedEndpoint;

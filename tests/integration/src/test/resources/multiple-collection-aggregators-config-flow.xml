@@ -37,15 +37,11 @@
     </flow>
 
     <flow name="Service9">
-        <async processingStrategy="Service9ProcessingStrategy">
+        <async>
             <collection-aggregator timeout="60000" failOnTimeout="false"/>
         </async>
     </flow>
 
-    <asynchronous-processing-strategy name="Service9ProcessingStrategy"
-        maxBufferSize="5" maxThreads="20" minThreads="5" poolExhaustedAction="RUN" threadTTL="500"
-        threadWaitTimeout="500" />
-    
     <flow name="Service10">
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>

@@ -7,11 +7,11 @@
 package org.mule.runtime.core.construct;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -23,19 +23,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -49,7 +53,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Test;
 
-public class FlowTestCase extends AbstractFlowConstuctTestCase {
+public class FlowTestCase extends AbstractFlowConstructTestCase {
 
   private static final String FLOW_NAME = "test-flow";
 
@@ -86,6 +90,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     });
     processors.add(sensingMessageProcessor);
     flow.setMessageProcessors(processors);
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    super.doTearDown();
   }
 
   @Override
@@ -179,23 +189,30 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   }
 
   @Test
-  public void testSequentialStageNames() throws Exception {
-    final int count = 10;
+  public void restartWithSynchronousProcessingStrategy() throws Exception {
+    flow.setProcessingStrategyFactory(new SynchronousProcessingStrategyFactory());
+    flow.initialise();
+    flow.start();
 
-    for (int i = 1; i <= count; i++) {
-      assertTrue(this.flow.getAsyncStageNameSource().getName().endsWith("." + i));
-    }
+    flow.stop();
+    flow.start();
+
+    Event response = directInboundMessageSource.process(testEvent());
+    assertThat(response, not(nullValue()));
   }
 
   @Test
-  public void testStageNameSourceWithName() throws Exception {
-    final int count = 10;
-    final String stageName = "myStage";
-    final String EXPECTED = String.format("%s.%s", FLOW_NAME, stageName);
+  public void restartWithAsynchronousProcessingStrategy() throws Exception {
+    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
+    flow.initialise();
+    flow.start();
 
-    for (int i = 0; i < count; i++) {
-      assertEquals(EXPECTED, this.flow.getAsyncStageNameSource(stageName).getName());
-    }
+    flow.stop();
+    flow.start();
+
+    Event response =
+        directInboundMessageSource.process(eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
+    assertThat(response, not(nullValue()));
   }
 
   @Test
