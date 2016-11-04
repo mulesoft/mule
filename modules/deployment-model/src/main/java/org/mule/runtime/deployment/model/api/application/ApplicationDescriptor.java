@@ -12,8 +12,11 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,6 +28,9 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
   public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
 
+  private File rootFolder;
+  private ArtifactClassLoaderFilter classLoaderFilter = DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+  private URL[] sharedRuntimeLibs = new URL[0];
   private String encoding;
   private String domain = DEFAULT_DOMAIN_NAME;
   private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
@@ -42,6 +48,34 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
    */
   public ApplicationDescriptor(String name) {
     super(name);
+  }
+
+  public File getRootFolder() {
+    return rootFolder;
+  }
+
+  public void setRootFolder(File rootFolder) {
+    if (rootFolder == null) {
+      throw new IllegalArgumentException("Root folder cannot be null");
+    }
+
+    this.rootFolder = rootFolder;
+  }
+
+  public ArtifactClassLoaderFilter getClassLoaderFilter() {
+    return classLoaderFilter;
+  }
+
+  public void setClassLoaderFilter(ArtifactClassLoaderFilter classLoaderFilter) {
+    this.classLoaderFilter = classLoaderFilter;
+  }
+
+  public URL[] getSharedRuntimeLibs() {
+    return sharedRuntimeLibs;
+  }
+
+  public void setSharedRuntimeLibs(URL[] sharedRuntimeLibs) {
+    this.sharedRuntimeLibs = sharedRuntimeLibs;
   }
 
   public String getEncoding() {

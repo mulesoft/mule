@@ -1,0 +1,13 @@
+{
+  "name": "plugin-name",
+  "minMuleVersion": "4.0.0",
+  "classloaderDescriptor": {
+    "id": "maven",
+    "attributes": {
+      "exportedPackages": [
+        "org.mule.extension.api",
+        "org.mule.extension.api.exception"
+      ]
+    }
+  }
+}

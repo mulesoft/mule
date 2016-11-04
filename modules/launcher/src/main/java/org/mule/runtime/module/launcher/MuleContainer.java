@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.module.artifact.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.deployment.api.DeploymentService;

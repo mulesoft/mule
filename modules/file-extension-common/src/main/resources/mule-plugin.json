@@ -1,0 +1,7 @@
+{
+  "name": "mule-module-file-extension-common",
+  "minMuleVersion": "4.0-SNAPSHOT",
+  "classloaderDescriptor": {
+    "id": "pluginproperties"
+  }
+}

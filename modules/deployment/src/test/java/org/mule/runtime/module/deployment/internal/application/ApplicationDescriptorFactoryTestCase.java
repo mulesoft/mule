@@ -34,7 +34,6 @@ import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFi
 import org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase;
 import org.mule.runtime.module.deployment.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
@@ -90,7 +89,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPluginDescriptorFactory pluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
+        new ApplicationDescriptorFactory(pluginDescriptorFactory,
                                          applicationPluginRepository);
     final ArtifactPluginDescriptor expectedPluginDescriptor1 = mock(ArtifactPluginDescriptor.class);
     when(expectedPluginDescriptor1.getName()).thenReturn("plugin1");
@@ -120,7 +119,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyResourceAs(echoTestJarFile.getAbsolutePath(), sharedLibFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()),
                                          applicationPluginRepository);
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -141,7 +140,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyResourceAs("test-jar-with-resources.jar", libFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()),
                                          applicationPluginRepository);
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -190,7 +189,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPluginDescriptorFactory pluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
+        new ApplicationDescriptorFactory(pluginDescriptorFactory,
                                          applicationPluginRepository);
 
     try {

@@ -10,11 +10,17 @@ package org.mule.runtime.module.deployment.internal.builder;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
+import static org.mule.runtime.deployment.model.internal.plugin.descriptor.PropertiesClassloaderDescriptor.PLUGINPROPERTIES;
+import static org.mule.runtime.deployment.model.internal.plugin.loader.AbstractPluginDescriptorLoader.PLUGIN_JSON_DESCRIPTOR_FILE;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
+import com.google.gson.Gson;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -119,6 +125,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       createPropertiesFile(applicationPropertiesFile, properties);
 
       customResources.add(new ZipResource(applicationPropertiesFile.getAbsolutePath(), PLUGIN_PROPERTIES));
+      customResources.add(createMulePluginJsonResource());
     }
 
     return customResources;
@@ -127,5 +134,53 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   @Override
   public String getConfigFile() {
     return null;
+  }
+
+  /**
+   * When generating a plugin for testing with plugin.properties, it must also have the mule-plugin.json file in it so that
+   * the descriptors are properly initialized
+   * @return a resource that represents the mule-plugin.json
+     */
+  private ZipResource createMulePluginJsonResource() {
+    final File mulePluginJsonFile =
+        new File(getTempFolder(), PLUGIN_JSON_DESCRIPTOR_FILE.getPath());
+    mulePluginJsonFile.deleteOnExit();
+
+    MulePluginJsonFileBuilder.ClassloaderDescriptor classloaderDescriptor =
+        new MulePluginJsonFileBuilder.ClassloaderDescriptor(PLUGINPROPERTIES);
+    MulePluginJsonFileBuilder mulePluginJsonFileBuilder =
+        new MulePluginJsonFileBuilder(this.getId(), "4.0.0", classloaderDescriptor);
+    String jsonContent = new Gson().toJson(mulePluginJsonFileBuilder);
+    try {
+      FileUtils.writeStringToFile(mulePluginJsonFile, jsonContent);
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("there was an issue generating the %s file",
+                                                    PLUGIN_JSON_DESCRIPTOR_FILE.getPath()));
+    }
+    return new ZipResource(mulePluginJsonFile.getAbsolutePath(),
+                           PLUGIN_JSON_DESCRIPTOR_FILE.getPath());
+  }
+
+  private static final class MulePluginJsonFileBuilder {
+
+    //TODO MULE-10875 this class should be provided in mule-module-artifact, as well as a builder for it so it can be serialized in one place
+    public final String name;
+    public final String minMuleVersion;
+    public final ClassloaderDescriptor classloaderDescriptor;
+
+    public MulePluginJsonFileBuilder(String name, String minMuleVersion, ClassloaderDescriptor classloaderDescriptor) {
+      this.name = name;
+      this.minMuleVersion = minMuleVersion;
+      this.classloaderDescriptor = classloaderDescriptor;
+    }
+
+    private static final class ClassloaderDescriptor {
+
+      public final String id;
+
+      public ClassloaderDescriptor(String id) {
+        this.id = id;
+      }
+    }
   }
 }

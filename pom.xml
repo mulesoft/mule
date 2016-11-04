@@ -175,6 +175,7 @@
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
         <grizzlyVersion>2.3.26</grizzlyVersion>
+        <gsonVersion>2.6.2</gsonVersion>
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.11</jacksonVersion>

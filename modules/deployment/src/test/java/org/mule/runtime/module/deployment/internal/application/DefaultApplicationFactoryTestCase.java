@@ -100,7 +100,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
     ApplicationClassLoaderBuilder applicationClassLoaderBuilderMock = mock(ApplicationClassLoaderBuilder.class);
     when(applicationClassLoaderBuilderMock.setDomain(any())).thenReturn(applicationClassLoaderBuilderMock);
-    when(applicationClassLoaderBuilderMock.setArtifactDescriptor(any()))
+    when(applicationClassLoaderBuilderMock.setDeployableArtifactDescriptor(any()))
         .thenReturn(applicationClassLoaderBuilderMock);
     when(applicationClassLoaderBuilderMock.setArtifactId(any())).thenReturn(applicationClassLoaderBuilderMock);
     when(applicationClassLoaderBuilderMock
@@ -126,7 +126,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     verify(applicationClassLoaderBuilderMock).setDomain(domain);
     verify(applicationClassLoaderBuilderMock)
         .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]));
-    verify(applicationClassLoaderBuilderMock).setArtifactDescriptor(descriptor);
+    verify(applicationClassLoaderBuilderMock).setDeployableArtifactDescriptor(descriptor);
     verify(applicationClassLoaderBuilderMock).setArtifactId(APP_NAME);
   }
 

@@ -10,16 +10,10 @@ package org.mule.runtime.module.artifact.descriptor;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
-
-import java.io.File;
 
 public class ArtifactDescriptor {
 
   private final String name;
-  private File rootFolder;
-  private ArtifactClassLoaderFilter classLoaderFilter = DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
   /**
    * Creates a new descriptor for a named artifact
@@ -33,26 +27,6 @@ public class ArtifactDescriptor {
 
   public String getName() {
     return name;
-  }
-
-  public File getRootFolder() {
-    return rootFolder;
-  }
-
-  public void setRootFolder(File rootFolder) {
-    if (rootFolder == null) {
-      throw new IllegalArgumentException("Root folder cannot be null");
-    }
-
-    this.rootFolder = rootFolder;
-  }
-
-  public ArtifactClassLoaderFilter getClassLoaderFilter() {
-    return classLoaderFilter;
-  }
-
-  public void setClassLoaderFilter(ArtifactClassLoaderFilter classLoaderFilter) {
-    this.classLoaderFilter = classLoaderFilter;
   }
 
   @Override

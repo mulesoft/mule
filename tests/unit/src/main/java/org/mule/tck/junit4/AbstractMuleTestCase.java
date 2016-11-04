@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
@@ -76,8 +75,6 @@ public abstract class AbstractMuleTestCase {
 
     System.setProperty(TESTING_MODE_PROPERTY_NAME, StringUtils.EMPTY);
 
-    // register the custom UrlStreamHandlerFactory.
-    MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
   }
 
   protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());

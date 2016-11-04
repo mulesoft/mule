@@ -7,6 +7,8 @@
 
 package org.mule.functional.junit4;
 
+import org.mule.runtime.module.artifact.net.MulePluginUrlStreamHandler;
+import org.mule.runtime.module.artifact.net.MuleUrlStreamHandlerFactory;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 /**
@@ -23,5 +25,13 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
     },
     testInclusions = {"*:*:jar:tests:*"})
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
+
+  static {
+    //TODO MULE-10873 if not registered, tests of plugins in zip format will break as the protocol will be unknown.Should this be here?
+    //Registering protocol for compressed artifacts
+    MulePluginUrlStreamHandler.register();
+    // register the custom UrlStreamHandlerFactory
+    MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
+  }
 
 }
