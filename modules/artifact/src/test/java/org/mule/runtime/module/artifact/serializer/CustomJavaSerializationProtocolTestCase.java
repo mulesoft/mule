@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.serializer;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
@@ -17,9 +19,9 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.serialization.AbstractSerializerProtocolContractTestCase;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.util.CompilerUtils;
@@ -48,6 +50,8 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
   @Override
   protected void doSetUp() throws Exception {
     classLoaderRepository = mock(ClassLoaderRepository.class);
+    when(classLoaderRepository.getId(getClass().getClassLoader())).thenReturn(empty());
+    when(classLoaderRepository.getId(null)).thenReturn(empty());
     serializationProtocol = new CustomJavaSerializationProtocol(classLoaderRepository);
 
     initialiseIfNeeded(serializationProtocol, muleContext);
@@ -75,8 +79,8 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     final MuleArtifactClassLoader artifactClassLoader =
         new MuleArtifactClassLoader(ARTIFACT_ID, new ArtifactDescriptor(ARTIFACT_NAME), urls, getClass().getClassLoader(),
                                     lookupPolicy);
-    when(classLoaderRepository.getId(artifactClassLoader)).thenReturn(ARTIFACT_ID);
-    when(classLoaderRepository.find(ARTIFACT_ID)).thenReturn(artifactClassLoader);
+    when(classLoaderRepository.getId(artifactClassLoader)).thenReturn(of(ARTIFACT_ID));
+    when(classLoaderRepository.find(ARTIFACT_ID)).thenReturn(of(artifactClassLoader));
 
     final Class<?> echoTestClass = artifactClassLoader.loadClass(SERIALIZABLE_CLASS);
     final Object payload = echoTestClass.newInstance();

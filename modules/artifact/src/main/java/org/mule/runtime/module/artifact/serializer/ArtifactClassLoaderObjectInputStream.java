@@ -51,10 +51,8 @@ public class ArtifactClassLoaderObjectInputStream extends ObjectInputStream {
     }
 
     String classLoaderId = new String(bytes);
-    final ClassLoader classLoader = classLoaderRepository.find(classLoaderId);
-    if (classLoader == null) {
-      throw new IOException("Artifact class loader not found: " + classLoaderId);
-    }
+    ClassLoader classLoader = classLoaderRepository.find(classLoaderId)
+        .orElseThrow(() -> new IOException("Artifact class loader not found: " + classLoaderId));
 
     return forName(desc.getName(), false, classLoader);
   }

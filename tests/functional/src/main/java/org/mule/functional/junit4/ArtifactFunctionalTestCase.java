@@ -7,6 +7,9 @@
 
 package org.mule.functional.junit4;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
@@ -37,6 +40,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -236,19 +240,19 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     }
 
     @Override
-    public ClassLoader find(String classLoaderId) {
-      return classLoaders.get(classLoaderId);
+    public Optional<ClassLoader> find(String classLoaderId) {
+      return ofNullable(classLoaders.get(classLoaderId));
     }
 
     @Override
-    public String getId(ClassLoader classLoader) {
+    public Optional<String> getId(ClassLoader classLoader) {
       for (String key : classLoaders.keySet()) {
         if (classLoaders.get(key) == classLoader) {
-          return key;
+          return of(key);
         }
       }
 
-      return null;
+      return empty();
     }
   }
 }

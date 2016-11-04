@@ -33,7 +33,7 @@ public class DefaultArtifactClassLoaderManagerTestCase extends AbstractMuleTestC
 
     manager.register(artifactClassLoader);
 
-    assertThat(manager.find(ARTIFACT_ID), is(expectedClassLoader));
+    assertThat(manager.find(ARTIFACT_ID).get(), is(expectedClassLoader));
   }
 
   @Test

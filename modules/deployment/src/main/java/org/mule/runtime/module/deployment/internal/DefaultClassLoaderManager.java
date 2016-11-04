@@ -7,13 +7,16 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,21 +42,17 @@ public class DefaultClassLoaderManager implements ArtifactClassLoaderManager, Cl
   }
 
   @Override
-  public ClassLoader find(String classLoaderId) {
+  public Optional<ClassLoader> find(String classLoaderId) {
     checkClassLoaderId(classLoaderId);
 
-    ClassLoader result = null;
     ArtifactClassLoader artifactClassLoader = artifactClassLoaders.get(classLoaderId);
-    if (artifactClassLoader != null) {
-      result = artifactClassLoader.getClassLoader();
-    }
 
-    return result;
+    return of(artifactClassLoader.getClassLoader());
   }
 
   @Override
-  public String getId(ClassLoader classLoader) {
-    return null;
+  public Optional<String> getId(ClassLoader classLoader) {
+    return empty();
   }
 
   private void checkClassLoaderId(String classLoaderId) {

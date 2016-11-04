@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.serializer;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.serialization.internal.AbstractSerializationProtocol;
@@ -74,8 +75,8 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
 
   private void validateForSerialization(Object object) {
     if (object != null && !(object instanceof Serializable)) {
-      throw new SerializationException(String.format("Was expecting a Serializable type. %s was found instead",
-                                                     object.getClass().getName()));
+      throw new SerializationException(format("Was expecting a Serializable type. %s was found instead",
+                                              object.getClass().getName()));
     }
   }
 }

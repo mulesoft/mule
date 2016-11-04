@@ -12,6 +12,7 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 
 /**
  * Customized version of {@link ObjectOutputStream} that for each serialized object, writes the identifier of the classLoader
@@ -38,10 +39,10 @@ public class ArtifactClassLoaderObjectOutputStream extends ObjectOutputStream {
 
   @Override
   protected void annotateClass(Class<?> clazz) throws IOException {
-    String id = classLoaderRepository.getId(clazz.getClassLoader());
-    if (id != null) {
-      this.writeByte(id.length());
-      this.writeBytes(id);
+    Optional<String> id = classLoaderRepository.getId(clazz.getClassLoader());
+    if (id.isPresent()) {
+      this.writeByte(id.get().length());
+      this.writeBytes(id.get());
     } else {
       this.writeByte(-1);
     }
