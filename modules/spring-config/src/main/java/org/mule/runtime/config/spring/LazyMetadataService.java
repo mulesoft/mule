@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Optional.empty;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -17,9 +19,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
 
 import java.util.Optional;
-
-import static java.util.Optional.empty;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 
 /**
  * {@link MetadataService} implementation that initialises the required components before doing test
@@ -96,7 +95,8 @@ public class LazyMetadataService implements MetadataService {
 
   private Optional<MetadataResult<?>> initializeComponent(ComponentId componentId) {
     //TODO MULE-9496: REFACTOR WHEN FLOWPATH IS AVAILABLE
-    final String componentIdentifier = componentId.getFlowName().get() + "/" + componentId.getComponentPath();
+    final String componentIdentifier = componentId.getFlowName().isPresent()
+        ? componentId.getFlowName().get() + "/" + componentId.getComponentPath() : componentId.getComponentPath();
     try {
       lazyMuleArtifactContext.initializeComponent(componentIdentifier);
     } catch (NoSuchComponentModelException e) {

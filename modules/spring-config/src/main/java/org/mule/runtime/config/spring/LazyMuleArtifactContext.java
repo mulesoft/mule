@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVIT
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -102,18 +103,20 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
 
   @Override
   public void initializeComponent(String componentName) {
-    if (muleContext.getRegistry().get(componentName) != null) {
-      return;
-    }
-    MinimalApplicationModelGenerator minimalApplicationModelGenerator =
-        new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
-    ApplicationModel minimalApplicationModel;
-    if (!componentName.contains("/")) {
-      minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByName(componentName);
-    } else {
-      minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByPath(componentName);
-    }
-    createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+    withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
+      if (muleContext.getRegistry().get(componentName) != null) {
+        return;
+      }
+      MinimalApplicationModelGenerator minimalApplicationModelGenerator =
+          new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
+      ApplicationModel minimalApplicationModel;
+      if (!componentName.contains("/")) {
+        minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByName(componentName);
+      } else {
+        minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByPath(componentName);
+      }
+      createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+    });
   }
 
   @Override

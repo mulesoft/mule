@@ -7,18 +7,18 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static java.util.Collections.emptyList;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
@@ -37,14 +37,22 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   public void noElements() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
-    assertThat(minimalModel.findNamedComponent("flow"), notNullValue());
+    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
+  }
+
+  @Test
+  public void wrongElementIndexOnMinimalModelByPath() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flow/3");
+    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flow").get().getInnerComponents(), hasSize(0));
   }
 
   @Test
   public void singleElement() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("single-element-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByName("errorHandler");
-    assertThat(minimalModel.findNamedComponent("errorHandler"), notNullValue());
+    assertThat(minimalModel.findNamedComponent("errorHandler").isPresent(), is(true));
   }
 
   @Test
