@@ -14,6 +14,9 @@ import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
+import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
@@ -78,6 +81,16 @@ import org.junit.runner.RunWith;
  */
 @RunWith(ArtifactClassLoaderRunner.class)
 public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
+
+  /**
+   * As part of providing support for handling different artifacts without unzipping them, the factory for URL must be
+   * registered and then the current protocol for mule artifacts {@link MuleArtifactUrlStreamHandler#PROTOCOL}.
+   */
+  static {
+    // register the custom UrlStreamHandlerFactory.
+    MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
+    MuleArtifactUrlStreamHandler.register();
+  }
 
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;

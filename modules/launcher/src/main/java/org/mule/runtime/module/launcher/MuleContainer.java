@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.deployment.api.DeploymentService;
@@ -145,6 +146,7 @@ public class MuleContainer {
     // set our own UrlStreamHandlerFactory to become more independent of system
     // properties
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
+    MuleArtifactUrlStreamHandler.register();
 
     // Startup properties
     String propertiesFile = (String) commandlineOptions.get("props");
