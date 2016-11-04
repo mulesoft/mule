@@ -336,8 +336,10 @@ public class GrizzlyHttpClient implements HttpClient {
     return reqBuilder.build();
   }
 
-  protected RequestBuilder createRequestBuilder(HttpRequest request, RequestConfigurer requestConfigurer) {
-    return new RequestBuilder();
+  protected RequestBuilder createRequestBuilder(HttpRequest request, RequestConfigurer requestConfigurer) throws IOException {
+    final RequestBuilder requestBuilder = new RequestBuilder();
+    requestConfigurer.configure(requestBuilder);
+    return requestBuilder;
   }
 
   @FunctionalInterface
