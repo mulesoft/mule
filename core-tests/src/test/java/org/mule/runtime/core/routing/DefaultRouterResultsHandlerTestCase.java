@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
@@ -30,7 +31,6 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.util.MuleContextUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,7 @@ import org.junit.Test;
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
-  protected MuleContext muleContext = MuleContextUtils.mockContextWithServices();
+  protected MuleContext muleContext = mockContextWithServices();
   protected MuleSession session = mock(MuleSession.class);
   protected Flow flow = mock(Flow.class);
   private EventContext context;

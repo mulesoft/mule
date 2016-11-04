@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -101,7 +102,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     }
 
     @Override
-    public ProcessingStrategy create() {
+    public ProcessingStrategy create(MuleContext muleContext) {
       return this;
     }
 
