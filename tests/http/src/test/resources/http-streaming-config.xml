@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${httpPort}"/>
+    </httpn:listener-config>
+
+    <flow name="client">
+        <httpn:request config-ref="requestConfig" method="GET" path="/"/>
+    </flow>
+
+    <flow name="server">
+        <httpn:listener path="/" config-ref="listenerConfig"/>
+        <custom-processor class="org.mule.test.module.http.functional.HttpStreamingTestCase$StoppableInputStreamProcessor"/>
+    </flow>
+
+</mule>

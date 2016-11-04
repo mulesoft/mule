@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
-
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -41,20 +40,9 @@ import org.mule.runtime.module.http.internal.request.grizzly.CustomTimeoutThrott
 import org.mule.runtime.module.http.internal.request.grizzly.IOStrategyTransportCustomizer;
 import org.mule.runtime.module.http.internal.request.grizzly.LoggerTransportCustomizer;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.BodyDeferringAsyncHandler;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
@@ -64,6 +52,19 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient {
 
@@ -226,23 +227,14 @@ public class GrizzlyHttpClient implements HttpClient {
       throws IOException, TimeoutException {
 
     Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
-    ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
+    PipedOutputStream outPipe = new PipedOutputStream();
+    PipedInputStream inPipe = new PipedInputStream(outPipe);
+    BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
+    asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
     try {
-      // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
-      // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
-      Response response = future.get();
-
-      // Under high load, sometimes the get() method returns null. Retrying once fixes the problem (see MULE-8712).
-      if (response == null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Null response returned by async client");
-        }
-        response = future.get();
-      }
-      return createMuleResponse(response);
-    } catch (InterruptedException e) {
-      throw new IOException(e);
-    } catch (ExecutionException e) {
+      Response response = asyncHandler.getResponse();
+      return createMuleResponse(response, inPipe);
+    } catch (IOException e) {
       if (e.getCause() instanceof TimeoutException) {
         throw (TimeoutException) e.getCause();
       } else if (e.getCause() instanceof IOException) {
@@ -250,14 +242,16 @@ public class GrizzlyHttpClient implements HttpClient {
       } else {
         throw new IOException(e);
       }
+    } catch (InterruptedException e) {
+      throw new IOException(e);
     }
   }
 
-  private HttpResponse createMuleResponse(Response response) throws IOException {
+  private HttpResponse createMuleResponse(Response response, InputStream inputStream) throws IOException {
     HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
     responseBuilder.setStatusCode(response.getStatusCode());
     responseBuilder.setReasonPhrase(response.getStatusText());
-    responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
+    responseBuilder.setEntity(new InputStreamHttpEntity(inputStream));
 
     if (response.hasResponseHeaders()) {
       for (String header : response.getHeaders().keySet()) {

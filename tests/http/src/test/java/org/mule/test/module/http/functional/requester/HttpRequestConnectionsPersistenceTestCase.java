@@ -9,6 +9,9 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -26,7 +29,21 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
 
   private static final int GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS = 6000;
   private static final int POLL_DELAY_MILLIS = 200;
+  private static final int SMALL_TIMEOUT_MILLIS = 500;
+  private static final int SMALL_POLL_DELAY_MILLIS = 100;
   private int remotePort;
+  private JUnitProbe probe = new JUnitProbe() {
+
+    @Override
+    public boolean test() throws Exception {
+      return getConnectedEndPoint() == null;
+    }
+
+    @Override
+    public String describeFailure() {
+      return "Connection should be closed.";
+    }
+  };
 
   @Override
   protected String getConfigFile() {
@@ -38,24 +55,17 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
     flowRunner("persistent").withPayload(TEST_MESSAGE).run();
     ensureConnectionIsOpen();
 
-    new PollingProber(GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitProbe() {
-
-      @Override
-      public boolean test() throws Exception {
-        return isConnectionClosed();
-      }
-
-      @Override
-      public String describeFailure() {
-        return "Connection should be closed.";
-      }
-    });
+    new PollingProber(GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(probe);
   }
 
   @Test
   public void nonPersistentConnections() throws Exception {
-    flowRunner("nonPersistent").withPayload(TEST_MESSAGE).run();
-    assertThat(isConnectionClosed(), is(true));
+    Flow flow = (Flow) getFlowConstruct("nonPersistent");
+    Event response = flow.process(testEvent());
+    //verify that the connection is released shortly
+    new PollingProber(SMALL_TIMEOUT_MILLIS, SMALL_POLL_DELAY_MILLIS).check(probe);
+    //verify the stream is still available
+    assertThat(response.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
   }
 
   private void ensureConnectionIsOpen() {
@@ -65,10 +75,6 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
 
     assertThat(endPoint.getLocalAddress().getPort(), is(httpPort.getNumber()));
     assertThat(endPoint.getRemoteAddress().getPort(), is(remotePort));
-  }
-
-  private boolean isConnectionClosed() {
-    return getConnectedEndPoint() == null;
   }
 
   private EndPoint getConnectedEndPoint() {

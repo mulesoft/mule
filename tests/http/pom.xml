@@ -132,6 +132,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+            <version>4.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
