@@ -8,9 +8,10 @@ package org.mule.runtime.core;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -21,13 +22,11 @@ import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.JdkVersionUtils;
-import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
@@ -157,10 +156,6 @@ public class MuleServer implements Runnable {
     } catch (DefaultMuleException me) {
       throw new IllegalArgumentException(me.toString());
     }
-
-    // set our own UrlStreamHandlerFactory to become more independent of system
-    // properties
-    MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
     String config = (String) commandlineOptions.get("config");
     // Try default if no config file was given.

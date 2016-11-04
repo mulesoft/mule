@@ -4,7 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.module.artifact.classloader.net;
+
+import org.mule.runtime.core.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.net.URLStreamHandler;
@@ -13,9 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A factory for loading URL protocol handlers. This factory is necessary to make Mule work in cases where the standard approach
