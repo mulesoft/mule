@@ -11,11 +11,13 @@ import static java.util.Arrays.asList;
 
 import java.util.Collection;
 
+import org.eclipse.aether.artifact.Artifact;
+
 /**
- * Implementation similar to {@link org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter} that adds support for
+ * Implementation similar to {@link org.eclipse.aether.util.filter.PatternExclusionsDependencyFilter} that adds support for
  * classifier attribute.
  * <p/>
- * Format for inclusions is:
+ * Format for exclusions is:
  * 
  * <pre>
  * [groupId]:[artifactId]:[extension]:[classifier]:[version]
@@ -23,24 +25,32 @@ import java.util.Collection;
  *
  * @since 4.0
  */
-public class PatternInclusionsDependencyFilter extends AbstractPatternDependencyFilter {
+public class PatternExclusionsDependencyFilter extends AbstractPatternDependencyFilter {
 
   /**
    * Creates the filter using the Maven coordinates
    *
-   * @param coordinates that define the inclusion patterns
+   * @param coordinates that define the exclusion patterns
    */
-  public PatternInclusionsDependencyFilter(final Collection<String> coordinates) {
+  public PatternExclusionsDependencyFilter(final Collection<String> coordinates) {
     super(coordinates);
   }
 
   /**
    * Creates the filter using the Maven coordinates
    *
-   * @param coordinates that define the inclusion patterns
+   * @param coordinates that define the exclusion patterns
    */
-  public PatternInclusionsDependencyFilter(final String... coordinates) {
+  public PatternExclusionsDependencyFilter(final String... coordinates) {
     this(asList(coordinates));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean accept(Artifact artifact) {
+    return !super.accept(artifact);
   }
 
 }
