@@ -291,7 +291,7 @@ public class GrizzlyHttpClient implements HttpClient
         {
             PipedOutputStream outPipe = new PipedOutputStream();
             asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
-                                           new BodyDeferringWorkManagerSource(completionHandler, workManager, outPipe));
+                                           new WorkManagerSourceBodyDeferringAsyncHandler(completionHandler, workManager, outPipe));
         }
         catch (Exception e)
         {
@@ -496,7 +496,7 @@ public class GrizzlyHttpClient implements HttpClient
         asyncHttpClient.close();
     }
 
-    private class BodyDeferringWorkManagerSource implements AsyncHandler<Response>, WorkManagerSource
+    private class WorkManagerSourceBodyDeferringAsyncHandler implements AsyncHandler<Response>, WorkManagerSource
     {
         private volatile Response response;
         private final OutputStream output;
@@ -506,7 +506,7 @@ public class GrizzlyHttpClient implements HttpClient
         private final Response.ResponseBuilder responseBuilder = new Response.ResponseBuilder();
         private final AtomicBoolean handled = new AtomicBoolean(false);
 
-        public BodyDeferringWorkManagerSource(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output) throws IOException
+        public WorkManagerSourceBodyDeferringAsyncHandler(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output) throws IOException
         {
             this.output = output;
             this.workManager = workManager;

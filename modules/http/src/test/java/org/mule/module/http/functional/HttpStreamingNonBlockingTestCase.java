@@ -61,7 +61,7 @@ public class HttpStreamingNonBlockingTestCase extends HttpStreamingTestCase
         @Override
         public void processExceptionReplyTo(MessagingException exception, Object replyTo)
         {
-            fail();
+            fail(String.format("Error executing request: %s", exception.getMessage()));
         }
     }
 }

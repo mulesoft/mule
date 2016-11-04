@@ -29,8 +29,8 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
 
     private static final int GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS = 6000;
     private static final int POLL_DELAY_MILLIS = 200;
-    public static final int SMALL_TIMEOUT_MILLIS = 500;
-    public static final int SMALL_POLL_DELAY_MILLIS = 100;
+    private static final int SMALL_TIMEOUT_MILLIS = 500;
+    private static final int SMALL_POLL_DELAY_MILLIS = 100;
     private int remotePort;
     private JUnitProbe probe = new JUnitProbe()
     {
