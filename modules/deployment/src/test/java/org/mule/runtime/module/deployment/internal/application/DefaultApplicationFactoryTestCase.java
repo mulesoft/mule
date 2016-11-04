@@ -59,7 +59,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                    applicationPluginRepository, domainRepository, serviceRepository);
+                                    applicationPluginRepository, domainRepository, serviceRepository, null);
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);

@@ -7,19 +7,22 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderRepository;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tracks all the {@link ArtifactClassLoader} created on the container.
  */
-public class DefaultArtifactClassLoaderManager implements ArtifactClassLoaderManager, ArtifactClassLoaderRepository {
+public class DefaultClassLoaderManager implements ArtifactClassLoaderManager, ClassLoaderRepository {
 
   private final Map<String, ArtifactClassLoader> artifactClassLoaders = new ConcurrentHashMap<>();
 
@@ -39,10 +42,17 @@ public class DefaultArtifactClassLoaderManager implements ArtifactClassLoaderMan
   }
 
   @Override
-  public ArtifactClassLoader find(String classLoaderId) {
+  public Optional<ClassLoader> find(String classLoaderId) {
     checkClassLoaderId(classLoaderId);
 
-    return artifactClassLoaders.get(classLoaderId);
+    ArtifactClassLoader artifactClassLoader = artifactClassLoaders.get(classLoaderId);
+
+    return of(artifactClassLoader.getClassLoader());
+  }
+
+  @Override
+  public Optional<String> getId(ClassLoader classLoader) {
+    return empty();
   }
 
   private void checkClassLoaderId(String classLoaderId) {

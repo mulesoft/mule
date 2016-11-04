@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.context.notification.SecurityNotificationListen
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
@@ -97,6 +98,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected ClassLoader executionClassLoader;
 
+  protected ObjectSerializer objectSerializer;
+
   /**
    * {@inheritDoc}
    */
@@ -122,14 +125,24 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext
         .setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
 
-    JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
-    defaultObjectSerializer.setMuleContext(muleContext);
-    muleContext.setObjectSerializer(defaultObjectSerializer);
+    getObjectSerializer(muleContext);
     ErrorTypeRepository defaultErrorTypeRepository = createDefaultErrorTypeRepository();
     muleContext.setErrorTypeRepository(defaultErrorTypeRepository);
     muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(defaultErrorTypeRepository));
 
     return muleContext;
+  }
+
+  private void getObjectSerializer(DefaultMuleContext muleContext) {
+    if (objectSerializer == null) {
+      objectSerializer = new JavaObjectSerializer();
+    }
+
+    if (objectSerializer instanceof MuleContextAware) {
+      ((MuleContextAware) objectSerializer).setMuleContext(muleContext);
+    }
+
+    muleContext.setObjectSerializer(objectSerializer);
   }
 
   protected SystemExceptionHandler createExceptionListener(DefaultMuleContext muleContext) {
@@ -175,6 +188,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   @Override
   public void setExecutionClassLoader(ClassLoader executionClassLoader) {
     this.executionClassLoader = executionClassLoader;
+  }
+
+  @Override
+  public void setObjectSerializer(ObjectSerializer objectSerializer) {
+    this.objectSerializer = objectSerializer;
   }
 
   protected ClassLoader getExecutionClassLoader() {

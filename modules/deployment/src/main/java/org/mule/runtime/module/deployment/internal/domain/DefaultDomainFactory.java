@@ -15,6 +15,7 @@ import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoade
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -29,12 +30,15 @@ public class DefaultDomainFactory implements DomainFactory {
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
   private final DomainManager domainManager;
   private final DomainDescriptorParser domainDescriptorParser;
+  private final ClassLoaderRepository classLoaderRepository;
 
   protected DeploymentListener deploymentListener;
   private final ArtifactClassLoader containerClassLoader;
 
   public DefaultDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
-                              DomainManager domainManager, ArtifactClassLoader containerClassLoader) {
+                              DomainManager domainManager, ArtifactClassLoader containerClassLoader,
+                              ClassLoaderRepository classLoaderRepository) {
+    this.classLoaderRepository = classLoaderRepository;
     checkArgument(domainManager != null, "Domain manager cannot be null");
     checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
     this.containerClassLoader = containerClassLoader;
@@ -61,7 +65,8 @@ public class DefaultDomainFactory implements DomainFactory {
     // TODO MULE-9653 - use the plugins class loader maps when plugins are allowed in domains
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(getDomainId(DEFAULT_DOMAIN_NAME), containerClassLoader,
-                                                                          descriptor, emptyList()));
+                                                                          descriptor, emptyList()),
+                              classLoaderRepository);
     defaultMuleDomain.setDeploymentListener(deploymentListener);
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

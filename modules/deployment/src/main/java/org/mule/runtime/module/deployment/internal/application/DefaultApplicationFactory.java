@@ -19,6 +19,7 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactFactory;
@@ -41,12 +42,15 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ServiceRepository serviceRepository;
+  private final ClassLoaderRepository classLoaderRepository;
   protected DeploymentListener deploymentListener;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
                                    ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
-                                   ServiceRepository serviceRepository) {
+                                   ServiceRepository serviceRepository,
+                                   ClassLoaderRepository classLoaderRepository) {
+    this.classLoaderRepository = classLoaderRepository;
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(artifactPluginRepository != null, "Artifact plugin repository cannot be null");
@@ -101,7 +105,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
 
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
-                                   serviceRepository, descriptor.getArtifactLocation());
+                                   serviceRepository, descriptor.getArtifactLocation(), classLoaderRepository);
 
     if (deploymentListener != null) {
       delegate.setDeploymentListener(deploymentListener);

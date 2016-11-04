@@ -106,6 +106,8 @@ public class CompilerUtils {
    */
   public static class SingleClassCompiler extends AbstractCompiler<SingleClassCompiler> {
 
+    private File targetFolder;
+
     /**
      * Compiles a single Java file.
      *
@@ -115,12 +117,19 @@ public class CompilerUtils {
     public File compile(File source) {
       checkArgument(source != null, "source cannot be null");
 
-      File targetFolder = createTargetFolder();
+      targetFolder = createTargetFolder();
       sources = new File[] {source};
 
       compileJavaSources(targetFolder);
 
       return getCompiledClass(targetFolder, source.getName());
+    }
+
+    /**
+     * @return the folder where compiled classes where written or null if {@link #compile(File)} was not execute yet.
+     */
+    public File getTargetFolder() {
+      return targetFolder;
     }
 
     private File getCompiledClass(File targetFolder, String name) {

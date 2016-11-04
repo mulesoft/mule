@@ -14,12 +14,12 @@ public class JavaExternalSerializerProtocolProtocolTestCase extends AbstractSeri
 
   @Override
   protected void doSetUp() throws Exception {
-    serializerProtocol = muleContext.getObjectSerializer().getExternalProtocol();
+    serializationProtocol = muleContext.getObjectSerializer().getExternalProtocol();
   }
 
   @Test(expected = SerializationException.class)
   public void notSerializable() throws Exception {
-    serializerProtocol.serialize(new Object());
+    serializationProtocol.serialize(new Object());
   }
 
 }

@@ -12,8 +12,9 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
-import org.mule.runtime.module.deployment.internal.DefaultArtifactClassLoaderManager;
+import org.mule.runtime.module.deployment.internal.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -37,9 +38,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                 ApplicationDescriptorFactory applicationDescriptorFactory,
                                 ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository) {
+                                ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
-          serviceRepository);
+          serviceRepository, classLoaderRepository);
   }
 
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
@@ -53,13 +54,13 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
-    final DefaultArtifactClassLoaderManager artifactClassLoaderManager = new DefaultArtifactClassLoaderManager();
+    final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository,
                                                  new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
                                                                                           new ArtifactPluginClassLoaderFactory()));
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                      applicationPluginRepository, domainManager, serviceRepository);
+                                      applicationPluginRepository, domainManager, serviceRepository, artifactClassLoaderManager);
   }
 
   @Override
