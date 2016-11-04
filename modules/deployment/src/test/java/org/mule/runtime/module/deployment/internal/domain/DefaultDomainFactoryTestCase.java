@@ -14,10 +14,12 @@ import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,9 +32,11 @@ import org.junit.Test;
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   private final ArtifactClassLoaderManager artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
+  private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DomainFactory domainFactory = new DefaultDomainFactory(
                                                                        new DomainClassLoaderFactory(getClass().getClassLoader()),
-                                                                       new DefaultDomainManager(), containerClassLoader, null);
+                                                                       new DefaultDomainManager(), containerClassLoader, null,
+                                                                       serviceRepository);
 
   public DefaultDomainFactoryTestCase() throws IOException {}
 

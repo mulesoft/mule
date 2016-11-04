@@ -36,7 +36,6 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -97,7 +96,6 @@ import org.mule.runtime.module.deployment.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.internal.domain.TestDomainFactory;
 import org.mule.runtime.module.service.ServiceManager;
-import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -1181,7 +1179,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, mock(ServiceRepository.class, RETURNS_DEEP_STUBS));
+                                     domainManager, serviceManager);
     appFactory.setFailOnStopApplication(true);
 
     deploymentService.setAppFactory(appFactory);
@@ -1207,7 +1205,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, mock(ServiceRepository.class, RETURNS_DEEP_STUBS));
+                                     domainManager, serviceManager);
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -2302,7 +2300,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestDomainFactory testDomainFactory =
         new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader, artifactClassLoaderManager);
+                              containerClassLoader, artifactClassLoaderManager, serviceManager);
     testDomainFactory.setFailOnStopApplication();
 
     deploymentService.setDomainFactory(testDomainFactory);
@@ -2323,7 +2321,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestDomainFactory testDomainFactory =
         new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader, artifactClassLoaderManager);
+                              containerClassLoader, artifactClassLoaderManager, serviceManager);
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
     startDeployment();
@@ -3205,7 +3203,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
-                                 artifactClassLoaderManager);
+                                 artifactClassLoaderManager, serviceManager);
   }
 
   /**

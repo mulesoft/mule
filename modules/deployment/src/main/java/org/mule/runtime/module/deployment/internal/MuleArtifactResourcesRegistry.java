@@ -71,8 +71,6 @@ public class MuleArtifactResourcesRegistry {
     this.domainClassLoaderFactory = trackDeployableArtifactClassLoaderFactory(
                                                                               new DomainClassLoaderFactory(containerClassLoader
                                                                                   .getClassLoader()));
-    domainFactory =
-        new DefaultDomainFactory(this.domainClassLoaderFactory, domainManager, containerClassLoader, artifactClassLoaderManager);
     this.artifactPluginClassLoaderFactory = trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
     final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
@@ -92,6 +90,8 @@ public class MuleArtifactResourcesRegistry {
                                                                                                     trackArtifactClassLoaderFactory(serviceClassLoaderFactory)),
                                                             new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
 
+    domainFactory = new DefaultDomainFactory(this.domainClassLoaderFactory, domainManager, containerClassLoader,
+                                             artifactClassLoaderManager, serviceManager);
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                                        artifactPluginRepository, domainManager, serviceManager,
                                                        artifactClassLoaderManager);

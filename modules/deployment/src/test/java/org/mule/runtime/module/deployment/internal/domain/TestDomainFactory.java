@@ -11,6 +11,7 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +22,9 @@ public class TestDomainFactory extends DefaultDomainFactory {
   private boolean failOnDispose;
 
   public TestDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
-                           ArtifactClassLoader containerClassLoader, ClassLoaderRepository classLoaderRepository) {
-    super(domainClassLoaderFactory, new DefaultDomainManager(), containerClassLoader, classLoaderRepository);
+                           ArtifactClassLoader containerClassLoader, ClassLoaderRepository classLoaderRepository,
+                           ServiceRepository serviceRepository) {
+    super(domainClassLoaderFactory, new DefaultDomainManager(), containerClassLoader, classLoaderRepository, serviceRepository);
   }
 
   @Override
