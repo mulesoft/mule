@@ -23,6 +23,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -53,10 +54,8 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   public TemporaryFolder tempMuleHome = new TemporaryFolder();
 
   private String previousMuleHome;
-
   private MuleSharedDomainClassLoader domainCL;
   private MuleApplicationClassLoader appCL;
-
   private File domainDir;
   private File classesDir;
   private File jarFile;
@@ -96,7 +95,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
                                         mock(ClassLoaderLookupPolicy.class), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
-    applicationDescriptor.setClassesFolder(getAppClassesFolder(applicationDescriptor.getName()));
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
+        .containing(MuleFoldersUtil.getAppClassesFolder(APP_NAME).toURI().toURL()).build();
+    applicationDescriptor.setClassLoaderModel(classLoaderModel);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
                                            mock(ClassLoaderLookupPolicy.class), emptyList());
   }

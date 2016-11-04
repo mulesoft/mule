@@ -8,18 +8,13 @@ package org.mule.runtime.deployment.model.api.plugin;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
-  private URL runtimeClassesDir;
-  private Set<String> pluginDependencies = new HashSet<>();
   private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
 
   /**
@@ -29,22 +24,6 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
    */
   public ArtifactPluginDescriptor(String name) {
     super(name);
-  }
-
-  public URL getRuntimeClassesDir() {
-    return runtimeClassesDir;
-  }
-
-  public void setRuntimeClassesDir(URL runtimeClassesDir) {
-    this.runtimeClassesDir = runtimeClassesDir;
-  }
-
-  public Set<String> getPluginDependencies() {
-    return pluginDependencies;
-  }
-
-  public void setPluginDependencies(Set<String> pluginDependencies) {
-    this.pluginDependencies = pluginDependencies;
   }
 
   public List<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {

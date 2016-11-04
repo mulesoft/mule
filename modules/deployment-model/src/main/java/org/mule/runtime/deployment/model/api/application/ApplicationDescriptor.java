@@ -33,7 +33,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   private Map<String, String> appProperties = new HashMap<String, String>();
   private File logConfigFile;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
-  private File classesFolder;
 
   /**
    * Creates a new application descriptor
@@ -113,16 +112,5 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
    */
   public void setPlugins(Set<ArtifactPluginDescriptor> plugins) {
     this.plugins = plugins;
-  }
-
-  /**
-   * @param classesFolder the location of the classes folder for the application.
-   */
-  public void setClassesFolder(File classesFolder) {
-    this.classesFolder = classesFolder;
-  }
-
-  public File getClassesFolder() {
-    return this.classesFolder;
   }
 }

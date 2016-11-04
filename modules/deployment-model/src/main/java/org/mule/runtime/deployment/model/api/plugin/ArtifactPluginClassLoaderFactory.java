@@ -7,14 +7,12 @@
 
 package org.mule.runtime.deployment.model.api.plugin;
 
-import static java.lang.System.arraycopy;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,10 +30,6 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
    */
   @Override
   public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
-    URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
-    urls[0] = descriptor.getRuntimeClassesDir();
-    arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
-
     Map<String, ClassLoaderLookupStrategy> pluginsLookupPolicies = new HashMap<>();
     for (ArtifactPluginDescriptor dependencyPluginDescriptor : descriptor.getArtifactPluginDescriptors()) {
       if (dependencyPluginDescriptor.getName().equals(descriptor.getName())) {
@@ -44,20 +38,21 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
 
       final ClassLoaderLookupStrategy parentFirst = getClassLoaderLookupStrategy(descriptor, dependencyPluginDescriptor);
 
-      for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderFilter().getExportedClassPackages()) {
+      for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getExportedPackages()) {
         pluginsLookupPolicies.put(exportedPackage, parentFirst);
       }
     }
 
     final ClassLoaderLookupPolicy lookupPolicy = parent.getClassLoaderLookupPolicy().extend(pluginsLookupPolicies);
 
-    return new MuleArtifactClassLoader(artifactId, descriptor, urls, parent.getClassLoader(), lookupPolicy);
+    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
+                                       parent.getClassLoader(), lookupPolicy);
   }
 
   private ClassLoaderLookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
                                                                  ArtifactPluginDescriptor dependencyPluginDescriptor) {
     final ClassLoaderLookupStrategy parentFirst;
-    if (isDependencyPlugin(descriptor.getPluginDependencies(), dependencyPluginDescriptor)) {
+    if (isDependencyPlugin(descriptor.getClassLoaderModel().getDependencies(), dependencyPluginDescriptor)) {
       parentFirst = ClassLoaderLookupStrategy.PARENT_FIRST;
     } else {
       parentFirst = ClassLoaderLookupStrategy.CHILD_ONLY;

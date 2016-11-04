@@ -42,6 +42,7 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
   }
 
   protected void listLibraries(ApplicationDescriptor descriptor) {
-    listItems(stream(descriptor.getRuntimeLibs()).map(url -> toFile(url).getName()).collect(toList()), "Application libraries:");
+    listItems(stream(descriptor.getClassLoaderModel().getUrls()).map(url -> toFile(url).getName()).collect(toList()),
+              "Application libraries:");
   }
 }
