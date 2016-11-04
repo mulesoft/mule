@@ -7,12 +7,11 @@
 package org.mule.runtime.core.api.processor.strategy;
 
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 
-import java.util.List;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -22,11 +21,43 @@ import org.reactivestreams.Publisher;
  */
 public interface ProcessingStrategy {
 
-  void configureProcessors(List<Processor> processors, MessageProcessorChainBuilder chainBuilder);
+  /**
+   * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
+   *
+   * @param pipeline pipeline instance.
+   * @param pipelineFunction pipeline function.
+   * @return enriched pipeline function/
+   */
+  default Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+                                                                  Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
+    return publisher -> from(publisher).transform(pipelineFunction);
+  }
 
-  default Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
-                                                                   Function<Publisher<Event>, Publisher<Event>> publisherFunction) {
-    return publisher -> from(publisher).transform(publisherFunction);
+  /**
+   * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
+   *
+   * @param pipeline pipeline instance.
+   * @param pipelineFunction pipeline function.
+   * @param messagingExceptionHandler exception handle to use.
+   * @return enriched pipeline function
+   */
+  default Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+                                                                  Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
+                                                                  MessagingExceptionHandler messagingExceptionHandler) {
+    return onPipeline(pipeline, pipelineFunction);
+  }
+
+
+  /**
+   * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
+   *
+   * @param processor processor instance.
+   * @param processorFunction processor function
+   * @return enriched processor function
+   */
+  default Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
+                                                                   Function<Publisher<Event>, Publisher<Event>> processorFunction) {
+    return publisher -> from(publisher).transform(processorFunction);
   }
 
   /**

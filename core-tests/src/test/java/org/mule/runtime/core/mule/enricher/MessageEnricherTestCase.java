@@ -114,12 +114,11 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      throw new MessagingException(CoreMessages.createStaticMessage("Expected"), event);
+      throw new IllegalStateException();
     });
     enricher.setFlowConstruct(getTestFlow(muleContext));
 
-    thrown.expect(is(instanceOf(MessagingException.class)));
-    thrown.expectMessage(equalTo("Expected."));
+    thrown.expect(is(instanceOf(IllegalStateException.class)));
     process(enricher, testEvent());
   }
 

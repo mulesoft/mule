@@ -34,7 +34,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
@@ -85,9 +85,7 @@ public class DefaultEventBuilder implements Event.Builder {
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
     this.groupCorrelation = event.getGroupCorrelation();
-    if (event instanceof EventImplementation) {
-      this.legacyCorrelationId = ((EventImplementation) event).getLegacyCorrelationId();
-    }
+    this.legacyCorrelationId = event.getLegacyCorrelationId();
 
     this.flowCallStack = event.getFlowCallStack().clone();
 
@@ -260,7 +258,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   protected boolean isFlowConstructNonBlockingProcessingStrategy() {
     return (flow instanceof Pipeline)
-        && ((Pipeline) flow).getProcessingStrategy() instanceof NonBlockingProcessingStrategy;
+        && ((Pipeline) flow).getProcessingStrategyFactory() instanceof LegacyNonBlockingProcessingStrategyFactory;
   }
 
   /**

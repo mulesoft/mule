@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -83,10 +83,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   public void testSingleEventNoTimeoutAsync() throws Exception {
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
-    asyncMP.setScheduler(scheduler);
-
-    asyncMP.setListener(target);
+    AsyncDelegateMessageProcessor asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
+    asyncMP.setMuleContext(muleContext);
+    asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
+    asyncMP.initialise();
+    asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
@@ -102,12 +103,12 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     asyncReplyMP.setTimeout(1);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-    target.setWaitTime(3000);
-    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
-    asyncMP.setScheduler(scheduler);
-
-    asyncMP.setListener(target);
+    target.setWaitTime(30000);
+    AsyncDelegateMessageProcessor asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
+    asyncMP.setMuleContext(muleContext);
     asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
+    asyncMP.initialise();
+    asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
@@ -175,10 +176,9 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(50);
-    LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor();
-    asyncMP.setScheduler(scheduler);
-
-    asyncMP.setListener(target);
+    AsyncDelegateMessageProcessor asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
+    asyncMP.setMuleContext(muleContext);
+    asyncMP.initialise();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
 

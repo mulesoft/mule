@@ -134,7 +134,6 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
     flowRunner("flowStaticWithAsync").withPayload("payload").run();
 
     FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
-
     assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
     assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flowInAsync", "/flowInAsync/processors/0"),

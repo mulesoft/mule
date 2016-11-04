@@ -7,9 +7,9 @@
 package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 
 public class ProcessingStrategyUtils {
@@ -25,9 +25,9 @@ public class ProcessingStrategyUtils {
     } else if (SYNC_PROCESSING_STRATEGY.equals(processingStrategy)) {
       return new SynchronousProcessingStrategyFactory();
     } else if (NON_BLOCKING_PROCESSING_STRATEGY.equals(processingStrategy)) {
-      return new NonBlockingProcessingStrategyFactory();
+      return new LegacyNonBlockingProcessingStrategyFactory();
     } else if (ASYNC_PROCESSING_STRATEGY.equals(processingStrategy)) {
-      return new AsynchronousProcessingStrategyFactory();
+      return new LegacyAsynchronousProcessingStrategyFactory();
     }
     return null;
   }

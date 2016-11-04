@@ -2127,7 +2127,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     } else {
       DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
       builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
-      DispatcherInterceptorMessageProcessor async = new DispatcherInterceptorMessageProcessor(() -> getDispatcherWorkManager());
+      DispatcherAsyncInterceptingMessageProcessor async =
+          new DispatcherAsyncInterceptingMessageProcessor(() -> getDispatcherWorkManager());
       builder.chain(async);
       builder.chain(new DispatcherMessageProcessor(endpoint));
       return builder.build();

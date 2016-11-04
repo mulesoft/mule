@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import com.yourkit.util.Asserts;
 
-public class ScatterGatherOneRouteTest extends AbstractMuleTestCase {
+public class ScatterGatherOneRouteTestCase extends AbstractMuleTestCase {
 
   private MuleContext context;
 

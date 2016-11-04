@@ -9,13 +9,14 @@ package org.mule.runtime.core.construct;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
@@ -24,9 +25,7 @@ import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -59,20 +58,8 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
-    configureFlowForRedelivery();
-    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
-
-    expected.expectCause(hasCause(instanceOf(FlowConstructInvalidException.class)));
-    expected.expectMessage("One of the message sources configured on this Flow is not "
-        + "compatible with an asynchronous processing strategy.  Either "
-        + "because it is request-response, has a transaction defined, or " + "messaging redelivered is configured.");
-    flow.initialise();
-  }
-
-  @Test
   public void testProcessingStrategyNonBlockingSupported() throws Exception {
-    flow.setProcessingStrategyFactory(new NonBlockingProcessingStrategyFactory());
+    flow.setProcessingStrategyFactory(new LegacyNonBlockingProcessingStrategyFactory());
     flow.setMessageSource((NonBlockingMessageSource) listener -> {
     });
     flow.initialise();
@@ -80,7 +67,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testProcessingStrategyNonBlockingNotSupported() throws Exception {
-    flow.setProcessingStrategyFactory(new NonBlockingProcessingStrategyFactory());
+    flow.setProcessingStrategyFactory(new LegacyNonBlockingProcessingStrategyFactory());
     flow.setMessageSource(listener -> {
     });
 
@@ -94,7 +81,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception {
     configureFlowForRedelivery();
     flow.initialise();
-    assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
+    assertThat(flow.getProcessingStrategy(), equalTo(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE));
   }
 
   private void configureFlowForRedelivery() {

@@ -36,9 +36,9 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTING;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
+import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
@@ -127,7 +127,6 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -245,12 +244,14 @@ public class DefaultMuleContext implements MuleContext {
 
   static {
     // Ensure reactor operatorError hook is always registered.
-    Hooks.onOperatorError((throwable, o) -> {
-      Throwable unwrapped = unwrap(throwable);
-      if (!(unwrapped instanceof MessagingException)) {
-        return new MessagingException((Event) o, unwrapped);
+    Hooks.onOperatorError((throwable, signal) -> {
+      // Only apply hook for Event signals.
+      if (signal instanceof Event) {
+        throwable = unwrap(throwable);
+        return throwable instanceof MessagingException ? throwable
+            : new MessagingException((Event) signal, getRootCauseException(throwable));
       } else {
-        return unwrapped;
+        return throwable;
       }
     });
   }

@@ -2213,7 +2213,7 @@
     <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Allows for the configuration of a custom processing strategy that implements 'org.mule.runtime.core.api.construct.PipelineProcessingStrategy'.
+                Allows for the configuration of a custom processing strategy.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2223,7 +2223,13 @@
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Custom processing strategy factory fully qualified class name.  Custom processing strategy factories should implement 'org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

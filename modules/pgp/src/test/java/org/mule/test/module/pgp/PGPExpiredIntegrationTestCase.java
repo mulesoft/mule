@@ -42,6 +42,7 @@ public class PGPExpiredIntegrationTestCase extends MuleArtifactFunctionalTestCas
 
     assertThat(client.request("test://out", 5000).getRight().isPresent(), is(false));
 
+    Thread.sleep(2000);
     assertNotNull("flow's exception strategy should have caught an exception", exceptionFromFlow);
     InvalidPublicKeyException ipke = ExceptionUtils.getDeepestOccurenceOfType(exceptionFromFlow, InvalidPublicKeyException.class);
     assertNotNull("root cause must be a InvalidPublicKeyException", ipke);

@@ -14,11 +14,10 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY;
-
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -35,20 +34,20 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
-        {DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategy.class},
-        {SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategy.class},
-        {ASYNC_PROCESSING_STRATEGY, AsynchronousProcessingStrategy.class},
+        {DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategyFactory.class},
+        {SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategyFactory.class},
+        {ASYNC_PROCESSING_STRATEGY, LegacyAsynchronousProcessingStrategyFactory.class},
     });
   }
 
-  private final Class<? extends ProcessingStrategy> expectedStrategyType;
+  private final Class<? extends ProcessingStrategyFactory> expectedStrategyFactoryType;
 
   @Rule
   public SystemProperty processingStrategyProperty;
 
   public ConfigurationProcessingStrategyParserTestCase(String defaultProcessingStrategy,
-                                                       Class<? extends ProcessingStrategy> expectedStrategyType) {
-    this.expectedStrategyType = expectedStrategyType;
+                                                       Class<? extends ProcessingStrategyFactory> expectedStrategyFactoryType) {
+    this.expectedStrategyFactoryType = expectedStrategyFactoryType;
     processingStrategyProperty = new SystemProperty(PROCESSING_STRATEGY_ATTRIBUTE, defaultProcessingStrategy);
   }
 
@@ -59,7 +58,6 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
 
   @Test
   public void verifyConfigurationProcessingStrategy() throws Exception {
-    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(muleContext),
-               is(instanceOf(expectedStrategyType)));
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory(), is(instanceOf(expectedStrategyFactoryType)));
   }
 }

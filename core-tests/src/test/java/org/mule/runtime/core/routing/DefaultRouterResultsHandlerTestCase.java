@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -49,7 +50,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setupMocks() throws Exception {
-    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create(muleContext));
+    when(flow.getProcessingStrategyFactory()).thenReturn(new SynchronousProcessingStrategyFactory());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));

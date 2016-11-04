@@ -7,26 +7,29 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
+import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.reactivestreams.Publisher;
 
 /**
  * This factory's processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes
  * it synchronously rather than failing.
  */
-public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class DefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
@@ -36,21 +39,30 @@ public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyF
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
-                                             new SynchronousProcessingStrategyFactory().create(muleContext));
+    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS), muleContext);
   }
 
-  public static class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy {
+  static class DefaultFlowProcessingStrategy extends LegacyAsynchronousProcessingStrategy {
 
     public DefaultFlowProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
-                                         ProcessingStrategy synchronousProcessingStrategy) {
-      super(schedulerSupplier, schedulerStopper, synchronousProcessingStrategy);
+                                         MuleContext muleContext) {
+      super(schedulerSupplier, schedulerStopper, muleContext);
     }
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor() {
-      return new LaxAsyncInterceptingMessageProcessor();
+    public Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
+      return publisher -> from(publisher).concatMap(request -> {
+        if (canProcessAsync(request)) {
+          return just(request).transform(super.onPipeline(pipeline, pipelineFunction));
+        } else {
+          return just(request).transform(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline, pipelineFunction));
+        }
+      });
     }
 
+    protected boolean canProcessAsync(Event event) {
+      return !(event.isSynchronous() || event.isTransacted());
+    }
   }
 }

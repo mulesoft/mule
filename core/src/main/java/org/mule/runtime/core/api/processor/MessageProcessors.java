@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.*;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -30,7 +31,8 @@ public class MessageProcessors {
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newChain(Processor... processors) {
-    if (processors.length == 1 && processors[0] instanceof MessageProcessorChain) {
+    if (processors.length == 1 && processors[0] instanceof MessageProcessorChain
+        && !(processors[0] instanceof ExplicitMessageProcessorChain)) {
       return (MessageProcessorChain) processors[0];
     } else {
       return new DefaultMessageProcessorChainBuilder().chain(processors).build();
@@ -45,7 +47,8 @@ public class MessageProcessors {
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newChain(List<Processor> processors) {
-    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
+    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain
+        && !(processors.get(0) instanceof ExplicitMessageProcessorChain)) {
       return (MessageProcessorChain) processors.get(0);
     } else {
       return new DefaultMessageProcessorChainBuilder().chain(processors).build();
@@ -53,15 +56,19 @@ public class MessageProcessors {
   }
 
   /**
-   * Creates a new explicit {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs
-   * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit
-   * chain differs in that it has a {@link MessageProcessorPathElement} associated with.
+   * Creates a new explicit {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs chains
+   * construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit chain
+   * differs in that it has a {@link MessageProcessorPathElement} associated with.
    *
    * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newExplicitChain(Processor... processors) {
-    return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    if (processors.length == 1 && processors[0] instanceof ExplicitMessageProcessorChain) {
+      return (MessageProcessorChain) processors[0];
+    } else {
+      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    }
   }
 
   /**
@@ -73,7 +80,11 @@ public class MessageProcessors {
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newExplicitChain(List<Processor> processors) {
-    return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    if (processors.size() == 1 && processors.get(0) instanceof ExplicitMessageProcessorChain) {
+      return (MessageProcessorChain) processors.get(0);
+    } else {
+      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    }
   }
 
 }

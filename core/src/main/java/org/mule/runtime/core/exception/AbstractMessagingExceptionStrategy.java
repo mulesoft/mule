@@ -44,6 +44,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
   @Override
   public Event handleException(MessagingException ex, Event event) {
     try {
+
       muleContext.getNotificationManager()
           .fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_START));
 

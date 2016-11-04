@@ -19,19 +19,9 @@ import java.util.List;
  * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
  * {@link MessageSource}
  */
-public interface Pipeline extends FlowConstruct, MessageProcessorContainer, ProcessingDescriptor, MessageProcessorPathResolver {
-
-  void setMessageSource(MessageSource messageSource);
-
-  MessageSource getMessageSource();
-
-  void setMessageProcessors(List<Processor> messageProcessors);
+public interface ProcessorPipe {
 
   List<Processor> getMessageProcessors();
-
-  void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
-
-  ProcessingStrategyFactory getProcessingStrategyFactory();
 
   ProcessingStrategy getProcessingStrategy();
 

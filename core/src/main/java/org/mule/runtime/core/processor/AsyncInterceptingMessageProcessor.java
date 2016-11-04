@@ -6,48 +6,72 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
-import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
-import javax.resource.spi.work.Work;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Processes {@link Event}'s asynchronously using a {@link Scheduler} to schedule asynchronous processing of the next
- * {@link Processor}. The next {@link Processor} is therefore be executed in a different thread regardless of the exchange-pattern
- * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
+ * {@link Processor}. The next {@link Processor} is therefore be executed in a different thread. Unlike the implementation in Mule
+ * 3.x this implementation ignores {@link Event} attributes to determine if the flow is synchronous or transactional and
+ * introduces an async boundary regardless. Also this implementation no longer handles exceptions during async processing and
+ * these are instrad propagted.
  */
-public class AsyncInterceptingMessageProcessor extends BaseAsyncInterceptingMessageProcessor {
+public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor {
 
-  public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
+  private Supplier<Scheduler> scheduler;
 
-  protected Scheduler workScheduler;
+  public AsyncInterceptingMessageProcessor(Supplier<Scheduler> scheduler) {
+    this.scheduler = scheduler;
+  }
 
   @Override
-  protected boolean isProcessAsync(Event event) throws MuleException {
-    if (!canProcessAsync(event)) {
-      throw new DefaultMuleException(createStaticMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE));
+  public Event process(Event event) throws MuleException {
+    if (isProcessAsync(event))
+      try {
+        return Mono.just(event).transform(this).block();
+      } catch (Throwable e) {
+        throw rxExceptionToMuleException(e);
+      }
+    else {
+      return processNext(event);
     }
-    return canProcessAsync(event);
   }
 
   @Override
-  protected void doProcessNextAsync(Work work) throws MuleException {
-    workScheduler.submit(work);
-  }
-
-  public void setScheduler(Scheduler workScheduler) {
-    this.workScheduler = workScheduler;
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).concatMap(event -> {
+      Event request = event;
+      if (isProcessAsync(request)) {
+        return just(request).publishOn(fromExecutorService(scheduler.get())).transform(s -> applyNext(s));
+      } else {
+        return just(request).transform(s -> applyNext(s));
+      }
+    });
   }
 
   @Override
-  protected Executor resolveExecutor() {
-    return workScheduler;
+  public ProcessingType getProccesingType() {
+    return CPU_LITE;
+  }
+
+  /**
+   * Template method that can be orverriden by implementationd to determine when async processing should occur.
+   * 
+   * @return if processing should be async.
+   */
+  protected boolean isProcessAsync(Event event) {
+    return true;
   }
 }

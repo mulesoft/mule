@@ -45,7 +45,7 @@
         </async>
     </flow>
  
-    <custom-processing-strategy name="customStrategy" class="org.mule.test.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
+    <custom-processing-strategy name="customStrategy" class="org.mule.test.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategyFactory">
         <spring:property name="foo" value="bar" />
     </custom-processing-strategy>
 

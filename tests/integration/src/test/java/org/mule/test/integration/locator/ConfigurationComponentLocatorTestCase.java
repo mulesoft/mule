@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 
 import org.junit.Test;
@@ -66,6 +66,6 @@ public class ConfigurationComponentLocatorTestCase extends MuleArtifactFunctiona
     processor = muleContext.getConfigurationComponentLocator().findByPath("flow/myFlow/processors/1");
     assertThat(processor, instanceOf(SetPayloadMessageProcessor.class));
     processor = muleContext.getConfigurationComponentLocator().findByPath("flow/myFlow/processors/2");
-    assertThat(processor, instanceOf(AsyncInterceptingMessageProcessor.class));
+    assertThat(processor, instanceOf(AsyncDelegateMessageProcessor.class));
   }
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -268,7 +269,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
   @Override
   public Processor getRoute() {
-    final MessageProcessorChain chain = newExplicitChain(routes.get(0));
+    final MessageProcessorChain chain = newChain(newExplicitChain(routes.get(0)));
     chain.setMuleContext(muleContext);
     chain.setFlowConstruct(flowConstruct);
     return chain;

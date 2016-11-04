@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.DelegateTransactionFactory;
 import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
@@ -29,10 +30,11 @@ public class TransactionalBlockTestCase extends AbstractIntegrationTestCase {
   public void resolvesStandardTransactionFactory() throws Exception {
     MessageProcessorChain blockChain =
         (MessageProcessorChain) ((Flow) getFlowConstruct("standardBlock")).getMessageProcessors().get(0);
-    assertThat(blockChain.getMessageProcessors().get(0), is(instanceOf(TransactionalInterceptingMessageProcessor.class)));
+    Processor firstProcessor = ((MessageProcessorChain) blockChain.getMessageProcessors().get(0)).getMessageProcessors().get(0);
+    assertThat(firstProcessor,
+               is(instanceOf(TransactionalInterceptingMessageProcessor.class)));
 
-    TransactionalInterceptingMessageProcessor block =
-        (TransactionalInterceptingMessageProcessor) blockChain.getMessageProcessors().get(0);
+    TransactionalInterceptingMessageProcessor block = (TransactionalInterceptingMessageProcessor) firstProcessor;
     assertThat(block.getTransactionConfig().getFactory(), is(instanceOf(DelegateTransactionFactory.class)));
   }
 

@@ -61,14 +61,13 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     return from(publisher).concatMap(event -> {
       Builder builder = Event.builder(event);
       boolean accepted = accept(event, builder);
-      event = builder.build();
       if (accepted) {
-        return applyNext(just(event));
+        return applyNext(just(builder.build()));
       } else {
         if (unacceptedMessageProcessor != null) {
           return just(event).transform(unacceptedMessageProcessor);
         } else if (throwOnUnaccepted) {
-          throw propagate(filterUnacceptedException(event));
+          throw propagate(filterUnacceptedException(builder.build()));
         } else {
           return empty();
         }

@@ -33,8 +33,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private ExecutionTemplate<Event> txExecutionTemplate = callback -> callback.process();
 
-  private ReplyToHandler replyToHandler;
-
   private Transformer responseEventTransformer = input -> input;
   private boolean nonBlocking = false;
 
