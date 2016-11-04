@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -27,25 +26,25 @@ import java.util.function.Supplier;
  * This factory's processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes
  * it synchronously rather than failing.
  */
-public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyFactory, MuleContextAware {
-
-  private MuleContext muleContext;
+public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create() {
+  public ProcessingStrategy create(MuleContext muleContext) {
     return new DefaultFlowProcessingStrategy(() -> {
       try {
         return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
+    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                                             new SynchronousProcessingStrategyFactory().create(muleContext));
   }
 
   public static class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy {
 
-    public DefaultFlowProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper) {
-      super(schedulerSupplier, schedulerStopper);
+    public DefaultFlowProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
+                                         ProcessingStrategy synchronousProcessingStrategy) {
+      super(schedulerSupplier, schedulerStopper, synchronousProcessingStrategy);
     }
 
     @Override
@@ -53,10 +52,5 @@ public class DefaultFlowProcessingStrategyFactory implements ProcessingStrategyF
       return new LaxAsyncInterceptingMessageProcessor();
     }
 
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 }

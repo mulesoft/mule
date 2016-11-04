@@ -47,13 +47,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
@@ -136,10 +134,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
     when(errorTypeLocator.lookupErrorType(any())).thenReturn(errorType);
     mockFlow = new Flow("flow", muleContext);
-    final ProcessingStrategyFactory processingStrategyFactory = nonBlocking ? new NonBlockingProcessingStrategyFactory()
-        : new DefaultFlowProcessingStrategyFactory();
-    LifecycleUtils.setMuleContextIfNeeded(processingStrategyFactory, muleContext);
-    mockFlow.setProcessingStrategyFactory(processingStrategyFactory);
+    mockFlow.setProcessingStrategyFactory(nonBlocking ? new NonBlockingProcessingStrategyFactory()
+        : new DefaultFlowProcessingStrategyFactory());
     mockFlow.initialise();
     mockFlow.start();
   }

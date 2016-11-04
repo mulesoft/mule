@@ -79,7 +79,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (processingStrategyFactory == null) {
       throw new InitialisationException(objectIsNull("processingStrategy"), this);
     }
-    processingStrategy = processingStrategyFactory.create();
+    processingStrategy = processingStrategyFactory.create(muleContext);
 
     validateFlowConstruct();
 

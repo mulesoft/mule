@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
@@ -20,7 +21,7 @@ import java.util.List;
 public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create() {
+  public ProcessingStrategy create(MuleContext muleContext) {
     return new SynchronousProcessingStrategy();
   }
 

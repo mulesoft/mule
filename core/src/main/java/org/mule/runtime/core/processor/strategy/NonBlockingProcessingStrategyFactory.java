@@ -14,7 +14,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -38,12 +37,10 @@ import org.reactivestreams.Publisher;
  *
  * @since 3.7
  */
-public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyFactory, MuleContextAware {
-
-  private MuleContext muleContext;
+public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create() {
+  public ProcessingStrategy create(MuleContext muleContext) {
     return new NonBlockingProcessingStrategy(() -> {
       try {
         return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
@@ -93,10 +90,5 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
         schedulerStopper.accept(scheduler);
       }
     }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 }

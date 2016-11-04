@@ -9,7 +9,6 @@ package org.mule.runtime.core.construct;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
@@ -144,23 +143,21 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       if (processingStrategyFactory == null) {
         final ProcessingStrategyFactory defaultProcessingStrategyFactory =
             muleContext.getConfiguration().getDefaultProcessingStrategyFactory();
-        setMuleContextIfNeeded(defaultProcessingStrategyFactory, muleContext);
 
         if (defaultProcessingStrategyFactory == null) {
           processingStrategyFactory = createDefaultProcessingStrategyFactory();
-          setMuleContextIfNeeded(processingStrategyFactory, muleContext);
         } else {
           processingStrategyFactory = defaultProcessingStrategyFactory;
         }
       }
 
-      processingStrategy = processingStrategyFactory.create();
+      processingStrategy = processingStrategyFactory.create(muleContext);
     }
 
     boolean userConfiguredProcessingStrategy = !(getProcessingStrategyFactory() instanceof DefaultFlowProcessingStrategyFactory);
     boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
     if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
-      processingStrategy = new SynchronousProcessingStrategyFactory().create();
+      processingStrategy = new SynchronousProcessingStrategyFactory().create(muleContext);
       if (LOGGER.isWarnEnabled()) {
         LOGGER
             .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");
@@ -290,7 +287,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStart() throws MuleException {
-    // initialiseProcessingStrategy();
     super.doStart();
     startIfStartable(pipeline);
     startIfNeeded(processingStrategy);

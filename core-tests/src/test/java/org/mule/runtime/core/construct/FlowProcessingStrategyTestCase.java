@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -50,7 +51,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   public void fixedProcessingStrategyIsHonoured() throws Exception {
     ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
-    when(processingStrategyFactory.create()).thenReturn(processingStrategy);
+    when(processingStrategyFactory.create(any(MuleContext.class))).thenReturn(processingStrategy);
     createFlow();
     flow.setProcessingStrategyFactory(processingStrategyFactory);
     flow.initialise();
@@ -62,7 +63,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   public void defaultProcessingStrategyInConfigIsHonoured() throws Exception {
     ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
-    when(processingStrategyFactory.create()).thenReturn(processingStrategy);
+    when(processingStrategyFactory.create(any(MuleContext.class))).thenReturn(processingStrategy);
     when(configuration.getDefaultProcessingStrategyFactory()).thenReturn(processingStrategyFactory);
 
     createFlow();
@@ -74,12 +75,12 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   public void fixedProcessingStrategyTakesPrecedenceOverConfig() throws Exception {
     ProcessingStrategy configProcessingStrategy = mock(ProcessingStrategy.class);
     ProcessingStrategyFactory configProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
-    when(configProcessingStrategyFactory.create()).thenReturn(configProcessingStrategy);
+    when(configProcessingStrategyFactory.create(any(MuleContext.class))).thenReturn(configProcessingStrategy);
     when(configuration.getDefaultProcessingStrategyFactory()).thenReturn(configProcessingStrategyFactory);
 
     ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
-    when(processingStrategyFactory.create()).thenReturn(processingStrategy);
+    when(processingStrategyFactory.create(any(MuleContext.class))).thenReturn(processingStrategy);
     createFlow();
     flow.setProcessingStrategyFactory(processingStrategyFactory);
     flow.initialise();

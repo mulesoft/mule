@@ -64,7 +64,7 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
 
   @Test
   public void assertDefaultProcessingStrategy() throws Exception {
-    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(),
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(muleContext),
                is(instanceOf(expectedStrategyType)));
   }
 }

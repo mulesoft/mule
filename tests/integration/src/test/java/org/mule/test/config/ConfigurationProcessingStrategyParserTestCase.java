@@ -59,7 +59,7 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
 
   @Test
   public void verifyConfigurationProcessingStrategy() throws Exception {
-    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(),
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(muleContext),
                is(instanceOf(expectedStrategyType)));
   }
 }

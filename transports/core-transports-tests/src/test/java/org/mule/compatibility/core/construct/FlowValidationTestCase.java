@@ -60,9 +60,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Test
   public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    final AsynchronousProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
-    processingStrategyFactory.setMuleContext(mockMuleContext);
-    flow.setProcessingStrategyFactory(processingStrategyFactory);
+    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
 
     expected.expectCause(hasCause(instanceOf(FlowConstructInvalidException.class)));
     expected.expectMessage("One of the message sources configured on this Flow is not "
@@ -74,7 +72,6 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Test
   public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    // flow.validateConstruct();
     flow.initialise();
     assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
   }

@@ -220,9 +220,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Test
   public void oneWayAsyncRequestException() throws Exception {
     Flow pipeline = new Flow("test", muleContext);
-    final AsynchronousProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
-    processingStrategyFactory.setMuleContext(muleContext);
-    pipeline.setProcessingStrategyFactory(processingStrategyFactory);
+    pipeline.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
     List<Processor> processors = new ArrayList<>();
     processors.add(event -> {

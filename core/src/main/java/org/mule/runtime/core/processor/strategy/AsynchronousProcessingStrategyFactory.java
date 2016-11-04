@@ -11,7 +11,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -33,24 +32,23 @@ import javax.resource.spi.work.WorkManager;
  * This factory's strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors in a single
  * worker thread.
  */
-public class AsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory, MuleContextAware {
-
-  private MuleContext muleContext;
+public class AsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create() {
+  public ProcessingStrategy create(MuleContext muleContext) {
     return new AsynchronousProcessingStrategy(() -> {
       try {
         return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
+    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                                              new SynchronousProcessingStrategyFactory().create(muleContext));
   }
 
   public static class AsynchronousProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
-    protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategyFactory().create();
+    protected ProcessingStrategy synchronousProcessingStrategy;
 
     private Supplier<Scheduler> schedulerSupplier;
     private Consumer<Scheduler> schedulerStopper;
@@ -58,9 +56,11 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
     private Scheduler scheduler;
     private AsyncInterceptingMessageProcessor asyncMessageProcessor;
 
-    public AsynchronousProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper) {
+    public AsynchronousProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
+                                          ProcessingStrategy synchronousProcessingStrategy) {
       this.schedulerSupplier = schedulerSupplier;
       this.schedulerStopper = schedulerStopper;
+      this.synchronousProcessingStrategy = synchronousProcessingStrategy;
     }
 
     @Override
@@ -89,10 +89,5 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
         asyncMessageProcessor.setScheduler(null);
       }
     }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 }
