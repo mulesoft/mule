@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.processor.strategy;
 
+import org.mule.runtime.core.api.MuleContext;
+
 /**
  * Abstract Factory for creating concrete {@link ProcessingStrategy}ies.
  *
@@ -16,5 +18,5 @@ public interface ProcessingStrategyFactory {
   /**
    * @return a new {@link ProcessingStrategy}.
    */
-  ProcessingStrategy create();
+  ProcessingStrategy create(MuleContext muleContext);
 }

@@ -161,7 +161,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     AsyncDelegateMessageProcessor mp =
         new AsyncDelegateMessageProcessor(listener, new AsynchronousProcessingStrategyFactory(), "thread");
     mp.setMuleContext(muleContext);
-    mp.setFlowConstruct(new Flow("flow", muleContext));
+    final Flow flowConstruct = new Flow("flow", muleContext);
+    flowConstruct.initialise();
+    mp.setFlowConstruct(flowConstruct);
     mp.initialise();
     return mp;
   }

@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.core.construct;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -25,10 +29,10 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFac
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.Arrays;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -45,17 +49,25 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   public AbstractRedeliveryPolicy mockRedeliveryPolicy;
   private Flow flow;
 
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
+
   @Before
   public void setUp() throws MuleException {
     when(mockMuleContext.getConfiguration().getDefaultProcessingStrategyFactory()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }
 
-  @Test(expected = FlowConstructInvalidException.class)
+  @Test
   public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
     configureFlowForRedelivery();
     flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
-    flow.validateConstruct();
+
+    expected.expectCause(hasCause(instanceOf(FlowConstructInvalidException.class)));
+    expected.expectMessage("One of the message sources configured on this Flow is not "
+        + "compatible with an asynchronous processing strategy.  Either "
+        + "because it is request-response, has a transaction defined, or " + "messaging redelivered is configured.");
+    flow.initialise();
   }
 
   @Test
@@ -63,26 +75,32 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
     flow.setProcessingStrategyFactory(new NonBlockingProcessingStrategyFactory());
     flow.setMessageSource((NonBlockingMessageSource) listener -> {
     });
-    flow.validateConstruct();
+    flow.initialise();
   }
 
-  @Test(expected = FlowConstructInvalidException.class)
+  @Test
   public void testProcessingStrategyNonBlockingNotSupported() throws Exception {
     flow.setProcessingStrategyFactory(new NonBlockingProcessingStrategyFactory());
     flow.setMessageSource(listener -> {
     });
-    flow.validateConstruct();
+
+    expected.expectCause(hasCause(instanceOf(FlowConstructInvalidException.class)));
+    expected.expectMessage(allOf(containsString("The non-blocking processing strategy"),
+                                 containsString("currently only supports non-blocking messages sources (source is")));
+    flow.initialise();
   }
 
   @Test
   public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    flow.validateConstruct();
+    flow.initialise();
     assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
   }
 
   private void configureFlowForRedelivery() {
-    flow.setMessageProcessors(Arrays.asList(new IdempotentRedeliveryPolicy()));
+    final IdempotentRedeliveryPolicy idempotentRedeliveryPolicy = new IdempotentRedeliveryPolicy();
+    idempotentRedeliveryPolicy.setUseSecureHash(true);
+    flow.setMessageProcessors(asList(idempotentRedeliveryPolicy));
     flow.setMessageSource(mock(MessageSource.class));
   }
 

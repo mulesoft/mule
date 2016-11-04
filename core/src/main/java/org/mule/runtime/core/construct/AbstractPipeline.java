@@ -9,6 +9,8 @@ package org.mule.runtime.core.construct;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
@@ -136,7 +138,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return new SynchronousProcessingStrategyFactory();
   }
 
-  protected void initialiseProcessingStrategy() {
+  private void initialiseProcessingStrategy() {
     if (processingStrategy == null) {
       if (processingStrategyFactory == null) {
         final ProcessingStrategyFactory defaultProcessingStrategyFactory =
@@ -149,7 +151,17 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
       }
 
-      processingStrategy = processingStrategyFactory.create();
+      processingStrategy = processingStrategyFactory.create(muleContext);
+    }
+
+    boolean userConfiguredProcessingStrategy = !(getProcessingStrategyFactory() instanceof DefaultFlowProcessingStrategyFactory);
+    boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
+    if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
+      processingStrategy = new SynchronousProcessingStrategyFactory().create(muleContext);
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER
+            .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");
+      }
     }
   }
 
@@ -235,7 +247,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    getProcessingStrategy().configureProcessors(getMessageProcessors(), schedulerService, builder, muleContext);
+    getProcessingStrategy().configureProcessors(getMessageProcessors(), builder);
   }
 
   @Override
@@ -264,14 +276,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           .createStaticMessage(format("The non-blocking processing strategy (%s) currently only supports non-blocking messages sources (source is %s).",
                                       getProcessingStrategyFactory().toString(), messageSource.toString())), this);
     }
-
-    if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
-      processingStrategy = new SynchronousProcessingStrategyFactory().create();
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER
-            .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");
-      }
-    }
   }
 
   protected boolean isRedeliveryPolicyConfigured() {
@@ -285,6 +289,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doStart() throws MuleException {
     super.doStart();
     startIfStartable(pipeline);
+    startIfNeeded(processingStrategy);
     canProcessMessage = true;
     try {
       startIfStartable(messageSource);
@@ -362,6 +367,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       canProcessMessage = false;
     }
 
+    stopIfNeeded(processingStrategy);
     stopIfStoppable(pipeline);
     super.doStop();
   }

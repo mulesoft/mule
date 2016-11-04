@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
@@ -98,13 +97,12 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     String foo;
 
     @Override
-    public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
-                                    MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+    public void configureProcessors(List<Processor> processors, MessageProcessorChainBuilder chainBuilder) {
       // Nothing to do
     }
 
     @Override
-    public ProcessingStrategy create() {
+    public ProcessingStrategy create(MuleContext muleContext) {
       return this;
     }
 

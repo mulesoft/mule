@@ -11,6 +11,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -20,11 +21,14 @@ import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 
@@ -36,21 +40,30 @@ import org.reactivestreams.Publisher;
 public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create() {
-    return new NonBlockingProcessingStrategy();
+  public ProcessingStrategy create(MuleContext muleContext) {
+    return new NonBlockingProcessingStrategy(() -> {
+      try {
+        return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
   public static class NonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
-    private SchedulerService schedulerService;
+    private Supplier<Scheduler> schedulerSupplier;
+    private Consumer<Scheduler> schedulerStopper;
+
     private Scheduler scheduler;
-    private MuleContext muleContext;
+
+    public NonBlockingProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper) {
+      this.schedulerSupplier = schedulerSupplier;
+      this.schedulerStopper = schedulerStopper;
+    }
 
     @Override
-    public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
-                                    MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
-      this.schedulerService = schedulerService;
-      this.muleContext = muleContext;
+    public void configureProcessors(List<Processor> processors, MessageProcessorChainBuilder chainBuilder) {
       for (Processor processor : processors) {
         chainBuilder.chain(processor);
       }
@@ -68,13 +81,13 @@ public class NonBlockingProcessingStrategyFactory implements ProcessingStrategyF
 
     @Override
     public void start() throws MuleException {
-      this.scheduler = schedulerService.ioScheduler();
+      this.scheduler = schedulerSupplier.get();
     }
 
     @Override
     public void stop() throws MuleException {
       if (scheduler != null) {
-        scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+        schedulerStopper.accept(scheduler);
       }
     }
   }

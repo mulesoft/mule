@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.List;
 
@@ -22,15 +21,14 @@ import java.util.List;
 public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create() {
+  public ProcessingStrategy create(MuleContext muleContext) {
     return new SynchronousProcessingStrategy();
   }
 
   public static class SynchronousProcessingStrategy implements ProcessingStrategy {
 
     @Override
-    public void configureProcessors(List<Processor> processors, SchedulerService schedulerService,
-                                    MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+    public void configureProcessors(List<Processor> processors, MessageProcessorChainBuilder chainBuilder) {
       for (Object processor : processors) {
         if (processor instanceof Processor) {
           chainBuilder.chain((Processor) processor);

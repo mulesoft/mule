@@ -59,7 +59,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
     when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
     when(endpoint.getExchangePattern()).thenReturn(ONE_WAY);
-    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create());
+    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create(muleContext));
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);

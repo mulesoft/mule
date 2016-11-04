@@ -6,14 +6,17 @@
  */
 package org.mule.compatibility.core.construct;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
@@ -23,10 +26,10 @@ import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFa
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.Arrays;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -45,32 +48,41 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   public AbstractRedeliveryPolicy mockRedeliveryPolicy;
   private Flow flow;
 
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
+
   @Before
-  public void setUp() throws RegistrationException {
+  public void setUp() throws RegistrationException, InitialisationException {
     when(mockMuleContext.getConfiguration().getDefaultProcessingStrategyFactory()).thenReturn(null);
     this.flow = new Flow(FLOW_NAME, mockMuleContext);
   }
 
-  @Test(expected = FlowConstructInvalidException.class)
+  @Test
   public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
     configureFlowForRedelivery();
     flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
-    flow.validateConstruct();
+
+    expected.expectCause(hasCause(instanceOf(FlowConstructInvalidException.class)));
+    expected.expectMessage("One of the message sources configured on this Flow is not "
+        + "compatible with an asynchronous processing strategy.  Either "
+        + "because it is request-response, has a transaction defined, or " + "messaging redelivered is configured.");
+    flow.initialise();
   }
 
   @Test
   public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    flow.validateConstruct();
+    flow.initialise();
     assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
   }
 
   private void configureFlowForRedelivery() {
     when(inboundEndpoint.getTransactionConfig().isConfigured()).thenReturn(false);
     when(inboundEndpoint.getExchangePattern().hasResponse()).thenReturn(false);
-    flow.setMessageProcessors(Arrays.asList(new IdempotentRedeliveryPolicy()));
+    final IdempotentRedeliveryPolicy idempotentRedeliveryPolicy = new IdempotentRedeliveryPolicy();
+    idempotentRedeliveryPolicy.setUseSecureHash(true);
+    flow.setMessageProcessors(asList(idempotentRedeliveryPolicy));
     flow.setMessageSource(inboundEndpoint);
-    // flow.setMessageSource(Mockito.mock(MessageSource.class));
   }
 
 }

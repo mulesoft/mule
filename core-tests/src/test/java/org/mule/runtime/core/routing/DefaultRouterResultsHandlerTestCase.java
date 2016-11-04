@@ -15,9 +15,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
@@ -42,14 +42,14 @@ import org.junit.Test;
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
-  protected MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  protected MuleContext muleContext = mockContextWithServices();
   protected MuleSession session = mock(MuleSession.class);
   protected Flow flow = mock(Flow.class);
   private EventContext context;
 
   @Before
   public void setupMocks() throws Exception {
-    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create());
+    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create(muleContext));
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
