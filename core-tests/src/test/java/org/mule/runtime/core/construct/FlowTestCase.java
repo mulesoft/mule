@@ -203,7 +203,9 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void restartWithAsynchronousProcessingStrategy() throws Exception {
-    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
+    final AsynchronousProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
+    processingStrategyFactory.setMuleContext(muleContext);
+    flow.setProcessingStrategyFactory(processingStrategyFactory);
     flow.initialise();
     flow.start();
 

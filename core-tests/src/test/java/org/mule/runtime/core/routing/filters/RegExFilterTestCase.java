@@ -37,7 +37,6 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
     regExWithValue.setMuleContext(muleContext);
   }
 
-
   @Test
   public void testRegexFilterNoPattern() {
     // start with default

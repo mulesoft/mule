@@ -158,10 +158,13 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   }
 
   protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(Processor listener) throws Exception {
-    AsyncDelegateMessageProcessor mp =
-        new AsyncDelegateMessageProcessor(listener, new AsynchronousProcessingStrategyFactory(), "thread");
+    final AsynchronousProcessingStrategyFactory processingStrategyFactory = new AsynchronousProcessingStrategyFactory();
+    processingStrategyFactory.setMuleContext(muleContext);
+    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(listener, processingStrategyFactory, "thread");
     mp.setMuleContext(muleContext);
-    mp.setFlowConstruct(new Flow("flow", muleContext));
+    final Flow flowConstruct = new Flow("flow", muleContext);
+    flowConstruct.initialise();
+    mp.setFlowConstruct(flowConstruct);
     mp.initialise();
     return mp;
   }

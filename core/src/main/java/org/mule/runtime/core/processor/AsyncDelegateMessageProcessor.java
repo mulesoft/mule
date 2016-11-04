@@ -29,9 +29,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.work.MuleWorkManager;
@@ -86,13 +84,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     validateFlowConstruct();
 
     MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    try {
-      processingStrategy.configureProcessors(singletonList(delegate),
-                                             muleContext.getRegistry().lookupObject(SchedulerService.class), builder,
-                                             muleContext);
-    } catch (RegistrationException e) {
-      throw new InitialisationException(e, this);
-    }
+    processingStrategy.configureProcessors(singletonList(delegate), builder);
     target = builder.build();
     super.initialise();
   }
