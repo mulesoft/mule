@@ -21,8 +21,8 @@ public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactor
 
   @Override
   public ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources) {
-    Set<String> exportedArtifactPackages = getPackages(exportedClassPackages);
-    Set<String> exportedArtifactResources = getPackages(exportedResources);
+    Set<String> exportedArtifactPackages = parseExportedResource(exportedClassPackages);
+    Set<String> exportedArtifactResources = parseExportedResource(exportedResources);
 
     if (exportedArtifactPackages.isEmpty() && exportedArtifactResources.isEmpty()) {
       return DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
@@ -31,7 +31,7 @@ public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactor
     }
   }
 
-  private Set<String> getPackages(String exportedPackages) {
+  public static Set<String> parseExportedResource(String exportedPackages) {
     Set<String> exported = new HashSet<>();
     if (StringUtils.isNotBlank(exportedPackages)) {
       final String[] exports = exportedPackages.split(",");

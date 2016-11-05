@@ -7,32 +7,32 @@
 
 package org.mule.runtime.module.deployment.internal.plugin;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
-
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -72,11 +72,15 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     new PluginPropertiesBuilder(pluginFolder).exportingClassesFrom(exportedClassPackages).build();
 
     final ArtifactClassLoaderFilter classLoaderFilter = mock(DefaultArtifactClassLoaderFilter.class);
+    Set<String> parsedExportedPackages = new HashSet<>();
+    parsedExportedPackages.add("org.foo");
+    parsedExportedPackages.add("org.bar");
+    when(classLoaderFilter.getExportedClassPackages()).thenReturn(parsedExportedPackages);
     when(classLoaderFilterFactory.create(exportedClassPackages, null)).thenReturn(classLoaderFilter);
 
     final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
-    new PluginDescriptorChecker(pluginFolder).limitingAccessWith(classLoaderFilter).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFolder).exportingPackages(parsedExportedPackages).assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
@@ -87,11 +91,16 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     new PluginPropertiesBuilder(pluginFolder).exportingResourcesFrom(exportedResources).build();
 
     final ArtifactClassLoaderFilter classLoaderFilter = mock(DefaultArtifactClassLoaderFilter.class);
+    Set<String> parsedExportedResources = new HashSet<>();
+    parsedExportedResources.add("META-INF");
+    parsedExportedResources.add("META-INF/xml");
+    when(classLoaderFilter.getExportedResources()).thenReturn(parsedExportedResources);
     when(classLoaderFilterFactory.create(null, exportedResources)).thenReturn(classLoaderFilter);
 
     final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
-    new PluginDescriptorChecker(pluginFolder).limitingAccessWith(classLoaderFilter).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFolder).exportingResources(parsedExportedResources)
+        .assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
@@ -125,48 +134,53 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   private static class PluginDescriptorChecker {
 
     private final File pluginFolder;
-    private URL[] runtimeLibs = new URL[0];;
-    private ClassLoaderLookupPolicy classLoaderLookupPolicy = null;
-    private ClassLoaderFilter classLoaderFilter = NULL_CLASSLOADER_FILTER;
+    private URL[] libraries = new URL[0];;
+    private Set<String> resources = emptySet();
+    private Set<String> packages = emptySet();
 
     public PluginDescriptorChecker(File pluginFolder) {
       this.pluginFolder = pluginFolder;
     }
 
-    public PluginDescriptorChecker limitingAccessWith(ClassLoaderFilter classLoaderFilter) {
-      this.classLoaderFilter = classLoaderFilter;
+    public PluginDescriptorChecker exportingResources(Set<String> resources) {
+      this.resources = resources;
+
+      return this;
+    }
+
+    public PluginDescriptorChecker exportingPackages(Set<String> packages) {
+      this.packages = packages;
 
       return this;
     }
 
     public PluginDescriptorChecker containing(URL[] libraries) {
-      runtimeLibs = libraries;
+      this.libraries = libraries;
       return this;
     }
 
-    public PluginDescriptorChecker configuredWith(ClassLoaderLookupPolicy classLoaderLookupPolicy) {
-      this.classLoaderLookupPolicy = classLoaderLookupPolicy;
-      return this;
-    }
-
-    public void assertPluginDescriptor(ArtifactPluginDescriptor pluginDescriptor) {
+    public void assertPluginDescriptor(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
       assertThat(pluginDescriptor.getName(), equalTo(pluginFolder.getName()));
       try {
-        assertThat(pluginDescriptor.getRuntimeClassesDir(),
+        assertThat(pluginDescriptor.getClassLoaderModel().getUrls()[0],
                    equalTo(new File(pluginFolder, "classes").toURI().toURL()));
       } catch (MalformedURLException e) {
         throw new AssertionError("Can't compare classes dir", e);
       }
 
-      assertRuntimeLibs(pluginDescriptor);
+      assertUrls(pluginDescriptor);
       assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
-      assertThat(pluginDescriptor.getClassLoaderFilter(), is(classLoaderFilter));
+      assertThat(pluginDescriptor.getClassLoaderModel().getExportedResources(), equalTo(resources));
+      assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages(), equalTo(packages));
     }
 
-    private void assertRuntimeLibs(ArtifactPluginDescriptor pluginDescriptor) {
-      assertThat(pluginDescriptor.getRuntimeLibs().length, equalTo(runtimeLibs.length));
-      for (URL libUrl : pluginDescriptor.getRuntimeLibs()) {
-        assertThat(pluginDescriptor.getRuntimeLibs(), hasItemInArray(equalTo(libUrl)));
+    private void assertUrls(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
+      assertThat(pluginDescriptor.getClassLoaderModel().getUrls().length, equalTo(libraries.length + 1));
+      assertThat(pluginDescriptor.getClassLoaderModel().getUrls(),
+                 hasItemInArray(equalTo(new File(pluginFolder, "classes").toURI().toURL())));
+
+      for (URL libUrl : libraries) {
+        assertThat(pluginDescriptor.getClassLoaderModel().getUrls(), hasItemInArray(equalTo(libUrl)));
       }
     }
   }

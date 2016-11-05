@@ -7,9 +7,9 @@
 
 package org.mule.runtime.deployment.model.internal.plugin;
 
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,13 +62,13 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
                                         List<ArtifactPluginDescriptor> resolvedPlugins) {
 
     final Set<String> packagesExportedByDependencies =
-        findDependencyPackageClosure(pluginDescriptor.getPluginDependencies(), resolvedPlugins);
+        findDependencyPackageClosure(pluginDescriptor.getClassLoaderModel().getDependencies(), resolvedPlugins);
 
-    final ArtifactClassLoaderFilter originalClassLoaderFilter = pluginDescriptor.getClassLoaderFilter();
-    final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderFilter.getExportedClassPackages());
+    ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
+    final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    pluginDescriptor.setClassLoaderFilter(new DefaultArtifactClassLoaderFilter(exportedClassPackages,
-                                                                               originalClassLoaderFilter.getExportedResources()));
+    pluginDescriptor.setClassLoaderModel(new ClassLoaderModelBuilder(originalClassLoaderModel)
+        .exportingPackages(exportedClassPackages).build());
 
   }
 
@@ -77,8 +77,9 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
     Set<String> exportedPackages = new HashSet<>();
     for (String pluginDependency : pluginDependencies) {
       ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(pluginDependency, resolvedPlugins);
-      exportedPackages.addAll(dependencyDescriptor.getClassLoaderFilter().getExportedClassPackages());
-      exportedPackages.addAll(findDependencyPackageClosure(dependencyDescriptor.getPluginDependencies(), resolvedPlugins));
+      exportedPackages.addAll(dependencyDescriptor.getClassLoaderModel().getExportedPackages());
+      exportedPackages
+          .addAll(findDependencyPackageClosure(dependencyDescriptor.getClassLoaderModel().getDependencies(), resolvedPlugins));
     }
 
     return exportedPackages;
@@ -90,7 +91,7 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
     for (ArtifactPluginDescriptor unresolvedPlugin : unresolvedPlugins) {
       builder.append("\nPlugin: ").append(unresolvedPlugin.getName()).append(" missing dependencies:");
       List<String> missingDependencies = new ArrayList<>();
-      for (String dependency : unresolvedPlugin.getPluginDependencies()) {
+      for (String dependency : unresolvedPlugin.getClassLoaderModel().getDependencies()) {
         final ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(dependency, resolvedPlugins);
         if (dependencyDescriptor == null) {
           missingDependencies.add(dependency);
@@ -104,9 +105,9 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
   }
 
   private boolean isResolvedPlugin(ArtifactPluginDescriptor descriptor, List<ArtifactPluginDescriptor> resolvedPlugins) {
-    boolean isResolved = descriptor.getPluginDependencies().isEmpty();
+    boolean isResolved = descriptor.getClassLoaderModel().getDependencies().isEmpty();
 
-    if (!isResolved && hasDependenciesResolved(descriptor.getPluginDependencies(), resolvedPlugins)) {
+    if (!isResolved && hasDependenciesResolved(descriptor.getClassLoaderModel().getDependencies(), resolvedPlugins)) {
       isResolved = true;
     }
 

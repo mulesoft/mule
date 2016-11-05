@@ -9,7 +9,6 @@ package org.mule.runtime.deployment.model.internal.application;
 
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyMap;
@@ -77,7 +76,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     when(classLoaderLookupPolicy.extend(anyMap())).thenReturn(classLoaderLookupPolicy);
     descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setDomain(DOMAIN_NAME);
-    descriptor.setClassesFolder(toFile(classesFolderUrl));
   }
 
   @After

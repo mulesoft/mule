@@ -21,9 +21,11 @@ import org.mule.runtime.deployment.model.internal.plugin.NamePluginDependenciesR
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -130,14 +132,20 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
     final ArtifactClassLoader artifactClassLoader =
         artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
-    regionClassLoader.addClassLoader(artifactClassLoader, artifactDescriptor.getClassLoaderFilter());
+    ArtifactClassLoaderFilter artifactClassLoaderFilter = createClassLoaderFilter(artifactDescriptor.getClassLoaderModel());
+    regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
 
     for (int i = 0; i < effectiveArtifactPluginDescriptors.size(); i++) {
-      final ArtifactClassLoaderFilter classLoaderFilter = effectiveArtifactPluginDescriptors.get(i).getClassLoaderFilter();
+      final ArtifactClassLoaderFilter classLoaderFilter =
+          createClassLoaderFilter(effectiveArtifactPluginDescriptors.get(i).getClassLoaderModel());
       regionClassLoader.addClassLoader(pluginClassLoaders.get(i), classLoaderFilter);
     }
 
     return artifactClassLoader;
+  }
+
+  private ArtifactClassLoaderFilter createClassLoaderFilter(ClassLoaderModel classLoaderModel) {
+    return new DefaultArtifactClassLoaderFilter(classLoaderModel.getExportedPackages(), classLoaderModel.getExportedResources());
   }
 
   protected abstract String getArtifactId(ArtifactDescriptor artifactDescriptor);

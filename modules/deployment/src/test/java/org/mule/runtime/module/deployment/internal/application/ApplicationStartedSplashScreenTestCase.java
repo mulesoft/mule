@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.internal.AbstractSplashScreenTestCase;
 
 import com.google.common.collect.Sets;
@@ -37,6 +38,7 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   private static final String MY_JAR = "myLib.jar";
 
   private ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
+  private ClassLoaderModel classLoaderModel = mock(ClassLoaderModel.class);
   private ArtifactPluginDescriptor pluginDescriptor = mock(ArtifactPluginDescriptor.class);
   private Set<ArtifactPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
   private static List<URL> runtimeLibs = newArrayList();
@@ -60,8 +62,10 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
     when(descriptor.getName()).thenReturn(APP_NAME);
     when(descriptor.getAppProperties()).thenReturn(new HashMap<>());
     when(descriptor.getPlugins()).thenReturn(plugins);
-    when(descriptor.getRuntimeLibs()).thenReturn(runtimeLibs.toArray(new URL[0]));
     when(pluginDescriptor.getName()).thenReturn(PLUGIN_NAME);
+    when(descriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+
+    when(classLoaderModel.getUrls()).thenReturn(runtimeLibs.toArray(new URL[0]));
   }
 
   @Override
