@@ -2302,7 +2302,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestDomainFactory testDomainFactory =
         new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader);
+                              containerClassLoader, artifactClassLoaderManager);
     testDomainFactory.setFailOnStopApplication();
 
     deploymentService.setDomainFactory(testDomainFactory);
@@ -2323,7 +2323,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestDomainFactory testDomainFactory =
         new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader);
+                              containerClassLoader, artifactClassLoaderManager);
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
     startDeployment();
@@ -3204,7 +3204,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     return new DefaultMuleDomain(new DomainDescriptor(DEFAULT_DOMAIN_NAME),
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
-                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()));
+                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
+                                 artifactClassLoaderManager);
   }
 
   /**
