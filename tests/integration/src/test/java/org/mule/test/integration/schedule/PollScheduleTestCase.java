@@ -31,7 +31,7 @@ public class PollScheduleTestCase extends AbstractIntegrationTestCase {
   private static List<String> foo = new ArrayList<String>();
   private static List<String> bar = new ArrayList<String>();
 
-  Prober workingPollProber = new PollingProber(5000, 1000l);
+  Prober workingPollProber = new PollingProber(10000, 100l);
 
   @BeforeClass
   public static void setProperties() {
