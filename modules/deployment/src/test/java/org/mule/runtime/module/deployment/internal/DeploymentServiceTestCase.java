@@ -63,7 +63,8 @@ import static org.mule.runtime.module.deployment.internal.application.Properties
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
+import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -137,6 +138,11 @@ import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
+
+  static {
+    MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
+    MuleArtifactUrlStreamHandler.register();
+  }
 
   private static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
   protected static final int DEPLOYMENT_TIMEOUT = 10000;
@@ -1464,7 +1470,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
-    assertContainerAppPluginExplodedDir(new String[] {echoPlugin.getDeployedPath()});
+    assertContainerAppPluginCompressedDir(new String[] {echoPlugin.getArtifactFile().getName()});
   }
 
   @Test
@@ -1706,6 +1712,26 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       assertThat(e.getCause().getCause(), instanceOf(NoClassDefFoundError.class));
       assertThat(e.getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
     }
+  }
+
+  @Test
+  public void deploysApplicationWithPluginDependingOnPluginAtContainerLevel() throws Exception {
+    ArtifactPluginFileBuilder dependantPlugin =
+        new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+            .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class")
+            .dependingOn(echoPlugin.getId());
+
+    installContainerPlugin(echoPlugin);
+
+    final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
+        .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(dependantPlugin);
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -3228,6 +3254,17 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
    */
   private void assertContainerAppPluginExplodedDir(String[] expectedPlugins) {
     final String[] actualArtifactPlugins = containerAppPluginsDir.list(DIRECTORY);
+    assertTrue("Invalid Mule core application plugins exploded",
+               isEqualCollection(asList(expectedPlugins), asList(actualArtifactPlugins)));
+  }
+
+  /**
+   * Asserts that the core application plugins are compressed and match the number of expected plugins to be used
+   *
+   * @param expectedPlugins
+   */
+  private void assertContainerAppPluginCompressedDir(String[] expectedPlugins) {
+    final String[] actualArtifactPlugins = containerAppPluginsDir.list(MuleDeploymentService.ZIP_ARTIFACT_FILTER);
     assertTrue("Invalid Mule core application plugins exploded",
                isEqualCollection(asList(expectedPlugins), asList(actualArtifactPlugins)));
   }

@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import org.mule.runtime.container.api.MuleFoldersUtil;
@@ -26,8 +25,7 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,14 +56,14 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   private static final Logger logger = LoggerFactory.getLogger(ApplicationDescriptorFactory.class);
 
   private final ArtifactPluginRepository applicationPluginRepository;
-  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+  private final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory;
 
-  public ApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
+  public ApplicationDescriptorFactory(ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory,
                                       ArtifactPluginRepository applicationPluginRepository) {
-    checkArgument(artifactPluginDescriptorLoader != null, "ApplicationPluginDescriptorFactory cannot be null");
+    checkArgument(artifactPluginDescriptorFactory != null, "ArtifactPluginDescriptorFactory cannot be null");
     checkArgument(applicationPluginRepository != null, "ApplicationPluginRepository cannot be null");
     this.applicationPluginRepository = applicationPluginRepository;
-    this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+    this.artifactPluginDescriptorFactory = artifactPluginDescriptorFactory;
   }
 
   public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
@@ -90,7 +88,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
       setApplicationProperties(desc, appPropsFile);
 
-      final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
+      final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder);
       verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
       desc.setPlugins(plugins);
       File appClassesFolder = getAppClassesFolder(desc);
@@ -224,7 +222,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     // TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
   }
 
-  private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor)
+  private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir)
       throws IOException {
     final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
     String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
@@ -236,10 +234,8 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     Set<ArtifactPluginDescriptor> pds = new HashSet<>(pluginZips.length);
 
     for (String pluginZip : pluginZips) {
-      String unpackDestinationFolder = appDescriptor.getName() + separator + PLUGINS_FOLDER + separator;
       File pluginZipFile = new File(pluginsDir, pluginZip);
-      pds.add(artifactPluginDescriptorLoader
-          .load(pluginZipFile, new File(MuleContainerBootstrapUtils.getMuleTmpDir(), unpackDestinationFolder)));
+      pds.add(artifactPluginDescriptorFactory.create(pluginZipFile));
     }
     return pds;
   }

@@ -6,25 +6,11 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import static java.util.Collections.emptyList;
-import static org.apache.commons.io.FileUtils.copyFile;
-import static org.apache.commons.io.IOUtils.copy;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppPluginsFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -35,7 +21,6 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderM
 import org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase;
 import org.mule.runtime.module.deployment.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
@@ -48,11 +33,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import static java.util.Collections.emptyList;
+import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.IOUtils.copy;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.container.api.MuleFoldersUtil.*;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 
 public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
@@ -91,7 +84,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPluginDescriptorFactory pluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
+        new ApplicationDescriptorFactory(pluginDescriptorFactory,
                                          applicationPluginRepository);
     final ArtifactPluginDescriptor expectedPluginDescriptor1 = mock(ArtifactPluginDescriptor.class);
     when(expectedPluginDescriptor1.getName()).thenReturn("plugin1");
@@ -119,7 +112,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyResourceAs(echoTestJarFile.getAbsolutePath(), sharedLibFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()),
                                          applicationPluginRepository);
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -141,7 +134,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyResourceAs("test-jar-with-resources.jar", libFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()),
                                          applicationPluginRepository);
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -191,7 +184,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPluginDescriptorFactory pluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
+        new ApplicationDescriptorFactory(pluginDescriptorFactory,
                                          applicationPluginRepository);
 
     try {

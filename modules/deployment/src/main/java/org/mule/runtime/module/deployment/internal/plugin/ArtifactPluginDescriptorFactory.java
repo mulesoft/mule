@@ -7,27 +7,16 @@
 
 package org.mule.runtime.module.deployment.internal.plugin;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory.parseExportedResource;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorZipLoader.EXTENSION_ZIP;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
@@ -47,57 +36,21 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     this.classLoaderFilterFactory = classLoaderFilterFactory;
   }
 
+  /**
+   * Creates an {@link ArtifactPluginDescriptor} descriptor from a folder or a ZIP file.
+   *
+   * @param pluginLocation an existing folder, or an existing ZIP file, containing artifact files for a plugin.
+   * @return a non null descriptor
+   * @throws ArtifactDescriptorCreateException if the factory is not able to create a descriptor from the folder or the ZIP file.
+   */
   @Override
-  public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {
-    final String pluginName = pluginFolder.getName();
-    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginName);
-    descriptor.setRootFolder(pluginFolder);
-
-    ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
-
-    final File pluginPropsFile = new File(pluginFolder, PLUGIN_PROPERTIES);
-    if (pluginPropsFile.exists()) {
-      Properties props;
-      try {
-        props = loadProperties(pluginPropsFile.toURI().toURL());
-      } catch (IOException e) {
-        throw new ArtifactDescriptorCreateException("Cannot read plugin.properties file", e);
-      }
-
-      String pluginDependencies = props.getProperty(PLUGIN_DEPENDENCIES);
-      if (!isEmpty(pluginDependencies)) {
-        classLoaderModelBuilder.dependingOn(getPluginDependencies(pluginDependencies));
-      }
-
-      classLoaderModelBuilder
-          .exportingPackages(parseExportedResource(props.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY)))
-          .exportingResources(parseExportedResource(props.getProperty(EXPORTED_RESOURCE_PROPERTY)));
+  public ArtifactPluginDescriptor create(File pluginLocation) throws ArtifactDescriptorCreateException {
+    if (pluginLocation.isDirectory()) {
+      return new ArtifactPluginDescriptorFolderLoader(pluginLocation).load();
+    } else if (endsWithIgnoreCase(pluginLocation.getName(), EXTENSION_ZIP)) {
+      return new ArtifactPluginDescriptorZipLoader(pluginLocation).load();
     }
-
-    try {
-      classLoaderModelBuilder.containing(new File(pluginFolder, "classes").toURI().toURL());
-      final File libDir = new File(pluginFolder, "lib");
-      if (libDir.exists()) {
-        final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(".jar"));
-        for (int i = 0; i < jars.length; i++) {
-          classLoaderModelBuilder.containing(jars[i].toURI().toURL());
-        }
-      }
-    } catch (MalformedURLException e) {
-      throw new ArtifactDescriptorCreateException("Failed to create plugin descriptor " + pluginFolder);
-    }
-
-    descriptor.setClassLoaderModel(classLoaderModelBuilder.build());
-
-    return descriptor;
-  }
-
-  private Set<String> getPluginDependencies(String pluginDependencies) {
-    Set<String> plugins = new HashSet<>();
-    final String[] split = pluginDependencies.split(",");
-    for (String plugin : split) {
-      plugins.add(plugin.trim());
-    }
-    return plugins;
+    throw new ArtifactDescriptorCreateException(format("Plugins are only supported in ZIP or folders, check '%s'",
+                                                       pluginLocation.getAbsolutePath()));
   }
 }
