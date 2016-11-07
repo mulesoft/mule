@@ -8,8 +8,10 @@
 package org.mule.tck;
 
 import static java.io.File.separator;
+import static java.nio.file.FileVisitResult.*;
+import static java.nio.file.Files.walkFileTree;
+import static org.apache.commons.lang.StringUtils.removeStart;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +20,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -89,12 +90,11 @@ public class ZipUtils {
   public static void compressDirectory(File targetFile, Path path) {
     List<ZipResource> resources = new ArrayList<>();
     try {
-      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+      walkFileTree(path, new SimpleFileVisitor<Path>() {
 
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          resources.add(new ZipResource(file.toString(),
-                                        StringUtils.removeStart(file.toString(), path.toString() + separator)));
-          return FileVisitResult.CONTINUE;
+          resources.add(new ZipResource(file.toString(), removeStart(file.toString(), path.toString() + separator)));
+          return CONTINUE;
         }
       });
     } catch (IOException e) {
