@@ -57,7 +57,7 @@ public class QueryStatementFactory implements ConfigurableStatementFactory
         {
             DatabaseMetaData metadata = connection.getMetaData();
             int resultSetType;
-            // MULE-10854: some DBs need scrolling for fetching CLOBs, but others don't support it so we check
+            // MULE-10854: some drivers need scrolling for fetching CLOBs, but others don't support it so we check
             if (metadata.supportsResultSetType(TYPE_SCROLL_INSENSITIVE))
             {
                 resultSetType = TYPE_SCROLL_INSENSITIVE;

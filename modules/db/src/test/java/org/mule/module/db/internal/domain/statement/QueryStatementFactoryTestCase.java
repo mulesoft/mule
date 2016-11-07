@@ -33,10 +33,10 @@ import org.junit.Test;
 @SmallTest
 public class QueryStatementFactoryTestCase extends AbstractMuleTestCase
 {
-    final String sqlText = "call test";
-    CallableStatement createdStatement;
-    DatabaseMetaData metadata;
-    DbConnection connection;
+    private final String sqlText = "call test";
+    private CallableStatement createdStatement;
+    private DatabaseMetaData metadata;
+    private DbConnection connection;
 
     @Before
     public void setUp() throws Exception
