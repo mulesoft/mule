@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,11 +41,14 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stax.StAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -399,7 +403,9 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
         xsr.nextTag();
       }
 
-      return factory.newDocumentBuilder().parse(new InputSource());
+      final InputSource is = new InputSource();
+      is.setCharacterStream(new StringReader(getOuterXml(xsr)));
+      return factory.newDocumentBuilder().parse(is);
     } else if (src instanceof DelayedResult) {
       DelayedResult result = ((DelayedResult) src);
       DOMResult domResult = new DOMResult();
@@ -410,6 +416,12 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     }
   }
 
+  private static String getOuterXml(XMLStreamReader xmlr) throws TransformerFactoryConfigurationError, TransformerException {
+    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    StringWriter stringWriter = new StringWriter();
+    transformer.transform(new StAXSource(xmlr), new StreamResult(stringWriter));
+    return stringWriter.toString();
+  }
 
   /**
    * Copies the reader to the writer. The start and end document methods must be handled on the writer manually. TODO: if the

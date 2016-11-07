@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.dom4j.DocumentHelper;
 import org.junit.Test;
@@ -126,6 +129,16 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
     evaluateFooFromPayload(document);
     evaluateFooFromFlowVar(document);
+  }
+
+  @Test
+  public void fromXmlStreamReader() throws Exception {
+    evaluateFooFromPayload(getXmlStreamReader());
+    evaluateFooFromFlowVar(getXmlStreamReader());
+  }
+
+  public XMLStreamReader getXmlStreamReader() throws XMLStreamException {
+    return XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(ROOT_FOO_BAR));
   }
 
   @Test
