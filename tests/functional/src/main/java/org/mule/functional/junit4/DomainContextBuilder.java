@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,7 @@ public class DomainContextBuilder {
   }
 
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    // nothing to do
+    builders.add(new TestServicesConfigurationBuilder());
   }
 
   protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception {

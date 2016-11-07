@@ -12,11 +12,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
@@ -79,13 +75,7 @@ public class DomainPropertiesPlaceHolderPropagationTestCase extends AbstractMule
   }
 
   private void configureContexts(String domainConfig, String appConfig) throws Exception {
-    domainContext = new DomainContextBuilder() {
-
-      @Override
-      protected void addBuilders(List<ConfigurationBuilder> builders) {
-        builders.add(new TestServicesConfigurationBuilder());
-      };
-    }.setDomainConfig(domainConfig).build();
+    domainContext = new DomainContextBuilder().setDomainConfig(domainConfig).build();
     applicationContext =
         new ApplicationContextBuilder().setApplicationResources(new String[] {appConfig}).setDomainContext(domainContext).build();
   }
