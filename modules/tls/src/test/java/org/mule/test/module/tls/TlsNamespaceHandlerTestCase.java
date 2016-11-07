@@ -15,7 +15,6 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import org.junit.Test;
@@ -30,16 +29,6 @@ public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase 
   @Override
   protected String getConfigFile() {
     return "tls-namespace-config.xml";
-  }
-
-  @Override
-  protected MuleContext createMuleContext() throws Exception {
-    try {
-      return super.createMuleContext();
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
   }
 
   @Test

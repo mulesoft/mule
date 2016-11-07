@@ -49,7 +49,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase {
+abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
   @Mock
   protected ServiceRegistry serviceRegistry;

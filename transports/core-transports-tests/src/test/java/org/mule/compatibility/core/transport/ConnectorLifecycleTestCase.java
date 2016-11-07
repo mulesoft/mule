@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -54,7 +55,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Override
   public void doSetUp() throws Exception {
-    muleContext.getNotificationManager().start();
+    initialiseIfNeeded(muleContext.getNotificationManager());
     connector = new TestConnector(muleContext);
     connector.initialise();
   }
@@ -65,7 +66,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
       connector.dispose();
     }
     connector = null;
-    muleContext.getNotificationManager().stop();
+    muleContext.getNotificationManager().dispose();
   }
 
   /**

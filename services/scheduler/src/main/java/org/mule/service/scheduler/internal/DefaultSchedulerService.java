@@ -22,10 +22,11 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
@@ -48,8 +49,6 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   // TODO MULE-10585 Externalize this timeout
   private static final int GRACEFUL_SHUTDOWN_TIMEOUT_SECS = 60;
-
-  // private static final int TASK_QUEUE_SIZE = 2000;
 
   private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
   private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
@@ -88,11 +87,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     logger.info("Starting " + this.toString() + "...");
 
     // TODO MULE-10585 Externalize the threads configuration
-    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(4 * cores),
+    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
                                               new NamedThreadFactory(CPU_LIGHT_THREADS_NAME));
-    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new ArrayBlockingQueue<>(cores * cores),
+    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new SynchronousQueue<>(),
                                         new NamedThreadFactory(IO_THREADS_NAME));
-    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(4 * cores),
+    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
                                                  new NamedThreadFactory(COMPUTATION_THREADS_NAME));
     scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(SCHEDULER_THREADS_NAME));
 

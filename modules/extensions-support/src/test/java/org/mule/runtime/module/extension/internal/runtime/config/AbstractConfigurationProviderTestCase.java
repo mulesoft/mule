@@ -30,7 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
+abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
 
   protected static final String CONFIG_NAME = "config";
 

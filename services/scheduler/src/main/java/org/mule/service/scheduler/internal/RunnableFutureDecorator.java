@@ -48,8 +48,8 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
     long startTime = 0;
     if (logger.isDebugEnabled()) {
       startTime = System.nanoTime();
+      logger.debug("Starting task " + this.toString() + "...");
     }
-    logger.debug("Starting task " + this.toString() + "...");
     started = true;
     try {
       task.run();

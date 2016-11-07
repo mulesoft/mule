@@ -41,7 +41,8 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws InitialisationException, ConfigurationException {
-    muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+    muleContext = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                                    new QueueManagerOnlyConfigurationBuilder());
     new TestServicesConfigurationBuilder().configure(muleContext);
   }
 

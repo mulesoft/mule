@@ -39,6 +39,7 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
@@ -127,6 +128,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -316,10 +318,11 @@ public class DefaultMuleContext implements MuleContext {
       }
 
       workManager.start();
-      getNotificationManager().initialise();
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
+
+      getNotificationManager().initialise();
     } catch (InitialisationException e) {
       disposeManagers();
       throw e;
@@ -333,7 +336,6 @@ public class DefaultMuleContext implements MuleContext {
   public synchronized void start() throws MuleException {
     getLifecycleManager().checkPhase(Startable.PHASE_NAME);
 
-    getNotificationManager().start();
 
     if (getQueueManager() == null) {
       throw new MuleRuntimeException(objectIsNull("queueManager"));
@@ -398,8 +400,6 @@ public class DefaultMuleContext implements MuleContext {
     fireNotification(new MuleContextNotification(this, CONTEXT_STOPPING));
     getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
     fireNotification(new MuleContextNotification(this, CONTEXT_STOPPED));
-
-    getNotificationManager().stop();
   }
 
   @Override

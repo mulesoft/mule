@@ -8,6 +8,7 @@ package org.mule.runtime.core.context.notification;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU;
@@ -23,8 +24,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -64,15 +63,13 @@ import org.slf4j.Logger;
  * </ul>
  */
 public class ServerNotificationManager
-    implements Initialisable, Disposable, Startable, Stoppable, ServerNotificationHandler, MuleContextAware {
+    implements Initialisable, Disposable, ServerNotificationHandler, MuleContextAware {
 
   private static final Logger logger = getLogger(ServerNotificationManager.class);
 
   private boolean dynamic = false;
   private Configuration configuration = new Configuration();
   private AtomicBoolean disposed = new AtomicBoolean(false);
-  // private volatile Thread runningThread;
-  // private BlockingDeque<ServerNotification> eventQueue = new LinkedBlockingDeque<>();
   private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
   private Scheduler notificationsIoScheduler;
@@ -94,31 +91,18 @@ public class ServerNotificationManager
 
   @Override
   public void initialise() throws InitialisationException {
-    // try {
-    // notificationsScheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).cpuLightScheduler();
-    // } catch (RegistrationException e) {
-    // throw new InitialisationException(e, this);
-    // }
-  }
-
-  @Override
-  public void start() throws InitialisationException {
+    SchedulerService schedulerService;
     try {
-      notificationsLiteScheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).cpuLightScheduler();
-      notificationsIoScheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
-      notificationsComputationScheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).computationScheduler();
+      schedulerService = muleContext.getRegistry().lookupObject(SchedulerService.class);
     } catch (RegistrationException e) {
       throw new InitialisationException(e, this);
     }
-  }
+    requireNonNull(schedulerService);
 
-  // public void start(WorkManager workManager, WorkListener workListener) throws LifecycleException {
-  // try {
-  // workManager.scheduleWork(this, WorkManager.INDEFINITE, null, workListener);
-  // } catch (WorkException e) {
-  // throw new LifecycleException(e, this);
-  // }
-  // }
+    notificationsLiteScheduler = schedulerService.cpuLightScheduler();
+    notificationsIoScheduler = schedulerService.ioScheduler();
+    notificationsComputationScheduler = schedulerService.computationScheduler();
+  }
 
   public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event) {
     configuration.addInterfaceToType(iface, event);
@@ -187,14 +171,6 @@ public class ServerNotificationManager
             notificationsComputationScheduler.submit(() -> listener.onNotification(nfn));
           }
         });
-        // notificationsScheduler.submit(() -> notifyListeners(notification));
-        // try {
-        // eventQueue.put(notification);
-        // } catch (InterruptedException e) {
-        // if (!disposed.get()) {
-        // logger.error("Failed to queue notification: " + notification, e);
-        // }
-        // }
       }
     } else {
       logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
@@ -220,58 +196,34 @@ public class ServerNotificationManager
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
+    final int shutdownTimeout = muleContext.getConfiguration().getShutdownTimeout();
+
     if (notificationsLiteScheduler != null) {
-      notificationsLiteScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      notificationsLiteScheduler.stop(shutdownTimeout, MILLISECONDS);
       notificationsLiteScheduler = null;
     }
     if (notificationsIoScheduler != null) {
-      notificationsIoScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      notificationsIoScheduler.stop(shutdownTimeout, MILLISECONDS);
       notificationsIoScheduler = null;
     }
     if (notificationsComputationScheduler != null) {
-      notificationsComputationScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      notificationsComputationScheduler.stop(shutdownTimeout, MILLISECONDS);
       notificationsComputationScheduler = null;
     }
-  }
 
-  @Override
-  public void dispose() {
     disposed.set(true);
     configuration = null;
-    // if (runningThread != null) {
-    // runningThread.interrupt();
-    // }
   }
 
   protected void notifyListeners(ServerNotification notification, Notifier notifier) {
+    final Policy policy = configuration.getPolicy();
     if (!disposed.get()) {
-      configuration.getPolicy().dispatch(notification, notifier);
+      policy.dispatch(notification, notifier);
     } else {
       logger.warn("Notification not delivered after ServerNotificationManager disposal: " + notification);
     }
   }
-
-  // @Override
-  // public void release() {
-  // dispose();
-  // }
-  //
-  // @Override
-  // public void run() {
-  // runningThread = currentThread();
-  // while (!disposed.get()) {
-  // try {
-  // int timeout = muleContext.getConfiguration().getDefaultQueueTimeout();
-  // ServerNotification notification = eventQueue.poll(timeout, TimeUnit.MILLISECONDS);
-  // if (notification != null) {
-  // notifyListeners(notification);
-  // }
-  // } catch (InterruptedException e) {
-  // currentThread().interrupt();
-  // }
-  // }
-  // }
 
   /**
    * Support string or class parameters
