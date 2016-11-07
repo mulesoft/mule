@@ -56,7 +56,7 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     expectedException
-        .expectMessage(is("Query defines parameters unused but they aren't present in the query."));
+        .expectMessage(is("Query defines parameters ['unused'] but they aren't present in the query."));
     Message response = flowRunner("bulkInsertWithUnusedParameterType").withPayload(values()).run().getMessage();
   }
 
