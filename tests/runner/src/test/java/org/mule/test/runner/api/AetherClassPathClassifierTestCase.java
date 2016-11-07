@@ -14,6 +14,7 @@ import static org.eclipse.aether.util.artifact.JavaScopes.PROVIDED;
 import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -37,6 +38,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -168,6 +170,65 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                    (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                    argThat(instanceOf(DependencyFilter.class)));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
+    verify(rootArtifactResult).getArtifact();
+  }
+
+  @Test
+  public void appendApplicationUrls() throws Exception {
+    Dependency compileMuleCoreDep = fooCoreDep.setScope(COMPILE);
+    Dependency compileMuleArtifactDep = fooToolsArtifactDep.setScope(COMPILE);
+    when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
+        .thenReturn(APPLICATION);
+
+    ArtifactDescriptorResult artifactDescriptorResult = mock(ArtifactDescriptorResult.class);
+    List<Dependency> managedDependencies = newArrayList(guavaDep);
+    when(artifactDescriptorResult.getManagedDependencies()).thenReturn(managedDependencies);
+    when(dependencyResolver.readArtifactDescriptor(any(Artifact.class))).thenReturn(artifactDescriptorResult);
+
+
+    File rootArtifactFile = temporaryFolder.newFile();
+    File fooCoreArtifactFile = temporaryFolder.newFile();
+    File fooToolsArtifactFile = temporaryFolder.newFile();
+
+    Artifact jarRootArtifact = rootArtifact.setFile(rootArtifactFile);
+    ArtifactResult rootArtifactResult = mock(ArtifactResult.class);
+    when(rootArtifactResult.getArtifact()).thenReturn(jarRootArtifact);
+
+    when(dependencyResolver
+        .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
+            .thenReturn(rootArtifactResult);
+
+    when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
+                                                (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
+                                                                                    equalTo(compileMuleArtifactDep))),
+                                                (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
+                                                argThat(instanceOf(DependencyFilter.class))))
+                                                    .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
+
+    URL url = mock(URL.class);
+    List<URL> appUrls = newArrayList(url);
+    when(context.getApplicationUrls()).thenReturn(appUrls);
+
+    ArtifactsUrlClassification classification = classifier.classify(context);
+
+    assertThat(classification.getApplicationUrls(), hasSize(2));
+    assertThat(classification.getApplicationUrls(), contains(rootArtifactFile.toURI().toURL(), url));
+    assertThat(classification.getPluginUrlClassifications(), is(empty()));
+    assertThat(classification.getPluginSharedLibUrls(), is(empty()));
+    assertThat(classification.getContainerUrls(), hasSize(2));
+    assertThat(classification.getContainerUrls(),
+               hasItems(fooCoreArtifactFile.toURI().toURL(), fooToolsArtifactFile.toURI().toURL()));
+
+    verify(artifactDescriptorResult, atLeastOnce()).getManagedDependencies();
+    verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class));
+    verify(dependencyResolver).resolveDependencies(argThat(nullValue(Dependency.class)),
+                                                   (List<Dependency>) argThat(
+                                                                              hasItems(equalTo(compileMuleCoreDep),
+                                                                                       equalTo(compileMuleArtifactDep))),
+                                                   (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
+                                                   argThat(instanceOf(DependencyFilter.class)));
+    verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
+    verify(context, atLeastOnce()).getApplicationUrls();
     verify(rootArtifactResult).getArtifact();
   }
 

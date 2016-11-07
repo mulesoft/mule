@@ -46,6 +46,9 @@ public class ClassPathClassifierContext {
   private final List<String> sharedPluginLibCoordinates = newArrayList();
   private final List<Class> exportPluginClasses = newArrayList();
   private final List<String> excludedArtifacts = newArrayList();
+
+  private final List<URL> applicationUrls = newArrayList();
+
   private boolean extensionMetadataGenerationEnabled = false;
   private File pluginResourcesFolder;
 
@@ -73,6 +76,8 @@ public class ClassPathClassifierContext {
    *        added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
    *        plugin, for testing purposes only.
+   * @param applicationUrls {@link List} of {@link URL}s to be appended to the application
+   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    * @param extensionMetadataGenerationEnabled if while building the a plugin
    *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for an
    *        {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
@@ -90,6 +95,7 @@ public class ClassPathClassifierContext {
                                     final List<String> pluginCoordinates,
                                     final List<String> sharedPluginLibCoordinates,
                                     final List<Class> exportPluginClasses,
+                                    final List<URL> applicationUrls,
                                     final boolean extensionMetadataGenerationEnabled)
       throws IOException {
     checkNotNull(rootArtifact, "rootArtifact cannot be null");
@@ -111,6 +117,9 @@ public class ClassPathClassifierContext {
     this.pluginCoordinates.addAll(pluginCoordinates);
     this.sharedPluginLibCoordinates.addAll(sharedPluginLibCoordinates);
     this.exportPluginClasses.addAll(exportPluginClasses);
+
+    this.applicationUrls.addAll(applicationUrls);
+
     this.extensionMetadataGenerationEnabled = extensionMetadataGenerationEnabled;
   }
 
@@ -222,6 +231,14 @@ public class ClassPathClassifierContext {
    */
   public List<String> getSharedPluginLibCoordinates() {
     return this.sharedPluginLibCoordinates;
+  }
+
+  /**
+   * @return {@link List} of {@link URL}s to be appended to the application
+   *          {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   */
+  public List<URL> getApplicationUrls() {
+    return this.applicationUrls;
   }
 
   /**
