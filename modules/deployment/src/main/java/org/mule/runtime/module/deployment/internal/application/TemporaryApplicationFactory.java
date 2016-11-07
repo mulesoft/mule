@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal.application;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
@@ -24,9 +25,10 @@ public class TemporaryApplicationFactory extends DefaultApplicationFactory {
   public TemporaryApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                      ApplicationDescriptorFactory applicationDescriptorFactory,
                                      ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
-                                     ServiceRepository serviceRepository) {
+                                     ServiceRepository serviceRepository,
+                                     ClassLoaderRepository classLoaderRepository) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
-          serviceRepository, null);
+          serviceRepository, classLoaderRepository);
   }
 
   @Override
