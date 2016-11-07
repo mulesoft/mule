@@ -30,7 +30,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
  *
  * @since 4.0
  */
-public class ArtifactPluginDescriptorFolderLoader extends AbstractArtifactPluginDescriptorLoader {
+public class FolderArtifactPluginDescriptorLoader extends AbstractArtifactPluginDescriptorLoader {
 
   /**
    * Stores the reference to a plugin so that it can later constructs an {@link ArtifactPluginDescriptor} through the
@@ -38,7 +38,7 @@ public class ArtifactPluginDescriptorFolderLoader extends AbstractArtifactPlugin
    *
    * @param pluginLocation location of a plugin
    */
-  ArtifactPluginDescriptorFolderLoader(File pluginLocation) {
+  FolderArtifactPluginDescriptorLoader(File pluginLocation) {
     super(pluginLocation);
   }
 

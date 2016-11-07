@@ -31,7 +31,7 @@ import java.util.zip.ZipFile;
  *
  * @since 4.0
  */
-public class ArtifactPluginDescriptorZipLoader extends AbstractArtifactPluginDescriptorLoader {
+public class ZipArtifactPluginDescriptorLoader extends AbstractArtifactPluginDescriptorLoader {
 
   public static final String EXTENSION_ZIP = ".zip";
 
@@ -48,7 +48,7 @@ public class ArtifactPluginDescriptorZipLoader extends AbstractArtifactPluginDes
    * @param pluginLocation location of a plugin
    * @see #assembleFor(String)
    */
-  ArtifactPluginDescriptorZipLoader(File pluginLocation) {
+  ZipArtifactPluginDescriptorLoader(File pluginLocation) {
     super(pluginLocation);
     try {
       this.pluginZip = new ZipFile(pluginLocation);

@@ -10,7 +10,7 @@ package org.mule.runtime.module.deployment.internal.plugin;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorZipLoader.EXTENSION_ZIP;
+import static org.mule.runtime.module.deployment.internal.plugin.ZipArtifactPluginDescriptorLoader.EXTENSION_ZIP;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -46,9 +46,9 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   @Override
   public ArtifactPluginDescriptor create(File pluginLocation) throws ArtifactDescriptorCreateException {
     if (pluginLocation.isDirectory()) {
-      return new ArtifactPluginDescriptorFolderLoader(pluginLocation).load();
+      return new FolderArtifactPluginDescriptorLoader(pluginLocation).load();
     } else if (endsWithIgnoreCase(pluginLocation.getName(), EXTENSION_ZIP)) {
-      return new ArtifactPluginDescriptorZipLoader(pluginLocation).load();
+      return new ZipArtifactPluginDescriptorLoader(pluginLocation).load();
     }
     throw new ArtifactDescriptorCreateException(format("Plugins are only supported in ZIP or folders, check '%s'",
                                                        pluginLocation.getAbsolutePath()));

@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal.plugin;
 
-import static java.io.File.separator;
 import static java.util.Collections.emptySet;
+import static org.apache.commons.io.FileUtils.write;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.Is.is;
@@ -20,36 +21,26 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.plugin.AbstractArtifactPluginDescriptorLoader.LIB;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
-import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorZipLoader.CLASSES;
-import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorZipLoader.EXTENSION_ZIP;
-import static org.mule.tck.ZipUtils.compress;
+import static org.mule.runtime.module.deployment.internal.plugin.ZipArtifactPluginDescriptorLoader.CLASSES;
+import static org.mule.runtime.module.deployment.internal.plugin.ZipArtifactPluginDescriptorLoader.EXTENSION_ZIP;
+import static org.mule.tck.ZipUtils.compressDirectory;
 import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
-import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hamcrest.MatcherAssert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -136,7 +127,7 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
     final File pluginFolder = createPluginFolder();
 
     final File pluginLibFolder = new File(pluginFolder, "lib");
-    MatcherAssert.assertThat(pluginLibFolder.mkdir(), is(true));
+    assertThat(pluginLibFolder.mkdir(), is(true));
 
     final File jar1 = createDummyJarFile(pluginLibFolder, "lib1.jar");
     final File jar2 = createDummyJarFile(pluginLibFolder, "lib2.jar");
@@ -149,13 +140,13 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
 
   private File createPluginFolder() {
     final File pluginFolder = new File(pluginsFolder.getRoot(), PLUGIN_NAME);
-    MatcherAssert.assertThat(pluginFolder.mkdir(), is(true));
+    assertThat(pluginFolder.mkdir(), is(true));
     return pluginFolder;
   }
 
   private File createDummyJarFile(File pluginLibFolder, String child) throws IOException {
     final File jar1 = new File(pluginLibFolder, child);
-    FileUtils.write(jar1, "foo");
+    write(jar1, "foo");
     return jar1;
   }
 
@@ -163,28 +154,11 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
     if (shouldCompressPluginFolder) {
       File targetFile = new File(pluginLocation.getAbsolutePath() + EXTENSION_ZIP);
 
-      compressDirectory(pluginLocation.toPath(), targetFile);
-      return new ArtifactPluginDescriptorZipLoader(targetFile).load();
+      compressDirectory(targetFile, pluginLocation.toPath());
+      return new ZipArtifactPluginDescriptorLoader(targetFile).load();
     } else {
-      return new ArtifactPluginDescriptorFolderLoader(pluginLocation).load();
+      return new FolderArtifactPluginDescriptorLoader(pluginLocation).load();
     }
-  }
-
-  private static void compressDirectory(Path path, File targetFile) {
-    List<ZipResource> resources = new ArrayList<>();
-    try {
-      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          resources.add(new ZipResource(file.toString(),
-                                        StringUtils.removeStart(file.toString(), path.toString() + separator)));
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-    compress(targetFile, resources.toArray(new ZipResource[resources.size()]));
   }
 
   private class PluginDescriptorChecker {
@@ -219,18 +193,18 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
     }
 
     public void assertPluginDescriptor(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
-      MatcherAssert.assertThat(pluginDescriptor.getName(), equalTo(getName()));
+      assertThat(pluginDescriptor.getName(), equalTo(getName()));
       try {
-        MatcherAssert.assertThat(pluginDescriptor.getClassLoaderModel().getUrls()[0],
-                                 equalTo(getClasses()));
+        assertThat(pluginDescriptor.getClassLoaderModel().getUrls()[0],
+                   equalTo(getClasses()));
       } catch (MalformedURLException e) {
         throw new AssertionError("Can't compare classes dir", e);
       }
 
       assertUrls(pluginDescriptor);
-      MatcherAssert.assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
-      MatcherAssert.assertThat(pluginDescriptor.getClassLoaderModel().getExportedResources(), equalTo(resources));
-      MatcherAssert.assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages(), equalTo(packages));
+      assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
+      assertThat(pluginDescriptor.getClassLoaderModel().getExportedResources(), equalTo(resources));
+      assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages(), equalTo(packages));
     }
 
     protected String getName() {
@@ -250,12 +224,12 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
     }
 
     private void assertUrls(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
-      MatcherAssert.assertThat(pluginDescriptor.getClassLoaderModel().getUrls().length, equalTo(libraries.length + 1));
-      MatcherAssert.assertThat(pluginDescriptor.getClassLoaderModel().getUrls(),
-                               hasItemInArray(equalTo(getClasses())));
+      assertThat(pluginDescriptor.getClassLoaderModel().getUrls().length, equalTo(libraries.length + 1));
+      assertThat(pluginDescriptor.getClassLoaderModel().getUrls(),
+                 hasItemInArray(equalTo(getClasses())));
 
       for (File libFile : libraries) {
-        MatcherAssert.assertThat(pluginDescriptor.getClassLoaderModel().getUrls(), hasItemInArray(equalTo(getLibFile(libFile))));
+        assertThat(pluginDescriptor.getClassLoaderModel().getUrls(), hasItemInArray(equalTo(getLibFile(libFile))));
       }
     }
 

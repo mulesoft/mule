@@ -7,7 +7,9 @@
 
 package org.mule.tck;
 
+import static java.io.File.separator;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -68,5 +77,29 @@ public class ZipUtils {
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  /**
+   * Takes a source {@link Path} it goes over every file recursively generating a temporary array of {@link ZipResource}s
+   * so that it can later compress it to the desired target.
+   *
+   * @param targetFile destination folder to compress the found files from {@code path}
+   * @param path to walk, while assembling a list of files to be later compressed.
+   */
+  public static void compressDirectory(File targetFile, Path path) {
+    List<ZipResource> resources = new ArrayList<>();
+    try {
+      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          resources.add(new ZipResource(file.toString(),
+                                        StringUtils.removeStart(file.toString(), path.toString() + separator)));
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    compress(targetFile, resources.toArray(new ZipResource[resources.size()]));
   }
 }

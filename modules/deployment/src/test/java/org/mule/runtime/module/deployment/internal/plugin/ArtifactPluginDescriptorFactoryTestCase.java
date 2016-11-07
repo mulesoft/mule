@@ -10,7 +10,7 @@ package org.mule.runtime.module.deployment.internal.plugin;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorZipLoader.EXTENSION_ZIP;
+import static org.mule.runtime.module.deployment.internal.plugin.ZipArtifactPluginDescriptorLoader.EXTENSION_ZIP;
 import static org.mule.tck.ZipUtils.compress;
 import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
