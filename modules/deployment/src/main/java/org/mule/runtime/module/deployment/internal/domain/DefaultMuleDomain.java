@@ -10,10 +10,11 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.newBuilder;
-import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -23,6 +24,7 @@ import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -30,10 +32,10 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.application.NullDeploymentListener;
-import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,6 +53,7 @@ public class DefaultMuleDomain implements Domain {
   protected transient final Logger deployLogger = LoggerFactory.getLogger(MuleDeploymentService.class);
 
   private final DomainDescriptor descriptor;
+  private final ServiceRepository serviceRepository;
   private DeploymentListener deploymentListener;
   private ArtifactClassLoader deploymentClassLoader;
   private final ClassLoaderRepository classLoaderRepository;
@@ -59,11 +62,12 @@ public class DefaultMuleDomain implements Domain {
   private ArtifactContext artifactContext;
 
   public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
-                           ClassLoaderRepository classLoaderRepository) {
+                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository) {
     this.deploymentClassLoader = deploymentClassLoader;
     this.classLoaderRepository = classLoaderRepository;
     this.deploymentListener = new NullDeploymentListener();
     this.descriptor = descriptor;
+    this.serviceRepository = serviceRepository;
     refreshClassLoaderAndLoadConfigResourceFile();
   }
 
@@ -138,7 +142,7 @@ public class DefaultMuleDomain implements Domain {
             .setExecutionClassloader(deploymentClassLoader.getClassLoader())
             .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
             .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN)
-            .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository);
+            .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository).setServiceRepository(serviceRepository);
 
         if (deploymentListener != null) {
           artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
@@ -266,6 +270,7 @@ public class DefaultMuleDomain implements Domain {
     }
   }
 
+  @Override
   public boolean containsSharedResources() {
     return this.artifactContext != null;
   }

@@ -8,19 +8,20 @@ package org.mule.runtime.module.deployment.internal.domain;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,20 +32,24 @@ public class DefaultDomainFactory implements DomainFactory {
   private final DomainManager domainManager;
   private final DomainDescriptorParser domainDescriptorParser;
   private final ClassLoaderRepository classLoaderRepository;
+  private final ServiceRepository serviceRepository;
 
   protected DeploymentListener deploymentListener;
   private final ArtifactClassLoader containerClassLoader;
 
   public DefaultDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
                               DomainManager domainManager, ArtifactClassLoader containerClassLoader,
-                              ClassLoaderRepository classLoaderRepository) {
+                              ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository) {
     this.classLoaderRepository = classLoaderRepository;
     checkArgument(domainManager != null, "Domain manager cannot be null");
     checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
+    checkArgument(serviceRepository != null, "Service repository cannot be null");
+
     this.containerClassLoader = containerClassLoader;
     this.domainClassLoaderFactory = domainClassLoaderFactory;
     this.domainManager = domainManager;
     this.domainDescriptorParser = new DomainDescriptorParser();
+    this.serviceRepository = serviceRepository;
   }
 
   public void setDeploymentListener(DeploymentListener deploymentListener) {
@@ -66,7 +71,7 @@ public class DefaultDomainFactory implements DomainFactory {
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(getDomainId(DEFAULT_DOMAIN_NAME), containerClassLoader,
                                                                           descriptor, emptyList()),
-                              classLoaderRepository);
+                              classLoaderRepository, serviceRepository);
     defaultMuleDomain.setDeploymentListener(deploymentListener);
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);
