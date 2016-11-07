@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.DEFAULT_PAGE_SIZE;
 import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
@@ -58,6 +60,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   protected static final String RETRIEVE_WITH_ATTACHMENTS = "retrieveWithAttachments";
   protected static final String STORE_MESSAGES = "storeMessages";
   protected static final String STORE_SINGLE_MESSAGE = "storeSingleMessage";
+  protected final int pageSize = Integer.valueOf(DEFAULT_PAGE_SIZE);
 
   @ClassRule
   public static TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -72,30 +75,28 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
 
   @Before
   public void sendInitialEmailBatch() throws MessagingException {
-    for (int i = 0; i < 10; i++) {
-      user.deliver(getMimeMessage(JUANI_EMAIL, ALE_EMAIL, EMAIL_CONTENT, EMAIL_SUBJECT, ESTEBAN_EMAIL));
-    }
+    sendEmails(pageSize);
   }
 
   @Test
   public void retrieveNothing() throws Exception {
     server.purgeEmailFromAllMailboxes();
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-    List<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
-    assertThat(messages, hasSize(0));
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    assertThat(paginationSize(messages), is(0));
   }
 
   @Test
   public void retrieveMatchingSubjectAndFromAddress() throws Exception {
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < pageSize; i++) {
       String fromAddress = format("address.%s@enterprise.com", i);
       MimeMessage mimeMessage = getMimeMessage(ESTEBAN_EMAIL, ALE_EMAIL, EMAIL_CONTENT, "Non Matching Subject", fromAddress);
       user.deliver(mimeMessage);
     }
 
-    List<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
-    assertThat(server.getReceivedMessages(), arrayWithSize(15));
-    assertThat(messages, hasSize(10));
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 2));
+    assertThat(paginationSize(messages), is(pageSize));
   }
 
   private MimeMessage getMimeMessage(String to, String cc, String body, String subject, String from) throws MessagingException {
@@ -112,29 +113,51 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveEmailWithAttachments() throws Exception {
     server.purgeEmailFromAllMailboxes();
     user.deliver(getMultipartTestMessage());
-    List<Result> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
-    assertThat(messages, hasSize(1));
-    assertThat(messages.get(0).getOutput(), instanceOf(MultiPartPayload.class));
-    List<Message> emailAttachments = ((MultiPartPayload) messages.get(0).getOutput()).getParts();
+    Result message = messages.next();
+    assertThat(messages.hasNext(), is(false));
+    assertThat(message.getOutput(), instanceOf(MultiPartPayload.class));
+    List<Message> emailAttachments = ((MultiPartPayload) message.getOutput()).getParts();
 
     assertThat(emailAttachments, hasSize(3));
-    assertThat(((DefaultMultiPartPayload) messages.get(0).getOutput()).hasBodyPart(), is(true));
-    assertThat(((MultiPartPayload) messages.get(0).getOutput()).getPartNames(),
+    assertThat(((DefaultMultiPartPayload) message.getOutput()).hasBodyPart(), is(true));
+    assertThat(((MultiPartPayload) message.getOutput()).getPartNames(),
                hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
-    assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
-    assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
+    assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT.getBytes());
+    assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT.getBytes());
   }
 
   @Test
   public void retrieveAndDelete() throws Exception {
-    assertThat(server.getReceivedMessages(), arrayWithSize(10));
-    runFlow(RETRIEVE_AND_DELETE);
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DELETE);
+    assertThat(paginationSize(messages), is(pageSize));
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
   }
 
-  protected List<Result> runFlowAndGetMessages(String flowName) throws Exception {
-    return (List<Result>) flowRunner(flowName).run().getMessage().getPayload().getValue();
+  @Test
+  public void retrieveEmptyPageInBetween() throws Exception {
+    sendNonMatchingEmails(pageSize);
+    sendEmails(pageSize);
+
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 3));
+    assertThat(paginationSize(messages), is(pageSize * 2));
+  }
+
+  protected ConsumerIterator<Result> runFlowAndGetMessages(String flowName) throws Exception {
+    return (ConsumerIterator<Result>) flowRunner(flowName).run().getMessage().getPayload().getValue();
+  }
+
+  protected int paginationSize(ConsumerIterator<?> iterator) {
+    int count = 0;
+    while (iterator.hasNext()) {
+      iterator.next();
+      count++;
+    }
+
+    return count;
   }
 
   protected void assertFlag(MimeMessage m, Flag flag, boolean contains) {
@@ -144,4 +167,19 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
       fail("flag assertion error");
     }
   }
+
+  private void sendEmails(int amount) throws MessagingException {
+    for (int i = 0; i < amount; i++) {
+      user.deliver(getMimeMessage(JUANI_EMAIL, ALE_EMAIL, EMAIL_CONTENT, EMAIL_SUBJECT, ESTEBAN_EMAIL));
+    }
+  }
+
+  private void sendNonMatchingEmails(int amount) throws MessagingException {
+    for (int i = 0; i < amount; i++) {
+      String fromAddress = format("address.%s@enterprise.com", i);
+      MimeMessage mimeMessage = getMimeMessage(ESTEBAN_EMAIL, ALE_EMAIL, EMAIL_CONTENT, "Non Matching Subject", fromAddress);
+      user.deliver(mimeMessage);
+    }
+  }
+
 }

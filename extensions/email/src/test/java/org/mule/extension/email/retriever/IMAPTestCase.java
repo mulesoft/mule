@@ -8,13 +8,13 @@
 package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.RECENT;
 import static javax.mail.Flags.Flag.SEEN;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
@@ -28,15 +28,14 @@ import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javax.mail.Flags.Flag;
 import javax.mail.internet.MimeMessage;
@@ -61,7 +60,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{"imap"}, {"imaps"}});
+    return asList(new Object[][] {{"imap"}, {"imaps"}});
   }
 
   @Override
@@ -76,19 +75,28 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndRead() throws Exception {
-    List<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
-    assertThat(messages, hasSize(10));
-    messages.forEach(m -> {
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    int size = 0;
+    while (messages.hasNext()) {
+      size++;
+      Result m = messages.next();
       assertBodyContent((String) m.getOutput());
       assertThat(((IMAPEmailAttributes) m.getAttributes().get()).getFlags().isSeen(), is(true));
-    });
+    }
+
+    assertThat(size, is(pageSize));
   }
 
   @Test
   public void retrieveAndDontRead() throws Exception {
-    List<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
-    assertThat(messages, hasSize(10));
-    messages.forEach(m -> assertThat(((IMAPEmailAttributes) m.getAttributes().get()).getFlags().isSeen(), is(false)));
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
+    int count = 0;
+    while (messages.hasNext()) {
+      Result m = messages.next();
+      assertThat(((IMAPEmailAttributes) m.getAttributes().get()).getFlags().isSeen(), is(false));
+      count++;
+    }
+    assertThat(count, is(pageSize));
   }
 
   @Test
@@ -103,7 +111,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
   public void retrieveAndMarkAsDelete() throws Exception {
     stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, false));
     runFlow(RETRIEVE_AND_MARK_AS_DELETE);
-    assertThat(server.getReceivedMessages(), arrayWithSize(10));
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
     stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, true));
   }
 
@@ -117,7 +125,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
   @Test
   public void retrieveAndDeleteIncomingAndScheduled() throws Exception {
     MimeMessage[] startMessageBatch = server.getReceivedMessages();
-    assertThat(startMessageBatch, arrayWithSize(10));
+    assertThat(startMessageBatch, arrayWithSize(pageSize));
     // Scheduled for deletion
     startMessageBatch[0].setFlag(DELETED, true);
     runFlow(RETRIEVE_AND_DELETE_INCOMING_AND_SCHEDULED);
@@ -146,7 +154,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
     flowRunner(STORE_MESSAGES).run();
     File[] storedEmails = temporaryFolder.getRoot().listFiles();
     assertThat(storedEmails, is(not(nullValue())));
-    assertThat(storedEmails, arrayWithSize(10));
+    assertThat(storedEmails, arrayWithSize(pageSize));
     for (File storedEmail : storedEmails) {
       assertStoredEmail(storedEmail);
     }
@@ -163,7 +171,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndDeleteSelectedEmails() throws Exception {
-    assertThat(server.getReceivedMessages(), arrayWithSize(10));
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
     runFlow(RETRIEVE_DELETE_SELECTED);
     assertThat(server.getReceivedMessages(), arrayWithSize(5));
   }
@@ -174,9 +182,14 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
       message.setFlag(flag, flagState);
     }
 
-    List<Result> messages = runFlowAndGetMessages(flowName);
-    assertThat(server.getReceivedMessages(), arrayWithSize(10));
-    assertThat(messages, hasSize(7));
+    ConsumerIterator<Result> messages = runFlowAndGetMessages(flowName);
+    assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
+    int count = 0;
+    while (messages.hasNext()) {
+      messages.next();
+      count++;
+    }
+    assertThat(count, is(7));
   }
 
   private void assertStoredEmail(File storedEmail) throws IOException {

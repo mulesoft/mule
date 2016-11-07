@@ -10,22 +10,32 @@ import static java.lang.String.format;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
 import static javax.mail.Folder.READ_WRITE;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.DEFAULT_PAGE_SIZE;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.PAGE_SIZE_ERROR_MESSAGE;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import org.mule.extension.email.api.EmailMetadataKey;
+import org.mule.extension.email.api.EmailMetadataResolver;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ExpungeCommand;
-import org.mule.extension.email.internal.commands.ListCommand;
+import org.mule.extension.email.internal.commands.PagingProviderEmailDelegate;
 import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
 
@@ -39,38 +49,39 @@ import javax.mail.MessagingException;
 public class IMAPOperations {
 
   private final ExpungeCommand expungeCommand = new ExpungeCommand();
-  private final ListCommand listCommand = new ListCommand();
   private final StoreCommand storeCommand = new StoreCommand();
   private final SetFlagCommand setFlagCommand = new SetFlagCommand();
 
   /**
-   * List all the emails in the configured imap mailBoxFolder that match with the specified {@code imapMatcher} criteria.
+   * List all the emails (with pagination) in the configured imap mailBoxFolder that match with the specified {@code imapMatcher}
+   * criteria.
    *
-   * @param config        The {@link MailboxAccessConfiguration} associated to this operation.
-   * @param connection    The corresponding {@link MailboxConnection} instance.
+   * @param config The {@link MailboxAccessConfiguration} associated to this operation.
+   * @param connection The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be fetched
-   * @param imapMatcher   Email Matcher which gives the capability of filter the retrieved emails
+   * @param imapMatcher Email Matcher which gives the capability of filter the retrieved emails
    * @param deleteAfterRetrieve Specifies if the returned emails must be deleted after being retrieved or not.
-   * @return an {@link Result} {@link List} carrying all the emails content
-   * and it's corresponding {@link IMAPEmailAttributes}.
+   * @return an {@link PagingProvider} composed with an {@link Result} with a {@link List} carrying all the emails content and
+   *         it's corresponding {@link IMAPEmailAttributes}.
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
-  public List<Result<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
-                                                            @Connection MailboxConnection connection,
-                                                            @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                            @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher,
-                                                            @Optional(
-                                                                defaultValue = "false") boolean deleteAfterRetrieve) {
-    List<Result<Object, IMAPEmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, imapMatcher);
-    if (deleteAfterRetrieve) {
-      emails.forEach(e -> {
-        long uid = e.getAttributes()
-            .orElseThrow(() -> new EmailException("Could not find attributes in retrieved email"))
-            .getId();
-        delete(connection, mailboxFolder, uid);
-      });
-    }
-    return emails;
+  @OutputResolver(output = EmailMetadataResolver.class)
+  public PagingProvider<MailboxConnection, Result<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
+                                                                                         @Connection MailboxConnection connection,
+                                                                                         @Optional(
+                                                                                             defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                                                                         @DisplayName("Match with") @Optional IMAPEmailPredicateBuilder imapMatcher,
+                                                                                         @Optional(
+                                                                                             defaultValue = "false") boolean deleteAfterRetrieve,
+                                                                                         @MetadataKeyId @Optional(
+                                                                                             defaultValue = "ANY") @Placement(
+                                                                                                 tab = ADVANCED) EmailMetadataKey outputType,
+                                                                                         @Optional(
+                                                                                             defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+    checkArgument(pageSize > 0, format(PAGE_SIZE_ERROR_MESSAGE, pageSize));
+    return new PagingProviderEmailDelegate<>(config, mailboxFolder, imapMatcher, pageSize, deleteAfterRetrieve,
+                                             attributes -> setFlagCommand.setByUID(connection, mailboxFolder, DELETED,
+                                                                                   attributes.getId()));
   }
 
   /**
@@ -78,9 +89,9 @@ public class IMAPOperations {
    * <p>
    * This operation can targets a single email.
    *
-   * @param connection    The corresponding {@link MailboxConnection} instance.
+   * @param connection The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Folder where the emails are going to be marked as read
-   * @param emailId       Email ID Number of the email to mark as read.
+   * @param emailId Email ID Number of the email to mark as read.
    */
   public void markAsRead(@Connection MailboxConnection connection,
                          @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
@@ -98,9 +109,9 @@ public class IMAPOperations {
    * <p>
    * This operation targets a single email.
    *
-   * @param connection    The corresponding {@link MailboxConnection} instance.
+   * @param connection The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be marked as deleted
-   * @param emailId       Email ID Number of the email to mark as deleted.
+   * @param emailId Email ID Number of the email to mark as deleted.
    */
   public void markAsDeleted(@Connection MailboxConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
@@ -111,9 +122,9 @@ public class IMAPOperations {
   /**
    * Eliminates from the mailbox all the messages scheduled for deletion with the DELETED flag set.
    *
-   * @param connection    The associated {@link MailboxConnection}.
+   * @param connection The associated {@link MailboxConnection}.
    * @param mailboxFolder Mailbox folder where the emails with the 'DELETED' flag are going to be scheduled to be definitely
-   *                      deleted
+   *        deleted
    */
 
   public void expungeFolder(@Connection MailboxConnection connection,
@@ -128,13 +139,13 @@ public class IMAPOperations {
    * <p>
    * The name of the email file is composed by the subject and the received date of the email.
    *
-   * @param connection     The associated {@link MailboxConnection}.
-   * @param mailboxFolder  Name of the folder where the email(s) is going to be stored.
+   * @param connection The associated {@link MailboxConnection}.
+   * @param mailboxFolder Name of the folder where the email(s) is going to be stored.
    * @param localDirectory Local directory where the emails are going to be stored.
-   * @param fileName       Name of the file that is going to be stored. The operation will append the email number and received
-   *                       date in the end.
-   * @param emailId        Email ID Number of the email to store.
-   * @param overwrite      Whether to overwrite a file that already exist
+   * @param fileName Name of the file that is going to be stored. The operation will append the email number and received date in
+   *        the end.
+   * @param emailId Email ID Number of the email to store.
+   * @param overwrite Whether to overwrite a file that already exist
    */
   // TODO: annotated the parameter localDirectory with @Path when available
   @Summary("Stores an specified email into a local directory")
@@ -150,9 +161,9 @@ public class IMAPOperations {
    * <p>
    * For IMAP mailboxes all the messages scheduled for deletion (marked as DELETED) will also be erased from the folder.
    *
-   * @param connection    The corresponding {@link MailboxConnection} instance.
+   * @param connection The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be deleted
-   * @param emailId       Email ID Number of the email to delete.
+   * @param emailId Email ID Number of the email to delete.
    */
   @Summary("Deletes an email from the given Mailbox Folder")
   public void delete(@Connection MailboxConnection connection,

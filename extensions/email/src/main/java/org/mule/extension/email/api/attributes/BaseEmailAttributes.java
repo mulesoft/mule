@@ -13,7 +13,7 @@ import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.commands.ListCommand;
+import org.mule.extension.email.internal.commands.PagingProviderEmailDelegate;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
@@ -33,18 +33,18 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
- * Contains all the basic metadata of a received email, it carries information such as the subject of the email,
- * the number in the mailbox and the recipients between others.
+ * Contains all the basic metadata of a received email, it carries information such as the subject of the email, the number in the
+ * mailbox and the recipients between others.
  * <p>
- * This class aims to be returned as attributes for every email message in a {@link ListCommand} operation.
+ * This class aims to be returned as attributes for every email message in a {@link PagingProviderEmailDelegate} operation.
  *
  * @since 4.0
  */
 public abstract class BaseEmailAttributes extends BaseAttributes {
 
   /**
-   * The number is the relative position of the email in its Folder. Note that the number for a particular email can change during a
-   * session if other emails in the Folder are isDeleted and expunged.
+   * The number is the relative position of the email in its Folder. Note that the number for a particular email can change during
+   * a session if other emails in the Folder are isDeleted and expunged.
    * <p>
    * Valid message ids start at 1. Emails that do not belong to any folder (like newly composed or derived messages) have 0 as
    * their message number.
@@ -132,8 +132,8 @@ public abstract class BaseEmailAttributes extends BaseAttributes {
   /**
    * Returns the number of the email in the mailbox folder in a moment.
    * <p>
-   * Take in mind that this number change with the different operations that can occur in a folder
-   * i.e. moving mails, deleting emails, etc.
+   * Take in mind that this number change with the different operations that can occur in a folder i.e. moving mails, deleting
+   * emails, etc.
    *
    * @return the number of the email in the mailbox.
    */

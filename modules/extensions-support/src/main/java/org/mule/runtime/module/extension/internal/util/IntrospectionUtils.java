@@ -22,6 +22,9 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forType;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -121,13 +124,7 @@ public final class IntrospectionUtils {
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader) {
-    ResolvableType methodType = getMethodResolvableType(method);
-    if (isInterceptingCallback(methodType)) {
-      methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
-    } else if (isPagingProvider(methodType)) {
-      methodType = unwrapGenericFromClass(PagingProvider.class, methodType, 1);
-    }
-
+    ResolvableType methodType = getMethodType(method);
     Type type = methodType.getType();
     if (methodType.getRawClass().equals(Result.class)) {
       ResolvableType genericType = methodType.getGenerics()[0];
@@ -155,11 +152,7 @@ public final class IntrospectionUtils {
    */
   public static MetadataType getMethodReturnAttributesType(Method method, ClassTypeLoader typeLoader) {
     Type type = null;
-
-    ResolvableType methodType = getMethodResolvableType(method);
-    if (isInterceptingCallback(methodType)) {
-      methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
-    }
+    ResolvableType methodType = getMethodType(method);
 
     if (methodType.getRawClass().equals(Result.class)) {
       ResolvableType genericType = methodType.getGenerics()[1];
@@ -169,6 +162,17 @@ public final class IntrospectionUtils {
     }
 
     return type != null ? typeLoader.load(type) : typeBuilder().voidType().build();
+  }
+
+  private static ResolvableType getMethodType(Method method) {
+    ResolvableType methodType = getMethodResolvableType(method);
+    if (isInterceptingCallback(methodType)) {
+      methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
+    } else if (isPagingProvider(methodType)) {
+      methodType = unwrapGenericFromClass(PagingProvider.class, methodType, 1);
+    }
+
+    return methodType;
   }
 
   static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {

@@ -6,39 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import org.junit.Test;
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.utils.JavaTypeUtils;
-import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.tck.testmodels.fruit.FruitBasket;
-import org.mule.tck.testmodels.fruit.FruitBox;
-import org.mule.tck.testmodels.fruit.Kiwi;
-import org.mule.test.heisenberg.extension.model.LifetimeInfo;
-import org.mule.test.petstore.extension.PhoneNumber;
-import org.springframework.core.ResolvableType;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -57,16 +24,74 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.springframework.core.ResolvableType.forType;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.FruitBasket;
+import org.mule.tck.testmodels.fruit.FruitBox;
+import org.mule.tck.testmodels.fruit.Kiwi;
+import org.mule.test.heisenberg.extension.model.LifetimeInfo;
+import org.mule.test.petstore.extension.PhoneNumber;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.junit.Test;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
+  public static final String OPERATION_RESULT = "operationResult";
+  public static final String PAGING_PROVIDER = "pagingProvider";
+  public static final String PAGING_PROVIDER_OPERATION_RESULT = "pagingProviderOperationResult";
+  public static final String FOO = "foo";
   private List<FruitBasket> baskets;
 
   @Test
   public void getMethodReturnType() throws Exception {
-    MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod("foo"), TYPE_LOADER);
+    MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod(FOO), TYPE_LOADER);
     assertDictionary(metadataType, String.class, Apple.class);
+  }
+
+  @Test
+  public void getOperationResultReturnType() throws Exception {
+    assertReturnType(OPERATION_RESULT);
+    assertAttributesType(OPERATION_RESULT);
+  }
+
+  @Test
+  public void getPagingProviderReturnType() throws Exception {
+    assertReturnType(PAGING_PROVIDER);
+  }
+
+  @Test
+  public void getPagingProviderOperationResultReturnType() throws Exception {
+    assertReturnType(PAGING_PROVIDER_OPERATION_RESULT);
+    assertAttributesType(PAGING_PROVIDER_OPERATION_RESULT);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -76,7 +101,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getArgumentlessMethodArgumentTypes() throws Exception {
-    MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod("foo"), TYPE_LOADER);
+    MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod(FOO), TYPE_LOADER);
     assertNotNull(types);
     assertEquals(0, types.length);
   }
@@ -206,9 +231,22 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return new HashMap<>();
   }
 
+  public Result<String, Attributes> operationResult() {
+    return null;
+  }
+
+  public PagingProvider<Object, String> pagingProvider() {
+    return null;
+  }
+
+  public PagingProvider<Object, Result<String, Attributes>> pagingProviderOperationResult() {
+    return null;
+  }
+
   public int bar(String s, Long l, Apple apple, Map<Banana, Kiwi> fruits) {
     return Objects.hash(s, l, apple, fruits);
   }
+
 
   public List<FruitBasket> getBaskets() {
     return baskets;
@@ -216,6 +254,18 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   public void setBaskets(List<FruitBasket> baskets) {
     this.baskets = baskets;
+  }
+
+  private void assertAttributesType(String method) throws Exception {
+    MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method), TYPE_LOADER);
+    assertThat(attributesType, is(instanceOf(ObjectType.class)));
+    assertType(attributesType, Attributes.class);
+  }
+
+  private void assertReturnType(String method) throws Exception {
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
+    assertThat(returnType, is(instanceOf(StringType.class)));
+    assertType(returnType, String.class);
   }
 
   private class InterceptingCallbackWithParent extends TestInterceptingCallback {
