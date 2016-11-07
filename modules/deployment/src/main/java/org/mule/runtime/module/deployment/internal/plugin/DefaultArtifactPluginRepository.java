@@ -12,6 +12,7 @@ import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
+import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorZipLoader.EXTENSION_ZIP;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 
@@ -60,7 +61,7 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
   private List<ArtifactPluginDescriptor> createApplicationPluginDescriptors() {
     List<ArtifactPluginDescriptor> pluginDescriptors = new LinkedList<>();
     File[] pluginFiles = getContainerAppPluginsFolder()
-        .listFiles(file -> file.isDirectory() || endsWithIgnoreCase(file.getName(), ".zip"));
+        .listFiles(file -> file.isDirectory() || endsWithIgnoreCase(file.getName(), EXTENSION_ZIP));
     if (pluginFiles != null) {
       for (File pluginFile : pluginFiles) {
         final ArtifactPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginFile);

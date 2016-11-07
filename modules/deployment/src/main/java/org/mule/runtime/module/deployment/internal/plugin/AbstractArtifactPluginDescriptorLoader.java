@@ -32,14 +32,23 @@ import java.util.Set;
  *
  * @since 4.0
  */
-abstract class ArtifactPluginDescriptorLoader {
+public abstract class AbstractArtifactPluginDescriptorLoader {
 
   private static final String PLUGIN_PROPERTIES = "plugin.properties";
   private static final String PLUGIN_DEPENDENCIES = "plugin.dependencies";
+  protected static final String CLASSES = "classes";
+  protected static final String LIB = "lib";
+  protected static final String JAR_EXTENSION = ".jar";
 
   protected final File pluginLocation;
 
-  public ArtifactPluginDescriptorLoader(File pluginLocation) {
+  /**
+   * Stores the reference to a plugin so that it can later constructs an {@link ArtifactPluginDescriptor} through the
+   * {@link #load()} method.
+   *
+   * @param pluginLocation location of a plugin
+   */
+  public AbstractArtifactPluginDescriptorLoader(File pluginLocation) {
     this.pluginLocation = pluginLocation;
   }
 

@@ -8,6 +8,8 @@ package org.mule.runtime.module.deployment.internal.plugin;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 
 import java.io.File;
@@ -28,8 +30,14 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
  *
  * @since 4.0
  */
-class ArtifactPluginDescriptorFolderLoader extends ArtifactPluginDescriptorLoader {
+public class ArtifactPluginDescriptorFolderLoader extends AbstractArtifactPluginDescriptorLoader {
 
+  /**
+   * Stores the reference to a plugin so that it can later constructs an {@link ArtifactPluginDescriptor} through the
+   * {@link #load()} method.
+   *
+   * @param pluginLocation location of a plugin
+   */
   ArtifactPluginDescriptorFolderLoader(File pluginLocation) {
     super(pluginLocation);
   }
@@ -41,15 +49,15 @@ class ArtifactPluginDescriptorFolderLoader extends ArtifactPluginDescriptorLoade
 
   @Override
   protected URL getClassesUrl() throws MalformedURLException {
-    return new File(pluginLocation, "classes").toURI().toURL();
+    return new File(pluginLocation, CLASSES).toURI().toURL();
   }
 
   @Override
   protected List<URL> getRuntimeLibs() throws MalformedURLException {
     List<URL> urls = new ArrayList<>();
-    final File libDir = new File(pluginLocation, "lib");
+    final File libDir = new File(pluginLocation, LIB);
     if (libDir.exists()) {
-      final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(".jar"));
+      final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(JAR_EXTENSION));
       for (File jar : jars) {
         urls.add(jar.toURI().toURL());
       }
@@ -63,7 +71,7 @@ class ArtifactPluginDescriptorFolderLoader extends ArtifactPluginDescriptorLoade
     final File file = new File(pluginLocation, resource);
     if (file.exists()) {
       try {
-        inputStream = Optional.of(new FileInputStream(file));
+        inputStream = of(new FileInputStream(file));
       } catch (FileNotFoundException e) {
         throw new ArtifactDescriptorCreateException(format("Cannot read resource '%s' from file '%s'", resource,
                                                            pluginLocation.getAbsolutePath()),
