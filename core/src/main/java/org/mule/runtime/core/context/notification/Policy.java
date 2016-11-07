@@ -8,6 +8,7 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.context.notification.ServerNotificationManager.Notifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +27,7 @@ class Policy {
 
   // map from event to set of senders
   private Map<Class<? extends ServerNotification>, Collection<Sender>> eventToSenders =
-      new HashMap<Class<? extends ServerNotification>, Collection<Sender>>();
+      new HashMap<>();
 
   // these are cumulative - set values should never change, they are just a cache of known info
   // they are co and contra-variant wrt to exact event type (see code below).
@@ -83,15 +84,15 @@ class Policy {
     return true;
   }
 
-  void dispatch(ServerNotification notification) {
+  void dispatch(ServerNotification notification, Notifier notifier) {
     if (null != notification) {
       Class notfnClass = notification.getClass();
       // search if we don't know about this event, or if we do know it is used
       if (!knownEventsExact.containsKey(notfnClass)) {
-        boolean found = doDispatch(notification, notfnClass);
+        boolean found = doDispatch(notification, notfnClass, notifier);
         knownEventsExact.put(notfnClass, Boolean.valueOf(found));
       } else if (((Boolean) knownEventsExact.get(notfnClass)).booleanValue()) {
-        boolean found = doDispatch(notification, notfnClass);
+        boolean found = doDispatch(notification, notfnClass, notifier);
         // reduce contention on the map by not writing the same value over and over again.
         if (!found) {
           knownEventsExact.put(notfnClass, Boolean.valueOf(found));
@@ -100,13 +101,14 @@ class Policy {
     }
   }
 
-  protected boolean doDispatch(ServerNotification notification, Class<? extends ServerNotification> notfnClass) {
+  protected boolean doDispatch(ServerNotification notification, Class<? extends ServerNotification> notfnClass,
+                               Notifier notifier) {
     boolean found = false;
     for (Class<? extends ServerNotification> event : eventToSenders.keySet()) {
       if (event.isAssignableFrom(notfnClass)) {
         found = true;
         for (Sender sender : eventToSenders.get(event)) {
-          sender.dispatch(notification);
+          sender.dispatch(notification, notifier);
         }
       }
     }

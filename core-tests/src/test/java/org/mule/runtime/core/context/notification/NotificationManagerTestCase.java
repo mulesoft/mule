@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 @SmallTest
 public class NotificationManagerTestCase extends AbstractMuleTestCase {
@@ -151,16 +151,16 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase {
     registerDefaultEvents();
     registerDefaultListeners();
     assertNoListenersNotified();
-    manager.notifyListeners(new Event1());
+    manager.notifyListeners(new Event1(), (listener, nfn) -> listener.onNotification(nfn));
     assertNoListenersNotified();
-    manager.notifyListeners(new SubEvent1());
+    manager.notifyListeners(new SubEvent1(), (listener, nfn) -> listener.onNotification(nfn));
     assertNoListenersNotified();
-    manager.notifyListeners(new Event1("id1"));
+    manager.notifyListeners(new Event1("id1"), (listener, nfn) -> listener.onNotification(nfn));
     assertNoListenersNotified();
-    manager.notifyListeners(new SubSubEvent1("id1"));
+    manager.notifyListeners(new SubSubEvent1("id1"), (listener, nfn) -> listener.onNotification(nfn));
     assertTrue(listener1.isNotified());
     assertFalse(listener2.isNotified());
-    manager.notifyListeners(new Event2());
+    manager.notifyListeners(new Event2(), (listener, nfn) -> listener.onNotification(nfn));
     assertTrue(listener1.isNotified());
     assertTrue(listener2.isNotified());
   }

@@ -6,11 +6,15 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.slf4j.Logger;
 
 /**
  * Decorates a {@link RunnableFuture} in order to do hook behavior both before and after the execution of the decorated
@@ -19,6 +23,8 @@ import java.util.concurrent.TimeoutException;
  * @since 4.0
  */
 class RunnableFutureDecorator<V> implements RunnableFuture<V> {
+
+  private static final Logger logger = getLogger(RunnableFutureDecorator.class);
 
   private final RunnableFuture<V> task;
 
@@ -39,11 +45,19 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   @Override
   public void run() {
+    long startTime = 0;
+    if (logger.isDebugEnabled()) {
+      startTime = System.nanoTime();
+    }
+    logger.debug("Starting task " + this.toString() + "...");
     started = true;
     try {
       task.run();
     } finally {
       wrapUp();
+      if (logger.isDebugEnabled()) {
+        logger.debug("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
+      }
     }
   }
 
@@ -60,6 +74,9 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Cancelling task " + this.toString() + " (mayInterruptIfRunning=" + mayInterruptIfRunning + ")...");
+    }
     return task.cancel(mayInterruptIfRunning);
   }
 

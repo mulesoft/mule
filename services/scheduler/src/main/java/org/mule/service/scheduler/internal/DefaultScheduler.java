@@ -56,17 +56,20 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private final CountDownLatch terminationLatch = new CountDownLatch(1);
 
   private static final ScheduledFuture<?> NULL_SCHEDULED_FUTURE = NullScheduledFuture.INSTANCE;
-  private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
+  private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks;
 
   private volatile boolean shutdown = false;
 
 
   /**
    * @param executor the actual executor that will run the dispatched tasks.
+   * @param workers
+   * @param cores
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
    */
-  DefaultScheduler(ExecutorService executor, ScheduledExecutorService scheduledExecutor) {
+  DefaultScheduler(ExecutorService executor, int workers, int totalWorkers, ScheduledExecutorService scheduledExecutor) {
+    scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
   }

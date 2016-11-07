@@ -49,12 +49,14 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   // TODO MULE-10585 Externalize this timeout
   private static final int GRACEFUL_SHUTDOWN_TIMEOUT_SECS = 60;
 
-  private static final int TASK_QUEUE_SIZE = 2000;
+  // private static final int TASK_QUEUE_SIZE = 2000;
 
   private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
   private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
   private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
   private static final String SCHEDULER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_sched";
+
+  private int cores = getRuntime().availableProcessors();
 
   private ExecutorService cpuLightExecutor;
   private ExecutorService ioExecutor;
@@ -68,31 +70,29 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return new DefaultScheduler(cpuLightExecutor, scheduledExecutor);
+    return new DefaultScheduler(cpuLightExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor);
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return new DefaultScheduler(ioExecutor, scheduledExecutor);
+    return new DefaultScheduler(ioExecutor, cores * cores, (cores + 4 + 4) * cores, scheduledExecutor);
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return new DefaultScheduler(computationExecutor, scheduledExecutor);
+    return new DefaultScheduler(computationExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor);
   }
 
   @Override
   public void start() throws MuleException {
-    int cores = getRuntime().availableProcessors();
-
     logger.info("Starting " + this.toString() + "...");
 
     // TODO MULE-10585 Externalize the threads configuration
-    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(TASK_QUEUE_SIZE),
+    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(4 * cores),
                                               new NamedThreadFactory(CPU_LIGHT_THREADS_NAME));
-    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new ArrayBlockingQueue<>(TASK_QUEUE_SIZE),
+    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new ArrayBlockingQueue<>(cores * cores),
                                         new NamedThreadFactory(IO_THREADS_NAME));
-    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(TASK_QUEUE_SIZE),
+    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new ArrayBlockingQueue<>(4 * cores),
                                                  new NamedThreadFactory(COMPUTATION_THREADS_NAME));
     scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(SCHEDULER_THREADS_NAME));
 
