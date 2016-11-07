@@ -32,7 +32,6 @@ import org.mule.extension.db.internal.util.DefaultFileReader;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
