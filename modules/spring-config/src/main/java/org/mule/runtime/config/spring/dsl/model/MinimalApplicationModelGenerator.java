@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
-import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -95,6 +95,7 @@ public class MinimalApplicationModelGenerator {
       int currentElement = 0;
       while (iterator.hasNext()) {
         if (currentElement != selectedPath) {
+          iterator.next();
           iterator.remove();
         } else {
           currentLevelModel = iterator.next();
