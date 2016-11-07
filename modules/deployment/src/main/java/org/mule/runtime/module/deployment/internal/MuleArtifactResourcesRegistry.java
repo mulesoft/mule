@@ -30,7 +30,6 @@ import org.mule.runtime.module.deployment.internal.application.TemporaryApplicat
 import org.mule.runtime.module.deployment.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPluginRepository;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.FileSystemServiceProviderDiscoverer;
@@ -47,7 +46,7 @@ import org.mule.runtime.module.service.ServiceDescriptor;
  */
 public class MuleArtifactResourcesRegistry {
 
-  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+  private final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory;
   private final DefaultDomainManager domainManager;
   private final DefaultDomainFactory domainFactory;
   private final DefaultApplicationFactory applicationFactory;
@@ -72,12 +71,11 @@ public class MuleArtifactResourcesRegistry {
                                                                               new DomainClassLoaderFactory(containerClassLoader
                                                                                   .getClassLoader()));
     this.artifactPluginClassLoaderFactory = trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
-    final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
+    artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
     artifactPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
-    artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, artifactPluginRepository);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorFactory, artifactPluginRepository);
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()));
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
@@ -96,7 +94,7 @@ public class MuleArtifactResourcesRegistry {
                                                        artifactPluginRepository, domainManager, serviceManager,
                                                        artifactClassLoaderManager);
     temporaryApplicationFactory = new TemporaryApplicationFactory(applicationClassLoaderBuilderFactory,
-                                                                  new TemporaryApplicationDescriptorFactory(artifactPluginDescriptorLoader,
+                                                                  new TemporaryApplicationDescriptorFactory(artifactPluginDescriptorFactory,
                                                                                                             artifactPluginRepository),
                                                                   artifactPluginRepository, domainManager, serviceManager,
                                                                   artifactClassLoaderManager);
@@ -115,10 +113,10 @@ public class MuleArtifactResourcesRegistry {
   }
 
   /**
-   * @return a loader for creating the {@link ArtifactPluginDescriptor} from a zipped extension
+   * @return a factory for creating the {@link ArtifactPluginDescriptor} from a zipped extension
    */
-  public ArtifactPluginDescriptorLoader getArtifactPluginDescriptorLoader() {
-    return artifactPluginDescriptorLoader;
+  public ArtifactPluginDescriptorFactory getArtifactPluginDescriptorLoader() {
+    return artifactPluginDescriptorFactory;
   }
 
   /**

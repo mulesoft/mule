@@ -18,7 +18,6 @@ import org.mule.runtime.module.deployment.internal.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -49,11 +48,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ArtifactClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
     ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
-    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
-        new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorFactory, applicationPluginRepository);
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository,

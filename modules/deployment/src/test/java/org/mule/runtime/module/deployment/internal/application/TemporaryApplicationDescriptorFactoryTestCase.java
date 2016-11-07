@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -35,7 +35,7 @@ public class TemporaryApplicationDescriptorFactoryTestCase extends AbstractMuleT
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+  private ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory;
   private ArtifactPluginRepository applicationPluginRepository;
   private TemporaryApplicationDescriptorFactory temporaryApplicationDescriptorFactory;
   private File rootArtifactFolder;
@@ -43,11 +43,11 @@ public class TemporaryApplicationDescriptorFactoryTestCase extends AbstractMuleT
 
   @Before
   public void before() throws IOException {
-    this.artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
+    this.artifactPluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
     this.applicationPluginRepository = mock(ArtifactPluginRepository.class);
 
     this.temporaryApplicationDescriptorFactory = new TemporaryApplicationDescriptorFactory(
-                                                                                           artifactPluginDescriptorLoader,
+                                                                                           artifactPluginDescriptorFactory,
                                                                                            applicationPluginRepository);
 
     this.rootArtifactFolder = temporaryFolder.newFolder();
