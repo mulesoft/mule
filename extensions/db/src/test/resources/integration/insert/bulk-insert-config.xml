@@ -20,4 +20,15 @@
             </db:parameter-types>
         </db:bulk-insert>
     </flow>
+
+    <flow name="bulkInsertWithUnusedParameterType">
+        <db:bulk-insert parameterValues="#[payload]">
+            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
+            <db:parameter-types>
+                <db:parameter-type key="name" type="VARCHAR" />
+                <db:parameter-type key="position" type="INTEGER" />
+                <db:parameter-type key="unused" type="INTEGER" />
+            </db:parameter-types>
+        </db:bulk-insert>
+    </flow>
 </mule>
