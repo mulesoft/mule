@@ -9,8 +9,6 @@ package org.mule.compatibility.transport.jms.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.JmsConstants;
@@ -35,17 +33,17 @@ public class JmsVendorNamespaceHandlerTestCase extends CompatibilityFunctionalTe
     setStartContext(false);
   }
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    startIfNeeded(muleContext.getNotificationManager());
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    stopIfNeeded(muleContext.getNotificationManager());
-  }
+  // @Override
+  // protected void doSetUp() throws Exception {
+  // super.doSetUp();
+  // startIfNeeded(muleContext.getNotificationManager());
+  // }
+  //
+  // @Override
+  // protected void doTearDown() throws Exception {
+  // super.doTearDown();
+  // stopIfNeeded(muleContext.getNotificationManager());
+  // }
 
   @Override
   protected String getConfigFile() {

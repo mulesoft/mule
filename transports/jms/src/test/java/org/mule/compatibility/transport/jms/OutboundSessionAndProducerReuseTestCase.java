@@ -24,7 +24,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -84,8 +83,6 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
   protected void doSetUp() throws Exception {
     super.doSetUp();
 
-    startIfNeeded(muleContext.getNotificationManager());
-
     when(connectionFactory.createConnection()).thenReturn(connection);
     when(connectionFactory.createConnection(anyString(), anyString())).thenReturn(connection);
     setupMockSession();
@@ -106,7 +103,6 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
-    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   private void setupMockSession() throws JMSException {

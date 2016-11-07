@@ -35,7 +35,6 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
@@ -183,12 +182,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private SourceCallback sourceCallback;
   private ExtensionMessageSource messageSource;
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    startIfNeeded(muleContext.getNotificationManager());
-  }
-
   @Before
   public void before() throws Exception {
     spyInjector(muleContext);
@@ -254,7 +247,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
-    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Test

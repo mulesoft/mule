@@ -14,8 +14,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -54,7 +52,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     super.doSetUp();
     muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
     scheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).computationScheduler();
-    startIfNeeded(muleContext.getNotificationManager());
   }
 
   @Override
@@ -65,7 +62,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       asyncReplyMP.dispose();
     }
     super.doTearDown();
-    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Test

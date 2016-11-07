@@ -25,7 +25,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
@@ -52,6 +51,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -65,8 +66,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.verification.VerificationMode;
-
-import com.google.common.collect.ImmutableList;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -126,12 +125,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private List<Interceptor> orderedInterceptors;
   private ExecutionMediator mediator;
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    startIfNeeded(muleContext.getNotificationManager());
-  }
-
   @Before
   public void before() throws Exception {
     when(configurationInstance.getStatistics()).thenReturn(configurationStats);
@@ -165,7 +158,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
-    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Test

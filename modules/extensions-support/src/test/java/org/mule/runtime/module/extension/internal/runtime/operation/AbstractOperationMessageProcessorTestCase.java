@@ -18,7 +18,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
@@ -155,12 +154,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   protected DefaultConnectionManager connectionManager;
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    startIfNeeded(muleContext.getNotificationManager());
-  }
-
   @Before
   public void before() throws Exception {
     event = configureEvent();
@@ -264,7 +257,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
-    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   protected abstract OperationMessageProcessor createOperationMessageProcessor();

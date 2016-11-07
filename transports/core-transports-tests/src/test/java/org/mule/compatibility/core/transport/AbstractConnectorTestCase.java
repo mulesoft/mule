@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
@@ -44,7 +43,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
 
   @Override
   protected void doSetUp() throws Exception {
-    startIfNeeded(muleContext.getNotificationManager());
     Connector connector = createConnector();
     if (connector.getName() == null) {
       connector.setName("test");
@@ -60,7 +58,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
     if (connector != null && connector.isDisposed()) {
       fail("Connector has been disposed prematurely - lifecycle problem? Instance: " + connector);
     }
-    stopIfNeeded(muleContext.getNotificationManager());
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 

@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
@@ -29,6 +28,8 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,8 +39,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.google.common.collect.ImmutableList;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -62,12 +61,6 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
   private ExpirationPolicy expirationPolicy;
 
   private ConnectionProvider connectionProvider = new HeisenbergConnectionProvider();
-
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    startIfNeeded(muleContext.getNotificationManager());
-  }
 
   @Override
   @Before
@@ -96,7 +89,6 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
-    stopIfNeeded(muleContext.getNotificationManager());
   }
 
   @Test
