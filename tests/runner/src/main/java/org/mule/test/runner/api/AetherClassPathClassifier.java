@@ -795,7 +795,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       throw new IllegalStateException("Couldn't resolve dependencies for application '" + context.getRootArtifact()
           + "' classification", e);
     }
-    return toUrl(appFiles);
+
+    List<URL> appUrls = newArrayList(toUrl(appFiles));
+    logger.debug("Appending URLs to application: {}", context.getApplicationUrls());
+    appUrls.addAll(context.getApplicationUrls());
+    return appUrls;
   }
 
   /**

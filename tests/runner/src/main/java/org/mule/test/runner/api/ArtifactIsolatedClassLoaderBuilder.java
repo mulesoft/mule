@@ -14,6 +14,7 @@ import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.maven.model.Model;
@@ -59,6 +60,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private List<Class> exportPluginClasses = newArrayList();
   private boolean extensionMetadataGenerationEnabled = false;
   private List<String> providedInclusions = newArrayList();
+  private List<URL> applicationUrls = newArrayList();
   private List<String> extraBootPackages;
 
   /**
@@ -239,6 +241,19 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
+   * Sets a {@link List} of {@link URL}s to be appended to the application
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   *
+   * @param {@link List} of {@link URL}s to be appended to the application
+   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   * @return this
+   */
+  public ArtifactIsolatedClassLoaderBuilder setApplicationUrls(List<URL> applicationUrls) {
+    this.applicationUrls = applicationUrls;
+    return this;
+  }
+
+  /**
    * Builds the {@link ArtifactClassLoaderHolder} with the
    * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s for application, plugins and container.
    *
@@ -266,6 +281,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
                                          pluginCoordinates,
                                          sharedPluginLibCoordinates,
                                          exportPluginClasses,
+                                         applicationUrls,
                                          extensionMetadataGenerationEnabled);
     } catch (IOException e) {
       throw new RuntimeException("Error while creating the classification context", e);
