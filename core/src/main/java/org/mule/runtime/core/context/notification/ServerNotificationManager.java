@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 
@@ -69,6 +70,7 @@ public class ServerNotificationManager
 
   private boolean dynamic = false;
   private Configuration configuration = new Configuration();
+  private ReentrantReadWriteLock disposeLock = new ReentrantReadWriteLock();
   private AtomicBoolean disposed = new AtomicBoolean(false);
   private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
@@ -157,7 +159,13 @@ public class ServerNotificationManager
 
   @Override
   public void fireNotification(ServerNotification notification) {
-    if (!disposed.get()) {
+    disposeLock.readLock().lock();
+    try {
+      if (disposed.get()) {
+        logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
+        return;
+      }
+
       notification.setMuleContext(muleContext);
       if (notification instanceof BlockingServerEvent) {
         notifyListeners(notification, (listener, nfn) -> listener.onNotification(nfn));
@@ -172,15 +180,9 @@ public class ServerNotificationManager
           }
         });
       }
-    } else {
-      logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
+    } finally {
+      disposeLock.readLock().unlock();
     }
-  }
-
-  @FunctionalInterface
-  public interface Notifier {
-
-    void notify(ServerNotificationListener listener, ServerNotification notification);
   }
 
   @Override
@@ -197,26 +199,31 @@ public class ServerNotificationManager
 
   @Override
   public void dispose() {
-    final int shutdownTimeout = muleContext.getConfiguration().getShutdownTimeout();
+    disposeLock.writeLock().lock();
+    try {
+      final int shutdownTimeout = muleContext.getConfiguration().getShutdownTimeout();
 
-    if (notificationsLiteScheduler != null) {
-      notificationsLiteScheduler.stop(shutdownTimeout, MILLISECONDS);
-      notificationsLiteScheduler = null;
-    }
-    if (notificationsIoScheduler != null) {
-      notificationsIoScheduler.stop(shutdownTimeout, MILLISECONDS);
-      notificationsIoScheduler = null;
-    }
-    if (notificationsComputationScheduler != null) {
-      notificationsComputationScheduler.stop(shutdownTimeout, MILLISECONDS);
-      notificationsComputationScheduler = null;
-    }
+      if (notificationsLiteScheduler != null) {
+        notificationsLiteScheduler.stop(shutdownTimeout, MILLISECONDS);
+        notificationsLiteScheduler = null;
+      }
+      if (notificationsIoScheduler != null) {
+        notificationsIoScheduler.stop(shutdownTimeout, MILLISECONDS);
+        notificationsIoScheduler = null;
+      }
+      if (notificationsComputationScheduler != null) {
+        notificationsComputationScheduler.stop(shutdownTimeout, MILLISECONDS);
+        notificationsComputationScheduler = null;
+      }
 
-    disposed.set(true);
-    configuration = null;
+      disposed.set(true);
+      configuration = null;
+    } finally {
+      disposeLock.writeLock().unlock();
+    }
   }
 
-  protected void notifyListeners(ServerNotification notification, Notifier notifier) {
+  protected void notifyListeners(ServerNotification notification, NotifierCallback notifier) {
     final Policy policy = configuration.getPolicy();
     if (!disposed.get()) {
       policy.dispatch(notification, notifier);

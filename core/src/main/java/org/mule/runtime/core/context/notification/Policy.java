@@ -8,7 +8,6 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.context.notification.ServerNotificationManager.Notifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,7 +83,7 @@ class Policy {
     return true;
   }
 
-  void dispatch(ServerNotification notification, Notifier notifier) {
+  void dispatch(ServerNotification notification, NotifierCallback notifier) {
     if (null != notification) {
       Class notfnClass = notification.getClass();
       // search if we don't know about this event, or if we do know it is used
@@ -102,7 +101,7 @@ class Policy {
   }
 
   protected boolean doDispatch(ServerNotification notification, Class<? extends ServerNotification> notfnClass,
-                               Notifier notifier) {
+                               NotifierCallback notifier) {
     boolean found = false;
     for (Class<? extends ServerNotification> event : eventToSenders.keySet()) {
       if (event.isAssignableFrom(notfnClass)) {

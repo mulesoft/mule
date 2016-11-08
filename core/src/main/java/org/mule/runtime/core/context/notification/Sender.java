@@ -7,7 +7,6 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.context.notification.ServerNotificationManager.Notifier;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 /**
@@ -25,7 +24,7 @@ class Sender {
     subscriptionFilter.setCaseSensitive(false);
   }
 
-  public void dispatch(ServerNotification notification, Notifier notifier) {
+  public void dispatch(ServerNotification notification, NotifierCallback notifier) {
     if (pair.isNullSubscription()
         || (null != notification.getResourceIdentifier() && subscriptionFilter.accept(notification.getResourceIdentifier()))) {
       try {
