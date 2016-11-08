@@ -352,4 +352,44 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetForbiddenPetsType" substitutionGroup="mule:abstract-message-processor" name="get-forbidden-pets"></xs:element>
+    <xs:complexType name="GetForbiddenPetsType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="forbidden-pets">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="forbidden-pet">
+                                    <xs:complexType>
+                                        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="org.mule.test.petstore.extension.PetEnumType" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionList" use="optional" name="forbiddenPets"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="org.mule.test.petstore.extension.PetEnumType">
+        <xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="DOG"></xs:enumeration>
+                    <xs:enumeration value="CAT"></xs:enumeration>
+                    <xs:enumeration value="FISH"></xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
 </xs:schema>

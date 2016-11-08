@@ -65,7 +65,7 @@ public class ParameterGroupModelEnricherTestCase {
     assertThat(childGroups.size(), is(1));
 
     final ParameterGroup lifeTimeInfoGroup = childGroups.get(0);
-    assertThat(lifeTimeInfoGroup.getParameters().size(), is(3));
+    assertThat(lifeTimeInfoGroup.getParameters().size(), is(4));
     assertThat(lifeTimeInfoGroup.getType(), is(equalTo(LifetimeInfo.class)));
   }
 }

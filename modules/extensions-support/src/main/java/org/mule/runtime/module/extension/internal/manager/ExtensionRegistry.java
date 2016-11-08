@@ -10,10 +10,10 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
@@ -80,17 +80,19 @@ final class ExtensionRegistry {
    */
   void registerExtension(String name, ExtensionModel extensionModel) {
     extensions.put(new ExtensionEntityKey(name), extensionModel);
-    getParameterClasses(extensionModel).stream().filter(type -> Enum.class.isAssignableFrom(type)).forEach(type -> {
-      final Class<Enum> enumClass = (Class<Enum>) type;
-      if (enumClasses.add(enumClass)) {
-        try {
-          registry.registerTransformer(new StringToEnum(enumClass));
-        } catch (MuleException e) {
-          throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum " + enumClass.getName()),
-                                         e);
-        }
-      }
-    });
+    getParameterClasses(extensionModel, Thread.currentThread().getContextClassLoader()).stream()
+        .filter(type -> Enum.class.isAssignableFrom(type))
+        .forEach(type -> {
+          final Class<Enum> enumClass = (Class<Enum>) type;
+          if (enumClasses.add(enumClass)) {
+            try {
+              registry.registerTransformer(new StringToEnum(enumClass));
+            } catch (MuleException e) {
+              throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
+                  + enumClass.getName()), e);
+            }
+          }
+        });
   }
 
   /**

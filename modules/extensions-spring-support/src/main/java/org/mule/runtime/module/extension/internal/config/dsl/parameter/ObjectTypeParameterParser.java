@@ -10,7 +10,7 @@ import static java.util.Collections.emptySet;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.*;
+import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
@@ -21,6 +21,7 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
@@ -89,8 +90,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     final String fieldName = objectField.getKey().getName().getLocalPart();
     final boolean acceptsReferences = acceptsReferences(objectField);
     final Object defaultValue = getDefaultValue(fieldType).orElse(null);
-    final ExpressionSupport expressionSupport = getExpressionSupport(fieldType);
-
+    final ExpressionSupport expressionSupport = getExpressionSupport(objectField);
     Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
     if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
       return;

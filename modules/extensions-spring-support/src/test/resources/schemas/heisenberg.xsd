@@ -279,6 +279,13 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="family-info">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-extended-personal-info"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="enemies">
                             <xs:complexType>
                                 <xs:sequence>
@@ -424,6 +431,7 @@
                         </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="familyInfo"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
                     <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
@@ -449,7 +457,28 @@
                     <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
                     <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfBirth"></xs:attribute>
                     <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfDeath"></xs:attribute>
+                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
                 </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfBirth"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfDeath"></xs:attribute>
+                <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo" abstract="true" name="abstract-extended-personal-info"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-extended-personal-info" name="extended-personal-info">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo"></xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>

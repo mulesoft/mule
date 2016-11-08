@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="configWithChildElements" cashierName="jim" >
+        <petstore:connection username="john" password="doe"/>
+    </petstore:config>
+
+    <flow name="getForbiddenPetWithExpression">
+        <set-variable variableName="petName" value="DOG"/>
+        <petstore:get-forbidden-pets>
+            <petstore:forbidden-pets>
+                <petstore:forbidden-pet value="#[petName]"/>
+                <petstore:forbidden-pet value="CAT"/>
+            </petstore:forbidden-pets>
+        </petstore:get-forbidden-pets>
+    </flow>
+</mule>
