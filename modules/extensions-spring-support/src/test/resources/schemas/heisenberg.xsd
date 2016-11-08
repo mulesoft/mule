@@ -434,7 +434,7 @@
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="weaponTypeFunction"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="optional" name="weaponTypeFunction"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardList"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
@@ -1182,13 +1182,12 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:simpleType name="org.mule.test.heisenberg.extension.model.HealthStatusEnumType">
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType">
         <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">
-                    <xs:enumeration value="HEALTHY"></xs:enumeration>
-                    <xs:enumeration value="CANCER"></xs:enumeration>
-                    <xs:enumeration value="DEAD"></xs:enumeration>
+                    <xs:enumeration value="FIRE_WEAPON"></xs:enumeration>
+                    <xs:enumeration value="MELEE_WEAPON"></xs:enumeration>
                 </xs:restriction>
             </xs:simpleType>
             <xs:simpleType>
@@ -1196,12 +1195,13 @@
             </xs:simpleType>
         </xs:union>
     </xs:simpleType>
-    <xs:simpleType name="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType">
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.HealthStatusEnumType">
         <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">
-                    <xs:enumeration value="FIRE_WEAPON"></xs:enumeration>
-                    <xs:enumeration value="MELEE_WEAPON"></xs:enumeration>
+                    <xs:enumeration value="HEALTHY"></xs:enumeration>
+                    <xs:enumeration value="CANCER"></xs:enumeration>
+                    <xs:enumeration value="DEAD"></xs:enumeration>
                 </xs:restriction>
             </xs:simpleType>
             <xs:simpleType>

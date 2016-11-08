@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
@@ -26,6 +25,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
+
+import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
@@ -65,22 +66,25 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
-import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.extension.api.manifest.DescriberManifest;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.manifest.DescriberManifest;
+import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
+import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.runtime.module.extension.internal.introspection.describer.contributor.FunctionParameterTypeContributor;
+import org.mule.runtime.module.extension.internal.introspection.describer.contributor.InfrastructureFieldContributor;
+import org.mule.runtime.module.extension.internal.introspection.describer.contributor.ParameterDeclarerContributor;
+import org.mule.runtime.module.extension.internal.introspection.describer.contributor.ParameterResolverParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
@@ -88,7 +92,6 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionTypeFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
@@ -113,7 +116,6 @@ import org.mule.runtime.module.extension.internal.model.property.ExtendingOperat
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
@@ -122,8 +124,6 @@ import org.mule.runtime.module.extension.internal.model.property.SourceFactoryMo
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -167,15 +167,19 @@ public final class AnnotationsBasedDescriber implements Describer {
   private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
   private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
-  private List<ParameterDeclarerContributor> fieldParameterContributors = ImmutableList.of(new InfrastructureFieldContributor());
-  private List<ParameterDeclarerContributor> methodParameterContributors =
-      ImmutableList.of(new ParameterResolverParameterTypeContributor());
+  private List<ParameterDeclarerContributor> fieldParameterContributors;
+  private List<ParameterDeclarerContributor> methodParameterContributors;
 
   public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver) {
     checkArgument(extensionType != null, format("describer %s does not specify an extension type", getClass().getName()));
     this.extensionType = extensionType;
     this.versionResolver = versionResolver;
     typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
+
+    fieldParameterContributors =
+        ImmutableList.of(new InfrastructureFieldContributor(), new FunctionParameterTypeContributor(typeLoader));
+    methodParameterContributors = ImmutableList.of(new ParameterResolverParameterTypeContributor(typeLoader),
+                                                   new FunctionParameterTypeContributor(typeLoader));
   }
 
   /**
@@ -688,49 +692,6 @@ public final class AnnotationsBasedDescriber implements Describer {
   private void addInterceptingCallbackModelProperty(MethodElement operationMethod, OperationDeclarer operation) {
     if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType())) {
       operation.withModelProperty(new InterceptingModelProperty());
-    }
-  }
-
-  private interface ParameterDeclarerContributor {
-
-    void contribute(ExtensionParameter parameter, ParameterDeclarer declarer, ParameterDeclarationContext declarationContext);
-  }
-
-
-  private static class InfrastructureFieldContributor implements ParameterDeclarerContributor {
-
-    @Override
-    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
-                           ParameterDeclarationContext declarationContext) {
-      if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaringClass())) {
-        declarer.withModelProperty(new InfrastructureParameterModelProperty());
-        declarer.withExpressionSupport(NOT_SUPPORTED);
-      }
-    }
-  }
-
-
-  private class ParameterResolverParameterTypeContributor implements ParameterDeclarerContributor {
-
-    @Override
-    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
-                           ParameterDeclarationContext declarationContext) {
-      MetadataType metadataType = parameter.getMetadataType(typeLoader);
-      if (ParameterResolver.class.isAssignableFrom(parameter.getType().getDeclaringClass())) {
-        final Optional<MetadataType> expressionResolverType = getGenericTypeAt(metadataType, 0, typeLoader);
-        if (expressionResolverType.isPresent()) {
-          metadataType = expressionResolverType.get();
-        } else {
-          throw new IllegalParameterModelDefinitionException(
-                                                             format(
-                                                                    "The parameter [%s] from the Operation [%s] doesn't specify the %s parameterized type",
-                                                                    parameter.getName(),
-                                                                    declarationContext.getName(),
-                                                                    ParameterResolver.class.getSimpleName()));
-        }
-        declarer.ofType(metadataType);
-        declarer.withModelProperty(new ParameterResolverTypeModelProperty());
-      }
     }
   }
 }
