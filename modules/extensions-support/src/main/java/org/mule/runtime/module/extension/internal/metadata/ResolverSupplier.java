@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.getClassName;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverSupplier;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
  * @since 4.0
  * @param <T> The type of the instances to supply
  */
-public final class ResolverSupplier<T> implements Supplier<T> {
+public final class ResolverSupplier<T extends NamedTypeResolver> implements Supplier<T> {
 
   private static final NullMetadataResolverSupplier NULL_METADATA_RESOLVER_SUPPLIER = new NullMetadataResolverSupplier();
   private Class<T> clazz;
@@ -41,7 +42,7 @@ public final class ResolverSupplier<T> implements Supplier<T> {
    * @param aClass The from which the {@link Supplier} will create instances
    * @param <T>    The {@link Class} type
    */
-  public static <T> Supplier<T> of(Class<T> aClass) {
+  public static <T extends NamedTypeResolver> Supplier<T> of(Class<T> aClass) {
     checkArgument(aClass != null, "The class can't be null");
     if (aClass.equals(NullMetadataResolver.class)) {
       return (Supplier<T>) NULL_METADATA_RESOLVER_SUPPLIER;

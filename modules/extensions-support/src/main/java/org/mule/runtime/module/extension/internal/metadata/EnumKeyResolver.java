@@ -39,7 +39,6 @@ public final class EnumKeyResolver implements TypeKeysResolver {
    * @param categoryName Category name of the current {@link TypeKeysResolver}
    */
   EnumKeyResolver(EnumAnnotation anEnum, String categoryName) {
-    checkArgument(isNotEmpty(categoryName), "Category Name can't be null");
     keys = Stream.of(anEnum.getValues())
         .map(Object::toString)
         .map(MetadataKeyBuilder::newKey)

@@ -52,6 +52,11 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
     keysResolver = keyResolver.get();
     outputTypeResolver = outputResolver.get();
     attributesTypeResolver = attributesResolver.get();
+
+    checkArgument(keysResolver != null, "MetadataKeyResolver type cannot be null");
+    inputResolvers.values().forEach(resolver -> checkArgument(resolver != null, "Input Type Resolver cannot be null"));
+    checkArgument(outputTypeResolver != null, "OutputTypeResolver type cannot be null");
+    checkArgument(attributesTypeResolver != null, "AttributesTypeResolver type cannot be null");
   }
 
   /**

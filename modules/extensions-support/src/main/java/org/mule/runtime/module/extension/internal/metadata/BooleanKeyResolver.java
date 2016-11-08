@@ -41,7 +41,6 @@ public final class BooleanKeyResolver implements TypeKeysResolver {
   private final String categoryName;
 
   BooleanKeyResolver(String categoryName) {
-    checkArgument(isNotEmpty(categoryName), "Category Name can't be null");
     this.categoryName = categoryName;
   }
 
