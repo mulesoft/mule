@@ -10,17 +10,14 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -74,7 +71,6 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
   private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
   private Scheduler notificationsIoScheduler;
-  private Scheduler notificationsComputationScheduler;
 
   @Override
   public boolean isNotificationDynamic() {
@@ -102,7 +98,6 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
 
     notificationsLiteScheduler = schedulerService.cpuLightScheduler();
     notificationsIoScheduler = schedulerService.ioScheduler();
-    notificationsComputationScheduler = schedulerService.computationScheduler();
   }
 
   public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event) {
@@ -166,16 +161,14 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
       }
 
       notification.setMuleContext(muleContext);
-      if (notification instanceof BlockingServerEvent) {
+      if (notification instanceof SynchronousServerEvent) {
         notifyListeners(notification, (listener, nfn) -> listener.onNotification(nfn));
       } else {
         notifyListeners(notification, (listener, nfn) -> {
-          if (CPU_LITE.equals(listener.getProcessingType())) {
-            notificationsLiteScheduler.submit(() -> listener.onNotification(nfn));
-          } else if (BLOCKING.equals(listener.getProcessingType())) {
+          if (listener.isBlocking()) {
             notificationsIoScheduler.submit(() -> listener.onNotification(nfn));
-          } else if (CPU.equals(listener.getProcessingType())) {
-            notificationsComputationScheduler.submit(() -> listener.onNotification(nfn));
+          } else {
+            notificationsLiteScheduler.submit(() -> listener.onNotification(nfn));
           }
         });
       }
@@ -213,10 +206,6 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
       if (notificationsIoScheduler != null) {
         notificationsIoScheduler.stop(shutdownTimeout, MILLISECONDS);
         notificationsIoScheduler = null;
-      }
-      if (notificationsComputationScheduler != null) {
-        notificationsComputationScheduler.stop(shutdownTimeout, MILLISECONDS);
-        notificationsComputationScheduler = null;
       }
 
       disposed.set(true);

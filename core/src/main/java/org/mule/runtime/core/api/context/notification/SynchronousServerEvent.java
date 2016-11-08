@@ -11,6 +11,6 @@ package org.mule.runtime.core.api.context.notification;
  * thread, thus blocking the current thread of execution until all listeners have been processed
  */
 
-public interface BlockingServerEvent {
+public interface SynchronousServerEvent {
   // no methods
 }

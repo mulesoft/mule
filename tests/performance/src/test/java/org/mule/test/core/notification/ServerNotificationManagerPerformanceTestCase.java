@@ -11,9 +11,9 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
@@ -151,6 +151,11 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
     private final AtomicInteger notifications = new AtomicInteger();
 
     @Override
+    public boolean isBlocking() {
+      return false;
+    }
+
+    @Override
     public void onNotification(PerfTestServerBlockingNotification notification) {
       notifications.incrementAndGet();
     }
@@ -176,7 +181,7 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
 
   }
 
-  public static class PerfTestServerBlockingNotification extends ServerNotification implements BlockingServerEvent {
+  public static class PerfTestServerBlockingNotification extends ServerNotification implements SynchronousServerEvent {
 
     static {
       registerAction("PerfTestServerBlockingNotification", CUSTOM_EVENT_ACTION_START_RANGE + 2);

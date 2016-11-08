@@ -164,11 +164,19 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
     contextStartedLatch.set(new Latch());
     // Do not inline it, otherwise the type of the listener is lost
-    final MuleContextNotificationListener<MuleContextNotification> listener = notification -> {
-      if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED) {
-        contextStartedLatch.get().countDown();
-      }
-    };
+    final MuleContextNotificationListener<MuleContextNotification> listener =
+        new MuleContextNotificationListener<MuleContextNotification>() {
+
+          @Override
+          public boolean isBlocking() {
+            return false;
+          }
+
+          @Override
+          public void onNotification(MuleContextNotification notification) {
+            contextStartedLatch.get().countDown();
+          }
+        };
     muleContext.registerListener(listener);
 
     muleContext.start();

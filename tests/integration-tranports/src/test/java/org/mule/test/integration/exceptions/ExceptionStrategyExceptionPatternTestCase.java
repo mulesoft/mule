@@ -49,11 +49,20 @@ public class ExceptionStrategyExceptionPatternTestCase extends CompatibilityFunc
     failingFlow.setEventCallback((context, component, muleContext) -> {
       throw exceptionHolder.get();
     });
-    final TransactionNotificationListener txListener = notification -> {
-      if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
-        commitLatch.release();
-      } else if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
-        rollbackLatch.release();
+    final TransactionNotificationListener txListener = new TransactionNotificationListener<TransactionNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
+
+      @Override
+      public void onNotification(TransactionNotification notification) {
+        if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
+          commitLatch.release();
+        } else if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
+          rollbackLatch.release();
+        }
       }
     };
     muleContext.registerListener(txListener);

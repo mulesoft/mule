@@ -389,6 +389,11 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     final AtomicBoolean stoppedNotificationFired = new AtomicBoolean(false);
 
     @Override
+    public boolean isBlocking() {
+      return false;
+    }
+
+    @Override
     public void onNotification(MuleContextNotification notification) {
       switch (notification.getAction()) {
         case MuleContextNotification.CONTEXT_STARTING:

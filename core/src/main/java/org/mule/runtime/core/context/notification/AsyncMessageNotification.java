@@ -9,14 +9,14 @@ package org.mule.runtime.core.context.notification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * <code>AsyncMessageNotification</code> when async work is scheduled and completed for a given flow
  */
-public class AsyncMessageNotification extends ServerNotification implements BlockingServerEvent {
+public class AsyncMessageNotification extends ServerNotification implements SynchronousServerEvent {
 
   private static final long serialVersionUID = 6065691696506216248L;
 

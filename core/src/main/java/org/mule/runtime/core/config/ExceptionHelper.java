@@ -7,6 +7,7 @@
 package org.mule.runtime.core.config;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.legacy.exception.ExceptionReader;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.registry.ServiceType;
@@ -14,7 +15,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.util.PropertiesUtils;
-import org.mule.runtime.api.legacy.exception.ExceptionReader;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -60,8 +60,8 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
 
   private static Properties errorDocs = new Properties();
   private static Properties errorCodes = new Properties();
-  private static Map<String, Properties> errorMappings = new HashMap<String, Properties>();
-  private static Map<String, Boolean> disposeListenerRegistered = new HashMap<String, Boolean>();
+  private static Map<String, Properties> errorMappings = new HashMap<>();
+  private static Map<String, Boolean> disposeListenerRegistered = new HashMap<>();
 
   private static boolean initialised = false;
 
@@ -137,6 +137,11 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
 
   private static MuleContextNotificationListener<MuleContextNotification> createClearCacheListenerOnContextDispose(final MuleContext muleContext) {
     return new MuleContextNotificationListener<MuleContextNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
 
       @Override
       public void onNotification(MuleContextNotification notification) {
@@ -291,7 +296,7 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
   }
 
   public static <T> T traverseCauseHierarchy(Throwable e, ExceptionEvaluator<T> evaluator) {
-    LinkedList<Throwable> exceptions = new LinkedList<Throwable>();
+    LinkedList<Throwable> exceptions = new LinkedList<>();
     exceptions.add(e);
     while (e.getCause() != null && !e.getCause().equals(e)) {
       exceptions.addFirst(e.getCause());
@@ -319,7 +324,7 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
   }
 
   private static void clearCacheFor(MuleContext muleContext) {
-    List<String> entriesToRemove = new ArrayList<String>();
+    List<String> entriesToRemove = new ArrayList<>();
     for (String key : errorMappings.keySet()) {
       if (key.endsWith(muleContext.getConfiguration().getId())) {
         entriesToRemove.add(key);

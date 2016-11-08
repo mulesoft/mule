@@ -34,7 +34,7 @@ public class JmxRegistrationContext {
    * Normally ThreadLocal is fine, as Mule is being initialised and destroyed by a single thread. We only need to share this info
    * between random agents during startup.
    */
-  private static final ThreadLocal<JmxRegistrationContext> contexts = new ThreadLocal<JmxRegistrationContext>();
+  private static final ThreadLocal<JmxRegistrationContext> contexts = new ThreadLocal<>();
 
   private String resolvedDomain;
 
@@ -44,6 +44,11 @@ public class JmxRegistrationContext {
       // register the cleanup hook, otherwise server stop/start cycles may produce
       // Mule JMX domains with ever increasing suffix.
       context.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
+
+        @Override
+        public boolean isBlocking() {
+          return false;
+        }
 
         @Override
         public void onNotification(MuleContextNotification notification) {

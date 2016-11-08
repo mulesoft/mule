@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.transaction;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -15,9 +17,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class TransactionNotificationsTestCase extends AbstractMuleContextTestCase {
 
@@ -31,6 +32,12 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
 
     muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>() {
 
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
+
+      @Override
       public void onNotification(TransactionNotification notification) {
         if (notification.getAction() == TransactionNotification.TRANSACTION_BEGAN) {
           assertEquals("begin", notification.getActionName());
@@ -75,14 +82,17 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
       return null; // To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     protected void doBegin() throws TransactionException {
 
     }
 
+    @Override
     protected void doCommit() throws TransactionException {
 
     }
 
+    @Override
     protected void doRollback() throws TransactionException {
 
     }

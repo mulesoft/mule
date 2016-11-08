@@ -17,14 +17,15 @@ import org.mule.compatibility.transport.jms.jndi.JndiNameResolver;
 import org.mule.compatibility.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.compatibility.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandlerFactory;
+import org.mule.runtime.api.exception.ExceptionHelper;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -32,10 +33,7 @@ import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -226,6 +224,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
       muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>() {
 
         @Override
+        public boolean isBlocking() {
+          return false;
+        }
+
+        @Override
         public void onNotification(ConnectionNotification notification) {
           if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED
               || notification.getAction() == ConnectionNotification.CONNECTION_FAILED) {
@@ -410,25 +413,21 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     if (muleContext.isPrimaryPollingInstance() || clientId == null) {
       super.connect();
     } else {
-      muleContext.registerListener(new ClusterNodeNotificationListener<ClusterNodeNotification>() {
+      muleContext.registerListener(notification -> {
+        // Notification thread is bound to the MuleContainerSystemClassLoader, save it
+        // so we can restore it later
+        ClassLoader notificationClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+          // The connection should use instead the ApplicationClassloader
+          Thread.currentThread().setContextClassLoader(muleContext.getExecutionClassLoader());
 
-        @Override
-        public void onNotification(ClusterNodeNotification notification) {
-          // Notification thread is bound to the MuleContainerSystemClassLoader, save it
-          // so we can restore it later
-          ClassLoader notificationClassLoader = Thread.currentThread().getContextClassLoader();
-          try {
-            // The connection should use instead the ApplicationClassloader
-            Thread.currentThread().setContextClassLoader(muleContext.getExecutionClassLoader());
-
-            JmsConnector.this.connect();
-          } catch (Exception e) {
-            throw new MuleRuntimeException(e);
-          } finally {
-            // Restore the notification original class loader so we don't interfere in any later
-            // usage of this thread
-            Thread.currentThread().setContextClassLoader(notificationClassLoader);
-          }
+          JmsConnector.this.connect();
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
+        } finally {
+          // Restore the notification original class loader so we don't interfere in any later
+          // usage of this thread
+          Thread.currentThread().setContextClassLoader(notificationClassLoader);
         }
       });
     }

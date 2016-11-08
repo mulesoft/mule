@@ -7,14 +7,14 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * <code>MuleContextNotification</code> is fired when an event such as the mule context starting occurs. The payload of this event
  * will always be a reference to the muleContext.
  */
-public class MuleContextNotification extends ServerNotification implements BlockingServerEvent {
+public class MuleContextNotification extends ServerNotification implements SynchronousServerEvent {
 
   /**
    * Serial version

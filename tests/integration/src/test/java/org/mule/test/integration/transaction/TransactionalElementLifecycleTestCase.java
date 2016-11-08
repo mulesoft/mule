@@ -43,7 +43,18 @@ public class TransactionalElementLifecycleTestCase extends AbstractIntegrationTe
 
   @Test
   public void testInitializeIsCalledInInnerExceptionStrategy() throws Exception {
-    final TransactionNotificationListener listener = notification -> notifications.add((TransactionNotification) notification);
+    final TransactionNotificationListener listener = new TransactionNotificationListener<TransactionNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
+
+      @Override
+      public void onNotification(TransactionNotification notification) {
+        notifications.add(notification);
+      }
+    };
     muleContext.getNotificationManager().addListener(listener);
 
     final Latch endDlqFlowLatch = new Latch();

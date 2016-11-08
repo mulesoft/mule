@@ -6,7 +6,7 @@
  */
 package org.mule.test.core.context.notification;
 
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 import java.util.HashSet;
@@ -66,7 +66,7 @@ public class Node implements RestrictedNode {
   }
 
   public Node parallel(RestrictedNode node) {
-    if (null != node.getNotificationClass() && BlockingServerEvent.class.isAssignableFrom(node.getNotificationClass())) {
+    if (null != node.getNotificationClass() && SynchronousServerEvent.class.isAssignableFrom(node.getNotificationClass())) {
       logger.warn("Registered blocking event as parallel: " + node);
     }
     parallel.add(node);
@@ -78,7 +78,7 @@ public class Node implements RestrictedNode {
    * generating some event)
    */
   public Node parallelSynch(RestrictedNode node) {
-    if (null != node.getNotificationClass() && !BlockingServerEvent.class.isAssignableFrom(node.getNotificationClass())) {
+    if (null != node.getNotificationClass() && !SynchronousServerEvent.class.isAssignableFrom(node.getNotificationClass())) {
       throw new IllegalStateException("Node " + node + " is not a synch event");
     }
     parallel.add(node);
@@ -86,7 +86,7 @@ public class Node implements RestrictedNode {
   }
 
   public RestrictedNode serial(RestrictedNode node) {
-    if (null != node.getNotificationClass() && !BlockingServerEvent.class.isAssignableFrom(node.getNotificationClass())) {
+    if (null != node.getNotificationClass() && !SynchronousServerEvent.class.isAssignableFrom(node.getNotificationClass())) {
       logger.warn("Registered non-blocking event as serial: " + node);
     }
     serial.addLast(node);

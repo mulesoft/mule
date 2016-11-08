@@ -38,7 +38,18 @@ public class SecureHttpPollingFunctionalTestCase extends UsesHttpExtensionFuncti
   @Test
   public void testPollingHttpConnectorSentCredentials() throws Exception {
     final Latch latch = new Latch();
-    muleContext.registerListener((SecurityNotificationListener<SecurityNotification>) notification -> latch.countDown());
+    muleContext.registerListener(new SecurityNotificationListener<SecurityNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
+
+      @Override
+      public void onNotification(SecurityNotification notification) {
+        latch.countDown();
+      }
+    });
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://toclient", 5000).getRight().get();

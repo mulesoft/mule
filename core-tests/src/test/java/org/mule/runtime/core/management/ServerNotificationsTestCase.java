@@ -125,6 +125,11 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   }
 
   @Override
+  public boolean isBlocking() {
+    return false;
+  }
+
+  @Override
   public void onNotification(ServerNotification notification) {
     if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED) {
       managerStopped.set(true);

@@ -7,10 +7,14 @@
 package org.mule.test.core.context.notification.processors;
 
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.test.core.context.notification.AbstractNotificationLogger;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
+import org.mule.test.core.context.notification.AbstractNotificationLogger;
 
 public class MessageProcessorNotificationLogger extends AbstractNotificationLogger<MessageProcessorNotification>
     implements MessageProcessorNotificationListener<MessageProcessorNotification> {
 
+  @Override
+  public boolean isBlocking() {
+    return false;
+  }
 }

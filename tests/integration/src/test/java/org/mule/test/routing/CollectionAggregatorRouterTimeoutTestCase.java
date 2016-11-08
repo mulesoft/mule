@@ -7,16 +7,16 @@
 package org.mule.test.routing;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +36,11 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrati
     // correlation timeouts should not fire in this scenario, check it
     final AtomicInteger correlationTimeoutCount = new AtomicInteger(0);
     muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
 
       @Override
       public void onNotification(RoutingNotification notification) {

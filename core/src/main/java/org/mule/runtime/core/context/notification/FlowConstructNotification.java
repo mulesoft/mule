@@ -7,14 +7,14 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * <code>FlowConstructNotification</code> is fired when an event such as the flow construct starting occurs. The payload of this
  * event will always be a reference to the flow construct.
  */
-public class FlowConstructNotification extends ServerNotification implements BlockingServerEvent {
+public class FlowConstructNotification extends ServerNotification implements SynchronousServerEvent {
 
   private static final long serialVersionUID = 6658641434183647952L;
   public static final int FLOW_CONSTRUCT_INITIALISED = FLOW_CONSTRUCT_EVENT_ACTION_START_RANGE + 1;

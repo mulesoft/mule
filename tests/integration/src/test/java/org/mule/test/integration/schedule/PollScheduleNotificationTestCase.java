@@ -7,7 +7,6 @@
 package org.mule.test.integration.schedule;
 
 
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
@@ -15,6 +14,7 @@ import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +55,11 @@ public class PollScheduleNotificationTestCase extends AbstractIntegrationTestCas
   class MyListener implements ConnectorMessageNotificationListener<ConnectorMessageNotification> {
 
     List<ConnectorMessageNotification> notifications = new ArrayList<>();
+
+    @Override
+    public boolean isBlocking() {
+      return false;
+    }
 
     @Override
     public void onNotification(ConnectorMessageNotification notification) {

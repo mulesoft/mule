@@ -33,5 +33,9 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
  * @see MuleContext
  */
 public interface FunctionalTestNotificationListener extends CustomNotificationListener {
-  // no methods
+
+  @Override
+  default boolean isBlocking() {
+    return false;
+  }
 }

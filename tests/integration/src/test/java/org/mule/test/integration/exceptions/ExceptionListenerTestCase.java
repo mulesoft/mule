@@ -47,14 +47,22 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     exceptionStrategyStartNotification = null;
     exceptionStrategyEndNotification = null;
-    final ExceptionStrategyNotificationListener listener = notification -> {
-      if (notification.getAction() == ExceptionStrategyNotification.PROCESS_START) {
-        exceptionStrategyStartNotification = notification;
-      } else if (notification.getAction() == ExceptionStrategyNotification.PROCESS_END) {
-        exceptionStrategyEndNotification = notification;
+    muleContext.getNotificationManager().addListener(new ExceptionStrategyNotificationListener<ExceptionStrategyNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
       }
-    };
-    muleContext.getNotificationManager().addListener(listener);
+
+      @Override
+      public void onNotification(ExceptionStrategyNotification notification) {
+        if (notification.getAction() == ExceptionStrategyNotification.PROCESS_START) {
+          exceptionStrategyStartNotification = notification;
+        } else if (notification.getAction() == ExceptionStrategyNotification.PROCESS_END) {
+          exceptionStrategyEndNotification = notification;
+        }
+      }
+    });
   }
 
   @Test

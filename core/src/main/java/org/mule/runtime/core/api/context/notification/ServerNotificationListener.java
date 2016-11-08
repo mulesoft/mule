@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-
 /**
  * <code>ServerNotificationListener</code> is an observer interface that objects can implement and register themselves with the
  * Mule Server to receive notifications when the server, model and components stop, start, initialise, etc.
  */
 public interface ServerNotificationListener<T extends ServerNotification> {
 
-  default ReactiveProcessor.ProcessingType getProcessingType() {
-    return ReactiveProcessor.ProcessingType.CPU_LITE;
+  /**
+   * @return true if this listener is expected to perform blocking I/O operations, false otherwise.
+   */
+  default boolean isBlocking() {
+    return true;
   }
 
   void onNotification(T notification);

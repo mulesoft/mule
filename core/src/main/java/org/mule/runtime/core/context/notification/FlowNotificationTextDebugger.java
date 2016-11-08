@@ -19,6 +19,10 @@ public class FlowNotificationTextDebugger implements PipelineMessageNotification
     this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
   }
 
+  @Override
+  public boolean isBlocking() {
+    return false;
+  }
 
   @Override
   public void onNotification(PipelineMessageNotification notification) {
