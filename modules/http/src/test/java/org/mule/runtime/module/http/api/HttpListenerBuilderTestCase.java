@@ -13,9 +13,13 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.execution.MessageProcessingManager;
@@ -24,9 +28,9 @@ import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,7 +49,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase {
   public static final String HOST = "localhost";
   public static final String IP = "127.0.0.1";
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MuleContext mockMuleContext = mockContextWithServices();
   private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
   private DefaultHttpListenerConfig mockListenerConfig = mock(DefaultHttpListenerConfig.class);
   private Flow mockFlow = mock(Flow.class);
@@ -156,9 +160,9 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private MuleContext createMuleContext() throws Exception {
-    MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
-    muleContext.getRegistry().registerObject(HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER,
-                                             mockListenerConnectionManager);
+    MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                                                new DefaultsConfigurationBuilder());
+    muleContext.getRegistry().registerObject(HTTP_LISTENER_CONNECTION_MANAGER, mockListenerConnectionManager);
 
     return muleContext;
   }
