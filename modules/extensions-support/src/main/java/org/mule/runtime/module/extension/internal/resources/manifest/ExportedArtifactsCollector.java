@@ -119,7 +119,7 @@ final class ExportedArtifactsCollector {
 
       @Override
       public void onParameter(ParameterizedModel owner, ParameterModel model) {
-        collectRelativeClasses(model.getType(), exportedClasses, extensionClassloader);
+        exportedClasses.addAll(collectRelativeClasses(model.getType(), extensionClassloader));
       }
 
       @Override
@@ -136,7 +136,7 @@ final class ExportedArtifactsCollector {
   }
 
   private void collectReturnTypes(ComponentModel model) {
-    collectRelativeClasses(model.getOutput().getType(), exportedClasses, extensionClassloader);
-    collectRelativeClasses(model.getOutputAttributes().getType(), exportedClasses, extensionClassloader);
+    exportedClasses.addAll(collectRelativeClasses(model.getOutput().getType(), extensionClassloader));
+    exportedClasses.addAll(collectRelativeClasses(model.getOutputAttributes().getType(), extensionClassloader));
   }
 }

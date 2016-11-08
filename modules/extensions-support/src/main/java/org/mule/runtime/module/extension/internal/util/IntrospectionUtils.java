@@ -547,7 +547,7 @@ public final class IntrospectionUtils {
 
       @Override
       public void onParameter(ParameterizedModel owner, ParameterModel model) {
-        collectRelativeClasses(model.getType(), parameterClasses, extensionClassLoader);
+        parameterClasses.addAll(collectRelativeClasses(model.getType(), extensionClassLoader));
       }
     }.walk(extensionModel);
 
@@ -560,11 +560,11 @@ public final class IntrospectionUtils {
    * {@link ArrayType}, key and value of an {@link DictionaryType} and classes from the fields of {@link ObjectType}.
    *
    * @param type {@link MetadataType} to inspect
-   * @param relativeClasses {@link Set} were the classes should be added
    * @param extensionClassLoader extension class loader
+   * @return {@link Set<Class<?>>} with the classes reachable from the {@code type}
    */
-  public static void collectRelativeClasses(MetadataType type, Set<Class<?>> relativeClasses, ClassLoader extensionClassLoader) {
-
+  public static Set<Class<?>> collectRelativeClasses(MetadataType type, ClassLoader extensionClassLoader) {
+    Set<Class<?>> relativeClasses = new HashSet<>();
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -606,6 +606,7 @@ public final class IntrospectionUtils {
         }
       }
     });
+    return relativeClasses;
   }
 
   private static Class loadClass(String name, ClassLoader extensionClassloader) {
