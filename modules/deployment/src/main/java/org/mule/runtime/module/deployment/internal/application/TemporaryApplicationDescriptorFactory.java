@@ -13,7 +13,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
+import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import java.io.File;
 
@@ -23,9 +23,9 @@ import java.io.File;
  */
 public class TemporaryApplicationDescriptorFactory extends ApplicationDescriptorFactory {
 
-  public TemporaryApplicationDescriptorFactory(ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory,
+  public TemporaryApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                                ArtifactPluginRepository applicationPluginRepository) {
-    super(artifactPluginDescriptorFactory, applicationPluginRepository);
+    super(artifactPluginDescriptorLoader, applicationPluginRepository);
   }
 
   @Override
