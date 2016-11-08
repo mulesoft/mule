@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
@@ -23,7 +24,6 @@ import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -600,12 +600,12 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitString(StringType stringType) {
-        Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
-        if (enumAnnotation.isPresent()) {
+        if (isEnum(stringType)) {
           relativeClasses.add(getType(stringType));
         }
       }
     });
+
     return relativeClasses;
   }
 
