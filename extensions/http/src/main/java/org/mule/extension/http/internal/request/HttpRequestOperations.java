@@ -20,7 +20,7 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.http.internal.HttpMetadataResolver;
+import org.mule.extension.http.internal.HttpRequestMetadataResolver;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -71,7 +71,7 @@ public class HttpRequestOperations {
    * @return an {@link Result} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
-  @OutputResolver(output = HttpMetadataResolver.class)
+  @OutputResolver(output = HttpRequestMetadataResolver.class)
   public Result<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
                                                         @Optional @Placement(tab = ADVANCED,
                                                             group = "Response Validation Settings") ResponseValidator responseValidator,

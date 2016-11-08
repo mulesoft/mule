@@ -9,6 +9,15 @@
         <httpn:request-connection host="localhost" protocol="HTTP" port="1010"/>
     </httpn:request-config>
 
+    <httpn:listener-config name="lisConfig">
+        <httpn:listener-connection host="localhost" port="${serverPort}" protocol="HTTP"/>
+    </httpn:listener-config>
+
+    <flow name="server">
+        <httpn:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true"
+                        config-ref="lisConfig"/>
+    </flow>
+
     <flow name="anyExplicit">
         <httpn:request path="/" config-ref="reqConfig" outputType="ANY"/>
     </flow>

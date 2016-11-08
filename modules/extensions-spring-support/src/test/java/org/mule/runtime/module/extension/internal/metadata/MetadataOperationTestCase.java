@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -34,6 +35,7 @@ import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AG
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 
+import org.junit.Test;
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -54,8 +56,10 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
+import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
+import org.mule.test.metadata.extension.model.animals.AnimalClade;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.animals.SwordFish;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
@@ -70,8 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.junit.Test;
+import java.util.stream.Stream;
 
 public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCase {
 
@@ -441,12 +444,41 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   }
 
   @Test
+  public void retrieveKeysFromBooleanMetadataKey() {
+    componentId = new ProcessorId(BOOLEAN_METADATA_KEY, FIRST_PROCESSOR_INDEX);
+    MetadataResult<MetadataKeysContainer> result = metadataService.getMetadataKeys(componentId);
+    assertSuccess(result);
+    String booleanMetadataResolver = "BooleanMetadataResolver";
+    assertThat(result.get().getCategories(), contains(booleanMetadataResolver));
+
+    Set<MetadataKey> metadataKeys = result.get().getKeys(booleanMetadataResolver).get();
+    assertThat(metadataKeys, hasItems(metadataKeyWithId("FALSE"), metadataKeyWithId("TRUE")));
+  }
+
+  @Test
   public void booleanMetadataKey() throws IOException {
     componentId = new ProcessorId(BOOLEAN_METADATA_KEY, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> result = metadataService.getMetadata(componentId, newKey("true").build());
     assertSuccess(result);
     assertExpectedType(result.get().getInputMetadata().get().getParameterMetadata("content"), "content",
                        TYPE_LOADER.load(SwordFish.class), true);
+  }
+
+  @Test
+  public void retrieveKeysFromEnumMetadataKey() {
+    componentId = new ProcessorId(ENUM_METADATA_KEY, FIRST_PROCESSOR_INDEX);
+    MetadataResult<MetadataKeysContainer> result = metadataService.getMetadataKeys(componentId);
+    assertSuccess(result);
+    String enumMetadataResolver = "EnumMetadataResolver";
+    assertThat(result.get().getCategories(), contains(enumMetadataResolver));
+
+    Set<MetadataKey> metadataKeys = result.get().getKeys(enumMetadataResolver).get();
+    MetadataKeyMatcher[] metadataKeyMatchers = Stream.of(AnimalClade.values())
+        .map(Object::toString)
+        .map(key -> metadataKeyWithId(key))
+        .toArray(MetadataKeyMatcher[]::new);
+
+    assertThat(metadataKeys, hasItems(metadataKeyMatchers));
   }
 
   @Test
