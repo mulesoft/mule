@@ -33,18 +33,6 @@ public class JmsVendorNamespaceHandlerTestCase extends CompatibilityFunctionalTe
     setStartContext(false);
   }
 
-  // @Override
-  // protected void doSetUp() throws Exception {
-  // super.doSetUp();
-  // startIfNeeded(muleContext.getNotificationManager());
-  // }
-  //
-  // @Override
-  // protected void doTearDown() throws Exception {
-  // super.doTearDown();
-  // stopIfNeeded(muleContext.getNotificationManager());
-  // }
-
   @Override
   protected String getConfigFile() {
     return "jms-vendor-namespace-config.xml";

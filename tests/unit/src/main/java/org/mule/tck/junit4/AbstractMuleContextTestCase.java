@@ -48,6 +48,7 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -283,7 +284,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static void disposeContext() throws RegistrationException, MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
-        stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+        final SchedulerService serviceImpl = muleContext.getRegistry().lookupObject(SchedulerService.class);
+        if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
+          stopIfNeeded(serviceImpl);
+        }
         muleContext.dispose();
 
         MuleConfiguration configuration = muleContext.getConfiguration();
