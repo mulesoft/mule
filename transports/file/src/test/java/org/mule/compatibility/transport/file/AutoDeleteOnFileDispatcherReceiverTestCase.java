@@ -87,7 +87,6 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    muleContext.getNotificationManager().start();
     // The working directory is deleted on tearDown
     tempDir = newFile(muleContext.getConfiguration().getWorkingDirectory(), tempDirName);
     tempDir.deleteOnExit();
@@ -105,7 +104,6 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     // TestConnector dispatches events via the test: protocol to test://test
     // endpoints, which seems to end up in a directory called "test" :(
     deleteTree(newFile(getTestConnector().getProtocol()));
-    muleContext.getNotificationManager().stop();
     super.doTearDown();
   }
 

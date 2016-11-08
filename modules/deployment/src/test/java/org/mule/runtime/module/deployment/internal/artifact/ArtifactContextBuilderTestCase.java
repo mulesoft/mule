@@ -43,9 +43,8 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void emptyBuilder() throws Exception {
     MuleContext muleContext =
-        newBuilder().setExecutionClassloader(currentThread().getContextClassLoader())
+        newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
             .setClassLoaderRepository(mock(ClassLoaderRepository.class)).build().getMuleContext();
-    new TestServicesConfigurationBuilder().configure(muleContext);
     assertThat(muleContext, notNullValue());
     assertThat(muleContext.isInitialised(), is(true));
     muleContext.start();
