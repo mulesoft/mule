@@ -52,8 +52,7 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   public void setUp() throws IOException {
     System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
     when(artifactPluginDescriptorFactory.create(anyObject()))
-        .thenAnswer(invocation -> new ArtifactPluginDescriptor(((File) invocation.getArguments()[0]).getName().replace(".zip",
-                                                                                                                       "")));
+        .thenAnswer(invocation -> new ArtifactPluginDescriptor(((File) invocation.getArguments()[0]).getName()));
 
     pluginsLibFolder = createContainerAppPluginsFolder();
   }
@@ -74,8 +73,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
     ArtifactPluginDescriptor descriptor = descriptorList.get(0);
     assertThat(descriptor.getName(), is(PLUGIN_NAME));
 
-    assertThat(zipPlugin.exists(), is(true));
-    assertThat(new File(pluginsLibFolder, descriptor.getName() + ".zip").exists(), is(true));
+    assertThat(zipPlugin.exists(), is(false));
+    assertThat(new File(pluginsLibFolder, descriptor.getName()).exists(), is(true));
   }
 
   @Test

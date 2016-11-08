@@ -8,9 +8,9 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -20,14 +20,15 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPlugin;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,11 +100,15 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
       public TemporaryArtifact build() {
         try {
           String artifactId = "tooling-" + UUID.getUUID();
+          File toolingTempFolder = new File(MuleContainerBootstrapUtils.getMuleTmpDir(), "tooling");
+
+          File artifactRootFolder = new File(toolingTempFolder, artifactId);
+          File tempPluginsFolder = new File(new File(artifactRootFolder, "plugins"), "lib");
 
           artifactPluginDescriptors.addAll(this.artifactPluginFiles.stream().map(file -> {
             try {
-              return muleArtifactResourcesRegistry.getArtifactPluginDescriptorLoader().create(file);
-            } catch (ArtifactDescriptorCreateException e) {
+              return muleArtifactResourcesRegistry.getArtifactPluginDescriptorLoader().load(file, tempPluginsFolder);
+            } catch (IOException e) {
               throw new MuleRuntimeException(e);
             }
           }).collect(toList()));
