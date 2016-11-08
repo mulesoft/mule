@@ -32,7 +32,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="parameterizedFunction"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="parameterizedFunction"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

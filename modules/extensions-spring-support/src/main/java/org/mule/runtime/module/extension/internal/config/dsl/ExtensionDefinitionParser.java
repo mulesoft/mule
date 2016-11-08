@@ -72,6 +72,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolve
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.runtime.module.extension.internal.introspection.describer.FunctionParameterTypeModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.describer.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
@@ -237,9 +238,7 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (isExpressionFunction(objectType)) {
-            defaultVisit(objectType);
-          } else if (isNestedProcessor(objectType)) {
+          if (isNestedProcessor(objectType)) {
             parseNestedProcessor(parameter);
           } else {
             parseObjectParameter(parameter, paramDsl);
@@ -489,10 +488,9 @@ public abstract class ExtensionDefinitionParser {
 
     ValueResolver resolver = null;
 
-    if (isExpressionFunction(expectedType) && value != null) {
+    if (isExpressionFunction(modelProperties) && value != null) {
       resolver =
-          new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt(expectedType, 1, typeLoader).get(),
-                                                muleContext);
+          new ExpressionFunctionValueResolver<>((String) value, expectedType, muleContext);
     }
     if (isExpressionResolver(modelProperties) && value != null) {
       resolver =
@@ -723,26 +721,8 @@ public abstract class ExtensionDefinitionParser {
         .build());
   }
 
-  private boolean isExpressionFunction(MetadataType metadataType) {
-    if (!Function.class.isAssignableFrom(getType(metadataType))) {
-      return false;
-    }
-
-    Optional<ClassInformationAnnotation> generics = metadataType.getAnnotation(ClassInformationAnnotation.class);
-    if (!generics.isPresent()) {
-      return false;
-    }
-
-    if (generics.get().getGenericTypes().size() != 2) {
-      return false;
-    }
-
-    final String genericClassName = generics.get().getGenericTypes().get(0);
-    try {
-      return Event.class.isAssignableFrom(ClassUtils.getClass(genericClassName));
-    } catch (ClassNotFoundException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not load class " + genericClassName), e);
-    }
+  private boolean isExpressionFunction(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(property -> property instanceof FunctionParameterTypeModelProperty);
   }
 
   private boolean isExpressionResolver(Set<ModelProperty> modelProperties) {

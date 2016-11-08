@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
+import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isEnum;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import com.google.common.collect.ImmutableSet;
-import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -32,11 +37,6 @@ import org.mule.runtime.extension.api.model.property.ExportModelProperty;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 /**
  * Utility class which calculates the default set of java package names and resources that a given extension should export in
@@ -183,8 +183,7 @@ final class ExportedArtifactsCollector {
 
       @Override
       public void visitString(StringType stringType) {
-        Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
-        if (enumAnnotation.isPresent()) {
+        if (isEnum(stringType)) {
           exportedClasses.add(getType(stringType));
         }
       }

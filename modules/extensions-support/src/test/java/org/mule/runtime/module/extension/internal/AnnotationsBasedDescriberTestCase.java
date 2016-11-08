@@ -377,11 +377,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertParameter(parameters, "labAddress", "", toMetadataType(String.class), false, REQUIRED, null);
     assertParameter(parameters, "firstEndevour", "", toMetadataType(String.class), false, NOT_SUPPORTED, null);
     assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
-    assertParameter(parameters, "weaponTypeFunction", "",
-                    TYPE_BUILDER.objectType().id(Function.class.getName())
-                        .with(new ClassInformationAnnotation(Function.class, asList(Event.class, WeaponType.class)))
-                        .with(new TypeAliasAnnotation(Function.class.getSimpleName())).build(),
-                    false, SUPPORTED, null);
+    assertParameter(parameters, "weaponTypeFunction", "", toMetadataType(WeaponType.class), false, SUPPORTED, null);
     assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED,
                     null);
     assertParameter(parameters, "wildCardList", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
