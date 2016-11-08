@@ -28,7 +28,6 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;

@@ -42,7 +42,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -64,14 +63,14 @@ import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;

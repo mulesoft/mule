@@ -104,7 +104,6 @@ public class ArtifactContextBuilder {
 
   private void setAdditionalBuilders(List<ConfigurationBuilder> additionalBuilders) {
     this.additionalBuilders = additionalBuilders;
-
   }
 
   /**

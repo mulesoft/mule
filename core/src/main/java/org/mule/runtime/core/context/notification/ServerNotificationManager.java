@@ -63,8 +63,7 @@ import org.slf4j.Logger;
  * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
  * </ul>
  */
-public class ServerNotificationManager
-    implements Initialisable, Disposable, ServerNotificationHandler, MuleContextAware {
+public class ServerNotificationManager implements Initialisable, Disposable, ServerNotificationHandler, MuleContextAware {
 
   private static final Logger logger = getLogger(ServerNotificationManager.class);
 
@@ -185,6 +184,10 @@ public class ServerNotificationManager
     }
   }
 
+  protected void notifyListeners(ServerNotification notification, NotifierCallback notifier) {
+    configuration.getPolicy().dispatch(notification, notifier);
+  }
+
   @Override
   public boolean isNotificationEnabled(Class<? extends ServerNotification> type) {
     boolean enabled = false;
@@ -220,15 +223,6 @@ public class ServerNotificationManager
       configuration = null;
     } finally {
       disposeLock.writeLock().unlock();
-    }
-  }
-
-  protected void notifyListeners(ServerNotification notification, NotifierCallback notifier) {
-    final Policy policy = configuration.getPolicy();
-    if (!disposed.get()) {
-      policy.dispatch(notification, notifier);
-    } else {
-      logger.warn("Notification not delivered after ServerNotificationManager disposal: " + notification);
     }
   }
 

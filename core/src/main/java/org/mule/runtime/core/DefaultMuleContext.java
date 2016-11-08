@@ -336,7 +336,6 @@ public class DefaultMuleContext implements MuleContext {
   public synchronized void start() throws MuleException {
     getLifecycleManager().checkPhase(Startable.PHASE_NAME);
 
-
     if (getQueueManager() == null) {
       throw new MuleRuntimeException(objectIsNull("queueManager"));
     }
