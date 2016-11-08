@@ -7,18 +7,26 @@
 package org.mule.extension.ws.internal.introspection;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import org.mule.extension.ws.api.exception.InvalidWsdlException;
 
 import com.ibm.wsdl.extensions.schema.SchemaSerializer;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Fault;
+import javax.wsdl.Message;
 import javax.wsdl.Operation;
+import javax.wsdl.Part;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
@@ -26,11 +34,10 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.mime.MIMEPart;
+import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Parses a WSDL file and for a given service name and port name introspecting all the operations and components for the given
@@ -46,11 +53,13 @@ public class WsdlIntrospecter {
   private final Definition definition;
   private final Service service;
   private final Port port;
+  private final Set<String> schemas;
 
   public WsdlIntrospecter(String wsdlLocation, String service, String port) {
     this.definition = parseWsdl(wsdlLocation);
     this.service = findService(service);
     this.port = findPort(port);
+    this.schemas = schemaCollector.getSchemas(definition);
   }
 
   private Service findService(String serviceName) {
@@ -86,6 +95,43 @@ public class WsdlIntrospecter {
     return operation;
   }
 
+  public Optional<Part> getBodyPart(String operation, TypeIntrospecterDelegate delegate) {
+    BindingOperation bindingOperation = getBindingOperation(operation);
+    Message message = delegate.getMessage(bindingOperation.getOperation());
+    Map parts = message.getParts();
+    if (parts == null || parts.isEmpty()) {
+      return empty();
+    }
+    if (parts.size() == 1) {
+      return ofNullable((Part) parts.get(parts.keySet().toArray()[0]));
+    }
+
+    Optional<String> bodyPartName = getBodyPartName(bindingOperation, delegate);
+    if (bodyPartName.isPresent()) {
+      return ofNullable((Part) parts.get(bodyPartName.get()));
+    }
+    return empty();
+  }
+
+  @SuppressWarnings("unchecked")
+  private Optional<String> getBodyPartName(BindingOperation bindingOperation, TypeIntrospecterDelegate delegate) {
+    List elements = delegate.getBindingType(bindingOperation).getExtensibilityElements();
+    if (elements != null) {
+      //TODO: MULE-10796 - what about other type of SOAP body out there? (e.g.: SOAP12Body)
+      Optional<SOAPBody> body = elements.stream().filter(e -> e instanceof SOAPBody).findFirst();
+      if (body.isPresent()) {
+        List bodyParts = body.get().getParts();
+        if (!bodyParts.isEmpty()) {
+          if (bodyParts.size() > 1) {
+            throw new InvalidWsdlException("Multipart body operations are not supported");
+          }
+          return ofNullable((String) bodyParts.get(0));
+        }
+      }
+    }
+    return empty();
+  }
+
   public Fault getFault(Operation operation, String faultName) {
     validateBlankString(faultName, "fault name");
     Fault fault = operation.getFault(faultName);
@@ -93,12 +139,8 @@ public class WsdlIntrospecter {
     return fault;
   }
 
-  public Definition getDefinition() {
-    return definition;
-  }
-
   public Set<String> getSchemas() {
-    return schemaCollector.getSchemas(definition);
+    return schemas;
   }
 
   public Service getService() {
@@ -133,7 +175,7 @@ public class WsdlIntrospecter {
       return definition;
     } catch (WSDLException e) {
       //TODO MULE-10784 we should analyze the type of exception (missing or corrupted file) and thrown better exceptions
-      throw new IllegalArgumentException(format("Something went wrong when parsing the wsdl file [%s]", wsdlLocation), e);
+      throw new InvalidWsdlException(format("Something went wrong when parsing the wsdl file [%s]", wsdlLocation), e);
     }
   }
 
@@ -168,7 +210,7 @@ public class WsdlIntrospecter {
   }
 
   private void validateBlankString(String paramValue, String paramName) {
-    if (StringUtils.isBlank(paramValue)) {
+    if (isBlank(paramValue)) {
       throw new IllegalArgumentException("The [" + paramName + "] can not be blank nor null.");
     }
   }

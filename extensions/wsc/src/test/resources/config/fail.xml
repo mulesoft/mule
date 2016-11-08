@@ -9,7 +9,9 @@
     </wsc:config>
 
     <flow name="failOperation">
-        <wsc:consume config-ref="config" operation="fail" body="#[payload]"/>
+        <wsc:consume config-ref="config" operation="fail">
+            <wsc:message body="#[payload]"/>
+        </wsc:consume>
     </flow>
 
 </mule>

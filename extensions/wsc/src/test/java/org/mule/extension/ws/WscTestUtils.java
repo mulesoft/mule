@@ -9,6 +9,10 @@ package org.mule.extension.ws;
 import static org.custommonkey.xmlunit.XMLUnit.compareXML;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import org.mule.extension.ws.api.SoapAttachment;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -31,6 +35,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import ru.yandex.qatools.allure.annotations.Step;
 
 public class WscTestUtils {
 
@@ -45,8 +50,8 @@ public class WscTestUtils {
   public static final String NO_PARAMS = "noParams";
   public static final String NO_PARAMS_HEADER = "noParamsWithHeader";
   public static final String FAIL = "fail";
-  public static final String UPLOAD_SINGLE_ATT = "attachmentUpload";
-  public static final String DOWNLOAD_ATT = "attachmentDownload";
+  public static final String UPLOAD_ATTACHMENT = "uploadAttachment";
+  public static final String DOWNLOAD_ATTACHMENT = "downloadAttachment";
 
   // Headers
   public static final String HEADER_INOUT = "headerInOut";
@@ -76,9 +81,10 @@ public class WscTestUtils {
   public static void assertSimilarXml(String expected, String result) throws Exception {
     Diff diff = compareXML(result, expected);
     if (!diff.similar()) {
-      System.out.println("Expected xml is: \n");
+      System.out.println("Expected xml is:\n");
       System.out.println(prettyPrint(expected));
-      System.out.println("\n\n But got: \n");
+      System.out.println("########################################\n");
+      System.out.println("But got:\n");
       System.out.println(prettyPrint(result));
     }
     assertThat(diff.similar(), is(true));
@@ -98,5 +104,15 @@ public class WscTestUtils {
     DOMSource source = new DOMSource(doc);
     transformer.transform(source, result);
     return result.getWriter().toString();
+  }
+
+
+  @Step("Prepares a test attachment")
+  public static SoapAttachment getTestAttachment() {
+    SoapAttachment attachment = mock(SoapAttachment.class);
+    when(attachment.getId()).thenReturn("attachment-id");
+    when(attachment.getContent()).thenReturn("Some Content");
+    when(attachment.getContentType()).thenReturn(MediaType.TEXT);
+    return attachment;
   }
 }

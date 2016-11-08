@@ -24,7 +24,11 @@ import java.util.Set;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Web Service Consumer")
+@Stories("Metadata")
 public class KeysMetadataTestCase extends AbstractMetadataTestCase {
 
   public static final String[] OPERATIONS = {ECHO, ECHO_ACCOUNT, ECHO_HEADERS, FAIL, NO_PARAMS_HEADER, NO_PARAMS};

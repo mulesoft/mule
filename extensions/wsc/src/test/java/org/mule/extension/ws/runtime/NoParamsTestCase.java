@@ -13,7 +13,11 @@ import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Web Service Consumer")
+@Stories("Operation Execution")
 public class NoParamsTestCase extends AbstractSoapServiceTestCase {
 
   private static final String NO_PARAMS_FLOW = "noParamsOperation";

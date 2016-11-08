@@ -7,7 +7,7 @@
 package org.mule.extension.ws.internal.metadata;
 
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.extension.ws.internal.metadata.header.OutputHeadersResolver;
+import org.mule.extension.ws.internal.introspection.OutputTypeIntrospecterDelegate;
 import org.mule.metadata.api.builder.DictionaryTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -26,18 +26,21 @@ import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
  */
 public final class WscAttributesResolver extends BaseWscResolver implements AttributesTypeResolver<String> {
 
-  private static final OutputHeadersResolver outputHeadersResolver = new OutputHeadersResolver();
+  private final HeadersElementResolver outputHeadersResolver;
+
+  public WscAttributesResolver() {
+    this.outputHeadersResolver = new HeadersElementResolver(new OutputTypeIntrospecterDelegate());
+  }
 
   @Override
   public MetadataType getAttributesType(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
-    MetadataType soapHeadersType = outputHeadersResolver.getOutputType(context, operationName);
+    MetadataType soapHeadersType = outputHeadersResolver.getMetadata(context, operationName);
     ObjectTypeBuilder attributes = context.getTypeBuilder().objectType();
-    attributes.addField().key("soapHeaders").value(soapHeadersType);
+    attributes.addField().key(HEADERS_FIELD).value(soapHeadersType);
     DictionaryTypeBuilder protocolHeaders = attributes.addField().key("protocolHeaders").value().dictionaryType();
     protocolHeaders.ofKey().stringType();
     protocolHeaders.ofValue().stringType();
-
     return attributes.build();
   }
 }

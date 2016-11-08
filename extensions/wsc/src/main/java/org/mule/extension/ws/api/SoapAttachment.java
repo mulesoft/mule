@@ -17,19 +17,21 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
-public final class WsAttachment {
+public class SoapAttachment {
 
   /**
    * the name of the attachment.
    */
   @Parameter
   private String id;
+
   /**
    * the content of the attachment.
    */
   @Parameter
   @XmlHints(allowReferences = false)
   private Object content;
+
   /**
    * the content type of the attachment content.
    */
@@ -37,16 +39,10 @@ public final class WsAttachment {
   @Optional
   private String contentType;
 
-  public WsAttachment() {}
-
-  public WsAttachment(String id, Object content, MediaType contentType) {
-    this.id = id;
-    this.content = content;
-    this.contentType = contentType.toString();
-  }
+  public SoapAttachment() {}
 
   /**
-   * @return the name of the attachment.
+   * @return the content id of the attachment.
    */
   public String getId() {
     return id;

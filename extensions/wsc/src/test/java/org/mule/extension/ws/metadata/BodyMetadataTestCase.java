@@ -13,29 +13,33 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
+import static org.mule.extension.ws.internal.metadata.BaseWscResolver.BODY_FIELD;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Web Service Consumer")
+@Stories("Metadata")
 public class BodyMetadataTestCase extends AbstractMetadataTestCase {
 
   @Test
   @Description("Checks the dynamic metadata of the request body parameter for the echo operation")
   public void getEchoInputBody() {
-    MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_FLOW, ECHO);
-    MetadataType type = result.get().getInputMetadata().get().getParameterMetadata(BODY_PARAM).get().getType();
+    ObjectType message = getMessageBuilderType(ECHO_FLOW, ECHO);
+    MetadataType body = getMessageBuilderFieldType(message, BODY_FIELD);
 
-    Collection<ObjectFieldType> fields = toObjectType(type).getFields();
+    Collection<ObjectFieldType> fields = toObjectType(body).getFields();
     assertThat(fields, hasSize(1));
+
     ObjectFieldType operationField = fields.iterator().next();
     assertThat(operationField.getKey().getName().getLocalPart(), is(ECHO));
 
@@ -49,10 +53,10 @@ public class BodyMetadataTestCase extends AbstractMetadataTestCase {
   @Test
   @Description("Checks the dynamic metadata of the request body parameter for the echo operation")
   public void getNoParamsInputBody() {
-    MetadataResult<ComponentMetadataDescriptor> result = getMetadata(NO_PARAMS_FLOW, NO_PARAMS);
-    MetadataType type = result.get().getInputMetadata().get().getParameterMetadata(BODY_PARAM).get().getType();
+    ObjectType message = getMessageBuilderType(NO_PARAMS_FLOW, NO_PARAMS);
+    MetadataType body = getMessageBuilderFieldType(message, BODY_FIELD);
 
-    Collection<ObjectFieldType> fields = toObjectType(type).getFields();
+    Collection<ObjectFieldType> fields = toObjectType(body).getFields();
     assertThat(fields, hasSize(1));
     ObjectFieldType operationField = fields.iterator().next();
     assertThat(operationField.getKey().getName().getLocalPart(), is(NO_PARAMS));
@@ -64,10 +68,10 @@ public class BodyMetadataTestCase extends AbstractMetadataTestCase {
   @Test
   @Description("Checks the dynamic metadata of the request body parameter for the echoAccount operation")
   public void getEchoAccountInputBody() {
-    MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
-    MetadataType type = result.get().getInputMetadata().get().getParameterMetadata(BODY_PARAM).get().getType();
+    ObjectType message = getMessageBuilderType(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
+    MetadataType body = getMessageBuilderFieldType(message, BODY_FIELD);
 
-    Collection<ObjectFieldType> fields = toObjectType(type).getFields();
+    Collection<ObjectFieldType> fields = toObjectType(body).getFields();
     assertThat(fields, hasSize(1));
     ObjectFieldType operationField = fields.iterator().next();
     assertThat(operationField.getKey().getName().getLocalPart(), is(ECHO_ACCOUNT));

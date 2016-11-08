@@ -11,8 +11,12 @@
     </wsc:config>
 
     <flow name="operationShareInstance">
-        <wsc:consume config-ref="single-instance" operation="echo" body="#[flowVars.req]"/>
-        <wsc:consume config-ref="single-instance" operation="echo" body="#[flowVars.req]"/>
+        <wsc:consume config-ref="single-instance" operation="echo">
+            <wsc:message body="#[flowVars.req]"/>
+        </wsc:consume>
+        <wsc:consume config-ref="single-instance" operation="echo">
+            <wsc:message body="#[flowVars.req]"/>
+        </wsc:consume>
     </flow>
 
 </mule>

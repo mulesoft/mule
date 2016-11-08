@@ -9,9 +9,9 @@ package org.mule.extension.ws.runtime;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
-import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
 import static org.mule.extension.ws.WscTestUtils.HEADER_OUT;
 import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
@@ -24,7 +24,11 @@ import java.util.List;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Web Service Consumer")
+@Stories("Operation Execution")
 public class EchoTestCase extends AbstractSoapServiceTestCase {
 
   // Flow Names

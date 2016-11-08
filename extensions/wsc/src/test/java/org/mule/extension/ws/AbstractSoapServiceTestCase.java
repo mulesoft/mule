@@ -11,12 +11,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.extension.ws.WscTestUtils.HEADER_IN;
 import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import static org.mule.extension.ws.WscTestUtils.getTestAttachment;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.extension.ws.consumer.TestAttachments;
 import org.mule.extension.ws.consumer.TestService;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.Endpoint;

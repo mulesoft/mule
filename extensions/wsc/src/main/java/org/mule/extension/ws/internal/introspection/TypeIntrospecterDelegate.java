@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.internal.metadata;
+package org.mule.extension.ws.internal.introspection;
 
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Message;
@@ -17,7 +17,7 @@ import javax.wsdl.extensions.ElementExtensible;
  *
  * @since 4.0
  */
-public interface TypeResolverDelegate {
+public interface TypeIntrospecterDelegate {
 
   Message getMessage(Operation operation);
 

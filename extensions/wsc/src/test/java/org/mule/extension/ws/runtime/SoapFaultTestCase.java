@@ -9,18 +9,20 @@ package org.mule.extension.ws.runtime;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
-import static org.mule.extension.ws.WscTestUtils.UPLOAD_SINGLE_ATT;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.extension.ws.api.exception.SoapFaultException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-@ArtifactClassLoaderRunnerConfig(testInclusions = {"org.apache.cxf.*:*:*:*:*"})
+@Features("Web Service Consumer")
+@Stories({"Operation Execution", "Soap Fault"})
 public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
   private static final String FAIL_FLOW = "failOperation";
@@ -44,11 +46,11 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
   @Test
   @Description("Consumes an operation that does not exist and throws a SOAP Fault because of it and asserts the thrown exception")
   public void missingHeadersOperation() throws Exception {
-    MessagingException e = flowRunner(FAIL_FLOW).withPayload(getRequestResource(UPLOAD_SINGLE_ATT)).runExpectingException();
+    MessagingException e = flowRunner(FAIL_FLOW).withPayload(getRequestResource(DOWNLOAD_ATTACHMENT)).runExpectingException();
     Exception causeException = e.getCauseException();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
     assertThat(sf.getFaultCode().getLocalPart(), is("Client"));
-    assertThat(sf.getMessage(), is("Cannot find dispatch method for {http://consumer.ws.extension.mule.org/}uploadAttachment"));
+    assertThat(sf.getMessage(), is("Cannot find dispatch method for {http://consumer.ws.extension.mule.org/}downloadAttachment"));
   }
 }

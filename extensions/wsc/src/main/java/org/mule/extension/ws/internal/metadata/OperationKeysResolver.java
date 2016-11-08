@@ -8,7 +8,7 @@ package org.mule.extension.ws.internal.metadata;
 
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.extension.ws.internal.WscConnection;
+import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;

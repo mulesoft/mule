@@ -12,8 +12,9 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.ENCODING;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
+import static org.mule.extension.ws.internal.ConsumeOperation.MULE_WSC_ENCODING;
 import org.mule.extension.ws.api.exception.WscException;
-import org.mule.extension.ws.internal.WscConnection;
+import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.extension.ws.internal.transport.HttpDispatcher;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -53,6 +54,8 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
   @Override
   public void handleMessage(Message message) throws Fault {
 
+    String encoding = (String) message.getExchange().get(MULE_WSC_ENCODING);
+
     // Performs all the remaining interceptions before sending.
     message.getInterceptorChain().doIntercept(message);
 
@@ -79,7 +82,7 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
       Message inMessage = new MessageImpl();
 
       // TODO make encoding policy
-      inMessage.put(ENCODING, "UTF-8");
+      inMessage.put(ENCODING, encoding);
 
       String contentType = response.header(CONTENT_TYPE);
       inMessage.put(CONTENT_TYPE, contentType);
