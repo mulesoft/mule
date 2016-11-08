@@ -11,14 +11,12 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -83,12 +81,6 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
         .createStaticConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                            new StaticValueResolver<>(connectionProvider), muleContext);
     super.before();
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   @Test

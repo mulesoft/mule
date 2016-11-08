@@ -24,12 +24,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -97,12 +95,6 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
     epBuilder.setConnector(connector);
     outboundEndpoint = epBuilder.buildOutboundEndpoint();
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   private void setupMockSession() throws JMSException {

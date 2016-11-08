@@ -9,12 +9,10 @@ package org.mule.runtime.core;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.api.context.notification.ServerNotification.TYPE_ERROR;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.ExceptionNotification.EXCEPTION_ACTION;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -25,12 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
 public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase {
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
-  }
 
   // MULE-1404
   @Test

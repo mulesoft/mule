@@ -7,7 +7,11 @@
 package org.mule.tck.junit4;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -28,6 +32,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -40,7 +45,6 @@ import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -276,9 +280,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void doTearDownAfterMuleContextDispose() throws Exception {}
 
   @AfterClass
-  public static void disposeContext() {
+  public static void disposeContext() throws RegistrationException, MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
+        stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
         muleContext.dispose();
 
         MuleConfiguration configuration = muleContext.getConfiguration();
@@ -287,13 +292,13 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
           final String workingDir = configuration.getWorkingDirectory();
           // do not delete TM recovery object store, everything else is good to
           // go
-          FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
+          deleteTree(newFile(workingDir), IGNORED_DOT_MULE_DIRS);
         }
       }
-      FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
+      deleteTree(newFile("./ActiveMQ"));
     } finally {
       muleContext = null;
-      TestsLogConfigurationHelper.clearLoggingConfig();
+      clearLoggingConfig();
     }
   }
 

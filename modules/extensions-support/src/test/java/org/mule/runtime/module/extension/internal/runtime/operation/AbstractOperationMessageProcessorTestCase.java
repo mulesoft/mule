@@ -18,7 +18,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -43,7 +42,6 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
@@ -251,12 +249,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     messageProcessor.initialise();
     muleContext.getInjector().inject(messageProcessor);
     return messageProcessor;
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   protected abstract OperationMessageProcessor createOperationMessageProcessor();

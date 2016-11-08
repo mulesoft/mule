@@ -9,12 +9,10 @@ package org.mule.runtime.core.management;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.CustomNotification;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -42,7 +40,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     super.doTearDown();
     managerStopped.set(true);
     managerStoppedEvents.set(0);
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
   }
 
   @Test
