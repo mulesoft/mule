@@ -8,7 +8,6 @@ package org.mule.transport;
 
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
 import javax.resource.spi.work.Work;
@@ -28,7 +27,7 @@ public class PollingReceiverWorker implements Work
     {
         return receiver;
     }
-    
+
     public boolean isRunning()
     {
         return running;
@@ -77,6 +76,11 @@ public class PollingReceiverWorker implements Work
 
     protected void poll() throws Exception
     {
+        if (this.receiver.getFlowConstruct().getMuleContext().isStopping())
+        {
+            return;
+        }
+
         receiver.performPoll();
     }
 
