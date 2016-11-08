@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -62,7 +61,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     output.close();
     ApplicationDescriptor descriptor = new ApplicationDescriptor("app");
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                          applicationPluginRepository);
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
     Map<String, String> appProps = descriptor.getAppProperties();

@@ -30,7 +30,6 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase;
 import org.mule.runtime.module.deployment.internal.builder.ArtifactPluginFileBuilder;
@@ -119,7 +118,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyResourceAs(echoTestJarFile.getAbsolutePath(), sharedLibFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                          applicationPluginRepository);
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -141,7 +140,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyResourceAs("test-jar-with-resources.jar", libFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                          applicationPluginRepository);
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -189,7 +188,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   private void doPackageValidationTest(ArtifactPluginRepository applicationPluginRepository) {
     final ArtifactPluginDescriptorFactory pluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
+        new ArtifactPluginDescriptorFactory();
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
                                          applicationPluginRepository);

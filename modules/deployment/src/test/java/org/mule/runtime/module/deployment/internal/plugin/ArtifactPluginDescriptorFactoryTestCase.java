@@ -47,7 +47,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
   private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
-  private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
+  private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory();
 
   @Before
   public void setUp() throws Exception {
