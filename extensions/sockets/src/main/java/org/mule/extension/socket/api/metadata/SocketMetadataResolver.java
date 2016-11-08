@@ -6,10 +6,7 @@
  */
 package org.mule.extension.socket.api.metadata;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.lang.Boolean.valueOf;
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
 import org.mule.extension.socket.api.SocketOperations;
@@ -17,29 +14,22 @@ import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * The output metadata only depends on whether
- * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, Message)} should await a response or
- * not. If no response is needed, the operation metadata should behave like a void operation.
+ * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, boolean, Message)} should await a
+ * response or not. If no response is needed, the operation metadata should behave like a void operation.
  */
 public class SocketMetadataResolver
-    implements OutputTypeResolver<String>, AttributesTypeResolver<String>, TypeKeysResolver {
+    implements OutputTypeResolver<Boolean>, AttributesTypeResolver<Boolean> {
 
   private final ClassTypeLoader typeLoader =
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClass().getClassLoader());
@@ -50,23 +40,16 @@ public class SocketMetadataResolver
   }
 
   @Override
-  public MetadataType getOutputType(MetadataContext metadataContext, String key)
+  public MetadataType getOutputType(MetadataContext metadataContext, Boolean key)
       throws MetadataResolvingException, ConnectionException {
-    return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).binaryType().build()
-        : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
+    return key ? BaseTypeBuilder.create(JAVA).binaryType().build()
+        : BaseTypeBuilder.create(JAVA).anyType().build();
   }
 
   @Override
-  public MetadataType getAttributesType(MetadataContext context, String key)
+  public MetadataType getAttributesType(MetadataContext context, Boolean key)
       throws MetadataResolvingException, ConnectionException {
-    return valueOf(key) ? typeLoader.load(ImmutableSocketAttributes.class)
-        : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
-
-  }
-
-  @Override
-  public Set<MetadataKey> getKeys(MetadataContext metadataContext)
-      throws MetadataResolvingException, ConnectionException {
-    return Stream.of(TRUE, FALSE).map(b -> newKey(b.toString()).build()).collect(Collectors.toSet());
+    return key ? typeLoader.load(ImmutableSocketAttributes.class)
+        : BaseTypeBuilder.create(JAVA).anyType().build();
   }
 }

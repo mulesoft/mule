@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 
 /**
@@ -37,20 +38,25 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
   private final Map<String, InputTypeResolver> inputResolvers = new HashMap<>();
   private final TypeKeysResolver keysResolver;
 
-  public DefaultMetadataResolverFactory(Class<? extends TypeKeysResolver> keyResolver,
-                                        Map<String, Class<? extends InputTypeResolver>> typeResolvers,
-                                        Class<? extends OutputTypeResolver> outputResolver,
-                                        Class<? extends AttributesTypeResolver> attributesResolver) {
+  public DefaultMetadataResolverFactory(Supplier<? extends TypeKeysResolver> keyResolver,
+                                        Map<String, Supplier<? extends InputTypeResolver>> typeResolvers,
+                                        Supplier<? extends OutputTypeResolver> outputResolver,
+                                        Supplier<? extends AttributesTypeResolver> attributesResolver) {
 
     checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
     checkArgument(typeResolvers != null, "InputTypeResolvers cannot be null");
     checkArgument(outputResolver != null, "OutputTypeResolver type cannot be null");
     checkArgument(attributesResolver != null, "AttributesTypeResolver type cannot be null");
 
-    typeResolvers.forEach((k, v) -> inputResolvers.put(k, instantiateResolver(v)));
-    keysResolver = instantiateResolver(keyResolver);
-    outputTypeResolver = instantiateResolver(outputResolver);
-    attributesTypeResolver = instantiateResolver(attributesResolver);
+    typeResolvers.forEach((k, v) -> inputResolvers.put(k, v.get()));
+    keysResolver = keyResolver.get();
+    outputTypeResolver = outputResolver.get();
+    attributesTypeResolver = attributesResolver.get();
+
+    checkArgument(keysResolver != null, "MetadataKeyResolver type cannot be null");
+    inputResolvers.values().forEach(resolver -> checkArgument(resolver != null, "Input Type Resolver cannot be null"));
+    checkArgument(outputTypeResolver != null, "OutputTypeResolver type cannot be null");
+    checkArgument(attributesTypeResolver != null, "AttributesTypeResolver type cannot be null");
   }
 
   /**
@@ -91,14 +97,5 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
   @Override
   public QueryEntityResolver getQueryEntityResolver() {
     return new NullQueryEntityMetadataResolver();
-  }
-
-  private <T> T instantiateResolver(Class<?> factoryType) {
-    try {
-      return (T) ClassUtils.instanciateClass(factoryType);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create NamedTypeResolver of type "
-          + getClassName(factoryType)), e);
-    }
   }
 }

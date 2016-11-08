@@ -7,28 +7,39 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toMap;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
-import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.core.internal.metadata.NullMetadataResolverSupplier;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Adapter implementation which expands the {@link MetadataScope} to a more descriptive of the developer's metadata declaration
@@ -38,27 +49,33 @@ import java.util.Optional;
  */
 public final class MetadataScopeAdapter {
 
-  private Class<? extends TypeKeysResolver> keysResolver = NullMetadataResolver.class;
-  private Class<? extends OutputTypeResolver> outputResolver = NullMetadataResolver.class;
-  private Map<String, Class<? extends InputTypeResolver>> inputResolvers = new HashMap<>();
-  private Class<? extends AttributesTypeResolver> attributesResolver = NullMetadataResolver.class;
+  private Supplier<NullMetadataResolver> nullMetadataResolverSupplier = new NullMetadataResolverSupplier();
+  private Supplier<? extends TypeKeysResolver> keysResolver = nullMetadataResolverSupplier;
+  private Supplier<? extends OutputTypeResolver> outputResolver = nullMetadataResolverSupplier;
+  private Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashMap<>();
+  private Supplier<? extends AttributesTypeResolver> attributesResolver = nullMetadataResolverSupplier;
+  private ClassTypeLoader typeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
   public MetadataScopeAdapter(Class<?> extensionType, Method operation, OperationDeclaration declaration) {
     OutputResolver outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
-    Optional<MetadataKeyId> keyId = locateMetadataKeyId(declaration);
+    Optional<Pair<MetadataKeyId, MetadataType>> keyId = locateMetadataKeyId(declaration);
 
     inputResolvers = declaration.getParameters().stream()
         .filter(p -> getAnnotatedElement(p).map(e -> e.isAnnotationPresent(TypeResolver.class)).orElse(false))
         .collect(toMap(NamedDeclaration::getName,
-                       p -> getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value()));
+                       p -> ResolverSupplier.of(getAnnotatedElement(p).get().getAnnotation(TypeResolver.class)
+                           .value())));
 
     if (outputResolverDeclaration != null || !inputResolvers.isEmpty()) {
       if (outputResolverDeclaration != null) {
-        outputResolver = outputResolverDeclaration.output();
-        attributesResolver = outputResolverDeclaration.attributes();
+        outputResolver = ResolverSupplier.of(outputResolverDeclaration.output());
+        attributesResolver = ResolverSupplier.of(outputResolverDeclaration.attributes());
       }
+
       if (keyId.isPresent()) {
-        keysResolver = keyId.get().value();
+        Pair<MetadataKeyId, MetadataType> pair = keyId.get();
+        keysResolver = getKeysResolver(pair.getRight(), pair.getLeft(),
+                                       () -> getCategoryName(outputResolver, attributesResolver, inputResolvers));
       }
     } else {
       initializeFromClass(extensionType, operation.getDeclaringClass());
@@ -70,31 +87,74 @@ public final class MetadataScopeAdapter {
   }
 
   private void initializeFromClass(Class<?> extensionType, Class<?> source) {
+    // TODO MULE-10891: Add support for Source Callback parameters
     MetadataScope scope = getAnnotation(source, MetadataScope.class);
     scope = scope != null ? scope : getAnnotation(extensionType, MetadataScope.class);
 
     if (scope != null) {
-      this.keysResolver = scope.keysResolver();
-      this.outputResolver = scope.outputResolver();
-      this.attributesResolver = scope.attributesResolver();
+      this.keysResolver = ResolverSupplier.of(scope.keysResolver());
+      this.outputResolver = ResolverSupplier.of(scope.outputResolver());
+      this.attributesResolver = ResolverSupplier.of(scope.attributesResolver());
     }
   }
 
-  private Optional<MetadataKeyId> locateMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
-    Optional<MetadataKeyId> keyId = component.getParameters().stream()
-        .map(IntrospectionUtils::getAnnotatedElement)
-        .filter(p -> p.isPresent() && p.get().isAnnotationPresent(MetadataKeyId.class))
-        .map(p -> p.get().getAnnotation(MetadataKeyId.class))
+  private Optional<Pair<MetadataKeyId, MetadataType>> locateMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
+    Optional<Pair<MetadataKeyId, MetadataType>> keyId = component.getParameters().stream()
+        .map((declaration) -> new ImmutablePair<>(declaration, getAnnotatedElement(declaration)))
+        .filter(p -> p.getRight().isPresent() && p.getRight().get().isAnnotationPresent(MetadataKeyId.class))
+        .map(p -> (Pair<MetadataKeyId, MetadataType>) new ImmutablePair<>(p.getRight().get().getAnnotation(MetadataKeyId.class),
+                                                                          p.getLeft().getType()))
         .findFirst();
 
     if (!keyId.isPresent() && component.getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       keyId = component.getModelProperty(ParameterGroupModelProperty.class).get().getGroups().stream()
           .filter(g -> g.getContainer().isAnnotationPresent(MetadataKeyId.class))
-          .map(g -> g.getContainer().getAnnotation(MetadataKeyId.class))
+          .map(g -> (Pair<MetadataKeyId, MetadataType>) new ImmutablePair<>(g.getContainer().getAnnotation(MetadataKeyId.class),
+                                                                            typeLoader.load(g.getType())))
           .findFirst();
     }
-
     return keyId;
+  }
+
+  private Supplier<? extends TypeKeysResolver> getKeysResolver(MetadataType metadataType, MetadataKeyId metadataKeyId,
+                                                               Supplier<String> categoryName) {
+    Supplier<? extends TypeKeysResolver> keysResolver;
+    if (metadataKeyId.value().equals(NullMetadataResolver.class)) {
+      if (metadataType instanceof BooleanType) {
+        keysResolver = () -> new BooleanKeyResolver(categoryName.get());
+      } else if (isEnum(metadataType)) {
+        keysResolver = () -> new EnumKeyResolver(metadataType.getAnnotation(EnumAnnotation.class).get(), categoryName.get());
+      } else {
+        keysResolver = nullMetadataResolverSupplier;
+      }
+    } else {
+      keysResolver = ResolverSupplier.of(metadataKeyId.value());
+    }
+    return keysResolver;
+  }
+
+  private String getCategoryName(Supplier<? extends OutputTypeResolver> outputResolver,
+                                 Supplier<? extends AttributesTypeResolver> attributesResolver,
+                                 Map<String, Supplier<? extends InputTypeResolver>> inputResolvers) {
+    OutputTypeResolver outputTypeResolver = outputResolver.get();
+    if (!(outputTypeResolver instanceof NullMetadataResolver)) {
+      return outputTypeResolver.getCategoryName();
+    }
+
+    AttributesTypeResolver attributesTypeResolver = attributesResolver.get();
+    if (!(attributesTypeResolver instanceof NullMetadataResolver)) {
+      return attributesTypeResolver.getCategoryName();
+    }
+
+    for (Supplier<? extends InputTypeResolver> supplier : inputResolvers.values()) {
+      InputTypeResolver inputTypeResolver = supplier.get();
+      if (!(inputTypeResolver instanceof NullMetadataResolver)) {
+        return inputTypeResolver.getCategoryName();
+      }
+    }
+
+    throw new IllegalModelDefinitionException("Unable to create Keys Resolver. A Keys Resolver is being defined " +
+        "without defining an Output Resolver, Input Resolver nor Attributes Resolver");
   }
 
   public boolean isCustomScope() {
@@ -106,27 +166,26 @@ public final class MetadataScopeAdapter {
   }
 
   public boolean hasOutputResolver() {
-    return !outputResolver.equals(NullMetadataResolver.class);
+    return !(outputResolver instanceof NullMetadataResolverSupplier);
   }
 
   public boolean hasAttributesResolver() {
-    return !attributesResolver.equals(NullMetadataResolver.class);
+    return !(attributesResolver instanceof NullMetadataResolverSupplier);
   }
 
-  public Class<? extends TypeKeysResolver> getKeysResolver() {
+  public Supplier<? extends TypeKeysResolver> getKeysResolver() {
     return keysResolver;
   }
 
-  public Map<String, Class<? extends InputTypeResolver>> getInputResolvers() {
+  public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
     return inputResolvers;
   }
 
-  public Class<? extends OutputTypeResolver> getOutputResolver() {
+  public Supplier<? extends OutputTypeResolver> getOutputResolver() {
     return outputResolver;
   }
 
-  public Class<? extends AttributesTypeResolver> getAttributesResolver() {
+  public Supplier<? extends AttributesTypeResolver> getAttributesResolver() {
     return attributesResolver;
   }
-
 }

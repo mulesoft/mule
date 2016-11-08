@@ -11,6 +11,7 @@ import static org.mule.extension.http.api.HttpMetadataKey.FORM;
 import static org.mule.extension.http.api.HttpMetadataKey.MULTIPART;
 import static org.mule.extension.http.api.HttpMetadataKey.STREAM;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+
 import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -33,13 +34,13 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class HttpMetadataResolver implements OutputTypeResolver<HttpMetadataKey> {
+public class HttpRequestMetadataResolver implements OutputTypeResolver<HttpMetadataKey> {
 
   private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   private Map<HttpMetadataKey, MetadataType> types = new HashMap<>();
 
-  public HttpMetadataResolver() {
+  public HttpRequestMetadataResolver() {
     // Create all MetadataTypes and store them by key using a friendly name
     MetadataType streamType = TYPE_LOADER.load(InputStream.class);
     types.put(STREAM, streamType);
@@ -63,5 +64,4 @@ public class HttpMetadataResolver implements OutputTypeResolver<HttpMetadataKey>
       throws MetadataResolvingException, ConnectionException {
     return types.get(key);
   }
-
 }
