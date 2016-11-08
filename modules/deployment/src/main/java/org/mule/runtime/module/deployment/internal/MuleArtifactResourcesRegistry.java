@@ -17,7 +17,6 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactor
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.TrackingDeployableArtifactClassLoaderFactory;
@@ -73,7 +72,7 @@ public class MuleArtifactResourcesRegistry {
                                                                                   .getClassLoader()));
     this.artifactPluginClassLoaderFactory = trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
     final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
+        new ArtifactPluginDescriptorFactory();
     artifactPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     final ApplicationDescriptorFactory applicationDescriptorFactory =

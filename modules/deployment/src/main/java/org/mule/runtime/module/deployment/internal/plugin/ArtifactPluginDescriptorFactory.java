@@ -8,13 +8,11 @@
 package org.mule.runtime.module.deployment.internal.plugin;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory.parseExportedResource;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
@@ -33,19 +31,6 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
 
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
   public static final String PLUGIN_DEPENDENCIES = "plugin.dependencies";
-
-  private final ClassLoaderFilterFactory classLoaderFilterFactory;
-
-  /**
-   * Creates a new instance
-   * 
-   * @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
-   */
-  public ArtifactPluginDescriptorFactory(ClassLoaderFilterFactory classLoaderFilterFactory) {
-    checkArgument(classLoaderFilterFactory != null, "ClassLoaderFilterFactory cannot be null");
-
-    this.classLoaderFilterFactory = classLoaderFilterFactory;
-  }
 
   @Override
   public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {

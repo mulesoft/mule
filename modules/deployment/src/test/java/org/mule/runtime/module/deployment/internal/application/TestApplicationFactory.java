@@ -48,7 +48,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                                                     ServiceRepository serviceRepository) {
     ArtifactClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
     ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
+        new ArtifactPluginDescriptorFactory();
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
         new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
