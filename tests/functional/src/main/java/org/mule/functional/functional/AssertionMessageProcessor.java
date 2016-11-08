@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

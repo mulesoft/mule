@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;

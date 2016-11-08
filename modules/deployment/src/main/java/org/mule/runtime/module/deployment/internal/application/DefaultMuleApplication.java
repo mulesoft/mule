@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;

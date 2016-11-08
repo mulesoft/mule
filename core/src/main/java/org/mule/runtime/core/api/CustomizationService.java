@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.lifecycle.Lifecycle;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,7 +29,7 @@ public interface CustomizationService {
    * default one if it's replacing an existent service.
    * <p>
    * The service implementation can be annotated with @Inject and implement methods from
-   * {@link org.mule.runtime.core.api.lifecycle.Lifecycle}.
+   * {@link Lifecycle}.
    * <p>
    * The service identifier can be used to locate the service in the mule registry.
    *
@@ -42,7 +44,7 @@ public interface CustomizationService {
    * service that replaces the default one if it's replacing an existent service.
    * <p>
    * The service class can be annotated with {@link javax.inject.Inject} and implement methods from
-   * {@link org.mule.runtime.core.api.lifecycle.Lifecycle}.
+   * {@link Lifecycle}.
    *
    * @param serviceId identifier of the services implementation to customize.
    * @param serviceClass the service class
@@ -62,7 +64,7 @@ public interface CustomizationService {
    * Allows to define a custom service on a mule context.
    * <p>
    * The service implementation can be annotated with @Inject and implement methods from
-   * {@link org.mule.runtime.core.api.lifecycle.Lifecycle}.
+   * {@link Lifecycle}.
    * <p>
    * The service identifier can be used to locate the service in the mule registry.
    *
@@ -78,7 +80,7 @@ public interface CustomizationService {
    * the default one if it's replacing an existent service.
    * <p>
    * The service class can be annotated with {@link javax.inject.Inject} and implement methods from
-   * {@link org.mule.runtime.core.api.lifecycle.Lifecycle}.
+   * {@link Lifecycle}.
    *
    * @param serviceId identifier of the services implementation to register. Non empty.
    * @param serviceClass the service class. Non null.

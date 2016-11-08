@@ -23,7 +23,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;

@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationLis
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.context.notification.NotificationException;
 
 import org.slf4j.Logger;

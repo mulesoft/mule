@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 
 import java.io.Serializable;
 import java.net.URI;

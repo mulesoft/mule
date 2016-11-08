@@ -20,9 +20,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.exception.MessagingException.PAYLOAD_INFO_KEY;
 
+import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;

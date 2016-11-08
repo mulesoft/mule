@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;

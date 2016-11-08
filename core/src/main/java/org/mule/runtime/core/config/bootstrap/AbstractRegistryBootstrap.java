@@ -10,8 +10,8 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
  * {@link org.mule.runtime.core.api.context.MuleContextAware} and lifecycle interfaces such as
- * {@link org.mule.runtime.core.api.lifecycle.Initialisable}.
+ * {@link Initialisable}.
  *
  * @since 3.7.0
  */

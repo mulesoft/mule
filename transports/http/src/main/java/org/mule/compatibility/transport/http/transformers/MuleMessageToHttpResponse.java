@@ -24,7 +24,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.GroupCorrelation;

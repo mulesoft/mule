@@ -9,7 +9,7 @@ package org.mule.test.runner.api;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;

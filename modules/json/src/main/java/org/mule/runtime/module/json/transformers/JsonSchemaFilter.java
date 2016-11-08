@@ -8,7 +8,7 @@ package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.module.json.validation.JsonSchemaValidator;
 

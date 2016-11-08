@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 

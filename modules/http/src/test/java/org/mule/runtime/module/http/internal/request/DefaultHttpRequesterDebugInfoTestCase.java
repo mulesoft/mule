@@ -35,7 +35,7 @@ import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParam;

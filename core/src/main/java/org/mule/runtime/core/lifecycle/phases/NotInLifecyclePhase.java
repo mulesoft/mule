@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.lifecycle.phases;
 
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 
 /**
  * This lifecycle phase marks the 'pre-lifecycle' phase of an object. The default phase before any other phase has been executed

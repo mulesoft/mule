@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.util.pool;
 
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 /**
  * An ObjectPool that allows Start and Stop life-cycle to be propagated pooled object.

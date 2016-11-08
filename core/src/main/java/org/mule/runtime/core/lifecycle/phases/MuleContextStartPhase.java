@@ -12,9 +12,9 @@ import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
@@ -36,14 +36,14 @@ import java.util.Set;
  * one or more registries that inherit the lifecycle of the MuleContext.
  * <p/>
  * This phase is responsible for starting objects. Any object that implements
- * {@link org.mule.runtime.core.api.lifecycle.Startable} will have its
- * {@link org.mule.runtime.core.api.lifecycle.Startable#start()} method called. Objects are initialised in the order based on
+ * {@link Startable} will have its
+ * {@link Startable#start()} method called. Objects are initialised in the order based on
  * type: {@link org.mule.runtime.core.api.agent.Agent}, {@link org.mule.runtime.core.api.construct.FlowConstruct}, followed by any
- * other object that implements {@link org.mule.runtime.core.api.lifecycle.Startable}.
+ * other object that implements {@link Startable}.
  *
  * @see org.mule.runtime.core.api.MuleContext
  * @see org.mule.runtime.core.api.lifecycle.LifecycleManager
- * @see org.mule.runtime.core.api.lifecycle.Startable
+ * @see Startable
  * @since 3.0
  */
 public class MuleContextStartPhase extends DefaultLifecyclePhase {

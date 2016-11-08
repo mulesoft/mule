@@ -8,9 +8,9 @@ package org.mule.runtime.core.lifecycle.processor;
 
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 

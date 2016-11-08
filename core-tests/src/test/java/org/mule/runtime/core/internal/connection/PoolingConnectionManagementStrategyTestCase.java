@@ -34,7 +34,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;

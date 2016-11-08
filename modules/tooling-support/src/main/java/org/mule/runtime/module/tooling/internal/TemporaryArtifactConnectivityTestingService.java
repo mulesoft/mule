@@ -13,7 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 

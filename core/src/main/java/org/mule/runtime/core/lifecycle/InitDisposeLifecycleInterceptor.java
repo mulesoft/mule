@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 

@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.connector;
 
-import org.mule.runtime.core.api.LocatedMuleException;
+import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.api.i18n.I18nMessage;
 

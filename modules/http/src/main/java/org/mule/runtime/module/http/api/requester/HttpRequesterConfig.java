@@ -8,8 +8,8 @@ package org.mule.runtime.module.http.api.requester;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.runtime.api.tls.TlsContextFactory;

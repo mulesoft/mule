@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.management.stats;
 
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 /**
  * Watches {@link ProcessingTime} instances to detect when they are weakly reachable.

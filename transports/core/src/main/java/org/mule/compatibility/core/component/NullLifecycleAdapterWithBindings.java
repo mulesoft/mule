@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.component.JavaWithBindingsComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /**

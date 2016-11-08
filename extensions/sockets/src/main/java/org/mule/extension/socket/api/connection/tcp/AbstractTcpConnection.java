@@ -14,8 +14,8 @@ import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import java.net.InetSocketAddress;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;

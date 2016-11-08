@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.jndi;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import javax.naming.Context;
 import javax.naming.NamingException;

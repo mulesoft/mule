@@ -10,7 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -50,7 +50,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer {
   /**
    * Template method were deriving classes can do any initialisation after the properties have been set on this transformer
    *
-   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
+   * @throws InitialisationException
    */
   @Override
   public void initialise() throws InitialisationException {

@@ -26,7 +26,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.component;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 

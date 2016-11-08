@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 
 /**
  * <code>CreateException</code> is thrown when creating an object inside Mule wasn't possible due to inconsistent internal state

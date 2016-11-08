@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;

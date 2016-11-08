@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;

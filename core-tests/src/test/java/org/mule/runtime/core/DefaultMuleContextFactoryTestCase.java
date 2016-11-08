@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;

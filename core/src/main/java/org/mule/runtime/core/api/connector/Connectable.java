@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.connector;
 
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.retry.RetryContext;
 
 /**

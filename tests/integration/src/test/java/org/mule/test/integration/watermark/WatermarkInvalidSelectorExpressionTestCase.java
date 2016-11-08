@@ -8,7 +8,7 @@
 package org.mule.test.integration.watermark;
 
 import org.mule.functional.junit4.ApplicationContextBuilder;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import org.junit.Test;
 

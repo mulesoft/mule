@@ -14,7 +14,7 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.support.MuleSecurityManagerValidator;

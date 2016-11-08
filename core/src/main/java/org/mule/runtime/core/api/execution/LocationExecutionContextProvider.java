@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.util.ComponentLocationProvider;
 
 import java.util.Map;
 
@@ -17,13 +18,8 @@ import javax.xml.namespace.QName;
  * 
  * @since 3.8.0
  */
-public abstract class LocationExecutionContextProvider implements ExceptionContextProvider {
+public abstract class LocationExecutionContextProvider extends ComponentLocationProvider implements ExceptionContextProvider {
 
-  private static final QName NAME_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
-  private static final QName SOURCE_FILE_ANNOTATION_KEY =
-      new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName");
-  private static final QName SOURCE_FILE_LINE_ANNOTATION_KEY =
-      new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
   private static final QName SOURCE_ELEMENT_ANNOTATION_KEY =
       new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceElement");
 
@@ -40,50 +36,6 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     beanAnnotations.put(SOURCE_FILE_ANNOTATION_KEY, fileName);
     beanAnnotations.put(SOURCE_FILE_LINE_ANNOTATION_KEY, lineNumber);
     beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, xmlContent);
-  }
-
-  /**
-   * Generates a representation of a flow element to be logged in a standard way.
-   * 
-   * @param appId
-   * @param processorPath
-   * @param element
-   * @return
-   */
-  public static String resolveProcessorRepresentation(String appId, String processorPath, Object element) {
-    String docName = getDocName(element);
-    if (docName != null) {
-      return String.format("%s @ %s:%s:%d (%s)", processorPath, appId, getSourceFile((AnnotatedObject) element),
-                           getSourceFileLine((AnnotatedObject) element), docName);
-    } else {
-      if (element instanceof AnnotatedObject) {
-        return String.format("%s @ %s:%s:%d", processorPath, appId, getSourceFile((AnnotatedObject) element),
-                             getSourceFileLine((AnnotatedObject) element));
-      } else {
-        return String.format("%s @ %s", processorPath, appId);
-      }
-    }
-  }
-
-  /**
-   * @param element the element to get the {@code doc:name} from.
-   * @return the {@code doc:name} attribute value of the element.
-   */
-  public static String getDocName(Object element) {
-    if (element instanceof AnnotatedObject) {
-      Object docName = ((AnnotatedObject) element).getAnnotation(NAME_ANNOTATION_KEY);
-      return docName != null ? docName.toString() : null;
-    } else {
-      return null;
-    }
-  }
-
-  protected static String getSourceFile(AnnotatedObject element) {
-    return (String) element.getAnnotation(SOURCE_FILE_ANNOTATION_KEY);
-  }
-
-  protected static Integer getSourceFileLine(AnnotatedObject element) {
-    return (Integer) element.getAnnotation(SOURCE_FILE_LINE_ANNOTATION_KEY);
   }
 
   protected static String getSourceXML(AnnotatedObject element) {

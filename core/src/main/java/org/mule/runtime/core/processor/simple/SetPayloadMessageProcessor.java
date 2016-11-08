@@ -13,9 +13,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 

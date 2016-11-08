@@ -10,8 +10,8 @@ import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

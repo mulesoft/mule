@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.processor.Processor;
 
 import com.google.common.cache.CacheBuilder;

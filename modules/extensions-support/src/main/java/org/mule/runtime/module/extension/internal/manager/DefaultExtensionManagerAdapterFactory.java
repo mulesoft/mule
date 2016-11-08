@@ -11,7 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 /**
  * Default implementation of {@link ExtensionManagerAdapterFactory} which creates instances of

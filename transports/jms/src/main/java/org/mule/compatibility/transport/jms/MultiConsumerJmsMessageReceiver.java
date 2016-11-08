@@ -22,7 +22,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;

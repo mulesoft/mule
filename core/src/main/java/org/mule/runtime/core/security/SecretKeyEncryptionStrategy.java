@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringMessageUtils;
 

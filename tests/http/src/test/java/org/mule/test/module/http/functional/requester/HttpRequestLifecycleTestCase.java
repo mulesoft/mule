@@ -10,8 +10,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 

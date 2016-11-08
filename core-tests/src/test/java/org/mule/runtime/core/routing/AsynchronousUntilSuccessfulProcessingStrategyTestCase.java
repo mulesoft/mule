@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeLocator;

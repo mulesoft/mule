@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;

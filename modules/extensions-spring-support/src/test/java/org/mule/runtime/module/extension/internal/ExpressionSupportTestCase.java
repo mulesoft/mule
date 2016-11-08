@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.util.Arrays;

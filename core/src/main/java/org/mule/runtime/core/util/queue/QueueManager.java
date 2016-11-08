@@ -7,8 +7,8 @@
 
 package org.mule.runtime.core.util.queue;
 
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 /**
  * A Queue manager is responsible for managing one or more Queue resources and providing common support for transactions and

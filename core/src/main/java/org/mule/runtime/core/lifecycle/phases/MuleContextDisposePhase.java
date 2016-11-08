@@ -11,9 +11,9 @@ import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
@@ -44,15 +44,15 @@ import javax.annotation.PreDestroy;
  * with one or more registries that inherit the lifecycle of the MuleContext.
  *
  * This phase is responsible for disposing objects. Any object that implements
- * {@link org.mule.runtime.core.api.lifecycle.Disposable} will have its
- * {@link org.mule.runtime.core.api.lifecycle.Disposable#dispose()} method called. Objects are initialised in the order based on
+ * {@link Disposable} will have its
+ * {@link Disposable#dispose()} method called. Objects are initialised in the order based on
  * type: {@link org.mule.runtime.core.api.construct.FlowConstruct}, {@link org.mule.runtime.core.api.agent.Agent},
  * {@link org.mule.runtime.core.api.transport.Connector} followed by any other object that implements
- * {@link org.mule.runtime.core.api.lifecycle.Disposable}.
+ * {@link Disposable}.
  *
  * @see org.mule.runtime.core.api.MuleContext
  * @see org.mule.runtime.core.api.lifecycle.LifecycleManager
- * @see org.mule.runtime.core.api.lifecycle.Disposable
+ * @see Disposable
  *
  * @since 3.0
  */

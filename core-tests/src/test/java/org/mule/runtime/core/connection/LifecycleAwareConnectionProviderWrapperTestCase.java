@@ -9,7 +9,7 @@ package org.mule.runtime.core.connection;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.internal.connection.LifecycleAwareConnectionProviderWrapper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;

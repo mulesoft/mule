@@ -9,7 +9,7 @@ package org.mule.properties;
 import static java.util.Arrays.asList;
 
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.ManagementNotification;

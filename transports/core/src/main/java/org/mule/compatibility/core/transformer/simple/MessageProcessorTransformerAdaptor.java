@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;

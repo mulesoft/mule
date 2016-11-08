@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;

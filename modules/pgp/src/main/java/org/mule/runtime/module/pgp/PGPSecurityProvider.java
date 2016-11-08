@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.pgp;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.api.security.UnauthorisedException;

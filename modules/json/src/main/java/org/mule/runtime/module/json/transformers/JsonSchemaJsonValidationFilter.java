@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.IOUtils;

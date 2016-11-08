@@ -10,10 +10,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.mule.compatibility.core.api.endpoint.EndpointException;
-import org.mule.compatibility.core.endpoint.outbound.OutboundTxRollbackMessageProcessor;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;

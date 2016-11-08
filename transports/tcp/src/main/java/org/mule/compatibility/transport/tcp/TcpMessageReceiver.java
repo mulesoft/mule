@@ -19,7 +19,7 @@ import org.mule.compatibility.transport.tcp.i18n.TcpMessages;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.DisposeException;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;

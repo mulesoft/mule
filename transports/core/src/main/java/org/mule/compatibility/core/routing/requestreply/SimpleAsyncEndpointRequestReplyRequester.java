@@ -7,8 +7,8 @@
 package org.mule.compatibility.core.routing.requestreply;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 

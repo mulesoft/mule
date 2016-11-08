@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.registry;
 
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 
 import java.util.Collection;
 import java.util.Map;

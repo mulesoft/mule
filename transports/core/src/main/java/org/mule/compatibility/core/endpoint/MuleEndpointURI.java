@@ -17,7 +17,7 @@ import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.PropertiesUtils;

@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms.test;
 
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 public class TestJmsConnector extends JmsConnector {
 

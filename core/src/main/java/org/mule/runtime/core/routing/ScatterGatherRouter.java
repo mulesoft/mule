@@ -25,7 +25,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;

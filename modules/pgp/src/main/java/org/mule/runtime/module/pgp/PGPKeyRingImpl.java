@@ -7,8 +7,8 @@
 package org.mule.runtime.module.pgp;
 
 import static org.mule.runtime.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SecurityUtils;

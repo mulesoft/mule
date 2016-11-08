@@ -14,7 +14,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;

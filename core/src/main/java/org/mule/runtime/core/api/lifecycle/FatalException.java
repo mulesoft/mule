@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 
 /**
  * <code>FatalException</code> can be thrown during initialisation or during execution to indicate that something fatal has

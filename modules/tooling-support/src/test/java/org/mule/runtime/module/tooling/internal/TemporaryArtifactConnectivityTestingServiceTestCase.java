@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

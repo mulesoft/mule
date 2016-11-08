@@ -10,9 +10,9 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.routing.MapSplitter.MAP_ENTRY_KEY;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 
 import java.util.ArrayList;

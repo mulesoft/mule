@@ -12,10 +12,9 @@ import static org.mockito.Mockito.mock;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractConnectorTestCase;
-import org.mule.compatibility.transport.http.HttpsConnector;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
 
 import java.io.IOException;

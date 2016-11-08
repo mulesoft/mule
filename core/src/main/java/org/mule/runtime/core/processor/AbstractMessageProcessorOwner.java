@@ -9,11 +9,9 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import javax.xml.namespace.QName;
 import java.util.Collections;

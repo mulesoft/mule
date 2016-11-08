@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.Connectable;
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.processor.Processor;
 

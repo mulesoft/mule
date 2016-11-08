@@ -9,8 +9,8 @@ package org.mule.runtime.module.service;
 
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Rule;

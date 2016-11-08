@@ -9,7 +9,7 @@ package org.mule.runtime.module.pgp.filters;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.UnauthorisedException;

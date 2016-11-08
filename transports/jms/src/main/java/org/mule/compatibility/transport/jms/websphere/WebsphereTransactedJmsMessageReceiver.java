@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.jms.XaTransactedJmsMessageReceiver;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import javax.jms.Session;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.functional.junit4;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import org.junit.Assert;
 import org.junit.Rule;

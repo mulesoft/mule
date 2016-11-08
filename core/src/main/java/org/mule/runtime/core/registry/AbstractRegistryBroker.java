@@ -8,11 +8,11 @@ package org.mule.runtime.core.registry;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;

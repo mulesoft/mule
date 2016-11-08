@@ -9,7 +9,7 @@ package org.mule.compatibility.core.endpoint.dynamic;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 /**
  * A placeholder for a connector that has not been created yet. This used by dynamic endpoints who's actual endpoint is not

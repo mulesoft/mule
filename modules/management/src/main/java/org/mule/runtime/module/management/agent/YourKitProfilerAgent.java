@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.management.i18n.ManagementMessages;

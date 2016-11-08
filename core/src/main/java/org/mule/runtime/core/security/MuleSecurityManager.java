@@ -7,8 +7,8 @@
 package org.mule.runtime.core.security;
 
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;

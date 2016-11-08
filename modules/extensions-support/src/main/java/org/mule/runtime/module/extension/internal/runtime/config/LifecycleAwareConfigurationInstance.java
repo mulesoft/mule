@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;

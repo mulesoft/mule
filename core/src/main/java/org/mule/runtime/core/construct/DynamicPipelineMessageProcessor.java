@@ -9,7 +9,7 @@ package org.mule.runtime.core.construct;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;

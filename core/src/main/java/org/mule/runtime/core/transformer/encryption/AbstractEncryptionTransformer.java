@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer.encryption;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -70,7 +70,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
   /**
    * Template method were deriving classes can do any initialisation after the properties have been set on this transformer
    * 
-   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
+   * @throws InitialisationException
    */
   @Override
   public void initialise() throws InitialisationException {

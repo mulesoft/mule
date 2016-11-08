@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 /**
  * A safe facade for lifecycle manager that objects can use to monitor its own state

@@ -9,7 +9,7 @@ package org.mule.runtime.module.pgp;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.security.AbstractNamedEncryptionStrategy;

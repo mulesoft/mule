@@ -12,7 +12,7 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.runtime.core.AbstractAgent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
@@ -94,7 +94,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent {
    * say by retrying to connect, a <code>RecoverableException</code> should be thrown. There is no guarantee that by throwing a
    * Recoverable exception that the Mule instance will not shut down.
    *
-   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException if a fatal error occurs causing the Mule instance to
+   * @throws InitialisationException if a fatal error occurs causing the Mule instance to
    *         shutdown
    */
   @Override

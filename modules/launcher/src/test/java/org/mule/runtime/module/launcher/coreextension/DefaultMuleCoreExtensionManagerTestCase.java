@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;

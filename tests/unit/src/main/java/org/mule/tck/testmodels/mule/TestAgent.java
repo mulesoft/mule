@@ -8,7 +8,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import java.util.Collections;
 import java.util.List;

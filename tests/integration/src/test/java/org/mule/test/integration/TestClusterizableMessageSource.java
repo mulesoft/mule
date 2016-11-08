@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 

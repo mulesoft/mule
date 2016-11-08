@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 import java.util.ArrayList;
 import java.util.List;
