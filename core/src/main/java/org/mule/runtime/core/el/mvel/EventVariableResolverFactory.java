@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -60,8 +61,8 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   public boolean isTarget(String name) {
     boolean isDeprecatedVariable = MULE_EVENT_INTERNAL_VARIABLE.equals(name);
     if (isDeprecatedVariable) {
-      logger.warn(String.format("Variable %s has been removed from MEL and will not work outside of compatibility mode.",
-                                MULE_EVENT_INTERNAL_VARIABLE));
+      logger.warn(format("Variable %s has been removed from MEL and will not work outside of compatibility mode.",
+                         MULE_EVENT_INTERNAL_VARIABLE));
     }
     return isDeprecatedVariable || FLOW.equals(name) || super.isTarget(name);
   }

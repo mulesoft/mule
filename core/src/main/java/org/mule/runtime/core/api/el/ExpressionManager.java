@@ -17,6 +17,10 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
+/**
+ * Provides universal access for evaluating expressions embedded in Mule configurations, such as XML, Java,
+ * scripting and annotations.
+ */
 public interface ExpressionManager {
 
   String DEFAULT_EXPRESSION_PREFIX = "#[";
@@ -183,11 +187,11 @@ public interface ExpressionManager {
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
    *
-   * @param expression
-   * @param event
-   * @param eventBuilder
-   * @param flowConstruct
-   * @param object
+   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
+   * @param event The event to be enriched
+   * @param eventBuilder event builder instance used to mutate the current message or event.
+   * @param flowConstruct the flow where the event is being processed
+   * @param object The object used for enrichment
    */
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object);
 
@@ -207,8 +211,29 @@ public interface ExpressionManager {
    */
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
 
+  /**
+   * Evaluates an expression considering a {@code boolean} as output. If the result cannot be clearly transformed or is
+   * {@link null}, {@link false} will be returned.
+   *
+   * @param expression a single expression to be evaluated and transformed
+   * @param event the {@link Event} to consider
+   * @param flowConstruct the {@link FlowConstruct} to consider
+   * @return {@link true} if the expression evaluated to that or "true", false otherwise
+   * @throws ExpressionRuntimeException if the expression is invalid
+   */
   boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
 
+  /**
+   * Evaluates an expression considering a {@code boolean} as output.
+   *
+   * @param expression a single expression to be evaluated and transformed
+   * @param event the {@link Event} to consider
+   * @param flowConstruct the {@link FlowConstruct} to consider
+   * @param nullReturnsTrue whether or not a {@link null} outcome should be considered a {@link true}
+   * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@link true}
+   * @return {@link true} if the expression evaluated to that, "true" or the above flags where considered, {@link false} otherwise
+   * @throws ExpressionRuntimeException if the expression is invalid
+   */
   boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
                           boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException;

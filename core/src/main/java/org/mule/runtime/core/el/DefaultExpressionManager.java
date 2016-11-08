@@ -243,6 +243,7 @@ public class DefaultExpressionManager implements ExpressionManager {
   }
 
   private boolean isDwExpression(String expression) {
+    //TODO: MULE-10410 - Remove once DW is the default language.
     return expression.startsWith(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX) || expression.startsWith(DW_PREFIX);
   }
 

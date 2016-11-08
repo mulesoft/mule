@@ -318,9 +318,7 @@ public interface MuleContext extends Lifecycle {
   DataTypeConversionResolver getDataTypeConverterResolver();
 
   /**
-   * Expression Language for evaluating expressions using Mule as the context
-   * 
-   * @return
+   * @return an {@link ExpressionManager} for evaluating expressions using Mule as the context
    */
   ExpressionManager getExpressionManager();
 
