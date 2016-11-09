@@ -96,14 +96,14 @@ public class JmsMessageRequester extends AbstractMessageRequester {
       if (selectorFilter != null) {
         final String expressionTemplate = selectorFilter.getExpression();
         if (StringUtils.isNotBlank(expressionTemplate)) {
-          selector = getEndpoint().getMuleContext().getExpressionLanguage().parse(expressionTemplate, null, null);
+          selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, null, null);
         }
       } else if (endpoint.getProperties() != null) {
         // still allow the selector to be set as a property on the endpoint
         // to be backward compatable
         final String expressionTemplate = (String) endpoint.getProperty(JmsConstants.JMS_SELECTOR_PROPERTY);
         if (StringUtils.isNotBlank(expressionTemplate)) {
-          selector = getEndpoint().getMuleContext().getExpressionLanguage().parse(expressionTemplate, null, null);
+          selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, null, null);
         }
       }
       String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);

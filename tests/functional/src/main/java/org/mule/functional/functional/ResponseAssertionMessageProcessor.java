@@ -47,7 +47,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   @Override
   public void start() throws InitialisationException {
     super.start();
-    this.expressionLanguage.validate(responseExpression);
+    this.expressionManager.validate(responseExpression);
     responseLatch = new CountDownLatch(responseCount);
     FlowAssert.addAssertion(flowConstruct.getName(), this);
   }
@@ -90,7 +90,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     }
     responseThread = Thread.currentThread();
     this.responseEvent = event;
-    responseResult = responseResult && expressionLanguage.evaluateBoolean(responseExpression, event, flowConstruct, false, true);
+    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, flowConstruct, false, true);
     increaseResponseCount();
     responseLatch.countDown();
     return event;

@@ -47,9 +47,9 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
 
     executeRefreshToken("testMultitenantFlow", MULTITENANT_OAUTH_CONFIG, multitenantUser.getValue(), 500);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_OAUTH_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_OAUTH_CONFIG, USER_ID_JOHN)
         .assertAccessTokenIs(REFRESHED_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_OAUTH_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_OAUTH_CONFIG, USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 

@@ -7,10 +7,9 @@
 package org.mule.runtime.core.expression.transformers;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -75,11 +74,11 @@ public class ExpressionArgument implements MuleContextAware {
   }
 
   protected String getFullExpression() {
-    return expressionConfig.getFullExpression(muleContext.getExpressionLanguage());
+    return expressionConfig.getFullExpression(muleContext.getExpressionManager());
   }
 
   protected void validate() {
-    expressionConfig.validate(muleContext.getExpressionLanguage());
+    expressionConfig.validate(muleContext.getExpressionManager());
   }
 
   /**
@@ -100,7 +99,7 @@ public class ExpressionArgument implements MuleContextAware {
     // certain ExpressionEvaluators further in.
     Object result =
         withContextClassLoader(expressionEvaluationClassLoader,
-                               () -> muleContext.getExpressionLanguage().evaluate(getExpression(), event, null));
+                               () -> muleContext.getExpressionManager().evaluate(getExpression(), event).getValue());
 
     if (getReturnClass() != null && result != null) {
       if (!getReturnClass().isInstance(result)) {

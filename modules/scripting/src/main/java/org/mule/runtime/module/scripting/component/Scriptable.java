@@ -188,8 +188,8 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     if (properties != null) {
       for (Entry entry : properties.entrySet()) {
         String value = (String) entry.getValue();
-        if (muleContext.getExpressionLanguage().isExpression(value)) {
-          bindings.put((String) entry.getKey(), muleContext.getExpressionLanguage().parse(value, event, flow));
+        if (muleContext.getExpressionManager().isExpression(value)) {
+          bindings.put((String) entry.getKey(), muleContext.getExpressionManager().parse(value, event, flow));
         } else {
           bindings.put((String) entry.getKey(), value);
         }

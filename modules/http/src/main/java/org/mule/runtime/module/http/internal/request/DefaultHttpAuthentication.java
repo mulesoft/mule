@@ -35,11 +35,11 @@ public class DefaultHttpAuthentication implements HttpAuthentication, MuleContex
 
   @Override
   public void initialise() throws InitialisationException {
-    username.initialize(muleContext.getExpressionLanguage());
-    password.initialize(muleContext.getExpressionLanguage());
-    domain.initialize(muleContext.getExpressionLanguage());
-    workstation.initialize(muleContext.getExpressionLanguage());
-    preemptive.initialize(muleContext.getExpressionLanguage());
+    username.initialize(muleContext.getExpressionManager());
+    password.initialize(muleContext.getExpressionManager());
+    domain.initialize(muleContext.getExpressionManager());
+    workstation.initialize(muleContext.getExpressionManager());
+    preemptive.initialize(muleContext.getExpressionManager());
   }
 
   public String getUsername() {

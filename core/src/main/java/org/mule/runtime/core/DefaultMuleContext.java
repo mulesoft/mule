@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MES
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
@@ -57,7 +56,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -92,7 +91,7 @@ import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
+import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -212,7 +211,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private LockFactory lockFactory;
 
-  private ExpressionLanguage expressionLanguage;
+  private ExtendedExpressionManager expressionManager;
 
   private ProcessingTimeWatcher processingTimeWatcher;
 
@@ -243,7 +242,6 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
-  private org.mule.runtime.api.el.ExpressionLanguage expressionLanguageV2;
 
   static {
     // Ensure reactor operatorError hook is always registered.
@@ -930,20 +928,11 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public ExpressionLanguage getExpressionLanguage() {
-    if (expressionLanguage == null) {
-      this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+  public ExtendedExpressionManager getExpressionManager() {
+    if (expressionManager == null) {
+      expressionManager = new DefaultExpressionManager(this);
     }
-    return this.expressionLanguage;
-  }
-
-  //TODO: MULE-10429 - Rename once we migrate mule test cases to EL expressions
-  @Override
-  public org.mule.runtime.api.el.ExpressionLanguage getExpressionLanguageV2() {
-    if (this.expressionLanguageV2 == null) {
-      this.expressionLanguageV2 = new MuleExpressionLanguage();
-    }
-    return this.expressionLanguageV2;
+    return expressionManager;
   }
 
   @Override

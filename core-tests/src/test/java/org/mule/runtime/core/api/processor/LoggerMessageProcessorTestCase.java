@@ -16,9 +16,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
@@ -89,9 +88,9 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn("WARN".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));
-    loggerMessageProcessor.expressionLanguage = buildExpressionLanguage();
+    loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.log(muleEvent);
-    verify(loggerMessageProcessor.expressionLanguage, timesEvaluateExpression).parse("some expression", muleEvent, flow);
+    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent, flow);
   }
 
   // Orchestrates the verifications for a call with a null MuleEvent
@@ -157,7 +156,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   private LoggerMessageProcessor buildLoggerMessageProcessorForExpressionEvaluation(String level) {
     LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    loggerMessageProcessor.expressionLanguage = buildExpressionLanguage();
+    loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.setMessage("some expression");
     loggerMessageProcessor.setFlowConstruct(flow);
     return loggerMessageProcessor;
@@ -171,8 +170,8 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     return event;
   }
 
-  private ExpressionLanguage buildExpressionLanguage() {
-    ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
+  private ExtendedExpressionManager buildExpressionManager() {
+    ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
     when(expressionLanguage.parse(anyString(), any(Event.class), eq(flow))).thenReturn("text to log");
     return expressionLanguage;
   }

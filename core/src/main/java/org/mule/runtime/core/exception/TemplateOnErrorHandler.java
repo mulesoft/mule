@@ -178,7 +178,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public boolean accept(Event event) {
     return acceptsAll() || acceptsErrorType(event)
-        || (when != null && muleContext.getExpressionLanguage().evaluateBoolean(when, event, flowConstruct));
+        || (when != null && muleContext.getExpressionManager().evaluateBoolean(when, event, flowConstruct));
   }
 
 

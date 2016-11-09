@@ -16,7 +16,7 @@ public class ClientCredentialsMinimalConfigTestCase extends AbstractClientCreden
   public void authenticationIsDoneOnStartup() throws Exception {
     verifyRequestDoneToTokenUrlForClientCredentials();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), "tokenManagerConfig")
         .assertAccessTokenIs(ACCESS_TOKEN);
   }
 

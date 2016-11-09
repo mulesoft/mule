@@ -9,19 +9,19 @@ package org.mule.runtime.core.transformer.simple;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -35,8 +35,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -53,12 +51,12 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   private InternalMessage muleMessage;
 
   @Mock
-  private ExpressionLanguage mockExpressionLanguage;
+  private ExtendedExpressionManager mockExpressionManager;
 
   @Before
   public void setUp() throws Exception {
-    when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
-    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
+    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    when(mockExpressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
     muleMessage = InternalMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();

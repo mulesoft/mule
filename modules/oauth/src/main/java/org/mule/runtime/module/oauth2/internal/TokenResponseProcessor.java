@@ -8,7 +8,7 @@ package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
@@ -25,7 +25,7 @@ public class TokenResponseProcessor {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private final TokenResponseConfiguration tokenResponseConfiguration;
-  private final ExpressionLanguage expressionLanguage;
+  private final ExtendedExpressionManager expressionManager;
   private final boolean retrieveRefreshToken;
   private String accessToken;
   private String refreshToken;
@@ -33,25 +33,25 @@ public class TokenResponseProcessor {
   private Map<String, Object> customResponseParameters;
 
   public static TokenResponseProcessor createAuthorizationCodeProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                                                        final ExpressionLanguage expressionLanguage) {
-    return new TokenResponseProcessor(tokenResponseConfiguration, expressionLanguage, true);
+                                                                        final ExtendedExpressionManager expressionManager) {
+    return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, true);
   }
 
   public static TokenResponseProcessor createClientCredentialsProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                                                        final ExpressionLanguage expressionLanguage) {
-    return new TokenResponseProcessor(tokenResponseConfiguration, expressionLanguage, false);
+                                                                        final ExtendedExpressionManager expressionManager) {
+    return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, false);
   }
 
   private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                 final ExpressionLanguage expressionLanguage, boolean retrieveRefreshToken) {
+                                 final ExtendedExpressionManager expressionManager, boolean retrieveRefreshToken) {
     this.tokenResponseConfiguration = tokenResponseConfiguration;
-    this.expressionLanguage = expressionLanguage;
+    this.expressionManager = expressionManager;
     this.retrieveRefreshToken = retrieveRefreshToken;
   }
 
   public void process(Event muleEvent) {
     Builder builder = Event.builder(muleEvent);
-    accessToken = expressionLanguage.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, builder, null);
+    accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, builder, null);
     muleEvent = builder.build();
     accessToken = isEmpty(accessToken) ? null : accessToken;
     if (accessToken == null) {
@@ -60,18 +60,18 @@ public class TokenResponseProcessor {
     }
     if (retrieveRefreshToken) {
       builder = Event.builder(muleEvent);
-      refreshToken = expressionLanguage.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, builder, null);
+      refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, builder, null);
       muleEvent = builder.build();
       refreshToken = isEmpty(refreshToken) ? null : refreshToken;
     }
     builder = Event.builder(muleEvent);
-    expiresIn = expressionLanguage.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, builder, null);
+    expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, builder, null);
     muleEvent = builder.build();
     customResponseParameters = new HashMap<>();
     for (ParameterExtractor parameterExtractor : tokenResponseConfiguration.getParameterExtractors()) {
       builder = Event.builder(muleEvent);
       customResponseParameters.put(parameterExtractor.getParamName(),
-                                   expressionLanguage.evaluate(parameterExtractor.getValue(), muleEvent, builder, null));
+                                   expressionManager.evaluate(parameterExtractor.getValue(), muleEvent, builder, null));
       muleEvent = builder.build();
     }
   }

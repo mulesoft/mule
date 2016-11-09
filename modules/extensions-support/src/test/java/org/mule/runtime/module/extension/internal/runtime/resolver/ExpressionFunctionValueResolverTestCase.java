@@ -11,15 +11,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.function.Function;
@@ -31,15 +26,6 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
   private static final String INTEGER_EXPRESSION = "#[2+2]";
   private static final ExpressionFunction INTEGER_EXPRESSION_FUNCTION =
       new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext);
-
-  private MVELExpressionLanguage expressionLanguage;
-
-  @Override
-  protected void doSetUp() throws Exception {
-    expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
-    DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContext;
-    defaultMuleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
-  }
 
   @Test
   public void testEqualExpressionFunctions() {

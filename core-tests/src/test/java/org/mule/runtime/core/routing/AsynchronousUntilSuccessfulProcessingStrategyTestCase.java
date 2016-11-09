@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -292,13 +293,15 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     String ackExpression = "some-expression";
     String expressionEvalutaionResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage().evaluate(ackExpression, event, null))
-        .thenReturn(expressionEvalutaionResult);
+    TypedValue mockTypedValue = mock(TypedValue.class);
+    when(mockTypedValue.getValue()).thenReturn(expressionEvalutaionResult);
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, event))
+        .thenReturn(mockTypedValue);
     final Event result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(any(Event.class));
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage(), times(1))
-        .evaluate(eq(ackExpression), any(Event.class), eq(null));
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1))
+        .evaluate(eq(ackExpression), any(Event.class));
 
     assertThat(result.getMessage().getPayload().getValue(), is(expressionEvalutaionResult));
     verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));

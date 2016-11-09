@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
@@ -21,12 +21,12 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   private Map<String, String> parameters = new HashMap<>();
   private boolean returnsVoid;
   @Inject
-  private ExpressionLanguage expressionLanguage;
+  private MuleContext muleContext;
 
   @Override
   protected MessageProcessorChainBuilder getBuilderInstance() {
     MessageProcessorChainBuilder builder =
-        new ModuleOperationMessageProcessorChainBuilder(properties, parameters, returnsVoid, expressionLanguage);
+        new ModuleOperationMessageProcessorChainBuilder(properties, parameters, returnsVoid, muleContext.getExpressionManager());
     return builder;
   }
 

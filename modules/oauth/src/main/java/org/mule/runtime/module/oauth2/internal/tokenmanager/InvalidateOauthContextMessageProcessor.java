@@ -50,7 +50,7 @@ public class InvalidateOauthContextMessageProcessor implements Processor, Initia
     if (resourceOwnerIdEvaluator == null) {
       resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
     }
-    resourceOwnerIdEvaluator.initialize(muleContext.getExpressionLanguage());
+    resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override

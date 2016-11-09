@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
@@ -15,8 +17,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
+import org.slf4j.Logger;
+
 public class EventVariableResolverFactory extends MessageVariableResolverFactory {
 
+  private static final Logger logger = getLogger(EventVariableResolverFactory.class);
   private static final long serialVersionUID = -6819292692339684915L;
 
   private final String FLOW = "flow";
@@ -54,7 +59,12 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
 
   @Override
   public boolean isTarget(String name) {
-    return FLOW.equals(name) || MULE_EVENT_INTERNAL_VARIABLE.equals(name) || super.isTarget(name);
+    boolean isDeprecatedVariable = MULE_EVENT_INTERNAL_VARIABLE.equals(name);
+    if (isDeprecatedVariable) {
+      logger.warn(format("Variable %s has been removed from MEL and will not work outside of compatibility mode.",
+                         MULE_EVENT_INTERNAL_VARIABLE));
+    }
+    return isDeprecatedVariable || FLOW.equals(name) || super.isTarget(name);
   }
 
   public static class FlowContext {

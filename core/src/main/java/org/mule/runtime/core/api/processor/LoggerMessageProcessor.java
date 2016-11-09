@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.StringUtils;
@@ -39,12 +39,12 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
 
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
-  protected ExpressionLanguage expressionLanguage;
+  protected ExtendedExpressionManager expressionManager;
 
   @Override
   public void initialise() throws InitialisationException {
     initLogger();
-    expressionLanguage = muleContext.getExpressionLanguage();
+    expressionManager = muleContext.getExpressionManager();
   }
 
   protected void initLogger() {
@@ -70,7 +70,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
       } else {
         LogLevel logLevel = LogLevel.valueOf(level);
         if (LogLevel.valueOf(level).isEnabled(logger)) {
-          logLevel.log(logger, expressionLanguage.parse(message, event, flowConstruct));
+          logLevel.log(logger, expressionManager.parse(message, event, flowConstruct));
         }
       }
     }

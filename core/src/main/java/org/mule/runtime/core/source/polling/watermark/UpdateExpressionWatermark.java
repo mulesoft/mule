@@ -42,7 +42,7 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
   public void initialise() throws InitialisationException {
     if (!StringUtils.isEmpty(this.updateExpression)) {
       try {
-        this.muleContext.getExpressionLanguage().validate(this.updateExpression);
+        this.muleContext.getExpressionManager().validate(this.updateExpression);
       } catch (InvalidExpressionException e) {
         throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
             .format("update-expression requires a valid MEL expression. '%s' was found instead", this.updateExpression)), e,

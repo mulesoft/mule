@@ -32,8 +32,8 @@ public class HttpSingleParam extends HttpParam implements Initialisable, MuleCon
 
   @Override
   public void initialise() throws InitialisationException {
-    name.initialize(muleContext.getExpressionLanguage());
-    value.initialize(muleContext.getExpressionLanguage());
+    name.initialize(muleContext.getExpressionManager());
+    value.initialize(muleContext.getExpressionManager());
   }
 
   @Override

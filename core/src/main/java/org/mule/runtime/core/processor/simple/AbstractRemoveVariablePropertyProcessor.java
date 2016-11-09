@@ -27,7 +27,7 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
 
   @Override
   public void initialise() throws InitialisationException {
-    this.identifierEvaluator.initialize(muleContext.getExpressionLanguage());
+    this.identifierEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override

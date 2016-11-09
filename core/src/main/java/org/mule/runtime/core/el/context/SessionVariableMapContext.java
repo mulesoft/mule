@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 /**
  * Session variables wrapper {@link Map} for exposing Session variables via an
- * {@link org.mule.runtime.core.api.el.ExpressionLanguage}
+ * {@link ExtendedExpressionLanguage}
  */
 public class SessionVariableMapContext extends AbstractMapContext<Object> {
 

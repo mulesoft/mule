@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.security;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityException;
@@ -65,10 +66,10 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
   }
 
   protected Authentication getAuthenticationToken(Event event) throws UnauthorisedException {
-    ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
+    ExpressionManager expressionManager = muleContext.getExpressionManager();
 
-    Object usernameEval = expressionLanguage.evaluate(username, event, null);
-    Object passwordEval = expressionLanguage.evaluate(password, event, null);
+    Object usernameEval = expressionManager.evaluate(username, event).getValue();
+    Object passwordEval = expressionManager.evaluate(password, event).getValue();
 
     if (usernameEval == null) {
       throw new UnauthorisedException(CoreMessages.authNoCredentials());

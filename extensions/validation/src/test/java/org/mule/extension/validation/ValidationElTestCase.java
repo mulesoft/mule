@@ -12,10 +12,9 @@ import static org.mule.extension.validation.ValidationTestCase.INVALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
-
 import org.mule.extension.validation.api.NumberType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -28,11 +27,11 @@ import org.junit.Test;
 
 public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
-  private ExpressionLanguage expressionLanguage;
+  private ExpressionManager expressionManager;
 
   @Override
   protected void doSetUp() throws Exception {
-    expressionLanguage = muleContext.getExpressionLanguage();
+    expressionManager = muleContext.getExpressionManager();
   }
 
   @Test
@@ -206,7 +205,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   }
 
   private boolean evaluate(String expression, Event event) {
-    return expressionLanguage.evaluate(expression, event, null);
+    return (boolean) expressionManager.evaluate(expression, event).getValue();
   }
 
   private void assertValid(String expression, Event event) {

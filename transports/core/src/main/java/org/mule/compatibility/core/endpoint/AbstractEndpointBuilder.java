@@ -162,7 +162,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
   protected InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException {
     // It does not make sense to allow inbound dynamic endpoints
     String uri = uriBuilder.getConstructor();
-    if (muleContext.getExpressionLanguage().isExpression(uri)) {
+    if (muleContext.getExpressionManager().isExpression(uri)) {
       throw new MalformedEndpointException(TransportCoreMessages.dynamicEndpointURIsCannotBeUsedOnInbound(), uri);
     }
 
@@ -212,8 +212,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
   protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException {
 
     String uri = uriBuilder.getConstructor();
-    if (muleContext.getExpressionLanguage().isExpression(uri)) {
-      if (muleContext.getExpressionLanguage().isValid(uri)) {
+    if (muleContext.getExpressionManager().isExpression(uri)) {
+      if (muleContext.getExpressionManager().isValid(uri)) {
         String dynamicAddress = getDynamicUriFrom(uri);
         URIBuilder originalBuilder = uriBuilder;
         uriBuilder = new URIBuilder(dynamicAddress, muleContext);

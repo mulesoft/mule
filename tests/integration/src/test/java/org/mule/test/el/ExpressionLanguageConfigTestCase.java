@@ -8,8 +8,7 @@ package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -21,7 +20,7 @@ import org.junit.Test;
 
 public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCase {
 
-  ExpressionLanguage el;
+  ExpressionManager el;
 
   @Override
   protected String getConfigFile() {
@@ -30,22 +29,22 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
 
   @Before
   public void setup() {
-    el = muleContext.getExpressionLanguage();
+    el = muleContext.getExpressionManager();
   }
 
   @Test
   public void testExpressionLanguageImport() {
-    assertEquals(Locale.class, el.evaluate("loc"));
+    assertEquals(Locale.class, evaluate("loc"));
   }
 
   @Test
   public void testExpressionLanguageImportNoName() {
-    assertEquals(DateFormat.class, el.evaluate("DateFormat"));
+    assertEquals(DateFormat.class, evaluate("DateFormat"));
   }
 
   @Test
   public void testExpressionLanguageAlias() {
-    assertEquals(muleContext.getConfiguration().getId(), el.evaluate("appName"));
+    assertEquals(muleContext.getConfiguration().getId(), evaluate("appName"));
   }
 
   @Test
@@ -53,34 +52,40 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
     // NOTE: This indirectly asserts that echo() function defined in config file rather than external
     // function definition file is being used (otherwise hiOTHER' would be returned
 
-    assertEquals("hi", el.evaluate("echo('hi')"));
+    assertEquals("hi", evaluate("echo('hi')"));
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionFromFile() {
-    assertEquals("hi", el.evaluate("echo2('hi')"));
+    assertEquals("hi", evaluate("echo2('hi')"));
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingStaticContext() {
-    assertEquals("Hello " + muleContext.getConfiguration().getId() + "!", el.evaluate("hello()"));
+    assertEquals("Hello " + muleContext.getConfiguration().getId() + "!", evaluate("hello()"));
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContext() throws Exception {
     assertEquals("123appended", el.evaluate("appendPayload()", eventBuilder().message(InternalMessage.of("123")).build(),
-                                            getTestFlow(muleContext)));
+                                            getTestFlow(muleContext))
+        .getValue());
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContextAndImport() throws Exception {
     assertEquals("321", el.evaluate("reversePayload()", eventBuilder().message(InternalMessage.of("123")).build(),
-                                    getTestFlow(muleContext)));
+                                    getTestFlow(muleContext))
+        .getValue());
   }
 
   @Test
   public void testExpressionLanguageExecuteElement() throws Exception {
     flowRunner("flow").withPayload("foo").run();
+  }
+
+  private Object evaluate(String expression) {
+    return el.evaluate(expression).getValue();
   }
 
 }

@@ -37,7 +37,7 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
   public void propagatesDataTypeForInlinedInvocationProperty() throws Exception {
     final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
@@ -53,7 +53,7 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
   public void propagatesDataTypeForInlinedSessionProperty() throws Exception {
     final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 

@@ -67,9 +67,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, NO_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_JOHN)
         .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 
@@ -79,9 +79,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, TONY_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_JOHN)
         .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(JOHN_STATE);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(TONY_STATE);
   }
 
@@ -91,9 +91,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, NO_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_JOHN)
         .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), MULTITENANT_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 

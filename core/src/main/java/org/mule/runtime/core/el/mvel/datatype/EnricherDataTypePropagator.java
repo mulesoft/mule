@@ -8,8 +8,8 @@
 package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.mvel2.compiler.CompiledExpression;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 /**
  * Propagates {@link org.mule.runtime.api.metadata.DataType} from the right to the left side of an assignment expression if
@@ -25,5 +25,5 @@ public interface EnricherDataTypePropagator {
    * @param compiledExpression assignment expression used for enrichment
    * @return true if propagation was done, false otherwise
    */
-  boolean propagate(Event event, Event.Builder builder, DefaultTypedValue typedValue, CompiledExpression compiledExpression);
+  boolean propagate(Event event, Event.Builder builder, TypedValue typedValue, CompiledExpression compiledExpression);
 }

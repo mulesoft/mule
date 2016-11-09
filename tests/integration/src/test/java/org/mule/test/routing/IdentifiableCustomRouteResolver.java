@@ -34,7 +34,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
 
   @Override
   public String getRouteIdentifier(Event event) throws MessagingException {
-    return muleContext.getExpressionLanguage().parse(ID_EXPRESSION, event, null);
+    return muleContext.getExpressionManager().parse(ID_EXPRESSION, event, null);
   }
 
   public static class AddLetterMessageProcessor implements Processor {

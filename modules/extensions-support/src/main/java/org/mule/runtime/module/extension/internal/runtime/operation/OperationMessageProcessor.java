@@ -170,7 +170,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
     if (target.startsWith(FLOW_VARS)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
                                                  format("the '%s' prefix", FLOW_VARS)));
-    } else if (muleContext.getExpressionLanguage().isExpression(target)) {
+    } else if (muleContext.getExpressionManager().isExpression(target)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
                                                  "an expression"));
     }

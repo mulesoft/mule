@@ -26,7 +26,7 @@ public class SetPayloadTransformer extends AbstractMessageTransformer {
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    valueEvaluator.initialize(muleContext.getExpressionLanguage());
+    valueEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   public SetPayloadTransformer() {

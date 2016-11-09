@@ -91,7 +91,7 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
   @Test
   public void customTokenResponseParametersAreCaptured() throws Exception {
     final OAuthContextFunctionAsserter oauthContextAsserter =
-        OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig");
+        OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), "tokenManagerConfig");
     oauthContextAsserter.assertAccessTokenIs(ACCESS_TOKEN);
     oauthContextAsserter.assertExpiresInIs(EXPIRES_IN);
     oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter1Name.getValue(),

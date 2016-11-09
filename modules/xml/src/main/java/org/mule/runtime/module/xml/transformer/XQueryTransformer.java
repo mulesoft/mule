@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -16,6 +16,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.i18n.XmlMessages;
+
+import com.saxonica.xqj.SaxonXQDataSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -37,6 +39,7 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
+import net.sf.saxon.Configuration;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -44,10 +47,6 @@ import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import com.saxonica.xqj.SaxonXQDataSource;
-
-import net.sf.saxon.Configuration;
 
 /**
  * The XQuery Module gives users the ability to perform XQuery transformations on XML messages in Mule
@@ -409,7 +408,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
    */
   protected Object evaluateTransformParameter(String name, Object value, Event event) throws TransformerException {
     if (value instanceof String) {
-      return muleContext.getExpressionLanguage().evaluate(value.toString(), event, null);
+      return muleContext.getExpressionManager().evaluate(value.toString(), event).getValue();
     }
     return value;
   }

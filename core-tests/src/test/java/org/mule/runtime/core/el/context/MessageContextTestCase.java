@@ -44,7 +44,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() {
-    event = mock(Event.class);
+    event = mock(Event.class, RETURNS_DEEP_STUBS);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     message = spy(InternalMessage.builder().nullPayload().build());

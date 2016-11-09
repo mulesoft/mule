@@ -7,9 +7,8 @@
 package org.mule.runtime.core.expression;
 
 import static org.junit.Assert.assertEquals;
-
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -17,18 +16,18 @@ import org.junit.Test;
 
 public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
 
-  private MVELExpressionLanguage expressionLanguage;
+  private ExpressionManager expressionManager;
 
   @Before
   public void setup() throws InitialisationException {
-    expressionLanguage = new MVELExpressionLanguage(muleContext);
+    expressionManager = muleContext.getExpressionManager();
   }
 
   @Test
   public void testExpressionLanguageExpression() throws Exception {
     ExpressionConfig config = new ExpressionConfig("message.inboundProperty['foo']=='bar'", "$[", "]");
 
-    assertEquals("$[message.inboundProperty['foo']=='bar']", config.getFullExpression(expressionLanguage));
+    assertEquals("$[message.inboundProperty['foo']=='bar']", config.getFullExpression(expressionManager));
 
     config = new ExpressionConfig();
     config.parse("#[message.inboundAttachment['baz']]");
@@ -41,7 +40,7 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
     ExpressionConfig expressionConfig = new ExpressionConfig();
     expressionConfig.setExpression("message.payload");
     assertEquals("message.payload", expressionConfig.getExpression());
-    assertEquals("#[message.payload]", expressionConfig.getFullExpression(expressionLanguage));
+    assertEquals("#[message.payload]", expressionConfig.getFullExpression(expressionManager));
   }
 
   @Test
@@ -49,7 +48,7 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
     ExpressionConfig expressionConfig = new ExpressionConfig();
     expressionConfig.setExpression("#[message.payload]");
     assertEquals("message.payload", expressionConfig.getExpression());
-    assertEquals("#[message.payload]", expressionConfig.getFullExpression(expressionLanguage));
+    assertEquals("#[message.payload]", expressionConfig.getFullExpression(expressionManager));
   }
 
   @Test
@@ -57,7 +56,7 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
     ExpressionConfig expressionConfig = new ExpressionConfig();
     expressionConfig.setExpression("1==1?true:false");
     assertEquals("1==1?true:false", expressionConfig.getExpression());
-    assertEquals("#[1==1?true:false]", expressionConfig.getFullExpression(expressionLanguage));
+    assertEquals("#[1==1?true:false]", expressionConfig.getFullExpression(expressionManager));
   }
 
   @Test
@@ -65,7 +64,7 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
     ExpressionConfig expressionConfig = new ExpressionConfig();
     expressionConfig.setExpression("for(a:[1,2,3){'1'}");
     assertEquals("for(a:[1,2,3){'1'}", expressionConfig.getExpression());
-    assertEquals("#[for(a:[1,2,3){'1'}]", expressionConfig.getFullExpression(expressionLanguage));
+    assertEquals("#[for(a:[1,2,3){'1'}]", expressionConfig.getFullExpression(expressionManager));
   }
 
   @Test
@@ -73,6 +72,6 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
     ExpressionConfig expressionConfig = new ExpressionConfig();
     expressionConfig.setExpression("'This is a message : msg'");
     assertEquals("'This is a message : msg'", expressionConfig.getExpression());
-    assertEquals("#['This is a message : msg']", expressionConfig.getFullExpression(expressionLanguage));
+    assertEquals("#['This is a message : msg']", expressionConfig.getFullExpression(expressionManager));
   }
 }

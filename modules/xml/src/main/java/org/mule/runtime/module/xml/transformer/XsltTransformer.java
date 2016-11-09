@@ -8,8 +8,8 @@ package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -434,8 +434,8 @@ public class XsltTransformer extends AbstractXmlTransformer {
   protected Object evaluateTransformParameter(String key, Object value, Event event) throws TransformerException {
     if (value instanceof String) {
       String stringValue = (String) value;
-      if (muleContext.getExpressionLanguage().isExpression(stringValue)) {
-        return muleContext.getExpressionLanguage().evaluate(stringValue, event, null);
+      if (muleContext.getExpressionManager().isExpression(stringValue)) {
+        return muleContext.getExpressionManager().evaluate(stringValue, event).getValue();
       }
     }
 

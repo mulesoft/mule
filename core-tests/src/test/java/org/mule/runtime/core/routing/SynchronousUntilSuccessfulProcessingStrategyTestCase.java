@@ -22,7 +22,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -144,15 +143,17 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     String ackExpression = "some-expression";
     String expressionEvalutaionResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage()
-        .evaluate(eq(ackExpression), any(Event.class), eq(null))).thenReturn(expressionEvalutaionResult);
+    TypedValue mockTypedValue = mock(TypedValue.class);
+    when(mockTypedValue.getValue()).thenReturn(expressionEvalutaionResult);
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()
+        .evaluate(eq(ackExpression), any(Event.class))).thenReturn(mockTypedValue);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
     Event response = processingStrategy.route(testEvent(), getTestFlow(muleContext));
     assertThat(response.getMessage().getPayload().getValue(), equalTo(expressionEvalutaionResult));
     verify(mockRoute).process(any(Event.class));
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage()).evaluate(eq(ackExpression),
-                                                                                               any(Event.class), eq(null));
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()).evaluate(eq(ackExpression),
+                                                                                              any(Event.class));
   }
 
   @Test

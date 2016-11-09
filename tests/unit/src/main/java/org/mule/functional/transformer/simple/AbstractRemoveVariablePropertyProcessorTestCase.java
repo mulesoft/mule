@@ -11,14 +11,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -49,7 +49,8 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   private Event event;
   private MuleSession mockSession = mock(MuleSession.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExpressionLanguage mockExpressionLanguage = mock(ExpressionLanguage.class);
+  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
+  private TypedValue mockTypedValue = mock(TypedValue.class);
   private AbstractRemoveVariablePropertyProcessor removeVariableProcessor;
 
 
@@ -59,15 +60,16 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
 
   @Before
   public void setUpTest() throws Exception {
-    when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
-    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
-        .thenAnswer(invocation -> invocation.getArguments()[0]);
-    when(mockExpressionLanguage.evaluate(EXPRESSION, event, null)).thenReturn(EXPRESSION_VALUE);
-    removeVariableProcessor.setMuleContext(mockMuleContext);
-
     message = InternalMessage.builder().payload("").build();
     event = eventBuilder().message(message).session(mockSession).build();
+
+    when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
+    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    when(mockTypedValue.getValue()).thenReturn(EXPRESSION_VALUE);
+    when(mockExpressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(mockExpressionManager.evaluate(EXPRESSION, event)).thenReturn(mockTypedValue);
+    removeVariableProcessor.setMuleContext(mockMuleContext);
   }
 
   @Test
@@ -93,6 +95,9 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
 
   @Test // Don't fail.
   public void testRemoveVariableExpressionKeyNullValue() throws MuleException {
+    TypedValue mockTypedValue = mock(TypedValue.class);
+    when(mockTypedValue.getValue()).thenReturn(null);
+    when(mockExpressionManager.evaluate(NULL_EXPRESSION, event)).thenReturn(mockTypedValue);
     removeVariableProcessor.setIdentifier(NULL_EXPRESSION);
     removeVariableProcessor.initialise();
     event = removeVariableProcessor.process(event);

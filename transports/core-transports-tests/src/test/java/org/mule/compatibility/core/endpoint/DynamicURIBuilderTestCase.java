@@ -11,11 +11,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -104,11 +103,11 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private void createExpressionManager(String expression, final String expressionValue) {
-    ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
+    ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
 
-    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
-    when(expressionLanguage.isExpression(expression)).thenReturn(true);
-    when(expressionLanguage.parse(expression, event, null)).thenReturn(expressionValue);
+    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+    when(expressionManager.isExpression(expression)).thenReturn(true);
+    when(expressionManager.parse(expression, event, null)).thenReturn(expressionValue);
   }
 
   private void doDynamicUriResolverTest(URIBuilder uriBuilder)

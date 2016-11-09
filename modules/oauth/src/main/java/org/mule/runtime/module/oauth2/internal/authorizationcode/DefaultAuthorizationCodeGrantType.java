@@ -168,11 +168,11 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
       if (localAuthorizationUrlResourceOwnerIdEvaluator == null) {
         localAuthorizationUrlResourceOwnerIdEvaluator = new AttributeEvaluator(null);
       }
-      localAuthorizationUrlResourceOwnerIdEvaluator.initialize(muleContext.getExpressionLanguage());
+      localAuthorizationUrlResourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
       if (resourceOwnerIdEvaluator == null) {
         resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
       }
-      resourceOwnerIdEvaluator.initialize(muleContext.getExpressionLanguage());
+      resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
       if (localCallbackConfig != null && localCallbackUrl != null) {
         throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackUrl are mutually exclusive");
       }
@@ -204,7 +204,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   @Override
   public boolean shouldRetry(final Event firstAttemptResponseEvent) throws MuleException {
     if (!StringUtils.isBlank(getRefreshTokenWhen())) {
-      final Object value = muleContext.getExpressionLanguage().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
+      final Object value =
+          muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent).getValue();
       if (!(value instanceof Boolean)) {
         throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",
                                                            getRefreshTokenWhen(), value));

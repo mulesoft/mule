@@ -185,7 +185,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   private void initializeAttributeEvaluators(AttributeEvaluator... attributeEvaluators) {
     for (AttributeEvaluator attributeEvaluator : attributeEvaluators) {
       if (attributeEvaluator != null) {
-        attributeEvaluator.initialize(muleContext.getExpressionLanguage());
+        attributeEvaluator.initialize(muleContext.getExpressionManager());
       }
     }
   }

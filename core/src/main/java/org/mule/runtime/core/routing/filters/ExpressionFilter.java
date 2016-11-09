@@ -95,7 +95,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    */
   @Override
   public boolean accept(Event event, Event.Builder builder) {
-    return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> muleContext.getExpressionLanguage()
+    return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> muleContext.getExpressionManager()
         .evaluateBoolean(getFullExpression(), event, null, nullReturnsTrue, !nullReturnsTrue));
   }
 

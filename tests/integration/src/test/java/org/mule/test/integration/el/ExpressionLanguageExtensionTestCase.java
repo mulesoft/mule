@@ -7,11 +7,10 @@
 package org.mule.test.integration.el;
 
 import static org.junit.Assert.assertSame;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -24,13 +23,13 @@ public class ExpressionLanguageExtensionTestCase extends AbstractIntegrationTest
 
   @Test
   public void doesNotOverrideExpressionLanguageInExpressionManagerOnCreation() throws Exception {
-    ExpressionLanguage originalExpressionLanguage = muleContext.getExpressionLanguage();
+    ExpressionManager originalExpressionManager = muleContext.getExpressionManager();
 
     flowRunner("createsExpressionLanguage").withPayload(TEST_MESSAGE).run();
 
-    ExpressionLanguage newExpressionLanguage = muleContext.getExpressionLanguage();
+    ExpressionManager newExpressionManager = muleContext.getExpressionManager();
 
-    assertSame(originalExpressionLanguage, newExpressionLanguage);
+    assertSame(originalExpressionManager, newExpressionManager);
   }
 
   public static class ExpressionLanguageFactory {

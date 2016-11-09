@@ -135,7 +135,7 @@ public class MuleEventToHttpRequest {
 
     if (!StringUtils.isEmpty(requester.getSource()) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource()))) {
       muleEvent = Event.builder(muleEvent).message(InternalMessage.builder(muleEvent.getMessage())
-          .payload(muleContext.getExpressionLanguage().evaluate(requester.getSource(), muleEvent, null)).build()).build();
+          .payload(muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent)).build()).build();
     }
 
     if (isEmptyBody(muleEvent, resolvedMethod)) {

@@ -20,6 +20,7 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -197,7 +198,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
   protected void setCacheControl(HttpResponse response, Event event) {
     if (cacheControl != null) {
-      cacheControl.parse(event, muleContext.getExpressionLanguage());
+      cacheControl.parse(event, muleContext.getExpressionManager());
       String cacheControlValue = cacheControl.toString();
       if (!"".equals(cacheControlValue)) {
         if (headers.get(HttpConstants.HEADER_CACHE_CONTROL) != null) {
@@ -215,7 +216,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     if (!cookies.isEmpty()) {
       for (CookieWrapper cookie : cookies) {
         try {
-          cookie.parse(event, muleContext.getExpressionLanguage());
+          cookie.parse(event, muleContext.getExpressionManager());
           response.addHeader(new Header(HttpConstants.HEADER_COOKIE_SET,
                                         CookieHelper.formatCookieForASetCookieHeader(cookie.createCookie())));
 
@@ -268,7 +269,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
   private String parse(String value, Event event) {
     if (value != null) {
-      return muleContext.getExpressionLanguage().parse(value, event, flowConstruct);
+      return muleContext.getExpressionManager().parse(value, event, flowConstruct);
     }
     return value;
   }
@@ -276,8 +277,9 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   private String evaluateDate(String value, Event event) {
     Object realValue = value;
 
-    if (value != null && muleContext.getExpressionLanguage().isExpression(value)) {
-      realValue = muleContext.getExpressionLanguage().evaluate(value, event, flowConstruct);
+    if (value != null && muleContext.getExpressionManager().isExpression(value)) {
+      TypedValue result = muleContext.getExpressionManager().evaluate(value, event, flowConstruct);
+      realValue = result != null ? result.getValue() : null;
     }
 
     if (realValue instanceof Date) {

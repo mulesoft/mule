@@ -9,12 +9,16 @@ package org.mule.runtime.core.keygenerator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.NotSerializableException;
@@ -32,27 +36,29 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   private InternalMessage message;
   private MuleContext muleContext;
   private Event event;
+  private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() throws Exception {
-    keyGenerator = new ExpressionMuleEventKeyGenerator();
-    expressionLanguage = mock(ExpressionLanguage.class);
+    expressionManager = mock(ExtendedExpressionManager.class);
     muleContext = mock(MuleContext.class);
-    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
+    doReturn(expressionManager).when(muleContext).getExpressionManager();
 
     message = mock(InternalMessage.class);
 
     event = mock(Event.class);
     when(event.getMessage()).thenReturn(message);
-  }
 
-  private ExpressionLanguage expressionLanguage;
+    keyGenerator = new ExpressionMuleEventKeyGenerator();
+  }
 
   @Test
   public void testGeneratesSerializableKey() throws Exception {
     keyGenerator.setExpression(SINGLE_EXPRESSION);
     keyGenerator.setMuleContext(muleContext);
-    when(expressionLanguage.evaluate(SINGLE_EXPRESSION, event, null)).thenReturn(RESOLVED_KEY);
+    TypedValue mockTypedValue = mock(TypedValue.class);
+    when(mockTypedValue.getValue()).thenReturn(RESOLVED_KEY);
+    when(expressionManager.evaluate(SINGLE_EXPRESSION, event)).thenReturn(mockTypedValue);
     Serializable key = keyGenerator.generateKey(event);
 
     assertEquals(RESOLVED_KEY, key);
@@ -62,7 +68,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   public void resolvesCompositeExpression() throws Exception {
     keyGenerator.setExpression(SINGLE_EXPRESSION + SINGLE_EXPRESSION);
     keyGenerator.setMuleContext(muleContext);
-    when(expressionLanguage.parse(SINGLE_EXPRESSION + SINGLE_EXPRESSION, event, null)).thenReturn(RESOLVED_KEY);
+    when(expressionManager.parse(SINGLE_EXPRESSION + SINGLE_EXPRESSION, event, null)).thenReturn(RESOLVED_KEY);
 
     Serializable key = keyGenerator.generateKey(event);
     assertThat(key, equalTo(RESOLVED_KEY));
@@ -72,8 +78,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   public void testThrowsExceptionOnNonSerializableKey() throws Exception {
     keyGenerator.setExpression(SINGLE_EXPRESSION);
     keyGenerator.setMuleContext(muleContext);
-    when(expressionLanguage.evaluate(SINGLE_EXPRESSION, event, null)).thenReturn(null);
-
+    when(expressionManager.evaluate(SINGLE_EXPRESSION, event)).thenReturn(new DefaultTypedValue(null, OBJECT));
     keyGenerator.generateKey(event);
   }
 }

@@ -54,6 +54,6 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
-    attributeEvaluator.initialize(muleContext.getExpressionLanguage());
+    attributeEvaluator.initialize(muleContext.getExpressionManager());
   }
 }

@@ -147,7 +147,7 @@ public class HttpResponseToMuleEvent {
       eventBuilder.message(InternalMessage.builder(muleEvent.getMessage()).payload(payload)
           .mediaType(muleEvent.getMessage().getPayload().getDataType().getMediaType()).build());
     } else {
-      muleContext.getExpressionLanguage().enrich(requester.getTarget(), muleEvent, eventBuilder, null, payload);
+      muleContext.getExpressionManager().enrich(requester.getTarget(), muleEvent, eventBuilder, null, payload);
     }
   }
 

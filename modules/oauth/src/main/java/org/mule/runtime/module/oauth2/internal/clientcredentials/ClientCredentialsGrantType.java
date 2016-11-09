@@ -109,7 +109,8 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
   @Override
   public boolean shouldRetry(final Event firstAttemptResponseEvent) {
-    final Object value = muleContext.getExpressionLanguage().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
+    final Object value =
+        muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent).getValue();
     if (!(value instanceof Boolean)) {
       throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",
                                                          getRefreshTokenWhen(), value));

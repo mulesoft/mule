@@ -7,8 +7,8 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -83,11 +83,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   }
 
   protected String getValueForEvent(Event event) throws MessagingException {
-    return flowConstruct.getMuleContext().getExpressionLanguage().parse(valueExpression, event, flowConstruct);
+    return flowConstruct.getMuleContext().getExpressionManager().parse(valueExpression, event, flowConstruct);
   }
 
   protected String getIdForEvent(Event event) throws MuleException {
-    return flowConstruct.getMuleContext().getExpressionLanguage().parse(idExpression, event, flowConstruct);
+    return flowConstruct.getMuleContext().getExpressionManager().parse(idExpression, event, flowConstruct);
   }
 
   public String getIdExpression() {

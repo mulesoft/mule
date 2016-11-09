@@ -46,7 +46,7 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
   }
 
   private CompiledExpression compileMelExpression() {
-    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
     return (CompiledExpression) compileExpression(MEL_EXPRESSION, new ParserContext(expressionLanguage.getParserConfiguration()));
   }
 

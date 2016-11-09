@@ -528,7 +528,7 @@ enum CookieStorageType {
 
         final String value;
         if (event != null) {
-          value = muleContext.getExpressionLanguage().parse(cookieValue, event, null);
+          value = muleContext.getExpressionManager().parse(cookieValue, event, null);
         } else {
           value = cookieValue;
         }

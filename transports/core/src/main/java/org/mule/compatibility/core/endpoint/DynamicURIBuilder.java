@@ -8,13 +8,12 @@
 package org.mule.compatibility.core.endpoint;
 
 import static org.mule.compatibility.core.endpoint.URIBuilder.URL_ENCODER;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -59,8 +58,8 @@ public class DynamicURIBuilder {
     String resolvedAddress = templateUriBuilder.getTransformedConstructor(input -> {
       String token = (String) input;
 
-      if (muleContext.getExpressionLanguage().isExpression(token)) {
-        token = muleContext.getExpressionLanguage().parse(token, event, null);
+      if (muleContext.getExpressionManager().isExpression(token)) {
+        token = muleContext.getExpressionManager().parse(token, event, null);
       }
 
       return token;

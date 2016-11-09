@@ -11,7 +11,7 @@ import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PARAM
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PROPERTY_VARS;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -48,15 +48,15 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
   private Map<String, String> properties;
   private Map<String, String> parameters;
   private boolean returnsVoid;
-  private ExpressionLanguage expressionLanguage;
+  private ExpressionManager expressionManager;
 
   public ModuleOperationMessageProcessorChainBuilder(Map<String, String> properties,
                                                      Map<String, String> parameters, boolean returnsVoid,
-                                                     ExpressionLanguage expressionLanguage) {
+                                                     ExpressionManager expressionManager) {
     this.properties = properties;
     this.parameters = parameters;
     this.returnsVoid = returnsVoid;
-    this.expressionLanguage = expressionLanguage;
+    this.expressionManager = expressionManager;
   }
 
   @Override
@@ -64,7 +64,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
                                                           List<Processor> processorForLifecycle) {
     return new ModuleOperationProcessorChain("wrapping-operation-module-chain", head, processors, processorForLifecycle,
                                              properties, parameters, returnsVoid,
-                                             expressionLanguage);
+                                             expressionManager);
   }
 
   /**
@@ -76,18 +76,18 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     private Map<String, String> properties;
     private Map<String, String> parameters;
     private boolean returnsVoid;
-    private ExpressionLanguage expressionLanguage;
+    private ExpressionManager expressionManager;
 
     ModuleOperationProcessorChain(String name, Processor head, List<Processor> processors,
                                   List<Processor> processorsForLifecycle,
                                   Map<String, String> properties, Map<String, String> parameters,
                                   boolean returnsVoid,
-                                  ExpressionLanguage expressionLanguage) {
+                                  ExpressionManager expressionManager) {
       super(name, head, processors, processorsForLifecycle);
       this.properties = properties;
       this.parameters = parameters;
       this.returnsVoid = returnsVoid;
-      this.expressionLanguage = expressionLanguage;
+      this.expressionManager = expressionManager;
     }
 
     @Override
@@ -125,8 +125,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     }
 
     private BiConsumer<String, String> addEvaluatedParam(Event event, Event.Builder builder, String prefix) {
-      return (name, value) -> builder.addVariable(prefix + "." + name, expressionLanguage.isExpression(value)
-          ? expressionLanguage.evaluate(value, event, flowConstruct)
+      return (name, value) -> builder.addVariable(prefix + "." + name, expressionManager.isExpression(value)
+          ? expressionManager.evaluate(value, event, flowConstruct)
           : value);
 
     }

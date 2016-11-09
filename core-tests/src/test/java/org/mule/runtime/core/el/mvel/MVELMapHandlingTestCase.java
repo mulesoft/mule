@@ -10,9 +10,8 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -25,13 +24,13 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
   private static final String KEY = "Name";
   private static final String VALUE = "MG";
-  private ExpressionLanguage el;
+  private ExpressionManager el;
 
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    el = muleContext.getExpressionLanguage();
+    el = muleContext.getExpressionManager();
   }
 
   @Test
@@ -83,7 +82,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   }
 
   private void runExpressionAndExpect(String expression, Object expectedValue, Event event) throws Exception {
-    Object result = el.evaluate(expression, event, getTestFlow(muleContext));
+    Object result = el.evaluate(expression, event, getTestFlow(muleContext)).getValue();
     assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }
 }

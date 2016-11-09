@@ -23,7 +23,7 @@ public class CopyAttachmentsProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    this.attachmentNameEvaluator.initialize(muleContext.getExpressionLanguage());
+    this.attachmentNameEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override

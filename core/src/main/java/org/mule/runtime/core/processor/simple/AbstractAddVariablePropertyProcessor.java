@@ -7,14 +7,13 @@
 package org.mule.runtime.core.processor.simple;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -34,8 +33,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   @Override
   public void initialise() throws InitialisationException {
-    identifierEvaluator.initialize(muleContext.getExpressionLanguage());
-    valueEvaluator.initialize(muleContext.getExpressionLanguage());
+    identifierEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
@@ -47,7 +46,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       return event;
     } else {
       final Builder builder = Event.builder(event);
-      DefaultTypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
+      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
       event = builder.build();
       if (typedValue.getValue() == null) {
         if (logger.isDebugEnabled()) {
@@ -57,7 +56,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
         }
         return removeProperty(event, key);
       } else {
-        return addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getValue().getClass())
+        return addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getDataType().getType())
             .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
       }
     }
