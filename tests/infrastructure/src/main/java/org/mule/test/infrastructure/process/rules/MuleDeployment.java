@@ -6,6 +6,8 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
@@ -14,7 +16,7 @@ import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
@@ -90,6 +92,8 @@ public class MuleDeployment extends MuleInstallation {
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
   private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
+
+  private final Thread shutdownHookThread = new Thread(this::after);
 
   public static class Builder {
 
@@ -248,6 +252,7 @@ public class MuleDeployment extends MuleInstallation {
     super.before();
     prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
     mule = new MuleProcessController(getMuleHome());
+    addShutdownHooks();
     try {
       doBefore();
     } catch (Error e) {
@@ -358,12 +363,26 @@ public class MuleDeployment extends MuleInstallation {
 
   protected void after() {
     if (STOP_ON_EXIT) {
-      if (mule.isRunning()) {
-        logger.info("Stopping Mule Server");
-        mule.stop();
-      }
+      stopMule();
       super.after();
     }
+    removeShutdownHooks();
+  }
+
+  private void stopMule() {
+    if (mule.isRunning()) {
+      logger.info("Stopping Mule Server");
+      mule.stop();
+      prober.check(isNotRunning(mule));
+    }
+  }
+
+  private void addShutdownHooks() {
+    Runtime.getRuntime().addShutdownHook(shutdownHookThread);
+  }
+
+  private void removeShutdownHooks() {
+    Runtime.getRuntime().removeShutdownHook(shutdownHookThread);
   }
 
 }
