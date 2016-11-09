@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -413,7 +414,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     if (muleContext.isPrimaryPollingInstance() || clientId == null) {
       super.connect();
     } else {
-      muleContext.registerListener(notification -> {
+      muleContext.registerListener((ClusterNodeNotificationListener) notification -> {
         // Notification thread is bound to the MuleContainerSystemClassLoader, save it
         // so we can restore it later
         ClassLoader notificationClassLoader = Thread.currentThread().getContextClassLoader();
