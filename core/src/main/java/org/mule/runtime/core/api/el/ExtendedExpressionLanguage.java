@@ -39,6 +39,7 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * @return the result of execution of the expression.
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                       BindingContext bindingContext);
 
@@ -57,6 +58,7 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * @param object The object used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object);
 
   /**
@@ -74,6 +76,7 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * @param value The typed value used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
 
 }

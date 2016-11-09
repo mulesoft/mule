@@ -37,6 +37,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @return the result of execution of the expression.
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct);
 
   /**
@@ -58,6 +59,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @return the result of execution of the expression.
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                       BindingContext context);
 
@@ -76,6 +78,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @param object The object used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object);
 
   /**
@@ -93,6 +96,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @param value The typed value used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
+  @Deprecated
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
 
   /**
@@ -112,6 +116,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    *         to true.
    * @deprecated Parsing of expressions is deprecated. Use standard evaluation instead.
    */
+  @Deprecated
   String parse(String expression, Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
 
   /**
@@ -133,6 +138,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    *         to true.
    * @deprecated Parsing of expressions is deprecated. Use standard evaluation instead.
    */
+  @Deprecated
   String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException;
 
