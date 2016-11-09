@@ -15,19 +15,22 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOM
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableList;
 
@@ -159,7 +162,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
           // Do not iterate since this iteration is done iside the resolve component going through childrens
           return null;
         } else {
-          if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)) {
+          if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)
+              && !element.getLocalName().equals(POLICY_ROOT_ELEMENT)) {
             ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
             finalChild = handler.parse(element, parserContext);
             currentDefinition = finalChild;
@@ -278,7 +282,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
    * @return true if the parsing should be done with the new mechanism, false otherwise.
    */
   private boolean shouldUseNewMechanism(Element element) {
-    if (element.getLocalName().equals(MULE_ROOT_ELEMENT) || element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)) {
+    if (element.getLocalName().equals(MULE_ROOT_ELEMENT) || element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)
+        || element.getLocalName().equals(POLICY_ROOT_ELEMENT)) {
       return false;
     }
     Node parentNode = element;
@@ -309,11 +314,17 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   }
 
   private boolean isMuleRootElement(ComponentIdentifier componentIdentifier) {
-    return MULE_IDENTIFIER.equals(componentIdentifier) || MULE_DOMAIN_IDENTIFIER.equals(componentIdentifier);
+    return MULE_IDENTIFIER.equals(componentIdentifier) || MULE_DOMAIN_IDENTIFIER.equals(componentIdentifier) ||
+        POLICY_IDENTIFIER.equals(componentIdentifier);
   }
 
   private String getNamespace(Node parentNode) {
-    return parentNode.getPrefix() != null ? parentNode.getPrefix() : CORE_NAMESPACE;
+    if (parentNode.getPrefix() == null) {
+      return parentNode.getNamespaceURI().equals("http://www.mulesoft.org/schema/mule/core") ? CORE_NAMESPACE
+          : POLICY_ROOT_ELEMENT;
+    } else {
+      return parentNode.getPrefix();
+    }
   }
 
   private void validate(Element element) {
