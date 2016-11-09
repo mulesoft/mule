@@ -74,6 +74,7 @@ public class ApplicationModel {
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String MULE_ROOT_ELEMENT = "mule";
   public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
+  public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
   public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
@@ -143,6 +144,8 @@ public class ApplicationModel {
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
+  public static final ComponentIdentifier POLICY_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(POLICY_ROOT_ELEMENT).withName(POLICY_ROOT_ELEMENT).build();
   public static final ComponentIdentifier SPRING_PROPERTY_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =

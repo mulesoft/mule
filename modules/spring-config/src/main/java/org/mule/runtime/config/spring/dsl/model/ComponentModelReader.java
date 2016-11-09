@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring.dsl.model;
 
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.VALUE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -78,6 +79,7 @@ public class ComponentModelReader {
   }
 
   private boolean isConfigurationTopComponent(ConfigLine parent) {
-    return (parent.getIdentifier().equals(MULE_ROOT_ELEMENT) || parent.getIdentifier().equals(MULE_DOMAIN_ROOT_ELEMENT));
+    return (parent.getIdentifier().equals(MULE_ROOT_ELEMENT) || parent.getIdentifier().equals(MULE_DOMAIN_ROOT_ELEMENT) ||
+        parent.getIdentifier().equals(POLICY_ROOT_ELEMENT));
   }
 }
