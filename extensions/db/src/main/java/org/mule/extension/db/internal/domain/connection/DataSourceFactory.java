@@ -109,6 +109,7 @@ public class DataSourceFactory implements Disposable {
     config.put("checkoutTimeout", new Long(poolingProfile.getMaxWaitUnit().toMillis(poolingProfile.getMaxWait())).intValue());
     config.put("acquireIncrement", poolingProfile.getAcquireIncrement());
     config.put("maxStatements", 0);
+    config.put("testConnectionOnCheckout", "true");
     config.put("maxStatementsPerConnection", poolingProfile.getPreparedStatementCacheSize());
 
     return DataSources.pooledDataSource(dataSource, config);

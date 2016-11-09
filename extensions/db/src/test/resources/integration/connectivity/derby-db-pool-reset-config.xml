@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:config name="pooledDbConfig">
+        <db:derby-connection database="target/muleEmbeddedDB" create="true">
+            <db:pooling-profile maxPoolSize="1" minPoolSize="1" maxWait="1" maxWaitUnit="SECONDS"/>
+        </db:derby-connection>
+    </db:config>
+
+    <flow name="main">
+        <db:select config-ref="pooledDbConfig">
+            <db:sql>select * from PLANET order by ID</db:sql>
+        </db:select>
+    </flow>
+</mule>
