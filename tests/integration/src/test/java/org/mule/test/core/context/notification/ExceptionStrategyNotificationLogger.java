@@ -11,4 +11,9 @@ import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 
 public class ExceptionStrategyNotificationLogger extends AbstractNotificationLogger<ExceptionStrategyNotification>
     implements ExceptionStrategyNotificationListener<ExceptionStrategyNotification> {
+
+  @Override
+  public boolean isBlocking() {
+    return false;
+  }
 }

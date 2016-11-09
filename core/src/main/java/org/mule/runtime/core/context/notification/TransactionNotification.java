@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.transaction.Transaction;
 
-public class TransactionNotification extends ServerNotification implements BlockingServerEvent {
+public class TransactionNotification extends ServerNotification implements SynchronousServerEvent {
 
   /**
    * Serial version

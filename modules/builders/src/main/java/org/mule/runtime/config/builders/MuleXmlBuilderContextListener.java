@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.config.builders;
 
+import static java.util.Arrays.asList;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.MuleServer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
@@ -63,6 +65,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener {
 
   protected transient final Logger logger = LoggerFactory.getLogger(MuleXmlBuilderContextListener.class);
 
+  @Override
   public void contextInitialized(ServletContextEvent event) {
     initialize(event.getServletContext());
   }
@@ -143,7 +146,8 @@ public class MuleXmlBuilderContextListener implements ServletContextListener {
     if (parentContext != null) {
       builder.setParentContext(parentContext);
     }
-    return muleContextFactory.createMuleContext(builder, muleContextBuilder);
+    return muleContextFactory.createMuleContext(asList(new BasicRuntimeServicesConfigurationBuilder(), builder),
+                                                muleContextBuilder);
   }
 
   /**
@@ -156,6 +160,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener {
     return MuleServer.DEFAULT_CONFIGURATION;
   }
 
+  @Override
   public void contextDestroyed(ServletContextEvent event) {
     destroy();
   }

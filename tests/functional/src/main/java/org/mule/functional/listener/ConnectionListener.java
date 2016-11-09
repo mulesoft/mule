@@ -10,11 +10,11 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.Optional;
@@ -35,6 +35,11 @@ public class ConnectionListener {
   public ConnectionListener(MuleContext muleContext) {
     try {
       muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>() {
+
+        @Override
+        public boolean isBlocking() {
+          return false;
+        }
 
         @Override
         public void onNotification(ConnectionNotification notification) {

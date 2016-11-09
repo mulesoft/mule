@@ -14,7 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 
@@ -27,7 +29,9 @@ public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase 
 
   @Test
   public void registerTransactionManager() throws Exception {
-    DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+    DefaultMuleContext context =
+        (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                                               new DefaultsConfigurationBuilder());
 
     TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
     txMgrFB.setMuleContext(context);
@@ -38,7 +42,9 @@ public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase 
 
   @Test
   public void registerCustomTransactionManager() throws Exception {
-    DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+    DefaultMuleContext context =
+        (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                                               new DefaultsConfigurationBuilder());
 
     TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
     txMgrFB.setMuleContext(context);
@@ -50,7 +56,9 @@ public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase 
 
   @Test
   public void ignoreCustomTransactionManager() throws Exception {
-    DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+    DefaultMuleContext context =
+        (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                                               new DefaultsConfigurationBuilder());
 
     TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
     txMgrFB.setMuleContext(context);

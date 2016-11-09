@@ -6,6 +6,8 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
+
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -22,6 +24,9 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
 
+  @Rule
+  public TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+
   protected FakeMuleServer muleServer;
 
   protected List<MuleCoreExtension> getCoreExtensions() {
@@ -31,6 +36,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
+    muleServer.addZippedService(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")));
   }
 
   @After

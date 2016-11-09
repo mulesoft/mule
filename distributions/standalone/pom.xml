@@ -250,6 +250,14 @@
                     <groupId>org.mockito</groupId>
                     <artifactId>mockito-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-service</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-artifact</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

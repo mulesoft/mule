@@ -6,14 +6,18 @@
  */
 package org.mule.test.management.support;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -28,7 +32,10 @@ public class JmxMissingIdTestCase extends AbstractMuleTestCase {
     config.setId("MY_SERVER");
     MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
     contextBuilder.setMuleConfiguration(config);
-    muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
+    muleContext =
+        new DefaultMuleContextFactory()
+            .createMuleContext(asList(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder()),
+                               contextBuilder);
 
     muleContext.start();
   }

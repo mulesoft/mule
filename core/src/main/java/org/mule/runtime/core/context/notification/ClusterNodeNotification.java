@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * Notifies when there are a cluster node event
  */
-public class ClusterNodeNotification extends ServerNotification implements BlockingServerEvent {
+public class ClusterNodeNotification extends ServerNotification implements SynchronousServerEvent {
 
   public static final int PRIMARY_CLUSTER_NODE_SELECTED = CLUSTER_NODE_EVENT_ACTION_START_RANGE + 1;
 

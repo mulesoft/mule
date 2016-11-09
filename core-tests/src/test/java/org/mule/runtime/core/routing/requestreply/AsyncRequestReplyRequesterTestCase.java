@@ -22,13 +22,13 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.beans.ExceptionListener;
@@ -51,7 +51,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected void doSetUp() throws Exception {
     super.doSetUp();
     muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
-    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
+    scheduler = muleContext.getRegistry().lookupObject(SchedulerService.class).computationScheduler();
   }
 
   @Override

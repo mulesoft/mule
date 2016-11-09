@@ -56,17 +56,20 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private final CountDownLatch terminationLatch = new CountDownLatch(1);
 
   private static final ScheduledFuture<?> NULL_SCHEDULED_FUTURE = NullScheduledFuture.INSTANCE;
-  private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
+  private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks;
 
   private volatile boolean shutdown = false;
 
 
   /**
    * @param executor the actual executor that will run the dispatched tasks.
+   * @param workers an estimate of how many threads will be, at maximum, in the underlying executor
+   * @param totalWorkers an estimate of how many threads will be, at maximum, in all the underlying executors
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
    */
-  DefaultScheduler(ExecutorService executor, ScheduledExecutorService scheduledExecutor) {
+  DefaultScheduler(ExecutorService executor, int workers, int totalWorkers, ScheduledExecutorService scheduledExecutor) {
+    scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
   }
@@ -218,22 +221,22 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-    final RunnableFutureDecorator<T> decorated = new RunnableFutureDecorator<>(super.newTaskFor(callable), this);
-    scheduledTasks.put(decorated, NULL_SCHEDULED_FUTURE);
-    return decorated;
+    return new RunnableFutureDecorator<>(super.newTaskFor(callable), this);
   }
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-    final RunnableFutureDecorator<T> decorated = new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this);
-    scheduledTasks.put(decorated, NULL_SCHEDULED_FUTURE);
-    return decorated;
+    return new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this);
   }
 
   @Override
   public void execute(Runnable command) {
     checkShutdown();
-    requireNonNull(command);
+    if (command instanceof RunnableFuture) {
+      scheduledTasks.put((RunnableFuture<?>) command, NULL_SCHEDULED_FUTURE);
+    } else {
+      scheduledTasks.put(newTaskFor(command, null), NULL_SCHEDULED_FUTURE);
+    }
 
     executor.execute(command);
   }

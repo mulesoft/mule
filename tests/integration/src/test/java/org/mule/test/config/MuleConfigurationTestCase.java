@@ -6,18 +6,22 @@
  */
 package org.mule.test.config;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.After;
@@ -55,8 +59,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
 
     MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
     contextBuilder.setMuleConfiguration(config);
-    muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
-
+    muleContext = new DefaultMuleContextFactory()
+        .createMuleContext(asList(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder()), contextBuilder);
     muleContext.start();
 
     verifyConfiguration();
@@ -82,7 +86,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
     System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
 
-    muleContext = new DefaultMuleContextFactory().createMuleContext();
+    muleContext = new DefaultMuleContextFactory()
+        .createMuleContext(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder());
     muleContext.start();
 
     verifyConfiguration();
@@ -108,7 +113,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
   /** Test for MULE-3110 */
   @Test
   public void testConfigureAfterInitFails() throws Exception {
-    muleContext = new DefaultMuleContextFactory().createMuleContext();
+    muleContext = new DefaultMuleContextFactory()
+        .createMuleContext(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder());
 
     DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
 
@@ -143,7 +149,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
   /** Test for MULE-3110 */
   @Test
   public void testConfigureAfterStartFails() throws Exception {
-    muleContext = new DefaultMuleContextFactory().createMuleContext();
+    muleContext = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+                                                                    new DefaultsConfigurationBuilder());
     muleContext.start();
 
     DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());

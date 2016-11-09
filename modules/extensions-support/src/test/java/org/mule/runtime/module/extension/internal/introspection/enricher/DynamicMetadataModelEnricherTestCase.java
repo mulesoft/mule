@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelPropert
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
@@ -40,7 +41,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DynamicMetadataModelEnricherTestCase {
+public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
 
   private static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
   private ExtensionDeclaration declaration;

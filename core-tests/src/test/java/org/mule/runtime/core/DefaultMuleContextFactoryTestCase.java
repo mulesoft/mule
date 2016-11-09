@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -24,9 +25,11 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 
@@ -58,7 +61,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContext() throws InitialisationException, ConfigurationException {
-    context = muleContextFactory.createMuleContext();
+    context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder());
 
     assertMuleContextConfiguration(context);
     assertDefaults(context);
@@ -66,7 +69,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContextConfigurationBuilder() throws InitialisationException, ConfigurationException {
-    context = muleContextFactory.createMuleContext(new TestConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), new TestConfigurationBuilder());
 
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);
@@ -75,7 +78,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContextListMuleContextBuilder() throws InitialisationException, ConfigurationException {
-    List<ConfigurationBuilder> configBuilders = new ArrayList<ConfigurationBuilder>();
+    List<ConfigurationBuilder> configBuilders = new ArrayList<>();
+    configBuilders.add(new TestServicesConfigurationBuilder());
     configBuilders.add(new TestConfigurationBuilder());
     configBuilders.add(new TestConfigurationBuilder2());
 
@@ -91,7 +95,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void testCreateMuleContextMuleContextBuilder() throws InitialisationException, ConfigurationException {
     TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-    context = muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null), muleContextBuilder);
+    context =
+        muleContextFactory.createMuleContext(asList(new TestServicesConfigurationBuilder(), new SimpleConfigurationBuilder(null)),
+                                             muleContextBuilder);
 
     assertCustomMuleContext(context);
     assertNoDefaults(context);
@@ -101,7 +107,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   public void testCreateMuleContextConfigurationBuilderMuleContextBuilder()
       throws InitialisationException, ConfigurationException {
     TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-    context = muleContextFactory.createMuleContext(new TestConfigurationBuilder2(), muleContextBuilder);
+    context = muleContextFactory
+        .createMuleContext(asList(new TestServicesConfigurationBuilder(), new TestConfigurationBuilder2()), muleContextBuilder);
 
     assertCustomMuleContext(context);
     assertConfigurationBuilder2Objects(context);
@@ -145,7 +152,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     properties.put("testKey3", "testValue3");
     properties.put("testKey4", "testValue4");
 
-    context = muleContextFactory.createMuleContext(new TestConfigurationBuilder(), properties);
+    context = muleContextFactory.createMuleContext(asList(new TestServicesConfigurationBuilder(), new TestConfigurationBuilder()),
+                                                   properties);
 
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);

@@ -15,10 +15,14 @@ public class MessageProcessorTextDebugger implements MessageProcessorNotificatio
 
   private final MessageProcessingFlowTraceManager messageProcessingFlowTraceManager;
 
+  @Override
+  public boolean isBlocking() {
+    return false;
+  }
+
   public MessageProcessorTextDebugger(MessageProcessingFlowTraceManager messageProcessingFlowTraceManager) {
     this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
   }
-
 
   @Override
   public void onNotification(MessageProcessorNotification notification) {

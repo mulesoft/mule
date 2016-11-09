@@ -14,10 +14,17 @@ import java.util.List;
 public class PipelineMessageNotificationLogger extends PipelineAndAsyncMessageNotificationLogger
     implements PipelineMessageNotificationListener<PipelineMessageNotification> {
 
+  @Override
+  public boolean isBlocking() {
+    return false;
+  }
+
+  @Override
   public synchronized void onNotification(PipelineMessageNotification notification) {
     notifications.addLast(notification);
   }
 
+  @Override
   public List getNotifications() {
     return notifications;
   }

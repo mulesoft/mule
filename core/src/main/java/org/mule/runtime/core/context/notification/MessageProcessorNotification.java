@@ -13,14 +13,14 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent {
+public class MessageProcessorNotification extends ServerNotification implements SynchronousServerEvent {
 
   private static final long serialVersionUID = 1L;
 

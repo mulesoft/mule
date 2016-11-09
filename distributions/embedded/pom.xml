@@ -94,6 +94,14 @@
             <version>${project.version}</version>
             <type>pom</type>
         </dependency>
+
+        <!-- TODO MULE-9655 Determine how services and extensions work in embedded mode -->
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-services-all</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+        </dependency>
         <dependency>
             <groupId>org.mule.extensions</groupId>
             <artifactId>mule-extensions-all</artifactId>

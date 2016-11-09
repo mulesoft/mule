@@ -9,6 +9,7 @@ package org.mule.test.core;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -42,6 +43,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
+
     // here we're trying to test log separation so we need to
     // disable this default property of the fake mule server
     // in order to test that
@@ -88,21 +90,17 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   }
 
   private void ensureArtifactAppender(final String appenderName, final Class<? extends Appender> appenderClass) throws Exception {
-    withAppClassLoader(APP_NAME, new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        Logger logger = getRootLoggerForApp(APP_NAME);
-        assertThat(Level.WARN, equalTo(logger.getLevel()));
-        assertThat(true, equalTo(loggerHasAppender(APP_NAME, logger, appenderName)));
+    withAppClassLoader(APP_NAME, () -> {
+      Logger logger = getRootLoggerForApp(APP_NAME);
+      assertThat(Level.WARN, equalTo(logger.getLevel()));
+      assertThat(true, equalTo(loggerHasAppender(APP_NAME, logger, appenderName)));
 
 
-        assertThat(1, equalTo(appendersCount(APP_NAME)));
-        assertThat(1, equalTo(selectByClass(APP_NAME, appenderClass).size()));
-        assertThat(appenderName, equalTo(selectByClass(APP_NAME, appenderClass).get(0).getName()));
+      assertThat(1, equalTo(appendersCount(APP_NAME)));
+      assertThat(1, equalTo(selectByClass(APP_NAME, appenderClass).size()));
+      assertThat(appenderName, equalTo(selectByClass(APP_NAME, appenderClass).get(0).getName()));
 
-        return null;
-      }
+      return null;
     });
   }
 
@@ -115,14 +113,10 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   }
 
   private LoggerContext getContext(final String appName) throws Exception {
-    return withAppClassLoader(appName, new Callable<LoggerContext>() {
-
-      @Override
-      public LoggerContext call() throws Exception {
-        Application app = muleServer.findApplication(appName);
-        ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
-        return (LoggerContext) LogManager.getContext(classLoader, false);
-      }
+    return withAppClassLoader(appName, () -> {
+      Application app = muleServer.findApplication(appName);
+      ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
+      return (LoggerContext) LogManager.getContext(classLoader, false);
     });
   }
 

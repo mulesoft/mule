@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tls;
+package org.mule.test.module.tls;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -18,7 +19,7 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import org.junit.Test;
 
-public class TlsNamespaceHandlerTestCase extends FunctionalTestCase {
+public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final String PASSWORD = "mulepassword";
   private static final String ALIAS = "muleserver";

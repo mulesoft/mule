@@ -14,8 +14,10 @@ import org.mule.runtime.core.util.ClassUtils;
  */
 public class ListenerSubscriptionPair {
 
+  private static final String NULL_SUBSCRIPTION = "NULL";
+
   private ServerNotificationListener listener;
-  private String subscription = ServerNotificationManager.NULL_SUBSCRIPTION;
+  private String subscription = NULL_SUBSCRIPTION;
   private boolean nullSubscription = true;
 
   /**

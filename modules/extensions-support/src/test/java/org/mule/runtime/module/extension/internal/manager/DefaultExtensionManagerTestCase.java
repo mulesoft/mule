@@ -26,6 +26,7 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -34,6 +35,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -49,7 +51,6 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -99,8 +100,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   @Mock
   private ExtensionModel extensionModel3WithRepeatedName;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockContextWithServices();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel extension1ConfigurationModel;
@@ -134,8 +134,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void before() throws InitialisationException {
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     extensionsManager.setMuleContext(muleContext);
-
-    when(muleContext.getConfiguration().getExtension(ExtensionConfig.class)).thenReturn(null);
     extensionsManager.initialise();
     this.extensionsManager = extensionsManager;
 

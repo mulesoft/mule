@@ -16,11 +16,15 @@ import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.Testable;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.config.spring.SpringXmlConfigurationMuleArtifactFactory;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
@@ -38,13 +42,17 @@ public class UnsupportedConnectorsMuleArtifactTestCase extends AbstractMuleTestC
   private XmlConfigurationMuleArtifactFactory lookupArtifact;
   private MuleArtifact artifact = null;
 
+  TestServicesConfigurationBuilder testServicesConfigurationBuilder;
+
   @Before
   public void before() {
+    testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
     lookupArtifact = lookupArtifact();
   }
 
   @After
-  public void after() {
+  public void after() throws MuleException {
+    testServicesConfigurationBuilder.stopServices();
     if (artifact != null) {
       lookupArtifact.returnArtifact(artifact);
     }
@@ -125,7 +133,14 @@ public class UnsupportedConnectorsMuleArtifactTestCase extends AbstractMuleTestC
 
   }
 
-  protected static XmlConfigurationMuleArtifactFactory lookupArtifact() {
-    return ServiceLoader.load(XmlConfigurationMuleArtifactFactory.class).iterator().next();
+  protected XmlConfigurationMuleArtifactFactory lookupArtifact() {
+    return new SpringXmlConfigurationMuleArtifactFactory() {
+
+      @Override
+      protected void addBuilders(List<ConfigurationBuilder> builders) {
+        super.addBuilders(builders);
+        builders.add(testServicesConfigurationBuilder);
+      }
+    };
   }
 }

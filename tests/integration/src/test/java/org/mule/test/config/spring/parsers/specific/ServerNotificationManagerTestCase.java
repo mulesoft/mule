@@ -175,6 +175,11 @@ public class ServerNotificationManagerTestCase extends AbstractIntegrationTestCa
     }
 
     @Override
+    public boolean isBlocking() {
+      return false;
+    }
+
+    @Override
     public void onNotification(SecurityNotification notification) {
       called = true;
     }

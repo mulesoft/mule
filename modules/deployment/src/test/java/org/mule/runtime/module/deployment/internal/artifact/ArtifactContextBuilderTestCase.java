@@ -23,6 +23,7 @@ import static org.mule.runtime.module.deployment.internal.artifact.ArtifactConte
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.ClassRule;
@@ -42,7 +43,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void emptyBuilder() throws Exception {
     MuleContext muleContext =
-        newBuilder().setExecutionClassloader(currentThread().getContextClassLoader())
+        newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
             .setClassLoaderRepository(mock(ClassLoaderRepository.class)).build().getMuleContext();
     assertThat(muleContext, notNullValue());
     assertThat(muleContext.isInitialised(), is(true));

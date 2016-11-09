@@ -8,6 +8,7 @@ package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -29,7 +30,7 @@ public class InOnlyTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testExchange() throws Exception {
     final Latch latch = new Latch();
-    muleContext.registerListener(notification -> latch.countDown());
+    muleContext.registerListener((FunctionalTestNotificationListener) notification -> latch.countDown());
 
     flowRunner("In-Only-Service").withPayload(TEST_PAYLOAD).asynchronously().run();
     assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));

@@ -7,16 +7,17 @@
 package org.mule.runtime.module.deployment.internal.artifact;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.UUID.getUUID;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -32,6 +33,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.internal.application.ApplicationMuleContextBuilder;
@@ -79,6 +81,7 @@ public class ArtifactContextBuilder {
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
   private boolean enableLazyInit;
+  private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
 
   private ArtifactContextBuilder() {}
@@ -88,6 +91,19 @@ public class ArtifactContextBuilder {
    */
   public static ArtifactContextBuilder newBuilder() {
     return new ArtifactContextBuilder();
+  }
+
+  /**
+   * @return a new builder to create a {@link ArtifactContext} instance.
+   */
+  public static ArtifactContextBuilder newBuilder(ConfigurationBuilder... additionalBuilders) {
+    final ArtifactContextBuilder builder = new ArtifactContextBuilder();
+    builder.setAdditionalBuilders(asList(additionalBuilders));
+    return builder;
+  }
+
+  private void setAdditionalBuilders(List<ConfigurationBuilder> additionalBuilders) {
+    this.additionalBuilders = additionalBuilders;
   }
 
   /**
@@ -269,11 +285,12 @@ public class ArtifactContextBuilder {
     try {
       return withContextClassLoader(executionClassLoader, () -> {
         List<ConfigurationBuilder> builders = new LinkedList<>();
+        builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         ArtifactConfigurationProcessor artifactConfigurationProcessor = ArtifactConfigurationProcessor.discover();
-        AtomicReference<ArtifactContext> artifactContext = new AtomicReference<ArtifactContext>();
+        AtomicReference<ArtifactContext> artifactContext = new AtomicReference<>();
         builders.add(new ConfigurationBuilder() {
 
           public boolean isConfigured;

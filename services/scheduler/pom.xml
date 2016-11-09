@@ -14,6 +14,7 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <mule.plugins.maven.app.plugins.version>1.0.0-SNAPSHOT</mule.plugins.maven.app.plugins.version>
     </properties>
 
     <build>
@@ -37,7 +38,7 @@
             <plugin>
                 <groupId>org.mule.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>${mule.plugins.maven.app.plugins.version}</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>

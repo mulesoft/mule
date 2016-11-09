@@ -202,6 +202,7 @@ public class MuleClient implements Disposable {
             public void doConfigure(MuleContext muleContext) throws Exception {
               MuleRegistry registry = muleContext.getRegistry();
               final StandaloneClientSchedulerService schedulerService = new StandaloneClientSchedulerService();
+              schedulerService.start();
               registry.registerObject(schedulerService.getName(), schedulerService);
             }
           }), contextBuilder);

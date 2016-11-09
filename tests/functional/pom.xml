@@ -159,6 +159,20 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-service</artifactId>
+            <type>test-jar</type>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-artifact</artifactId>
+            <type>test-jar</type>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-runner</artifactId>
             <version>${project.version}</version>

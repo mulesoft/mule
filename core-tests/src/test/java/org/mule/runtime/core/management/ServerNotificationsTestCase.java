@@ -9,6 +9,7 @@ package org.mule.runtime.core.management;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -36,6 +37,7 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
   @Override
   protected void doTearDown() throws Exception {
+    super.doTearDown();
     managerStopped.set(true);
     managerStoppedEvents.set(0);
   }
@@ -83,14 +85,11 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   public void testCustomNotifications() throws Exception {
     final CountDownLatch latch = new CountDownLatch(2);
 
-    muleContext.registerListener(new DummyNotificationListener() {
-
-      public void onNotification(ServerNotification notification) {
-        if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
-          customNotificationCount.incrementAndGet();
-          assertEquals("hello", notification.getSource());
-          latch.countDown();
-        }
+    muleContext.registerListener((DummyNotificationListener) notification -> {
+      if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
+        customNotificationCount.incrementAndGet();
+        assertEquals("hello", notification.getSource());
+        latch.countDown();
       }
     });
 
@@ -107,14 +106,11 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
     final CountDownLatch latch = new CountDownLatch(2);
 
-    muleContext.registerListener(new DummyNotificationListener() {
-
-      public void onNotification(ServerNotification notification) {
-        if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
-          customNotificationCount.incrementAndGet();
-          assertFalse("e quick bro".equals(notification.getResourceIdentifier()));
-          latch.countDown();
-        }
+    muleContext.registerListener((DummyNotificationListener) notification -> {
+      if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
+        customNotificationCount.incrementAndGet();
+        assertFalse("e quick bro".equals(notification.getResourceIdentifier()));
+        latch.countDown();
       }
     }, "* quick brown*");
 
@@ -128,6 +124,12 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     assertEquals(2, customNotificationCount.get());
   }
 
+  @Override
+  public boolean isBlocking() {
+    return false;
+  }
+
+  @Override
   public void onNotification(ServerNotification notification) {
     if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED) {
       managerStopped.set(true);

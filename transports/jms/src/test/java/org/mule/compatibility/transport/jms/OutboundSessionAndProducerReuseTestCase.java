@@ -77,7 +77,6 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
   private OutboundEndpoint outboundEndpoint;
   private CountDownLatch messageSentLatch = new CountDownLatch(1);
 
-
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();

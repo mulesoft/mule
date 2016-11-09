@@ -10,7 +10,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -51,7 +50,6 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   @Before
   public void setUpMuleContexts() throws Exception {
     domainContext = new DomainContextBuilder().setDomainConfig(getDomainConfig()).build();
-    new TestServicesConfigurationBuilder().configure(domainContext);
     ApplicationConfig[] applicationConfigs = getConfigResources();
     for (ApplicationConfig applicationConfig : applicationConfigs) {
       MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);

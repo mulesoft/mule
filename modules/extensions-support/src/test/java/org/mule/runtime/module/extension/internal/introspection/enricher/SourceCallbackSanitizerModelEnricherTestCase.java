@@ -15,8 +15,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
@@ -40,7 +42,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class SourceCallbackSanitizerModelEnricherTestCase extends AbstractMuleTestCase {
 
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock
   private DescribingContext describingContext;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
@@ -60,6 +62,7 @@ public class SourceCallbackSanitizerModelEnricherTestCase extends AbstractMuleTe
 
   @Before
   public void before() {
+    when(describingContext.getExtensionDeclarer()).thenReturn(mock(ExtensionDeclarer.class));
     when(describingContext.getExtensionDeclarer().getDeclaration()).thenReturn(extensionDeclaration);
     when(extensionDeclaration.getMessageSources()).thenReturn(asList(sourceDeclaration));
     when(sourceDeclaration.getParameters()).thenReturn(parameters);

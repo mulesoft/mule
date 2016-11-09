@@ -8,7 +8,7 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Used to notify that a message was received or sent through a Connector
  */
-public class ConnectorMessageNotification extends ServerNotification implements BlockingServerEvent {
+public class ConnectorMessageNotification extends ServerNotification implements SynchronousServerEvent {
 
   /**
    * Serial version

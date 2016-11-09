@@ -7,14 +7,15 @@
 package org.mule.runtime.module.deployment.internal.application;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder.newBuilder;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
@@ -212,6 +213,11 @@ public class DefaultMuleApplication implements Application {
 
   private void setMuleContext(final MuleContext muleContext) throws NotificationException {
     statusListener = new MuleContextNotificationListener<MuleContextNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
 
       @Override
       public void onNotification(MuleContextNotification notification) {
