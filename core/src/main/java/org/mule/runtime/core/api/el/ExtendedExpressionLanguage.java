@@ -37,6 +37,7 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * @param flowConstruct the flow where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
+   * @deprecated Mutation via expressions is deprecated.
    */
   TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                       BindingContext bindingContext);
@@ -49,11 +50,12 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
    *
-   * @param expression
-   * @param event
-   * @param eventBuilder
-   * @param flowConstruct
-   * @param object
+   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
+   * @param event The event to be enriched
+   * @param eventBuilder event builder instance used to mutate the current message or event.
+   * @param flowConstruct the flow where the event is being processed
+   * @param object The object used for enrichment
+   * @deprecated Mutation via expressions is deprecated.
    */
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object);
 
@@ -70,6 +72,7 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * @param eventBuilder event builder instance used to mutate the current message or event.
    * @param flowConstruct the flow where the event is being processed
    * @param value The typed value used for enrichment
+   * @deprecated Mutation via expressions is deprecated.
    */
   void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
 

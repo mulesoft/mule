@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -58,7 +58,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   private InternalMessage message;
   private MuleSession mockSession = mock(MuleSession.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
+  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
   private TypedValue mockTypedValue = mock(TypedValue.class);
   private AbstractAddVariablePropertyProcessor addVariableProcessor;
 

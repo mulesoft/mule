@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -34,13 +34,13 @@ import org.junit.Test;
 public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
   private CookieWrapper cookieWrapper;
-  private ExpressionManager mockExpressionManager;
+  private ExtendedExpressionManager mockExpressionManager;
   private Event mockMuleEvent;
 
   @Before
   public void setUp() {
     cookieWrapper = new CookieWrapper();
-    mockExpressionManager = mock(ExpressionManager.class);
+    mockExpressionManager = mock(ExtendedExpressionManager.class);
     mockMuleEvent = mock(Event.class);
   }
 

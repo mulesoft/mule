@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.http;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,7 +29,7 @@ public class CookieWrapper extends NameValuePair {
   private String secure;
   private String version;
 
-  public void parse(Event event, ExpressionManager expressionManager) {
+  public void parse(Event event, ExtendedExpressionManager expressionManager) {
     setName(parse(getName(), event, expressionManager));
     setValue(parse(getValue(), event, expressionManager));
     this.domain = parse(domain, event, expressionManager);
@@ -41,7 +42,7 @@ public class CookieWrapper extends NameValuePair {
     this.version = parse(version, event, expressionManager);
   }
 
-  private String parse(String value, Event event, ExpressionManager expressionManager) {
+  private String parse(String value, Event event, ExtendedExpressionManager expressionManager) {
     if (value != null) {
       return expressionManager.parse(value, event, null);
     }

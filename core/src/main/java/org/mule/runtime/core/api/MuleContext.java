@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -318,9 +318,9 @@ public interface MuleContext extends Lifecycle {
   DataTypeConversionResolver getDataTypeConverterResolver();
 
   /**
-   * @return an {@link ExpressionManager} for evaluating expressions using Mule as the context
+   * @return an {@link ExtendedExpressionManager} for evaluating expressions using Mule as the context
    */
-  ExpressionManager getExpressionManager();
+  ExtendedExpressionManager getExpressionManager();
 
   /**
    * Factory for creating locks for synchronizing mule components.

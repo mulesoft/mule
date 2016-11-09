@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.el.BindingContext;
@@ -21,8 +22,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -35,7 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
-public class DefaultExpressionManager implements ExpressionManager {
+public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   public static final String DW_PREFIX = "dw:";
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
@@ -109,14 +110,18 @@ public class DefaultExpressionManager implements ExpressionManager {
     TypedValue result = evaluate(expression, event, null, null, context);
     DataType sourceType = result.getDataType();
     try {
-      Object trans = muleContext.getRegistry().lookupTransformer(sourceType, outputType).transform(result.getValue());
-      return new DefaultTypedValue(trans, outputType);
+      return transform(result, sourceType, outputType);
     } catch (TransformerException e) {
       throw new ExpressionRuntimeException(createStaticMessage(
                                                                format("Failed to apply implicit transformation from type %s to %s",
                                                                       sourceType, outputType),
                                                                e));
     }
+  }
+
+  private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
+    Object result = muleContext.getRegistry().lookupTransformer(sourceType, outputType).transform(target.getValue());
+    return new DefaultTypedValue(result, outputType);
   }
 
   @Override
@@ -173,14 +178,25 @@ public class DefaultExpressionManager implements ExpressionManager {
   @Override
   public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
-    return parser.parse(token -> {
-      Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
-      if (result instanceof InternalMessage) {
-        return ((InternalMessage) result).getPayload().getValue();
-      } else {
-        return result;
+    if (isDwExpression(expression)) {
+      TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
+      try {
+        return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
+      } catch (TransformerException e) {
+        throw new ExpressionRuntimeException(createStaticMessage(format("Failed to transform %s to %s.", evaluation.getDataType(),
+                                                                        STRING)),
+                                             e);
       }
-    }, expression);
+    } else {
+      return parser.parse(token -> {
+        Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
+        if (result instanceof InternalMessage) {
+          return ((InternalMessage) result).getPayload().getValue();
+        } else {
+          return result;
+        }
+      }, expression);
+    }
   }
 
   @Override

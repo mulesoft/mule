@@ -19,7 +19,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -39,14 +39,14 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
   private MuleContext mockMuleContext;
   private Event mockMuleEvent;
   private InternalMessage mockMuleMessage;
-  private ExpressionManager mockExpressionManager;
+  private ExtendedExpressionManager mockExpressionManager;
 
   @Before
   public void setUp() {
     setPayloadTransformer = new SetPayloadTransformer();
     mockMuleContext = mock(MuleContext.class);
     setPayloadTransformer.setMuleContext(mockMuleContext);
-    mockExpressionManager = mock(ExpressionManager.class);
+    mockExpressionManager = mock(ExtendedExpressionManager.class);
     mockMuleEvent = mock(Event.class);
     mockMuleMessage = mock(InternalMessage.class);
 

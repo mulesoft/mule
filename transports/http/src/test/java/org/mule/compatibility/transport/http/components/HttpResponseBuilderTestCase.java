@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
@@ -82,7 +82,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
   private MuleContext muleContext;
   private InternalMessage mockMuleMessage;
-  private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
+  private ExtendedExpressionManager mockExpressionManager;
   private Event mockEvent;
 
   @Before
@@ -97,7 +97,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
     when(mockEvent.getContext()).thenReturn(executionContext);
-    mockExpressionManager = mock(ExpressionManager.class);
+    mockExpressionManager = mock(ExtendedExpressionManager.class);
     when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);
   }
 

@@ -55,7 +55,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -209,7 +209,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private LockFactory lockFactory;
 
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   private ProcessingTimeWatcher processingTimeWatcher;
 
@@ -925,7 +925,7 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public ExpressionManager getExpressionManager() {
+  public ExtendedExpressionManager getExpressionManager() {
     if (expressionManager == null) {
       expressionManager = new DefaultExpressionManager(this);
     }

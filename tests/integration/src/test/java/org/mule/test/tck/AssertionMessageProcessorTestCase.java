@@ -18,7 +18,7 @@ import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -33,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   protected FlowConstruct flowConstruct;
-  protected ExpressionManager expressionManager;
+  protected ExtendedExpressionManager expressionManager;
   protected final String TRUE_EXPRESSION = "trueExpression";
   protected final String FALSE_EXPRESSION = "falseExpression";
 
@@ -49,7 +49,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   @Before
   public void initialise() {
     when(mockEvent.getMessage()).thenReturn(muleMessage);
-    expressionManager = mock(ExpressionManager.class);
+    expressionManager = mock(ExtendedExpressionManager.class);
     when(expressionManager.isValid(anyString())).thenReturn(true);
     when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(Event.class), any(FlowConstruct.class), anyBoolean(),
                                            anyBoolean()))

@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.StringUtils;
@@ -39,7 +39,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
 
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
-  protected ExpressionManager expressionManager;
+  protected ExtendedExpressionManager expressionManager;
 
   @Override
   public void initialise() throws InitialisationException {

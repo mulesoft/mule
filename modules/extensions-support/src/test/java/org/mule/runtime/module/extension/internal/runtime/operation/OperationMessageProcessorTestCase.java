@@ -56,10 +56,10 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.el.DefaultExpressionManager;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -258,7 +258,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     target = format("flowVars.%s", TARGET_VAR);
     messageProcessor = createOperationMessageProcessor();
 
-    when(context.getExpressionManager()).thenReturn(mock(ExpressionManager.class));
+    when(context.getExpressionManager()).thenReturn(mock(ExtendedExpressionManager.class));
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 

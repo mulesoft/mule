@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -103,7 +103,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private void createExpressionManager(String expression, final String expressionValue) {
-    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(expressionManager.isExpression(expression)).thenReturn(true);

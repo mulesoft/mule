@@ -92,24 +92,6 @@ public interface ExpressionManager {
    */
   TypedValue evaluate(String expression, Event event, BindingContext context);
 
-
-  /**
-   * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
-   * language implementation should provided access to the message.
-   *
-   * This version of {@code evaluate} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
-   *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
-   * @return the result of execution of the expression.
-   */
-  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct);
-
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message. A Map of variables can be provided that will be able to the
@@ -127,27 +109,6 @@ public interface ExpressionManager {
    * @return the result of execution of the expression.
    */
   TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext context);
-
-  /**
-   * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
-   * language implementation should provided access to the message. A Map of variables can be provided that will be able to the
-   * expression when executed. Variable provided in the map will only be available if there are no conflict with context variables
-   * provided by the expression language implementation.
-   *
-   * This version of {@code evaluate} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
-   *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
-   * @param context the bindings to be considered
-   * @return the result of execution of the expression.
-   */
-  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
-                      BindingContext context);
 
   /**
    * Evaluates an expression according to the global {@link BindingContext} and the {@link DataType} of the expected result.
@@ -180,38 +141,6 @@ public interface ExpressionManager {
   TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, Event event);
 
   /**
-   * Enriches an event.
-   *
-   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
-   *
-   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-   * @param event The event to be enriched
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
-   * @param object The object used for enrichment
-   */
-  void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object);
-
-  /**
-   * Enriches an event using a typed value.
-   *
-   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
-   *
-   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-   * @param event The event to be enriched
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
-   * @param value The typed value used for enrichment
-   */
-  void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
-
-  /**
    * Evaluates an expression considering a {@code boolean} as output. If the result cannot be clearly transformed or is
    * {@link null}, {@link false} will be returned.
    *
@@ -239,45 +168,6 @@ public interface ExpressionManager {
       throws ExpressionRuntimeException;
 
   /**
-   * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
-   * evaluate a single expression they can use {@link #evaluate(String, Event, FlowConstruct, BindingContext)}.
-   *
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link Event} or
-   * {@link InternalMessage} mutation performed within the expression will impact within the context of
-   * expression evaluation but will not mutated the {@code event} parameter.
-   *
-   * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[xpath://foo] other value is
-   *        #[header:foo]."
-   * @param event The current event being processed
-   * @param flowConstruct the flow where the event is being processed
-   * @return the result of the evaluation
-   * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
-   *         to true.
-   */
-  String parse(String expression, Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
-
-  /**
-   * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
-   * evaluate a single expression they can use {@link #evaluate(String, Event, FlowConstruct, BindingContext)}.
-   *
-   * This version of {@code parse} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
-   *
-   * @param expression one or more expressions embedded in a literal string i.e. "Value is #[xpath://foo] other value is
-   *        #[header:foo]."
-   * @param event The current event being processed
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
-   * @return the result of the evaluation
-   * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
-   *         to true.
-   */
-  String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
-      throws ExpressionRuntimeException;
-
-  /**
    * Determines if the string is an expression.
    *
    * @param expression is this string an expression string
@@ -299,7 +189,6 @@ public interface ExpressionManager {
    * should validate expression syntactically. Semantic validation is optional.
    *
    * @param expression the expression to validate
-   * @throws InvalidExpressionException if the expression is invalid, including information about the position and fault
    */
   ValidationResult validate(String expression);
 }

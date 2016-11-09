@@ -21,7 +21,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -51,7 +51,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   private InternalMessage muleMessage;
 
   @Mock
-  private ExpressionManager mockExpressionManager;
+  private ExtendedExpressionManager mockExpressionManager;
 
   @Before
   public void setUp() throws Exception {

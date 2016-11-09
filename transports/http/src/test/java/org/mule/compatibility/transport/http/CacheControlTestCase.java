@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -31,13 +31,13 @@ public class CacheControlTestCase extends AbstractMuleTestCase {
   private static final String HEADER_NO_STORE = "#[header:noStore]";
   private InternalMessage muleMessage;
   private Event muleEvent;
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() {
     muleMessage = mock(InternalMessage.class);
     muleEvent = mock(Event.class);
-    expressionManager = mock(ExpressionManager.class);
+    expressionManager = mock(ExtendedExpressionManager.class);
   }
 
   @Test

@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -62,7 +62,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private FlowConstruct targetFlow = mock(FlowConstruct.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private Processor targetSubFlow = mock(SubFlowMessageProcessor.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private ApplicationContext applicationContext = mock(ApplicationContext.class);
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
   private MuleContext mockMuleContext;
 
   public FlowRefFactoryBeanTestCase() throws MuleException {}

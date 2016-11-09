@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.construct.Flow;
@@ -170,8 +170,8 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     return event;
   }
 
-  private ExpressionManager buildExpressionManager() {
-    ExpressionManager expressionLanguage = mock(ExpressionManager.class);
+  private ExtendedExpressionManager buildExpressionManager() {
+    ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
     when(expressionLanguage.parse(anyString(), any(Event.class), eq(flow))).thenReturn("text to log");
     return expressionLanguage;
   }

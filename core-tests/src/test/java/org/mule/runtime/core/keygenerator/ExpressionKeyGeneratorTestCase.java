@@ -16,7 +16,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -36,11 +36,11 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   private InternalMessage message;
   private MuleContext muleContext;
   private Event event;
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() throws Exception {
-    expressionManager = mock(ExpressionManager.class);
+    expressionManager = mock(ExtendedExpressionManager.class);
     muleContext = mock(MuleContext.class);
     doReturn(expressionManager).when(muleContext).getExpressionManager();
 

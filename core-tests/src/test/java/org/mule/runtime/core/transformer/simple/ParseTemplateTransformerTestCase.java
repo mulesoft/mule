@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -35,7 +35,7 @@ public class ParseTemplateTransformerTestCase {
   private Event mockMuleEvent = mock(Event.class);
   private InternalMessage mockMuleMessage = mock(InternalMessage.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
+  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
 
   @Before
   public void setUp() {

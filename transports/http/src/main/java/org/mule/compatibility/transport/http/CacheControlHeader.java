@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 
 import java.util.Arrays;
 
@@ -33,11 +33,10 @@ public class CacheControlHeader {
 
   /**
    * Evaluates all the properties in case there are expressions
-   *
-   * @param event MuleEvent
+   *  @param event MuleEvent
    * @param expressionManager
    */
-  public void parse(Event event, ExpressionManager expressionManager) {
+  public void parse(Event event, ExtendedExpressionManager expressionManager) {
     directive = parse(directive, event, expressionManager);
     checkDirective(directive);
     noCache = parse(noCache, event, expressionManager);
@@ -78,7 +77,7 @@ public class CacheControlHeader {
     return value;
   }
 
-  private String parse(String value, Event event, ExpressionManager expressionManager) {
+  private String parse(String value, Event event, ExtendedExpressionManager expressionManager) {
     if (value != null) {
       return expressionManager.parse(value, event, null);
     }

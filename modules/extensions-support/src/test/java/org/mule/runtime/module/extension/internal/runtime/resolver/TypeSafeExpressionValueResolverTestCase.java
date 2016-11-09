@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -30,7 +30,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   private static final String HELLO_WORLD = "Hello World!";
 
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Override
   protected void doSetUp() throws Exception {

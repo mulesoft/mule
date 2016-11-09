@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -42,14 +42,14 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
   private SetPayloadMessageProcessor setPayloadMessageProcessor;
   private MuleContext muleContext;
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() throws Exception {
     setPayloadMessageProcessor = new SetPayloadMessageProcessor();
     muleContext = mock(MuleContext.class);
     setPayloadMessageProcessor.setMuleContext(muleContext);
-    expressionManager = mock(ExpressionManager.class);
+    expressionManager = mock(ExtendedExpressionManager.class);
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));

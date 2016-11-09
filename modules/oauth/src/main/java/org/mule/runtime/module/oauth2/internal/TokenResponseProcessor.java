@@ -8,7 +8,7 @@ package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
@@ -25,7 +25,7 @@ public class TokenResponseProcessor {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private final TokenResponseConfiguration tokenResponseConfiguration;
-  private final ExpressionManager expressionManager;
+  private final ExtendedExpressionManager expressionManager;
   private final boolean retrieveRefreshToken;
   private String accessToken;
   private String refreshToken;
@@ -33,17 +33,17 @@ public class TokenResponseProcessor {
   private Map<String, Object> customResponseParameters;
 
   public static TokenResponseProcessor createAuthorizationCodeProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                                                        final ExpressionManager expressionManager) {
+                                                                        final ExtendedExpressionManager expressionManager) {
     return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, true);
   }
 
   public static TokenResponseProcessor createClientCredentialsProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                                                        final ExpressionManager expressionManager) {
+                                                                        final ExtendedExpressionManager expressionManager) {
     return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, false);
   }
 
   private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                 final ExpressionManager expressionManager, boolean retrieveRefreshToken) {
+                                 final ExtendedExpressionManager expressionManager, boolean retrieveRefreshToken) {
     this.tokenResponseConfiguration = tokenResponseConfiguration;
     this.expressionManager = expressionManager;
     this.retrieveRefreshToken = retrieveRefreshToken;
