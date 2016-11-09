@@ -12,15 +12,12 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.NotSerializableException;
-import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,20 +55,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                         {
                             event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
                         }
-                        MuleSession session = successEvent.getSession();
-                        for (String sessionVarName : session.getPropertyNamesAsSet())
-                        {
-                            Object sessionVar = session.getProperty(sessionVarName);
-                            if (sessionVar instanceof Serializable)
-                            {
-                                DataType<?> sessionVarDataType = session.getPropertyDataType(sessionVarName);
-                                event.getSession().setProperty(sessionVarName, (Serializable) sessionVar, sessionVarDataType);
-                            }
-                            else
-                            {
-                                event.getSession().setProperty(sessionVarName, sessionVar);
-                            }
-                        }
+                        event.getSession().merge(successEvent.getSession());
                         finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
                     }
                     return OptimizedRequestContext.unsafeSetEvent(finalEvent);
