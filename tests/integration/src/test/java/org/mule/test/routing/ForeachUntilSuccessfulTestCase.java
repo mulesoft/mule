@@ -24,23 +24,25 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void flowVariableSyncNoForeach() throws Exception
+    public void variablesSyncNoForeach() throws Exception
     {
-        MuleEvent event = runAndAssert("flowVarSyncNoForEach", 3);
+        MuleEvent event = runAndAssert("varSyncNoForEach", 3);
         assertThat((Integer) event.getFlowVariable("until"), is(3));
+        assertThat((Integer) event.getSessionVariable("until"), is(3));
     }
 
     @Test
-    public void flowVariablesSyncArePropagated() throws Exception
+    public void variablesSyncArePropagated() throws Exception
     {
-        MuleEvent event = runAndAssert("flowVarSync");
+        MuleEvent event = runAndAssert("varSync");
         assertThat((Integer) event.getFlowVariable("until"), is(3));
+        assertThat((Integer) event.getSessionVariable("until"), is(3));
     }
 
     @Test
-    public void flowVariablesAsyncArePropagated() throws Exception
+    public void variablesAsyncArePropagated() throws Exception
     {
-        runAndAssert("flowVarAsync");
+        runAndAssert("varAsync");
     }
 
     private MuleEvent runAndAssert(String flowName) throws Exception
@@ -53,6 +55,8 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase
         MuleEvent event = runFlow(flowName, payload);
         assertThat((Integer) event.getFlowVariable("count"), is(6));
         assertThat((Integer) event.getFlowVariable("current"), is(3));
+        assertThat((Integer) event.getSessionVariable("count"), is(6));
+        assertThat((Integer) event.getSessionVariable("current"), is(3));
         return event;
     }
 }
