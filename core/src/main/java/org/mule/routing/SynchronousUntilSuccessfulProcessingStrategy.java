@@ -66,7 +66,9 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                             {
                                 DataType<?> sessionVarDataType = session.getPropertyDataType(sessionVarName);
                                 event.getSession().setProperty(sessionVarName, (Serializable) sessionVar, sessionVarDataType);
-                            } else {
+                            }
+                            else
+                            {
                                 event.getSession().setProperty(sessionVarName, sessionVar);
                             }
                         }
