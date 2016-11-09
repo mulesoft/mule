@@ -15,7 +15,7 @@
     </configuration>
 
     <flow name="wiretap">
-        <test:assert-intercepting message="before" responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:assert-intercepting message="before" responseSameTask="false" responseExpression="#[assertPayload()]"/>
         <wire-tap>
             <processor-chain>
                 <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
@@ -27,14 +27,14 @@
     </flow>
 
     <flow name="childDefaultFlow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]" message="1"/>
+        <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]" message="1"/>
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <flow-ref name="childDefaultFlowChild"/>
         <test:assert expression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
     </flow>
     <flow name="childDefaultFlowChild" processingStrategy="default">
-        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]" message="2"/>
+        <test:assert-intercepting responseSameTask="true" responseExpression="#[assertPayload()]" message="2"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
     </flow>

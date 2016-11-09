@@ -116,7 +116,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ResponseAssertionMessageProcessor.class))
         .withSetterParameterDefinition("responseExpression", fromSimpleParameter("responseExpression").build())
         .withSetterParameterDefinition("responseCount", fromSimpleParameter("responseCount").build())
-        .withSetterParameterDefinition("responseSameThread", fromSimpleParameter("responseSameThread").build())
+        .withSetterParameterDefinition("responseSameTask", fromSimpleParameter("responseSameTask").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy()

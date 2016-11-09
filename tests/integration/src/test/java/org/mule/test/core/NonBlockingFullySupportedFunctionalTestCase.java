@@ -6,11 +6,13 @@
  */
 package org.mule.test.core;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
@@ -22,7 +24,6 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFac
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Ignore;
@@ -47,8 +48,10 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
 
   @Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays
-        .asList(new Object[][] {{new DefaultFlowProcessingStrategyFactory()}, {new NonBlockingProcessingStrategyFactory()}});
+    return asList(new Object[][] {
+        {new DefaultFlowProcessingStrategyFactory()},
+        {new NonBlockingProcessingStrategyFactory()}
+    });
   }
 
   @Override
@@ -201,7 +204,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
   }
 
   protected MessageExchangePattern getMessageExchnagePattern() {
-    return MessageExchangePattern.REQUEST_RESPONSE;
+    return REQUEST_RESPONSE;
   }
 }
 

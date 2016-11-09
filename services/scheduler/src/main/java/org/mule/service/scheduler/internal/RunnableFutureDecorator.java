@@ -6,8 +6,12 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Thread.currentThread;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
+
+import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
@@ -25,6 +29,17 @@ import org.slf4j.Logger;
 class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   private static final Logger logger = getLogger(RunnableFutureDecorator.class);
+
+  private static Field threadLocalsField;
+
+  static {
+    try {
+      threadLocalsField = Thread.class.getDeclaredField("threadLocals");
+      threadLocalsField.setAccessible(true);
+    } catch (NoSuchFieldException | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   private final RunnableFuture<V> task;
 
@@ -63,6 +78,15 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   private void wrapUp() {
     scheduler.taskFinished(this);
+    clearAllThreadLocals();
+  }
+
+  public static void clearAllThreadLocals() {
+    try {
+      threadLocalsField.set(currentThread(), null);
+    } catch (Exception e) {
+      new MuleRuntimeException(e);
+    }
   }
 
   /**

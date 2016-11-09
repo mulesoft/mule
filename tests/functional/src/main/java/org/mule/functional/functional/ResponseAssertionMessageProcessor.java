@@ -6,15 +6,19 @@
  */
 package org.mule.functional.functional;
 
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.functional.functional.FlowAssert.addAssertion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -24,24 +28,27 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.reactivestreams.Publisher;
+
+import com.eaio.uuid.UUID;
+
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     implements InterceptingMessageProcessor, FlowConstructAware, Startable {
 
+  private static final ThreadLocal<String> taskTokenInThread = new ThreadLocal<>();
+
   protected String responseExpression = "#[true]";
   private int responseCount = 1;
-  private boolean responseSameThread = true;
+  private boolean responseSameTask = true;
 
   private Processor next;
-  private Thread requestThread;
-  private Thread responseThread;
+  private String requestTaskToken;
+  private String responseTaskToken;
   private CountDownLatch responseLatch;
   private int responseInvocationCount = 0;
-  private Event responseEvent;
   private boolean responseResult = true;
 
   @Override
@@ -49,7 +56,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     super.start();
     this.expressionManager.validate(responseExpression);
     responseLatch = new CountDownLatch(responseCount);
-    FlowAssert.addAssertion(flowConstruct.getName(), this);
+    addAssertion(flowConstruct.getName(), this);
   }
 
   @Override
@@ -79,21 +86,35 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     });
   }
 
-  public Event processRequest(Event event) throws MuleException {
-    requestThread = Thread.currentThread();
+  private Event processRequest(Event event) throws MuleException {
+    if (taskTokenInThread.get() != null) {
+      requestTaskToken = taskTokenInThread.get();
+    } else {
+      requestTaskToken = generateTaskToken();
+      taskTokenInThread.set(requestTaskToken);
+    }
     return super.process(event);
   }
 
-  public Event processResponse(Event event) throws MuleException {
+  private Event processResponse(Event event) throws MuleException {
     if (event == null) {
       return event;
     }
-    responseThread = Thread.currentThread();
-    this.responseEvent = event;
+
+    if (taskTokenInThread.get() != null) {
+      responseTaskToken = taskTokenInThread.get();
+    } else {
+      responseTaskToken = generateTaskToken();
+    }
+
     responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, flowConstruct, false, true);
     increaseResponseCount();
     responseLatch.countDown();
     return event;
+  }
+
+  protected String generateTaskToken() {
+    return currentThread().getName() + " - " + new UUID().toString();
   }
 
   private Event processNext(Event event) throws MuleException {
@@ -112,12 +133,12 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
           + "attribute was set then it was no matched.");
     } else if (responseExpressionFailed()) {
       fail(failureMessagePrefix() + "Response expression " + expression + " evaluated false.");
-    } else if (responseCount > 0 && responseSameThread && (requestThread != responseThread)) {
-      assertThat(failureMessagePrefix() + "Response thread was not same as request thread", responseThread,
-                 sameInstance(requestThread));
-    } else if (responseCount > 0 && !responseSameThread) {
-      assertThat(failureMessagePrefix() + "Response thread was same as request thread", responseThread,
-                 not(sameInstance(requestThread)));
+    } else if (responseCount > 0 && responseSameTask) {
+      assertThat(failureMessagePrefix() + "Response thread was not same as request thread", responseTaskToken,
+                 is(requestTaskToken));
+    } else if (responseCount > 0 && !responseSameTask) {
+      assertThat(failureMessagePrefix() + "Response thread was same as request thread", responseTaskToken,
+                 not(is(requestTaskToken)));
     }
   }
 
@@ -147,8 +168,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     this.responseCount = responseCount;
   }
 
-  public void setResponseSameThread(boolean responseSameThread) {
-    this.responseSameThread = responseSameThread;
+  public void setResponseSameTask(boolean responseSameTask) {
+    this.responseSameTask = responseSameTask;
   }
 
   /**
@@ -159,7 +180,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
    * @throws InterruptedException
    */
   synchronized private boolean isResponseProcessesCountCorrect() throws InterruptedException {
-    boolean countReached = responseLatch.await(timeout, TimeUnit.MILLISECONDS);
+    boolean countReached = responseLatch.await(timeout, MILLISECONDS);
     if (needToMatchCount) {
       return responseCount == responseInvocationCount;
     } else {
