@@ -62,7 +62,7 @@
     </flow>
 
     <flow name="childSyncFlow">
-        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"  message="1"/>
+        <test:assert-intercepting responseSameTask="true" responseExpression="#[assertPayload()]"  message="1"/>
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <flow-ref name="childSyncFlowChild"/>
         <test:assert expression="#[assertPayload()]"  message="2"/>
@@ -87,7 +87,7 @@
     <flow name="processorChain">
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <processor-chain>
-            <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+            <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]"/>
             <test:non-blocking-processor/>
             <test:assert expression="#[assertPayload()]"/>
             <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
@@ -173,7 +173,7 @@
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <choice>
             <when expression="#[true]">
-                <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+                <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]"/>
                 <test:non-blocking-processor/>
             </when>
         </choice>
@@ -186,7 +186,7 @@
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <enricher source="#[payload]" target="#[payload]">
             <processor-chain>
-                <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+                <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]"/>
                 <test:non-blocking-processor/>
             </processor-chain>
         </enricher>

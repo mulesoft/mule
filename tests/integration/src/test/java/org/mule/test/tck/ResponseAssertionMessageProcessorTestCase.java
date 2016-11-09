@@ -16,11 +16,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.processor.TestNonBlockingProcessor;
 
-import java.util.Optional;
-
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase {
@@ -50,7 +46,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
     asp.setResponseExpression(TRUE_EXPRESSION);
     asp.setCount(1);
     asp.setResponseCount(1);
-    asp.setResponseSameThread(false);
+    asp.setResponseSameTask(false);
     asp.start();
     asp.process(mockEvent);
     assertFalse(asp.expressionFailed());
@@ -71,7 +67,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
     asp.setResponseExpression(TRUE_EXPRESSION);
     asp.setCount(1);
     asp.setResponseCount(1);
-    asp.setResponseSameThread(false);
+    asp.setResponseSameTask(false);
     asp.start();
     asp.process(mockEvent);
     assertFalse(asp.expressionFailed());

@@ -193,7 +193,7 @@
                 <xsd:extension base="assertType">
                     <xsd:attribute name="responseExpression" />
                     <xsd:attribute name="responseCount" type="xsd:string"/>
-                    <xsd:attribute name="responseSameThread" type="xsd:string" default="true"/>
+                    <xsd:attribute name="responseSameTask" type="xsd:string" default="true"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
