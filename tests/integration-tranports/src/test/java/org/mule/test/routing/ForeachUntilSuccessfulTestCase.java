@@ -9,13 +9,12 @@ package org.mule.test.routing;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class ForeachUntilSuccessfulTestCase extends AbstractIntegrationTestCase {
+public class ForeachUntilSuccessfulTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -23,20 +22,22 @@ public class ForeachUntilSuccessfulTestCase extends AbstractIntegrationTestCase 
   }
 
   @Test
-  public void flowVariableSyncNoForeach() throws Exception {
-    Event event = runAndAssert("flowVarSyncNoForEach", 3);
+  public void variablesSyncNoForeach() throws Exception {
+    Event event = runAndAssert("varSyncNoForEach", 3);
     assertThat(event.getVariable("until").getValue(), is(3));
+    assertThat(event.getSession().getProperty("until"), is(3));
   }
 
   @Test
-  public void flowVariablesSyncArePropagated() throws Exception {
-    Event event = runAndAssert("flowVarSync");
+  public void variablesSyncArePropagated() throws Exception {
+    Event event = runAndAssert("varSync");
     assertThat(event.getVariable("until").getValue(), is(3));
+    assertThat(event.getSession().getProperty("until"), is(3));
   }
 
   @Test
-  public void flowVariablesAsyncArePropagated() throws Exception {
-    runAndAssert("flowVarAsync");
+  public void variablesAsyncArePropagated() throws Exception {
+    runAndAssert("varAsync");
   }
 
   private Event runAndAssert(String flowName) throws Exception {
@@ -47,6 +48,8 @@ public class ForeachUntilSuccessfulTestCase extends AbstractIntegrationTestCase 
     Event event = flowRunner(flowName).withPayload(payload).run();
     assertThat(event.getVariable("count").getValue(), is(6));
     assertThat(event.getVariable("current").getValue(), is(3));
+    assertThat(event.getSession().getProperty("count"), is(6));
+    assertThat(event.getSession().getProperty("current"), is(3));
     return event;
   }
 }

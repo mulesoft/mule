@@ -47,6 +47,8 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
           for (String flowVar : successEvent.getVariableNames()) {
             builder.addVariable(flowVar, successEvent.getVariable(flowVar).getValue());
           }
+          event.getSession().merge(successEvent.getSession());
+          builder.session(event.getSession());
           finalEvent = builder.build();
           setCurrentEvent(finalEvent);
           return finalEvent;
