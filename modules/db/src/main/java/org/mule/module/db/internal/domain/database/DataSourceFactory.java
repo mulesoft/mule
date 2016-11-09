@@ -134,6 +134,7 @@ public class DataSourceFactory implements MuleContextAware, Disposable
         config.put("checkoutTimeout", poolingProfile.getMaxWaitMillis());
         config.put("acquireIncrement", poolingProfile.getAcquireIncrement());
         config.put("maxStatements", 0);
+        config.put("testConnectionOnCheckout", "true");
         config.put("maxStatementsPerConnection", poolingProfile.getPreparedStatementCacheSize());
 
         return DataSources.pooledDataSource(dataSource, config);
