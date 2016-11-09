@@ -7,10 +7,9 @@
 package org.mule.runtime.core.api.context.notification;
 
 /**
- * <code>BlockingServerEvent</code> is a marker interface that tells the server event manager to publish this event in the current
- * thread, thus blocking the current thread of execution until all listeners have been processed
+ * Marker interface that tells the server event manager to publish this event in the current thread, thus executing the listeners
+ * synchronously.
  */
-
 public interface SynchronousServerEvent {
   // no methods
 }
