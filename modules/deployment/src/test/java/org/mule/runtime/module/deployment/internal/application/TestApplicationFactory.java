@@ -11,6 +11,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFac
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
@@ -58,7 +59,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository,
                                                  new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
-                                                                                          new ArtifactPluginClassLoaderFactory()));
+                                                                                          new ArtifactPluginClassLoaderFactory()),
+                                                 artifactPluginDescriptorFactory, new DefaultDependenciesProvider());
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                       applicationPluginRepository, domainManager, serviceRepository, artifactClassLoaderManager);
   }

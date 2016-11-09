@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
@@ -20,6 +21,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.IOException;
 
@@ -43,8 +45,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    */
   public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                        ArtifactPluginRepository artifactPluginRepository,
-                                       ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
-    super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginClassLoaderFactory);
+                                       ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+                                       ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
+                                       DependenciesProvider dependenciesProvider) {
+    super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginClassLoaderFactory, artifactDescriptorFactory,
+          dependenciesProvider);
   }
 
   /**
