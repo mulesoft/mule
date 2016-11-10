@@ -109,11 +109,8 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
                 if (!scheduledFiles.contains(fileName) && !currentFiles.contains(fileName))
                 {
-                    if (!scheduledFiles.contains(fileName) && !currentFiles.contains(fileName))
-                    {
-                        scheduledFiles.add(fileName);
-                        getWorkManager().scheduleWork(new FtpWork(fileName, file));
-                    }
+                    scheduledFiles.add(fileName);
+                    getWorkManager().scheduleWork(new FtpWork(fileName, file));
                 }
             }
         }
@@ -350,6 +347,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     currentFiles.remove(name);
                     scheduledFiles.remove(name);
                 }
+            }
+            else
+            {
+                scheduledFiles.remove(name);
             }
         }
 
