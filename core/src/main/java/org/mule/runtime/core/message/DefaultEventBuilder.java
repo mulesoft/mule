@@ -35,6 +35,7 @@ import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory.LegacyNonBlockingProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
@@ -258,7 +259,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   protected boolean isFlowConstructNonBlockingProcessingStrategy() {
     return (flow instanceof Pipeline)
-        && ((Pipeline) flow).getProcessingStrategyFactory() instanceof LegacyNonBlockingProcessingStrategyFactory;
+        && ((Pipeline) flow).getProcessingStrategy() instanceof LegacyNonBlockingProcessingStrategy;
   }
 
   /**

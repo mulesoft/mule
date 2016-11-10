@@ -37,7 +37,7 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new NonBlockingProcessingStrategy(() -> {
+    return new LegacyNonBlockingProcessingStrategy(() -> {
       try {
         return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
       } catch (RegistrationException e) {
@@ -46,13 +46,13 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
     }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
-  public static class NonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+  public static class LegacyNonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
     private Supplier<Scheduler> schedulerSupplier;
     private Consumer<Scheduler> schedulerStopper;
     private Scheduler scheduler;
 
-    public NonBlockingProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper) {
+    public LegacyNonBlockingProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper) {
       this.schedulerSupplier = schedulerSupplier;
       this.schedulerStopper = schedulerStopper;
     }

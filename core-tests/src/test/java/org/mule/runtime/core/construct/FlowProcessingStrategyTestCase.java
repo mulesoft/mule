@@ -37,9 +37,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   @Mock
   private MuleConfiguration configuration;
 
-  @Mock
-  private SchedulerService schedulerService;
-
   private AbstractPipeline flow;
 
   @Before

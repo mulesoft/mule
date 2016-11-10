@@ -31,8 +31,6 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
 
   void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
 
-  ProcessingStrategyFactory getProcessingStrategyFactory();
-
   ProcessingStrategy getProcessingStrategy();
 
 }

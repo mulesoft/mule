@@ -207,7 +207,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return processingStrategy.isSynchronous();
   }
 
-  @Override
   public ProcessingStrategyFactory getProcessingStrategyFactory() {
     return processingStrategyFactory;
   }

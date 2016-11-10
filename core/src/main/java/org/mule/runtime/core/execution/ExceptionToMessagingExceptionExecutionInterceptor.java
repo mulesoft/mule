@@ -9,6 +9,7 @@ package org.mule.runtime.core.execution;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
+import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
@@ -49,14 +50,14 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
       }
 
       if (messagingException.getFailingMessageProcessor() == null) {
-        throw ExceptionUtils.putContext(messagingException, messageProcessor, event, flowConstruct, muleContext);
+        throw putContext(messagingException, messageProcessor, event, flowConstruct, muleContext);
       } else {
-        throw ExceptionUtils
-            .putContext(messagingException, messagingException.getFailingMessageProcessor(), event, flowConstruct, muleContext);
+        throw
+            putContext(messagingException, messagingException.getFailingMessageProcessor(), event, flowConstruct, muleContext);
       }
     } catch (Throwable ex) {
-      throw ExceptionUtils
-          .putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
+      throw
+          putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
     }
   }
 

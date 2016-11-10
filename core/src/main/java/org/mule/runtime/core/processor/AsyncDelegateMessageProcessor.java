@@ -119,28 +119,17 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher)
-        .doOnNext(event -> System.out
-            .println("BEFORE OUT " + System.identityHashCode(event) + " " + System.identityHashCode(event.getFlowCallStack())))
         .doOnNext(checkedConsumer(event -> assertNotTransactional(event)))
         .doOnNext(event -> warnConsumablePayload(event.getMessage()))
-        .doOnNext(request -> {
-          just(request)
-              .doOnNext(event -> System.out
-                  .println("BEFORE " + System.identityHashCode(event) + " " + System.identityHashCode(event.getFlowCallStack())))
-              .map(event1 -> updateEventForAsync(event1))
-              .doOnNext(event -> System.out
-                  .println("AFTER " + System.identityHashCode(event) + " " + System.identityHashCode(event.getFlowCallStack())))
-              .transform(processingStrategy.onPipeline((Pipeline) flowConstruct, delegate, messagingExceptionHandler))
-              .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
-              .doOnError(exception -> {
-                if (!(exception instanceof MessagingException))
-                  logger.error("Unhandled exception in async processing " + exception);
-              })
-              .subscribe();
-        })
-        .doOnNext(event -> System.out
-            .println("AFTER OUT " + System.identityHashCode(event) + " " + System.identityHashCode(event.getFlowCallStack())));
-
+        .doOnNext(request -> just(request)
+            .map(event1 -> updateEventForAsync(event1))
+            .transform(processingStrategy.onPipeline((Pipeline) flowConstruct, delegate, messagingExceptionHandler))
+            .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
+            .doOnError(exception -> {
+              if (!(exception instanceof MessagingException))
+                logger.error("Unhandled exception in async processing " + exception);
+            })
+            .subscribe());
   }
 
   private Event updateEventForAsync(Event event) {

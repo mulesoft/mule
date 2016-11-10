@@ -30,7 +30,6 @@ public class FlowTraceUtils {
     @Override
     public Event process(Event event) throws MuleException {
       stackToAssert = event.getFlowCallStack().clone();
-      System.out.println("CALLED " + stackToAssert + "eventId: " + System.identityHashCode(event));
       return event;
     }
   }
@@ -43,7 +42,6 @@ public class FlowTraceUtils {
     public Event process(Event event) throws MuleException {
       super.process(event);
       latch.countDown();
-      System.out.println("CALLED ASYNC");
       return event;
     }
   }
