@@ -15,6 +15,8 @@ import static java.sql.DriverManager.getDrivers;
 import org.mule.runtime.module.artifact.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -115,6 +117,9 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       if (isOracleDriver(driver)) {
         deregisterOracleDiagnosabilityMBean();
       }
+      if (isMySqlDriver(driver)) {
+        shutdownMySqlAbandonedConnectionCleanupThread();
+      }
     } catch (Exception e) {
       logger.warn(format("Can not deregister driver %s. This can cause a memory leak.", driver.getClass()), e);
     }
@@ -124,10 +129,14 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     return "oracle.jdbc.OracleDriver".equals(driver.getClass().getName());
   }
 
+  private boolean isMySqlDriver(Driver driver) {
+    return "com.mysql.jdbc.Driver".equals(driver.getClass().getName());
+  }
+
   private void deregisterOracleDiagnosabilityMBean() {
     ClassLoader cl = this.getClass().getClassLoader();
     MBeanServer mBeanServer = getPlatformMBeanServer();
-    final Hashtable<String, String> keys = new Hashtable<String, String>();
+    final Hashtable<String, String> keys = new Hashtable<>();
     keys.put("type", DIAGNOSABILITY_BEAN_NAME);
     keys.put("name", cl.getClass().getName() + "@" + toHexString(cl.hashCode()).toLowerCase());
 
@@ -142,4 +151,18 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     }
   }
 
+  /**
+   * Workaround for http://bugs.mysql.com/bug.php?id=65909
+   */
+  private void shutdownMySqlAbandonedConnectionCleanupThread() {
+    try {
+      Class<?> classAbandonedConnectionCleanupThread =
+          this.getClass().getClassLoader().loadClass("com.mysql.jdbc.AbandonedConnectionCleanupThread");
+      Method methodShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
+      methodShutdown.invoke(null);
+    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread");
+    }
+  }
 }
