@@ -8,11 +8,12 @@
 package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Boolean.TRUE;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Matchers.isNull;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.runtime.module.http.internal.HttpParamType.QUERY_PARAM;
@@ -33,9 +34,9 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParam;
@@ -133,7 +134,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     assertThat(debugInfo, hasItem(objectLike(QUERY_PARAMS_DEBUG, List.class, paramMatchers)));
 
     if (securityFieldMatchers == null) {
-      assertThat(debugInfo, hasItem(fieldLike(SECURITY_DEBUG, HttpRequestAuthentication.class, isNull())));
+      assertThat(debugInfo, hasItem(fieldLike(SECURITY_DEBUG, HttpRequestAuthentication.class, is(nullValue()))));
     } else {
       assertThat(debugInfo, hasItem(objectLike(SECURITY_DEBUG, HttpRequestAuthentication.class, securityFieldMatchers)));
     }
