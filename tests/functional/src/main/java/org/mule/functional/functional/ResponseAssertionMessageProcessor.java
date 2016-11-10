@@ -16,23 +16,23 @@ import static org.mule.functional.functional.FlowAssert.addAssertion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
+import com.eaio.uuid.UUID;
+
 import java.util.concurrent.CountDownLatch;
 
 import org.reactivestreams.Publisher;
-
-import com.eaio.uuid.UUID;
-
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
@@ -54,7 +54,10 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   @Override
   public void start() throws InitialisationException {
     super.start();
-    this.expressionManager.validate(responseExpression);
+    ValidationResult result = this.expressionManager.validate(responseExpression);
+    if (!result.isSuccess()) {
+      throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid expression"));
+    }
     responseLatch = new CountDownLatch(responseCount);
     addAssertion(flowConstruct.getName(), this);
   }

@@ -7,6 +7,7 @@
 package org.mule.functional.functional;
 
 import static org.junit.Assert.fail;
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -45,7 +47,10 @@ public class AssertionMessageProcessor implements Processor, FlowConstructAware,
   @Override
   public void start() throws InitialisationException {
     this.expressionManager = flowConstruct.getMuleContext().getExpressionManager();
-    this.expressionManager.validate(expression);
+    ValidationResult result = this.expressionManager.validate(expression);
+    if (!result.isSuccess()) {
+      throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid exception"));
+    }
     latch = new CountDownLatch(count);
     FlowAssert.addAssertion(flowConstruct.getName(), this);
   }

@@ -7,13 +7,14 @@
 
 package org.mule.runtime.core.source.polling.watermark.selector;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
 
@@ -38,11 +39,10 @@ public class SelectorWatermark extends Watermark implements Initialisable, MuleC
 
   @Override
   public void initialise() throws InitialisationException {
-    try {
-      this.muleContext.getExpressionManager().validate(this.selectorExpression);
-    } catch (InvalidExpressionException e) {
-      throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
-          .format("selector-expression requires a valid MEL expression. '%s' was found instead", this.selectorExpression)), e,
+    ValidationResult result = muleContext.getExpressionManager().validate(selectorExpression);
+    if (!result.isSuccess()) {
+      throw new InitialisationException(createStaticMessage(format("selector-expression requires a valid MEL expression. '%s' was found instead",
+                                                                   selectorExpression)),
                                         this);
     }
   }
