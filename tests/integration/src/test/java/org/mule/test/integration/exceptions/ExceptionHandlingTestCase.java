@@ -143,7 +143,6 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   public void testAsyncInExceptionStrategy() throws Exception {
     testExceptionStrategy("asyncInExceptionStrategy", emptyMap());
     assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
-    Thread.sleep(200);
   }
 
   @Test
