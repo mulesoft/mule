@@ -91,57 +91,6 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
     process(messageProcessor, event);
   }
 
-  @Test
-  public void testCannotProcessAsync() throws Exception {
-
-    Flow flow = new Flow("flow", muleContext);
-    initialiseObject(flow);
-    messageProcessor = new AsyncInterceptingMessageProcessor(() -> scheduler) {
-
-      @Override
-      protected boolean isProcessAsync(Event event) {
-        return false;
-      }
-    };
-    messageProcessor.setListener(target);
-    messageProcessor.setMuleContext(muleContext);
-    messageProcessor.setFlowConstruct(flow);
-
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    assertSync(messageProcessor, event);
-  }
-
-  @Test
-  public void testCannotProcessAsyncException() throws Exception {
-
-    Flow flow = new Flow("flow", muleContext);
-    initialiseObject(flow);
-    messageProcessor = new AsyncInterceptingMessageProcessor(() -> scheduler) {
-
-      @Override
-      protected boolean isProcessAsync(Event event) {
-        return false;
-      }
-    };
-    messageProcessor.setListener(failingProcessor);
-    messageProcessor.setMuleContext(muleContext);
-    messageProcessor.setFlowConstruct(flow);
-
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    expectedException.expect(DefaultMuleException.class);
-    assertSync(messageProcessor, event);
-  }
-
-  protected void assertSync(Processor processor, Event event) throws Exception {
-    Event result = process(processor, event);
-
-    assertSame(event, target.sensedEvent);
-    assertSame(event, result);
-    assertSame(Thread.currentThread(), target.thread);
-  }
-
   protected void assertAsync(Processor processor, Event event)
       throws Exception {
     Event result = process(processor, event);

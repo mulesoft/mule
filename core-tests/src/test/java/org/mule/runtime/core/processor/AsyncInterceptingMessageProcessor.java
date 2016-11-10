@@ -38,27 +38,16 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (isProcessAsync(event))
-      try {
-        return Mono.just(event).transform(this).block();
-      } catch (Throwable e) {
-        throw rxExceptionToMuleException(e);
-      }
-    else {
-      return processNext(event);
+    try {
+      return Mono.just(event).transform(this).block();
+    } catch (Throwable e) {
+      throw rxExceptionToMuleException(e);
     }
   }
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).concatMap(event -> {
-      Event request = event;
-      if (isProcessAsync(request)) {
-        return just(request).publishOn(fromExecutorService(scheduler.get())).transform(s -> applyNext(s));
-      } else {
-        return just(request).transform(s -> applyNext(s));
-      }
-    });
+    return from(publisher).publishOn(fromExecutorService(scheduler.get())).transform(s -> applyNext(s));
   }
 
   @Override
@@ -66,12 +55,4 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     return CPU_LITE;
   }
 
-  /**
-   * Template method that can be orverriden by implementationd to determine when async processing should occur.
-   * 
-   * @return if processing should be async.
-   */
-  protected boolean isProcessAsync(Event event) {
-    return true;
-  }
 }
