@@ -52,12 +52,10 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
       if (messagingException.getFailingMessageProcessor() == null) {
         throw putContext(messagingException, messageProcessor, event, flowConstruct, muleContext);
       } else {
-        throw
-            putContext(messagingException, messagingException.getFailingMessageProcessor(), event, flowConstruct, muleContext);
+        throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event, flowConstruct, muleContext);
       }
     } catch (Throwable ex) {
-      throw
-          putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
+      throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
     }
   }
 
