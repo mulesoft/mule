@@ -10,6 +10,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
@@ -37,11 +38,13 @@ public interface ExtendedExpressionLanguage extends ExpressionLanguage {
    * @param flowConstruct the flow where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
   TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
-                      BindingContext bindingContext);
+                      BindingContext bindingContext)
+      throws ExpressionRuntimeException;
 
   /**
    * Enriches an event.

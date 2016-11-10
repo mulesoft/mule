@@ -12,6 +12,7 @@ import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 /**
  * Evaluates an expression considering a given context.
@@ -27,8 +28,9 @@ public interface ExpressionLanguage {
    * @param event the current event to consider
    * @param context an expression binding context to consider
    * @return the result of the expression plus its type
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, Event event, BindingContext context);
+  TypedValue evaluate(String expression, Event event, BindingContext context) throws ExpressionRuntimeException;
 
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link MuleEvent} and a {@link FlowConstruct}.
@@ -38,8 +40,10 @@ public interface ExpressionLanguage {
    * @param flowConstruct the flow where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext);
+  TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext)
+      throws ExpressionRuntimeException;
 
   /**
    * Verifies whether an expression is valid or not syntactically.
