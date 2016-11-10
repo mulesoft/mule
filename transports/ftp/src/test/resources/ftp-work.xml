@@ -11,8 +11,6 @@
     <flow name="main">
         <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}" binary="true" passive="true"/>
 
-        <object-to-string-transformer/>
-
         <vm:outbound-endpoint path="testOut"/>
     </flow>
 </mule>

@@ -6,9 +6,10 @@
  */
 package org.mule.transport.ftp;
 
-import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -19,19 +20,17 @@ import org.mule.util.lock.LockFactory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class FtpWorkTestCase extends AbstractFtpServerTestCase
+public class FtpRetryProcessTestCase extends AbstractFtpServerTestCase
 {
-    DefaultRegistryBroker registryBroker = mock(DefaultRegistryBroker.class);
-    MockLock lock;
+    private final DefaultRegistryBroker registryBroker = mock(DefaultRegistryBroker.class);
+    private final Lock lock = mock(Lock.class);
 
-    public FtpWorkTestCase(ConfigVariant variant, String configResources)
+    public FtpRetryProcessTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -48,8 +47,8 @@ public class FtpWorkTestCase extends AbstractFtpServerTestCase
     public void doSetUp() throws Exception
     {
         super.doSetUp();
-        lock = new MockLock();
 
+        when(lock.tryLock()).thenReturn(false).thenReturn(true);
         when(registryBroker.get(MuleProperties.OBJECT_LOCK_FACTORY)).thenReturn(new LockFactory()
         {
             @Override
@@ -64,7 +63,7 @@ public class FtpWorkTestCase extends AbstractFtpServerTestCase
     }
 
     @Test
-    public void testRetryWork() throws Exception
+    public void testRetryAfterUngrantedLock() throws Exception
     {
         File tmpDir = getFtpServerBaseDir();
         createDataFile(tmpDir, TEST_MESSAGE);
@@ -72,49 +71,7 @@ public class FtpWorkTestCase extends AbstractFtpServerTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
 
-        assertEquals(2, lock.attemps);
-        assertEquals(TEST_MESSAGE, response.getPayload());
+        assertNotNull(response);
     }
 
-    private class MockLock implements Lock
-    {
-        int attemps = 0;
-
-        @Override
-        public void lock()
-        {
-
-        }
-
-        @Override
-        public void lockInterruptibly() throws InterruptedException
-        {
-
-        }
-
-        @Override
-        public boolean tryLock()
-        {
-            attemps++;
-            return attemps > 1;
-        }
-
-        @Override
-        public boolean tryLock(long time, TimeUnit unit) throws InterruptedException
-        {
-            return false;
-        }
-
-        @Override
-        public void unlock()
-        {
-
-        }
-
-        @Override
-        public Condition newCondition()
-        {
-            return null;
-        }
-    }
 }
