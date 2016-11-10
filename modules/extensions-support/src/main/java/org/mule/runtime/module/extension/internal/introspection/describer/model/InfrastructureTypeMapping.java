@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
-
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 
@@ -29,5 +29,9 @@ public class InfrastructureTypeMapping {
 
   public static Map<Class<?>, String> getMap() {
     return mapping;
+  }
+
+  public static Map<String, String> getNameMap() {
+    return mapping.entrySet().stream().collect(toMap(e -> e.getKey().getName(), Map.Entry::getValue));
   }
 }

@@ -6,8 +6,9 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,19 @@ public class PetCage {
   @Optional
   List<String> ammenities;
 
+  @Parameter
+  @Optional
+  TlsContextFactory tls;
+
   public Map<String, Integer> getBirds() {
     return birds;
   }
 
   public List<String> getAmmenities() {
     return ammenities;
+  }
+
+  public TlsContextFactory getTls() {
+    return tls;
   }
 }

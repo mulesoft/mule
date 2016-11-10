@@ -86,9 +86,11 @@
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
+                    <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionMap" use="optional" name="birds"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="ammenities"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

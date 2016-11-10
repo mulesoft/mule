@@ -14,6 +14,7 @@ import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Bui
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -25,14 +26,16 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
-import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Optional;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing extension objects that can be defined as named top level elements and be placed
@@ -85,13 +88,22 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     type.getFields().forEach(this::parseField);
   }
 
+  private String getFieldName(ObjectFieldType objectFieldType, String fieldName) {
+
+    return objectFieldType.getValue().getAnnotation(TypeIdAnnotation.class)
+        .map(typeIdAnnotation -> typeIdAnnotation.getValue())
+        .map(typeIdName -> InfrastructureTypeMapping.getNameMap().get(typeIdName))
+        .filter(infrastructureName -> !StringUtils.isBlank(infrastructureName)).orElse(fieldName);
+  }
+
   private void parseField(ObjectFieldType objectField) {
     final MetadataType fieldType = objectField.getValue();
-    final String fieldName = objectField.getKey().getName().getLocalPart();
+    final String key = objectField.getKey().getName().getLocalPart();
+    final String fieldName = getFieldName(objectField, key);
     final boolean acceptsReferences = acceptsReferences(objectField);
     final Object defaultValue = getDefaultValue(fieldType).orElse(null);
     final ExpressionSupport expressionSupport = getExpressionSupport(objectField);
-    Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
+    Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(key);
     if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
       return;
     }
@@ -100,7 +112,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
+        parseAttributeParameter(key, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
       }
 
       @Override
@@ -128,23 +140,23 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
         if (!parsingContext.isRegistered(name, namespace)) {
           parsingContext.registerObjectType(name, namespace, type);
-          parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
+          parseObjectParameter(key, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
                                fieldDsl.get(), emptySet());
         } else {
-          parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
+          parseObject(key, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
                       fieldDsl.get(), emptySet());
         }
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+        parseCollectionParameter(key, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
                                  emptySet());
       }
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
+        parseMapParameters(key, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
                            emptySet());
       }
     });
