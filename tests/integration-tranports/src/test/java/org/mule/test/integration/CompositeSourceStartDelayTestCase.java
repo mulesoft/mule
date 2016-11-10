@@ -12,7 +12,7 @@ import org.mule.compatibility.core.endpoint.DefaultEndpointFactory;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.util.endpoint.InboundEndpointWrapper;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.StartException;
+import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

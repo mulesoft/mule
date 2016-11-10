@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationLis
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.StartException;
+import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
