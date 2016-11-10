@@ -7,11 +7,11 @@
 package org.mule.runtime.core.el;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.contains;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
@@ -103,7 +103,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("sessionVars['foo']", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getSession().getProperty("foo"), equalTo("bar"));
-    assertThat(eventBuilder.build().getVariableNames(), not(contains("foo")));
+    assertThat(eventBuilder.build().getVariableNames(), not(hasItem("foo")));
   }
 
   @Test

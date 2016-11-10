@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.routing;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -91,7 +92,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertThat(result.getVariableNames(), not(hasItem("key1")));
     assertEquals("value2", result.getVariable("key2").getValue());
 
     assertEquals("valueNEW", result.getSession().getProperty("key"));
@@ -170,7 +171,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertThat(result.getVariableNames(), not(hasItem("key1")));
     assertEquals("value2", result.getVariable("key2").getValue());
   }
 
@@ -195,7 +196,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertThat(result.getVariableNames(), not(hasItem("key1")));
     assertEquals("value2", result.getVariable("key2").getValue());
   }
 
