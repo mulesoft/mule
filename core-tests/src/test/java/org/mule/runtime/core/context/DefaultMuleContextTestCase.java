@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
