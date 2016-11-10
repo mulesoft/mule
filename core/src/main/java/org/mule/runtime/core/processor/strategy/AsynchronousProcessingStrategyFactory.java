@@ -20,6 +20,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -70,17 +71,17 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
       this.muleContext = muleContext;
     }
 
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
 
       return publisher -> from(publisher)
           .doOnNext(assertCanProcessAsync())
-          .doOnNext(fireAsyncScheduledNotification(pipeline))
+          .doOnNext(fireAsyncScheduledNotification(flowConstruct))
           .publishOn(fromExecutorService(scheduler))
           .transform(pipelineFunction)
-          .doOnNext(request -> fireAsyncCompleteNotification(request, pipeline, null))
+          .doOnNext(request -> fireAsyncCompleteNotification(request, flowConstruct, null))
           .doOnError(MessagingException.class,
-                     msgException -> fireAsyncCompleteNotification(msgException.getEvent(), pipeline, msgException));
+                     msgException -> fireAsyncCompleteNotification(msgException.getEvent(), flowConstruct, msgException));
     }
 
     @Override
@@ -103,14 +104,14 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
       };
     }
 
-    protected Consumer<Event> fireAsyncScheduledNotification(Pipeline pipeline) {
+    protected Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
       return event -> muleContext.getNotificationManager()
-          .fireNotification(new AsyncMessageNotification(pipeline, event, null, PROCESS_ASYNC_SCHEDULED));
+          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_SCHEDULED));
     }
 
-    protected void fireAsyncCompleteNotification(Event event, Pipeline pipeline, MessagingException exception) {
+    protected void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
       muleContext.getNotificationManager()
-          .fireNotification(new AsyncMessageNotification(pipeline, event, null, PROCESS_ASYNC_COMPLETE, exception));
+          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_COMPLETE, exception));
     }
 
     protected Scheduler getScheduler() {

@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.processor.strategy;
 
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -24,11 +24,11 @@ public interface ProcessingStrategy {
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *
-   * @param pipeline pipeline instance.
+   * @param flowConstruct pipeline instance.
    * @param pipelineFunction pipeline function.
    * @return enriched pipeline function/
    */
-  default Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+  default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
     return publisher -> from(publisher).transform(pipelineFunction);
   }
@@ -36,15 +36,15 @@ public interface ProcessingStrategy {
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *
-   * @param pipeline pipeline instance.
+   * @param flowConstruct pipeline instance.
    * @param pipelineFunction pipeline function.
    * @param messagingExceptionHandler exception handle to use.
    * @return enriched pipeline function
    */
-  default Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+  default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                   MessagingExceptionHandler messagingExceptionHandler) {
-    return onPipeline(pipeline, pipelineFunction);
+    return onPipeline(flowConstruct, pipelineFunction);
   }
 
 

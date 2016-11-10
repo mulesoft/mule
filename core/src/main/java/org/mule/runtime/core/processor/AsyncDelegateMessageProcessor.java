@@ -123,7 +123,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(event -> warnConsumablePayload(event.getMessage()))
         .doOnNext(request -> just(request)
             .map(event1 -> updateEventForAsync(event1))
-            .transform(processingStrategy.onPipeline((Pipeline) flowConstruct, delegate, messagingExceptionHandler))
+            .transform(processingStrategy.onPipeline(flowConstruct, delegate, messagingExceptionHandler))
             .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
             .doOnError(exception -> {
               if (!(exception instanceof MessagingException))

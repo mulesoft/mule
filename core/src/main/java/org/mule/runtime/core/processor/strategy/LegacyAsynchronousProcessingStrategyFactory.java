@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -66,13 +66,13 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
       super(schedulerSupplier, schedulerStopper, muleContext);
     }
 
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
 
-      return onPipeline(pipeline, pipelineFunction, pipeline.getExceptionListener());
+      return onPipeline(flowConstruct, pipelineFunction, flowConstruct.getExceptionListener());
     }
 
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
 
@@ -81,13 +81,13 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
       // ii) Any exceptions that occur due to async processing are not propagated upwards
       return publisher -> from(publisher)
           .doOnNext(assertCanProcessAsync())
-          .doOnNext(fireAsyncScheduledNotification(pipeline))
+          .doOnNext(fireAsyncScheduledNotification(flowConstruct))
           .doOnNext(request -> just(request)
               .map(event -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
               .publishOn(fromExecutorService(getScheduler()))
               .transform(pipelineFunction)
-              .doOnNext(event -> fireAsyncCompleteNotification(event, pipeline, null))
-              .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), pipeline, e))
+              .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
+              .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
               .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
               .doOnError(exception -> {
                 if (!(exception instanceof MessagingException))

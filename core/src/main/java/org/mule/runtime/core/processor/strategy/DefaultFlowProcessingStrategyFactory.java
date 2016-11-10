@@ -13,7 +13,7 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -50,13 +50,13 @@ public class DefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProc
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(Pipeline pipeline,
+    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
       return publisher -> from(publisher).concatMap(request -> {
         if (canProcessAsync(request)) {
-          return just(request).transform(super.onPipeline(pipeline, pipelineFunction));
+          return just(request).transform(super.onPipeline(flowConstruct, pipelineFunction));
         } else {
-          return just(request).transform(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline, pipelineFunction));
+          return just(request).transform(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.onPipeline(flowConstruct, pipelineFunction));
         }
       });
     }
