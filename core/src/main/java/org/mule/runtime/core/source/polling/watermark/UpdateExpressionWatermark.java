@@ -7,12 +7,13 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
 
 import java.io.NotSerializableException;
@@ -40,12 +41,12 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
 
   @Override
   public void initialise() throws InitialisationException {
-    if (!StringUtils.isEmpty(this.updateExpression)) {
-      try {
-        this.muleContext.getExpressionManager().validate(this.updateExpression);
-      } catch (InvalidExpressionException e) {
-        throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
-            .format("update-expression requires a valid MEL expression. '%s' was found instead", this.updateExpression)), e,
+    if (!StringUtils.isEmpty(updateExpression)) {
+      ValidationResult result = muleContext.getExpressionManager().validate(updateExpression);
+      if (!result.isSuccess()) {
+        throw new InitialisationException(createStaticMessage(
+                                                              format("update-expression requires a valid MEL expression. '%s' was found instead",
+                                                                     updateExpression)),
                                           this);
       }
     }

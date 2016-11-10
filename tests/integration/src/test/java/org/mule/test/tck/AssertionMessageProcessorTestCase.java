@@ -14,6 +14,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.el.ValidationResult.success;
 import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -51,6 +52,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     when(mockEvent.getMessage()).thenReturn(muleMessage);
     expressionManager = mock(ExtendedExpressionManager.class);
     when(expressionManager.isValid(anyString())).thenReturn(true);
+    when(expressionManager.validate(anyString())).thenReturn(success());
     when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(Event.class), any(FlowConstruct.class), anyBoolean(),
                                            anyBoolean()))
                                                .thenReturn(true);
