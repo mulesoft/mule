@@ -9,23 +9,19 @@ package org.mule.runtime.core.mule.enricher;
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
@@ -110,16 +106,16 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testEnrichWithException() throws Exception {
+    IllegalStateException testException = new IllegalStateException();
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      throw new MessagingException(CoreMessages.createStaticMessage("Expected"), event);
+      throw testException;
     });
     enricher.setFlowConstruct(getTestFlow(muleContext));
 
-    thrown.expect(is(instanceOf(MessagingException.class)));
-    thrown.expectMessage(equalTo("Expected."));
+    thrown.expect(sameInstance(testException));
     process(enricher, testEvent());
   }
 

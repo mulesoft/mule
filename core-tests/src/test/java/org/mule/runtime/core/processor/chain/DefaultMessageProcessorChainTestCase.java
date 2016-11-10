@@ -29,10 +29,10 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Flux.from;
-
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -61,7 +61,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
@@ -134,7 +134,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
     when(errorTypeLocator.lookupErrorType(any())).thenReturn(errorType);
     mockFlow = new Flow("flow", muleContext);
-    mockFlow.setProcessingStrategyFactory(nonBlocking ? new NonBlockingProcessingStrategyFactory()
+    mockFlow.setProcessingStrategyFactory(nonBlocking ? new LegacyNonBlockingProcessingStrategyFactory()
         : new DefaultFlowProcessingStrategyFactory());
     mockFlow.initialise();
     mockFlow.start();
@@ -751,7 +751,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     }
     try {
       if (nonBlocking) {
-        return processAsStreamAndBlock(event, messageProcessor);
+        try {
+          return just(event)
+              .transform(messageProcessor)
+              .subscribe()
+              .blockMillis(RECEIVE_TIMEOUT);
+        } catch (Throwable exception) {
+          throw (Exception) unwrap(exception);
+        }
       } else {
         return messageProcessor.process(event);
       }

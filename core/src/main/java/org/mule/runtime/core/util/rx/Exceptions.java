@@ -7,6 +7,11 @@
 package org.mule.runtime.core.util.rx;
 
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.Exceptions.unwrap;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -210,4 +215,25 @@ public class Exceptions {
 
     boolean testChecked(T t, U u) throws Throwable;
   }
+
+  /**
+   * Unwrap reactive exception and rethrow instances {@link MuleException} or {@link RuntimeException}.  Other exception types
+   * are wrapped in a instance of {@link DefaultMuleException}.
+   *
+   * @param throwable
+   * @return
+   * @throws MuleException
+   */
+  public static MuleException rxExceptionToMuleException(Throwable throwable)
+      throws MuleException {
+    throwable = unwrap(throwable);
+    if (throwable instanceof MuleException) {
+      return (MuleException) throwable;
+    } else if (throwable instanceof RuntimeException) {
+      throw (RuntimeException) throwable;
+    } else {
+      throw new DefaultMuleException(throwable);
+    }
+  }
+
 }

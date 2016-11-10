@@ -9,6 +9,8 @@ package org.mule.runtime.core.processor.chain;
 import static org.mule.runtime.core.api.message.InternalMessage.builder;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PARAM_VARS;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PROPERTY_VARS;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -22,16 +24,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.reactivestreams.Publisher;
+
 /**
- * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the
- * inner processors through the {@link Event}.
+ * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
+ * through the {@link Event}.
  *
- * <p> Both parameter and property could be simple literals or expressions that will be evaluated before passing the new
- * {@link Event} to the child processors.
+ * <p>
+ * Both parameter and property could be simple literals or expressions that will be evaluated before passing the new {@link Event}
+ * to the child processors.
  *
- * <p> Taking the following sample where the current event passed to {@link ModuleOperationProcessorChain#doProcess(Event)}
- * has a flow variable under "person" with a value of "stranger!", the result of executing the above processor will be
- * "howdy stranger!":
+ * <p>
+ * Taking the following sample where the current event passed to {@link ModuleOperationProcessorChain#doProcess(Event)} has a flow
+ * variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy stranger!":
+ * 
  * <pre>
  *  <module-operation-chain returnsVoid="false">
  *    <module-operation-properties/>
@@ -97,8 +103,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     }
 
     /**
-     * Given an {@code event}, it will consume from it ONLY the defined properties and parameters that were set when
-     * initializing this class to provide scoping for the inner list of processors.
+     * Given an {@code event}, it will consume from it ONLY the defined properties and parameters that were set when initializing
+     * this class to provide scoping for the inner list of processors.
      *
      * @param event parameter to consume elements from
      * @return a modified {@link Event} if the output of the operation was not void, the same event otherwise.
@@ -109,11 +115,26 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       Event eventResponse = super.doProcess(createEventWithParameters(event));
 
       if (!returnsVoid) {
-        event = Event.builder(event)
-            .message(builder(eventResponse.getMessage()).build())
-            .build();
+        event = createNewEventFromJustMessage(event, eventResponse);
       }
       return event;
+    }
+
+    @Override
+    public Publisher<Event> apply(Publisher<Event> publisher) {
+      if (!returnsVoid) {
+        return from(publisher)
+            .concatMap(request -> just(request)
+                .map(event -> createEventWithParameters(event))
+                .transform(s -> super.apply(s))
+                .map(result -> createNewEventFromJustMessage(request, result)));
+      } else {
+        return publisher;
+      }
+    }
+
+    private Event createNewEventFromJustMessage(Event request, Event response) {
+      return Event.builder(request).message(builder(response.getMessage()).build()).build();
     }
 
     private Event createEventWithParameters(Event event) {

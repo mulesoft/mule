@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -57,46 +56,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @After
   public void after() {
     scheduler.shutdownNow();
-  }
-
-  /**
-   * MuleSession is not copied when async intercepting processor is used
-   */
-  @Test
-  public void asyncInterceptingProcessorSessionPropertyPropagation() throws Exception {
-    AsyncInterceptingMessageProcessor async = new AsyncInterceptingMessageProcessor();
-    async.setScheduler(scheduler);
-    SensingNullMessageProcessor asyncListener = new SensingNullMessageProcessor();
-    async.setMuleContext(muleContext);
-    async.setFlowConstruct(flow);
-    async.setListener(asyncListener);
-
-    InternalMessage message = InternalMessage.builder().payload("data").build();
-    Event event = Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flow).build();
-
-    event.getSession().setProperty("key", "value");
-
-    async.process(event);
-    asyncListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-    Event asyncEvent = asyncListener.event;
-
-    // Event is copied, but session isn't
-    assertNotSame(asyncEvent, event);
-    assertNotSame(asyncEvent, event);
-    assertNotSame(asyncEvent.getSession(), event.getSession());
-
-    // Session properties available before async are available after too
-    assertEquals(1, asyncEvent.getSession().getPropertyNamesAsSet().size());
-    assertEquals("value", asyncEvent.getSession().getProperty("key"));
-
-    // Session properties set after async are available in message processor
-    // before async
-    asyncEvent.getSession().setProperty("newKey", "newValue");
-    assertEquals(2, asyncEvent.getSession().getPropertyNamesAsSet().size());
-    assertEquals("newValue", asyncEvent.getSession().getProperty("newKey"));
-    assertEquals(1, event.getSession().getPropertyNamesAsSet().size());
-    assertNull(event.getSession().getProperty("newKey"));
   }
 
   /**

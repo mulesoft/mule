@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.api.Event;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -16,6 +17,11 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.List;
+import java.util.function.Consumer;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
@@ -48,13 +54,27 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
 
     @Override
     public Event process(Event event) throws MuleException {
-      ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(getSubFlowName(), null));
+      pushSubFlowFlowStackElement().accept(event);
 
       try {
         return super.process(event);
       } finally {
-        ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+        popSubFlowFlowStackElement().accept(event);
       }
+    }
+
+    private Consumer<Event> pushSubFlowFlowStackElement() {
+      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(getSubFlowName(), null));
+    }
+
+    private Consumer<Event> popSubFlowFlowStackElement() {
+      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+    }
+
+    @Override
+    public Publisher<Event> apply(Publisher<Event> publisher) {
+      return from(publisher).concatMap(event -> Mono.just(event).doOnNext(pushSubFlowFlowStackElement())
+          .transform(s -> super.apply(s)).doOnTerminate((event1, throwable) -> popSubFlowFlowStackElement().accept(event)));
     }
 
     @Override

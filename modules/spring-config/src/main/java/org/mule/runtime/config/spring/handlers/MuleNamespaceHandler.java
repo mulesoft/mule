@@ -129,8 +129,8 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
@@ -453,10 +453,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     // Processing Strategies
     registerMuleBeanDefinitionParser("asynchronous-processing-strategy",
-                                     new OrphanDefinitionParser(AsynchronousProcessingStrategyFactory.class, false))
+                                     new OrphanDefinitionParser(LegacyAsynchronousProcessingStrategyFactory.class, false))
                                          .addIgnored("name");
     registerMuleBeanDefinitionParser("non-blocking-processing-strategy",
-                                     new OrphanDefinitionParser(NonBlockingProcessingStrategyFactory.class, false))
+                                     new OrphanDefinitionParser(LegacyNonBlockingProcessingStrategyFactory.class, false))
                                          .addIgnored("name");
     registerMuleBeanDefinitionParser("custom-processing-strategy", new OrphanDefinitionParser(false)).addIgnored("name");
 

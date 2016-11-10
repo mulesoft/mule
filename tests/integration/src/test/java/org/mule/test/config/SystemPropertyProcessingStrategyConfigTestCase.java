@@ -14,10 +14,9 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY;
-
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -34,14 +33,14 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
-        {"Container level system property", new String[] {}, SynchronousProcessingStrategy.class},
+        {"Container level system property", new String[] {}, SynchronousProcessingStrategyFactory.class},
         {"Configuration overrides system property", new String[] {"configuration-processing-strategy-config.xml"},
-            NonBlockingProcessingStrategy.class}
+            LegacyNonBlockingProcessingStrategyFactory.class}
     });
   }
 
   private final String[] configFiles;
-  private Class<? extends ProcessingStrategy> expectedStrategyType;
+  private Class<? extends ProcessingStrategyFactory> expectedStrategyFactoryType;
 
   @Rule
   public SystemProperty globalProcessingStrategy =
@@ -52,9 +51,9 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
       new SystemProperty(PROCESSING_STRATEGY_ATTRIBUTE, NON_BLOCKING_PROCESSING_STRATEGY);
 
   public SystemPropertyProcessingStrategyConfigTestCase(String name, String[] configFiles,
-                                                        Class<? extends ProcessingStrategy> expectedStrategyType) {
+                                                        Class<? extends ProcessingStrategyFactory> expectedStrategyFactoryType) {
     this.configFiles = configFiles;
-    this.expectedStrategyType = expectedStrategyType;
+    this.expectedStrategyFactoryType = expectedStrategyFactoryType;
   }
 
   @Override
@@ -64,7 +63,6 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractInte
 
   @Test
   public void assertDefaultProcessingStrategy() throws Exception {
-    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory().create(muleContext),
-               is(instanceOf(expectedStrategyType)));
+    assertThat(muleContext.getConfiguration().getDefaultProcessingStrategyFactory(), is(instanceOf(expectedStrategyFactoryType)));
   }
 }

@@ -10,6 +10,7 @@ import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.api.Event;
@@ -70,7 +71,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
           try {
             return just(processCatch(e.getEvent(), e));
           } catch (MessagingException e1) {
-            throw propagate(e1);
+            return error(e1);
           }
         })
         .doOnError(MessagingException.class, checkedConsumer(e -> processFinally(e.getEvent(), e)));
@@ -93,7 +94,13 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * @return function that performs request processing
    */
   protected Function<Publisher<Event>, Publisher<Event>> processRequest() {
-    return stream -> from(stream).handle(nullSafeMap(checkedFunction(event -> processRequest(event))));
+    return stream -> from(stream).map(event -> {
+      try {
+        return processRequest(event);
+      } catch (MuleException e) {
+        throw propagate(e);
+      }
+    });
   }
 
   /**

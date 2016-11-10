@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
@@ -60,11 +61,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
     when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
     when(endpoint.getExchangePattern()).thenReturn(ONE_WAY);
-    when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategyFactory().create(muleContext));
+    when(flow.getProcessingStrategyFactory()).thenReturn(new SynchronousProcessingStrategyFactory());
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);
-
   }
 
   @Test

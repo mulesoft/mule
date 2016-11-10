@@ -100,7 +100,9 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost()) // route 1 first logger
                 .serial(prePost()) // route 1 second logger
                 .serial(post())) // route 1 chain
-            .parallelSynch(prePost())) // route 0 logger
+            .parallelSynch(pre() // route 2 chain
+                .serial(prePost()) // route 2 logger
+                .serial(post()))) // route 2 chain
         .serial(post()) // scatter-gather
     ;
 
@@ -127,12 +129,14 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
   @Test
   public void enricher() throws Exception {
     specificationFactory = () -> new Node()
-        .serial(pre()) // append-string
-        .serial(prePost())
+        .serial(pre())
+        .serial(prePost()) // append-string
         .serial(post())
+        .serial(pre())
         .serial(pre()) // chain
-        .serial(prePost())
-        .serial(prePost())
+        .serial(prePost()) // echo
+        .serial(prePost()) // echo
+        .serial(post()) // chain
         .serial(post());
 
     assertNotNull(flowRunner("enricher").withPayload(TEST_PAYLOAD).run());

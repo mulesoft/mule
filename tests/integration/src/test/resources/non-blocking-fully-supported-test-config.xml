@@ -213,9 +213,8 @@
     <flow name="async">
         <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]"/>
         <async processingStrategy="asynchronous">
-            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+            <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]"/>
             <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread and assertPayload()]"/>
         </async>
         <test:non-blocking-processor/>
     </flow>

@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.construct;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
@@ -22,10 +23,11 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +62,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Test
   public void testProcessingStrategyCantBeAsyncWithRedelivery() throws Exception {
     configureFlowForRedelivery();
-    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
+    flow.setProcessingStrategyFactory(new LegacyAsynchronousProcessingStrategyFactory());
 
     expected.expectCause(hasCause(instanceOf(FlowConstructInvalidException.class)));
     expected.expectMessage("One of the message sources configured on this Flow is not "
@@ -73,7 +75,8 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   public void testChangeDefaultProcessingStrategyWithRedelivery() throws Exception {
     configureFlowForRedelivery();
     flow.initialise();
-    assertThat(flow.getProcessingStrategy(), instanceOf(SynchronousProcessingStrategy.class));
+    assertThat(flow.getProcessingStrategy(),
+               equalTo(SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE));
   }
 
   private void configureFlowForRedelivery() {

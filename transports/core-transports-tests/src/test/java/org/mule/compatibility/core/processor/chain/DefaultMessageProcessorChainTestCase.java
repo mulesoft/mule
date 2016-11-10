@@ -27,12 +27,11 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -113,10 +112,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     Pipeline mockFlow = mock(Flow.class);
-
-    ProcessingStrategyFactory psFactory =
-        nonBlocking ? new NonBlockingProcessingStrategyFactory() : new DefaultFlowProcessingStrategyFactory();
-    when(mockFlow.getProcessingStrategy()).thenReturn(psFactory.create(muleContext));
+    when(mockFlow.getProcessingStrategy())
+        .thenReturn(nonBlocking ? new LegacyNonBlockingProcessingStrategyFactory().create(muleContext)
+            : new DefaultFlowProcessingStrategyFactory().create(muleContext));
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);

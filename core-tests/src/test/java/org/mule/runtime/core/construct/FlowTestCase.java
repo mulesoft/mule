@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
@@ -50,6 +50,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 
 public class FlowTestCase extends AbstractFlowConstructTestCase {
 
@@ -71,8 +72,13 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);
     when(dynamicProcessorContainer.process(any(Event.class))).then(invocation -> {
       Object[] args = invocation.getArguments();
-      return (Event) args[0];
+      return args[0];
     });
+    when(dynamicProcessorContainer.apply(any(Publisher.class))).then(invocation -> {
+      Object[] args = invocation.getArguments();
+      return args[0];
+    });
+
     doAnswer(invocation -> ((MessageProcessorPathElement) invocation.getArguments()[0]).addChild(dynamicProcessorContainer))
         .when(dynamicProcessorContainer).addMessageProcessorPathElements(any(MessageProcessorPathElement.class));
     List<Processor> processors = new ArrayList<>();
@@ -83,9 +89,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(new StringAppendTransformer("b"));
     processors.add(new StringAppendTransformer("c"));
     processors.add(dynamicProcessorContainer);
-    processors.add(event -> {
-      return Event.builder(event).addVariable("thread", Thread.currentThread()).build();
-    });
+    processors.add(event -> Event.builder(event).addVariable("thread", Thread.currentThread()).build());
     processors.add(sensingMessageProcessor);
     flow.setMessageProcessors(processors);
   }
@@ -195,7 +199,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void restartWithAsynchronousProcessingStrategy() throws Exception {
-    flow.setProcessingStrategyFactory(new AsynchronousProcessingStrategyFactory());
+    flow.setProcessingStrategyFactory(new LegacyAsynchronousProcessingStrategyFactory());
     flow.initialise();
     flow.start();
 

@@ -11,9 +11,24 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
+import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -153,4 +168,83 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
       return exceptionHandler.handle(e);
     }
   }
+
+  /**
+   * Determine the {@link ErrorType} of a given exception thrown by a given message processor.
+   *
+   * @param messageProcessor the {@link Processor} that throw the exception.
+   * @param exception the exception thrown.
+   * @param muleContext the mule context.
+   * @return the resolved {@link ErrorType}
+   */
+  public static ErrorType getErrorTypeFromFailingProcessor(Processor messageProcessor, Throwable exception,
+                                                           MuleContext muleContext) {
+    ErrorType errorType;
+    Throwable causeException =
+        exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
+            : exception;
+    ComponentIdentifier componentIdentifier = null;
+    if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {
+      componentIdentifier =
+          (ComponentIdentifier) ((AnnotatedObject) messageProcessor).getAnnotation(ComponentIdentifier.ANNOTATION_NAME);
+    }
+    if (componentIdentifier != null) {
+      errorType = muleContext.getErrorTypeLocator().lookupComponentErrorType(componentIdentifier, causeException);
+    } else {
+      errorType = muleContext.getErrorTypeLocator().lookupErrorType(causeException);
+    }
+    return errorType;
+  }
+
+  public static MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
+                                              Event event, FlowConstruct flowConstruct, MuleContext muleContext) {
+    for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
+      for (Map.Entry<String, Object> contextInfoEntry : exceptionContextProvider
+          .getContextInfo(event, failingMessageProcessor, flowConstruct).entrySet()) {
+        if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey())) {
+          messagingException.getInfo().put(contextInfoEntry.getKey(), contextInfoEntry.getValue());
+        }
+      }
+    }
+    return messagingException;
+  }
+
+  /**
+   * Create new {@link Event} with {@link org.mule.runtime.api.message.Error} instance set.
+   *
+   * @param currentEvent event when error occured.
+   * @param messageProcessor message processor.
+   * @param messagingException messaging exception.
+   * @param muleContext the mule context.
+   * @return new {@link Event} with relevant {@link org.mule.runtime.api.message.Error} set.
+   */
+  public static Event createErrorEvent(Event currentEvent, Processor messageProcessor, MessagingException messagingException,
+                                       MuleContext muleContext) {
+    Throwable causeException = messagingException.getCause() != null ? messagingException.getCause() : messagingException;
+    Optional<Error> error = messagingException.getEvent().getError();
+    if (!error.isPresent() || !error.get().getCause().equals(causeException)
+        || !messagingException.causedExactlyBy(error.get().getCause().getClass())) {
+
+
+      ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException, muleContext);
+      Event event = Event.builder(messagingException.getEvent())
+          .error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
+      messagingException.setProcessedEvent(event);
+      return event;
+    } else {
+      return currentEvent;
+    }
+  }
+
+  /**
+   * Resolve the root cause of an exception. If the exception is an instance of {@link ErrorMessageAwareException} then it's root
+   * cause is used, else the candidate exception instance if returned.
+   * 
+   * @param exception candidate exception.
+   * @return root cause exception.
+   */
+  public static Throwable getRootCauseException(Throwable exception) {
+    return exception instanceof ErrorMessageAwareException ? ((ErrorMessageAwareException) exception).getRootCause() : exception;
+  }
+
 }
