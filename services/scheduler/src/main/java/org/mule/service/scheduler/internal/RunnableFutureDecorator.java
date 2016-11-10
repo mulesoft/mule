@@ -6,12 +6,8 @@
  */
 package org.mule.service.scheduler.internal;
 
-import static java.lang.Thread.currentThread;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
-
-import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
@@ -26,26 +22,13 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-class RunnableFutureDecorator<V> implements RunnableFuture<V> {
+class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
 
   private static final Logger logger = getLogger(RunnableFutureDecorator.class);
-
-  private static Field threadLocalsField;
-
-  static {
-    try {
-      threadLocalsField = Thread.class.getDeclaredField("threadLocals");
-      threadLocalsField.setAccessible(true);
-    } catch (NoSuchFieldException | SecurityException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   private final RunnableFuture<V> task;
 
   private final DefaultScheduler scheduler;
-
-  private volatile boolean started = false;
 
   /**
    * Decorates the given {@code task}
@@ -60,40 +43,21 @@ class RunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   @Override
   public void run() {
-    long startTime = 0;
-    if (logger.isDebugEnabled()) {
-      startTime = System.nanoTime();
-      logger.debug("Starting task " + this.toString() + "...");
-    }
-    started = true;
+    long startTime = beforeRun();
     try {
       task.run();
     } finally {
       wrapUp();
-      if (logger.isDebugEnabled()) {
-        logger.debug("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
+      if (logger.isTraceEnabled()) {
+        logger.trace("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
       }
     }
   }
 
-  private void wrapUp() {
+  @Override
+  protected void wrapUp() {
     scheduler.taskFinished(this);
-    clearAllThreadLocals();
-  }
-
-  public static void clearAllThreadLocals() {
-    try {
-      threadLocalsField.set(currentThread(), null);
-    } catch (Exception e) {
-      new MuleRuntimeException(e);
-    }
-  }
-
-  /**
-   * @return {@code true} if the execution of this task has already started, false otherwise.
-   */
-  boolean isStarted() {
-    return started;
+    super.wrapUp();
   }
 
   @Override

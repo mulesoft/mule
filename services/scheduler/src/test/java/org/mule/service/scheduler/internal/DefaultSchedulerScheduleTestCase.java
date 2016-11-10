@@ -6,13 +6,18 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -46,7 +51,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Parameters
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        // Use a default ScheluedExecutorService to compare behavior
+        // Use a default ScheduledExecutorService to compare behavior
         {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test.useSharedScheduledExecutor()},
         {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test.createScheduledSameThreadExecutor()},
         {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test
@@ -416,6 +421,87 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
 
     List<Runnable> notStartedTasks = executor.shutdownNow();
     assertThat(notStartedTasks, is(empty()));
+  }
+
+  @Test
+  @Description("Tests that scheduleAtFixedRate parameters are honored")
+  public void fixedRateRepeats() {
+    final ScheduledExecutorService executor = createExecutor();
+
+    List<Long> startTimes = new ArrayList<>();
+    List<Long> endTimes = new ArrayList<>();
+
+    final CountDownLatch latch = new CountDownLatch(2);
+
+    final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
+      startTimes.add(System.nanoTime());
+      try {
+        sleep(200);
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
+      latch.countDown();
+      endTimes.add(System.nanoTime());
+    }, 0, 1, SECONDS);
+
+    assertThat(awaitLatch(latch), is(true));
+    scheduled.cancel(true);
+
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(800, 10));
+  }
+
+  @Test
+  @Description("Tests that scheduleAtFixedRate parameters are honored even if the task takes longer than the rate")
+  public void fixedRateExceeds() {
+    final ScheduledExecutorService executor = createExecutor();
+
+    List<Long> startTimes = new ArrayList<>();
+    List<Long> endTimes = new ArrayList<>();
+
+    final CountDownLatch latch = new CountDownLatch(2);
+
+    final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
+      startTimes.add(System.nanoTime());
+      try {
+        sleep(1200);
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
+      latch.countDown();
+      endTimes.add(System.nanoTime());
+    }, 0, 1, SECONDS);
+
+    assertThat(awaitLatch(latch), is(true));
+    scheduled.cancel(true);
+
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(0, 10));
+  }
+
+  @Test
+  @Description("Tests that scheduleAtFixedDelay parameters are honored")
+  public void fixedDelayRepeats() {
+    final ScheduledExecutorService executor = createExecutor();
+
+    List<Long> startTimes = new ArrayList<>();
+    List<Long> endTimes = new ArrayList<>();
+
+    final CountDownLatch latch = new CountDownLatch(2);
+
+    final ScheduledFuture<?> scheduled = executor.scheduleWithFixedDelay(() -> {
+      startTimes.add(System.nanoTime());
+      try {
+        sleep(200);
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
+      latch.countDown();
+      endTimes.add(System.nanoTime());
+    }, 0, 1, SECONDS);
+
+    assertThat(awaitLatch(latch), is(true));
+    scheduled.cancel(true);
+
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(1000, 10));
   }
 
   @Override

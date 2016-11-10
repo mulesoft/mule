@@ -6,12 +6,17 @@
  */
 package org.mule.tck;
 
+import static java.util.Collections.unmodifiableList;
+import static org.mockito.Mockito.spy;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 /**
@@ -25,6 +30,8 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
       new SimpleUnitTestSupportScheduler(2, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
                                          new AbortPolicy());
 
+  private List<Scheduler> decorators = new ArrayList<>();
+
   @Override
   public String getName() {
     return this.getClass().getSimpleName();
@@ -32,22 +39,35 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler);
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    decorators.add(decorator);
+    return decorator;
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler);
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    decorators.add(decorator);
+    return decorator;
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler);
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    decorators.add(decorator);
+    return decorator;
   }
 
   @Override
   public void stop() throws MuleException {
     scheduler.shutdownNow();
+  }
+
+  public List<Scheduler> getCreatedSchedulers() {
+    return unmodifiableList(decorators);
   }
 
   public int getScheduledTasks() {

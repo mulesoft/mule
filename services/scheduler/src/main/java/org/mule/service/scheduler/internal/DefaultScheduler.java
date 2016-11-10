@@ -79,7 +79,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(command);
 
-    final RunnableFutureDecorator<?> task = new RunnableFutureDecorator<>(super.newTaskFor(command, null), this);
+    final RunnableFuture<?> task = newTaskFor(command, null);
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
@@ -93,9 +93,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(callable);
 
-    final RunnableFutureDecorator<V> task = new RunnableFutureDecorator<>(super.newTaskFor(callable), this);
+    final RunnableFuture<V> task = newTaskFor(callable);
 
-    final ScheduledFutureDecorator<V> scheduled =
+    final ScheduledFuture<V> scheduled =
         new ScheduledFutureDecorator(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
 
     scheduledTasks.put(task, scheduled);
@@ -107,9 +107,13 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(command);
 
-    final RunnableFutureDecorator<?> task = new RunnableFutureDecorator<>(super.newTaskFor(command, null), this);
+    final RunnableFuture<?> task = new RunnableRepeatableFutureDecorator<>(() -> super.newTaskFor(command, null), t -> {
+      if (t.isCancelled()) {
+        taskFinished(t);
+      }
+    });
 
-    final ScheduledFutureDecorator<?> scheduled =
+    final ScheduledFuture<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
                                        task);
 
@@ -122,28 +126,35 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     requireNonNull(command);
 
-    final RunnableFutureDecorator<?> task = new RunnableFutureDecorator<>(super.newTaskFor(command, null), this);
+    final RunnableFuture<?> task = new RunnableRepeatableFutureDecorator<>(() -> super.newTaskFor(command, null), t -> {
+      if (!t.isCancelled()) {
+        scheduledExecutor.schedule(schedulableTask(t), delay, unit);
+      } else {
+        taskFinished(t);
+      }
+    });
 
     final ScheduledFutureDecorator<?> scheduled =
-        new ScheduledFutureDecorator<>(scheduledExecutor.scheduleWithFixedDelay(schedulableTask(task), initialDelay, delay, unit),
-                                       task);
+        new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
 
     scheduledTasks.put(task, scheduled);
     return scheduled;
   }
 
-  private Runnable schedulableTask(RunnableFuture<?> task) {
+  private <T> Runnable schedulableTask(RunnableFuture<T> task) {
     return () -> executor.execute(task);
   }
 
   @Override
   public void shutdown() {
+    logger.debug("Shutting down " + this.toString());
     this.shutdown = true;
     tryTerminate();
   }
 
   @Override
   public List<Runnable> shutdownNow() {
+    logger.debug("Shutting down NOW " + this.toString());
     shutdown();
 
     List<Runnable> tasks;
@@ -247,7 +258,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     }
   }
 
-  protected void taskFinished(RunnableFutureDecorator<?> task) {
+  protected void taskFinished(RunnableFuture<?> task) {
     scheduledTasks.remove(task);
     tryTerminate();
   }

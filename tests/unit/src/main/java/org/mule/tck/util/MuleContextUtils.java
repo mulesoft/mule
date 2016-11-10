@@ -8,6 +8,7 @@ package org.mule.tck.util;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
@@ -44,7 +45,7 @@ public class MuleContextUtils {
     final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     final MuleRegistry muleRegistry = mock(MuleRegistry.class);
     try {
-      when(muleRegistry.lookupObject(SchedulerService.class)).thenReturn(new SimpleUnitTestSupportSchedulerService());
+      when(muleRegistry.lookupObject(SchedulerService.class)).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

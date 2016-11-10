@@ -89,7 +89,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     // TODO MULE-10585 Externalize the threads configuration
     cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
                                               new NamedThreadFactory(CPU_LIGHT_THREADS_NAME));
-    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 0, SECONDS, new SynchronousQueue<>(),
+    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 30, SECONDS, new SynchronousQueue<>(),
                                         new NamedThreadFactory(IO_THREADS_NAME));
     computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
                                                  new NamedThreadFactory(COMPUTATION_THREADS_NAME));
