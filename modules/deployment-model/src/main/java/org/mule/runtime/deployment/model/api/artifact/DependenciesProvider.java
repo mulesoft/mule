@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
-import org.mule.runtime.deployment.model.api.DeploymentException;
-
 import java.io.File;
-import java.net.URL;
 
 /**
  * Resolver of an artifact's location from a reference.
@@ -19,11 +16,11 @@ import java.net.URL;
 public interface DependenciesProvider {
 
   /**
-   * Given a reference to an artifact, it will look up the plugin's location and it will return it in a {@link URL}.
+   * Given a reference to an artifact, it will look up the plugin's location and it will return it in a {@link File}.
    *
    * @param artifactName reference to an artifact. Non null. // TODO(fernandezlautaro): MULE-10440 same as the class comment, ideally we should rely in an object like org.mule.runtime.module.repository.api.BundleDescriptor
    * @return an {@link File} pointing to the artifact location's folder (it must be unzipped).
-   * @throws DeploymentException if the artifact to look for wasn't found.
+   * @throws DependencyNotFoundException if the dependency to look for wasn't found.
    */
   File resolve(String artifactName);
 }

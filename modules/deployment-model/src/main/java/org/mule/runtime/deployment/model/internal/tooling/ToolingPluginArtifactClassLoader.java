@@ -7,8 +7,8 @@
 package org.mule.runtime.deployment.model.internal.tooling;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -40,7 +40,7 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
    *
    * @param regionClassLoader class loader used to execute the {@link #dispose()} properly.
    * @param artifactPluginDescriptor descriptor to look for within the {@link RegionClassLoader}.
-   * @throws DeploymentException if the plugin is not within the {@link RegionClassLoader}.
+   * @throws DependencyNotFoundException if the plugin is not within the {@link RegionClassLoader}.
    */
   public ToolingPluginArtifactClassLoader(RegionClassLoader regionClassLoader,
                                           ArtifactPluginDescriptor artifactPluginDescriptor) {
@@ -59,8 +59,8 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
                                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
     return artifactPluginClassLoaders.stream()
         .filter(artifactClassLoader -> artifactClassLoader.getArtifactId().equals(artifactPluginDescriptor.getName())).findFirst()
-        .orElseThrow(() -> new DeploymentException(createStaticMessage(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
-                                                                              artifactPluginDescriptor.getName()))));
+        .orElseThrow(() -> new DependencyNotFoundException(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
+                                                                  artifactPluginDescriptor.getName())));
   }
 
   @Override

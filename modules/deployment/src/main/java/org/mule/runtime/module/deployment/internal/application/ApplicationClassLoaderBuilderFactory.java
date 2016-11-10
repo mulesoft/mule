@@ -35,6 +35,8 @@ public class ApplicationClassLoaderBuilderFactory {
    * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
    * @param artifactPluginRepository repository for artifact plugins provided by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders. Non null.
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
+   * @param dependenciesProvider resolver for missing dependencies
    */
   public ApplicationClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory,
                                               ArtifactPluginRepository artifactPluginRepository,

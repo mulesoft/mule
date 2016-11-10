@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -40,21 +40,18 @@ public class ToolingPluginArtifactClassLoaderTestCase extends AbstractMuleTestCa
   @Before
   public void createAppClassLoader() {
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    //mandatory to find a resource releaser instance when doing the {@link org.mule.runtime.module.artifact.classloader.RegionClassLoader#dispose}
+    // Mandatory to find a resource releaser instance when doing the dispose of a RegionClassLoader
     when(classLoaderLookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     regionClassLoader =
         new RegionClassLoader(TEST_REGION, new ArtifactDescriptor(REGION_NAME), null, classLoaderLookupPolicy);
-    /**
-     * we simulate loading an additional classloader as the {@link ToolingPluginClassLoaderBuilder#build()} will do when
-     * creating the fake {@link ArtifactDescriptor}.
-     */
+    // Loading the additional classloader as the ToolingPluginClassLoaderBuilder does
     regionClassLoader.addClassLoader(mock(ArtifactClassLoader.class), mock(ArtifactClassLoaderFilter.class));
     artifactPluginDescriptor = new ArtifactPluginDescriptor(PLUGIN_NAME);
     pluginArtifactClassLoader = spy(new TestToolingPluginClassLoader(artifactPluginDescriptor));
   }
 
-  @Test(expected = DeploymentException.class)
+  @Test(expected = DependencyNotFoundException.class)
   public void createClassLoaderWithEmptyPluginList() {
     new ToolingPluginArtifactClassLoader(regionClassLoader, artifactPluginDescriptor);
   }

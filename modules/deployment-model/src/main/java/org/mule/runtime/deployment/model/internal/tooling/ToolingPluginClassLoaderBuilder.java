@@ -7,6 +7,7 @@
 package org.mule.runtime.deployment.model.internal.tooling;
 
 import static java.lang.String.format;
+import static java.util.UUID.*;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
@@ -79,7 +80,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   @Override
   protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
-    return TOOLING_EXTENSION_MODEL + "/" + artifactDescriptor.getName();
+    return TOOLING_EXTENSION_MODEL + randomUUID().toString() + "/" + artifactDescriptor.getName();
   }
 
   @Override

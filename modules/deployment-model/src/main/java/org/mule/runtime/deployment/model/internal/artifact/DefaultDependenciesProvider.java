@@ -7,9 +7,8 @@
 package org.mule.runtime.deployment.model.internal.artifact;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
+import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 
 import java.io.File;
 
@@ -23,8 +22,8 @@ public class DefaultDependenciesProvider implements DependenciesProvider {
 
   @Override
   public File resolve(String artifactName) {
-    throw new DeploymentException(createStaticMessage(format("Default implementation of DependenciesProvider cannot resolve dependencies. Dependency that trigger the exception is '%s'",
-                                                             artifactName)));
+    throw new DependencyNotFoundException(format("Default implementation of DependenciesProvider cannot resolve dependencies. Dependency that trigger the exception is '%s'",
+                                                 artifactName));
   }
 
 }

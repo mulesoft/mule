@@ -39,9 +39,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * <p>
    * The {@code domainRepository} is used to locate the domain that this application belongs to and the
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
-   *  @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
+   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
    * @param artifactPluginRepository repository of plugins contained by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders.
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
+   * @param dependenciesProvider resolver for missing dependencies.
    */
   public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                        ArtifactPluginRepository artifactPluginRepository,

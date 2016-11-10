@@ -29,6 +29,8 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    * 
    * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
+   * @param dependenciesProvider resolver for missing dependencies
    */
   public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
                                                     ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,

@@ -29,15 +29,12 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Base class for all artifacts class loader filters.
@@ -50,8 +47,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
-  private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
-  private final DependenciesProvider dependenciesProvider;
+  private final NamePluginDependenciesResolver namePluginDependenciesResolver;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
   private ArtifactDescriptor artifactDescriptor;
@@ -64,9 +60,8 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    *        null.
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency
-   *                                  resolving
-   * @param dependenciesProvider {@link URL} resolver for missing dependencies.
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
+   * @param dependenciesProvider resolver for missing dependencies.
    */
   public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                             ArtifactPluginRepository artifactPluginRepository,
@@ -81,8 +76,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.artifactDescriptorFactory = artifactDescriptorFactory;
-    this.dependenciesProvider = dependenciesProvider;
+    this.namePluginDependenciesResolver = new NamePluginDependenciesResolver(artifactDescriptorFactory, dependenciesProvider);
   }
 
   /**
@@ -141,11 +135,11 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
     List<ArtifactPluginDescriptor> pluginDescriptors = createContainerApplicationPlugins();
     pluginDescriptors.addAll(artifactPluginDescriptors);
-    Set<String> knownPlugins =
-        pluginDescriptors.stream().map(ArtifactDescriptor::getName).collect(Collectors.toSet());
-    List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors =
-        getArtifactsWithDependencies(pluginDescriptors, knownPlugins);
-    effectiveArtifactPluginDescriptors = new NamePluginDependenciesResolver().resolve(effectiveArtifactPluginDescriptors);
+    //Set<String> knownPlugins =
+    //    pluginDescriptors.stream().map(ArtifactDescriptor::getName).collect(Collectors.toSet());
+    //List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors =
+    //    getArtifactsWithDependencies(pluginDescriptors, knownPlugins);
+    List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = namePluginDependenciesResolver.resolve(pluginDescriptors);
 
     final List<ArtifactClassLoader> pluginClassLoaders =
         createPluginClassLoaders(artifactId, regionClassLoader, effectiveArtifactPluginDescriptors);
@@ -164,34 +158,34 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     return artifactClassLoader;
   }
 
-  /**
-   * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet. If it hasn't
-   * then it looks it up through the {@link DependenciesProvider} and then creates an {@link ArtifactPluginDescriptor}.
-   *
-   * @param pluginDescriptors plugins to validate.
-   * @param visited plugins that are already resolved (by either the container or application initially, or by the resolver).
-   * @return the plugins that were obtained initially plus all the ones that were found.
-   * @throws DeploymentException if any dependency wasn't found properly
-   */
-  private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
-                                                                      Set<String> visited) {
-    if (!pluginDescriptors.isEmpty()) {
-      List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
-      pluginDescriptors.stream()
-          .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
-          .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
-              .forEach(dependency -> {
-                if (!visited.contains(dependency)) {
-                  File mulePluginLocation = dependenciesProvider.resolve(dependency);
-                  foundDependencies.add(artifactDescriptorFactory.create(new File(mulePluginLocation.toURI())));
-                  visited.add(dependency);
-                }
-              }));
-
-      pluginDescriptors.addAll(getArtifactsWithDependencies(foundDependencies, visited));
-    }
-    return pluginDescriptors;
-  }
+  ///**
+  // * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet. If it hasn't
+  // * then it looks it up through the {@link DependenciesProvider} and then creates an {@link ArtifactPluginDescriptor}.
+  // *
+  // * @param pluginDescriptors plugins to validate.
+  // * @param visited plugins that are already resolved (by either the container or application initially, or by the resolver).
+  // * @return the plugins that were obtained initially plus all the ones that were found.
+  // * @throws DeploymentException if any dependency wasn't found properly
+  // */
+  //private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
+  //                                                                    Set<String> visited) {
+  //  if (!pluginDescriptors.isEmpty()) {
+  //    List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
+  //    pluginDescriptors.stream()
+  //        .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
+  //        .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
+  //            .forEach(dependency -> {
+  //              if (!visited.contains(dependency)) {
+  //                File mulePluginLocation = dependenciesProvider.resolve(dependency);
+  //                foundDependencies.add(artifactDescriptorFactory.create(new File(mulePluginLocation.toURI())));
+  //                visited.add(dependency);
+  //              }
+  //            }));
+  //
+  //    pluginDescriptors.addAll(getArtifactsWithDependencies(foundDependencies, visited));
+  //  }
+  //  return pluginDescriptors;
+  //}
 
   private ArtifactClassLoaderFilter createClassLoaderFilter(ClassLoaderModel classLoaderModel) {
     return new DefaultArtifactClassLoaderFilter(classLoaderModel.getExportedPackages(), classLoaderModel.getExportedResources());
