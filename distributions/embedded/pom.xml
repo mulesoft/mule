@@ -69,8 +69,8 @@
                                     <Vendor-Url>${project.organization.url}</Vendor-Url>
                                     <Product-Url>${productUrl}</Product-Url>
                                     <Build-Date>${timestamp}</Build-Date>
-                                    <Supported-Jdks>[1.7.0,1.8)</Supported-Jdks>
-                                    <Recommended-Jdks>[1.7.0_60,1.8)</Recommended-Jdks>
+                                    <Supported-Jdks>[1.8.0_20,1.9)</Supported-Jdks>
+                                    <Recommended-Jdks>[1.8.0_112,1.9)</Recommended-Jdks>
                                 </manifestEntries>
                             </archive>
                         </configuration>
