@@ -11,8 +11,10 @@ import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.message.Attributes;
@@ -22,6 +24,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import java.util.HashMap;
@@ -86,7 +89,11 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
   }
 
   private TypedValue evaluate(String expression, BindingContext context) {
-    return expressionExecutor.evaluate(sanitize(expression), context);
+    try {
+      return expressionExecutor.evaluate(sanitize(expression), context);
+    } catch (ExpressionExecutionException e) {
+      throw new ExpressionRuntimeException(expressionEvaluationFailed(expression), e);
+    }
   }
 
   private BindingContext.Builder addFlowBindings(FlowConstruct flow, BindingContext.Builder contextBuilder) {

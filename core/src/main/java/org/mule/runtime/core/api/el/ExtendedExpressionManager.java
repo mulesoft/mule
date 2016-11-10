@@ -38,7 +38,8 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct);
+  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException;
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
@@ -61,7 +62,8 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    */
   @Deprecated
   TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
-                      BindingContext context);
+                      BindingContext context)
+      throws ExpressionRuntimeException;
 
   /**
    * Enriches an event.

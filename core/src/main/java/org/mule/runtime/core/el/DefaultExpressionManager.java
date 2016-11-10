@@ -214,7 +214,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
     return validateExpression(expression, selectExpressionLanguage(expression));
   }
 
-  public ValidationResult validateExpression(String expression, ExpressionLanguage expressionLanguage) {
+  private ValidationResult validateExpression(String expression, ExpressionLanguage expressionLanguage) {
     if (!muleContext.getConfiguration().isValidateExpressions()) {
       if (logger.isDebugEnabled()) {
         logger.debug("Validate expressions is turned off, no checking done for: " + expression);
