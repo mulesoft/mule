@@ -135,10 +135,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
     List<ArtifactPluginDescriptor> pluginDescriptors = createContainerApplicationPlugins();
     pluginDescriptors.addAll(artifactPluginDescriptors);
-    //Set<String> knownPlugins =
-    //    pluginDescriptors.stream().map(ArtifactDescriptor::getName).collect(Collectors.toSet());
-    //List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors =
-    //    getArtifactsWithDependencies(pluginDescriptors, knownPlugins);
     List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = namePluginDependenciesResolver.resolve(pluginDescriptors);
 
     final List<ArtifactClassLoader> pluginClassLoaders =
@@ -157,35 +153,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
     return artifactClassLoader;
   }
-
-  ///**
-  // * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet. If it hasn't
-  // * then it looks it up through the {@link DependenciesProvider} and then creates an {@link ArtifactPluginDescriptor}.
-  // *
-  // * @param pluginDescriptors plugins to validate.
-  // * @param visited plugins that are already resolved (by either the container or application initially, or by the resolver).
-  // * @return the plugins that were obtained initially plus all the ones that were found.
-  // * @throws DeploymentException if any dependency wasn't found properly
-  // */
-  //private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
-  //                                                                    Set<String> visited) {
-  //  if (!pluginDescriptors.isEmpty()) {
-  //    List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
-  //    pluginDescriptors.stream()
-  //        .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
-  //        .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
-  //            .forEach(dependency -> {
-  //              if (!visited.contains(dependency)) {
-  //                File mulePluginLocation = dependenciesProvider.resolve(dependency);
-  //                foundDependencies.add(artifactDescriptorFactory.create(new File(mulePluginLocation.toURI())));
-  //                visited.add(dependency);
-  //              }
-  //            }));
-  //
-  //    pluginDescriptors.addAll(getArtifactsWithDependencies(foundDependencies, visited));
-  //  }
-  //  return pluginDescriptors;
-  //}
 
   private ArtifactClassLoaderFilter createClassLoaderFilter(ClassLoaderModel classLoaderModel) {
     return new DefaultArtifactClassLoaderFilter(classLoaderModel.getExportedPackages(), classLoaderModel.getExportedResources());

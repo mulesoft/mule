@@ -81,7 +81,6 @@ public class NamePluginDependenciesResolverTestCase extends AbstractMuleTestCase
     fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(BAR_PLUGIN)).build());
 
     expectedException.expect(PluginResolutionError.class);
-    //expectedException.expectMessage(createResolutionErrorMessage(singletonList(fooPlugin), emptyList()));
     expectedException.expectMessage(format(DEPENDENCY_PROVIDER_ERROR_MESSAGE, BAR_PLUGIN));
     dependenciesResolver.resolve(pluginDescriptors);
   }
