@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.service;
 
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 /**
  * Manages the lifecycle of the services avaialbe in the {@link ServiceRepository}

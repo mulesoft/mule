@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformer.encryption;
 
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;

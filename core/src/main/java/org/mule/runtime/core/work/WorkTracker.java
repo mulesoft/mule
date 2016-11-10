@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.work;
 
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 
 import java.util.List;
 

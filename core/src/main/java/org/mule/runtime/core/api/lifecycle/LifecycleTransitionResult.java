@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +26,7 @@ public final class LifecycleTransitionResult {
    *
    * @param iface The lifecycle interface to be called
    * @param objects An iterator over all children that must also be called
-   * @throws org.mule.runtime.core.api.lifecycle.LifecycleException if any fail
+   * @throws LifecycleException if any fail
    */
   private static void processAllNoRetry(Class<? extends Initialisable> iface, Iterator<? extends Initialisable> objects)
       throws LifecycleException {

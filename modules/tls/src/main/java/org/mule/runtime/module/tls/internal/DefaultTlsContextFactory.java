@@ -8,8 +8,8 @@ package org.mule.runtime.module.tls.internal;
 
 
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;

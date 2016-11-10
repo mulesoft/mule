@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -36,7 +36,6 @@ import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SynchronousProcessingStrategy;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.lock.LockFactory;
 

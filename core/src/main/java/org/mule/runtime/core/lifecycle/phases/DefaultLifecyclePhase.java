@@ -8,7 +8,7 @@ package org.mule.runtime.core.lifecycle.phases;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.config.ExceptionHelper;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * Note that this class and {@link org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult} both make assumptions about the
  * interfaces used - the return values and exceptions. These are, currently, that the return value is either void or
  * {@link org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult} and either 0 or 1 exceptions can be thrown which are
- * either {@link InstantiationException} or {@link org.mule.runtime.core.api.lifecycle.LifecycleException}.
+ * either {@link InstantiationException} or {@link LifecycleException}.
  *
  * @see org.mule.runtime.core.api.lifecycle.LifecyclePhase
  */

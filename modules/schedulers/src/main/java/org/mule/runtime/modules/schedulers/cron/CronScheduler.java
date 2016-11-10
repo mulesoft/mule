@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.source.polling.PollingWorker;
 import org.mule.runtime.core.source.polling.schedule.PollScheduler;
 import org.mule.runtime.modules.schedulers.internal.cron.CronJob;

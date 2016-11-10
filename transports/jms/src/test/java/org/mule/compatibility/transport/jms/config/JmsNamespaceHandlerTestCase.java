@@ -28,7 +28,7 @@ import org.mule.compatibility.transport.jms.test.TestRedeliveryHandler;
 import org.mule.compatibility.transport.jms.test.TestRedeliveryHandlerFactory;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;

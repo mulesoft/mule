@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;

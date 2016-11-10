@@ -9,7 +9,7 @@ package org.mule.test.core.context;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Rule;

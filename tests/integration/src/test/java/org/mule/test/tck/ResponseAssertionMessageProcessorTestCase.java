@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.processor.TestNonBlockingProcessor;
 

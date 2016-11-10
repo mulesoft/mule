@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.component;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 
 /**
  * <code>LifecycleAdapter</code> is a wrapper around a pojo service that adds Lifecycle methods to the pojo.

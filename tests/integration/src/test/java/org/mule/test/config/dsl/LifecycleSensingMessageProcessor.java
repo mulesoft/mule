@@ -12,8 +12,8 @@ import static org.mule.test.config.dsl.LifecycleAction.START;
 import static org.mule.test.config.dsl.LifecycleAction.STOP;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.LinkedList;

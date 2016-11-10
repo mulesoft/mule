@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.security;
 
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 
 import java.util.Collection;
 

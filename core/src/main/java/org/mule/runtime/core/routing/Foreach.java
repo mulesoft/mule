@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.transformer.TransformerException;

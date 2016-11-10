@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.schedule;
 
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 
 /**
  * <p>

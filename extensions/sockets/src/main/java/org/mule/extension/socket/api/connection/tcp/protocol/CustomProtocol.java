@@ -9,8 +9,8 @@ package org.mule.extension.socket.api.connection.tcp.protocol;
 import static java.lang.String.format;
 
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;

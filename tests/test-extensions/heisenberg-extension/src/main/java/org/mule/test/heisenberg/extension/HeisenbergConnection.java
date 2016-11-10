@@ -7,8 +7,8 @@
 package org.mule.test.heisenberg.extension;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 
 public class HeisenbergConnection implements Lifecycle {
 

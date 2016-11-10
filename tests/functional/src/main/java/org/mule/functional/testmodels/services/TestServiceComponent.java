@@ -7,7 +7,7 @@
 package org.mule.functional.testmodels.services;
 
 import org.mule.runtime.core.api.component.simple.EchoService;
-import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.util.StringUtils;
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 /**

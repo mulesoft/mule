@@ -18,7 +18,7 @@ import static org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreEx
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;

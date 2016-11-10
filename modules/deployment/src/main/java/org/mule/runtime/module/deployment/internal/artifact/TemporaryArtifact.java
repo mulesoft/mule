@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal.artifact;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
 
 /**
  * Artifact meant to be used for tooling purposes.
@@ -26,7 +27,7 @@ public interface TemporaryArtifact extends Startable, Disposable {
   /**
    * Initialises and starts the tooling context.
    *
-   * @throws MuleException which can be an {@link org.mule.runtime.core.api.lifecycle.InitialisationException} or
+   * @throws MuleException which can be an {@link InitialisationException} or
    *         {@link org.mule.runtime.core.api.config.ConfigurationException} that represents a failure in the configuration of
    *         components.
    */

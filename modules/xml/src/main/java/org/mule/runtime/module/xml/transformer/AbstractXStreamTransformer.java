@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;

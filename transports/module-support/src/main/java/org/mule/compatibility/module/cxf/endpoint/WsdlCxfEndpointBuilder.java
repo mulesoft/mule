@@ -13,7 +13,7 @@ import org.mule.compatibility.core.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.module.cxf.builder.WsdlClientMessageProcessorBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
 

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.security;
 
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 
 /**
  * <code>SecurityProvider</code> is a target security provider that actually does the work of authenticating credentials and

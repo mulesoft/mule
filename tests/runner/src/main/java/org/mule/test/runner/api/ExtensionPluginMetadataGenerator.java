@@ -11,7 +11,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;

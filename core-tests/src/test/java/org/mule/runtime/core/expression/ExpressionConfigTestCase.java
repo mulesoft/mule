@@ -8,7 +8,8 @@ package org.mule.runtime.core.expression;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;

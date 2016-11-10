@@ -9,8 +9,8 @@ package org.mule.runtime.core.source.polling.watermark;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;

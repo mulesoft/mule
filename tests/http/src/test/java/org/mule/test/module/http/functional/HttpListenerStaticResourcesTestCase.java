@@ -15,7 +15,7 @@ import static org.mule.runtime.core.util.ClassUtils.getClassPathRoot;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;

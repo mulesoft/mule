@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.security;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 /**
  * <code>SecurityFilter</code> is a base filter for secure filtering of inbound and outbound event flow.

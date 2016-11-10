@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.management.agent.mbean;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 
 public interface ConnectorServiceMBean extends Initialisable {
 

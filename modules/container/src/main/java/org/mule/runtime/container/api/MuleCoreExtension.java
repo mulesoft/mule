@@ -7,7 +7,7 @@
 package org.mule.runtime.container.api;
 
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 /**

@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 public class XMLExpressionLanguageExtension extends org.mule.runtime.core.el.mvel.DataConversion
     implements ExpressionLanguageExtension, MuleContextAware, Initialisable {

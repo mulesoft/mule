@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.CountDownLatch;

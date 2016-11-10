@@ -9,9 +9,9 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 public class MessageDispatcherUtils {
 

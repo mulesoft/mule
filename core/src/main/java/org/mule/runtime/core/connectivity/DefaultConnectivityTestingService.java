@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 

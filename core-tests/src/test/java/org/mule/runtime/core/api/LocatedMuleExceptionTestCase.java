@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

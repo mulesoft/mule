@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 /**
  * <code>RecoverableException</code> can be thrown during initialisation to indicate that the error occurred is not fatal and a

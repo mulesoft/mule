@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;

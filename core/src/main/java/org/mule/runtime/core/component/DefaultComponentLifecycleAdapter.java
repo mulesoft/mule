@@ -17,11 +17,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
@@ -44,10 +44,10 @@ import org.slf4j.LoggerFactory;
  * {@link JavaComponent} that expects component instances to implement Mule lifecycle interfaces in order to receive lifecycle.
  * Lifecycle interfaces supported are -
  * <ul>
- * <li>{@link org.mule.runtime.core.api.lifecycle.Initialisable}</li>
- * <li>{@link org.mule.runtime.core.api.lifecycle.Startable}</li>
- * <li>{@link org.mule.runtime.core.api.lifecycle.Stoppable}</li>
- * <li>{@link org.mule.runtime.core.api.lifecycle.Disposable}</li>
+ * <li>{@link Initialisable}</li>
+ * <li>{@link Startable}</li>
+ * <li>{@link Stoppable}</li>
+ * <li>{@link Disposable}</li>
  * </ul>
  * This implementation also supports JSR-250 lifecycle annotations {@link javax.annotation.PostConstruct} (for initialisation)
  * and/or {@link javax.annotation.PreDestroy} (for disposal of the object). Only one of each annotation can be used per component

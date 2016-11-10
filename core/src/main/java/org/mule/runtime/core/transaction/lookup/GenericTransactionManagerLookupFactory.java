@@ -7,8 +7,8 @@
 package org.mule.runtime.core.transaction.lookup;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.JndiContextHelper;
@@ -94,7 +94,7 @@ public class GenericTransactionManagerLookupFactory implements TransactionManage
    * say by retrying to connect, a <code>RecoverableException</code> should be thrown. There is no guarantee that by throwing a
    * Recoverable exception that the Mule instance will not shut down.
    *
-   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException if a fatal error occurs causing the Mule instance to
+   * @throws InitialisationException if a fatal error occurs causing the Mule instance to
    *         shutdown
    */
   public void initialise() throws InitialisationException {
