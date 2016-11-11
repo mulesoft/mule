@@ -42,6 +42,8 @@ import ru.yandex.qatools.allure.annotations.Features;
 @Features("Scheduler Task Scheduling")
 public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCase {
 
+  private static final int DELTA_MILLIS = 30;
+
   private Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService> executorFactory;
 
   public DefaultSchedulerScheduleTestCase(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService> executorFactory) {
@@ -447,7 +449,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(800, 10));
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(800, DELTA_MILLIS));
   }
 
   @Test
@@ -474,7 +476,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(0, 10));
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(0, DELTA_MILLIS));
   }
 
   @Test
@@ -501,7 +503,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(1000, 10));
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(1000, DELTA_MILLIS));
   }
 
   @Override

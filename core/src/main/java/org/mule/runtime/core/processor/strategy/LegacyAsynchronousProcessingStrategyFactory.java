@@ -14,7 +14,7 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,9 +22,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -50,13 +48,10 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new LegacyAsynchronousProcessingStrategy(() -> {
-      try {
-        return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS), muleContext);
+    return new LegacyAsynchronousProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+                                                    scheduler -> scheduler
+                                                        .stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                                                    muleContext);
   }
 
   static class LegacyAsynchronousProcessingStrategy extends AsynchronousProcessingStrategy {
@@ -67,12 +62,14 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
       super(schedulerSupplier, schedulerStopper, muleContext);
     }
 
+    @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
 
       return onPipeline(flowConstruct, pipelineFunction, flowConstruct.getExceptionListener());
     }
 
+    @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {

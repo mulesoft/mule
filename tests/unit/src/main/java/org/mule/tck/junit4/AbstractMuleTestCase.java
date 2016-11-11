@@ -7,17 +7,15 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
@@ -243,9 +241,7 @@ public abstract class AbstractMuleTestCase {
   }
 
   public static void registerServices(MuleContext muleContext) throws RegistrationException {
-    final MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleRegistry.lookupObject(SchedulerService.class)).thenReturn(new SimpleUnitTestSupportSchedulerService());
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    when(muleContext.getSchedulerService()).thenReturn(new SimpleUnitTestSupportSchedulerService());
   }
 
   private Event _testEvent;

@@ -23,6 +23,7 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultEventContext;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
@@ -102,7 +102,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @After
   public void after() throws MuleException {
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(muleContext.getSchedulerService());
   }
 
   @Test

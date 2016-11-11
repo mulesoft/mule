@@ -292,7 +292,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static void disposeContext() throws RegistrationException, MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
-        final SchedulerService serviceImpl = muleContext.getRegistry().lookupObject(SchedulerService.class);
+        final SchedulerService serviceImpl = muleContext.getSchedulerService();
         if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
           stopIfNeeded(serviceImpl);
         }

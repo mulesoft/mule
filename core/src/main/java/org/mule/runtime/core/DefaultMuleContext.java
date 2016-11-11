@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
@@ -39,8 +40,15 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.Event;
@@ -61,17 +69,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -127,6 +130,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -172,6 +176,9 @@ public class DefaultMuleContext implements MuleContext {
   private WorkManager workManager;
 
   private WorkListener workListener;
+
+  private SchedulerService schedulerService;
+  private Object schedulerServiceLock = new Object();
 
   /**
    * LifecycleManager for the MuleContext. Note: this is NOT the same lifecycle manager as the one in the Registry.
@@ -308,7 +315,7 @@ public class DefaultMuleContext implements MuleContext {
     try {
       // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
       // The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
-      muleRegistryHelper.initialise();
+      getRegistry().initialise();
 
       // We need to start the work manager straight away since we need it to fire notifications
       if (workManager instanceof MuleContextAware) {
@@ -610,6 +617,24 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public WorkListener getWorkListener() {
     return workListener;
+  }
+
+  @Override
+  public SchedulerService getSchedulerService() {
+    if (this.schedulerService == null) {
+      synchronized (schedulerServiceLock) {
+        if (this.schedulerService == null) {
+          try {
+            this.schedulerService = this.getRegistry().lookupObject(SchedulerService.class);
+            requireNonNull(schedulerService);
+          } catch (RegistrationException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }
+      }
+    }
+
+    return this.schedulerService;
   }
 
   @Override

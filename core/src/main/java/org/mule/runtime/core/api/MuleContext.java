@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DataTypeConversionResolver;
 import org.mule.runtime.core.TransformationService;
@@ -21,13 +23,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ListableObjectStore;
@@ -169,6 +170,8 @@ public interface MuleContext extends Lifecycle {
   WorkManager getWorkManager();
 
   WorkListener getWorkListener();
+
+  SchedulerService getSchedulerService();
 
   /**
    * Sets the queue manager used by mule for queuing events. This is used for service queues

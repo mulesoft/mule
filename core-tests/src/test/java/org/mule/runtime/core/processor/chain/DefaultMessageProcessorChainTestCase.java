@@ -33,7 +33,10 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
@@ -45,15 +48,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -142,7 +142,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
   @After
   public void after() throws RegistrationException, MuleException {
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(muleContext.getSchedulerService());
     mockFlow.stop();
     mockFlow.dispose();
   }
@@ -764,7 +764,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
       }
     } finally {
       final SimpleUnitTestSupportSchedulerService schedulerService =
-          (SimpleUnitTestSupportSchedulerService) (muleContext.getRegistry().lookupObject(SchedulerService.class));
+          (SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService());
       new PollingProber().check(new JUnitLambdaProbe(() -> {
         assertThat(schedulerService.getScheduledTasks(), greaterThanOrEqualTo(nonBlockingProcessorsExecuted.get()));
         return true;
