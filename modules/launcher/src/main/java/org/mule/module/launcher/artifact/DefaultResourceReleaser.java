@@ -141,12 +141,25 @@ public class DefaultResourceReleaser implements ResourceReleaser
 
     private boolean isOracleDriver(Driver driver)
     {
-        return "oracle.jdbc.OracleDriver".equals(driver.getClass().getName());
+        return isDriver(driver, "oracle.jdbc.OracleDriver");
     }
 
     private boolean isMySqlDriver(Driver driver)
     {
-        return "com.mysql.jdbc.Driver".equals(driver.getClass().getName());
+        return isDriver(driver, "com.mysql.jdbc.Driver");
+    }
+
+    private boolean isDriver(Driver driver, String expectedDriverClass)
+    {
+        try
+        {
+            return driver.getClass().getClassLoader().loadClass(expectedDriverClass).isAssignableFrom(driver.getClass());
+        }
+        catch (ClassNotFoundException e)
+        {
+            // If the class is not found, there is no such driver.
+            return false;
+        }
     }
 
     private void deregisterOracleDiagnosabilityMBean()
@@ -170,7 +183,7 @@ public class DefaultResourceReleaser implements ResourceReleaser
         }
         catch (Throwable e)
         {
-            logger.warn("Unable to unregister Oracle's mbeans");
+            logger.warn("Unable to unregister Oracle's mbeans", e);
         }
     }
 
@@ -187,7 +200,7 @@ public class DefaultResourceReleaser implements ResourceReleaser
         }
         catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
-            logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread");
+            logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
         }
     }
 }
