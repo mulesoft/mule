@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.plugin.NamePluginDependenciesResolver;
@@ -25,6 +26,7 @@ import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFi
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
@@ -45,6 +47,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
+  private final NamePluginDependenciesResolver namePluginDependenciesResolver;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
   private ArtifactDescriptor artifactDescriptor;
@@ -57,16 +60,23 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    *        null.
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
+   * @param dependenciesProvider resolver for missing dependencies.
    */
   public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                             ArtifactPluginRepository artifactPluginRepository,
-                                            ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
+                                            ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+                                            ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
+                                            DependenciesProvider dependenciesProvider) {
     checkArgument(artifactClassLoaderFactory != null, "artifact class loader factory cannot be null");
     checkArgument(artifactPluginRepository != null, "artifact plugin repository cannot be null");
     checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
+    checkArgument(artifactDescriptorFactory != null, "artifactPluginClassLoaderFactory cannot be null");
+    checkArgument(dependenciesProvider != null, "dependenciesProvider cannot be null");
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
+    this.namePluginDependenciesResolver = new NamePluginDependenciesResolver(artifactDescriptorFactory, dependenciesProvider);
   }
 
   /**
@@ -123,9 +133,9 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         new RegionClassLoader(artifactId, artifactDescriptor, parentClassLoader.getClassLoader(),
                               parentClassLoader.getClassLoaderLookupPolicy());
 
-    List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = createContainerApplicationPlugins();
-    effectiveArtifactPluginDescriptors.addAll(artifactPluginDescriptors);
-    effectiveArtifactPluginDescriptors = new NamePluginDependenciesResolver().resolve(effectiveArtifactPluginDescriptors);
+    List<ArtifactPluginDescriptor> pluginDescriptors = createContainerApplicationPlugins();
+    pluginDescriptors.addAll(artifactPluginDescriptors);
+    List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = namePluginDependenciesResolver.resolve(pluginDescriptors);
 
     final List<ArtifactClassLoader> pluginClassLoaders =
         createPluginClassLoaders(artifactId, regionClassLoader, effectiveArtifactPluginDescriptors);

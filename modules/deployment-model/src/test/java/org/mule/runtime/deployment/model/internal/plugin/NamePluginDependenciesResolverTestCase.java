@@ -7,14 +7,14 @@
 
 package org.mule.runtime.deployment.model.internal.plugin;
 
-import static java.util.Collections.emptyList;
+import static java.lang.String.format;
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mule.runtime.deployment.model.internal.plugin.NamePluginDependenciesResolver.createResolutionErrorMessage;
+import static org.mockito.Mockito.mock;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,11 +33,15 @@ public class NamePluginDependenciesResolverTestCase extends AbstractMuleTestCase
   private static final String FOO_PLUGIN = "foo";
   private static final String BAZ_PLUGIN = "baz";
   private static final String BAR_PLUGIN = "bar";
+  public static final String DEPENDENCY_PROVIDER_ERROR_MESSAGE = "The '%s' cannot be found.";
 
   private final ArtifactPluginDescriptor fooPlugin = new ArtifactPluginDescriptor(FOO_PLUGIN);
   private final ArtifactPluginDescriptor barPlugin = new ArtifactPluginDescriptor("bar");
   private final ArtifactPluginDescriptor bazPlugin = new ArtifactPluginDescriptor(BAZ_PLUGIN);
-  private final PluginDependenciesResolver dependenciesResolver = new NamePluginDependenciesResolver();
+  private final PluginDependenciesResolver dependenciesResolver =
+      new NamePluginDependenciesResolver(mock(ArtifactDescriptorFactory.class), artifactName -> {
+        throw new PluginResolutionError(format(DEPENDENCY_PROVIDER_ERROR_MESSAGE, artifactName));
+      });
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -77,7 +81,7 @@ public class NamePluginDependenciesResolverTestCase extends AbstractMuleTestCase
     fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().dependingOn(singleton(BAR_PLUGIN)).build());
 
     expectedException.expect(PluginResolutionError.class);
-    expectedException.expectMessage(createResolutionErrorMessage(singletonList(fooPlugin), emptyList()));
+    expectedException.expectMessage(format(DEPENDENCY_PROVIDER_ERROR_MESSAGE, BAR_PLUGIN));
     dependenciesResolver.resolve(pluginDescriptors);
   }
 

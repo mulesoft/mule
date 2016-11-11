@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
@@ -13,6 +14,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.IOException;
 
@@ -33,11 +35,15 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    * 
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory for creating class loaders for artifact plugins. Must be not null.
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve.
+   * @param dependenciesProvider resolver for missing dependencies.
    */
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
-                                             ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
+                                             ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+                                             ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
+                                             DependenciesProvider dependenciesProvider) {
     super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository,
-          artifactPluginClassLoaderFactory);
+          artifactPluginClassLoaderFactory, artifactDescriptorFactory, dependenciesProvider);
   }
 
   /**

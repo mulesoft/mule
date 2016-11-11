@@ -13,6 +13,7 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -79,9 +80,11 @@ public class MuleArtifactResourcesRegistry {
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, artifactPluginRepository);
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()));
+    DefaultDependenciesProvider dependenciesProvider = new DefaultDependenciesProvider();
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, artifactPluginRepository,
-                                                 this.artifactPluginClassLoaderFactory);
+                                                 this.artifactPluginClassLoaderFactory, artifactPluginDescriptorFactory,
+                                                 dependenciesProvider);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
         new MuleServiceManager(new DefaultServiceDiscoverer(
@@ -101,7 +104,8 @@ public class MuleArtifactResourcesRegistry {
                                                                   artifactClassLoaderManager);
 
     temporaryArtifactClassLoaderBuilderFactory =
-        new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginRepository, null);
+        new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginRepository, null, artifactPluginDescriptorFactory,
+                                                       dependenciesProvider);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {

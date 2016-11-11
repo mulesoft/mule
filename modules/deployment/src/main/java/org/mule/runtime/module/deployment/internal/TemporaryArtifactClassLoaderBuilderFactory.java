@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 /**
  * Factory for {@code ArtifactClassLoaderBuilder} instances.
@@ -20,17 +21,25 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
 
   private ArtifactPluginRepository applicationPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
+  private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
+  private final DependenciesProvider dependenciesProvider;
 
   /**
    * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
    * 
    * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
+   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
+   * @param dependenciesProvider resolver for missing dependencies
    */
   public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
-                                                    ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
+                                                    ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+                                                    ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
+                                                    DependenciesProvider dependenciesProvider) {
     this.applicationPluginRepository = applicationPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
+    this.artifactDescriptorFactory = artifactDescriptorFactory;
+    this.dependenciesProvider = dependenciesProvider;
   }
 
   /**
@@ -39,7 +48,8 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    * @return a new instance of {@code ArtifactClassLoaderBuilder}
    */
   public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory);
+    return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory,
+                                                   artifactDescriptorFactory, dependenciesProvider);
   }
 
 }
