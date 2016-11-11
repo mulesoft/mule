@@ -31,6 +31,8 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   private final Supplier<RunnableFuture<V>> taskSupplier;
   private final Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback;
 
+  private final DefaultScheduler scheduler;
+
   private volatile boolean cancelled = false;
   private RunnableFuture<V> task;
 
@@ -41,9 +43,11 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
    * @param scheduler the owner {@link Executor} of this task
    */
   RunnableRepeatableFutureDecorator(Supplier<RunnableFuture<V>> taskSupplier,
-                                    Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback) {
+                                    Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback,
+                                    DefaultScheduler scheduler) {
     this.taskSupplier = taskSupplier;
     this.wrapUpCallback = wrapUpCallback;
+    this.scheduler = scheduler;
   }
 
   @Override
@@ -74,14 +78,15 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
     this.cancelled = true;
+    boolean success = true;
     if (task != null) {
       if (logger.isDebugEnabled()) {
         logger.debug("Cancelling task " + this.toString() + " (mayInterruptIfRunning=" + mayInterruptIfRunning + ")...");
       }
-      return task.cancel(mayInterruptIfRunning);
-    } else {
-      return true;
+      success = task.cancel(mayInterruptIfRunning);
     }
+    scheduler.taskFinished(this);
+    return success;
   }
 
   @Override

@@ -48,7 +48,9 @@ class ScheduledFutureDecorator<V> implements ScheduledFuture<V> {
 
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
-    return scheduled.cancel(mayInterruptIfRunning) || task.cancel(mayInterruptIfRunning);
+    boolean scheduledCancelled = scheduled.cancel(mayInterruptIfRunning);
+    boolean taskCancelled = task.cancel(mayInterruptIfRunning);
+    return scheduledCancelled || taskCancelled;
   }
 
   @Override
