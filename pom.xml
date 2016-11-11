@@ -229,6 +229,7 @@
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <tomcatVersion>6.0.44</tomcatVersion>
         <unirestVersion>1.4.9</unirestVersion>
+        <weaveVersion>${project.version}</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>
@@ -729,6 +730,11 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertJVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mulesoft.weave</groupId>
+                <artifactId>mule-plugin-weave</artifactId>
+                <version>${weaveVersion}</version>
             </dependency>
 
             <!--Logging-->
