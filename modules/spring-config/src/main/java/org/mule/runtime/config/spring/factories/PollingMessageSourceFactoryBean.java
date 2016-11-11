@@ -9,23 +9,23 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.schedule.SchedulerFactory;
+import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 
 public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContextAware {
 
-  protected SchedulerFactory<Runnable> schedulerFactory;
+  protected ScheduledPollFactory schedulerFactory;
   protected Processor messageProcessor;
   protected MessageProcessorPollingOverride override;
   protected Long frequency;
   private MuleContext muleContext;
 
-  private FixedFrequencySchedulerFactory defaultSchedulerFactory() {
-    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+  private FixedFrequencyScheduledPollFactory defaultSchedulerFactory() {
+    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
     factory.setFrequency(frequency);
     factory.setMuleContext(muleContext);
     return factory;
@@ -43,7 +43,7 @@ public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContext
     this.frequency = frequency;
   }
 
-  public void setSchedulerFactory(SchedulerFactory<Runnable> schedulerFactory) {
+  public void setSchedulerFactory(ScheduledPollFactory schedulerFactory) {
     this.schedulerFactory = schedulerFactory;
   }
 

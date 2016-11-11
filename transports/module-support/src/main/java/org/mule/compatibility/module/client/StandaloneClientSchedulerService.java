@@ -15,6 +15,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
+import java.util.TimeZone;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -81,6 +83,16 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
     @Override
     public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
       shutdownNow();
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
+      throw new UnsupportedOperationException("Cron scheduling is not supported in standalone.");
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
+      throw new UnsupportedOperationException("Cron scheduling is not supported in standalone.");
     }
   }
 

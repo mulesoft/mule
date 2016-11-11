@@ -20,6 +20,17 @@
             <artifactId>mule-service-scheduler</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <exclusions>
+                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <exclusion>
+                    <groupId>org.quartz-scheduler</groupId>
+                    <artifactId>quartz</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

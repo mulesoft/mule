@@ -8,9 +8,11 @@ package org.mule.tck;
 
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableScheduledFuture;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +51,16 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
   protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable, RunnableScheduledFuture<V> task) {
     scheduledTasks.incrementAndGet();
     return super.decorateTask(runnable, task);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
+    throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implelemtation.");
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
+    throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implelemtation.");
   }
 
   int getScheduledTasks() {

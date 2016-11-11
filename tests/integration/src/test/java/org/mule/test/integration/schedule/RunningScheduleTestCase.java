@@ -9,9 +9,11 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.util.Predicate;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -32,10 +34,11 @@ public class RunningScheduleTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void test() throws Exception {
-    Thread.sleep(2000);
-
     MockScheduler scheduler = findScheduler(SCHEDULER_NAME);
-    assertTrue(scheduler.getCount() > 0);
+    new PollingProber(2000, 50).check(new JUnitLambdaProbe(() -> {
+      assertTrue(scheduler.getCount() > 0);
+      return true;
+    }));
 
     stopSchedulers();
 
@@ -46,13 +49,6 @@ public class RunningScheduleTestCase extends AbstractIntegrationTestCase {
     Thread.sleep(2000);
 
     assertEquals(count, scheduler.getCount());
-    scheduler.schedule();
-
-    Thread.sleep(2000);
-
-    assertEquals(count + 1, scheduler.getCount());
-
-
   }
 
   private void stopSchedulers() throws MuleException {
@@ -60,20 +56,6 @@ public class RunningScheduleTestCase extends AbstractIntegrationTestCase {
   }
 
   private MockScheduler findScheduler(String schedulerName) {
-    return (MockScheduler) muleContext.getRegistry().lookupScheduler(new NamePredicate(schedulerName)).iterator().next();
-  }
-
-  private class NamePredicate implements Predicate<String> {
-
-    private String name;
-
-    private NamePredicate(String name) {
-      this.name = name;
-    }
-
-    @Override
-    public boolean evaluate(String s) {
-      return s.equalsIgnoreCase(name);
-    }
+    return (MockScheduler) muleContext.getRegistry().lookupObject(schedulerName);
   }
 }

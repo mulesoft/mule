@@ -8,14 +8,9 @@ package org.mule.runtime.core.agent.registry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -59,39 +54,5 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
     Transformer result = muleContext.getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
     assertNotNull(result);
     assertEquals(t1, result);
-  }
-
-  @Test
-  public void registerScheduler() throws MuleException {
-    Scheduler scheduler = scheduler();
-    register(scheduler);
-    muleContext.getRegistry().unregisterScheduler(scheduler);
-    assertNull(muleContext.getRegistry().lookupObject("schedulerName"));
-  }
-
-  @Test
-  public void lookupScheduler() throws MuleException {
-    Scheduler scheduler = scheduler();
-    register(scheduler);
-    assertEquals(scheduler,
-                 muleContext.getRegistry().lookupScheduler(s -> s.equalsIgnoreCase("schedulerName")).iterator().next());
-  }
-
-  @Test
-  public void unregisterScheduler() throws MuleException {
-    Scheduler scheduler = scheduler();
-    register(scheduler);
-
-    assertEquals(scheduler, muleContext.getRegistry().lookupObject("schedulerName"));
-  }
-
-  private void register(Scheduler scheduler) throws MuleException {
-    muleContext.getRegistry().registerScheduler(scheduler);
-  }
-
-  private Scheduler scheduler() {
-    Scheduler scheduler = mock(Scheduler.class);
-    when(scheduler.getName()).thenReturn("schedulerName");
-    return scheduler;
   }
 }

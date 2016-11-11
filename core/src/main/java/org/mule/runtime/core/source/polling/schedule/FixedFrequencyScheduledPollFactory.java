@@ -9,20 +9,18 @@ package org.mule.runtime.core.source.polling.schedule;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.SchedulerFactory;
+import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
- * Implementation of {@link org.mule.runtime.core.api.schedule.SchedulerFactory} for a
- * {@link org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler}.
+ * Implementation of {@link ScheduledPollFactory} for a fixed-frequency {@link ScheduledPoll}.
  * </p>
  *
  * @since 3.5.0
  */
-public class FixedFrequencySchedulerFactory<T extends Runnable> extends SchedulerFactory<T> {
+public class FixedFrequencyScheduledPollFactory extends ScheduledPollFactory {
 
   /**
    * <p>
@@ -47,10 +45,9 @@ public class FixedFrequencySchedulerFactory<T extends Runnable> extends Schedule
 
 
   @Override
-  public Scheduler doCreate(String name, final T job) {
-    FixedFrequencyScheduler<T> fixedFrequencyScheduler =
-        new FixedFrequencyScheduler<T>(name, frequency, startDelay, job, timeUnit);
-    return fixedFrequencyScheduler;
+  public ScheduledPoll doCreate(String name, final Runnable job) {
+    return new ScheduledPoll(context.getSchedulerService(), name, job,
+                             executor -> executor.scheduleAtFixedRate(job, startDelay, frequency, timeUnit));
   }
 
   public void setTimeUnit(TimeUnit timeUnit) {

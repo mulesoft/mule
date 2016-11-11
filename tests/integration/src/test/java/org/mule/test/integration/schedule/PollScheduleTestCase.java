@@ -8,16 +8,17 @@ package org.mule.test.integration.schedule;
 
 
 import static org.junit.Assert.assertEquals;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -28,8 +29,8 @@ import org.junit.Test;
  */
 public class PollScheduleTestCase extends AbstractIntegrationTestCase {
 
-  private static List<String> foo = new ArrayList<String>();
-  private static List<String> bar = new ArrayList<String>();
+  private static List<String> foo = new ArrayList<>();
+  private static List<String> bar = new ArrayList<>();
 
   Prober workingPollProber = new PollingProber(10000, 100l);
 
@@ -102,21 +103,21 @@ public class PollScheduleTestCase extends AbstractIntegrationTestCase {
 
 
   private void runSchedulersOnce() throws Exception {
-    Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollfoo"));
-
-    for (Scheduler scheduler : schedulers) {
-      scheduler.schedule();
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    flow.start();
+    try {
+      MessageSource flowSource = flow.getMessageSource();
+      if (flowSource instanceof PollingMessageSource) {
+        ((PollingMessageSource) flowSource).performPoll();
+      }
+    } finally {
+      flow.stop();
     }
   }
 
   private void stopSchedulers() throws MuleException {
-    Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollfoo"));
-
-    for (Scheduler scheduler : schedulers) {
-      scheduler.stop();
-    }
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    flow.stop();
   }
 
   public static class FooComponent {

@@ -26,7 +26,7 @@
     </flow>
 
 
-    <flow name="pollbar" processingStrategy="synchronous" >
+    <flow name="pollbar" processingStrategy="synchronous">
         <poll>
             <schedulers:cron-scheduler expression="${expression.property}"/>
             <static-component>

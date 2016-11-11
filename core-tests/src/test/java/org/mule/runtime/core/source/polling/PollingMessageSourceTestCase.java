@@ -17,9 +17,9 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
+import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -74,10 +74,10 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
 
     PollingMessageSource pollinMessageSource = createMessageSource(event -> null);
 
-    Collection<Scheduler> allSchedulers = getAllSchedulers();
+    Collection<ScheduledPoll> allSchedulers = getAllSchedulers();
     assertThat(allSchedulers.size(), is(1));
 
-    Scheduler scheduler = allSchedulers.iterator().next();
+    ScheduledPoll scheduler = allSchedulers.iterator().next();
 
     pollinMessageSource.stop();
     pollinMessageSource.dispose();
@@ -86,8 +86,8 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     verify(scheduler).dispose();
   }
 
-  private Collection<Scheduler> getAllSchedulers() {
-    return muleContext.getRegistry().lookupObjects(Scheduler.class);
+  private Collection<ScheduledPoll> getAllSchedulers() {
+    return muleContext.getRegistry().lookupObjects(ScheduledPoll.class);
   }
 
   private PollingMessageSource createMessageSource(Processor processor) throws Exception {
@@ -98,11 +98,11 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     return pollingMessageSource;
   }
 
-  private FixedFrequencySchedulerFactory schedulerFactory() {
-    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory() {
+  private FixedFrequencyScheduledPollFactory schedulerFactory() {
+    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory() {
 
       @Override
-      public Scheduler doCreate(String name, final Runnable job) {
+      public ScheduledPoll doCreate(String name, final Runnable job) {
         return spy(super.doCreate(name, job));
       }
     };

@@ -8,10 +8,6 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                ">
 
-    <spring:beans>
-        <spring:bean class="org.mule.test.integration.watermark.WatermarkPollingTestCase$PollStopper"/>
-    </spring:beans>
-
     <flow name="echo">
         <static-component>
             <return-data>foo</return-data>
@@ -27,7 +23,7 @@
     	<set-payload value="#[payload.iterator()]" />
     </sub-flow>
     
-    <flow name="pollWithoutWatermark">
+    <flow name="pollWithoutWatermark" initialState="stopped">
         <poll frequency="1000">
             <processor-chain>
                 <set-payload value="pollWithoutWatermark"/>
@@ -37,7 +33,7 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
+    <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test1" default-expression="#['noKey']"/>
             <flow-ref name="echo"/>
@@ -45,7 +41,7 @@
         <logger message="Executed With watermark"/>
     </flow>
 
-    <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
+    <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test2" default-expression="#['noKey']"/>
             <flow-ref name="echo"/>
@@ -55,7 +51,7 @@
     </flow>
 
 
-    <flow name="usingWatermarkFlow" processingStrategy="synchronous">
+    <flow name="usingWatermarkFlow" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test3" default-expression="#['noKey']"/>
             <flow-ref name="echo"/>
@@ -66,7 +62,7 @@
     </flow>
 
 
-    <flow name="usingWatermarkFlowWithNullValue" processingStrategy="synchronous">
+    <flow name="usingWatermarkFlowWithNullValue" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="testNull" default-expression="#[null]" update-expression="#['noWatermark']"/>
             <flow-ref name="echo"/>
@@ -83,7 +79,7 @@
 
     </flow>
 
-    <flow name="usingWatermarkFlowWithNullUpdateValue" processingStrategy="synchronous">
+    <flow name="usingWatermarkFlowWithNullUpdateValue" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="testUpdateAsNull" default-expression="#['defaultValue']" update-expression="#[null]"/>
             <flow-ref name="echo"/>
@@ -93,7 +89,7 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous">
+    <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="#['test4']" default-expression="#['noKey']"/>
             <flow-ref name="echo"/>
@@ -102,7 +98,7 @@
     </flow>
 
 
-    <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous">
+    <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test5" default-expression="#['noKey']" update-expression="#[payload]"/>
             <flow-ref name="echo"/>
@@ -113,7 +109,7 @@
     </flow>
 
 
-    <flow name="watermarkWithAnnotations" processingStrategy="synchronous">
+    <flow name="watermarkWithAnnotations" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#['noKey']" doc:name="watermark"/>
             <flow-ref name="echo"/>
@@ -121,7 +117,7 @@
         <set-payload value="#['valueUpdated']"/>
     </flow>
 
-    <flow name="watermarkWithAsyncProcessing">
+    <flow name="watermarkWithAsyncProcessing" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#['noKey']"/>
             <flow-ref name="echo"/>
@@ -131,7 +127,7 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="watermarkWithObjectStore" processingStrategy="synchronous">
+    <flow name="watermarkWithObjectStore" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test8" default-expression="#['noKey']" update-expression="#[payload]" object-store-ref="_defaultInMemoryObjectStore"/>
             <flow-ref name="echo"/>
@@ -141,7 +137,7 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="failingFlowWithWatermark" processingStrategy="synchronous">
+    <flow name="failingFlowWithWatermark" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#['noKey']" update-expression="#[payload]"/>
             <flow-ref name="echo"/>
@@ -152,7 +148,7 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="failingFlowCachedExceptionWatermark" processingStrategy="synchronous">
+    <flow name="failingFlowCachedExceptionWatermark" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
             <watermark variable="test7" default-expression="#['noKey']"/>
             <flow-ref name="echo"/>
@@ -169,7 +165,7 @@
 
     </flow>
 
-	<flow name="minSelectorWithList" processingStrategy="synchronous">
+	<flow name="minSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="minSelectorWithList" default-expression="#['noKey']" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
     		<flow-ref name="fruits" />
@@ -178,7 +174,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="maxSelectorWithList" processingStrategy="synchronous">
+	<flow name="maxSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="maxSelectorWithList" default-expression="#['noKey']" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
     		<flow-ref name="fruits" />
@@ -187,7 +183,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="firstSelectorWithList" processingStrategy="synchronous">
+	<flow name="firstSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="firstSelectorWithList" default-expression="#['noKey']" selector="FIRST" />
     		<flow-ref name="fruits" />
@@ -196,7 +192,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="lastSelectorWithList" processingStrategy="synchronous">
+	<flow name="lastSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="lastSelectorWithList" default-expression="#['noKey']" selector="LAST" />
     		<flow-ref name="fruits" />
@@ -205,7 +201,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="minSelectorWithIterator" processingStrategy="synchronous">
+	<flow name="minSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="minSelectorWithIterator" default-expression="#['noKey']" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
     		<flow-ref name="fruitsIterator" />
@@ -214,7 +210,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="maxSelectorWithIterator" processingStrategy="synchronous">
+	<flow name="maxSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="maxSelectorWithIterator" default-expression="#['noKey']" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
     		<flow-ref name="fruitsIterator" />
@@ -223,7 +219,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="firstSelectorWithIterator" processingStrategy="synchronous">
+	<flow name="firstSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="firstSelectorWithIterator" default-expression="#['noKey']" selector="FIRST" />
     		<flow-ref name="fruitsIterator" />
@@ -232,7 +228,7 @@
         <flow-ref name="consume" />
 	</flow>
 	
-	<flow name="lastSelectorWithIterator" processingStrategy="synchronous">
+	<flow name="lastSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
             <watermark variable="lastSelectorWithIterator" default-expression="#['noKey']" selector="LAST" />
     		<flow-ref name="fruitsIterator" />

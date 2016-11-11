@@ -7,16 +7,17 @@
 package org.mule.runtime.core.registry;
 
 import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAction.ADDED;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.agent.Agent;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.meta.NameableObject;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -24,13 +25,11 @@ import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
-import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
-import org.mule.runtime.core.util.Predicate;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 
@@ -310,29 +309,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   @Override
   public void unregisterAgent(String agentName) throws MuleException {
     registry.unregisterObject(agentName, Agent.class);
-  }
-
-  @Override
-  public void registerScheduler(Scheduler scheduler) throws MuleException {
-    registry.registerObject(scheduler.getName(), scheduler);
-  }
-
-  @Override
-  public void unregisterScheduler(Scheduler scheduler) throws MuleException {
-    registry.unregisterObject(scheduler.getName(), scheduler);
-  }
-
-  @Override
-  public Collection<Scheduler> lookupScheduler(Predicate<String> schedulerNamePredicate) {
-    Collection<Scheduler> schedulers = new ArrayList<>();
-    Map<String, Scheduler> registeredSchedulers = lookupByType(Scheduler.class);
-    for (Scheduler registeredScheduler : registeredSchedulers.values()) {
-      if (schedulerNamePredicate.evaluate(registeredScheduler.getName())) {
-        schedulers.add(registeredScheduler);
-      }
-    }
-
-    return schedulers;
   }
 
   /**

@@ -6,17 +6,17 @@
  */
 package org.mule.test.modules.schedulers.cron;
 
-import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.SchedulerFactoryPostProcessor;
-import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
@@ -34,9 +34,11 @@ public class StoppedCronSchedulerTestCase extends MuleArtifactFunctionalTestCase
   @Test
   public void test() throws Exception {
     runSchedulersOnce();
-    Thread.sleep(6000);
 
-    assertEquals(1, foo.size());
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      assertThat(foo.size(), greaterThanOrEqualTo(1));
+      return true;
+    }));
   }
 
 
@@ -54,55 +56,15 @@ public class StoppedCronSchedulerTestCase extends MuleArtifactFunctionalTestCase
   }
 
   private void runSchedulersOnce() throws Exception {
-    Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollfoo"));
-
-    for (Scheduler scheduler : schedulers) {
-      scheduler.schedule();
-    }
-  }
-
-  public static class TestSchedulerFactoryPostProcessor implements SchedulerFactoryPostProcessor {
-
-    @Override
-    public Scheduler process(Object job, Scheduler scheduler) {
-      return new Scheduler() {
-
-        @Override
-        public void schedule() throws Exception {
-          scheduler.schedule();
-        }
-
-        @Override
-        public void dispose() {
-          scheduler.dispose();
-        }
-
-        @Override
-        public void initialise() throws InitialisationException {
-          scheduler.initialise();
-        }
-
-        @Override
-        public void setName(String s) {
-          scheduler.setName(s);
-        }
-
-        @Override
-        public String getName() {
-          return scheduler.getName();
-        }
-
-        @Override
-        public void start() throws MuleException {
-          // Does Nothing
-        }
-
-        @Override
-        public void stop() throws MuleException {
-          // Does Nothing
-        }
-      };
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    flow.start();
+    try {
+      MessageSource flowSource = flow.getMessageSource();
+      if (flowSource instanceof PollingMessageSource) {
+        ((PollingMessageSource) flowSource).performPoll();
+      }
+    } finally {
+      flow.stop();
     }
   }
 }

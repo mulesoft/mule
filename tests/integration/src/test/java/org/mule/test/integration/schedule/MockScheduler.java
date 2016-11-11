@@ -8,7 +8,8 @@ package org.mule.test.integration.schedule;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.NameableObject;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,17 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-public class MockScheduler implements Scheduler, BeanNameAware {
+public class MockScheduler implements Lifecycle, NameableObject, BeanNameAware {
 
   private AtomicInteger count = new AtomicInteger(0);
   private ScheduledExecutorService executorService;
   private String name;
   private Runnable task;
-
-  @Override
-  public void schedule() throws Exception {
-    task.run();
-  }
 
   @Override
   public void setName(String name) {
@@ -42,13 +38,7 @@ public class MockScheduler implements Scheduler, BeanNameAware {
   @Override
   public void start() throws MuleException {
     executorService = Executors.newSingleThreadScheduledExecutor();
-    task = new Runnable() {
-
-      @Override
-      public void run() {
-        count.incrementAndGet();
-      }
-    };
+    task = () -> count.incrementAndGet();
     executorService.scheduleAtFixedRate(task, 1000, 2000, TimeUnit.MILLISECONDS);
   }
 

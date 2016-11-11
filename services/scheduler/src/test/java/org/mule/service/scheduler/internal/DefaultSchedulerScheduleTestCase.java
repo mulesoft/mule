@@ -534,6 +534,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   }
 
   protected ScheduledExecutorService createScheduledSameThreadExecutor() {
-    return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor);
+    return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor, sharedQuartzScheduler);
   }
 }

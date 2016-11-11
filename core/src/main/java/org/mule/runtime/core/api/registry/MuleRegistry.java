@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.core.api.registry;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;
@@ -90,12 +88,6 @@ public interface MuleRegistry extends LifecycleRegistry {
   void registerAgent(Agent agent) throws MuleException;
 
   void unregisterAgent(String agentName) throws MuleException;
-
-  void registerScheduler(Scheduler scheduler) throws MuleException;
-
-  void unregisterScheduler(Scheduler scheduler) throws MuleException;
-
-  Collection<Scheduler> lookupScheduler(Predicate<String> schedulerNamePredicate);
 
   /**
    * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually

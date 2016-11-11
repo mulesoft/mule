@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,6 +23,39 @@ import java.util.concurrent.TimeUnit;
  * @since 4.0
  */
 public interface Scheduler extends ScheduledExecutorService {
+
+  /**
+   * Creates and executes a periodic action that becomes enabled according to given {@code cronExpression} and {@code timeZone}.
+   * If any execution of the task encounters an exception, subsequent executions are suppressed. Otherwise, the task will only
+   * terminate via cancellation or termination of the executor. If any execution of this task takes longer than the time before
+   * the next execution should start, then subsequent executions may start late, but will not concurrently execute.
+   *
+   * @param command the task to execute
+   * @param cronExpression the cron expression string to base the schedule on.
+   * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception
+   *         upon cancellation
+   * @throws RejectedExecutionException if the task cannot be scheduled for execution
+   * @throws NullPointerException if command is null
+   * @throws IllegalArgumentException if delay less than or equal to zero
+   */
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression);
+
+  /**
+   * Creates and executes a periodic action that becomes enabled according to given {@code cronExpression} in the given
+   * {@code timeZone}. If any execution of the task encounters an exception, subsequent executions are suppressed. Otherwise, the
+   * task will only terminate via cancellation or termination of the executor. If any execution of this task takes longer than the
+   * time before the next execution should start, then subsequent executions may start late, but will not concurrently execute.
+   *
+   * @param command the task to execute
+   * @param cronExpression the cron expression string to base the schedule on.
+   * @param timeZone the time-zone for the schedule.
+   * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception
+   *         upon cancellation
+   * @throws RejectedExecutionException if the task cannot be scheduled for execution
+   * @throws NullPointerException if command is null
+   * @throws IllegalArgumentException if delay less than or equal to zero
+   */
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone);
 
   /**
    * Tries to do a graceful shutdown.

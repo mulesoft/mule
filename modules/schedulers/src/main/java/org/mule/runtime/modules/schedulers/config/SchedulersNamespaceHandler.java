@@ -8,13 +8,13 @@ package org.mule.runtime.modules.schedulers.config;
 
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.runtime.modules.schedulers.cron.CronSchedulerFactory;
+import org.mule.runtime.modules.schedulers.cron.CronScheduledPollFactory;
 
 
 public class SchedulersNamespaceHandler extends AbstractMuleNamespaceHandler {
 
   @Override
   public void init() {
-    registerBeanDefinitionParser("cron-scheduler", new ChildDefinitionParser("schedulerFactory", CronSchedulerFactory.class));
+    registerBeanDefinitionParser("cron-scheduler", new ChildDefinitionParser("schedulerFactory", CronScheduledPollFactory.class));
   }
 }

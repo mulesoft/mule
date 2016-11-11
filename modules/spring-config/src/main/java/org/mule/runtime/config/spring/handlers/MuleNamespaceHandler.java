@@ -166,7 +166,7 @@ import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
@@ -416,7 +416,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     registerBeanDefinitionParser("poll", new ChildEmbeddedDefinitionParser(PollingMessageSourceFactoryBean.class));
     registerBeanDefinitionParser("fixed-frequency-scheduler",
-                                 new ChildDefinitionParser("schedulerFactory", FixedFrequencySchedulerFactory.class));
+                                 new ChildDefinitionParser("schedulerFactory", FixedFrequencyScheduledPollFactory.class));
 
 
     // Poll overrides

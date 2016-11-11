@@ -32,15 +32,6 @@
          </dependency>
 
          <dependency>
-             <groupId>org.quartz-scheduler</groupId>
-             <artifactId>quartz</artifactId>
-         </dependency>
-         <!-- Explicitly adding C3P0 dependency to replace quartz's excluded C3P0 version-->
-         <dependency>
-             <groupId>com.mchange</groupId>
-             <artifactId>c3p0</artifactId>
-         </dependency>
-         <dependency>
              <groupId>org.mule</groupId>
              <artifactId>mule-core</artifactId>
              <version>${project.version}</version>
