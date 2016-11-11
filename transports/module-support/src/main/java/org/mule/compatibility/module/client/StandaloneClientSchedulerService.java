@@ -57,6 +57,21 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
     return scheduler;
   }
 
+  @Override
+  public boolean isCurrentThreadCpuLight() {
+    return false;
+  }
+
+  @Override
+  public boolean isCurrentThreadIo() {
+    return false;
+  }
+
+  @Override
+  public boolean isCurrentThreadComputation() {
+    return false;
+  }
+
   private static class StandaloneClientThreadScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
     public StandaloneClientThreadScheduler() {

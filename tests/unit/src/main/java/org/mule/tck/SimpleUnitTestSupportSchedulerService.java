@@ -73,4 +73,28 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public int getScheduledTasks() {
     return scheduler.getScheduledTasks();
   }
+
+  /**
+   * @return {@code true} since this Services's scheduler unit testing threads are general purpose.
+   */
+  @Override
+  public boolean isCurrentThreadCpuLight() {
+    return true;
+  }
+
+  /**
+   * @return {@code true} since this Services's scheduler unit testing threads are general purpose.
+   */
+  @Override
+  public boolean isCurrentThreadIo() {
+    return true;
+  }
+
+  /**
+   * @return {@code true} since this Services's scheduler unit testing threads are general purpose.
+   */
+  @Override
+  public boolean isCurrentThreadComputation() {
+    return true;
+  }
 }
