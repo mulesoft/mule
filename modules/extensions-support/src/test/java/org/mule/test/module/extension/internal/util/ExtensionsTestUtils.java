@@ -123,13 +123,26 @@ public abstract class ExtensionsTestUtils {
   }
 
   public static ParameterModel getParameter(String name, Class<?> type) {
-    ParameterModel parameterModel = mock(ParameterModel.class);
+    ParameterModel parameterModel = getParameter();
     when(parameterModel.getName()).thenReturn(name);
     when(parameterModel.getType()).thenReturn(toMetadataType(type));
+    when(parameterModel.getLayoutModel()).thenReturn(empty());
+    return parameterModel;
+  }
+
+  public static ParameterModel getParameter(String name, MetadataType metadataType) {
+    ParameterModel parameterModel = getParameter();
+    when(parameterModel.getName()).thenReturn(name);
+    when(parameterModel.getType()).thenReturn(metadataType);
+    return parameterModel;
+  }
+
+  private static ParameterModel getParameter() {
+    ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
     when(parameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
-
     return parameterModel;
+
   }
 
   public static void stubRegistryKeys(MuleContext muleContext, final String... keys) {
@@ -162,7 +175,7 @@ public abstract class ExtensionsTestUtils {
    * Receives to {@link String} representation of two XML files and verify that they are semantically equivalent
    *
    * @param expected the reference content
-   * @param actual   the actual content
+   * @param actual the actual content
    * @throws Exception if comparison fails
    */
   public static void compareXML(String expected, String actual) throws Exception {

@@ -42,6 +42,10 @@ public class PetStoreConnector {
   @Optional
   private PetCage cage;
 
+  @Parameter
+  @Optional
+  private List<PetCage> cages;
+
   @ParameterGroup
   private ExclusiveCashier cashier;
 
