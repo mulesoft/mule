@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -118,12 +118,10 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
   @Test
   public void testEmptySequence() throws Exception {
     Object payload = Collections.emptySet();
-    MuleSession session = new DefaultMuleSession();
     InternalMessage toSplit = InternalMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
-    Event event = eventBuilder().message(toSplit).session(session).build();
-    event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    Event event = createEventUsingInboundEndpoint(eventBuilder(), toSplit, getTestInboundEndpoint("ep"));
     assertSame(event, splitter.process(event));
   }
 
@@ -132,7 +130,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     assertRouted(new IteratorMessageSequence(TEST_LIST_SINGLE.iterator()), 1, false);
   }
 
-  private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException {
+  private void assertRouted(Object payload, int count, boolean counted) throws Exception {
     MuleSession session = new DefaultMuleSession();
 
     Map<String, Serializable> inboundProps = new HashMap<>();
@@ -161,12 +159,11 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
     splitter.setListener(grabber);
-    final Builder builder = eventBuilder().message(toSplit).session(session);
+    final Builder builder = eventBuilder().session(session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       builder.addVariable(entry.getKey(), entry.getValue());
     }
-    Event event = builder.build();
-    event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    Event event = createEventUsingInboundEndpoint(builder, toSplit, getTestInboundEndpoint("ep"));
     splitter.process(event);
     List<Event> splits = grabber.getEvents();
     assertEquals(count, splits.size());

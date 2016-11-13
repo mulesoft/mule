@@ -225,4 +225,13 @@ public final class TransactionCoordination {
       transactions.set((Transaction) isolatedTransactions.get().pop());
     }
   }
+
+  /**
+   * Determine is there is an active transaction associated with the current thread.
+   *
+   * @return true if there is an active transaction, false otherwise.
+   */
+  public static boolean isTransactionActive() {
+    return getInstance().getTransaction() != null;
+  }
 }

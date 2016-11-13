@@ -196,7 +196,6 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextEndpo
 
     @Override
     protected void doDispatch(Event event) throws Exception {
-      new Exception().printStackTrace();
       super.doDispatch(event);
       latch.countDown();
     }

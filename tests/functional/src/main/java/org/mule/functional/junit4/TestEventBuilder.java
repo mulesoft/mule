@@ -58,8 +58,6 @@ public class TestEventBuilder {
 
   private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
 
-  private boolean transacted = false;
-
   private ReplyToHandler replyToHandler;
 
   private Transformer spyTransformer = input -> input;
@@ -241,12 +239,6 @@ public class TestEventBuilder {
     return this;
   }
 
-  public TestEventBuilder transactionally() {
-    transacted = true;
-
-    return this;
-  }
-
   /**
    * Configures the product event to run as one-way.
    *
@@ -315,7 +307,7 @@ public class TestEventBuilder {
 
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
         .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(variables).groupCorrelation(correlation)
-        .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).transacted(transacted).build();
+        .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

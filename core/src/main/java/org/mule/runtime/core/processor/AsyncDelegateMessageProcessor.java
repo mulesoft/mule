@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
@@ -111,7 +112,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   private void assertNotTransactional(Event event) throws RoutingException {
-    if (event.isTransacted()) {
+    if (isTransactionActive()) {
       throw new RoutingException(asyncDoesNotSupportTransactions(), delegate);
     }
   }

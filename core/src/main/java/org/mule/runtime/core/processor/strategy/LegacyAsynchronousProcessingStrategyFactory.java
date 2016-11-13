@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -98,7 +99,7 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
 
     private Consumer<Event> assertCanProcessAsync() {
       return event -> {
-        if (event.isSynchronous() || event.isTransacted()) {
+        if (event.isSynchronous() || isTransactionActive()) {
           throw propagate(new DefaultMuleException(createStaticMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE)));
         }
       };

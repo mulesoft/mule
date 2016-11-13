@@ -6,7 +6,8 @@
  */
 package org.mule.test.construct;
 
-import static org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
+import static org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory
+    .SYNCHRONOUS_EVENT_ERROR_MESSAGE;
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;

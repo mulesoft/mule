@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_NONE;
 
 import org.mule.runtime.core.DefaultEventContext;
@@ -393,7 +394,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testAsyncTransactionalEndpoint() throws Exception {
-    Exception e = flowRunner("async-tx").withPayload("0").transactionally(ACTION_NONE, new TestTransactionFactory())
+    Exception e = flowRunner("async-tx").withPayload("0").transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
         .asynchronously().runExpectingException();
 
     assertThat(e, instanceOf(MessagingException.class));

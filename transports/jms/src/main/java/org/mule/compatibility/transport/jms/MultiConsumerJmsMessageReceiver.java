@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.jms;
 
 import static java.util.Collections.unmodifiableList;
 import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.TransactionCollection;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;
@@ -374,7 +376,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver {
 
         if (e instanceof MessagingException) {
           MessagingException messagingException = (MessagingException) e;
-          if (!messagingException.getEvent().isTransacted() && messagingException.causedRollback()) {
+          if (!isTransactionActive() && messagingException.causedRollback()) {
             rollbackMethod.rollback();
           }
         } else {

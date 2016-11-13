@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.processor;
 
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -22,6 +22,7 @@ import org.mule.compatibility.core.context.notification.EndpointMessageNotificat
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
@@ -126,10 +127,9 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
   }
 
   protected Event createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
-    final Event event = eventBuilder()
-        .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build())
-        .session(new DefaultMuleSession()).build();
-    return populateFieldsFromInboundEndpoint(event, endpoint);
+    final InternalMessage message =
+        InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build();
+    return createEventUsingInboundEndpoint(eventBuilder(), message, endpoint);
   }
 
   protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer,
@@ -202,10 +202,9 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     if (exceptionListener != null) {
       flow.setExceptionListener(exceptionListener);
     }
-    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
-        .session(new DefaultMuleSession()).build();
-    return populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
+    final Event.Builder eventBuilder = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).flow(flow);
+    final InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build();
+    return createEventUsingInboundEndpoint(eventBuilder, message, getTestInboundEndpoint(REQUEST_RESPONSE));
   }
 
   protected InternalMessage createTestResponseMuleMessage() {

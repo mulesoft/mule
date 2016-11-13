@@ -8,7 +8,7 @@ package org.mule.compatibility.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -33,7 +33,6 @@ import org.mockito.Mockito;
 
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextEndpointTestCase {
 
-  private MuleSession session;
   private Flow flow;
   private InboundEndpoint inboundEndpoint;
   private ObjectStore<String> objectStore;
@@ -50,8 +49,6 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
   public void testRaceConditionOnAcceptAndProcess() throws Exception {
     inboundEndpoint = getTestInboundEndpoint("Test", "test://Test?exchangePattern=one-way");
     flow = getTestFlow(muleContext);
-
-    session = Mockito.mock(MuleSession.class);
 
     CountDownLatch cdl = new CountDownLatch(2);
 
@@ -78,9 +75,8 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Override
     public void run() {
       InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      Event newEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
-          .session(session).build();
-      Event event = populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
+      Event.Builder eventBuilder = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).flow(flow);
+      Event event = createEventUsingInboundEndpoint(eventBuilder, okMessage, inboundEndpoint);
 
       try {
         event = idempotentMessageFilter.process(event);
