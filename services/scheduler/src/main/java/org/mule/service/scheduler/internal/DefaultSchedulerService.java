@@ -19,7 +19,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
+import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -53,9 +53,15 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
   private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
   private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
-  private static final String SCHEDULER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_sched";
+  private static final String TIMER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_timer";
 
   private int cores = getRuntime().availableProcessors();
+
+  private final ThreadGroup schedulerGroup = new ThreadGroup(getName());
+  private final ThreadGroup cpuLightGroup = new ThreadGroup(schedulerGroup, CPU_LIGHT_THREADS_NAME);
+  private final ThreadGroup ioGroup = new ThreadGroup(schedulerGroup, IO_THREADS_NAME);
+  private final ThreadGroup computationGroup = new ThreadGroup(schedulerGroup, COMPUTATION_THREADS_NAME);
+  private final ThreadGroup timerGroup = new ThreadGroup(schedulerGroup, TIMER_THREADS_NAME);
 
   private ExecutorService cpuLightExecutor;
   private ExecutorService ioExecutor;
@@ -83,17 +89,32 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
+  public boolean isCurrentThreadCpuLight() {
+    return currentThread().getThreadGroup() == cpuLightGroup;
+  }
+
+  @Override
+  public boolean isCurrentThreadIo() {
+    return currentThread().getThreadGroup() == ioGroup;
+  }
+
+  @Override
+  public boolean isCurrentThreadComputation() {
+    return currentThread().getThreadGroup() == computationGroup;
+  }
+
+  @Override
   public void start() throws MuleException {
     logger.info("Starting " + this.toString() + "...");
 
     // TODO MULE-10585 Externalize the threads configuration
     cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
-                                              new NamedThreadFactory(CPU_LIGHT_THREADS_NAME));
+                                              new SchedulerThreadFactory(cpuLightGroup));
     ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 30, SECONDS, new SynchronousQueue<>(),
-                                        new NamedThreadFactory(IO_THREADS_NAME));
+                                        new SchedulerThreadFactory(ioGroup));
     computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
-                                                 new NamedThreadFactory(COMPUTATION_THREADS_NAME));
-    scheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(SCHEDULER_THREADS_NAME));
+                                                 new SchedulerThreadFactory(computationGroup));
+    scheduledExecutor = newScheduledThreadPool(1, new SchedulerThreadFactory(timerGroup, "%s"));
 
     ((ThreadPoolExecutor) cpuLightExecutor).prestartAllCoreThreads();
     ((ThreadPoolExecutor) ioExecutor).prestartAllCoreThreads();
@@ -116,7 +137,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       final long startMillis = currentTimeMillis();
 
       // Stop the scheduled first to avoid it dispatching tasks to an already stopped executor
-      waitForExecutorTermination(startMillis, scheduledExecutor, SCHEDULER_THREADS_NAME);
+      waitForExecutorTermination(startMillis, scheduledExecutor, TIMER_THREADS_NAME);
       waitForExecutorTermination(startMillis, cpuLightExecutor, CPU_LIGHT_THREADS_NAME);
       waitForExecutorTermination(startMillis, ioExecutor, IO_THREADS_NAME);
       waitForExecutorTermination(startMillis, computationExecutor, COMPUTATION_THREADS_NAME);

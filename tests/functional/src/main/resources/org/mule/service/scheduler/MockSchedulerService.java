@@ -30,4 +30,19 @@ public class MockSchedulerService implements SchedulerService {
   public Scheduler computationScheduler() {
     return new MockScheduler();
   }
+
+  @Override
+  public boolean isCurrentThreadCpuLight() {
+    return false;
+  }
+
+  @Override
+  public boolean isCurrentThreadIo() {
+    return false;
+  }
+
+  @Override
+  public boolean isCurrentThreadComputation() {
+    return false;
+  }
 }

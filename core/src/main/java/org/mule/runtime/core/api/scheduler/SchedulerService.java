@@ -57,4 +57,21 @@ public interface SchedulerService extends Service {
    * @return a scheduler for {@link ProcessingType#CPU computation} tasks
    */
   Scheduler computationScheduler();
+
+  /**
+   * @return {@code true} if the current thread belongs to a {@link Scheduler} that was obtained from
+   *         {@link #cpuLightScheduler()}.
+   */
+  boolean isCurrentThreadCpuLight();
+
+  /**
+   * @return {@code true} if the current thread belongs to a {@link Scheduler} that was obtained from {@link #ioScheduler()}.
+   */
+  boolean isCurrentThreadIo();
+
+  /**
+   * @return {@code true} if the current thread belongs to a {@link Scheduler} that was obtained from
+   *         {@link #computationScheduler()}.
+   */
+  boolean isCurrentThreadComputation();
 }
