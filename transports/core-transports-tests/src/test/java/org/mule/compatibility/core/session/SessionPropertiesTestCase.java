@@ -30,7 +30,6 @@ import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collections;
@@ -50,7 +49,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);
-    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
+    scheduler = muleContext.getSchedulerService().computationScheduler();
   }
 
   @After

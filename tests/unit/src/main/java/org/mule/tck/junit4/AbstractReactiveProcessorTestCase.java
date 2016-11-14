@@ -10,12 +10,12 @@ import static java.util.Arrays.asList;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.Collection;
 
@@ -49,7 +49,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
+    scheduler = muleContext.getSchedulerService().computationScheduler();
   }
 
   @Override

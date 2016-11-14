@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import static org.mule.runtime.core.security.MuleCredentials.createHeader;
 
+import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -23,18 +24,17 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;

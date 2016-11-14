@@ -15,20 +15,20 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
+import org.mule.compatibility.core.util.concurrent.WaitableBoolean;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
-import org.mule.runtime.core.execution.CompletionHandler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.concurrent.WaitableBoolean;
 
 import java.util.concurrent.TimeUnit;
 

@@ -9,9 +9,9 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
