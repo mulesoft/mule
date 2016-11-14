@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PARAMETERIZATION;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -142,7 +142,7 @@ public abstract class ExtensionsTestUtils {
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
     when(parameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
-    when(parameterModel.getRole()).thenReturn(PARAMETERIZATION);
+    when(parameterModel.getRole()).thenReturn(BEHAVIOUR);
     return parameterModel;
 
   }

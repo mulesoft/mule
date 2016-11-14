@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PARAMETERIZATION;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.meta.model.ElementDslModel;
@@ -90,6 +90,6 @@ public class ContentParameterModelEnricher implements ModelEnricher {
   }
 
   private List<ParameterDeclaration> getContentParameters(List<ParameterDeclaration> parameters) {
-    return parameters.stream().filter(p -> p.getRole() != PARAMETERIZATION).collect(toList());
+    return parameters.stream().filter(p -> p.getRole() != BEHAVIOUR).collect(toList());
   }
 }

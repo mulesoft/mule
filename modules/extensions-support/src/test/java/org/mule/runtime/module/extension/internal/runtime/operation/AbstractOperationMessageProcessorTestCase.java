@@ -19,7 +19,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PARAMETERIZATION;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -188,7 +188,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getType()).thenReturn(stringType);
     when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class))
         .thenReturn(of(new MetadataKeyPartModelProperty(0)));
-    when(keyParamMock.getRole()).thenReturn(PARAMETERIZATION);
+    when(keyParamMock.getRole()).thenReturn(BEHAVIOUR);
     when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
