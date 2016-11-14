@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -137,10 +136,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertEquals("value1", result.getVariable("key1").getValue());
-    assertTrue(simpleDateType1.equals(result.getVariable("key1").getDataType()));
-    assertThat(result.getVariableNames(), not(contains("key2")));
-    assertThat(result.getVariableNames(), not(contains("key3")));
+    assertThat(result.getVariable("key1").getValue(), equalTo("value1"));
+    assertThat(result.getVariable("key1").getDataType(), equalTo(simpleDateType1));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
+    assertThat(result.getVariable("key3").getValue(), equalTo("value3"));
 
     // Root id
     assertEquals(event1.getCorrelationId(), result.getCorrelationId());
@@ -238,8 +237,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
     assertThat(result.getVariable("key1").getValue(), equalTo("value1"));
-    assertThat(result.getVariableNames(), not(contains("key2")));
-    assertThat(result.getVariableNames(), not(contains("key3")));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
+    assertThat(result.getVariable("key3").getValue(), equalTo("value3"));
 
     // Root id
     assertEquals(event1.getCorrelationId(), result.getCorrelationId());

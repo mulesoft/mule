@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,7 +15,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -28,7 +28,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -81,7 +80,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertThat(result.getVariableNames(), not(hasItem("key1")));
     assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
 
     assertThat(result.getSession().getProperty("key"), equalTo("valueNEW"));
@@ -123,8 +122,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // original event
     assertEquals("value1", result.getVariable("key1").getValue());
     assertTrue(simpleDateType1.equals(result.getVariable("key1").getDataType()));
-    assertThat(result.getVariableNames(), not(contains("key2")));
-    assertThat(result.getVariableNames(), not(contains("key3")));
+    assertEquals("value2", result.getVariable("key2").getValue());
+    assertEquals("value3", result.getVariable("key3").getValue());
 
     // Root id
     assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
@@ -151,7 +150,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertThat(result.getVariableNames(), not(hasItem("key1")));
     assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
   }
 
@@ -174,7 +173,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertThat(result.getVariableNames(), not(hasItem("key1")));
     assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
   }
 
@@ -215,8 +214,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
     assertThat(result.getVariable("key1").getValue(), equalTo("value1"));
-    assertThat(result.getVariableNames(), not(contains("key2")));
-    assertThat(result.getVariableNames(), not(contains("key3")));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
+    assertThat(result.getVariable("key3").getValue(), equalTo("value3"));
 
     // Root id
     assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
