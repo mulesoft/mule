@@ -8,7 +8,11 @@ package org.mule.runtime.core.routing;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -38,6 +42,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
@@ -112,27 +118,27 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     events.add(event3);
 
     Event result = resultsHandler.aggregateResults(events, event1);
-    assertNotNull(result);
-    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).size());
-    assertTrue(result.getMessage().getPayload().getValue() instanceof List<?>);
-    assertEquals(message2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(0));
-    assertEquals(message3, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(1));
+    assertThat(result, notNullValue());
+    assertThat((List<InternalMessage>) result.getMessage().getPayload().getValue(), hasSize(2));
+    assertThat(result.getMessage().getPayload().getValue(), instanceOf(List.class));
+    assertThat(((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(0), is(message2));
+    assertThat(((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(1), is(message3));
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertEquals("value1", result.getVariable("key1").getValue());
-    assertTrue(simpleDateType1.equals(result.getVariable("key1").getDataType()));
-    assertEquals("value2", result.getVariable("key2").getValue());
-    assertEquals("value3", result.getVariable("key3").getValue());
+    assertThat(result.getVariable("key1").getValue(), equalTo("value1"));
+    assertThat(result.getVariable("key1").getDataType(), equalTo(simpleDateType1));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
+    assertThat(result.getVariable("key3").getValue(), equalTo("value3"));
 
     // Root id
     assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
 
-    assertEquals("value", result.getSession().getProperty("key"));
-    assertEquals("value1", result.getSession().getProperty("key1"));
-    assertEquals("value2NEW", result.getSession().getProperty("key2"));
-    assertEquals("value3", result.getSession().getProperty("key3"));
-    assertNull(result.getSession().getProperty("key4"));
+    assertThat(result.getSession().getProperty("key"), is("value"));
+    assertThat(result.getSession().getProperty("key1"), is("value1"));
+    assertThat(result.getSession().getProperty("key2"), is("value2NEW"));
+    assertThat(result.getSession().getProperty("key3"), is("value3"));
+    assertThat(result.getSession().getProperty("key4"), nullValue());
   }
 
   @Test
