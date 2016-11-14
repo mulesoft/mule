@@ -14,20 +14,17 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -49,13 +46,10 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new AsynchronousProcessingStrategy(() -> {
-      try {
-        return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS), muleContext);
+    return new AsynchronousProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                                          MILLISECONDS),
+                                              muleContext);
   }
 
   static class AsynchronousProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
@@ -72,6 +66,7 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
       this.muleContext = muleContext;
     }
 
+    @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
 

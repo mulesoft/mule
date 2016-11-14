@@ -9,8 +9,8 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
@@ -18,9 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,13 +35,9 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new LegacyNonBlockingProcessingStrategy(() -> {
-      try {
-        return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
+    return new LegacyNonBlockingProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+                                                   scheduler -> scheduler
+                                                       .stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
   public static class LegacyNonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {

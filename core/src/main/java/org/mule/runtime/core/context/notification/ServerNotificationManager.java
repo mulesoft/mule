@@ -8,10 +8,10 @@ package org.mule.runtime.core.context.notification;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,10 +20,8 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Collection;
@@ -88,16 +86,8 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
 
   @Override
   public void initialise() throws InitialisationException {
-    SchedulerService schedulerService;
-    try {
-      schedulerService = muleContext.getRegistry().lookupObject(SchedulerService.class);
-    } catch (RegistrationException e) {
-      throw new InitialisationException(e, this);
-    }
-    requireNonNull(schedulerService);
-
-    notificationsLiteScheduler = schedulerService.cpuLightScheduler();
-    notificationsIoScheduler = schedulerService.ioScheduler();
+    notificationsLiteScheduler = muleContext.getSchedulerService().cpuLightScheduler();
+    notificationsIoScheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
   public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event) {

@@ -14,15 +14,11 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 /**
@@ -43,13 +39,7 @@ public class MuleContextUtils {
    */
   public static MuleContext mockContextWithServices() {
     final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    final MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    try {
-      when(muleRegistry.lookupObject(SchedulerService.class)).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    when(muleContext.getSchedulerService()).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
     return muleContext;
   }
 

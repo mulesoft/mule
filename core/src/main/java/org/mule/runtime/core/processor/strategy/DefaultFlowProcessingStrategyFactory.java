@@ -12,14 +12,12 @@ import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStra
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -35,13 +33,10 @@ public class DefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProc
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new DefaultFlowProcessingStrategy(() -> {
-      try {
-        return muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }, scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS), muleContext);
+    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+                                             scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                                         MILLISECONDS),
+                                             muleContext);
   }
 
   static class DefaultFlowProcessingStrategy extends LegacyAsynchronousProcessingStrategy {
