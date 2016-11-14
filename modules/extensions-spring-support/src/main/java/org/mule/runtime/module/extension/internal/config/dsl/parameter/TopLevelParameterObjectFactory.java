@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
+import static java.lang.String.format;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -112,9 +113,9 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
 
   private Field getField(Class<?> objectClass, String key) {
     return getFieldByNameOrAlias(objectClass, key)
-        .orElseThrow(() -> new IllegalModelDefinitionException(String.format("Class '%s' does not contain field %s",
-                                                                             objectClass.getName(),
-                                                                             key)));
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
+                                                                      objectClass.getName(),
+                                                                      key)));
   }
 
   private String getFieldKey(ObjectFieldType field) {
