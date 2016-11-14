@@ -84,6 +84,11 @@ public class ExtensionProperties {
   public static final String TRANSACTIONAL_ACTION_PARAMETER_NAME = "transactionalAction";
 
   /**
+   * The name of the tab in which transaction parameters should appear
+   */
+  public static final String TRANSACTIONAL_TAB_NAME = "Transaction";
+
+  /**
    * The description of the parameter for configuring transactional actions
    */
   public static final String TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION =
