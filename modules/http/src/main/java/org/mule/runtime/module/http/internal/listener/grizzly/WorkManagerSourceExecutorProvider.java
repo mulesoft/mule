@@ -6,23 +6,21 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
+import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * {@link org.mule.runtime.module.http.internal.listener.grizzly.ExecutorProvider} implementation that retrieves an
- * {@link java.util.concurrent.Executor} from a {@link org.mule.runtime.core.api.context.WorkManagerSource}
+ * {@link java.util.concurrent.Executor} for a {@link ServerAddress}.
  */
 public class WorkManagerSourceExecutorProvider implements ExecutorProvider {
 
-  private ServerAddressMap<WorkManagerSource> executorPerServerAddress =
-      new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, WorkManagerSource>());
+  private ServerAddressMap<Supplier<Executor>> executorPerServerAddress =
+      new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, Supplier<Executor>>());
 
   /**
    * Adds an {@link java.util.concurrent.Executor} to be used when a request is made to a
@@ -31,16 +29,12 @@ public class WorkManagerSourceExecutorProvider implements ExecutorProvider {
    * @param serverAddress address to which the executor should be applied to
    * @param workManagerSource the executor to use when a request is done to the server address
    */
-  public void addExecutor(final ServerAddress serverAddress, final WorkManagerSource workManagerSource) {
+  public void addExecutor(final ServerAddress serverAddress, final Supplier<Executor> workManagerSource) {
     executorPerServerAddress.put(serverAddress, workManagerSource);
   }
 
   @Override
   public Executor getExecutor(ServerAddress serverAddress) {
-    try {
-      return executorPerServerAddress.get(serverAddress).getWorkManager();
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return executorPerServerAddress.get(serverAddress).get();
   }
 }

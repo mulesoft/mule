@@ -14,21 +14,22 @@ import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType
 
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.module.http.internal.HttpMessageLogger;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.runtime.module.http.internal.listener.Server;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
@@ -160,7 +161,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     return false;
   }
 
-  public Server createSslServerFor(TlsContextFactory tlsContextFactory, WorkManagerSource workManagerSource,
+  @Override
+  public Server createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<Executor> workManagerSource,
                                    final ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException {
     if (logger.isDebugEnabled()) {
@@ -180,7 +182,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     return grizzlyServer;
   }
 
-  public Server createServerFor(ServerAddress serverAddress, WorkManagerSource workManagerSource,
+  @Override
+  public Server createServerFor(ServerAddress serverAddress, Supplier<Executor> workManagerSource,
                                 boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException {
     if (logger.isDebugEnabled()) {
@@ -255,7 +258,7 @@ public class GrizzlyServerManager implements HttpServerManager {
   }
 
   private int convertToSeconds(int milliseconds) {
-    return (int) Math.ceil((double) milliseconds / 1000.0);
+    return (int) Math.ceil(milliseconds / 1000.0);
 
   }
 

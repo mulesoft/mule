@@ -11,6 +11,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.config.ListenerConfig;
 import org.mule.extension.socket.api.connection.ListenerConnection;
@@ -18,18 +19,18 @@ import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.execution.OnError;
+import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
-import org.mule.runtime.extension.api.annotation.execution.OnError;
-import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -39,8 +40,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +62,9 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private SchedulerService schedulerService;
+
   @Connection
   private ListenerConnection connection;
 
@@ -70,19 +72,14 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   private ListenerConfig config;
 
   private AtomicBoolean stopRequested = new AtomicBoolean(false);
-  private WorkManager workManager;
+  private Scheduler workManager;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void onStart(SourceCallback<InputStream, SocketAttributes> sourceCallback) throws MuleException {
-    // TODO MULE-9898
-    ThreadingProfile threadingProfile =
-        config.getThreadingProfile() == null ? muleContext.getDefaultThreadingProfile() : config.getThreadingProfile();
-    workManager =
-        threadingProfile.createWorkManager("SocketListenerWorkManager", muleContext.getConfiguration().getShutdownTimeout());
-    workManager.start();
+    workManager = schedulerService.ioScheduler();
 
     executorService =
         newSingleThreadExecutor(r -> new Thread(r,
@@ -106,79 +103,13 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
     worker.onError(error.getCause());
   }
 
-  private class SocketWorkListener implements WorkListener {
-
-    private final SourceCallback<InputStream, SocketAttributes> sourceCallback;
-
-    private SocketWorkListener(
-                               SourceCallback<InputStream, SocketAttributes> sourceCallback) {
-      this.sourceCallback = sourceCallback;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void workAccepted(WorkEvent event) {
-      handleWorkException(event, "workAccepted");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void workRejected(WorkEvent event) {
-      handleWorkException(event, "workRejected");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void workStarted(WorkEvent event) {
-      handleWorkException(event, "workStarted");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void workCompleted(WorkEvent event) {
-      handleWorkException(event, "workCompleted");
-    }
-
-    private void handleWorkException(WorkEvent event, String type) {
-      if (event == null) {
-        return;
-      }
-
-      Throwable e = event.getException();
-
-      if (e == null) {
-        return;
-      }
-
-      if (e.getCause() != null) {
-        e = e.getCause();
-      }
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Work caused exception on '%s'. Work being executed was: %s", type, event.getWork().toString()));
-      }
-
-      if (e instanceof MessagingException || e instanceof ConnectionException) {
-        sourceCallback.onSourceException(e);
-      }
-    }
-  }
-
   /**
    * {@inheritDoc}
    */
   @Override
   public void onStop() {
     stopRequested.set(true);
-    workManager.dispose();
+    workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     shutdownExecutor();
   }
 
@@ -215,8 +146,6 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   }
 
   private void listen(SourceCallback<InputStream, SocketAttributes> sourceCallback) {
-
-    SocketWorkListener socketWorkListener = new SocketWorkListener(sourceCallback);
     for (;;) {
       if (isRequestedToStop()) {
         return;
@@ -225,7 +154,21 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
       try {
         SocketWorker worker = connection.listen(sourceCallback);
         worker.setEncoding(config.getDefaultEncoding());
-        workManager.scheduleWork(worker, WorkManager.INDEFINITE, null, socketWorkListener);
+        worker.onError(e -> {
+          Throwable t = e;
+          if (t.getCause() != null) {
+            t = t.getCause();
+          }
+
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format("Got exception '%s'. Work being executed was: %s", t.getClass().getName(), worker.toString()));
+          }
+
+          if (t instanceof MessagingException || t instanceof ConnectionException) {
+            sourceCallback.onSourceException(t);
+          }
+        });
+        workManager.execute(worker);
       } catch (ConnectionException e) {
         if (!isRequestedToStop()) {
           sourceCallback.onSourceException(e);

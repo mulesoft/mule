@@ -10,18 +10,15 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,74 +40,63 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
   @Override
   public void runPhase(final FlowProcessingPhaseTemplate flowProcessingPhaseTemplate,
                        final MessageProcessContext messageProcessContext, final PhaseResultNotifier phaseResultNotifier) {
-    Work flowExecutionWork = new Work() {
-
-      @Override
-      public void release() {}
-
-      @Override
-      public void run() {
+    Runnable flowExecutionWork = () -> {
+      try {
         try {
-          try {
-            final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
-            TransactionalErrorHandlingExecutionTemplate transactionTemplate =
-                createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
-                                            messageProcessContext.getFlowConstruct(),
-                                            (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
-                                                : messageProcessContext.getTransactionConfig()),
-                                            messageProcessContext.getFlowConstruct().getExceptionListener());
-            Event response = transactionTemplate.execute(() -> {
-              try {
-                Object message = flowProcessingPhaseTemplate.getOriginalMessage();
-                if (message == null) {
-                  return null;
-                }
-                Event muleEvent = flowProcessingPhaseTemplate.getEvent();
-                muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
-                muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
-                muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
-                sendResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(),
-                                         muleEvent, flowProcessingPhaseTemplate);
-                return muleEvent;
-              } catch (Exception e) {
-                exceptionThrownDuringFlowProcessing.set(e);
-                throw e;
+          final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
+          TransactionalErrorHandlingExecutionTemplate transactionTemplate =
+              createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
+                                          messageProcessContext.getFlowConstruct(),
+                                          (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
+                                              : messageProcessContext.getTransactionConfig()),
+                                          messageProcessContext.getFlowConstruct().getExceptionListener());
+          Event response = transactionTemplate.execute(() -> {
+            try {
+              Object message = flowProcessingPhaseTemplate.getOriginalMessage();
+              if (message == null) {
+                return null;
               }
-            });
-            if (exceptionThrownDuringFlowProcessing.get() != null
-                && !(exceptionThrownDuringFlowProcessing.get() instanceof ResponseDispatchException)) {
+              Event muleEvent = flowProcessingPhaseTemplate.getEvent();
+              muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
+              muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
+              muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
               sendResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(),
-                                       response, flowProcessingPhaseTemplate);
+                                       muleEvent, flowProcessingPhaseTemplate);
+              return muleEvent;
+            } catch (Exception e2) {
+              exceptionThrownDuringFlowProcessing.set(e2);
+              throw e2;
             }
-            flowProcessingPhaseTemplate.afterSuccessfulProcessingFlow(response);
-          } catch (ResponseDispatchException e) {
-            flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
-          } catch (MessagingException e) {
-            sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(), e,
-                                            flowProcessingPhaseTemplate);
-            flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
+          });
+          if (exceptionThrownDuringFlowProcessing.get() != null
+              && !(exceptionThrownDuringFlowProcessing.get() instanceof ResponseDispatchException)) {
+            sendResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(),
+                                     response, flowProcessingPhaseTemplate);
           }
-          phaseResultNotifier.phaseSuccessfully();
-        } catch (Exception e) {
-          MuleException me = new DefaultMuleException(e);
-          try {
-            flowProcessingPhaseTemplate.afterFailureProcessingFlow(me);
-          } catch (MuleException e1) {
-            logger.warn("Failure during exception processing in flow template: " + e.getMessage());
-            if (logger.isDebugEnabled()) {
-              logger.debug("Failure during exception processing in flow template: ", e);
-            }
-          }
-          phaseResultNotifier.phaseFailure(e);
+          flowProcessingPhaseTemplate.afterSuccessfulProcessingFlow(response);
+        } catch (ResponseDispatchException e3) {
+          flowProcessingPhaseTemplate.afterFailureProcessingFlow(e3);
+        } catch (MessagingException e4) {
+          sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(), e4,
+                                          flowProcessingPhaseTemplate);
+          flowProcessingPhaseTemplate.afterFailureProcessingFlow(e4);
         }
+        phaseResultNotifier.phaseSuccessfully();
+      } catch (Exception e5) {
+        MuleException me = new DefaultMuleException(e5);
+        try {
+          flowProcessingPhaseTemplate.afterFailureProcessingFlow(me);
+        } catch (MuleException e1) {
+          logger.warn("Failure during exception processing in flow template: " + e5.getMessage());
+          if (logger.isDebugEnabled()) {
+            logger.debug("Failure during exception processing in flow template: ", e5);
+          }
+        }
+        phaseResultNotifier.phaseFailure(e5);
       }
     };
     if (messageProcessContext.supportsAsynchronousProcessing()) {
-      try {
-        messageProcessContext.getFlowExecutionWorkManager().scheduleWork(flowExecutionWork);
-      } catch (WorkException e) {
-        phaseResultNotifier.phaseFailure(e);
-      }
+      messageProcessContext.getFlowExecutionExecutor().execute(flowExecutionWork);
     } else {
       flowExecutionWork.run();
     }

@@ -7,6 +7,7 @@
 package org.mule.extension.socket.api.worker;
 
 import static java.lang.String.format;
+
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
@@ -115,7 +116,7 @@ public final class TcpWorker extends SocketWorker {
   }
 
   @Override
-  public void run() {
+  public void doRun() {
     while (hasMoreMessages()) {
       InputStream content;
       try {
@@ -180,11 +181,5 @@ public final class TcpWorker extends SocketWorker {
         }
       }
     }
-  }
-
-  @Override
-  public void release() {
-    waitForStreams();
-    releaseSocket();
   }
 }

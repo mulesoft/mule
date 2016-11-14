@@ -7,28 +7,29 @@
 package org.mule.runtime.module.http.api;
 
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
+import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.runtime.module.http.internal.listener.Server;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager;
-import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
-import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import com.google.common.collect.Iterables;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 public class HttpListenerConnectionManager implements Initialisable, Disposable, MuleContextAware {
 
@@ -74,7 +75,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
     this.muleContext = muleContext;
   }
 
-  public Server createServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, boolean usePersistentConnections,
+  public Server createServer(ServerAddress serverAddress, Supplier<Executor> workManagerSource, boolean usePersistentConnections,
                              int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {
@@ -93,7 +94,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
     return httpServerManager.containsServerFor(serverAddress);
   }
 
-  public Server createSslServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, TlsContextFactory tlsContext,
+  public Server createSslServer(ServerAddress serverAddress, Supplier<Executor> workManagerSource, TlsContextFactory tlsContext,
                                 boolean usePersistentConnections, int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {

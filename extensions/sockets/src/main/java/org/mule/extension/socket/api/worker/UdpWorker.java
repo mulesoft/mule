@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.copyOf;
 import static org.mule.extension.socket.internal.SocketUtils.createPacket;
 import static org.mule.extension.socket.internal.SocketUtils.getUdpAllowedByteArray;
+
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -47,7 +48,7 @@ public final class UdpWorker extends SocketWorker {
   }
 
   @Override
-  public void run() {
+  public void doRun() {
     InputStream content = new ByteArrayInputStream(copyOf(packet.getData(), packet.getLength()));
     handle(content, new ImmutableSocketAttributes(packet));
   }
@@ -68,11 +69,6 @@ public final class UdpWorker extends SocketWorker {
   @Override
   public void onError(Throwable e) {
     LOGGER.error("UDP worker will not answer back due an exception was received", e);
-  }
-
-  @Override
-  public void release() {
-    dispose();
   }
 
   @Override

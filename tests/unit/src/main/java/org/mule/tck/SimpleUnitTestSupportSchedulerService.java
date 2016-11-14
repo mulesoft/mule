@@ -70,6 +70,10 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     return unmodifiableList(decorators);
   }
 
+  public void clearCreatedSchedulers() {
+    decorators.clear();
+  }
+
   public int getScheduledTasks() {
     return scheduler.getScheduledTasks();
   }

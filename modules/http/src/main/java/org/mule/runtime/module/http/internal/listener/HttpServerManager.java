@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * A Server managers is in charge to handle all ServerSocket connections and to handle incoming requests to an Execution Service
@@ -27,13 +28,12 @@ public interface HttpServerManager {
   /**
    *
    * @param serverAddress address of the server
-   * @param workManagerSource work manager source to use for retrieving a {@link org.mule.runtime.core.api.context.WorkManager}
-   *        for processing this server requests
+   * @param workManagerSource work manager source to use for retrieving an {@link Executor} for processing this server requests
    * @param usePersistentConnections if true, the connections will be kept open for subsequent requests
    * @param connectionIdleTimeout the amount of milliseconds to keep open an idle connection @return the create Server handler
    * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
    */
-  Server createServerFor(ServerAddress serverAddress, WorkManagerSource workManagerSource, boolean usePersistentConnections,
+  Server createServerFor(ServerAddress serverAddress, Supplier<Executor> workManagerSource, boolean usePersistentConnections,
                          int connectionIdleTimeout)
       throws IOException;
 
@@ -41,14 +41,14 @@ public interface HttpServerManager {
    *
    * @param tlsContextFactory
    * @param serverAddress address of the server
-   * @param workManagerSource work manager source to use for retrieving a {@link org.mule.runtime.core.api.context.WorkManager}
-   *        for processing this server requests
+   * @param workManagerSource work manager source to use for retrieving an {@link Executor} for processing this server requests
    * @param usePersistentConnections if true, the connections will be kept open for subsequent requests
    * @param connectionIdleTimeout the amount of milliseconds to keep open an idle connection
    * @return the create Server handler
    * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
    */
-  Server createSslServerFor(TlsContextFactory tlsContextFactory, WorkManagerSource workManagerSource, ServerAddress serverAddress,
+  Server createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<Executor> workManagerSource,
+                            ServerAddress serverAddress,
                             boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException;
 

@@ -12,14 +12,13 @@ import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
 import org.mule.extension.http.internal.listener.server.HttpServerFactory;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
@@ -33,7 +32,9 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 /**
  * Grizzly based {@link HttpServerFactory}.
@@ -101,15 +102,15 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
 
     TlsContextFactory tlsContextFactory = serverConfiguration.getTlsContextFactory();
     if (tlsContextFactory == null) {
-      return createServer(serverAddress, serverConfiguration.getWorkManagerSource(),
+      return createServer(serverAddress, serverConfiguration.getWorkManagerSupplier(),
                           serverConfiguration.isUsePersistentConnections(), serverConfiguration.getConnectionIdleTimeout());
     } else {
-      return createSslServer(serverAddress, serverConfiguration.getWorkManagerSource(), tlsContextFactory,
+      return createSslServer(serverAddress, serverConfiguration.getWorkManagerSupplier(), tlsContextFactory,
                              serverConfiguration.isUsePersistentConnections(), serverConfiguration.getConnectionIdleTimeout());
     }
   }
 
-  public Server createServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, boolean usePersistentConnections,
+  public Server createServer(ServerAddress serverAddress, Supplier<Executor> workManagerSource, boolean usePersistentConnections,
                              int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {
@@ -128,7 +129,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     return httpServerManager.containsServerFor(serverAddress);
   }
 
-  public Server createSslServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, TlsContextFactory tlsContext,
+  public Server createSslServer(ServerAddress serverAddress, Supplier<Executor> workManagerSource, TlsContextFactory tlsContext,
                                 boolean usePersistentConnections, int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {

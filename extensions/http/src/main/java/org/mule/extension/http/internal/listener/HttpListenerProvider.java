@@ -7,42 +7,39 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import org.mule.extension.http.internal.server.HttpListenerConnectionManager;
+
 import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
+import org.mule.extension.http.internal.server.HttpListenerConnectionManager;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.config.MutableThreadingProfile;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.api.HttpConstants;
@@ -50,6 +47,8 @@ import org.mule.runtime.module.http.internal.listener.Server;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -60,8 +59,6 @@ import javax.inject.Inject;
  */
 @Alias("listener")
 public class HttpListenerProvider implements CachedConnectionProvider<Server>, Initialisable, Startable, Stoppable {
-
-  private static final int DEFAULT_MAX_THREADS = 128;
 
   @ConfigName
   private String configName;
@@ -129,9 +126,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Inject
   private MuleContext muleContext;
 
-  // TODO: MULE-9320 Define threading model for message sources in Mule 4 - This should be a parameter if nothing changes
-  private ThreadingProfile workerThreadingProfile;
-  private WorkManager workManager;
+  @Inject
+  private SchedulerService schedulerService;
+
+  private Scheduler workManager;
   private Server server;
 
   @Override
@@ -160,13 +158,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
 
     verifyConnectionsParameters();
 
-    // TODO: MULE-9320 Define threading model for message sources in Mule 4 - Analyse whether this can be avoided
-    workerThreadingProfile = new MutableThreadingProfile(DEFAULT_THREADING_PROFILE);
-    workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
 
     HttpServerConfiguration serverConfiguration = new HttpServerConfiguration.Builder().setHost(host).setPort(port)
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(usePersistentConnections)
-        .setConnectionIdleTimeout(connectionIdleTimeout).setWorkManagerSource(createWorkManagerSource(workManager)).build();
+        .setConnectionIdleTimeout(connectionIdleTimeout).setWorkManagerSource(() -> workManager).build();
     try {
       server = connectionManager.create(serverConfiguration);
     } catch (ConnectionException e) {
@@ -176,9 +171,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
 
   @Override
   public void start() throws MuleException {
+    workManager = schedulerService.cpuLightScheduler();
     try {
-      workManager = createWorkManager(configName);
-      workManager.start();
       server.start();
     } catch (IOException e) {
       throw new DefaultMuleException(new ConnectionException("Could not start HTTP server", e));
@@ -191,7 +185,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
       server.stop();
     } finally {
       try {
-        workManager.dispose();
+        workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
       } finally {
         workManager = null;
       }
@@ -225,17 +219,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
     }
   }
 
-  private WorkManager createWorkManager(String name) {
-    final WorkManager workManager =
-        workerThreadingProfile.createWorkManager(format("%s%s.%s", getPrefix(muleContext), name, "worker"),
-                                                 muleContext.getConfiguration().getShutdownTimeout());
-    if (workManager instanceof MuleContextAware) {
-      ((MuleContextAware) workManager).setMuleContext(muleContext);
-    }
-    return workManager;
-  }
-
-  private WorkManagerSource createWorkManagerSource(WorkManager workManager) {
+  private Supplier<Executor> createWorkManagerSource() {
     return () -> workManager;
   }
 }

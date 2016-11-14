@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 
+import java.util.concurrent.Executor;
+
 /**
  * Context for processing one message from a {@link org.mule.runtime.core.api.source.MessageSource}.
  *
@@ -40,10 +42,10 @@ public interface MessageProcessContext {
   FlowConstruct getFlowConstruct();
 
   /**
-   * @return the {@link WorkManager} were the incoming message must be processed. If null it will be executed in the same thread
-   *         were the message was received
+   * @return the {@link Executor} were the incoming message must be processed. If null it will be executed in the same thread were
+   *         the message was received
    */
-  WorkManager getFlowExecutionWorkManager();
+  Executor getFlowExecutionExecutor();
 
   /**
    * @return the {@link TransactionConfig} associated to the {@link MessageSource} that received the message. If null then no
