@@ -7,7 +7,7 @@
 package org.mule.runtime.module.repository.internal;
 
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import org.mule.runtime.module.repository.api.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.repository.api.RepositoryConnectionException;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -44,14 +44,14 @@ public class DefaultRepositoryService implements RepositoryService {
   }
 
   @Override
-  public File lookupBundle(BundleDescriptor bundleDescriptor) {
+  public File lookupBundle(BundleDependency bundleDependency) {
     try {
       if (remoteRepositories.isEmpty()) {
         throw new RepositoryServiceDisabledException("Repository service has not been configured so it's disabled. "
             + "To enable it you must configure the set of repositories to use using the system property: "
             + MULE_REMOTE_REPOSITORIES_PROPERTY);
       }
-      DefaultArtifact artifact = toArtifact(bundleDescriptor);
+      DefaultArtifact artifact = toArtifact(bundleDependency);
       ArtifactRequest getArtifactRequest = new ArtifactRequest();
       getArtifactRequest.setRepositories(remoteRepositories);
       getArtifactRequest.setArtifact(artifact);
@@ -59,7 +59,7 @@ public class DefaultRepositoryService implements RepositoryService {
       return artifactResult.getArtifact().getFile();
     } catch (ArtifactResolutionException e) {
       if (e.getCause() instanceof ArtifactNotFoundException) {
-        throw new BundleNotFoundException("Couldn't find bundle " + bundleDescriptor.toString(), e);
+        throw new BundleNotFoundException("Couldn't find bundle " + bundleDependency.toString(), e);
       } else {
         throw new RepositoryConnectionException("There was a problem connecting to one of the repositories", e);
 
@@ -67,8 +67,9 @@ public class DefaultRepositoryService implements RepositoryService {
     }
   }
 
-  private DefaultArtifact toArtifact(BundleDescriptor bundleDescriptor) {
-    return new DefaultArtifact(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(), bundleDescriptor.getType(),
-                               bundleDescriptor.getVersion());
+  private DefaultArtifact toArtifact(BundleDependency bundleDependency) {
+    return new DefaultArtifact(bundleDependency.getDescriptor().getGroupId(), bundleDependency.getDescriptor().getArtifactId(),
+                               bundleDependency.getType(),
+                               bundleDependency.getDescriptor().getVersion());
   }
 }

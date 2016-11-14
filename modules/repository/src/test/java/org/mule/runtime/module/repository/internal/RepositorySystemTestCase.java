@@ -13,7 +13,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REPOSITORY_FOLDER_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import org.mule.runtime.module.repository.api.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.repository.api.RepositoryConnectionException;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -29,8 +30,10 @@ import org.junit.rules.TemporaryFolder;
 
 public class RepositorySystemTestCase extends AbstractMuleTestCase {
 
-  private static final BundleDescriptor VALIDA_BUNDLE =
-      new BundleDescriptor.Builder().setGroupId("ant").setArtifactId("ant-antlr").setVersion("1.6").setType("jar").build();
+  private static final BundleDescriptor VALID_BUNDLE_DESCRIPTOR =
+      new BundleDescriptor.Builder().setGroupId("ant").setArtifactId("ant-antlr").setVersion("1.6").build();
+  private static final BundleDependency VALID_BUNDLE =
+      new BundleDependency.Builder().sedBundleDescriptor(VALID_BUNDLE_DESCRIPTOR).setType("jar").build();
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -41,7 +44,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
   public void existingResourceFromMaven() throws Exception {
     executeTestWithDefaultRemoteRepo(() -> {
       RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
-      File bundleFile = defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
+      File bundleFile = defaultRepositoryService.lookupBundle(VALID_BUNDLE);
       assertThat(bundleFile, notNullValue());
       assertThat(bundleFile.exists(), is(true));
       assertThat(bundleFile.getAbsolutePath().startsWith(temporaryFolder.getRoot().getAbsolutePath()), is(true));
@@ -52,9 +55,11 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
   public void noExistentResource() throws Exception {
     executeTestWithDefaultRemoteRepo(() -> {
       RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+      BundleDescriptor bundleDescriptor =
+          new BundleDescriptor.Builder().setGroupId("no").setArtifactId("existent").setVersion("bundle").build();
       expectedException.expect(BundleNotFoundException.class);
-      defaultRepositoryService.lookupBundle(new BundleDescriptor.Builder().setGroupId("no").setArtifactId("existent")
-          .setVersion("bundle").setType("jar").build());
+      defaultRepositoryService
+          .lookupBundle(new BundleDependency.Builder().sedBundleDescriptor(bundleDescriptor).setType("jar").build());
     });
   }
 
@@ -63,7 +68,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
     executeTestWithCustomRepoRepo("http://doesnotexists/repo", () -> {
       RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
       expectedException.expect(RepositoryConnectionException.class);
-      defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
+      defaultRepositoryService.lookupBundle(VALID_BUNDLE);
     });
   }
 
@@ -72,7 +77,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
     executeTestWithCustomRepoRepo(null, () -> {
       RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
       expectedException.expect(RepositoryServiceDisabledException.class);
-      defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
+      defaultRepositoryService.lookupBundle(VALID_BUNDLE);
     });
   }
 

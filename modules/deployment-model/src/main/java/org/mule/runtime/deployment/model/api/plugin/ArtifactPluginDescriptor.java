@@ -13,6 +13,8 @@ import java.util.List;
 
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
+  public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
+  public static final String EXTENSION_BUNDLE_TYPE = "zip";
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
   private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();

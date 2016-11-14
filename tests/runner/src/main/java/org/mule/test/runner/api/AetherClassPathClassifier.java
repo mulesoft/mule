@@ -23,6 +23,7 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilt
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
@@ -85,7 +86,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String MAVEN_COORDINATES_SEPARATOR = ":";
   private static final String JAR_EXTENSION = "jar";
   private static final String SNAPSHOT_WILCARD_FILE_FILTER = "*-SNAPSHOT*.*";
-  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String TESTS_CLASSIFIER = "tests";
   private static final String TESTS_JAR = "-tests.jar";
   private static final String SERVICE_PROPERTIES_FILE_NAME = "service.properties";

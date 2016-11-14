@@ -30,9 +30,10 @@ public class ClassLoaderModel {
   private final URL[] urls;
   private final Set<String> exportedPackages;
   private final Set<String> exportedResources;
-  private final Set<String> dependencies;
+  private final Set<BundleDependency> dependencies;
 
-  private ClassLoaderModel(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources, Set<String> dependencies) {
+  private ClassLoaderModel(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources,
+                           Set<BundleDependency> dependencies) {
     this.urls = urls;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
@@ -63,7 +64,7 @@ public class ClassLoaderModel {
   /**
    * @return the artifact dependencies required to create the {@link ClassLoader}. Non null
    */
-  public Set<String> getDependencies() {
+  public Set<BundleDependency> getDependencies() {
     return dependencies;
   }
 
@@ -75,7 +76,7 @@ public class ClassLoaderModel {
     private Set<String> packages = new HashSet<>();
     private Set<String> resources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();
-    private Set<String> dependencies = new HashSet<>();
+    private Set<BundleDependency> dependencies = new HashSet<>();
 
     /**
      * Creates an empty builder.
@@ -126,7 +127,7 @@ public class ClassLoaderModel {
      * @param dependencies dependencies on which the model depends on. Non null.
      * @return same builder instance.
      */
-    public ClassLoaderModelBuilder dependingOn(Set<String> dependencies) {
+    public ClassLoaderModelBuilder dependingOn(Set<BundleDependency> dependencies) {
       checkArgument(dependencies != null, "dependencies cannot be null");
       this.dependencies = dependencies;
       return this;

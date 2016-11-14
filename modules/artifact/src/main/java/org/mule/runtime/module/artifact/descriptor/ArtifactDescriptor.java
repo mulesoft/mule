@@ -19,6 +19,7 @@ public class ArtifactDescriptor {
   private final String name;
   private File rootFolder;
   private ClassLoaderModel classLoaderModel = NULL_CLASSLOADER_MODEL;
+  private BundleDescriptor bundleDescriptor;
 
   /**
    * Creates a new descriptor for a named artifact
@@ -52,6 +53,14 @@ public class ArtifactDescriptor {
 
   public void setClassLoaderModel(ClassLoaderModel classLoaderModel) {
     this.classLoaderModel = classLoaderModel;
+  }
+
+  public BundleDescriptor getBundleDescriptor() {
+    return bundleDescriptor;
+  }
+
+  public void setBundleDescriptor(BundleDescriptor bundleDescriptor) {
+    this.bundleDescriptor = bundleDescriptor;
   }
 
   @Override

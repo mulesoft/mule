@@ -7,14 +7,20 @@
 
 package org.mule.runtime.module.deployment.internal.plugin;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory.parseExportedResource;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
@@ -31,6 +37,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
 
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
   public static final String PLUGIN_DEPENDENCIES = "plugin.dependencies";
+  public static final String BUNDLE_DESCRIPTOR_SEPARATOR = ":";
 
   @Override
   public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {
@@ -74,15 +81,51 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
 
     descriptor.setClassLoaderModel(classLoaderModelBuilder.build());
 
+    descriptor.setBundleDescriptor(createDefaultPluginBundleDescriptor(descriptor.getName()));
+
     return descriptor;
   }
 
-  private Set<String> getPluginDependencies(String pluginDependencies) {
-    Set<String> plugins = new HashSet<>();
+  private Set<BundleDependency> getPluginDependencies(String pluginDependencies) {
+    Set<BundleDependency> plugins = new HashSet<>();
     final String[] split = pluginDependencies.split(",");
     for (String plugin : split) {
-      plugins.add(plugin.trim());
+      plugins.add(createBundleDescriptor(plugin));
     }
     return plugins;
+  }
+
+  private BundleDependency createBundleDescriptor(String bundle) {
+    String[] bundleProperties = bundle.trim().split(BUNDLE_DESCRIPTOR_SEPARATOR);
+
+    BundleDescriptor bundleDescriptor;
+
+    if (isFullyDefinedBundle(bundleProperties)) {
+      String groupId = bundleProperties[0];
+      String artifactId = bundleProperties[1];
+      String version = bundleProperties[2];
+      bundleDescriptor = new BundleDescriptor.Builder().setArtifactId(artifactId).setGroupId(groupId).setVersion(version).build();
+    } else if (isNameOnlyDefinedBundle(bundleProperties)) {
+      // TODO(pablo.kraan): MULE-10966: remove this once extensions and plugins are properly migrated to the new model
+      bundleDescriptor = createDefaultPluginBundleDescriptor(bundleProperties[0]);
+    } else {
+      throw new IllegalArgumentException(format("Cannot create a bundle descriptor from '%s': invalid descriptor format",
+                                                bundle));
+    }
+
+    return new BundleDependency.Builder().setDescriptor(bundleDescriptor).setType(EXTENSION_BUNDLE_TYPE)
+        .setClassifier(MULE_PLUGIN_CLASSIFIER).setScope(COMPILE).build();
+  }
+
+  private boolean isNameOnlyDefinedBundle(String[] bundleProperties) {
+    return bundleProperties.length == 1;
+  }
+
+  private boolean isFullyDefinedBundle(String[] bundleProperties) {
+    return bundleProperties.length == 3;
+  }
+
+  private BundleDescriptor createDefaultPluginBundleDescriptor(String pluginName) {
+    return new BundleDescriptor.Builder().setArtifactId(pluginName).setGroupId("test").setVersion("1.0").build();
   }
 }

@@ -7,11 +7,13 @@
 
 package org.mule.runtime.deployment.model.api.plugin;
 
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +62,15 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
     return parentFirst;
   }
 
-  private boolean isDependencyPlugin(Set<String> pluginDependencies, ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    return pluginDependencies.contains(dependencyPluginDescriptor.getName());
+  private boolean isDependencyPlugin(Set<BundleDependency> pluginDependencies,
+                                     ArtifactPluginDescriptor dependencyPluginDescriptor) {
+    for (BundleDependency pluginDependency : pluginDependencies) {
+      if (pluginDependency.getDescriptor().getArtifactId().equals(dependencyPluginDescriptor.getName())
+          && MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getClassifier().get())) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

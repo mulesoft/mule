@@ -4,24 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.repository.api;
+
+package org.mule.runtime.module.artifact.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
-import com.google.common.base.Preconditions;
-
 /**
- * Descriptor to identify a bundle
- *
- * @since 4.0
+ * Describes a bundle by its Maven coordinates.
  */
 public class BundleDescriptor {
 
   private String groupId;
   private String artifactId;
   private String version;
-  private String type;
 
   private BundleDescriptor() {}
 
@@ -37,12 +33,42 @@ public class BundleDescriptor {
     return this.version;
   }
 
-  public String getType() {
-    return type;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    BundleDescriptor that = (BundleDescriptor) o;
+
+    if (!groupId.equals(that.groupId)) {
+      return false;
+    }
+    if (!artifactId.equals(that.artifactId)) {
+      return false;
+    }
+    return version.equals(that.version);
+
   }
 
+  @Override
+  public int hashCode() {
+    int result = groupId.hashCode();
+    result = 31 * result + artifactId.hashCode();
+    result = 31 * result + version.hashCode();
+    return result;
+  }
+
+  @Override
   public String toString() {
-    return format("BundleDescriptor { %s:%s:%s:%s }", groupId, artifactId, version, type);
+    return "BundleDescriptor{" +
+        "groupId='" + groupId + '\'' +
+        ", artifactId='" + artifactId + '\'' +
+        ", version='" + version + '\'' +
+        '}';
   }
 
   /**
@@ -52,19 +78,18 @@ public class BundleDescriptor {
 
     private static final String ARTIFACT_ID = "artifact id";
     private static final String VERSION = "version";
-    private static final String TYPE = "type";
     private static final String GROUP_ID = "group id";
     private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
 
-    private BundleDescriptor bundleDescriptor = new BundleDescriptor();
+    private BundleDescriptor bundleDependency = new BundleDescriptor();
 
     /**
      * @param groupId the group id of the bundle. Cannot be null or empty.
      * @return the builder
      */
-    public Builder setGroupId(String groupId) {
+    public BundleDescriptor.Builder setGroupId(String groupId) {
       validateIsNotEmpty(groupId, GROUP_ID);
-      bundleDescriptor.groupId = groupId;
+      bundleDependency.groupId = groupId;
       return this;
     }
 
@@ -72,9 +97,9 @@ public class BundleDescriptor {
      * @param artifactId the artifactId id of the bundle. Cannot be null or empty.
      * @return the builder
      */
-    public Builder setArtifactId(String artifactId) {
+    public BundleDescriptor.Builder setArtifactId(String artifactId) {
       validateIsNotEmpty(artifactId, ARTIFACT_ID);
-      bundleDescriptor.artifactId = artifactId;
+      bundleDependency.artifactId = artifactId;
       return this;
     }
 
@@ -84,21 +109,9 @@ public class BundleDescriptor {
      * @param version the version of the bundle. Cannot be null or empty.
      * @return the builder
      */
-    public Builder setVersion(String version) {
+    public BundleDescriptor.Builder setVersion(String version) {
       validateIsNotEmpty(version, ARTIFACT_ID);
-      bundleDescriptor.version = version;
-      return this;
-    }
-
-    /**
-     * Sets the extension type of the bundle.
-     *
-     * @param type the type id of the bundle. Cannot be null or empty.
-     * @return the builder
-     */
-    public Builder setType(String type) {
-      validateIsNotEmpty(type, TYPE);
-      bundleDescriptor.type = type;
+      bundleDependency.version = version;
       return this;
     }
 
@@ -106,11 +119,11 @@ public class BundleDescriptor {
      * @return a {@code BundleDescriptor} with the previous provided parameters to the builder.
      */
     public BundleDescriptor build() {
-      validateIsNotEmpty(bundleDescriptor.groupId, GROUP_ID);
-      validateIsNotEmpty(bundleDescriptor.artifactId, ARTIFACT_ID);
-      validateIsNotEmpty(bundleDescriptor.version, VERSION);
-      validateIsNotEmpty(bundleDescriptor.type, TYPE);
-      return this.bundleDescriptor;
+      validateIsNotEmpty(bundleDependency.groupId, GROUP_ID);
+      validateIsNotEmpty(bundleDependency.artifactId, ARTIFACT_ID);
+      validateIsNotEmpty(bundleDependency.version, VERSION);
+
+      return this.bundleDependency;
     }
 
     private String getNullFieldMessage(String field) {
@@ -121,9 +134,8 @@ public class BundleDescriptor {
       checkState(!isEmpty(value), getNullFieldMessage(fieldId));
     }
 
-    private boolean isEmpty(String value) {
+    private static boolean isEmpty(String value) {
       return value == null || value.equals("");
     }
-
   }
 }
