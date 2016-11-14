@@ -23,7 +23,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
@@ -344,14 +344,11 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   }
 
   protected Event createTestRequestEvent(InboundEndpoint ep) throws Exception {
-    final Event event = eventBuilder().message(inMessage).session(new DefaultMuleSession()).build();
-    return populateFieldsFromInboundEndpoint(event, ep);
+    return createEventUsingInboundEndpoint(eventBuilder(), inMessage, ep);
   }
 
   protected Event createTestResponseEvent(InboundEndpoint ep) throws Exception {
-    final Event event = eventBuilder().message(InternalMessage.builder().payload(RESPONSE_MESSAGE).build())
-        .session(new DefaultMuleSession()).build();
-    return populateFieldsFromInboundEndpoint(event, ep);
+    return createEventUsingInboundEndpoint(eventBuilder(), InternalMessage.builder().payload(RESPONSE_MESSAGE).build(), ep);
   }
 
   protected Event assertMessageSent(boolean sync) throws MuleException {

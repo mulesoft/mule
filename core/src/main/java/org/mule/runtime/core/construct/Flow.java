@@ -8,6 +8,7 @@ package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -58,7 +59,7 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   public Event process(final Event event) throws MuleException {
-    if (event.isSynchronous() || isSynchronous()) {
+    if (event.isSynchronous() || isSynchronous() || isTransactionActive()) {
       final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
       try {
         ExecutionTemplate<Event> executionTemplate =

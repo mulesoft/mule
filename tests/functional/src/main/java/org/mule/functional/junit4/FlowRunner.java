@@ -59,7 +59,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     transactionConfig.setFactory(factory);
 
     txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
-    eventBuilder.transactionally();
 
     return this;
   }

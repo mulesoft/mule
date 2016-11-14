@@ -8,6 +8,8 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -62,7 +64,7 @@ public class DefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProc
     }
 
     protected boolean canProcessAsync(Event event) {
-      return !(event.isSynchronous() || event.isTransacted());
+      return !(event.isSynchronous() || isTransactionActive());
     }
   }
 }

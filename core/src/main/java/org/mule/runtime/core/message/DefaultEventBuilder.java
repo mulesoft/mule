@@ -69,7 +69,6 @@ public class DefaultEventBuilder implements Event.Builder {
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
-  private boolean transacted;
   private Boolean synchronous;
   private MuleSession session = new DefaultMuleSession();
   private Event originalEvent;
@@ -99,7 +98,6 @@ public class DefaultEventBuilder implements Event.Builder {
     if (event.isSynchronous()) {
       this.synchronous = event.isSynchronous();
     }
-    this.transacted = event.isTransacted();
 
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
@@ -204,13 +202,6 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder transacted(boolean transacted) {
-    this.transacted = transacted;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public Event.Builder session(MuleSession session) {
     this.session = session;
     this.modified = true;
@@ -225,21 +216,12 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  @Deprecated
-  public Event.Builder refreshSync() {
-    this.synchronous = resolveEventSynchronicity();
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public Event build() {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session, transacted,
-                                     synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null)
-                                         : synchronous,
+      return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session,
+                                     synchronous == null ? resolveEventSynchronicity() : synchronous,
                                      replyToDestination,
                                      replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
                                      notificationsEnabled);
@@ -247,9 +229,8 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   protected boolean resolveEventSynchronicity() {
-    return transacted
-        || isFlowConstructSynchronous()
-        || exchangePattern != null && exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy();
+    return isFlowConstructSynchronous()
+        || (exchangePattern != null && exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy());
   }
 
   private boolean isFlowConstructSynchronous() {
@@ -285,7 +266,6 @@ public class DefaultEventBuilder implements Event.Builder {
 
     private final MessageExchangePattern exchangePattern;
     private final ReplyToHandler replyToHandler;
-    private final boolean transacted;
     private final boolean synchronous;
 
     /** Mutable MuleEvent state **/
@@ -303,7 +283,7 @@ public class DefaultEventBuilder implements Event.Builder {
     private EventImplementation(EventContext context, InternalMessage message,
                                 Map<String, DefaultTypedValue<Object>> variables,
                                 MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
-                                boolean transacted, boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler,
+                                boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
                                 String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
@@ -315,7 +295,6 @@ public class DefaultEventBuilder implements Event.Builder {
       this.exchangePattern = exchangePattern;
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
-      this.transacted = transacted;
       this.synchronous = synchronous;
 
       this.flowCallStack = flowCallStack;
@@ -475,11 +454,6 @@ public class DefaultEventBuilder implements Event.Builder {
     @Override
     public MessageExchangePattern getExchangePattern() {
       return exchangePattern;
-    }
-
-    @Override
-    public boolean isTransacted() {
-      return transacted || TransactionCoordination.getInstance().getTransaction() != null;
     }
 
     @Override

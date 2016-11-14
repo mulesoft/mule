@@ -12,6 +12,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.errorSchedulingMess
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
@@ -85,7 +86,7 @@ public class DispatcherAsyncInterceptingMessageProcessor extends AbstractInterce
   }
 
   protected boolean canProcessAsync(Event event) {
-    return !(event.isSynchronous() || event.isTransacted());
+    return !(event.isSynchronous() || isTransactionActive());
   }
 
   private void processNextAsync(Event event) throws MuleException {

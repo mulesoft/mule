@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -98,7 +99,7 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
 
     private Consumer<Event> assertCanProcessAsync() {
       return event -> {
-        if (event.isTransacted()) {
+        if (isTransactionActive()) {
           throw propagate(new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
         }
       };

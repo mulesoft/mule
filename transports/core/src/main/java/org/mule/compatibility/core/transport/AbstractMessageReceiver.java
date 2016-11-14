@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
@@ -231,7 +231,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
   protected Event createMuleEvent(CompatibilityMessage message, OutputStream outputStream)
       throws MuleException {
-    Event event;
     MuleSession session = connector.getSessionHandler().retrieveSessionInfoFromMessage(message, flowConstruct.getMuleContext());
 
     if (session == null) {
@@ -250,10 +249,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       builder.correlationId(message.getCorrelationId());
     }
     builder.groupCorrelation(message.getCorrelation());
-    Event newEvent = builder.build();
+    Event event = createEventUsingInboundEndpoint(builder, message, getEndpoint());
 
-    newEvent = populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
-    event = newEvent;
     setCurrentEvent(event);
     if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {
       session.getSecurityContext().getAuthentication().setEvent(event);

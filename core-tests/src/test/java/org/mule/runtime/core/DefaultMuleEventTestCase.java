@@ -96,7 +96,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -106,7 +105,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -116,7 +114,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -126,7 +123,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -137,7 +133,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow)
         .synchronous(true).build();
     assertThat(event.isSynchronous(), equalTo(true));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -148,7 +143,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Event event =
         Event.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).synchronous(true).build();
     assertThat(event.isSynchronous(), equalTo(true));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -159,7 +153,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 
   @Test
@@ -170,6 +163,5 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     Event event = Event.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
-    assertThat(event.isTransacted(), equalTo(false));
   }
 }

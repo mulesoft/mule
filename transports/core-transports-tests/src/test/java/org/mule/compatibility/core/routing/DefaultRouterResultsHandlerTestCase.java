@@ -19,7 +19,7 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
@@ -77,13 +76,13 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   public void aggregateSingleEvent() {
 
     InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
-    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
-    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
+    Event.Builder eventBuilder1 = Event.builder(context).flow(flow).addVariable("key1", "value1");
+    Event event1 = createEventUsingInboundEndpoint(eventBuilder1, message1, endpoint);
     event1.getSession().setProperty("key", "value");
 
     InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    Event event2 = Event.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
-    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
+    Event.Builder eventBuilder2 = Event.builder(context).flow(flow).addVariable("key2", "value2");
+    Event event2 = createEventUsingInboundEndpoint(eventBuilder2, message2, endpoint);
     event2.getSession().setProperty("key", "valueNEW");
     event2.getSession().setProperty("key1", "value1");
 
@@ -106,18 +105,18 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
     InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
     InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
-    Event event1 =
-        Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1", simpleDateType1).build();
-    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
+    Event.Builder eventBuilder1 =
+        Event.builder(context).flow(flow).addVariable("key1", "value1", simpleDateType1);
+    Event event1 = createEventUsingInboundEndpoint(eventBuilder1, message1, endpoint);
     MuleSession session = event1.getSession();
 
-    Event event2 = Event.builder(context).message(message2).flow(flow).session(session)
-        .addVariable("key2", "value2", simpleDateType1).build();
-    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
+    Event.Builder eventBuilder2 = Event.builder(context).flow(flow).session(session)
+        .addVariable("key2", "value2", simpleDateType1);
+    Event event2 = createEventUsingInboundEndpoint(eventBuilder2, message2, endpoint);
 
-    Event event3 = Event.builder(context).message(message3).flow(flow).session(session)
-        .addVariable("key3", "value3", simpleDateType1).build();
-    event3 = populateFieldsFromInboundEndpoint(event3, endpoint);
+    Event.Builder eventBuilder3 = Event.builder(context).message(message3).flow(flow).session(session)
+        .addVariable("key3", "value3", simpleDateType1);
+    Event event3 = createEventUsingInboundEndpoint(eventBuilder3, message3, endpoint);
 
     event1.getSession().setProperty("key", "value");
     event2.getSession().setProperty("key1", "value1");
@@ -157,11 +156,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   public void aggregateMultipleEventsAllButOneNull() {
     InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
     InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key", "value").build();
-    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
+    Event.Builder eventBuilder1 = Event.builder(context).flow(flow).addVariable("key", "value");
+    Event event1 = createEventUsingInboundEndpoint(eventBuilder1, message1, endpoint);
 
-    Event event2 = Event.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
-    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
+    Event.Builder eventBuilder2 = Event.builder(context).flow(flow).addVariable("key2", "value2");
+    Event event2 = createEventUsingInboundEndpoint(eventBuilder2, message2, endpoint);
     List<Event> events = new ArrayList<>();
     events.add(null);
     events.add(event2);
@@ -178,8 +177,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   @Test
   public void aggregateSingleMuleMessageCollection() {
     InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
-    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
-    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
+    Event.Builder eventBuilder1 = Event.builder(context).flow(flow).addVariable("key1", "value1");
+    Event event1 = createEventUsingInboundEndpoint(eventBuilder1, message1, endpoint);
 
     InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
     InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
@@ -188,8 +187,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     list.add(message2);
     list.add(message3);
     InternalMessage messageCollection = InternalMessage.builder().payload(list).build();
-    Event event2 = Event.builder(context).message(messageCollection).flow(flow).addVariable("key2", "value2").build();
-    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
+    Event.Builder eventBuilder2 = Event.builder(context).flow(flow).addVariable("key2", "value2");
+    Event event2 = createEventUsingInboundEndpoint(eventBuilder2, messageCollection, endpoint);
 
     Event result = resultsHandler.aggregateResults(Collections.<Event>singletonList(event2), event1);
     assertSame(event2, result);
@@ -214,16 +213,16 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     list.add(message2);
     list.add(message3);
     InternalMessage messageCollection = InternalMessage.builder().payload(list).build();
-    Event event2 = Event.builder(context).message(messageCollection).flow(flow).addVariable("key2", "value2").build();
-    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
+    Event.Builder eventBuilder2 = Event.builder(context).flow(flow).addVariable("key2", "value2");
+    Event event2 = createEventUsingInboundEndpoint(eventBuilder2, messageCollection, endpoint);
 
     List<InternalMessage> list2 = new ArrayList<>();
     list.add(message4);
     list.add(message5);
     InternalMessage messageCollection2 = InternalMessage.builder().payload(list2).build();
-    Event event3 =
-        Event.builder(context).message(messageCollection2).flow(flow).addVariable("key3", "value3").build();
-    event3 = populateFieldsFromInboundEndpoint(event3, endpoint);
+    Event.Builder eventBuilder3 =
+        Event.builder(context).flow(flow).addVariable("key3", "value3");
+    Event event3 = createEventUsingInboundEndpoint(eventBuilder3, messageCollection2, endpoint);
 
     List<Event> events = new ArrayList<>();
     events.add(event2);

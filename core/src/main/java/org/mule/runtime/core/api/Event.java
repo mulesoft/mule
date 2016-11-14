@@ -184,14 +184,6 @@ public interface Event extends MuleEvent {
   MessageExchangePattern getExchangePattern();
 
   /**
-   * Returns true is this event is being processed in a transaction
-   * 
-   * @deprecated TODO MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  boolean isTransacted();
-
-  /**
    * Return the replyToHandler (if any) that will be used to perform async reply
    * 
    * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
@@ -345,7 +337,7 @@ public interface Event extends MuleEvent {
     Builder error(Error error);
 
     /**
-     * 
+     *
      * @param synchronous
      * @return the builder instance
      * @deprecated MULE-10445 Mule 4 - New Threading model
@@ -390,15 +382,6 @@ public interface Event extends MuleEvent {
     Builder flow(FlowConstruct flow);
 
     /**
-     * 
-     * @param transacted
-     * @return the builder instance
-     * @deprecated TODO MULE-10445 Mule 4 - New Threading model
-     */
-    @Deprecated
-    Builder transacted(boolean transacted);
-
-    /**
      * Disables the firing of notifications when processing the produced event.
      * 
      * @deprecated Transport infrastructure is deprecated.
@@ -413,13 +396,6 @@ public interface Event extends MuleEvent {
      */
     @Deprecated
     Builder session(MuleSession session);
-
-    /**
-     * @return the builder instance
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder refreshSync();
 
     /**
      * Build a new {@link Event} based on the state configured in the {@link Builder}.

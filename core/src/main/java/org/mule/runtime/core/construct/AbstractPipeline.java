@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
@@ -236,7 +237,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Event process(final Event event) throws MuleException {
-          if (event.isSynchronous() || isSynchronous()) {
+          if (event.isSynchronous() || isSynchronous() || isTransactionActive()) {
             return pipeline.process(event);
           } else {
             return Mono.just(event).transform(this).block();

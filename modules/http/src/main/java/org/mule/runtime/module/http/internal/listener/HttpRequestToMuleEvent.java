@@ -10,6 +10,7 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.*;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
@@ -17,14 +18,12 @@ import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
-
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -111,7 +110,7 @@ public class HttpRequestToMuleEvent {
             .outboundProperties(outboundProperties).build();
     // TODO does a correlation id come as a header that we may use?
     return Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(message)
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(new DefaultMuleSession()).build();
+        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
   }
 
   private static URI resolveUri(final HttpRequestContext requestContext) {
@@ -119,7 +118,7 @@ public class HttpRequestToMuleEvent {
       String hostAndPort = resolveTargetHost(requestContext.getRequest());
       String[] hostAndPortParts = hostAndPort.split(":");
       String host = hostAndPortParts[0];
-      int port = requestContext.getScheme().equals(HttpConstants.Protocols.HTTP) ? 80 : 4343;
+      int port = requestContext.getScheme().equals(HTTP) ? 80 : 4343;
       if (hostAndPortParts.length > 1) {
         port = Integer.valueOf(hostAndPortParts[1]);
       }

@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 
 import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -37,42 +38,33 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     InternalMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
     assertThat(response.getPayload().getValue().toString(), is(TEST_PAYLOAD));
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
   }
 
   @Test
   public void oneWay() throws Exception {
     flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(Thread.currentThread().getName())));
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(currentThread().getName())));
   }
 
   @Test
   public void requestResponseTransacted() throws Exception {
-    flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
+    flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
         .run();
 
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
   }
 
   @Test
   public void oneWayTransacted() throws Exception {
-    flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
+    flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
         .asynchronously().run();
 
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
   }
-
-  protected void testTransacted(MessageExchangePattern mep) throws Exception {
-    flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
-        .run();
-
-    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
-  }
-
 
   public static class ThreadSensingMessageProcessor implements Processor {
 

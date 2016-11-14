@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.redelivery;
 
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.compatibility.transport.jms.i18n.JmsMessages.tooManyRedeliveries;
 import static org.mule.runtime.core.DefaultEventContext.create;
 
@@ -24,9 +24,8 @@ public class MessageRedeliveredException extends org.mule.compatibility.core.api
   }
 
   protected static Event buildEvent(InboundEndpoint endpoint, FlowConstruct flow, InternalMessage muleMessage) {
-    final Event event =
-        Event.builder(create(flow, "MessageRedeliveredException")).message(muleMessage).flow(flow).build();
-    return populateFieldsFromInboundEndpoint(event, endpoint);
+    final Event.Builder eventBuilder = Event.builder(create(flow, "MessageRedeliveredException")).flow(flow);
+    return createEventUsingInboundEndpoint(eventBuilder, muleMessage, endpoint);
   }
 
 }

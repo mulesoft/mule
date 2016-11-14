@@ -8,7 +8,6 @@ package org.mule.compatibility.core;
 
 import static org.mule.runtime.core.api.config.MuleProperties.ENDPOINT_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -21,13 +20,14 @@ public class DefaultMuleEventEndpointUtils {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  public static Event populateFieldsFromInboundEndpoint(Event event, InboundEndpoint endpoint) {
-    Builder builder = Event.builder(event);
+  public static Event createEventUsingInboundEndpoint(Builder builder, InternalMessage message, InboundEndpoint endpoint) {
 
-    if (!event.getMessage().getPayload().getDataType().getMediaType().getCharset().isPresent()
+    builder.message(message);
+
+    if (!message.getPayload().getDataType().getMediaType().getCharset().isPresent()
         && endpoint.getEncoding() != null) {
-      builder.message(InternalMessage.builder(event.getMessage())
-          .mediaType(DataType.builder(event.getMessage().getPayload().getDataType()).charset(endpoint.getEncoding()).build()
+      builder.message(InternalMessage.builder(message)
+          .mediaType(DataType.builder(message.getPayload().getDataType()).charset(endpoint.getEncoding()).build()
               .getMediaType())
           .build());
     }
@@ -37,7 +37,7 @@ public class DefaultMuleEventEndpointUtils {
         String prop = (String) name;
 
         // don't overwrite property on the message
-        if (!ignoreProperty(prop, event.getMessage())) {
+        if (!ignoreProperty(prop, message)) {
           // inbound endpoint flowVariables are in the invocation scope
           Object value = endpoint.getProperties().get(prop);
           builder.addVariable(prop, value);
@@ -45,10 +45,7 @@ public class DefaultMuleEventEndpointUtils {
       }
     }
 
-    builder.exchangePattern(endpoint.getExchangePattern())
-        .transacted(endpoint.getTransactionConfig().isTransacted())
-        .refreshSync()
-        .build();
+    builder.exchangePattern(endpoint.getExchangePattern());
 
     return builder.build();
   }
