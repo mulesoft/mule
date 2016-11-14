@@ -33,6 +33,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinition
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -51,6 +52,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final DslElementSyntax typeDsl;
   private final String name;
   private final String namespace;
+  private final Map<String, String> infrastructureParameterMap = getNameMap();
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
@@ -88,7 +90,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
 
   private Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
-    return Optional.ofNullable(getNameMap().get(getId(fieldType)));
+    return Optional.ofNullable(infrastructureParameterMap.get(getId(fieldType)));
   }
 
   private void parseField(ObjectFieldType objectField) {
