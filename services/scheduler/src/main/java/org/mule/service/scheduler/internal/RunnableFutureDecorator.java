@@ -65,7 +65,9 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
     if (logger.isDebugEnabled()) {
       logger.debug("Cancelling task " + this.toString() + " (mayInterruptIfRunning=" + mayInterruptIfRunning + ")...");
     }
-    return task.cancel(mayInterruptIfRunning);
+    boolean success = task.cancel(mayInterruptIfRunning);
+    scheduler.taskFinished(this);
+    return success;
   }
 
   @Override

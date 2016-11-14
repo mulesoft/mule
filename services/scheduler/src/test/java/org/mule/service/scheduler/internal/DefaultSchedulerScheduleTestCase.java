@@ -6,9 +6,11 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
@@ -55,9 +57,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     return asList(new Object[][] {
         // Use a default ScheduledExecutorService to compare behavior
         {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test.useSharedScheduledExecutor()},
-        {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test.createScheduledSameThreadExecutor()},
-        {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test
-            .createScheduledNotSameThreadExecutor()}
+        {(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService>) test -> test.createScheduledSameThreadExecutor()}
     });
   }
 
@@ -209,7 +209,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
 
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a one-shot Runnable before it starts executing")
-  public void cancelRunnableBeforeFire() {
+  public void cancelRunnableBeforeFire() throws InterruptedException {
     final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
@@ -221,6 +221,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
@@ -240,11 +241,12 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a one-shot Callable before it starts executing")
-  public void cancelCallableBeforeFire() {
+  public void cancelCallableBeforeFire() throws InterruptedException {
     final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
@@ -256,6 +258,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
@@ -275,11 +278,12 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-rate Callable before it starts executing")
-  public void cancelFixedRateBeforeFire() {
+  public void cancelFixedRateBeforeFire() throws InterruptedException {
     final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
@@ -291,6 +295,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
@@ -310,6 +315,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
@@ -327,11 +333,12 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-delay Callable before it starts executing")
-  public void cancelFixedDelayBeforeFire() {
+  public void cancelFixedDelayBeforeFire() throws InterruptedException {
     final ScheduledExecutorService executor = createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
@@ -343,6 +350,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
@@ -362,6 +370,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   @Test
@@ -379,6 +388,7 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     scheduled.cancel(true);
 
     assertCancelled(scheduled);
+    assertTerminationIsNotDelayed(executor);
   }
 
   private void assertCancelled(final ScheduledFuture<?> scheduled) {
@@ -386,8 +396,16 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(scheduled.isDone(), is(true));
   }
 
+  protected void assertTerminationIsNotDelayed(final ScheduledExecutorService executor) throws InterruptedException {
+    long startTime = nanoTime();
+    executor.shutdown();
+    executor.awaitTermination(1000, MILLISECONDS);
+
+    assertThat((double) NANOSECONDS.toMillis(nanoTime() - startTime), closeTo(0, DELTA_MILLIS));
+  }
+
   @Test
-  @Description("Tests that shutdownNow after cancelling a running ScheduledFuture returns no cancelled tasks")
+  @Description("Tests that shutdownNow after cancelling a running ScheduledFuture before being fired returns the cancelled task")
   public void shutdownNowAfterCancelCallableBeforeFire() {
     final ScheduledExecutorService executor = createExecutor();
 
@@ -516,10 +534,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   }
 
   protected ScheduledExecutorService createScheduledSameThreadExecutor() {
-    return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor);
-  }
-
-  protected ScheduledExecutorService createScheduledNotSameThreadExecutor() {
     return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor);
   }
 }

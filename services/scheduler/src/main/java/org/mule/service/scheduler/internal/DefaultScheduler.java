@@ -10,6 +10,7 @@ import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,9 +59,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private static final ScheduledFuture<?> NULL_SCHEDULED_FUTURE = NullScheduledFuture.INSTANCE;
   private Map<RunnableFuture<?>, ScheduledFuture<?>> scheduledTasks;
+  private Set<RunnableFuture<?>> cancelledBeforeFireTasks;
 
   private volatile boolean shutdown = false;
-
 
   /**
    * @param executor the actual executor that will run the dispatched tasks.
@@ -70,6 +72,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    */
   DefaultScheduler(ExecutorService executor, int workers, int totalWorkers, ScheduledExecutorService scheduledExecutor) {
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
+    cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
   }
@@ -111,7 +114,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    });
+    }, this);
 
     final ScheduledFuture<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
@@ -132,7 +135,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       } else {
         taskFinished(t);
       }
-    });
+    }, this);
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
@@ -159,7 +162,8 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
     List<Runnable> tasks;
     try {
-      tasks = new ArrayList<>(scheduledTasks.size());
+      tasks = new ArrayList<>(scheduledTasks.size() + cancelledBeforeFireTasks.size());
+      tasks.addAll(cancelledBeforeFireTasks);
 
       for (Entry<RunnableFuture<?>, ScheduledFuture<?>> taskEntry : scheduledTasks.entrySet()) {
         taskEntry.getValue().cancel(true);
@@ -170,6 +174,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
         }
       }
       scheduledTasks.clear();
+      cancelledBeforeFireTasks.clear();
 
       return tasks;
     } finally {
@@ -260,6 +265,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   protected void taskFinished(RunnableFuture<?> task) {
     scheduledTasks.remove(task);
+    if (task instanceof AbstractRunnableFutureDecorator && !((AbstractRunnableFutureDecorator) task).isStarted()) {
+      cancelledBeforeFireTasks.add(task);
+    }
     tryTerminate();
   }
 
