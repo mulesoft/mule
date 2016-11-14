@@ -21,37 +21,49 @@
 
     <flow name="getEchoMetadata">
         <ws:consume config-ref="config" operation="echo">
-            <ws:message body="#[payload]"/>
+            <ws:message>
+                <ws:body>#[payload]</ws:body>
+            </ws:message>
         </ws:consume>
     </flow>
 
     <flow name="getNoParams">
         <ws:consume config-ref="config" operation="noParams">
-            <ws:message body="#[payload]"/>
+            <ws:message>
+                <ws:body>#[payload]</ws:body>
+            </ws:message>
         </ws:consume>
     </flow>
 
     <flow name="getEchoHeadersMetadata">
         <ws:consume config-ref="config" operation="echoWithHeaders">
-            <ws:message body="#[payload]"/>
+            <ws:message>
+                <ws:body>#[payload]</ws:body>
+            </ws:message>
         </ws:consume>
     </flow>
 
     <flow name="getEchoAccountMetadata">
         <ws:consume config-ref="config" operation="echoAccount">
-            <ws:message body="#[payload]"/>
+            <ws:message>
+                <ws:body>#[payload]</ws:body>
+            </ws:message>
         </ws:consume>
     </flow>
 
     <flow name="downloadAttachment">
         <ws:consume config-ref="attachmentsConfig" operation="downloadAttachment">
-            <ws:message body="#[payload]"/>
+            <ws:message>
+                <ws:body>#[payload]</ws:body>
+            </ws:message>
         </ws:consume>
     </flow>
 
     <flow name="uploadAttachment">
         <ws:consume config-ref="attachmentsConfig" operation="uploadAttachment">
-            <ws:message body="#[payload]"/>
+            <ws:message>
+                <ws:body>#[payload]</ws:body>
+            </ws:message>
         </ws:consume>
     </flow>
 </mule>

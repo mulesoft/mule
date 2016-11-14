@@ -8,7 +8,6 @@
     <flow name="queryTimeout">
         <db:execute-script queryTimeout="1">
             <db:sql>
-                update PLANET set NAME='Mercury' where DELAY(#[payload]) = 1;
                 update PLANET set NAME='Mercury' where DELAY(#[payload]) = 1
             </db:sql>
         </db:execute-script>

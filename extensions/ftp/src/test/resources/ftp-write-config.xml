@@ -16,7 +16,9 @@
     </flow>
 
     <flow name="writeStaticContent">
-        <ftp:write path="#[path]" mode="#[mode]" content="Hello World!" createParentDirectories="#[createParent]"/>
+        <ftp:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]">
+            <ftp:content>Hello World!</ftp:content>
+        </ftp:write>
     </flow>
 
     <flow name="readAndWrite">

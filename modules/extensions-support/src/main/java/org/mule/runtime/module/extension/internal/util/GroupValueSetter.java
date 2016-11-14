@@ -8,12 +8,11 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
@@ -72,10 +71,11 @@ public final class GroupValueSetter implements ValueSetter {
 
   @Override
   public void set(Object target, ResolverSetResult result) throws MuleException {
-    ObjectBuilder<?> groupBuilder = new DefaultObjectBuilder<>(group.getType());
+    DefaultObjectBuilder<?> groupBuilder = new DefaultObjectBuilder<>(group.getType());
 
     group.getParameters()
-        .forEach(field -> groupBuilder.addPropertyResolver(field, new StaticValueResolver<>(result.get(field.getName()))));
+        .forEach(field -> groupBuilder.addPropertyResolver(field.getName(),
+                                                           new StaticValueResolver<>(result.get(field.getName()))));
 
     Object groupValue = groupBuilder.build(null);
 

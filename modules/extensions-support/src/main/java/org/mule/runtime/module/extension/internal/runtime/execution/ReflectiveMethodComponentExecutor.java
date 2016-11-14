@@ -60,16 +60,16 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel> impleme
   public ReflectiveMethodComponentExecutor(M componentModel, Method method, Object componentInstance) {
     this.method = method;
     this.componentInstance = componentInstance;
-    argumentResolverDelegate = isEmpty(method.getParameterTypes()) ? NO_ARGS_DELEGATE
+    argumentResolverDelegate = isEmpty(method.getParameterTypes())
+        ? NO_ARGS_DELEGATE
         : new MethodArgumentResolverDelegate(componentModel, method);
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
   public Object execute(ExecutionContext<M> executionContext) throws Exception {
-    return withContextClassLoader(extensionClassLoader, () -> invokeMethod(
-                                                                           method, componentInstance,
-                                                                           getParameterValues(executionContext,
-                                                                                              method.getParameterTypes())));
+    return withContextClassLoader(extensionClassLoader,
+                                  () -> invokeMethod(method, componentInstance,
+                                                     getParameterValues(executionContext, method.getParameterTypes())));
   }
 
   private Object[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {

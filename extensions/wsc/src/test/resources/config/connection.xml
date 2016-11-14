@@ -12,10 +12,14 @@
 
     <flow name="operationShareInstance">
         <wsc:consume config-ref="single-instance" operation="echo">
-            <wsc:message body="#[flowVars.req]"/>
+            <wsc:message>
+                <wsc:body>#[flowVars.req]</wsc:body>
+            </wsc:message>
         </wsc:consume>
         <wsc:consume config-ref="single-instance" operation="echo">
-            <wsc:message body="#[flowVars.req]"/>
+            <wsc:message>
+                <wsc:body>#[flowVars.req]</wsc:body>
+            </wsc:message>
         </wsc:consume>
     </flow>
 

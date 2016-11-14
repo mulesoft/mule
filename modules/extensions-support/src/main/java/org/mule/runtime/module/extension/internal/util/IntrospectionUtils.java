@@ -257,6 +257,15 @@ public final class IntrospectionUtils {
     return typeLoader.load(ResolvableType.forField(field).getType());
   }
 
+  public static Optional<Field> getFieldByNameOrAlias(Class<?> clazz, String nameOrAlias) {
+    Optional<Field> field = getField(clazz, nameOrAlias);
+    if (!field.isPresent()) {
+      field = getAllFields(clazz, f -> getAlias(f).equals(nameOrAlias)).stream().findFirst();
+    }
+
+    return field;
+  }
+
   public static Optional<Field> getField(Class<?> clazz, ParameterModel parameterModel) {
     return getField(clazz, getMemberName(parameterModel, parameterModel.getName()));
   }

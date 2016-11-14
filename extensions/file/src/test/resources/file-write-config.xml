@@ -16,7 +16,9 @@
     </flow>
 
     <flow name="writeStaticContent">
-        <file:write path="#[path]" mode="#[mode]" content="Hello World!" createParentDirectories="#[createParent]"/>
+        <file:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]">
+            <file:content>Hello World!</file:content>
+        </file:write>
     </flow>
 
     <flow name="readAndWrite">

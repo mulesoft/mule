@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsR
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -111,6 +112,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
       return;
     }
 
+    final boolean isContent = isContent(objectField);
     fieldType.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -141,10 +143,14 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
           return;
         }
 
+        if (parseAsContent(isContent, objectType)) {
+          return;
+        }
+
         if (!parsingContext.isRegistered(name, namespace)) {
           parsingContext.registerObjectType(name, namespace, type);
-          parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
-                               fieldDsl.get(), emptySet());
+          parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport,
+                               false, acceptsReferences, fieldDsl.get(), emptySet());
         } else {
           parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
                       fieldDsl.get(), emptySet());
@@ -153,14 +159,30 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
-                                 emptySet());
+        if (!parseAsContent(isContent, arrayType)) {
+          parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                                   emptySet());
+        }
       }
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
-                           emptySet());
+        if (!parseAsContent(isContent, dictionaryType)) {
+          parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                             emptySet());
+        }
+      }
+
+      private boolean parseAsContent(boolean isContent, MetadataType type) {
+        if (isContent) {
+          parseFromTextExpression(fieldName, fieldDsl.get(), () -> value -> resolverOf(fieldName, type, value, defaultValue,
+                                                                                       expressionSupport, false, emptySet(),
+                                                                                       false));
+
+          return true;
+        }
+
+        return false;
       }
     });
   }

@@ -8,6 +8,7 @@ package org.mule.extension.ws.api;
 
 import static java.util.Collections.emptyMap;
 import org.mule.extension.ws.internal.WebServiceConsumer;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -25,7 +26,7 @@ public class SoapMessageBuilder {
    * The XML body to include in the SOAP message, with all the required parameters, or {@code null} if no params are required.
    */
   @Parameter
-  @Optional
+  @Content
   private String body;
 
   /**

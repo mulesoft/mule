@@ -6,23 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
+import static java.lang.String.format;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -35,13 +38,15 @@ import java.lang.reflect.Field;
  */
 public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> {
 
-  private ObjectBuilder builder;
+  private DefaultObjectBuilder builder;
   private Class<Object> objectClass;
+  private final ObjectType objectType;
   private final ClassLoader classLoader;
 
   public TopLevelParameterObjectFactory(ObjectType type, ClassLoader classLoader, MuleContext muleContext) {
     super(muleContext);
     this.classLoader = classLoader;
+    this.objectType = type;
     withContextClassLoader(classLoader, () -> {
       objectClass = getType(type);
       builder = new DefaultObjectBuilder(objectClass);
@@ -51,8 +56,11 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   @Override
   public Object getObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
-      resolveParameters(objectClass, builder);
-      resolveParameterGroups(objectClass, builder);
+      //TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
+      // be generalized
+
+      resolveParameters(objectType, builder);
+      resolveParameterGroups(objectType, builder);
 
       ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder);
       return resolver.isDynamic() ? resolver : resolver.resolve(getInitialiserEvent(muleContext));
@@ -61,24 +69,56 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     });
   }
 
-  private void resolveParameterGroups(Class<?> objectClass, ObjectBuilder builder) {
-    for (Field groupField : getAllFields(objectClass, withAnnotation(ParameterGroup.class))) {
-      final Class<?> groupType = groupField.getType();
-      ObjectBuilder groupBuilder = new DefaultObjectBuilder(groupType);
-      builder.addPropertyResolver(groupField, new ObjectBuilderValueResolver<>(groupBuilder));
+  private void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
+    Class<?> objectClass = getType(objectType);
+    objectType.getFields().stream()
+        .filter(f -> f.getAnnotation(FlattenedTypeAnnotation.class).isPresent())
+        .forEach(groupField -> {
+          if (!(groupField.getValue() instanceof ObjectType)) {
+            return;
+          }
 
-      resolveParameters(groupType, groupBuilder);
-      resolveParameterGroups(groupType, groupBuilder);
-    }
+          final ObjectType groupType = (ObjectType) groupField.getValue();
+          final Field objectField = getField(objectClass, getFieldKey(groupField));
+          DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(groupField.getValue()));
+          builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
+
+          resolveParameters(groupType, groupBuilder);
+          resolveParameterGroups(groupType, groupBuilder);
+        });
   }
 
-  private void resolveParameters(Class<?> objectClass, ObjectBuilder builder) {
-    // TODO: MULE-9453 this needs to not depend on fields exclusively
-    for (Field field : getAllFields(objectClass)) {
-      String key = getAliasName(field);
-      if (getParameters().containsKey(key)) {
-        builder.addPropertyResolver(field, toValueResolver(getParameters().get(key)));
+  private void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
+    final Class<?> objectClass = getType(objectType);
+    final boolean isParameterGroup = objectType.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
+    final Map<String, Object> parameters = getParameters();
+    objectType.getFields().forEach(field -> {
+      final String key = getFieldKey(field);
+
+      ValueResolver<?> valueResolver = null;
+      Field objectField = getField(objectClass, key);
+      if (parameters.containsKey(key)) {
+        valueResolver = toValueResolver(parameters.get(key));
+      } else if (!isParameterGroup) {
+        valueResolver = getDefaultValue(field)
+            .map(value -> new TypeSafeExpressionValueResolver<>(value, objectField.getType(), muleContext))
+            .orElse(null);
       }
-    }
+
+      if (valueResolver != null) {
+        builder.addPropertyResolver(objectField.getName(), valueResolver);
+      }
+    });
+  }
+
+  private Field getField(Class<?> objectClass, String key) {
+    return getFieldByNameOrAlias(objectClass, key)
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
+                                                                      objectClass.getName(),
+                                                                      key)));
+  }
+
+  private String getFieldKey(ObjectFieldType field) {
+    return field.getKey().getName().getLocalPart();
   }
 }

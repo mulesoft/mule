@@ -6,13 +6,13 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="bulkUpdate">
-        <db:bulk-update parameterValues="#[payload]">
+        <db:bulk-update>
             <db:sql>update PLANET set NAME='Mercury' where NAME= :name</db:sql>
         </db:bulk-update>
     </flow>
 
     <flow name="bulkUpdateWithOverriddenType">
-        <db:bulk-update parameterValues="#[payload]">
+        <db:bulk-update>
             <db:sql>update PLANET set NAME='Mercury' where NAME= :name</db:sql>
             <db:parameter-types>
                 <db:parameter-type key="name" type="VARCHAR" />
@@ -25,7 +25,7 @@
             <db:sql>select * from PLANET</db:sql>
         </db:select>
 
-        <db:bulk-update parameterValues="#[payload]">
+        <db:bulk-update>
             <db:sql>update PLANET set NAME='Mercury' where NAME= :name</db:sql>
         </db:bulk-update>
     </flow>

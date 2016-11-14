@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
@@ -308,7 +309,7 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private void declareObjectField(ObjectFieldType field, ExtensionType extension, ExplicitGroup all) {
-    field.getValue().accept(builder.getParameterDeclarationVisitor(extension, all, asParameter(field)));
+    builder.declareAsParameter(field.getValue(), extension, all, asParameter(field));
   }
 
   private void registerPojoGlobalElements(DslElementSyntax typeDsl, ObjectType type, ObjectType baseType, String description) {
@@ -434,7 +435,7 @@ final class ObjectTypeSchemaDelegate {
   private ImmutableParameterModel asParameter(ObjectFieldType field) {
     return new ImmutableParameterModel(field.getKey().getName().getLocalPart(), "", field.getValue(), false, field.isRequired(),
                                        getExpressionSupport(field), getDefaultValue(field).orElse(null),
-                                       ElementDslModel.getDefaultInstance(),
+                                       getParameterRole(field), ElementDslModel.getDefaultInstance(),
                                        null, getLayoutModel(field).orElse(null), emptySet());
   }
 

@@ -44,8 +44,6 @@ public class SendTestCase extends SMTPTestCase {
     assertSubject(sentMessage.getSubject());
     assertBodyContent(sentMessage.getContent().toString().trim());
 
-    assertThat(sentMessage.getHeader("CustomConfigHeader"), arrayWithSize(1));
-    assertThat(sentMessage.getHeader("CustomConfigHeader")[0], is("Dummy"));
     assertThat(sentMessage.getHeader("CustomOperationHeader"), arrayWithSize(1));
     assertThat(sentMessage.getHeader("CustomOperationHeader")[0], is("Dummy"));
   }

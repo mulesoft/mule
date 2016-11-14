@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
@@ -32,6 +33,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResol
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.base.Joiner;
@@ -95,9 +97,18 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
           ValueResolver<?> resolver = null;
           if (parameters.containsKey(parameterName)) {
             resolver = toValueResolver(parameters.get(parameterName));
-          } else if (isNullSafe(p)) {
-            resolver = NullSafeValueResolverWrapper
-                .of(p.getType(), new StaticValueResolver<>(null), p.getModelProperties(), muleContext);
+          } else {
+            Object defaultValue = p.getDefaultValue();
+            if (defaultValue instanceof String) {
+              resolver = new TypeSafeExpressionValueResolver((String) defaultValue, getType(p.getType()), muleContext);
+            } else if (defaultValue != null) {
+              resolver = new StaticValueResolver<>(defaultValue);
+            }
+          }
+
+          if (isNullSafe(p)) {
+            resolver = resolver != null ? resolver : new StaticValueResolver<>(null);
+            resolver = NullSafeValueResolverWrapper.of(p.getType(), resolver, p.getModelProperties(), muleContext);
           }
 
           if (resolver != null) {

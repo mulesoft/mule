@@ -25,12 +25,11 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Query;
-import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.model.property.ContentParameterModelProperty;
 import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
@@ -217,7 +216,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
   }
 
   /**
-   * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link ContentParameterModelProperty}
+   * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty}
    * if the parsedParameter is annotated either as {@link MetadataKeyId} or {@link MetadataKeyPart}
    *
    * @param element         the method annotated parameter parsed

@@ -7,12 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.BaseObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
@@ -23,13 +22,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A specialization of {@link BaseObjectBuilder} which generates object based on an {@link EnrichableModel} for with parameter
+ * Base implementation of an {@link ObjectBuilder} which generates object based on an {@link EnrichableModel} for with parameter
  * groups have been defined based on a {@link ParameterGroupModelProperty}
  *
  * @param <T> the generic type of the instances to be produced
  * @since 4.0
  */
-public abstract class ResolverSetBasedObjectBuilder<T> extends BaseObjectBuilder<T> {
+public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<T> {
 
   protected final ResolverSet resolverSet;
   private final List<ValueSetter> singleValueSetters;
@@ -46,6 +45,17 @@ public abstract class ResolverSetBasedObjectBuilder<T> extends BaseObjectBuilder
     groupValueSetters = GroupValueSetter.settersFor(groupModelProperty);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isDynamic() {
+    return resolverSet.isDynamic();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public final T build(Event event) throws MuleException {
     return build(resolverSet.resolve(event));
@@ -72,4 +82,9 @@ public abstract class ResolverSetBasedObjectBuilder<T> extends BaseObjectBuilder
       setter.set(target, result);
     }
   }
+
+  /**
+   * Creates the instances to be produced
+   */
+  protected abstract T instantiateObject();
 }

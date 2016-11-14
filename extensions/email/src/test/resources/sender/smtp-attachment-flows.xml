@@ -22,9 +22,16 @@
                     <email:content>Email Content</email:content>
                 </email:body>
                 <email:attachments>
-                    <email:email-attachment content="#[app.registry.jsonAttachmentResource.getURL()]" id="json-attachment"/>
-                    <email:email-attachment content="#['This is the email text attachment']" id="text-attachment"
-                                            contentType="text/plain"/>
+                    <email:email-attachment id="json-attachment">
+                        <email:content>
+                            #[app.registry.jsonAttachmentResource.getURL()]
+                        </email:content>
+                    </email:email-attachment>
+                    <email:email-attachment id="text-attachment" contentType="text/plain">
+                        <email:content>
+                            #['This is the email text attachment']
+                        </email:content>
+                    </email:email-attachment>
                 </email:attachments>
             </email:email-builder>
         </email:send>

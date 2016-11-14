@@ -8,7 +8,7 @@ package org.mule.extension.http.api.listener.builder;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -23,8 +23,7 @@ public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
    * The body of the response message
    */
   @Parameter
-  @Optional(defaultValue = "#[payload]")
-  @XmlHints(allowReferences = false)
+  @Content(primary = true)
   private Object body;
 
   /**

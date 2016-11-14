@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request.builder;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -29,6 +30,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
    */
   @Parameter
   @Optional
+  @Content
   private Map<String, String> queryParams = new HashMap<>();
 
   /**
@@ -36,6 +38,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
    */
   @Parameter
   @Optional
+  @Content
   private Map<String, String> uriParams = new HashMap<>();
 
   // For now, only handle single params

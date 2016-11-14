@@ -29,7 +29,7 @@
                     <email:content>Email Content</email:content>
                 </email:body>
                 <email:headers>
-                    <email:header key="CustomOperationHeader" value="Dummy"/>
+                    #[['CustomOperationHeader' : 'Dummy']]
                 </email:headers>
             </email:email-builder>
         </email:send>
