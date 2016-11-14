@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -31,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifactBuilderFactory {
 
+  private final ExecutorService deleteService;
   private final MuleArtifactResourcesRegistry muleArtifactResourcesRegistry;
   private ArtifactContext artifactContext;
 
@@ -53,6 +57,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
    */
   public DefaultTemporaryArtifactBuilderFactory(MuleArtifactResourcesRegistry muleArtifactResourcesRegistry) {
     this.muleArtifactResourcesRegistry = muleArtifactResourcesRegistry;
+    this.deleteService = newSingleThreadExecutor();
   }
 
   /**
@@ -64,6 +69,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
 
       private Logger logger = LoggerFactory.getLogger(TemporaryArtifactBuilder.class);
 
+      private File artifactRootFolder;
       private ArtifactContextBuilder artifactContextBuilder;
       private MuleDeployableArtifactClassLoader temporaryContextClassLoader;
       private ArtifactConfiguration artifactConfiguration;
@@ -102,7 +108,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
           String artifactId = "tooling-" + UUID.getUUID();
           File toolingTempFolder = new File(MuleContainerBootstrapUtils.getMuleTmpDir(), "tooling");
 
-          File artifactRootFolder = new File(toolingTempFolder, artifactId);
+          artifactRootFolder = new File(toolingTempFolder, artifactId);
           File tempPluginsFolder = new File(new File(artifactRootFolder, "plugins"), "lib");
 
           artifactPluginDescriptors.addAll(this.artifactPluginFiles.stream().map(file -> {
@@ -112,7 +118,6 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
               throw new MuleRuntimeException(e);
             }
           }).collect(toList()));
-
 
           temporaryContextClassLoader = muleArtifactResourcesRegistry.getTemporaryArtifactClassLoaderBuilderFactory()
               .createArtifactClassLoaderBuilder().setParentClassLoader(muleArtifactResourcesRegistry.getContainerClassLoader())
@@ -131,7 +136,9 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
 
           artifactContextBuilder = ArtifactContextBuilder.newBuilder().setArtifactType(DOMAIN)
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(temporaryContextClassLoader)
-              .setArtifactConfiguration(artifactConfiguration).setMuleContextListener(createMuleContextListener());
+              .setServiceRepository(muleArtifactResourcesRegistry.getServiceManager())
+              .setArtifactConfiguration(artifactConfiguration).setMuleContextListener(createMuleContextListener())
+              .setClassLoaderRepository(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
 
           return new TemporaryArtifact() {
 
@@ -178,6 +185,9 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
                   logger.debug("Failure disposing temporary context class loader", e);
                 }
               }
+              deleteService.submit(() -> {
+                deleteQuietly(artifactRootFolder);
+              });
             }
           };
         } catch (Exception e) {
