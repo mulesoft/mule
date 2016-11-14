@@ -177,8 +177,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private WorkListener workListener;
 
-  private SchedulerService schedulerService;
-  private Object schedulerServiceLock = new Object();
+  private volatile SchedulerService schedulerService;
 
   /**
    * LifecycleManager for the MuleContext. Note: this is NOT the same lifecycle manager as the one in the Registry.
@@ -622,15 +621,11 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public SchedulerService getSchedulerService() {
     if (this.schedulerService == null) {
-      synchronized (schedulerServiceLock) {
-        if (this.schedulerService == null) {
-          try {
-            this.schedulerService = this.getRegistry().lookupObject(SchedulerService.class);
-            requireNonNull(schedulerService);
-          } catch (RegistrationException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }
+      try {
+        this.schedulerService = this.getRegistry().lookupObject(SchedulerService.class);
+        requireNonNull(schedulerService);
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
       }
     }
 
