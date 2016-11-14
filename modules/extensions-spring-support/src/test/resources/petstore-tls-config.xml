@@ -12,13 +12,17 @@
         <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
+    <tls:context name="pojoTlsContext">
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
     <petstore:config name="globalTls" tlsContext="globalTlsContext" cashierName="jim">
         <petstore:connection username="john" password="doe" />
         <petstore:pets>
             <petstore:pet value="Lassie" />
-            <petstore:pet value="Sapo Pepe" />
-            <petstore:pet value="My mother's parrot" />
         </petstore:pets>
+        <petstore:cage tlsContext="pojoTlsContext"/>
     </petstore:config>
 
     <petstore:config name="inlineTls" cashierName="jim">
@@ -29,9 +33,13 @@
         </tls:context>
         <petstore:pets>
             <petstore:pet value="Lassie" />
-            <petstore:pet value="Sapo Pepe" />
-            <petstore:pet value="My mother's parrot" />
         </petstore:pets>
+        <petstore:cage>
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </petstore:cage>
     </petstore:config>
 
     <flow name="getClient">

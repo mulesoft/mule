@@ -14,6 +14,8 @@ import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Bui
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping.getNameMap;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -25,13 +27,13 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
-import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -50,6 +52,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final DslElementSyntax typeDsl;
   private final String name;
   private final String namespace;
+  private final Map<String, String> infrastructureParameterMap = getNameMap();
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
@@ -85,6 +88,11 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     type.getFields().forEach(this::parseField);
   }
 
+
+  private Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
+    return Optional.ofNullable(infrastructureParameterMap.get(getId(fieldType)));
+  }
+
   private void parseField(ObjectFieldType objectField) {
     final MetadataType fieldType = objectField.getValue();
     final String fieldName = objectField.getKey().getName().getLocalPart();
@@ -93,6 +101,13 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     final ExpressionSupport expressionSupport = getExpressionSupport(objectField);
     Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
     if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
+      return;
+    }
+
+    Optional<String> keyName = getInfrastructureParameterName(fieldType);
+    if (keyName.isPresent()) {
+      parseObject(fieldName, keyName.get(), (ObjectType) fieldType, defaultValue, expressionSupport, false, acceptsReferences,
+                  fieldDsl.get(), emptySet());
       return;
     }
 

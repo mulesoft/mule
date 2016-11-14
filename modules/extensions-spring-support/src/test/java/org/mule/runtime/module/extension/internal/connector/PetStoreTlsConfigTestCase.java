@@ -63,6 +63,13 @@ public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase {
   public void tls() throws Exception {
     PetStoreConnector connector = getConfigurationFromRegistry(configName, testEvent(), muleContext);
     TlsContextFactory tls = connector.getTlsContext();
+    assertTls(tls);
+
+    TlsContextFactory tlsInsidePojo = connector.getCage().getTls();
+    assertTls(tlsInsidePojo);
+  }
+
+  private void assertTls(TlsContextFactory tls) {
     assertThat(tls, is(notNullValue()));
 
     TlsContextTrustStoreConfiguration trustStoreConfig = tls.getTrustStoreConfiguration();
@@ -73,5 +80,6 @@ public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase {
     assertThat(keyStoreConfiguration.getPath().endsWith("ssltest-keystore.jks"), is(true));
     assertThat(keyStoreConfiguration.getKeyPassword(), equalTo(PASSWORD));
     assertThat(keyStoreConfiguration.getPassword(), equalTo(PASSWORD));
+
   }
 }
