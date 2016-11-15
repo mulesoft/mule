@@ -6,13 +6,15 @@
  */
 package org.mule.routing;
 
+import static org.mule.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -21,7 +23,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.Aggregator;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.service.Service;
@@ -33,7 +34,6 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.util.store.ProvidedObjectStoreWrapper;
 import org.mule.util.store.ProvidedPartitionableObjectStoreWrapper;
 
@@ -118,7 +118,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
             @Override
             public Object create()
             {
-                ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+                ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
                 return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
             }
         };
@@ -148,27 +148,20 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
             @Override
             public Object create()
             {
-                try
+                ObjectStore objectStore;
+                if (persistentStores)
                 {
-                    ObjectStore objectStore;
-                    if (persistentStores)
-                    {
-                        objectStore = muleContext.getRegistry().lookupObject(DefaultObjectStoreFactoryBean.class).createDefaultPersistentObjectStore();
-                    }
-                    else
-                    {
-                        objectStore = muleContext.getRegistry().lookupObject(DefaultObjectStoreFactoryBean.class).createDefaultInMemoryObjectStore();
-                    }
-                    if (objectStore instanceof MuleContextAware)
-                    {
-                        ((MuleContextAware) objectStore).setMuleContext(muleContext);
-                    }
-                    return objectStore;
+                    objectStore = muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
                 }
-                catch (RegistrationException e)
+                else
                 {
-                    throw new MuleRuntimeException(e);
+                    objectStore = muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
                 }
+                if (objectStore instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) objectStore).setMuleContext(muleContext);
+                }
+                return objectStore;
             }
         };
     }
