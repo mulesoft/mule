@@ -11,7 +11,9 @@
 
     <flow name="streamingAuto">
         <httpn:request config-ref="requestConfig"  method="POST" path="path">
-            <httpn:request-builder headers="#[headers]"/>
+            <httpn:request-builder>
+                <httpn:headers>#[headers]</httpn:headers>
+            </httpn:request-builder>
         </httpn:request>
     </flow>
 
@@ -19,8 +21,7 @@
         <httpn:request config-ref="requestConfig"  method="POST" path="path">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked" />
-                    <httpn:header key="Content-Length" value="12" />
+                    #[['Transfer-Encoding' : 'chunked' , 'Content-Length' : '12']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -28,13 +29,17 @@
 
     <flow name="streamingAlways">
         <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS">
-            <httpn:request-builder headers="#[headers]"/>
+            <httpn:request-builder>
+                <httpn:headers>#[headers]</httpn:headers>
+            </httpn:request-builder>
         </httpn:request>
     </flow>
 
     <flow name="streamingNever">
         <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER">
-            <httpn:request-builder headers="#[headers]"/>
+            <httpn:request-builder>
+                <httpn:headers>#[headers]</httpn:headers>
+            </httpn:request-builder>
         </httpn:request>
     </flow>
 </mule>

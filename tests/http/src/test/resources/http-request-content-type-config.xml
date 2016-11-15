@@ -20,7 +20,7 @@
         <httpn:request config-ref="requesterConfig" port="${httpPort}" path="testPath" method="GET">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="content-type" value="application/json; charset=UTF-8"/>
+                    #[['content-type' : 'application/json; charset=UTF-8']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>

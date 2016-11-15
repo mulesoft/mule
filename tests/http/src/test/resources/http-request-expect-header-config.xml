@@ -17,7 +17,7 @@
             </httpn:response-validator>
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="Expect" value="100-continue"/>
+                    #[['Expect' : '100-continue']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>

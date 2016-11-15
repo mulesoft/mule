@@ -28,7 +28,7 @@
         <httpn:listener config-ref="listenerConfig" path="/stringWithContentLengthHeader">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                    #[['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -39,7 +39,7 @@
         <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeader">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                    #[['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -50,8 +50,7 @@
         <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthHeader">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked"/>
-                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                    #[['Transfer-Encoding' : 'chunked', 'Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -67,7 +66,7 @@
         <httpn:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthHeader">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                    #[['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -78,7 +77,7 @@
         <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeader">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                    #[['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -89,8 +88,7 @@
         <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthHeader">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked"/>
-                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                    #[['Transfer-Encoding' : 'chunked', 'Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -106,7 +104,7 @@
         <httpn:listener config-ref="listenerConfig" path="/neverStringTransferEncodingHeader" responseStreamingMode="NEVER">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                    #[['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -122,7 +120,7 @@
         <httpn:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingHeader"  responseStreamingMode="NEVER">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                    #[['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -138,7 +136,7 @@
         <httpn:listener config-ref="listenerConfig" path="/alwaysStringContentLengthHeader" responseStreamingMode="ALWAYS">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                    #[['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -154,7 +152,7 @@
         <httpn:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthHeader" responseStreamingMode="ALWAYS">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                    #[['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -165,7 +163,7 @@
         <httpn:listener config-ref="listenerConfig" path="/map">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Type" value="application/x-www-form-urlencoded"/>
+                    #[['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -176,7 +174,7 @@
         <httpn:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Type" value="application/x-www-form-urlencoded"/>
+                    #[['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -187,7 +185,7 @@
         <httpn:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Type" value="application/x-www-form-urlencoded"/>
+                    #[['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

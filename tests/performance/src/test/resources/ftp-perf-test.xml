@@ -40,7 +40,9 @@
     </flow>
 
     <flow name="write">
-        <ftp:write path="write.txt" content="This is a test content" createParentDirectories="true"/>
+        <ftp:write path="write.txt" createParentDirectories="true">
+            <ftp:content>This is a test content</ftp:content>
+        </ftp:write>
     </flow>
 
 

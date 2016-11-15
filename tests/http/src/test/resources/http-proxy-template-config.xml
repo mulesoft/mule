@@ -21,14 +21,18 @@
     <flow name="proxyTemplate">
         <httpn:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
             <httpn:response-builder statusCode="#[message.getAttributes().getStatusCode()]"
-                                    reasonPhrase="#[message.getAttributes().getReasonPhrase()]"
-                                    headers="#[message.getAttributes().getHeaders()]" />
+                                    reasonPhrase="#[message.getAttributes().getReasonPhrase()]">
+                <httpn:headers>#[message.getAttributes().getHeaders()]</httpn:headers>
+            </httpn:response-builder>
         </httpn:listener>
 
         <processor ref="sensingRequestResponseProcessor" />
 
         <httpn:request config-ref="requestConfig" method="#[message.getAttributes().getMethod()]" path="#[message.getAttributes().getRequestPath()]" parseResponse="false">
-            <httpn:request-builder queryParams="#[message.getAttributes().getQueryParams()]" headers="#[message.getAttributes().getHeaders()]"/>
+            <httpn:request-builder>
+                <httpn:query-params>#[message.getAttributes().getQueryParams()]</httpn:query-params>
+                <httpn:headers>#[message.getAttributes().getHeaders()]</httpn:headers>
+            </httpn:request-builder>
         </httpn:request>
 
     </flow>

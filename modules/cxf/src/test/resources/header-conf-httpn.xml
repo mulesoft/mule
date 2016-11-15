@@ -34,8 +34,7 @@
         <httpn:request path="services/greeter" method="POST" config-ref="requestConfig">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="FOO" value="#[message.outboundProperties['FOO']]"/>
-                    <httpn:header key="operation" value="#[message.outboundProperties['operation']]"/>
+                    #[['FOO' : message.outboundProperties['FOO'], 'operation' : message.outboundProperties['operation']]]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>

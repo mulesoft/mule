@@ -22,7 +22,7 @@
         <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Type" value="invalidMimeType"/>
+                    #[['Content-Type' : 'invalidMimeType']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
