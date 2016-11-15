@@ -66,7 +66,7 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
                                      ArtifactPluginDescriptor dependencyPluginDescriptor) {
     for (BundleDependency pluginDependency : pluginDependencies) {
       if (pluginDependency.getDescriptor().getArtifactId().equals(dependencyPluginDescriptor.getName())
-          && MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getClassifier().get())) {
+          && MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().get())) {
         return true;
       }
     }

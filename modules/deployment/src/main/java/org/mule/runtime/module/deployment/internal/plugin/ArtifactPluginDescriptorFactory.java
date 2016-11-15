@@ -104,7 +104,8 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
       String groupId = bundleProperties[0];
       String artifactId = bundleProperties[1];
       String version = bundleProperties[2];
-      bundleDescriptor = new BundleDescriptor.Builder().setArtifactId(artifactId).setGroupId(groupId).setVersion(version).build();
+      bundleDescriptor = new BundleDescriptor.Builder().setArtifactId(artifactId).setGroupId(groupId).setVersion(version)
+          .setType(EXTENSION_BUNDLE_TYPE).setClassifier(MULE_PLUGIN_CLASSIFIER).build();
     } else if (isNameOnlyDefinedBundle(bundleProperties)) {
       // TODO(pablo.kraan): MULE-10966: remove this once extensions and plugins are properly migrated to the new model
       bundleDescriptor = createDefaultPluginBundleDescriptor(bundleProperties[0]);
@@ -113,8 +114,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
                                                 bundle));
     }
 
-    return new BundleDependency.Builder().setDescriptor(bundleDescriptor).setType(EXTENSION_BUNDLE_TYPE)
-        .setClassifier(MULE_PLUGIN_CLASSIFIER).setScope(COMPILE).build();
+    return new BundleDependency.Builder().setDescriptor(bundleDescriptor).setScope(COMPILE).build();
   }
 
   private boolean isNameOnlyDefinedBundle(String[] bundleProperties) {
@@ -126,6 +126,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   }
 
   private BundleDescriptor createDefaultPluginBundleDescriptor(String pluginName) {
-    return new BundleDescriptor.Builder().setArtifactId(pluginName).setGroupId("test").setVersion("1.0").build();
+    return new BundleDescriptor.Builder().setArtifactId(pluginName).setGroupId("test").setVersion("1.0")
+        .setClassifier(MULE_PLUGIN_CLASSIFIER).setType(EXTENSION_BUNDLE_TYPE).build();
   }
 }

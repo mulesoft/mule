@@ -8,10 +8,6 @@ package org.mule.runtime.module.artifact.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
-import java.util.Optional;
 
 /**
  * Describes a dependency on a bundle.
@@ -21,19 +17,9 @@ import java.util.Optional;
 public class BundleDependency {
 
   private BundleDescriptor descriptor;
-  private String type;
-  private Optional<String> classifier = empty();
   private BundleScope scope;
 
   private BundleDependency() {}
-
-  public String getType() {
-    return type;
-  }
-
-  public Optional<String> getClassifier() {
-    return classifier;
-  }
 
   public BundleScope getScope() {
     return scope;
@@ -47,8 +33,6 @@ public class BundleDependency {
   public String toString() {
     return "BundleDependency{" +
         "descriptor=" + descriptor +
-        ", type='" + type + '\'' +
-        ", classifier=" + classifier +
         ", scope=" + scope +
         '}';
   }
@@ -58,9 +42,8 @@ public class BundleDependency {
    */
   public static class Builder {
 
-    private static final String TYPE = "type";
+
     private static final String BUNDLE_DESCRIPTOR = "bundle descriptor";
-    private static final String CLASSIFIER = "classifier";
     private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
     private static final String REQUIRED_FIELD_IS_NULL = "bundle cannot be created with null %s";
 
@@ -80,18 +63,6 @@ public class BundleDependency {
     }
 
     /**
-     * Sets the extension type of the bundle.
-     *
-     * @param type the type id of the bundle. Cannot be null or empty.
-     * @return the builder
-     */
-    public Builder setType(String type) {
-      validateIsNotEmpty(type, TYPE);
-      bundleDependency.type = type;
-      return this;
-    }
-
-    /**
      * Sets the scope of the bundle.
      *
      * @param scope scope of the bundle. Non null
@@ -100,19 +71,6 @@ public class BundleDependency {
     public Builder setScope(BundleScope scope) {
       checkState(scope != null, "scope cannot be null");
       bundleDependency.scope = scope;
-
-      return this;
-    }
-
-    /**
-     * Sets the classifier of the bundle.
-     *
-     * @param classifier classifier of the bundle. Cannot be empty
-     * @return the builder
-     */
-    public Builder setClassifier(String classifier) {
-      validateIsNotEmpty(classifier, CLASSIFIER);
-      bundleDependency.classifier = of(classifier);
 
       return this;
     }
@@ -134,7 +92,6 @@ public class BundleDependency {
      * @return a {@code BundleDescriptor} with the previous provided parameters to the builder.
      */
     public BundleDependency build() {
-      validateIsNotEmpty(bundleDependency.type, TYPE);
       validateIsNotNull(bundleDependency.descriptor, BUNDLE_DESCRIPTOR);
 
       return this.bundleDependency;

@@ -9,6 +9,10 @@ package org.mule.runtime.module.artifact.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import java.util.Optional;
 
 /**
  * Describes a bundle by its Maven coordinates.
@@ -18,6 +22,8 @@ public class BundleDescriptor {
   private String groupId;
   private String artifactId;
   private String version;
+  private String type = "jar";
+  private Optional<String> classifier = empty();
 
   private BundleDescriptor() {}
 
@@ -31,6 +37,14 @@ public class BundleDescriptor {
 
   public String getVersion() {
     return this.version;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public Optional<String> getClassifier() {
+    return classifier;
   }
 
   @Override
@@ -68,6 +82,8 @@ public class BundleDescriptor {
         "groupId='" + groupId + '\'' +
         ", artifactId='" + artifactId + '\'' +
         ", version='" + version + '\'' +
+        ", type='" + type + '\'' +
+        ", classifier=" + classifier +
         '}';
   }
 
@@ -79,6 +95,8 @@ public class BundleDescriptor {
     private static final String ARTIFACT_ID = "artifact id";
     private static final String VERSION = "version";
     private static final String GROUP_ID = "group id";
+    private static final String TYPE = "type";
+    private static final String CLASSIFIER = "classifier";
     private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
 
     private BundleDescriptor bundleDependency = new BundleDescriptor();
@@ -112,6 +130,31 @@ public class BundleDescriptor {
     public BundleDescriptor.Builder setVersion(String version) {
       validateIsNotEmpty(version, ARTIFACT_ID);
       bundleDependency.version = version;
+      return this;
+    }
+
+    /**
+     * Sets the extension type of the bundle.
+     *
+     * @param type the type id of the bundle. Cannot be null or empty.
+     * @return the builder
+     */
+    public BundleDescriptor.Builder setType(String type) {
+      validateIsNotEmpty(type, TYPE);
+      bundleDependency.type = type;
+      return this;
+    }
+
+    /**
+     * Sets the classifier of the bundle.
+     *
+     * @param classifier classifier of the bundle. Cannot be empty
+     * @return the builder
+     */
+    public BundleDescriptor.Builder setClassifier(String classifier) {
+      validateIsNotEmpty(classifier, CLASSIFIER);
+      bundleDependency.classifier = of(classifier);
+
       return this;
     }
 

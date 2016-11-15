@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
@@ -48,12 +49,12 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   private static final BundleDependency BAR_PLUGIN_DESCRIPTOR = createBundleDependency(BAR_BUNDLE_DESCRIPTOR);
 
   private static BundleDependency createBundleDependency(BundleDescriptor bundleDescriptor) {
-    return new BundleDependency.Builder().setDescriptor(bundleDescriptor).setType("zip").setClassifier(MULE_PLUGIN_CLASSIFIER)
-        .build();
+    return new BundleDependency.Builder().setDescriptor(bundleDescriptor).build();
   }
 
   private static BundleDescriptor createTestBundleDescriptor(String artifactId, String version) {
-    return new BundleDescriptor.Builder().setGroupId("test").setArtifactId(artifactId).setVersion(version).build();
+    return new BundleDescriptor.Builder().setGroupId("test").setArtifactId(artifactId).setVersion(version)
+        .setType(EXTENSION_BUNDLE_TYPE).setClassifier(MULE_PLUGIN_CLASSIFIER).build();
   }
 
   private final ArtifactPluginDescriptor fooPlugin = new ArtifactPluginDescriptor(FOO_PLUGIN);

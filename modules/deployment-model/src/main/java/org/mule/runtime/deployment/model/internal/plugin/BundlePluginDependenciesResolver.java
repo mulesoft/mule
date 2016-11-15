@@ -142,7 +142,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                                    List<ArtifactPluginDescriptor> resolvedPlugins) {
     Set<String> exportedPackages = new HashSet<>();
     for (BundleDependency pluginDependency : pluginDependencies) {
-      if (MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getClassifier().get())) {
+      if (MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().get())) {
         ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(pluginDependency, resolvedPlugins);
         exportedPackages.addAll(dependencyDescriptor.getClassLoaderModel().getExportedPackages());
         exportedPackages
@@ -160,7 +160,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       builder.append("\nPlugin: ").append(unresolvedPlugin.getName()).append(" missing dependencies:");
       List<BundleDependency> missingDependencies = new ArrayList<>();
       for (BundleDependency dependency : unresolvedPlugin.getClassLoaderModel().getDependencies()) {
-        if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getClassifier().get())) {
+        if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().get())) {
           final ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(dependency, resolvedPlugins);
           if (dependencyDescriptor == null) {
             missingDependencies.add(dependency);

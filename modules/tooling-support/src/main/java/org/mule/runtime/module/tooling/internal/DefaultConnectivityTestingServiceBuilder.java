@@ -50,9 +50,10 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   @Override
   public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
     BundleDescriptor bundleDescriptor =
-        new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion).build();
+        new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
+            .setType(EXTENSION_BUNDLE_TYPE).build();
     this.bundleDependencies
-        .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).setType(EXTENSION_BUNDLE_TYPE).build());
+        .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
     return this;
   }
 
@@ -70,7 +71,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   @Override
   public ConnectivityTestingService build() {
     checkState(artifactConfiguration != null, "artifact configuration cannot be null");
-    checkState(!bundleDescriptors.isEmpty(), "no extensions were configured");
+    checkState(!bundleDependencies.isEmpty(), "no extensions were configured");
     TemporaryArtifact temporaryArtifact = buildArtifact();
     return new TemporaryArtifactConnectivityTestingService(temporaryArtifact);
   }
@@ -83,7 +84,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
     TemporaryArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
         .setArtifactConfiguration(artifactConfiguration);
 
-    bundleDescriptors.stream()
+    bundleDependencies.stream()
         .forEach(bundleDescriptor -> temporaryArtifactBuilder
             .addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
     temporaryArtifact = temporaryArtifactBuilder.build();
