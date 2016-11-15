@@ -28,6 +28,7 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingTyp
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /**
@@ -41,9 +42,9 @@ public class ConfigurationModelEnricher extends AbstractAnnotatedModelEnricher {
 
   @Override
   public void enrich(DescribingContext describingContext) {
-    final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
-    if (extensionType != null) {
-
+    final Optional<ImplementingTypeModelProperty> implementingType =
+        extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+    if (implementingType.isPresent()) {
       ClassTypeLoader typeLoader =
           ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
       new IdempotentDeclarationWalker() {

@@ -55,21 +55,22 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
+import org.mule.runtime.api.deployment.meta.MulePluginModelBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.StartupContext;
@@ -1507,6 +1508,28 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                             "/, META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
         .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void deploysAppZipWithExtensionXmlPlugin() throws Exception {
+    String moduleFileName = "module-bye.xml";
+    String extensionName = "bye-extension";
+
+    MulePluginModelBuilder builder =
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+    builder.withExtensionModelDescriber().setId(DESCRIBER_ID).addProperty("resource-xml", moduleFileName);
+
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
+        .containingResource("module-byeSource.xml", moduleFileName)
+        .configuredWith(builder.build());
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
+        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();

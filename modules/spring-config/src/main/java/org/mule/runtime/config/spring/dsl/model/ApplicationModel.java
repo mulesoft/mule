@@ -14,7 +14,9 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -24,11 +26,16 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import org.mule.metadata.api.model.VoidType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.spring.dsl.model.extension.ModuleExtension;
-import org.mule.runtime.config.spring.dsl.model.extension.OperationExtension;
-import org.mule.runtime.config.spring.dsl.model.extension.ParameterExtension;
-import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.config.spring.dsl.model.extension.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.spring.dsl.model.extension.OperationComponentModelModelProperty;
+import org.mule.runtime.config.spring.dsl.model.extension.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -36,6 +43,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.dsl.api.config.ComponentConfiguration;
+import org.mule.runtime.extension.api.ExtensionManager;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -51,6 +59,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.w3c.dom.Element;
@@ -285,7 +294,7 @@ public class ApplicationModel {
    */
   // TODO: MULE-9638 remove this optional
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration,
-                          Optional<ModuleExtensionStore> moduleExtensionStore,
+                          Optional<ExtensionManager> extensionManager,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
       throws Exception {
     configurePropertyPlaceholderResolver(artifactConfig);
@@ -294,7 +303,7 @@ public class ApplicationModel {
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
 
-    expandModules(moduleExtensionStore);
+    expandModules(extensionManager);
   }
 
   /**
@@ -697,28 +706,39 @@ public class ApplicationModel {
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes
    * care of the global elements.
    *
-   * @param moduleExtensionStore extensions that will use to check if the element has to be expanded.
+   * @param extensionManager extensions that will be used to check if the element has to be expanded.
    */
-  private void expandModules(Optional<ModuleExtensionStore> moduleExtensionStore) {
-    if (moduleExtensionStore.isPresent()) {
-      createOperationRefEffectiveModel(moduleExtensionStore.get());
-      createConfigRefEffectiveModel(moduleExtensionStore.get());
+  private void expandModules(Optional<ExtensionManager> extensionManager) {
+    if (extensionManager.isPresent()) {
+      Map<String, ExtensionModel> extensions = extensionManager.get().getExtensions().stream()
+          .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
+          .collect(toMap(extensionModel -> extensionModel.getName(), identity()));
+
+      if (!extensions.isEmpty()) {
+        createOperationRefEffectiveModel(extensions);
+        createConfigRefEffectiveModel(extensions);
+      }
     }
   }
 
-  private void createOperationRefEffectiveModel(ModuleExtensionStore moduleExtensionStore) {
+  private void createOperationRefEffectiveModel(Map<String, ExtensionModel> extensionManager) {
     HashMap<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
 
     executeOnEveryMuleComponentTree(componentModel -> {
       for (int i = 0; i < componentModel.getInnerComponents().size(); i++) {
         ComponentModel operationRefModel = componentModel.getInnerComponents().get(i);
         ComponentIdentifier identifier = operationRefModel.getIdentifier();
-        Optional<ModuleExtension> moduleExtension = moduleExtensionStore.lookupByName(identifier.getNamespace());
-        if (moduleExtension.isPresent()
-            && !identifier.getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)) {
-          //config elements will be worked later on, that's why we are skipping itomitting this element
-          OperationExtension operationExtension = moduleExtension.get().getOperations().get(identifier.getName());
-          ComponentModel replacementModel = createOperationInstance(operationRefModel, moduleExtension.get(), operationExtension);
+        String identifierName = identifier.getName();
+        if (identifierName.equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)) {
+          continue;
+        }
+        ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
+        if (extensionModel != null) {
+          //config elements will be worked later on, that's why we are skipping this element
+          OperationModel operationModel = extensionModel.getOperationModel(identifierName)
+              .orElseThrow(() -> new IllegalArgumentException(format("The operation '%s' is missing in the module '%s'",
+                                                                     identifierName, extensionModel.getName())));
+          ComponentModel replacementModel = createOperationInstance(operationRefModel, extensionModel, operationModel);
           componentModelsToReplaceByIndex.put(i, replacementModel);
         }
       }
@@ -731,7 +751,7 @@ public class ApplicationModel {
     });
   }
 
-  private void createConfigRefEffectiveModel(ModuleExtensionStore moduleExtensionStore) {
+  private void createConfigRefEffectiveModel(Map<String, ExtensionModel> extensionManager) {
     this.muleComponentModels.stream()
         .forEach(componentModel -> {
           HashMap<Integer, List<ComponentModel>> componentModelsToReplaceByIndex = new HashMap<>();
@@ -739,10 +759,10 @@ public class ApplicationModel {
           for (int i = 0; i < componentModel.getInnerComponents().size(); i++) {
             ComponentModel configRefModel = componentModel.getInnerComponents().get(i);
             ComponentIdentifier identifier = configRefModel.getIdentifier();
-            Optional<ModuleExtension> moduleExtension = moduleExtensionStore.lookupByName(identifier.getNamespace());
-            if (moduleExtension.isPresent()) {
+            ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
+            if (extensionModel != null) {
               List<ComponentModel> replacementGlobalElements =
-                  createGlobalElementsInstance(configRefModel, moduleExtension.get());
+                  createGlobalElementsInstance(configRefModel, extensionModel);
               componentModelsToReplaceByIndex.put(i, replacementGlobalElements);
             }
           }
@@ -753,19 +773,26 @@ public class ApplicationModel {
         });
   }
 
-  private List<ComponentModel> createGlobalElementsInstance(ComponentModel configRefModel, ModuleExtension moduleExtension) {
+  private List<ComponentModel> createGlobalElementsInstance(ComponentModel configRefModel, ExtensionModel extensionModel) {
     List<ComponentModel> globalElementsModel = new ArrayList<>();
 
-    globalElementsModel.addAll(moduleExtension.getGlobalElements().stream()
-        .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute())).collect(toList()));
+    Optional<ConfigurationModel> config = extensionModel.getConfigurationModel("config");
+    if (config.isPresent()
+        && config.get().getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent()) {
+      GlobalElementComponentModelModelProperty globalElementComponentModelModelProperty =
+          config.get().getModelProperty(GlobalElementComponentModelModelProperty.class).get();
 
-    ComponentModel muleRootElement = configRefModel.getParent();
-    globalElementsModel.stream().forEach(componentModel -> {
-      componentModel.setRoot(true);
-      componentModel.setParameter(NAME_ATTRIBUTE, componentModel.getNameAttribute() + "-" + configRefModel.getNameAttribute());
-      componentModel.setParent(muleRootElement);
-    });
+      globalElementsModel.addAll(globalElementComponentModelModelProperty.getGlobalElements().stream()
+          .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute()))
+          .collect(Collectors.toList()));
 
+      ComponentModel muleRootElement = configRefModel.getParent();
+      globalElementsModel.stream().forEach(componentModel -> {
+        componentModel.setRoot(true);
+        componentModel.setParameter(NAME_ATTRIBUTE, componentModel.getNameAttribute() + "-" + configRefModel.getNameAttribute());
+        componentModel.setParent(muleRootElement);
+      });
+    }
     return globalElementsModel;
   }
 
@@ -775,13 +802,14 @@ public class ApplicationModel {
    *
    * <pre></pre>
    * @param operationRefModel message processor that will be replaced by a scope element named "module-operation-chain".
-   * @param moduleExtension extension that holds a possible set of <property/>s that has to be parametrized to the new scope.
-   * @param operationExtension operation that provides both the <parameter/>s and content of the <body/>
+   * @param extensionModel extension that holds a possible set of <property/>s that has to be parametrized to the new scope.
+   * @param operationModel operation that provides both the <parameter/>s and content of the <body/>
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
-  private ComponentModel createOperationInstance(ComponentModel operationRefModel, ModuleExtension moduleExtension,
-                                                 OperationExtension operationExtension) {
-    List<ComponentModel> bodyProcessors = operationExtension.getMessageProcessorsComponentModels();
+  private ComponentModel createOperationInstance(ComponentModel operationRefModel, ExtensionModel extensionModel,
+                                                 OperationModel operationModel) {
+    List<ComponentModel> bodyProcessors = operationModel.getModelProperty(OperationComponentModelModelProperty.class).get()
+        .getComponentModel().getInnerComponents();
 
     String configRefName = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
 
@@ -789,9 +817,13 @@ public class ApplicationModel {
     processorChainBuilder
         .setIdentifier(new ComponentIdentifier.Builder().withNamespace("mule").withName("module-operation-chain").build());
 
-    processorChainBuilder.addParameter("returnsVoid", Boolean.toString(operationExtension.returnsVoid()), false);
-    Map<String, String> propertiesMap = extractProperties(operationRefModel, moduleExtension);
-    Map<String, String> parametersMap = extractParameters(operationRefModel, operationExtension.getParameters());
+
+    ReturnsVoidTypeVisitor returnsVoidTypeVisitor = new ReturnsVoidTypeVisitor();
+    operationModel.getOutput().getType().accept(returnsVoidTypeVisitor);
+
+    processorChainBuilder.addParameter("returnsVoid", Boolean.toString(returnsVoidTypeVisitor.returnsVoid), false);
+    Map<String, String> propertiesMap = extractProperties(operationRefModel, extensionModel);
+    Map<String, String> parametersMap = extractParameters(operationRefModel, operationModel.getParameterModels());
     ComponentModel propertiesComponentModel =
         getParameterChild(propertiesMap, "module-operation-properties", "module-operation-property-entry");
     ComponentModel parametersComponentModel =
@@ -810,6 +842,20 @@ public class ApplicationModel {
       processoChainModelChild.setParent(processorChainModel);
     }
     return processorChainModel;
+  }
+
+  /**
+   * visits all the possible types of a given parameter to realize if it's a "void return type", in which case the
+   * expanded chain will not modify the structure of the event
+   */
+  private class ReturnsVoidTypeVisitor extends MetadataTypeVisitor {
+
+    private boolean returnsVoid = false;
+
+    @Override
+    public void visitVoid(VoidType voidType) {
+      returnsVoid = true;
+    }
   }
 
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
@@ -833,34 +879,34 @@ public class ApplicationModel {
     return parametersComponentModel;
   }
 
-  private Map<String, String> extractProperties(ComponentModel operationRefModel, ModuleExtension moduleExtension) {
+  private Map<String, String> extractProperties(ComponentModel operationRefModel, ExtensionModel extensionModel) {
     Map<String, String> valuesMap = new HashMap<>();
     //extract the <properties>
     String configParameter = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
     if (configParameter != null) {
       ComponentModel configRefComponentModel = this.muleComponentModels.get(0).getInnerComponents().stream()
-          .filter(componentModel -> componentModel.getIdentifier().getNamespace().equals(moduleExtension.getName())
+          .filter(componentModel -> componentModel.getIdentifier().getNamespace().equals(extensionModel.getName())
               && componentModel.getIdentifier().getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
               && configParameter.equals(componentModel.getParameters().get(NAME_ATTRIBUTE)))
           .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException(
-                                                          format("There's no <%s:config> named [%s] in the current mule app",
-                                                                 moduleExtension.getName(), configParameter)));
+          .orElseThrow(() -> new IllegalArgumentException(String
+              .format("There's no <%s:config> named [%s] in the current mule app", extensionModel.getName(), configParameter)));
       valuesMap
-          .putAll(extractParameters(configRefComponentModel, moduleExtension.getProperties()));
+          .putAll(extractParameters(configRefComponentModel,
+                                    extensionModel.getConfigurationModel("config").get().getParameterModels()));
     }
     return valuesMap;
   }
 
-  private Map<String, String> extractParameters(ComponentModel componentModel, List<ParameterExtension> parameters) {
+  private Map<String, String> extractParameters(ComponentModel componentModel, List<ParameterModel> parameters) {
     Map<String, String> valuesMap = new HashMap<>();
-    for (ParameterExtension parameterExtension : parameters) {
+    for (ParameterModel parameterExtension : parameters) {
       String paramName = parameterExtension.getName();
       String value = null;
       if (componentModel.getParameters().containsKey(paramName)) {
         value = componentModel.getParameters().get(paramName);
-      } else if (parameterExtension.getDefaultValue().isPresent()) {
-        value = parameterExtension.getDefaultValue().get();
+      } else if (parameterExtension.getDefaultValue() != null) {
+        value = (String) parameterExtension.getDefaultValue();
       }
       valuesMap.put(paramName, value);
     }

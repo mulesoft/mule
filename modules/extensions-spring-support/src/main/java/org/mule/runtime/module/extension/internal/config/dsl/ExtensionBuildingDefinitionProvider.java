@@ -19,6 +19,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.internal.utils.MetadataTypeUtils;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -27,8 +28,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.config.spring.dsl.model.extension.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -86,8 +87,21 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
   public void init() {
     extensionManager = muleContext.getExtensionManager();
     if (extensionManager != null) {
-      extensionManager.getExtensions().forEach(this::registerExtensionParsers);
+      extensionManager.getExtensions().stream()
+          .filter(this::shouldRegisterExtensionParser)
+          .forEach(this::registerExtensionParsers);
     }
+  }
+
+  /**
+   * Taking an {@link ExtensionModel}, it will indicate whether it must register a {@link ComponentBuildingDefinitionProvider}
+   * or not.
+   *
+   * @param extensionModel to introspect
+   * @return true if a parser must be registered, false otherwise.
+   */
+  private boolean shouldRegisterExtensionParser(ExtensionModel extensionModel) {
+    return !extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent();
   }
 
   /**

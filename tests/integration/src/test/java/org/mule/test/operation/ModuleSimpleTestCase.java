@@ -9,12 +9,16 @@ package org.mule.test.operation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.test.AbstractIntegrationTestCase;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
-public class ModuleSimpleTestCase extends AbstractIntegrationTestCase {
+public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+
+  @Override
+  protected String getModulePath() {
+    return "module/module-simple/module-simple.xml";
+  }
 
   @Override
   protected String getConfigFile() {

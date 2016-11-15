@@ -8,13 +8,21 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.io.File.separator;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -25,6 +33,7 @@ import java.util.Properties;
 public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<ArtifactPluginFileBuilder> {
 
   private Properties properties = new Properties();
+  private MulePluginModel mulePluginModel;
 
   /**
    * Creates a new builder
@@ -76,6 +85,19 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   }
 
   /**
+   * Adds a describer into the plugin describer file.
+   *
+   * @param mulePluginModel the describer to store under {@link ArtifactPluginDescriptor#META_INF}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder configuredWith(MulePluginModel mulePluginModel) {
+    checkImmutable();
+    checkArgument(mulePluginModel != null, "JSON describer cannot be null");
+    this.mulePluginModel = mulePluginModel;
+    return this;
+  }
+
+  /**
    * Adds a resource file to the application classes folder.
    *
    * @param resourceFile resource file from a external file or test resource.
@@ -119,6 +141,19 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       createPropertiesFile(applicationPropertiesFile, properties);
 
       customResources.add(new ZipResource(applicationPropertiesFile.getAbsolutePath(), PLUGIN_PROPERTIES));
+    }
+
+    if (mulePluginModel != null) {
+      final File jsonDescriptorFile = new File(getTempFolder(), META_INF + separator + MULE_PLUGIN_JSON);
+      jsonDescriptorFile.deleteOnExit();
+
+      String jsonDescriber = new MulePluginModelJsonSerializer().serialize(mulePluginModel);
+      try {
+        FileUtils.writeStringToFile(jsonDescriptorFile, jsonDescriber);
+      } catch (IOException e) {
+        throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
+      }
+      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), META_INF + "/" + MULE_PLUGIN_JSON));
     }
 
     return customResources;
