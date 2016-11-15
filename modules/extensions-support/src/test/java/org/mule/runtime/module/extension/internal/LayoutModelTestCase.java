@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static java.util.Optional.ofNullable;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -76,11 +77,7 @@ public class LayoutModelTestCase extends AbstractAnnotationsBasedDescriberTestCa
     LayoutModel layout = param.getLayoutModel();
     assertThat(layout, is(notNullValue()));
 
-    if (groupName != null) {
-      assertThat(layout.getGroupName(), is(groupName));
-    }
-    if (order != null) {
-      assertThat(layout.getOrder(), is(order));
-    }
+    assertThat(layout.getGroupName(), equalTo(ofNullable(groupName)));
+    assertThat(layout.getOrder(), equalTo(ofNullable(order)));
   }
 }
