@@ -8,14 +8,13 @@ package org.mule.runtime.module.tooling.internal;
 
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 
 /**
  * {@link ConnectivityTestingService} for a temporary artifact.
@@ -44,17 +43,21 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
   @Override
   public ConnectionValidationResult testConnection(String identifier) {
     checkArgument(identifier != null, "identifier cannot be null");
-    if (!temporaryArtifact.isStarted()) {
-      try {
-        temporaryArtifact.start();
-      } catch (InitialisationException e) {
-        return failure(e.getMessage(), UNKNOWN, e);
-      } catch (ConfigurationException e) {
-        return failure(e.getMessage(), UNKNOWN, e);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
+    try {
+      if (!temporaryArtifact.isStarted()) {
+        try {
+          temporaryArtifact.start();
+        } catch (InitialisationException e) {
+          return failure(e.getMessage(), UNKNOWN, e);
+        } catch (ConfigurationException e) {
+          return failure(e.getMessage(), UNKNOWN, e);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
+        }
       }
+      return temporaryArtifact.getConnectivityTestingService().testConnection(identifier);
+    } finally {
+      temporaryArtifact.dispose();
     }
-    return temporaryArtifact.getConnectivityTestingService().testConnection(identifier);
   }
 }

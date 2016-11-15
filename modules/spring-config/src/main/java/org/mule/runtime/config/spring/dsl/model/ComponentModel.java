@@ -234,6 +234,7 @@ public class ComponentModel {
      */
     public Builder addChildComponentModel(ComponentModel componentModel) {
       this.model.innerComponents.add(componentModel);
+      componentModel.setParent(model);
       return this;
     }
 

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Collections.emptyList;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+
+import java.util.List;
 
 /**
  * Factory for {@code ArtifactClassLoaderBuilder} instances.
@@ -36,7 +39,7 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
                                                     ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                                     ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
                                                     DependenciesProvider dependenciesProvider) {
-    this.applicationPluginRepository = applicationPluginRepository;
+    this.applicationPluginRepository = new EmptyArtifactPluginRepository();
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
     this.artifactDescriptorFactory = artifactDescriptorFactory;
     this.dependenciesProvider = dependenciesProvider;
@@ -50,6 +53,18 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
   public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
     return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory,
                                                    artifactDescriptorFactory, dependenciesProvider);
+  }
+
+  /**
+   * For temporary artifacts the runtime shouldn't have any plugin already registered.
+   */
+  private class EmptyArtifactPluginRepository implements ArtifactPluginRepository {
+
+    @Override
+    public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors() {
+      return emptyList();
+    }
+
   }
 
 }

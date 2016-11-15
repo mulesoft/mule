@@ -32,6 +32,8 @@ public class ArtifactConfiguration {
     this.componentConfiguration = componentConfigurations;
   }
 
+  private ArtifactConfiguration() {}
+
   /**
    * @return collection of root mule configuration elements.
    */
