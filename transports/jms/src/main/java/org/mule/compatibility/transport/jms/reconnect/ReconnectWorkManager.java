@@ -6,14 +6,11 @@
  */
 package org.mule.compatibility.transport.jms.reconnect;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
@@ -52,7 +49,7 @@ public class ReconnectWorkManager implements WorkManager {
 
   @Override
   public void execute(Runnable runnable) {
-    throw new UnsupportedOperationException();
+    this.executor.execute(runnable);
   }
 
   public synchronized void startIfNotStarted() throws MuleException {
@@ -63,13 +60,7 @@ public class ReconnectWorkManager implements WorkManager {
 
   @Override
   public void start() throws MuleException {
-    executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-
-      @Override
-      public Thread newThread(Runnable runnable) {
-        return new Thread(runnable, String.format("%s.endpoint.reconnection", ThreadNameHelper.getPrefix(muleContext)));
-      }
-    });
+    executor = muleContext.getSchedulerService().ioScheduler();
     isStarted = true;
   }
 

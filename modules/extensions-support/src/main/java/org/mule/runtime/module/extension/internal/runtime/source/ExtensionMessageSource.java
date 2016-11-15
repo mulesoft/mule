@@ -7,28 +7,29 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.ExceptionCallback;
@@ -63,23 +64,25 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
   @Inject
   private MessageProcessingManager messageProcessingManager;
 
+  @Inject
+  private SchedulerService schdulerService;
+
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
-  private final ThreadingProfile threadingProfile;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final ExceptionEnricherManager exceptionEnricherManager;
   private Processor messageProcessor;
 
   private SourceAdapter sourceAdapter;
-  private WorkManager workManager;
+  private Scheduler retryScheduler;
+  private Scheduler flowTriggerScheduler;
 
   public ExtensionMessageSource(ExtensionModel extensionModel, SourceModel sourceModel, SourceAdapterFactory sourceAdapterFactory,
-                                ConfigurationProvider configurationProvider, ThreadingProfile threadingProfile,
-                                RetryPolicyTemplate retryPolicyTemplate, ExtensionManagerAdapter managerAdapter) {
+                                ConfigurationProvider configurationProvider, RetryPolicyTemplate retryPolicyTemplate,
+                                ExtensionManagerAdapter managerAdapter) {
     super(extensionModel, sourceModel, configurationProvider, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
-    this.threadingProfile = threadingProfile;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
 
@@ -96,7 +99,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   private void startSource() {
     try {
-      retryPolicyTemplate.execute(new SourceRetryCallback(), workManager);
+      retryPolicyTemplate.execute(new SourceRetryCallback(), retryScheduler);
     } catch (Throwable e) {
       throw new MuleRuntimeException(e);
     }
@@ -159,9 +162,11 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   @Override
   public void doStart() throws MuleException {
-    if (workManager == null) {
-      workManager = createWorkManager();
-      workManager.start();
+    if (retryScheduler == null) {
+      retryScheduler = schdulerService.ioScheduler();
+    }
+    if (flowTriggerScheduler == null) {
+      flowTriggerScheduler = schdulerService.cpuLightScheduler();
     }
 
     startSource();
@@ -172,7 +177,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     try {
       stopSource();
     } finally {
-      stopWorkManager();
+      stopSchedulers();
     }
   }
 
@@ -190,12 +195,19 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     disposeIfNeeded(this, LOGGER);
   }
 
-  private void stopWorkManager() {
-    if (workManager != null) {
+  private void stopSchedulers() {
+    if (retryScheduler != null) {
       try {
-        workManager.dispose();
+        retryScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
       } finally {
-        workManager = null;
+        retryScheduler = null;
+      }
+    }
+    if (flowTriggerScheduler != null) {
+      try {
+        flowTriggerScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      } finally {
+        flowTriggerScheduler = null;
       }
     }
   }
@@ -224,8 +236,8 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
       }
 
       @Override
-      public WorkManager getFlowExecutionWorkManager() {
-        return workManager;
+      public Scheduler getFlowExecutionExecutor() {
+        return flowTriggerScheduler;
       }
 
       @Override
@@ -269,12 +281,6 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     public Object getWorkOwner() {
       return ExtensionMessageSource.this;
     }
-  }
-
-  // TODO: MULE-9320
-  private WorkManager createWorkManager() {
-    return threadingProfile.createWorkManager(format("%s%s.worker", getPrefix(muleContext), flowConstruct.getName()),
-                                              muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override

@@ -8,7 +8,6 @@ package org.mule.runtime.core.retry.policies;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
@@ -21,6 +20,7 @@ import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +39,12 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
 
-  public RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception {
+  public RetryContext execute(RetryCallback callback, Executor workManager) throws Exception {
     PolicyStatus status = null;
     RetryPolicy policy = createRetryInstance();
     DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(), metaInfo);
@@ -90,18 +91,22 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     }
   }
 
+  @Override
   public RetryNotifier getNotifier() {
     return notifier;
   }
 
+  @Override
   public void setNotifier(RetryNotifier retryNotifier) {
     this.notifier = retryNotifier;
   }
 
+  @Override
   public Map<Object, Object> getMetaInfo() {
     return metaInfo;
   }
 
+  @Override
   public void setMetaInfo(Map<Object, Object> metaInfo) {
     this.metaInfo = metaInfo;
   }

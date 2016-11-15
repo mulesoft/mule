@@ -7,6 +7,8 @@
 
 package org.mule.tck.config;
 
+import static org.mockito.Mockito.spy;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -27,7 +29,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
-    registry.registerObject(schedulerService.getName(), schedulerService);
+    registry.registerObject(schedulerService.getName(), spy(schedulerService));
   }
 
   public void stopServices() throws MuleException {

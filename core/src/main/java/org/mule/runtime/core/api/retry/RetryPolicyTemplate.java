@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.api.retry;
 
-import org.mule.runtime.core.api.context.WorkManager;
-
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 
 /**
@@ -29,5 +28,5 @@ public interface RetryPolicyTemplate {
 
   void setNotifier(RetryNotifier retryNotifier);
 
-  RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception;
+  RetryContext execute(RetryCallback callback, Executor workManager) throws Exception;
 }

@@ -6,39 +6,38 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.config.MutableThreadingProfile;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.util.NetworkUtils;
-import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
@@ -67,7 +66,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   private ThreadingProfile workerThreadingProfile;
   private boolean started = false;
   private Server server;
-  private WorkManager workManager;
+  private Scheduler workManager;
   private boolean initialised;
 
   private boolean usePersistentConnections = true;
@@ -160,42 +159,20 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
     }
 
     if (tlsContext == null) {
-      server = connectionManager.createServer(serverAddress, createWorkManagerSource(), usePersistentConnections,
+      server = connectionManager.createServer(serverAddress, () -> workManager, usePersistentConnections,
                                               connectionIdleTimeout);
     } else {
       LifecycleUtils.initialiseIfNeeded(tlsContext);
-      server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections,
+      server = connectionManager.createSslServer(serverAddress, () -> workManager, tlsContext, usePersistentConnections,
                                                  connectionIdleTimeout);
     }
     initialised = true;
-  }
-
-  // We use a WorkManagerSource since the workManager instance may be recreated during stop/start and it would leave the server
-  // with an invalid work manager instance.
-  private WorkManagerSource createWorkManagerSource() {
-    return new WorkManagerSource() {
-
-      @Override
-      public WorkManager getWorkManager() throws MuleException {
-        return workManager;
-      }
-    };
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
     if (!usePersistentConnections) {
       connectionIdleTimeout = 0;
     }
-  }
-
-  private WorkManager createWorkManager() {
-    final WorkManager workManager =
-        workerThreadingProfile.createWorkManager(format("%s%s.%s", ThreadNameHelper.getPrefix(muleContext), name, "worker"),
-                                                 muleContext.getConfiguration().getShutdownTimeout());
-    if (workManager instanceof MuleContextAware) {
-      ((MuleContextAware) workManager).setMuleContext(muleContext);
-    }
-    return workManager;
   }
 
   /**
@@ -205,6 +182,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
     return new ServerAddress(NetworkUtils.getLocalHostIp(host), port);
   }
 
+  @Override
   public void setMuleContext(final MuleContext muleContext) {
     this.muleContext = muleContext;
   }
@@ -218,10 +196,12 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
     return listenerParseRequest != null ? listenerParseRequest : (parseRequest != null ? parseRequest : true);
   }
 
+  @Override
   public int getPort() {
     return port;
   }
 
+  @Override
   public String getHost() {
     return host;
   }
@@ -237,8 +217,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
       return;
     }
     try {
-      workManager = createWorkManager();
-      workManager.start();
+      workManager = muleContext.getSchedulerService().cpuLightScheduler();
       server.start();
     } catch (IOException e) {
       throw new DefaultMuleException(e);
@@ -256,7 +235,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   public synchronized void stop() throws MuleException {
     if (started) {
       try {
-        workManager.dispose();
+        workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
       } catch (Exception e) {
         logger.warn("Failure shutting down work manager " + e.getMessage());
         if (logger.isDebugEnabled()) {
@@ -275,11 +254,12 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
     return String.format("%s://%s:%d%s", protocol.getScheme(), getHost(), getPort(), StringUtils.defaultString(basePath));
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
-  WorkManager getWorkManager() {
+  Executor getWorkManager() {
     return workManager;
   }
 

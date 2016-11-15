@@ -72,7 +72,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "worker", "worker", false}// ,
+    return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "cpuLight", "worker", false}// ,
         // {"http-proxy-template-config.xml", "worker", "proxyTemplate", true}
     });
   }

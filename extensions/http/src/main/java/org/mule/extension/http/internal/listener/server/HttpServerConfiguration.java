@@ -7,8 +7,10 @@
 package org.mule.extension.http.internal.listener.server;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.module.http.internal.listener.Server;
+
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * Configuration component that specifies how a {@link Server} should be created.
@@ -22,16 +24,16 @@ public class HttpServerConfiguration {
   private final TlsContextFactory tlsContextFactory;
   private final boolean usePersistentConnections;
   private final int connectionIdleTimeout;
-  private final WorkManagerSource workManagerSource;
+  private final Supplier<Executor> workManagerSupplier;
 
   public HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
-                                 int connectionIdleTimeout, WorkManagerSource workManagerSource) {
+                                 int connectionIdleTimeout, Supplier<Executor> workManagerSupplier) {
     this.host = host;
     this.port = port;
     this.tlsContextFactory = tlsContextFactory;
     this.usePersistentConnections = usePersistentConnections;
     this.connectionIdleTimeout = connectionIdleTimeout;
-    this.workManagerSource = workManagerSource;
+    this.workManagerSupplier = workManagerSupplier;
   }
 
   public String getHost() {
@@ -54,8 +56,8 @@ public class HttpServerConfiguration {
     return connectionIdleTimeout;
   }
 
-  public WorkManagerSource getWorkManagerSource() {
-    return workManagerSource;
+  public Supplier<Executor> getWorkManagerSupplier() {
+    return workManagerSupplier;
   }
 
   public static class Builder {
@@ -65,7 +67,7 @@ public class HttpServerConfiguration {
     private TlsContextFactory tlsContextFactory;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
-    private WorkManagerSource workManagerSource;
+    private Supplier<Executor> workManagerSupplier;
 
 
     public Builder setHost(String host) {
@@ -93,14 +95,14 @@ public class HttpServerConfiguration {
       return this;
     }
 
-    public Builder setWorkManagerSource(WorkManagerSource workManagerSource) {
-      this.workManagerSource = workManagerSource;
+    public Builder setWorkManagerSource(Supplier<Executor> workManagerSupplier) {
+      this.workManagerSupplier = workManagerSupplier;
       return this;
     }
 
     public HttpServerConfiguration build() {
       return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout,
-                                         workManagerSource);
+                                         workManagerSupplier);
     }
   }
 }

@@ -8,20 +8,18 @@ package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -81,7 +79,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                    sourceModel,
                                    getSourceFactory(nonCallbackParameters, responseCallbackParameters, errorCallbackParameters),
                                    configurationProvider,
-                                   getThreadingProfile(),
                                    getRetryPolicyTemplate(),
                                    (ExtensionManagerAdapter) muleContext.getExtensionManager());
     try {
@@ -105,13 +102,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     return parameter.getModelProperty(CallbackParameterModelProperty.class)
         .map(property -> property.getCallbackPhase() == callbackPhase)
         .orElse(false);
-  }
-
-  private ThreadingProfile getThreadingProfile() {
-    ThreadingProfile tp = new ImmutableThreadingProfile(DEFAULT_THREADING_PROFILE);
-    tp.setMuleContext(muleContext);
-
-    return tp;
   }
 
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,

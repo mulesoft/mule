@@ -14,11 +14,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
+import static org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
@@ -132,8 +132,8 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase {
   public void createListenerConfigIfThereIsNoMatch() throws Exception {
     new HttpListenerBuilder(createMuleContext()).setFlow(mockFlow).setHost(HOST).setPort(PORT).setPath(PATH).build();
 
-    verify(mockListenerConnectionManager).createServer(eq(new ServerAddress(IP, PORT)), any(WorkManagerSource.class), eq(true),
-                                                       eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
+    verify(mockListenerConnectionManager).createServer(eq(new ServerAddress(IP, PORT)), any(), eq(true),
+                                                       eq(DEFAULT_CONNECTION_IDLE_TIMEOUT));
   }
 
   @Test
@@ -143,9 +143,8 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase {
     new HttpListenerBuilder(createMuleContext()).setTlsContextFactory(mockTlsContextFactory).setFlow(mockFlow).setHost(HOST)
         .setPort(PORT).setPath(PATH).build();
 
-    verify(mockListenerConnectionManager).createSslServer(eq(new ServerAddress(IP, PORT)), any(WorkManagerSource.class),
-                                                          eq(mockTlsContextFactory), eq(true),
-                                                          eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
+    verify(mockListenerConnectionManager).createSslServer(eq(new ServerAddress(IP, PORT)), any(), eq(mockTlsContextFactory),
+                                                          eq(true), eq(DEFAULT_CONNECTION_IDLE_TIMEOUT));
   }
 
   @Test

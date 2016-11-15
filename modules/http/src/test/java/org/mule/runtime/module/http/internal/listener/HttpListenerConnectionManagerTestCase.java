@@ -8,20 +8,22 @@ package org.mule.runtime.module.http.internal.listener;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Answers;
 
 public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase {
 
@@ -49,9 +51,9 @@ public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase 
 
   private void testInitialization(String firstIp, String secondIp) throws MuleException {
     final HttpListenerConnectionManager connectionManager = new HttpListenerConnectionManager();
-    final MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+    final MuleContext mockMuleContext = mockContextWithServices();
     connectionManager.setMuleContext(mockMuleContext);
-    WorkManagerSource mockWorkManagerSource = mock(WorkManagerSource.class);
+    Supplier<Executor> mockWorkManagerSource = mock(Supplier.class);
     when((Object) (mockMuleContext.getRegistry().lookupObject(TcpServerSocketProperties.class)))
         .thenReturn(mock(TcpServerSocketProperties.class));
 

@@ -7,32 +7,36 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.time.TimeSupplier;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
 
@@ -75,7 +79,12 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private MuleContext muleContext;
 
   @Inject
+  private SchedulerService schedulerService;
+
+  @Inject
   private ConnectionManagerAdapter connectionManager;
+
+  private Scheduler retryScheduler;
 
   /**
    * Creates a new instance
@@ -166,7 +175,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     };
 
     try {
-      retryTemplate.execute(retryCallback, muleContext.getWorkManager());
+      retryTemplate.execute(retryCallback, retryScheduler);
     } catch (Exception e) {
       throw new DefaultMuleException(createStaticMessage(format("Could not perform connectivity testing for config '%s'",
                                                                 getName())),
@@ -199,6 +208,9 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    */
   @Override
   public void dispose() {
+    if (retryScheduler != null) {
+      retryScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+    }
     disposeIfNeeded(value, LOGGER);
     disposeIfNeeded(connectionProvider, LOGGER);
     super.dispose();
@@ -211,6 +223,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
 
     initialiseIfNeeded(value, true, muleContext);
+    retryScheduler = schedulerService.ioScheduler();
     super.initialise();
   }
 

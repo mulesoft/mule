@@ -8,10 +8,11 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
+
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class TransportMessageProcessContext implements MessageProcessContext {
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   private final MessageReceiver messageReceiver;
-  private WorkManager flowExecutionWorkManager;
+  private Executor flowExecutor;
 
   /**
    * Creates an instance that executes the flow in the current thread. Calling #supportsAsynchronousProcessing method will always
@@ -41,11 +42,11 @@ public class TransportMessageProcessContext implements MessageProcessContext {
    * will always return true since there's a WorkManager available to execute the flow.
    *
    * @param messageReceiver receiver of the message
-   * @param flowExecutionWorkManager the work manager to use for the flow execution
+   * @param flowExecutor the {@link Executor} to use for the flow execution
    */
-  public TransportMessageProcessContext(MessageReceiver messageReceiver, WorkManager flowExecutionWorkManager) {
+  public TransportMessageProcessContext(MessageReceiver messageReceiver, Executor flowExecutor) {
     this.messageReceiver = messageReceiver;
-    this.flowExecutionWorkManager = flowExecutionWorkManager;
+    this.flowExecutor = flowExecutor;
   }
 
   @Override
@@ -64,7 +65,7 @@ public class TransportMessageProcessContext implements MessageProcessContext {
 
   @Override
   public boolean supportsAsynchronousProcessing() {
-    if (flowExecutionWorkManager != null) {
+    if (flowExecutor != null) {
       return true;
     } else {
       return false;
@@ -72,8 +73,8 @@ public class TransportMessageProcessContext implements MessageProcessContext {
   }
 
   @Override
-  public WorkManager getFlowExecutionWorkManager() {
-    return flowExecutionWorkManager;
+  public Executor getFlowExecutionExecutor() {
+    return flowExecutor;
   }
 
   @Override

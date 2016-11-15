@@ -8,13 +8,14 @@ package org.mule.extension.http.internal.listener.grizzly;
 
 import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
+
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.module.http.internal.HttpMessageLogger;
@@ -31,8 +32,10 @@ import org.mule.runtime.module.http.internal.listener.grizzly.WorkManagerSourceE
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
@@ -163,7 +166,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     return false;
   }
 
-  public Server createSslServerFor(TlsContextFactory tlsContextFactory, WorkManagerSource workManagerSource,
+  @Override
+  public Server createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<Executor> workManagerSource,
                                    final ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException {
     if (logger.isDebugEnabled()) {
@@ -183,7 +187,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     return grizzlyServer;
   }
 
-  public Server createServerFor(ServerAddress serverAddress, WorkManagerSource workManagerSource,
+  @Override
+  public Server createServerFor(ServerAddress serverAddress, Supplier<Executor> workManagerSource,
                                 boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException {
     if (logger.isDebugEnabled()) {
@@ -237,7 +242,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     if (usePersistentConnections) {
       ka = new KeepAlive();
       ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
-      ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
+      ka.setIdleTimeoutInSeconds((int) MILLISECONDS.toSeconds(connectionIdleTimeout));
     }
     HttpServerFilter httpServerFilter =
         new HttpServerFilter(true, retrieveMaximumHeaderSectionSize(), ka, idleTimeoutDelayedExecutor);
@@ -255,11 +260,6 @@ public class GrizzlyServerManager implements HttpServerManager {
                                                                                     MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY)),
                                      e);
     }
-  }
-
-  private int convertToSeconds(int milliseconds) {
-    return (int) Math.ceil((double) milliseconds / 1000.0);
-
   }
 
 }

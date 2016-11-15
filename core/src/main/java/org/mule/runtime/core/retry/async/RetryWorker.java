@@ -6,35 +6,34 @@
  */
 package org.mule.runtime.core.retry.async;
 
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.util.concurrent.Latch;
 
-import javax.resource.spi.work.Work;
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link javax.resource.spi.work.Work} implementation used when executing a {@link RetryPolicyTemplate} in a separate thread.
+ * A {@link Runnable} implementation used when executing a {@link RetryPolicyTemplate} in a separate thread.
  */
-public class RetryWorker implements Work {
+public class RetryWorker implements Runnable {
 
   protected transient final Logger logger = LoggerFactory.getLogger(RetryWorker.class);
 
   private final RetryCallback callback;
-  private final WorkManager workManager;
+  private final Executor workManager;
   private Exception exception = null;
   private final FutureRetryContext context = new FutureRetryContext();
   private final RetryPolicyTemplate delegate;
   private Latch startLatch;
 
-  public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, WorkManager workManager) {
+  public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, Executor workManager) {
     this(delegate, callback, workManager, null);
   }
 
-  public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, WorkManager workManager, Latch startLatch) {
+  public RetryWorker(RetryPolicyTemplate delegate, RetryCallback callback, Executor workManager, Latch startLatch) {
     this.callback = callback;
     this.workManager = workManager;
     this.delegate = delegate;
@@ -45,10 +44,7 @@ public class RetryWorker implements Work {
     }
   }
 
-  public void release() {
-
-  }
-
+  @Override
   public void run() {
     try {
       startLatch.await();
