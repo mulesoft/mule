@@ -43,11 +43,9 @@
     <flow name="uriParamNull">
         <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
             <httpn:request-builder>
-                <httpn:request-builder>
-                    <httpn:uri-params>
-                        #['testParam1' : 'testValue1' , 'testParam2' : payload]]
-                    </httpn:uri-params>
-                </httpn:request-builder>
+                <httpn:uri-params>
+                    #['testParam1' : 'testValue1' , 'testParam2' : payload]]
+                </httpn:uri-params>
             </httpn:request-builder>
         </httpn:request>
     </flow>

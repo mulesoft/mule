@@ -17,8 +17,7 @@
         <httpn:listener path="test" config-ref="listenerConfig">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Type" value="application/x-www-form-urlencoded"/>
-                    <httpn:header key="customname1" value="customValue"/>
+                    #[['Content-Type' : 'application/x-www-form-urlencoded', 'customname1' : 'customValue']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -29,7 +28,7 @@
         <httpn:request path="test" config-ref="requestConfig">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="CusTomName2" value="CustomValue"/>
+                    #[['CusTomName2' : 'CustomValue']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
