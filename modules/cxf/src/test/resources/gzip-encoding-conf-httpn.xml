@@ -24,7 +24,7 @@
         <httpn:listener path="/proxy" config-ref="listenerConfig2" allowedMethods="POST">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Encoding" value="gzip"/>
+                    #[['Content-Encoding' : 'gzip']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -44,8 +44,7 @@
         <httpn:request config-ref="requestConfig" path="/artistRegistry" method="POST">
             <httpn:request-builder>
                 <httpn:headers>
-                    <!-- TODO MULE-9857 Make message properties case sensitive -->
-                    <httpn:header key="Content-Encoding" value="#[message.attributes.headers['content-encoding']]"/>
+                    #[['Content-Encoding' : message.attributes.headers['content-encoding']]]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -55,7 +54,7 @@
         <httpn:listener path="/artistRegistry" config-ref="listenerConfig1" allowedMethods="POST">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="Content-Encoding" value="gzip"/>
+                    #[['Content-Encoding' : 'gzip']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

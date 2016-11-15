@@ -14,8 +14,7 @@
         <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="testName1" value="testValue1" />
-                    <httpn:header key="#[headerName]" value="#[headerValue]" />
+                    #[['testName1' : 'testValue1', headerName : headerValue]]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -23,13 +22,17 @@
 
     <flow name="headerMap">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder headers="#[headers]"/>
+            <httpn:request-builder>
+                <httpn:headers>#[headers]</httpn:headers>
+            </httpn:request-builder>
         </httpn:request>
     </flow>
 
     <flow name="headerOverride">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder headers="#[headers]"/>
+            <httpn:request-builder>
+                <httpn:headers>#[headers]</httpn:headers>
+            </httpn:request-builder>
         </httpn:request>
     </flow>
 
@@ -37,7 +40,7 @@
         <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="http.scheme" value="testValue1" />
+                    #[['http.scheme' : 'testValue1']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -47,7 +50,7 @@
         <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="Connection" value="close" />
+                    #[['Connection' : 'close']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -61,7 +64,7 @@
         <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="Host" value="${host}" />
+                    #[['Host' : server.systemProperties['host']]]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -71,7 +74,7 @@
         <httpn:request config-ref="config" path="testPath" method="POST">
             <httpn:request-builder>
                 <httpn:headers>
-                    <httpn:header key="Transfer-Encoding" value="${encoding}" />
+                    #[['Transfer-Encoding' : server.systemProperties['encoding']]]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>

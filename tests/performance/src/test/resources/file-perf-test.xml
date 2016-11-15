@@ -11,17 +11,17 @@
 
     <flow name="read-write">
         <file:read path="files/hello.json" />
-        <file:write path="output" content="#[payload]" mode="OVERWRITE" lock="false" />
+        <file:write path="output" mode="OVERWRITE" lock="false" />
     </flow>
 
     <flow name="read-write-1K">
         <file:read path="1K/file" />
-        <file:write path="output" content="#[payload]" mode="OVERWRITE" lock="false" />
+        <file:write path="output" mode="OVERWRITE" lock="false" />
     </flow>
 
     <flow name="read-write-1M">
         <file:read path="1M/file" />
-        <file:write path="output" content="#[payload]" mode="OVERWRITE" lock="false" />
+        <file:write path="output" mode="OVERWRITE" lock="false" />
     </flow>
 
     <flow name="read">
@@ -38,16 +38,21 @@
 
 
     <flow name="write">
-        <file:write path="write-test-file.txt" content="This is the file content" mode="OVERWRITE" lock="false" />
+        <file:write path="write-test-file.txt" mode="OVERWRITE" lock="false">
+            <file:content>This is the file content</file:content>
+        </file:write>
     </flow>
 
     <flow name="write-with-absolute-path">
-        <file:write content="my content" path="/temp/my file.txt" mode="OVERWRITE" createParentDirectories="true" lock="true" />
+        <file:write path="/temp/my file.txt" mode="OVERWRITE" createParentDirectories="true" lock="true">
+            <file:content>my content</file:content>
+        </file:write>
+
     </flow>
 
     <flow name="write-bytearray">
         <expression-transformer expression="#[result = '\u0003H\u0001e\u0002l\u0004l\u0005o\u0008\u0020\u0040\u0035北\u0003'.getBytes('ASCII'); return result[1]]"/>
-        <file:write content="#[payload]" path="byte-array.txt" mode="OVERWRITE" createParentDirectories="false" lock="false" />
+        <file:write path="byte-array.txt" mode="OVERWRITE" createParentDirectories="false" lock="false" />
     </flow>
 
     <flow name="write-iterable">
@@ -56,8 +61,9 @@
     </flow>
 
     <flow name="write-lock">
-        <file:write path="write-test-file.txt" content="This is the file content" mode="OVERWRITE" lock="true" />
+        <file:write path="write-test-file.txt" mode="OVERWRITE" lock="true">
+            <file:content>This is the file content</file:content>
+        </file:write>
     </flow>
-
 </mule>
 

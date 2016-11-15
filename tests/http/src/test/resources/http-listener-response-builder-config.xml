@@ -31,8 +31,7 @@
         <httpn:listener config-ref="listenerConfig" path="${headerResponseBuilderPath}">
             <httpn:response-builder>
                 <httpn:headers>
-                    <httpn:header key="User-Agent" value="Mule 3.6.0"/>
-                    <httpn:header key="Date" value="2016-06-08T13:34:41.080-03:00"/>
+                    #[['User-Agent' : 'Mule 3.6.0', 'Date' : '2016-06-08T13:34:41.080-03:00']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -41,14 +40,20 @@
 
     <flow name="headersResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headersResponseBuilderPath}">
-            <httpn:response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]"/>
+            <httpn:response-builder>
+                <httpn:headers>#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]</httpn:headers>
+            </httpn:response-builder>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="headersOverrideResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headersOverrideResponseBuilderPath}">
-            <httpn:response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]" />
+            <httpn:response-builder>
+                <httpn:headers>
+                    #[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]
+                </httpn:headers>
+            </httpn:response-builder>
         </httpn:listener>
         <echo-component/>
     </flow>
@@ -85,10 +90,7 @@
     <flow name="errorHeaderResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeaderResponseBuilderPath}">
             <httpn:error-response-builder>
-                <httpn:headers>
-                    <httpn:header key="User-Agent" value="Mule 3.6.0"/>
-                    <httpn:header key="Date" value="2016-06-08T13:34:41.080-03:00"/>
-                </httpn:headers>
+                <httpn:headers>#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]</httpn:headers>
             </httpn:error-response-builder>
         </httpn:listener>
         <test:component throwException="true"/>
@@ -96,14 +98,22 @@
 
     <flow name="errorHeadersResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeadersResponseBuilderPath}">
-            <httpn:error-response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]"/>
+            <httpn:error-response-builder>
+                <httpn:headers>
+                    #[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]
+                </httpn:headers>
+            </httpn:error-response-builder>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="errorHeadersOverrideResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeadersOverrideResponseBuilderPath}">
-            <httpn:error-response-builder headers="#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]" />
+            <httpn:error-response-builder>
+                <httpn:headers>
+                    #[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]
+                </httpn:headers>
+            </httpn:error-response-builder>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>

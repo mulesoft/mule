@@ -14,7 +14,7 @@
         <httpn:request config-ref="requestConfig" path="status">
             <httpn:request-builder>
                 <httpn:query-params>
-                    <httpn:query-param key="code" value="#[code]" />
+                    #[['code', code]]
                 </httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
@@ -27,7 +27,7 @@
             </httpn:response-validator>
             <httpn:request-builder>
                 <httpn:query-params>
-                    <httpn:query-param key="code" value="#[code]" />
+                    #[['code', code]]
                 </httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
@@ -40,7 +40,7 @@
             </httpn:response-validator>
             <httpn:request-builder>
                 <httpn:query-params>
-                    <httpn:query-param key="code" value="#[code]" />
+                    #[['code', code]]
                 </httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
