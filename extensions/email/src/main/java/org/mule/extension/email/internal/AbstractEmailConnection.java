@@ -23,6 +23,9 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.net.ssl.SSLContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Generic implementation for an email connection of a connector which operates over the SMTP, IMAP, POP3 and it's secure versions
  * protocols.
@@ -32,6 +35,8 @@ import javax.net.ssl.SSLContext;
  * @since 4.0
  */
 public abstract class AbstractEmailConnection {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmailConnection.class);
 
   public static final String PASSWORD_NO_USERNAME_ERROR = "Password provided but not username was specified.";
   public static final String USERNAME_NO_PASSWORD_ERROR = "Username provided but not password was specified.";
@@ -141,8 +146,16 @@ public abstract class AbstractEmailConnection {
 
     String[] sslProtocols = tlsContextFactory.getEnabledProtocols();
     if (sslProtocols != null) {
+
       Stream.of(sslProtocols).filter(p -> p.startsWith("SSL")).findAny()
-          .ifPresent(p -> properties.setProperty(protocol.getSslEnableProperty(), "true"));
+          .ifPresent(p -> {
+            properties.setProperty(protocol.getSslEnableProperty(), "true");
+            if (LOGGER.isWarnEnabled()) {
+              LOGGER.warn(
+                          "Property %s has been enabled. For disabling this property remove SSL from the enabled protocols in your TLS configuration",
+                          protocol.getSslEnableProperty());
+            }
+          });
       properties.setProperty(protocol.getSslProtocolsProperty(), join(sslProtocols, WHITESPACE_SEPARATOR));
     }
 
