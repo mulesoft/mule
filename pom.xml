@@ -16,7 +16,7 @@
     <!-- Project -->
     <name>Mule Kernel</name>
     <description>
-        Mule is the runtime enaine of Anypoint™ Platform. It is the industry’s only unified platform that combines data and application integration across legacy systems, SaaS applications, and APIs with hybrid deployment options for maximum flexibility.
+        Mule is the runtime engine of Anypoint™ Platform. It is the industry’s only unified platform that combines data and application integration across legacy systems, SaaS applications, and APIs with hybrid deployment options for maximum flexibility.
     </description>
     <url>https://developer.mulesoft.com/</url>
     <inceptionYear>2003</inceptionYear>
@@ -229,6 +229,7 @@
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <tomcatVersion>6.0.44</tomcatVersion>
         <unirestVersion>1.4.9</unirestVersion>
+        <weaveVersion>4.0-SNAPSHOT</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>
@@ -729,6 +730,11 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertJVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mulesoft.weave</groupId>
+                <artifactId>mule-plugin-weave</artifactId>
+                <version>${weaveVersion}</version>
             </dependency>
 
             <!--Logging-->

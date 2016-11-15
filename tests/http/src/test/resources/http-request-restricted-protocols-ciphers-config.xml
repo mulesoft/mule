@@ -18,7 +18,7 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" path="/" method="POST"/>
+        <httpn:request config-ref="requestConfig" path="/" method="#[dw:'POST']"/>
     </flow>
 
 

@@ -9,7 +9,8 @@ package org.mule.test.module.http.functional;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
+@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext",
+    "com.mulesoft.weave:mule-plugin-weave"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
