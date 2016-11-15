@@ -9,11 +9,9 @@ package org.mule.runtime.core.api.source.polling;
 import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
 
 /**
- * <p>
  * This exception is thrown if a {@link ScheduledPoll} could not be created.
- * </p>
  *
- * @since 3.5.0
+ * @since 3.5.0, moved from {@link org.mule.runtime.core.api.schedule.SchedulerCreationException}.
  */
 public class ScheduledPollCreationException extends RuntimeException {
 

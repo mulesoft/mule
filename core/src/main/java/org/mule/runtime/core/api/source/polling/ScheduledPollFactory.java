@@ -15,27 +15,22 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * <p>
  * Factory of poll schedules. Every {@link ScheduledPoll} should be created by a {@link ScheduledPollFactory} if the creation
  * process allows post creation hooking.
- * </p>
- * <p>
  *
  * @param <T> is the type of the scheduler job (what is the scheduler going to execute)
- * @since 3.5.0
+ * @since 3.5.0, moved from {@link org.mule.runtime.core.api.schedule.SchedulerFactory}.
  */
 public abstract class ScheduledPollFactory {
 
   /**
-   * <p>
    * Creates a scheduler for a job and runs all the registered post processors.
-   * </p>
    *
    * @param executorSupplier the command that provides the corresponding {@link Scheduler} instance.
    * @param executorStopper the command to stop the {@link Scheduler} that was obtained via {@code executorSupplier}.
-   * @param job The {@link Scheduler} job that has to be executed.
-   * @param name The {@link Scheduler} name. This name is the one that is going to be use to register the {@link Scheduler} in the
-   *        {@link org.mule.runtime.core.api.registry.MuleRegistry}
+   * @param name The {@link ScheduledPoll} name. This name is the one that is going to be use to register the
+   *        {@link ScheduledPoll} in the {@link org.mule.runtime.core.api.registry.MuleRegistry}
+   * @param job The {@link Runnable} job that has to be executed.
    * @return A new instance of a {@link Scheduler}. It must never be null.
    * @throws ScheduledPollCreationException In case after creating and post processing the {@link Scheduler} it is null.
    */
@@ -48,10 +43,8 @@ public abstract class ScheduledPollFactory {
   }
 
   /**
-   * <p>
    * Template method to delegate the creation of the {@link Scheduler}. This method is thought to create an instance of a
    * {@link Scheduler}. It should not Start/Stop it.
-   * </p>
    *
    * @param executorSupplier the command that provides the corresponding {@link Scheduler} instance.
    * @param executorStopper the command to stop the {@link Scheduler} that was obtained via {@code executorSupplier}.

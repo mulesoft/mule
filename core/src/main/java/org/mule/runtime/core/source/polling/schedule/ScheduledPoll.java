@@ -19,11 +19,9 @@ import java.util.function.Supplier;
 
 
 /**
- * <p>
  * Definition of a Scheduler for poll.
- * </p>
  *
- * @since 3.5.0
+ * @since 3.5.0, moved from {@link org.mule.runtime.core.api.schedule.Scheduler}.
  */
 public class ScheduledPoll implements Lifecycle, NameableObject {
 
@@ -31,9 +29,7 @@ public class ScheduledPoll implements Lifecycle, NameableObject {
   private Consumer<Scheduler> executorStopper;
 
   /**
-   * <p>
    * Thread executor service
-   * </p>
    */
   private Scheduler executor;
 
@@ -44,10 +40,7 @@ public class ScheduledPoll implements Lifecycle, NameableObject {
   private ScheduledFuture<?> scheduledJob;
 
   /**
-   * <p>
-   * The {@link org.mule.runtime.core.api.schedule.Scheduler} name used as an identifier in the
-   * {@link org.mule.runtime.core.api.registry.MuleRegistry}
-   * </p>
+   * The {@link ScheduledPoll} name used as an identifier in the {@link org.mule.runtime.core.api.registry.MuleRegistry}.
    */
   protected String name;
 
