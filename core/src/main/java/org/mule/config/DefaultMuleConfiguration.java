@@ -221,10 +221,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public DefaultMuleConfiguration(boolean containerMode)
     {
         this.containerMode = containerMode;
-
-        // Apply any settings which come from the JVM system properties.
-        applySystemProperties();
-
         if (id == null)
         {
             id = UUID.getUUID();
@@ -274,119 +270,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         else if (isStandalone())
         {
             this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
-        }
-    }
-
-    /**
-     * Apply any settings which come from the JVM system properties.
-     */
-    protected void applySystemProperties()
-    {
-        String p;
-
-        p = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
-        if (p != null)
-        {
-            encoding = p;
-        }
-        else
-        {
-            System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
-        if (p != null)
-        {
-            synchronous = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
-        if (p != null)
-        {
-            systemModelType = p;
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
-        if (p != null)
-        {
-            responseTimeout = NumberUtils.toInt(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
-        if (p != null)
-        {
-            defaultTransactionTimeout = NumberUtils.toInt(p);
-        }
-
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
-        if (p != null)
-        {
-            workingDirectory = p;
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
-        if (p != null)
-        {
-            clientMode = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
-        if (p != null)
-        {
-            id = p;
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
-        if (p != null)
-        {
-            domainId = p;
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
-        if (p != null)
-        {
-            cacheMessageAsBytes = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
-        if (p != null)
-        {
-            cacheMessageOriginalPayload = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
-        if (p != null)
-        {
-            enableStreaming = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
-        if (p != null)
-        {
-            autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.full");
-        if (p != null)
-        {
-            fullStackTraces = false;
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.filter");
-        if (p != null)
-        {
-            stackTraceFilter = p.split(",");
-        }
-
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "verbose.exceptions");
-        if (p != null)
-        {
-            verboseExceptions = BooleanUtils.toBoolean(p);
-        }
-
-        p = System.getProperty(MuleProperties.MULE_FLOW_TRACE);
-        if (p != null)
-        {
-            flowTrace = BooleanUtils.toBoolean(p);
-        }
-
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
-        if (p != null)
-        {
-            validateExpressions = Boolean.valueOf(p);
-        }
-
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.disable");
-        if (p != null)
-        {
-            disableTimeouts = Boolean.valueOf(p);
         }
     }
     
