@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.Aggregator;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -28,7 +30,6 @@ import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
-import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.util.store.ProvidedPartitionableObjectStoreWrapper;
 
@@ -84,7 +85,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   protected Factory internalProcessedGroupsObjectStoreFactory() {
     return () -> {
-      ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+      ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
       return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1,
                                                1000);
     };
@@ -104,22 +105,16 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   protected Factory internalEventsGroupsObjectStoreFactory() {
     return () -> {
-      try {
-        ObjectStore objectStore;
-        if (persistentStores) {
-          objectStore =
-              muleContext.getRegistry().lookupObject(DefaultObjectStoreFactoryBean.class).createDefaultPersistentObjectStore();
-        } else {
-          objectStore =
-              muleContext.getRegistry().lookupObject(DefaultObjectStoreFactoryBean.class).createDefaultInMemoryObjectStore();
-        }
-        if (objectStore instanceof MuleContextAware) {
-          ((MuleContextAware) objectStore).setMuleContext(muleContext);
-        }
-        return objectStore;
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
+      ObjectStore objectStore;
+      if (persistentStores) {
+        objectStore = muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+      } else {
+        objectStore = muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
       }
+      if (objectStore instanceof MuleContextAware) {
+        ((MuleContextAware) objectStore).setMuleContext(muleContext);
+      }
+      return objectStore;
     };
   }
 
