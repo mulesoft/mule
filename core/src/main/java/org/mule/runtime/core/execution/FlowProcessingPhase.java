@@ -63,9 +63,9 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
               sendResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(),
                                        muleEvent, flowProcessingPhaseTemplate);
               return muleEvent;
-            } catch (Exception e2) {
-              exceptionThrownDuringFlowProcessing.set(e2);
-              throw e2;
+            } catch (Exception e) {
+              exceptionThrownDuringFlowProcessing.set(e);
+              throw e;
             }
           });
           if (exceptionThrownDuringFlowProcessing.get() != null
@@ -74,25 +74,25 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                                      response, flowProcessingPhaseTemplate);
           }
           flowProcessingPhaseTemplate.afterSuccessfulProcessingFlow(response);
-        } catch (ResponseDispatchException e3) {
-          flowProcessingPhaseTemplate.afterFailureProcessingFlow(e3);
-        } catch (MessagingException e4) {
-          sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(), e4,
+        } catch (ResponseDispatchException e) {
+          flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
+        } catch (MessagingException e) {
+          sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(), e,
                                           flowProcessingPhaseTemplate);
-          flowProcessingPhaseTemplate.afterFailureProcessingFlow(e4);
+          flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
         }
         phaseResultNotifier.phaseSuccessfully();
-      } catch (Exception e5) {
-        MuleException me = new DefaultMuleException(e5);
+      } catch (Exception e) {
+        MuleException me = new DefaultMuleException(e);
         try {
           flowProcessingPhaseTemplate.afterFailureProcessingFlow(me);
         } catch (MuleException e1) {
-          logger.warn("Failure during exception processing in flow template: " + e5.getMessage());
+          logger.warn("Failure during exception processing in flow template: " + e.getMessage());
           if (logger.isDebugEnabled()) {
-            logger.debug("Failure during exception processing in flow template: ", e5);
+            logger.debug("Failure during exception processing in flow template: ", e);
           }
         }
-        phaseResultNotifier.phaseFailure(e5);
+        phaseResultNotifier.phaseFailure(e);
       }
     };
     if (messageProcessContext.supportsAsynchronousProcessing()) {

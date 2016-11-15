@@ -8,6 +8,7 @@ package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
@@ -237,7 +238,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     if (usePersistentConnections) {
       ka = new KeepAlive();
       ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
-      ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
+      ka.setIdleTimeoutInSeconds((int) MILLISECONDS.toSeconds(connectionIdleTimeout));
     }
     HttpServerFilter httpServerFilter =
         new HttpServerFilter(true, retrieveMaximumHeaderSectionSize(), ka, idleTimeoutDelayedExecutor);
@@ -256,10 +257,4 @@ public class GrizzlyServerManager implements HttpServerManager {
                                      e);
     }
   }
-
-  private int convertToSeconds(int milliseconds) {
-    return (int) Math.ceil(milliseconds / 1000.0);
-
-  }
-
 }

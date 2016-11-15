@@ -6,10 +6,6 @@
  */
 package org.mule.compatibility.transport.jms.reconnect;
 
-import static java.lang.String.format;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -64,8 +60,7 @@ public class ReconnectWorkManager implements WorkManager {
 
   @Override
   public void start() throws MuleException {
-    executor =
-        newSingleThreadExecutor(runnable -> new Thread(runnable, format("%s.endpoint.reconnection", getPrefix(muleContext))));
+    executor = muleContext.getSchedulerService().ioScheduler();
     isStarted = true;
   }
 

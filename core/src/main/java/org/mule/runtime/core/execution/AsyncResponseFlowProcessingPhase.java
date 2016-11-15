@@ -58,12 +58,12 @@ public class AsyncResponseFlowProcessingPhase
           });
           fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
           template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
-        } catch (final MessagingException e1) {
-          fireNotification(messageSource, e1.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
-          template.sendFailureResponseToClient(e1, createSendFailureResponseCompletationCallback(phaseResultNotifier));
+        } catch (final MessagingException e) {
+          fireNotification(messageSource, e.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
+          template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
         }
-      } catch (Exception e2) {
-        phaseResultNotifier.phaseFailure(e2);
+      } catch (Exception e) {
+        phaseResultNotifier.phaseFailure(e);
       }
     };
 

@@ -134,9 +134,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Mock
   private ThreadingProfile threadingProfile;
 
-  // @Mock
-  // private WorkManager workManager;
-
   @Mock
   Scheduler ioScheduler;
 
@@ -192,11 +189,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Before
   public void before() throws Exception {
     spyInjector(muleContext);
-    // when(muleContext.getSchedulerService().ioScheduler()).thenReturn(ioScheduler);
-    // when(muleContext.getSchedulerService().cpuLightScheduler()).thenReturn(cpuLightScheduler);
     reset(muleContext.getSchedulerService());
-    // when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout())))
-    // .thenReturn(workManager);
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(of(mock(Attributes.class)));
 
