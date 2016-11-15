@@ -12,13 +12,13 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.ws.api.exception.InvalidWsdlException;
+import org.mule.metadata.xml.SchemaCollector;
 
 import com.ibm.wsdl.extensions.schema.SchemaSerializer;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
@@ -48,18 +48,16 @@ import javax.xml.namespace.QName;
 @SuppressWarnings("unchecked")
 public class WsdlIntrospecter {
 
-  private static final WsdlSchemaCollector schemaCollector = new WsdlSchemaCollector();
+  private static final WsdlSchemasCollector schemaCollector = new WsdlSchemasCollector();
 
   private final Definition definition;
   private final Service service;
   private final Port port;
-  private final Set<String> schemas;
 
   public WsdlIntrospecter(String wsdlLocation, String service, String port) {
     this.definition = parseWsdl(wsdlLocation);
     this.service = findService(service);
     this.port = findPort(port);
-    this.schemas = schemaCollector.getSchemas(definition);
   }
 
   private Service findService(String serviceName) {
@@ -139,8 +137,8 @@ public class WsdlIntrospecter {
     return fault;
   }
 
-  public Set<String> getSchemas() {
-    return schemas;
+  public SchemaCollector getSchemas() {
+    return schemaCollector.collect(definition);
   }
 
   public Service getService() {
