@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
@@ -31,8 +32,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
 
+  private static final Logger logger = getLogger(MuleExpressionLanguage.class);
   public static final String ATTRIBUTES = "attributes";
   public static final String PAYLOAD = "payload";
   public static final String ERROR = "error";
@@ -46,7 +50,12 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class).iterator();
 
     while (executors.hasNext()) {
-      this.expressionExecutor = executors.next();
+      try {
+        this.expressionExecutor = executors.next();
+      } catch (Throwable e) {
+        //TODO - MULE-10938: Fix DW dependency for FunctionalTestCase
+        logger.warn("DW Executor could not be loaded.");
+      }
       break;
     }
     // TODO: MULE-10765 - Define global bindings
