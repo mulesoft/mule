@@ -134,6 +134,7 @@
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
                 <include>org.mule.modules:mule-module-deployment</include>
+                <include>org.mule.modules:mule-module-deployment-impl</include>
                 <include>org.mule.modules:mule-module-deployment-model</include>
                 <include>org.mule.modules:mule-module-dsl-api</include>
                 <include>org.mule.modules:mule-module-service</include>
@@ -224,6 +225,7 @@
                 <exclude>org.mule.modules:mule-module-container</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-deployment</exclude>
+                <exclude>org.mule.modules:mule-module-deployment-impl</exclude>
                 <exclude>org.mule.modules:mule-module-deployment-model</exclude>
                 <exclude>org.mule.modules:mule-module-dsl-api</exclude>
                 <exclude>org.mule.modules:mule-module-service</exclude>

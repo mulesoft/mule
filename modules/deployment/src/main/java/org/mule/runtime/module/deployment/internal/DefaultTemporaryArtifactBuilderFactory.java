@@ -22,11 +22,11 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
-import org.mule.runtime.module.deployment.internal.plugin.DefaultArtifactPlugin;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;

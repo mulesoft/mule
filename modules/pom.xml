@@ -20,6 +20,7 @@
         <module>cxf</module>
         <module>container</module>
         <module>deployment</module>
+        <module>deployment-impl</module>
         <module>deployment-model</module>
         <module>dsl-api</module>
         <module>extensions-support</module>

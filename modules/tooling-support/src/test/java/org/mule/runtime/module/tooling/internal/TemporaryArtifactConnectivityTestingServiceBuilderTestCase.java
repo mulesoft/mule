@@ -17,7 +17,7 @@ import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

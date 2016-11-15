@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
 
 /**
  * {@link ConnectivityTestingService} for a temporary artifact.

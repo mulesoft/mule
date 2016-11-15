@@ -139,6 +139,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-json-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-deployment-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-deployment-impl-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-deployment-model-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-dsl-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-service-${productVersion}.jar
