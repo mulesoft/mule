@@ -17,6 +17,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
 import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
@@ -24,6 +25,8 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
@@ -102,12 +105,12 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory() {
 
       @Override
-      public ScheduledPoll doCreate(String name, final Runnable job) {
-        return spy(super.doCreate(name, job));
+      public ScheduledPoll doCreate(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name,
+                                    final Runnable job) {
+        return spy(super.doCreate(executorSupplier, executorStopper, name, job));
       }
     };
     factory.setFrequency(1000);
-    factory.setMuleContext(muleContext);
     return factory;
   }
 

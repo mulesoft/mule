@@ -7,6 +7,7 @@
 package org.mule.runtime.core.source.polling;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
@@ -269,7 +270,11 @@ public class PollingMessageSource
   }
 
   private void createScheduler() {
-    poll = pollFactory.create(schedulerNameOf(flowConstruct), () -> performPoll());
+    // This will scheduled to IO because the processor may be a chain and chains don't currently support having processing
+    // strategies.
+    poll = pollFactory.create(() -> muleContext.getSchedulerService().ioScheduler(),
+                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                              schedulerNameOf(flowConstruct), () -> performPoll());
     try {
       muleContext.getRegistry().registerObject(poll.getName(), poll);
     } catch (MuleException e) {

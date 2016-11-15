@@ -7,11 +7,15 @@
 package org.mule.runtime.core.source.polling.schedule;
 
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * <p>
@@ -27,7 +31,7 @@ public class FixedFrequencyScheduledPollFactory extends ScheduledPollFactory {
    * The {@link TimeUnit} of the scheduler
    * </p>
    */
-  private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+  private TimeUnit timeUnit = MILLISECONDS;
 
   /**
    * <p>
@@ -45,8 +49,9 @@ public class FixedFrequencyScheduledPollFactory extends ScheduledPollFactory {
 
 
   @Override
-  public ScheduledPoll doCreate(String name, final Runnable job) {
-    return new ScheduledPoll(context.getSchedulerService(), name, job,
+  public ScheduledPoll doCreate(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name,
+                                final Runnable job) {
+    return new ScheduledPoll(executorSupplier, executorStopper, name, job,
                              executor -> executor.scheduleAtFixedRate(job, startDelay, frequency, timeUnit));
   }
 

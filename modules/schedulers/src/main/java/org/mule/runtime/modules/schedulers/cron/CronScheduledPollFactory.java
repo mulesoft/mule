@@ -10,10 +10,13 @@ import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
 
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
 import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
 
 import java.util.TimeZone;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +40,9 @@ public class CronScheduledPollFactory extends ScheduledPollFactory {
   private String timeZone;
 
   @Override
-  protected ScheduledPoll doCreate(String name, Runnable job) {
-    return new ScheduledPoll(context.getSchedulerService(), name, job,
+  protected ScheduledPoll doCreate(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name,
+                                   Runnable job) {
+    return new ScheduledPoll(executorSupplier, executorStopper, name, job,
                              executor -> executor.scheduleWithCronExpression(job, expression, resolveTimeZone(timeZone)));
   }
 

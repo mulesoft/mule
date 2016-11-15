@@ -37,10 +37,9 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void testSchedulerCreation() throws MuleException {
     CronScheduledPollFactory factory = new CronScheduledPollFactory();
-    factory.setMuleContext(muleContext);
     factory.setExpression("0 * * * ? *");
 
-    ScheduledPoll scheduler = factory.create("name", () -> {
+    ScheduledPoll scheduler = factory.create(() -> schedulerService.ioScheduler(), null, "name", () -> {
     });
 
     scheduler.initialise();
@@ -54,12 +53,11 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void testSchedulerCreationWithTimeZone() throws MuleException {
     CronScheduledPollFactory factory = new CronScheduledPollFactory();
-    factory.setMuleContext(muleContext);
     factory.setExpression("0 * * * ? *");
     factory.setTimeZone(getTimeZone("America/Argentina/Buenos_Aires").getID());
 
     ScheduledPoll scheduler =
-        factory.create("name", () -> {
+        factory.create(() -> schedulerService.ioScheduler(), null, "name", () -> {
         });
 
     scheduler.initialise();
@@ -74,12 +72,11 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void testSchedulerCreationWithAnotherTimeZone() throws MuleException {
     CronScheduledPollFactory factory = new CronScheduledPollFactory();
-    factory.setMuleContext(muleContext);
     factory.setExpression("0 * * * ? *");
     factory.setTimeZone(getTimeZone("Europe/London").getID());
 
     ScheduledPoll scheduler =
-        factory.create("name", () -> {
+        factory.create(() -> schedulerService.ioScheduler(), null, "name", () -> {
         });
 
     scheduler.initialise();

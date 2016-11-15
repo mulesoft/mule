@@ -7,11 +7,13 @@
 package org.mule.runtime.core.api.source.polling;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.source.polling.ScheduledPollCreationException;
-import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
@@ -28,13 +30,11 @@ public class ScheduledPollFactoryTest extends AbstractMuleTestCase {
    */
   @Test(expected = ScheduledPollCreationException.class)
   public void checkCreationOfNullScheduler() {
-    factory(null, null).create(NAME, this.newRunnable());
+    factory(null, null).create(null, null, NAME, this.newRunnable());
   }
 
   private ScheduledPollFactory factory(ScheduledPoll schedulerToReturn, MuleContext muleContext) {
-    TestedSchedulerFactory factory = new TestedSchedulerFactory(schedulerToReturn);
-    factory.setMuleContext(muleContext);
-    return factory;
+    return new TestedSchedulerFactory(schedulerToReturn);
   }
 
   private Runnable newRunnable() {
@@ -52,7 +52,8 @@ public class ScheduledPollFactoryTest extends AbstractMuleTestCase {
     }
 
     @Override
-    protected ScheduledPoll doCreate(String name, Runnable job) {
+    protected ScheduledPoll doCreate(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name,
+                                     Runnable job) {
       return schedulerToReturn;
     }
   }

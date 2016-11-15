@@ -46,13 +46,12 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
   @Test
   public void testCreatesCorrectInstance() throws MuleException {
     FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
-    factory.setMuleContext(muleContext);
     factory.setFrequency(300);
     factory.setStartDelay(400);
     factory.setTimeUnit(DAYS);
 
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
-    ScheduledPoll scheduler = factory.doCreate("name", worker);
+    ScheduledPoll scheduler = factory.doCreate(() -> schedulerService.ioScheduler(), null, "name", worker);
 
     scheduler.initialise();
     scheduler.start();
@@ -67,10 +66,9 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
   @Test
   public void testDefaultValues() throws MuleException {
     FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
-    factory.setMuleContext(muleContext);
 
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
-    ScheduledPoll scheduler = factory.doCreate("name", worker);
+    ScheduledPoll scheduler = factory.doCreate(() -> schedulerService.ioScheduler(), null, "name", worker);
 
     scheduler.initialise();
     scheduler.start();

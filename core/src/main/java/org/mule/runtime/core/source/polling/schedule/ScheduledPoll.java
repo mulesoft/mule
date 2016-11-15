@@ -6,27 +6,29 @@
  */
 package org.mule.runtime.core.source.polling.schedule;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.concurrent.ScheduledFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 /**
  * <p>
- * Abstract definition of a Scheduler for poll.
+ * Definition of a Scheduler for poll.
  * </p>
  *
  * @since 3.5.0
  */
 public class ScheduledPoll implements Lifecycle, NameableObject {
+
+  private Supplier<Scheduler> executorSupplier;
+  private Consumer<Scheduler> executorStopper;
 
   /**
    * <p>
@@ -36,8 +38,6 @@ public class ScheduledPoll implements Lifecycle, NameableObject {
   private Scheduler executor;
 
   protected Runnable job;
-
-  private final SchedulerService schedulerService;
 
   private final Function<Scheduler, ScheduledFuture<?>> jobScheduler;
 
@@ -51,9 +51,10 @@ public class ScheduledPoll implements Lifecycle, NameableObject {
    */
   protected String name;
 
-  public ScheduledPoll(SchedulerService schedulerService, String name, Runnable job,
+  public ScheduledPoll(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name, Runnable job,
                        Function<Scheduler, ScheduledFuture<?>> jobScheduler) {
-    this.schedulerService = schedulerService;
+    this.executorSupplier = executorSupplier;
+    this.executorStopper = executorStopper;
     this.name = name;
     this.job = job;
     this.jobScheduler = jobScheduler;
@@ -61,8 +62,7 @@ public class ScheduledPoll implements Lifecycle, NameableObject {
 
   @Override
   public void initialise() throws InitialisationException {
-    // TODO Allow to configure the type of task to do
-    executor = schedulerService.ioScheduler();
+    executor = executorSupplier.get();
   }
 
   @Override
@@ -79,7 +79,8 @@ public class ScheduledPoll implements Lifecycle, NameableObject {
 
   @Override
   public void dispose() {
-    executor.stop(1000, MILLISECONDS);
+    executorStopper.accept(executor);
+    executor = null;
   }
 
   @Override
