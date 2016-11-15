@@ -16,6 +16,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
@@ -46,15 +47,15 @@ public abstract class AbstractEmailConnection {
   /**
    * Base constructor for {@link AbstractEmailConnection} implementations.
    *
-   * @param protocol          the protocol used to send mails.
-   * @param username          the username to establish connection with the mail server.
-   * @param password          the password corresponding to the {@code username}
-   * @param host              the host name of the mail server.
-   * @param port              the port number of the mail server.
+   * @param protocol the protocol used to send mails.
+   * @param username the username to establish connection with the mail server.
+   * @param password the password corresponding to the {@code username}
+   * @param host the host name of the mail server.
+   * @param port the port number of the mail server.
    * @param connectionTimeout the socket connection timeout
-   * @param readTimeout       the socket read timeout
-   * @param writeTimeout      the socket write timeout
-   * @param properties        the custom properties added to configure the session.
+   * @param readTimeout the socket read timeout
+   * @param writeTimeout the socket write timeout
+   * @param properties the custom properties added to configure the session.
    */
   public AbstractEmailConnection(EmailProtocol protocol, String username, String password, String host, String port,
                                  long connectionTimeout, long readTimeout, long writeTimeout, Map<String, String> properties)
@@ -66,15 +67,15 @@ public abstract class AbstractEmailConnection {
   /**
    * Base constructor for {@link AbstractEmailConnection} implementations that aims to be secured by TLS.
    *
-   * @param protocol          the protocol used to send mails.
-   * @param username          the username to establish connection with the mail server.
-   * @param password          the password corresponding to the {@code username}
-   * @param host              the host name of the mail server.
-   * @param port              the port number of the mail server.
+   * @param protocol the protocol used to send mails.
+   * @param username the username to establish connection with the mail server.
+   * @param password the password corresponding to the {@code username}
+   * @param host the host name of the mail server.
+   * @param port the port number of the mail server.
    * @param connectionTimeout the socket connection timeout
-   * @param readTimeout       the socket read timeout
-   * @param writeTimeout      the socket write timeout
-   * @param properties        the custom properties added to configure the session.
+   * @param readTimeout the socket read timeout
+   * @param writeTimeout the socket write timeout
+   * @param properties the custom properties added to configure the session.
    * @param tlsContextFactory the tls context factory for creating the context to secure the connection
    */
   public AbstractEmailConnection(EmailProtocol protocol, String username, String password, String host, String port,
@@ -127,7 +128,6 @@ public abstract class AbstractEmailConnection {
   private Properties buildSecureProperties(TlsContextFactory tlsContextFactory) throws EmailConnectionException {
     Properties properties = new Properties();
     properties.setProperty(protocol.getStartTlsProperty(), "true");
-    properties.setProperty(protocol.getSslEnableProperty(), "true");
     properties.setProperty(protocol.getSocketFactoryFallbackProperty(), "false");
 
     if (tlsContextFactory.getTrustStoreConfiguration().isInsecure()) {
@@ -141,6 +141,8 @@ public abstract class AbstractEmailConnection {
 
     String[] sslProtocols = tlsContextFactory.getEnabledProtocols();
     if (sslProtocols != null) {
+      Stream.of(sslProtocols).filter(p -> p.startsWith("SSL")).findAny()
+          .ifPresent(p -> properties.setProperty(protocol.getSslEnableProperty(), "true"));
       properties.setProperty(protocol.getSslProtocolsProperty(), join(sslProtocols, WHITESPACE_SEPARATOR));
     }
 
