@@ -29,13 +29,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mulesoft.weave.engine.exception.ExecutionException;
 
 import java.util.Map;
 
@@ -143,7 +142,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     Object mvelFlowResult = expressionManager.evaluate(expression, testEvent()).getValue();
     assertThat(mvelFlowResult, is(instanceOf(MessageContext.class)));
 
-    expectedException.expect(ExecutionException.class);
+    expectedException.expect(ExpressionRuntimeException.class);
     expressionManager.evaluate(weavify(expression), testEvent()).getValue();
   }
 
