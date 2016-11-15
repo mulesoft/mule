@@ -6,11 +6,15 @@
  */
 package org.mule.extension.ws.internal.introspection;
 
+import static java.lang.String.format;
+import static org.mule.extension.ws.internal.util.TransformationUtils.nodeToString;
+import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.internal.util.WscTransformationException;
+import org.mule.metadata.xml.SchemaCollector;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.wsdl.Definition;
@@ -26,31 +30,39 @@ import javax.wsdl.extensions.schema.SchemaImport;
  * @since 4.0
  */
 @SuppressWarnings("unchecked")
-final class WsdlSchemaCollector {
+final class WsdlSchemasCollector {
 
-  Set<String> getSchemas(Definition wsdlDefinition) {
-    Set<String> schemas = new LinkedHashSet<>();
+  SchemaCollector collect(Definition wsdlDefinition) {
+    SchemaCollector collector = SchemaCollector.getInstance();
 
-    Types types = wsdlDefinition.getTypes();
+    collectTypes(wsdlDefinition.getTypes(), collector);
+
+    wsdlDefinition.getImports().values().forEach(wsdlImport -> {
+      Definition definition = ((Import) wsdlImport).getDefinition();
+      collectTypes(definition.getTypes(), collector);
+    });
+
+    return collector;
+  }
+
+  private void collectTypes(Types types, SchemaCollector collector) {
     if (types != null) {
       types.getExtensibilityElements().forEach(element -> {
         if (element instanceof Schema) {
           Schema schema = (Schema) element;
-          schemas.add(schema.getDocumentBaseURI());
-          schemas.addAll(getSchemaImports(schema));
+          String schemaUri = schema.getDocumentBaseURI();
+          try {
+            collector.addSchema(schemaUri, nodeToString(schema.getElement()));
+          } catch (WscTransformationException e) {
+            throw new WscException(format("Cannot collect schema [%s], error while processing content", schemaUri), e);
+          }
+          getSchemaImportsUrls(schema).forEach(collector::addSchema);
         }
       });
     }
-
-    wsdlDefinition.getImports().values().forEach(wsdlImport -> {
-      Definition definition = ((Import) wsdlImport).getDefinition();
-      schemas.addAll(getSchemas(definition));
-    });
-
-    return schemas;
   }
 
-  private List<String> getSchemaImports(Schema schema) {
+  private List<String> getSchemaImportsUrls(Schema schema) {
     List<String> schemas = new ArrayList<>();
     Collection imports = schema.getImports().values();
     imports.forEach(i -> {
