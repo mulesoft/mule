@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-
 /**
  * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
  */
-public interface SystemExceptionHandler extends ExceptionHandler, Initialisable, Disposable {
+public interface SystemExceptionHandler extends ExceptionHandler {
 
   /**
    * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).

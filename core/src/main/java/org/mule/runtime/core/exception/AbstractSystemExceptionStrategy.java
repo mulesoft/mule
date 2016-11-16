@@ -52,9 +52,6 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     }
 
     if (ex instanceof ConnectException) {
-      if (retryScheduler == null) {
-        throw new NullPointerException("asdfasdfasdfasd");
-      }
       ((ConnectException) ex).handleReconnection(retryScheduler);
     }
   }

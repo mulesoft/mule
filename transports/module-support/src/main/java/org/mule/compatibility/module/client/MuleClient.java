@@ -106,7 +106,6 @@ public class MuleClient implements Disposable {
 
   private Scheduler scheduler;
 
-
   /**
    * Creates a Mule client that will use the default serverEndpoint when connecting to a remote server instance.
    *
