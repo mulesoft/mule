@@ -31,8 +31,7 @@
             <httpn:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <httpn:request-builder>
                     <httpn:uri-params>
-                        <httpn:uri-param key="aUser" value="#[param.someUser]"/>
-                        <httpn:uri-param key="aPass" value="#[param.somePass]"/>
+                        #[['aUser' : param.someUser, 'aPass' : param.somePass]]
                     </httpn:uri-params>
                 </httpn:request-builder>
             </httpn:request>
