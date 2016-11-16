@@ -7,13 +7,14 @@
 package org.mule.runtime.core.connector;
 
 import org.mule.runtime.api.exception.LocatedMuleException;
-import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.core.api.connector.Connectable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.concurrent.Executor;
 
 /**
  * When this exception is thrown it will trigger a retry (reconnection) policy to go into effect if one is configured.
@@ -67,7 +68,7 @@ public class ConnectException extends LocatedMuleException {
     }
   }
 
-  public void handleReconnection() {
+  public void handleReconnection(Executor retryExecutor) {
     // TODO See MULE-9307 - read reconnection behaviour for configs and sources
   }
 }

@@ -11,8 +11,6 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.exception.AbstractSystemExceptionStrategy;
 
-import javax.resource.spi.work.Work;
-
 public class ReconnectionAwareSystemExceptionStrategy extends AbstractSystemExceptionStrategy {
 
   @Override
@@ -45,22 +43,15 @@ public class ReconnectionAwareSystemExceptionStrategy extends AbstractSystemExce
 
     // Reconnect (retry policy will go into effect here if configured)
     try {
-      connector.getMuleContext().getWorkManager().scheduleWork(new Work() {
-
-        @Override
-        public void release() {}
-
-        @Override
-        public void run() {
-          try {
-            logger.debug("Reconnecting " + connector.getName());
-            connector.start();
-          } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Error reconnecting", e);
-            }
-            logger.error(e.getMessage());
+      retryScheduler.execute(() -> {
+        try {
+          logger.debug("Reconnecting " + connector.getName());
+          connector.start();
+        } catch (Exception e) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Error reconnecting", e);
           }
+          logger.error(e.getMessage());
         }
       });
     } catch (Exception e) {

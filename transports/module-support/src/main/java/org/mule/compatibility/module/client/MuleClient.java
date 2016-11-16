@@ -38,6 +38,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
@@ -102,6 +103,8 @@ public class MuleClient implements Disposable {
   private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<>();
   private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<>();
 
+  private Scheduler scheduler;
+
 
   /**
    * Creates a Mule client that will use the default serverEndpoint when connecting to a remote server instance.
@@ -118,6 +121,7 @@ public class MuleClient implements Disposable {
 
   public MuleClient(MuleContext context) throws MuleException {
     this.muleContext = context;
+    scheduler = muleContext.getSchedulerService().ioScheduler();
     init(false);
   }
 
@@ -310,8 +314,8 @@ public class MuleClient implements Disposable {
 
     FutureMessageResult result = new FutureMessageResult(call, muleContext);
 
-    if (muleContext.getWorkManager() != null) {
-      result.setExecutor(muleContext.getWorkManager());
+    if (scheduler != null) {
+      result.setExecutor(scheduler);
     }
 
     result.execute();

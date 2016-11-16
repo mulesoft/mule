@@ -8,11 +8,11 @@ package org.mule.compatibility.core.connector;
 
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.AbstractTransportMessageHandler;
-import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.connector.ConnectException;
 
-import javax.resource.spi.work.Work;
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class EndpointConnectException extends ConnectException {
   }
 
   @Override
-  public void handleReconnection() {
+  public void handleReconnection(Executor retryExecutor) {
     final AbstractConnector connector = (AbstractConnector) getFailed();
 
     // Make sure the connector is not already being reconnected by another receiver thread.
@@ -65,22 +65,15 @@ public class EndpointConnectException extends ConnectException {
 
     // Reconnect (retry policy will go into effect here if configured)
     try {
-      connector.getMuleContext().getWorkManager().scheduleWork(new Work() {
-
-        @Override
-        public void release() {}
-
-        @Override
-        public void run() {
-          try {
-            logger.debug("Reconnecting " + connector.getName());
-            connector.start();
-          } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Error reconnecting", e);
-            }
-            logger.error(e.getMessage());
+      retryExecutor.execute(() -> {
+        try {
+          logger.debug("Reconnecting " + connector.getName());
+          connector.start();
+        } catch (Exception e) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Error reconnecting", e);
           }
+          logger.error(e.getMessage());
         }
       });
     } catch (Exception e) {

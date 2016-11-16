@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.compatibility.core.config.i18n.TransportCoreMessages.connectorCausedError;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
@@ -37,6 +38,9 @@ import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -52,10 +56,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -63,6 +64,7 @@ import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -82,13 +84,11 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -96,10 +96,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
@@ -249,7 +245,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   /**
    * A generic scheduling service for tasks that need to be performed periodically.
    */
-  private ScheduledExecutorService scheduler;
+  private Scheduler scheduler;
 
   /**
    * Holds the service configuration for this connector
@@ -608,34 +604,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
   protected void shutdownScheduler() {
     if (scheduler != null) {
-      // Disable new tasks from being submitted
-      scheduler.shutdown();
-      try {
-        // Wait a while for existing tasks to terminate
-        if (!scheduler.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(), TimeUnit.MILLISECONDS)) {
-          // Cancel currently executing tasks and return list of pending
-          // tasks
-          List outstanding = scheduler.shutdownNow();
-          // Wait a while for tasks to respond to being cancelled
-          if (!scheduler.awaitTermination(SCHEDULER_FORCED_SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS)) {
-            logger.warn(MessageFormat.format("Pool {0} did not terminate in time; {1} work items were cancelled.", name,
-                                             outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
-          } else {
-            if (!outstanding.isEmpty()) {
-              logger.warn(MessageFormat.format("Pool {0} terminated; {1} work items were cancelled.", name,
-                                               Integer.toString(outstanding.size())));
-            }
-          }
-
-        }
-      } catch (InterruptedException ie) {
-        // (Re-)Cancel if current thread also interrupted
-        scheduler.shutdownNow();
-        // Preserve interrupt status
-        Thread.currentThread().interrupt();
-      } finally {
-        scheduler = null;
-      }
+      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      scheduler = null;
     }
   }
 
@@ -1365,7 +1335,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       if (logger.isDebugEnabled()) {
         logger.debug("Connecting: " + this);
       }
-      retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
+      retryPolicyTemplate.execute(callback, getScheduler());
     }
   }
 
@@ -1680,20 +1650,14 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   }
 
   /**
-   * Returns a Scheduler service for periodic tasks, currently limited to internal use. Note: getScheduler() currently conflicts
-   * with the same method in the Quartz transport
+   * Returns a Scheduler for periodic tasks, currently limited to internal use.
    */
-  public ScheduledExecutorService getScheduler() {
+  public Scheduler getScheduler() {
     return scheduler;
   }
 
-  protected ScheduledExecutorService createScheduler() {
-    ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler");
-    ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
-    newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-    newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(), TimeUnit.MILLISECONDS);
-    newExecutor.allowCoreThreadTimeOut(true);
-    return newExecutor;
+  protected Scheduler createScheduler() {
+    return muleContext.getSchedulerService().ioScheduler();
   }
 
   /**
