@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring;
 
-import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
@@ -50,9 +49,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
@@ -71,7 +70,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.context.notification.RegistryNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.factories.HostNameFactory;
@@ -134,7 +132,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 class SpringMuleContextServiceConfigurator {
 
-  private static final String ENDPOINT_FACTORY_IMPL_CLASS_NAME = "org.mule.compatibility.core.endpoint.DefaultEndpointFactory";
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringMuleContextServiceConfigurator.class);
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
@@ -243,7 +240,6 @@ class SpringMuleContextServiceConfigurator {
     createLocalObjectStoreBeanDefinitions();
     createQueueStoreBeanDefinitions();
     createQueueManagerBeanDefinitions();
-    createEndpointFactory();
     createCustomServices();
   }
 
@@ -332,19 +328,6 @@ class SpringMuleContextServiceConfigurator {
               .getBeanDefinition());
     } else {
       beanDefinitionRegistry.registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);
-    }
-  }
-
-  private void createEndpointFactory() {
-    try {
-      Class endpointFactoryClass = loadClass(ENDPOINT_FACTORY_IMPL_CLASS_NAME, Thread.currentThread().getContextClassLoader());
-      beanDefinitionRegistry.registerBeanDefinition("_muleEndpointFactory", getBeanDefinition(endpointFactoryClass));
-    } catch (ClassNotFoundException e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Could not load class endpoint factory implementation %s. Endpoint factory will not be available.",
-                            ENDPOINT_FACTORY_IMPL_CLASS_NAME),
-                     e);
-      }
     }
   }
 

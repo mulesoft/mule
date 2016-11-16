@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -27,7 +26,6 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
   private long timeout = 0;
   private List<Processor> messageProcessors;
   private AggregationStrategy aggregationStrategy;
-  private ThreadingProfile threadingProfile;
   private MuleContext muleContext;
   private FlowConstruct flowConstruct;
 
@@ -44,10 +42,6 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
 
     if (this.aggregationStrategy != null) {
       sg.setAggregationStrategy(this.aggregationStrategy);
-    }
-
-    if (this.threadingProfile != null) {
-      sg.setThreadingProfile(this.threadingProfile);
     }
 
     sg.setAnnotations(getAnnotations());
@@ -74,14 +68,6 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
 
   public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
     this.aggregationStrategy = aggregationStrategy;
-  }
-
-  public ThreadingProfile getThreadingProfile() {
-    return this.threadingProfile;
-  }
-
-  public void setThreadingProfile(ThreadingProfile threadingProfile) {
-    this.threadingProfile = threadingProfile;
   }
 
   @Override

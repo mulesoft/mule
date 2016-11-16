@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.cxf;
 
-import org.mule.runtime.config.spring.SpringRegistry;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.spring.SpringRegistry;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.runtime.module.cxf.support.MuleProtocolHeadersOutInterceptor;
@@ -70,7 +70,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     }
 
     MuleUniversalTransport transport =
-        new MuleUniversalTransport(this, muleContext.getRegistry().lookupObject("_muleUniversalConduitFacotry"));
+        new MuleUniversalTransport(this, muleContext.getRegistry().lookupObject("_muleUniversalConduitFactory"));
     DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
     dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
     dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", transport);

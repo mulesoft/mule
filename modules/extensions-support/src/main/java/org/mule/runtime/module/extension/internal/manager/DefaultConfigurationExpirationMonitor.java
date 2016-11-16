@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import com.google.common.collect.Multimap;
 
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -110,6 +111,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
   private BiConsumer<String, ConfigurationInstance> expirationHandler;
 
   private Scheduler executor;
+  private ScheduledFuture<?> scheduledMonitoring;
 
   private DefaultConfigurationExpirationMonitor() {}
 
@@ -122,7 +124,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
   public void beginMonitoring() {
     // TODO: Change the executor type when MULE-8870 is implemented
     executor = muleContext.getSchedulerService().ioScheduler();
-    executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
+    scheduledMonitoring = executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
   }
 
   private void expire() {
@@ -167,6 +169,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
    */
   @Override
   public void stopMonitoring() {
+    scheduledMonitoring.cancel(false);
     executor.stop(30, SECONDS);
   }
 

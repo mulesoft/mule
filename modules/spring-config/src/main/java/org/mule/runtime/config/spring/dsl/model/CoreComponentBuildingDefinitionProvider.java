@@ -427,7 +427,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("aggregationStrategy", fromChildConfiguration(AggregationStrategy.class).build())
-        .withSetterParameterDefinition("threadingProfile", fromChildConfiguration(ThreadingProfile.class).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(WIRE_TAP).withTypeDefinition(fromType(WireTap.class))

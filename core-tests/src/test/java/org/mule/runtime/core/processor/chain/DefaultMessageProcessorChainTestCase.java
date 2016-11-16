@@ -43,7 +43,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -684,9 +683,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     scatterGatherRouter.addRoute(getAppendingMP("1"));
     scatterGatherRouter.addRoute(getAppendingMP("2"));
     scatterGatherRouter.addRoute(getAppendingMP("3"));
-    ThreadingProfile tp = ThreadingProfile.DEFAULT_THREADING_PROFILE;
-    tp.setMuleContext(muleContext);
-    scatterGatherRouter.setThreadingProfile(tp);
     scatterGatherRouter.setMuleContext(muleContext);
     scatterGatherRouter.initialise();
     scatterGatherRouter.start();
