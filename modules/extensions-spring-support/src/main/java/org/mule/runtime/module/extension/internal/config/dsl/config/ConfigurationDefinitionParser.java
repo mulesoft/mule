@@ -56,7 +56,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
         .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
         .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
 
-    parseParameters(configurationModel.getParameterModels());
+    parseParameters(configurationModel.getAllParameterModels());
     parseConnectionProvider(definitionBuilder);
 
   }

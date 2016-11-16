@@ -25,6 +25,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -181,7 +182,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         }
 
         @Override
-        public void onParameter(ParameterModel model) {
+        protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
           registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
         }
 

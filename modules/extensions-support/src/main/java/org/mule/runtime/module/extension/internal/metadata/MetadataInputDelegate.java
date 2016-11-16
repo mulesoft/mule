@@ -51,7 +51,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     InputMetadataDescriptorBuilder input = MetadataDescriptorBuilder.inputDescriptor();
 
     List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
-    for (ParameterModel parameter : component.getParameterModels()) {
+    for (ParameterModel parameter : component.getAllParameterModels()) {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
       input.withParameter(parameter.getName(), result);
       results.add(result);

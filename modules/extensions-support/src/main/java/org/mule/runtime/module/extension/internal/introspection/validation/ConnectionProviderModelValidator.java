@@ -128,7 +128,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator {
   private <T> Optional<Class<T>> getConnectionType(EnrichableModel model) {
     Optional<ConnectivityModelProperty> connectivityProperty = model.getModelProperty(ConnectivityModelProperty.class);
     if (!connectivityProperty.isPresent() && model instanceof ParameterizedModel) {
-      connectivityProperty = ((ParameterizedModel) model).getParameterModels().stream()
+      connectivityProperty = ((ParameterizedModel) model).getAllParameterModels().stream()
           .map(p -> p.getModelProperty(ConnectivityModelProperty.class).orElse(null)).filter(p -> p != null).findFirst();
     }
 

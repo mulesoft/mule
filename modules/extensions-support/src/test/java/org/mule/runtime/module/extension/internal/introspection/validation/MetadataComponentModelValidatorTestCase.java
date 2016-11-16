@@ -6,14 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -30,18 +36,18 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.module.extension.internal.metadata.ResolverSupplier;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverSupplier;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.metadata.ResolverSupplier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -51,20 +57,14 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -308,7 +308,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     ParameterModel param1 = getMockKeyPartParam(null, 1);
     ParameterModel param2 = getMockKeyPartParam("SomeValue", 2);
-    when(sourceModel.getParameterModels()).thenReturn(asList(param1, param2));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
     validator.validate(extensionModel);
   }
 
@@ -319,7 +319,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     MetadataKeyIdModelProperty keyIdModelProperty =
         new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
-    when(sourceModel.getParameterModels()).thenReturn(asList(param1, param2));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
     validator.validate(extensionModel);
   }
 
@@ -331,7 +331,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     MetadataKeyIdModelProperty keyIdModelProperty =
         new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
-    when(sourceModel.getParameterModels()).thenReturn(asList(param1, param2));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
     validator.validate(extensionModel);
   }
 
@@ -339,7 +339,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void noMetadataKey() {
     ParameterModel param = mock(ParameterModel.class);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
-    when(sourceModel.getParameterModels()).thenReturn(singletonList(param));
+    when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
     validator.validate(extensionModel);
   }
 
@@ -348,7 +348,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     ParameterModel param = getMockKeyPartParam("default", 1);
     MetadataKeyIdModelProperty keyIdModelProperty = new MetadataKeyIdModelProperty(loader.load(String.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
-    when(sourceModel.getParameterModels()).thenReturn(singletonList(param));
+    when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
     validator.validate(extensionModel);
   }
 

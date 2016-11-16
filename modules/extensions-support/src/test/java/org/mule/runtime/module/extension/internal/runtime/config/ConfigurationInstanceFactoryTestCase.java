@@ -27,6 +27,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -80,6 +81,9 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Event event;
+
+  @Mock
+  private MuleContext muleContext;
 
   private ResolverSet resolverSet;
   private ConfigurationInstanceFactory<TestConfig> factory;

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -27,8 +27,6 @@ import org.mule.runtime.module.extension.internal.model.property.CallbackParamet
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -56,8 +54,6 @@ public class SourceCallbackSanitizerModelEnricherTestCase extends AbstractMuleTe
   private ParameterDeclaration param2;
   private ParameterDeclaration notACallback;
 
-  private List<ParameterDeclaration> parameters = new ArrayList<>();
-
   private SourceCallbackSanitizerModelEnricher enricher = new SourceCallbackSanitizerModelEnricher();
 
   @Before
@@ -65,30 +61,26 @@ public class SourceCallbackSanitizerModelEnricherTestCase extends AbstractMuleTe
     when(describingContext.getExtensionDeclarer()).thenReturn(mock(ExtensionDeclarer.class));
     when(describingContext.getExtensionDeclarer().getDeclaration()).thenReturn(extensionDeclaration);
     when(extensionDeclaration.getMessageSources()).thenReturn(asList(sourceDeclaration));
-    when(sourceDeclaration.getParameters()).thenReturn(parameters);
 
     param1 = mockParameter("param1", true);
     param2 = mockParameter("param2", true);
     notACallback = mockParameter("notACallback", true);
-
-    parameters.add(param1);
-    parameters.add(param2);
-    parameters.add(notACallback);
+    mockParameters(sourceDeclaration, param1, param2, notACallback);
   }
 
   @Test
   public void unnecesarySanitization() {
     enricher.enrich(describingContext);
-    assertThat(parameters, hasSize(3));
-    assertThat(parameters, hasItems(param1, param2, notACallback));
+    assertThat(sourceDeclaration.getAllParameters(), hasSize(3));
+    assertThat(sourceDeclaration.getAllParameters(), hasItems(param1, param2, notACallback));
   }
 
   @Test
   public void sanitization() {
-    parameters.add(param1);
+    sourceDeclaration.getParameterGroups().get(0).getParameters().add(param1);
     enricher.enrich(describingContext);
-    assertThat(parameters, hasSize(3));
-    assertThat(parameters, hasItems(param1, param2, notACallback));
+    assertThat(sourceDeclaration.getAllParameters(), hasSize(3));
+    assertThat(sourceDeclaration.getAllParameters(), hasItems(param1, param2, notACallback));
   }
 
   private ParameterDeclaration mockParameter(String name, boolean isCallback) {

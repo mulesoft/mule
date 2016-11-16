@@ -7,24 +7,24 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
-import com.google.common.collect.ImmutableSet;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.model.property.ExportModelProperty;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -118,7 +118,7 @@ final class ExportedArtifactsCollector {
     new ExtensionWalker() {
 
       @Override
-      public void onParameter(ParameterizedModel owner, ParameterModel model) {
+      public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
         exportedClasses.addAll(collectRelativeClasses(model.getType(), extensionClassloader));
       }
 

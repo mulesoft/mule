@@ -111,8 +111,8 @@ public final class DefaultEventContext implements CoreEventContext, Serializable
    *        context, if available.
    */
   private DefaultEventContext(FlowConstruct flow, String connectorName, String correlationId) {
-    this.id = flow.getMuleContext().getUniqueIdString();
-    this.serverId = flow.getMuleContext().getId();
+    this.id = flow.getUniqueIdString();
+    this.serverId = flow.getServerId();
     this.flowName = flow.getName();
     this.connectorName = connectorName;
     this.processingTime = ProcessingTime.newInstance(flow);

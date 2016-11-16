@@ -168,7 +168,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
 
   private void assertRicinPacks(HeisenbergExtension heisenberg) {
-    Set<Ricin> ricinPacks = heisenberg.getRicinPacks();
+    Set<Ricin> ricinPacks = heisenberg.getRicinGroup().getRicinPacks();
 
     assertNotNull(ricinPacks);
     assertThat(ricinPacks.size(), equalTo(1));
@@ -179,7 +179,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
   }
 
   private void assertDoors(HeisenbergExtension heisenberg) {
-    KnockeableDoor door = heisenberg.getNextDoor();
+    KnockeableDoor door = heisenberg.getRicinGroup().getNextDoor();
     assertDoor(door, GUSTAVO_FRING, POLLOS_HERMANOS);
 
     KnockeableDoor previous = door.getPrevious();
@@ -213,15 +213,15 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     assertThat(heisenberg.getLabAddress(), is(LAB_ADDRESS));
 
     Calendar dayOfBirth = Calendar.getInstance();
-    dayOfBirth.setTime(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfBirth());
+    dayOfBirth.setTime(heisenberg.getPersonalInfo().getDateOfBirth());
 
     // only compare year to avoid timezone related flakyness
     assertThat(dayOfBirth.get(YEAR), equalTo(getDateOfBirth().get(YEAR)));
-    assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(YEAR), equalTo(getDateOfDeath().get(YEAR)));
+    assertThat(heisenberg.getPersonalInfo().getDateOfDeath().get(YEAR), equalTo(getDateOfDeath().get(YEAR)));
 
-    assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getYear(),
+    assertThat(heisenberg.getPersonalInfo().getDateOfConception().getYear(),
                is(getDateOfConception().getYear()));
-    assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getMonth(),
+    assertThat(heisenberg.getPersonalInfo().getDateOfConception().getMonth(),
                is(getDateOfConception().getMonth()));
 
     assertThat(heisenberg.getMoney(), equalTo(new BigDecimal(MONEY)));
@@ -273,7 +273,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   private void assertLabeledRicin(HeisenbergExtension heisenberg) {
 
-    Map<String, Ricin> labeledRicin = heisenberg.getLabeledRicin();
+    Map<String, Ricin> labeledRicin = heisenberg.getRicinGroup().getLabeledRicin();
 
     assertNotNull(labeledRicin);
     assertThat(labeledRicin.size(), equalTo(1));

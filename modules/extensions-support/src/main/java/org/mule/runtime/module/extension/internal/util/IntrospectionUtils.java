@@ -45,6 +45,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -555,7 +556,7 @@ public final class IntrospectionUtils {
     new ExtensionWalker() {
 
       @Override
-      public void onParameter(ParameterizedModel owner, ParameterModel model) {
+      public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
         parameterClasses.addAll(collectRelativeClasses(model.getType(), extensionClassLoader));
       }
     }.walk(extensionModel);

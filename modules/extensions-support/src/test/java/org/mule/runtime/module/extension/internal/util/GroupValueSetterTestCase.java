@@ -6,28 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-import org.mule.test.heisenberg.extension.HeisenbergExtension;
-import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
-import org.mule.test.heisenberg.extension.model.LifetimeInfo;
-
-import java.util.Date;
-
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -46,20 +46,16 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     final String personalInfo = "personalInfo";
-    ParameterGroup group =
-        new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, personalInfo).get(), personalInfo);
-    group.addParameter(getField(ExtendedPersonalInfo.class, "name").get());
-    group.addParameter(getField(ExtendedPersonalInfo.class, "age").get());
+    ParameterGroupDescriptor group =
+        new ParameterGroupDescriptor("group", new TypeWrapper(PersonalInfo.class),
+                                     getField(HeisenbergExtension.class, personalInfo).get());
 
-    final String lifetimeInfo = "lifetimeInfo";
-    ParameterGroup child =
-        new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, lifetimeInfo).get(), lifetimeInfo);
-    child.addParameter(getField(LifetimeInfo.class, "dateOfBirth").get());
-    group.addModelProperty(new ParameterGroupModelProperty(asList(child)));
+    Map<String, Object> resultMap = new HashMap<>();
+    resultMap.put("name", NAME);
+    resultMap.put("age", AGE);
+    resultMap.put("dateOfBirth", DATE);
 
-    when(result.get("name")).thenReturn(NAME);
-    when(result.get("age")).thenReturn(AGE);
-    when(result.get("dateOfBirth")).thenReturn(DATE);
+    when(result.asMap()).thenReturn(resultMap);
 
     valueSetter = new GroupValueSetter(group);
   }
@@ -71,6 +67,6 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
 
     assertThat(extension.getPersonalInfo().getName(), is(NAME));
     assertThat(extension.getPersonalInfo().getAge(), is(AGE));
-    assertThat(extension.getPersonalInfo().getLifetimeInfo().getDateOfBirth(), is(sameInstance(DATE)));
+    assertThat(extension.getPersonalInfo().getDateOfBirth(), is(sameInstance(DATE)));
   }
 }

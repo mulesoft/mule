@@ -9,6 +9,8 @@ package org.mule.extension.socket.api.provider.tcp;
 import static org.mule.extension.socket.api.SocketsExtension.TLS;
 import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.socket.api.ConnectionSettings;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
@@ -56,19 +58,19 @@ public final class TcpListenerProvider implements CachedConnectionProvider<TcpLi
   @Parameter
   @Optional
   @DisplayName(TLS_CONFIGURATION)
-  @Placement(tab = TLS, group = TLS_CONFIGURATION)
+  @Placement(tab = TLS)
   private TlsContextFactory tlsContext;
 
   /**
    * This configuration parameter refers to the address where the TCP socket should listen for incoming connections.
    */
-  @ParameterGroup
+  @ParameterGroup(name = CONNECTION)
   private ConnectionSettings connectionSettings;
 
   /**
    * {@link ServerSocket} configuration properties
    */
-  @ParameterGroup
+  @ParameterGroup(name = ADVANCED)
   private TcpServerSocketProperties tcpServerSocketProperties;
 
   /**

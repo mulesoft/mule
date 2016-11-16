@@ -14,16 +14,17 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-import java.util.List;
-
+import javafx.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,23 +42,23 @@ public class LayoutModelTestCase extends AbstractAnnotationsBasedDescriberTestCa
   public void parseLayoutAnnotationsOnParameter() {
     ExtensionDeclarer declarer = describeExtension();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-    List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
+    final ConfigurationDeclaration configurationDeclaration = extensionDeclaration.getConfigurations().get(0);
 
-    assertParameterPlacement(findParameter(parameters, "labeledRicin"), RICIN_GROUP_NAME, 1);
-    assertParameterPlacement(findParameter(parameters, "ricinPacks"), RICIN_GROUP_NAME, 2);
+    assertParameterPlacement(findParameterInGroup(configurationDeclaration, "labeledRicin"), RICIN_GROUP_NAME, 1);
+    assertParameterPlacement(findParameterInGroup(configurationDeclaration, "ricinPacks"), RICIN_GROUP_NAME, 2);
   }
 
   @Test
   public void parseLayoutAnnotationsOnParameterGroup() {
     ExtensionDeclarer declarer = describeExtension();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-    List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
+    ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
 
-    assertParameterPlacement(findParameter(parameters, "myName"), PERSONAL_INFORMATION_GROUP_NAME, 1);
-    assertParameterPlacement(findParameter(parameters, "age"), PERSONAL_INFORMATION_GROUP_NAME, 2);
-    assertParameterPlacement(findParameter(parameters, "dateOfConception"), PERSONAL_INFORMATION_GROUP_NAME, 3);
-    assertParameterPlacement(findParameter(parameters, "dateOfBirth"), PERSONAL_INFORMATION_GROUP_NAME, 4);
-    assertParameterPlacement(findParameter(parameters, "dateOfDeath"), PERSONAL_INFORMATION_GROUP_NAME, 5);
+    assertParameterPlacement(findParameterInGroup(config, "myName"), PERSONAL_INFORMATION_GROUP_NAME, 1);
+    assertParameterPlacement(findParameterInGroup(config, "age"), PERSONAL_INFORMATION_GROUP_NAME, 2);
+    assertParameterPlacement(findParameterInGroup(config, "dateOfConception"), PERSONAL_INFORMATION_GROUP_NAME, 3);
+    assertParameterPlacement(findParameterInGroup(config, "dateOfBirth"), PERSONAL_INFORMATION_GROUP_NAME, 4);
+    assertParameterPlacement(findParameterInGroup(config, "dateOfDeath"), PERSONAL_INFORMATION_GROUP_NAME, 5);
   }
 
   @Test
@@ -67,17 +68,23 @@ public class LayoutModelTestCase extends AbstractAnnotationsBasedDescriberTestCa
     OperationDeclaration operation = getOperation(extensionDeclaration, KILL_CUSTOM_OPERATION);
 
     assertThat(operation, is(notNullValue()));
-    List<ParameterDeclaration> parameters = operation.getParameters();
 
-    assertParameterPlacement(findParameter(parameters, "victim"), KILL_WITH_GROUP, 1);
-    assertParameterPlacement(findParameter(parameters, "goodbyeMessage"), KILL_WITH_GROUP, 2);
+    assertParameterPlacement(findParameterInGroup(operation, "victim"), KILL_WITH_GROUP, 1);
+    assertParameterPlacement(findParameterInGroup(operation, "goodbyeMessage"), KILL_WITH_GROUP, 2);
   }
 
-  private void assertParameterPlacement(ParameterDeclaration param, String groupName, Integer order) {
+  private void assertParameterPlacement(Pair<ParameterGroupDeclaration, ParameterDeclaration> pair, String groupName,
+                                        Integer order) {
+    ParameterGroupDeclaration group = pair.getKey();
+    assertThat(group.getName(), equalTo(groupName));
+
+    assertParameterPlacement(pair.getValue(), order);
+  }
+
+  private void assertParameterPlacement(ParameterDeclaration param, Integer order) {
     LayoutModel layout = param.getLayoutModel();
     assertThat(layout, is(notNullValue()));
 
-    assertThat(layout.getGroupName(), equalTo(ofNullable(groupName)));
     assertThat(layout.getOrder(), equalTo(ofNullable(order)));
   }
 }

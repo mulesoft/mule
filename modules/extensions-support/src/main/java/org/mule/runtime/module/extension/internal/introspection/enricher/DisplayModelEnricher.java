@@ -19,11 +19,14 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDecl
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
@@ -51,7 +54,7 @@ public final class DisplayModelEnricher extends AbstractAnnotatedModelEnricher {
       }
 
       @Override
-      public void onParameter(ParameterizedDeclaration owner, ParameterDeclaration declaration) {
+      protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration declaration) {
         enrichParameter(declaration);
       }
 

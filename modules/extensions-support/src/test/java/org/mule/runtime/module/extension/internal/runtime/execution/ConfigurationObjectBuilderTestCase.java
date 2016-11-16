@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -23,7 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -65,7 +65,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    when(configurationModel.getParameterModels()).thenReturn(Arrays.asList(nameParameterModel, descriptionParameterModel));
+    when(configurationModel.getAllParameterModels()).thenReturn(asList(nameParameterModel, descriptionParameterModel));
     mockConfigurationInstance(configurationModel, new TestConfig());
     when(configurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
 

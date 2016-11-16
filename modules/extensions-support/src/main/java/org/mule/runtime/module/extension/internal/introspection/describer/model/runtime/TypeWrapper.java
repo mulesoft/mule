@@ -25,7 +25,7 @@ public class TypeWrapper implements Type {
 
   private final Class<?> aClass;
 
-  TypeWrapper(Class<?> aClass) {
+  public TypeWrapper(Class<?> aClass) {
     this.aClass = aClass;
   }
 

@@ -6,16 +6,15 @@
  */
 package org.mule.extension.ftp.internal.ftp.connection;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.ftp.api.ftp.FtpTransferMode;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Password;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.io.IOException;
@@ -33,30 +32,8 @@ import org.apache.commons.net.ftp.FTPReply;
 @Summary("Connection to connect against an FTP server")
 public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<ClassicFtpFileSystem> {
 
-  /**
-   * The port number of the FTP server to connect
-   */
-  @Parameter
-  @Optional(defaultValue = "21")
-  @Placement(group = CONNECTION, order = 2)
-  private int port = 21;
-
-  /**
-   * Username for the FTP Server. Required if the server is authenticated.
-   */
-  @Parameter
-  @Optional
-  @Placement(group = CONNECTION, order = 3)
-  private String username;
-
-  /**
-   * Password for the FTP Server. Required if the server is authenticated.
-   */
-  @Parameter
-  @Password
-  @Optional
-  @Placement(group = CONNECTION, order = 4)
-  private String password;
+  @ParameterGroup(name = CONNECTION)
+  private FtpConnectionSettings connectionSettings;
 
   /**
    * The transfer mode to be used. Currently {@code BINARY} and {@code ASCII} are supported.
@@ -95,11 +72,11 @@ public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<
     }
 
     try {
-      client.connect(getHost(), port);
+      client.connect(connectionSettings.getHost(), connectionSettings.getPort());
       if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
         throw new IOException("Ftp connect failed: " + client.getReplyCode());
       }
-      if (!client.login(username, password)) {
+      if (!client.login(connectionSettings.getUsername(), connectionSettings.getPassword())) {
         throw new IOException("Ftp login failed: " + client.getReplyCode());
       }
     } catch (Exception e) {

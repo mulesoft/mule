@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -34,6 +35,7 @@ public class IdempotentDeclarationWalker extends DeclarationWalker {
 
   private Set<Reference<SourceDeclaration>> sources = new HashSet<>();
   private Set<Reference<ParameterDeclaration>> parameters = new HashSet<>();
+  private Set<Reference<ParameterGroupDeclaration>> parameterGroups = new HashSet<>();
   private Set<Reference<OperationDeclaration>> operations = new HashSet<>();
   private Set<Reference<ConnectionProviderDeclaration>> connectionProviders = new HashSet<>();
 
@@ -47,8 +49,14 @@ public class IdempotentDeclarationWalker extends DeclarationWalker {
   }
 
   @Override
-  public void onParameter(ParameterizedDeclaration owner, ParameterDeclaration declaration) {
-    doOnce(parameters, declaration, this::onParameter);
+  public void onParameterGroup(ParameterizedDeclaration owner, ParameterGroupDeclaration declaration) {
+    doOnce(parameterGroups, declaration, this::onParameterGroup);
+  }
+
+  @Override
+  public void onParameter(ParameterizedDeclaration owner, ParameterGroupDeclaration parameterGroup,
+                          ParameterDeclaration declaration) {
+    doOnce(parameters, declaration, p -> onParameter(parameterGroup, declaration));
   }
 
   @Override
@@ -85,14 +93,17 @@ public class IdempotentDeclarationWalker extends DeclarationWalker {
    */
   protected void onSource(SourceDeclaration declaration) {}
 
+  protected void onParameterGroup(ParameterGroupDeclaration declaration) {}
+
   /**
    * Invoked when an {@link ParameterDeclaration} is found in the traversed {@code extensionDeclaration}.
    * <p>
    * This method will only be invoked once per each found instance
    *
+   * @param parameterGroup the {@link ParameterGroupDeclaration} in which the {@code declaration} is contained
    * @param declaration the {@link ParameterDeclaration}
    */
-  protected void onParameter(ParameterDeclaration declaration) {}
+  protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration declaration) {}
 
   /**
    * Invoked when an {@link OperationDeclaration} is found in the traversed {@code extensionDeclaration}.

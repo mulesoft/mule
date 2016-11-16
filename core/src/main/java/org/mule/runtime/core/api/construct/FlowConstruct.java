@@ -6,22 +6,13 @@
  */
 package org.mule.runtime.core.api.construct;
 
-import static reactor.core.publisher.Flux.error;
-import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-
-import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
 
 /**
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct through which messages are
@@ -44,5 +35,12 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled {
    * @return This muleContext that this flow construct belongs to and runs in the context of.
    */
   MuleContext getMuleContext();
+
+  /**
+   * Generate a unique ID string; this will begin with the cluster node ID followed by a dash, e.g. "3-XXXYYY"
+   */
+  String getUniqueIdString();
+
+  String getServerId();
 
 }

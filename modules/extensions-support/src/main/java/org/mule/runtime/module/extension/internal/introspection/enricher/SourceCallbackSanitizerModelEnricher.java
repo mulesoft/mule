@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -24,9 +25,9 @@ import java.util.List;
  * Verifies that if a source was developed using JAVA and it contains methods
  * annotated with {@link OnSuccess} and {@link OnError} which declare the same parameter,
  * such parameter is not reflected as a {@link ParameterModel} twice.
- *
+ * <p>
  * For example:
- *
+ * <p>
  * <pre>
  *   @OnSuccess
  *   public void onSuccess(String foo, String bar) {}
@@ -34,7 +35,7 @@ import java.util.List;
  *   @OnError
  *   public void onError(String foo) {}
  * </pre>
- *
+ * <p>
  * This enricher makes sure that the source only has two parameters, foo and bar.
  *
  * @since 4.0
@@ -47,16 +48,18 @@ public final class SourceCallbackSanitizerModelEnricher implements ModelEnricher
 
       @Override
       protected void onSource(SourceDeclaration declaration) {
-        List<ParameterDeclaration> callbackParameters = getCallbackParameters(declaration);
-        if (!callbackParameters.isEmpty()) {
-          declaration.getParameters().removeAll(callbackParameters);
-          declaration.getParameters().addAll(sanitizeCallbackParameters(callbackParameters));
-        }
+        declaration.getParameterGroups().forEach(group -> {
+          List<ParameterDeclaration> callbackParameters = getCallbackParameters(group);
+          if (!callbackParameters.isEmpty()) {
+            group.getParameters().removeAll(callbackParameters);
+            group.getParameters().addAll(sanitizeCallbackParameters(callbackParameters));
+          }
+        });
       }
     }.walk(describingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  private List<ParameterDeclaration> getCallbackParameters(SourceDeclaration declaration) {
+  private List<ParameterDeclaration> getCallbackParameters(ParameterGroupDeclaration declaration) {
     return declaration.getParameters().stream()
         .filter(p -> p.getModelProperty(CallbackParameterModelProperty.class).isPresent())
         .collect(toList());

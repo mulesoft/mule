@@ -16,7 +16,6 @@ import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMe
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
 import org.mule.runtime.api.metadata.DataType;

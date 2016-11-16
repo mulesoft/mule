@@ -14,13 +14,13 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
  * Resolves and injects the values of a {@link Source} that has fields annotated with {@link Parameter} or
- * {@link ParameterGroup}
+ * {@link ParameterGroupDescriptor}
  *
  * @since 4.0
  */

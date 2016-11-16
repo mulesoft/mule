@@ -10,13 +10,11 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
@@ -54,6 +52,6 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
         .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build());
 
-    parseParameters(providerModel.getParameterModels());
+    parseParameters(providerModel.getAllParameterModels());
   }
 }

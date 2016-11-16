@@ -282,7 +282,7 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="family-info">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-extended-personal-info"></xs:element>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-personal-info"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -336,35 +336,6 @@
                                             <xs:attribute type="mule:expressionList" use="optional" name="value"></xs:attribute>
                                         </xs:complexType>
                                     </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="labeled-ricin">
-                                        <xs:complexType>
-                                            <xs:sequence maxOccurs="1">
-                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
-                                            </xs:sequence>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="next-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -429,17 +400,49 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="labeled-ricin">
+                                        <xs:complexType>
+                                            <xs:sequence maxOccurs="1">
+                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="next-door">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
+                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="familyInfo"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
                     <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="optional" name="weaponTypeFunction"></xs:attribute>
@@ -452,33 +455,30 @@
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="healthProgressions"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
-                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
-                    <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfBirth"></xs:attribute>
-                    <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfDeath"></xs:attribute>
-                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo">
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.PersonalInfo">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
-                <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfBirth"></xs:attribute>
-                <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfDeath"></xs:attribute>
-                <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
+                <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo" abstract="true" name="abstract-extended-personal-info"></xs:element>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-extended-personal-info" name="extended-personal-info">
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.PersonalInfo" abstract="true" name="abstract-personal-info"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-personal-info" name="personal-info">
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo"></xs:extension>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.PersonalInfo"></xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
@@ -668,9 +668,13 @@
     <xs:complexType name="AliasType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
+                <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
+                <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

@@ -6,11 +6,10 @@
  */
 package org.mule.extension.socket.api.socket.tcp;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.net.ServerSocket;
@@ -29,7 +28,7 @@ public class TcpServerSocketProperties extends AbstractTcpSocketProperties {
    */
   @Parameter
   @Optional
-  @Placement(group = TIMEOUT_CONFIGURATION)
+  @Placement(tab = TIMEOUT_CONFIGURATION)
   private Integer serverTimeout;
 
   /**
@@ -37,7 +36,7 @@ public class TcpServerSocketProperties extends AbstractTcpSocketProperties {
    */
   @Parameter
   @Optional(defaultValue = "50")
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED_TAB)
   private int receiveBacklog = 50;
 
   /**

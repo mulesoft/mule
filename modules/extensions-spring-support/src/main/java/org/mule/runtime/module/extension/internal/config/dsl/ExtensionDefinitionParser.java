@@ -26,8 +26,6 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -135,7 +133,6 @@ public abstract class ExtensionDefinitionParser {
   protected final Builder baseDefinitionBuilder;
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private final ConversionService conversionService = new DefaultConversionService();
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =

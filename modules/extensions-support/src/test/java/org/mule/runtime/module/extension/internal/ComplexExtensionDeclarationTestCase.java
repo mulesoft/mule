@@ -74,9 +74,9 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
         extensionModel.getConfigurationModel(LISTENER_CONFIG_NAME).get().getSourceModel(LISTEN_MESSAGE_SOURCE).get();
     assertDataType(source.getOutput().getType(), InputStream.class, BinaryType.class);
     assertDataType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
-    assertThat(source.getParameterModels(), hasSize(1));
+    assertThat(source.getAllParameterModels(), hasSize(1));
 
-    ParameterModel parameter = source.getParameterModels().get(0);
+    ParameterModel parameter = source.getAllParameterModels().get(0);
     assertThat(parameter.getName(), is(PORT));
     assertThat(parameter.isRequired(), is(false));
     assertDataType(parameter.getType(), Integer.class, NumberType.class);
@@ -97,9 +97,9 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
         extensionModel.getConfigurationModel(REQUESTER_CONFIG_NAME).get().getOperationModel(REQUEST_OPERATION_NAME).get();
     assertThat(operation.getName(), is(REQUEST_OPERATION_NAME));
     assertDataType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
-    assertThat(operation.getParameterModels(), hasSize(1));
+    assertThat(operation.getAllParameterModels(), hasSize(1));
 
-    ParameterModel parameter = operation.getParameterModels().get(0);
+    ParameterModel parameter = operation.getAllParameterModels().get(0);
     assertThat(parameter.getName(), is(PATH));
     assertDataType(parameter.getType(), String.class, StringType.class);
   }
@@ -109,9 +109,9 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
     OperationModel operation = extensionModel.getOperationModel(STATIC_RESOURCE_OPERATION_NAME).get();
     assertThat(operation.getName(), is(STATIC_RESOURCE_OPERATION_NAME));
     assertDataType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
-    assertThat(operation.getParameterModels(), hasSize(1));
+    assertThat(operation.getAllParameterModels(), hasSize(1));
 
-    ParameterModel parameter = operation.getParameterModels().get(0);
+    ParameterModel parameter = operation.getAllParameterModels().get(0);
     assertThat(parameter.getName(), is(PATH));
     assertDataType(parameter.getType(), String.class, StringType.class);
   }

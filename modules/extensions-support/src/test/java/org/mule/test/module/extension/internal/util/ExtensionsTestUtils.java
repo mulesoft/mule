@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.internal.util;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
@@ -35,8 +37,13 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.ExtensionManager;
@@ -56,10 +63,12 @@ import org.mule.runtime.module.extension.internal.model.property.ExceptionEnrich
 import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -223,6 +232,40 @@ public abstract class ExtensionsTestUtils {
     } else {
       when(mockModel.getSubTypes()).thenReturn(copyOf(subtypes));
     }
+  }
+
+  public static ParameterGroupModel mockParameters(ParameterizedModel parameterizedModel, ParameterModel... parameterModels) {
+    return mockParameters(parameterizedModel, DEFAULT_GROUP_NAME, parameterModels);
+  }
+
+  public static ParameterGroupModel mockParameters(ParameterizedModel parameterizedModel, String groupName,
+                                                   ParameterModel... parameterModels) {
+    ParameterGroupModel group = mock(ParameterGroupModel.class);
+    when(group.getName()).thenReturn(groupName);
+    when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(parameterizedModel.getParameterGroupModels()).thenReturn(asList(group));
+    when(group.getParameterModels()).thenReturn(asList(parameterModels));
+    when(parameterizedModel.getAllParameterModels()).thenReturn(asList(parameterModels));
+
+    return group;
+  }
+
+  public static ParameterGroupDeclaration mockParameters(ParameterizedDeclaration declaration,
+                                                         ParameterDeclaration... parameters) {
+    return mockParameters(declaration, DEFAULT_GROUP_NAME, parameters);
+  }
+
+  public static ParameterGroupDeclaration mockParameters(ParameterizedDeclaration declaration, String groupName,
+                                                         ParameterDeclaration... parameters) {
+    ParameterGroupDeclaration group = mock(ParameterGroupDeclaration.class);
+    when(group.getName()).thenReturn(groupName);
+    when(declaration.getParameterGroups()).thenReturn(asList(group));
+    when(declaration.getParameterGroup(groupName)).thenReturn(group);
+    List<ParameterDeclaration> params = new ArrayList<>(asList(parameters));
+    when(group.getParameters()).thenReturn(params);
+    when(declaration.getAllParameters()).thenReturn(params);
+
+    return group;
   }
 
   public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionEnricherFactory exceptionEnricherFactory) {

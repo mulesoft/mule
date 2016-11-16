@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -27,12 +26,7 @@ import java.util.Optional;
  *
  * @since 3.7.0
  */
-public interface ExecutionContextAdapter<M extends ComponentModel> extends ExecutionContext<M> {
-
-  /**
-   * Returns the {@link Event} on which an operation is to be executed
-   */
-  Event getEvent();
+public interface ExecutionContextAdapter<M extends ComponentModel> extends EventedExecutionContext<M> {
 
   /**
    * Returns the value associated with the {@code key}

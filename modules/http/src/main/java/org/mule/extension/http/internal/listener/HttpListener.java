@@ -7,35 +7,34 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapping;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-import com.google.common.collect.Lists;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
-import org.mule.extension.http.internal.HttpConnectorConstants;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
-import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
+import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -71,11 +70,15 @@ import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallba
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.MethodRequestMatcher;
-import org.slf4j.Logger;
 
-import javax.inject.Inject;
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -91,6 +94,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private static final String SERVER_PROBLEM = "Server encountered a problem";
   private static final String ERROR_RESPONSE_SETTINGS = "Error Response Settings";
   private static final String RESPONSE_CONTEXT = "responseContext";
+
 
   @Inject
   private MuleContext muleContext;
@@ -115,24 +119,24 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private String allowedMethods;
 
   /**
-   * Defines if the response should be sent using streaming or not. If this attribute is not present, the behavior will depend on
-   * the type of the payload (it will stream only for InputStream). If set to true, it will always stream. If set to false, it
-   * will never stream. As streaming is done the response will be sent user Transfer-Encoding: chunked.
-   */
-  @Parameter
-  @Optional(defaultValue = "AUTO")
-  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS)
-  private HttpStreamingType responseStreamingMode;
-
-  /**
    * By default, the request will be parsed (for example, a multi part request will be mapped as a Mule message with null payload
    * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
    * always contain the raw contents of the HTTP request.
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED, group = HttpConnectorConstants.CONFIGURATION_OVERRIDES)
+  @Placement(tab = CONFIGURATION_OVERRIDES)
   private Boolean parseRequest;
+
+  /**
+   * Defines if the response should be sent using streaming or not. If this attribute is not present, the behavior will depend on
+   * the type of the payload (it will stream only for InputStream). If set to true, it will always stream. If set to false, it
+   * will never stream. As streaming is done the response will be sent user Transfer-Encoding: chunked.
+   */
+  @Parameter
+  @Optional(defaultValue = "AUTO")
+  @Placement(tab = ADVANCED_TAB)
+  private HttpStreamingType responseStreamingMode;
 
   private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
   private HttpListenerResponseSender responseSender;
@@ -142,9 +146,9 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private HttpResponseFactory responseFactory;
   private List<ErrorType> knownErrors;
 
+  //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
-  public void onSuccess(@Optional @DisplayName(RESPONSE_SETTINGS) @Placement(
-      group = RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder responseBuilder,
+  public void onSuccess(@Optional @DisplayName(RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder responseBuilder,
                         SourceCallbackContext callbackContext)
       throws Exception {
 
@@ -152,9 +156,10 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     responseSender.sendResponse(context, responseBuilder);
   }
 
+  //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
-  public void onError(@Optional @DisplayName(ERROR_RESPONSE_SETTINGS) @Placement(
-      group = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponseBuilder,
+  public void onError(
+                      @Optional @DisplayName(ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponseBuilder,
                       SourceCallbackContext callbackContext,
                       Error error) {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
@@ -386,4 +391,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     }
   }
 
+  public Boolean getParseRequest() {
+    return parseRequest;
+  }
 }

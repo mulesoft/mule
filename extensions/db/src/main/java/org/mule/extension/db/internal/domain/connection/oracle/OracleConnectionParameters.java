@@ -8,12 +8,10 @@ package org.mule.extension.db.internal.domain.connection.oracle;
 
 import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
  * /**
@@ -30,7 +28,7 @@ public class OracleConnectionParameters extends BaseDbConnectionParameters imple
    * Configures the host of the database
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 1)
+  @Placement(order = 1)
   private String host;
 
   /**
@@ -38,7 +36,7 @@ public class OracleConnectionParameters extends BaseDbConnectionParameters imple
    */
   @Parameter
   @Optional(defaultValue = "1521")
-  @Placement(group = CONNECTION, order = 2)
+  @Placement(order = 2)
   private Integer port;
 
   /**
@@ -46,7 +44,7 @@ public class OracleConnectionParameters extends BaseDbConnectionParameters imple
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 3)
+  @Placement(order = 3)
   private String user;
 
   /**
@@ -54,7 +52,7 @@ public class OracleConnectionParameters extends BaseDbConnectionParameters imple
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 4)
+  @Placement(order = 4)
   @Password
   private String password;
 
@@ -63,7 +61,7 @@ public class OracleConnectionParameters extends BaseDbConnectionParameters imple
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 5)
+  @Placement(order = 5)
   private String instance;
 
 

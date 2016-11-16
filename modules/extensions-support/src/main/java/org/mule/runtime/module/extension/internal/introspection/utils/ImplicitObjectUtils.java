@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.introspection.utils;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 
@@ -30,17 +30,17 @@ public final class ImplicitObjectUtils {
    * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()} then it's ignored
    *
    * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
-   * @param muleContext the Mule node.
+   * @param muleContext        the Mule node.
    * @return a {@link ResolverSet}
    */
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     ResolverSet resolverSet = new ResolverSet();
-    for (ParameterModel parameterModel : parameterizedModel.getParameterModels()) {
+    for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       Object defaultValue = parameterModel.getDefaultValue();
       if (defaultValue != null) {
-        resolverSet
-            .add(parameterModel.getName(),
-                 new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()), muleContext));
+        resolverSet.add(parameterModel.getName(),
+                        new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()),
+                                                              muleContext));
       }
     }
 
@@ -54,8 +54,8 @@ public final class ImplicitObjectUtils {
    * default value
    *
    * @param models a {@link List} of {@code T}
-   * @param <T> the generic type of the items in the {@code models}. It's a type which is assignable from
-   *        {@link ParameterizedModel}
+   * @param <T>    the generic type of the items in the {@code models}. It's a type which is assignable from
+   *               {@link ParameterizedModel}
    * @return one of the items in {@code models} or {@code null} if none of the models are implicit
    */
   public static <T extends ParameterizedModel> T getFirstImplicit(List<T> models) {
@@ -69,12 +69,6 @@ public final class ImplicitObjectUtils {
   }
 
   private static boolean canBeUsedImplicitly(ParameterizedModel parameterizedModel) {
-    for (ParameterModel parameterModel : parameterizedModel.getParameterModels()) {
-      if (parameterModel.isRequired() && parameterModel.getDefaultValue() == null) {
-        return false;
-      }
-    }
-
-    return true;
+    return parameterizedModel.getAllParameterModels().stream().noneMatch(p -> p.isRequired() && p.getDefaultValue() == null);
   }
 }

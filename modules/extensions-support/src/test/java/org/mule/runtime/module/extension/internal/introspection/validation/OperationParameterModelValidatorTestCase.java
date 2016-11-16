@@ -48,7 +48,7 @@ public class OperationParameterModelValidatorTestCase extends AbstractMuleTestCa
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(goodParameter.getName()).thenReturn("valid");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-    when(operationModel.getParameterModels()).thenReturn(asList(goodParameter));
+    when(operationModel.getAllParameterModels()).thenReturn(asList(goodParameter));
   }
 
   @Test
@@ -61,13 +61,13 @@ public class OperationParameterModelValidatorTestCase extends AbstractMuleTestCa
     ParameterModel offending = mock(ParameterModel.class);
     when(offending.getName()).thenReturn(TARGET_ATTRIBUTE);
 
-    when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
+    when(operationModel.getAllParameterModels()).thenReturn(asList(goodParameter, offending));
     validator.validate(extensionModel);
   }
 
   @Test
   public void validForParameterLessOperation() {
-    when(operationModel.getParameterModels()).thenReturn(ImmutableList.of());
+    when(operationModel.getAllParameterModels()).thenReturn(ImmutableList.of());
     validator.validate(extensionModel);
   }
 }

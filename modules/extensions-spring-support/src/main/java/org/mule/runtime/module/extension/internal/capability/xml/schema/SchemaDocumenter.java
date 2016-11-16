@@ -6,17 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+
+import java.util.Collection;
+import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -24,15 +33,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.Collection;
-import java.util.Map;
-
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 /**
  * Utility class that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel} has already been described and
@@ -94,7 +94,7 @@ final class SchemaDocumenter {
   }
 
   private void documentOperationParameters(OperationDeclaration operation, MethodDocumentation documentation) {
-    for (ParameterDeclaration parameter : operation.getParameters()) {
+    for (ParameterDeclaration parameter : operation.getAllParameters()) {
       String description = documentation.getParameters().get(parameter.getName());
       if (description != null) {
         parameter.setDescription(description);
@@ -107,10 +107,10 @@ final class SchemaDocumenter {
     if (extensionDeclaration.getConfigurations().size() > 1) {
       for (TypeElement configurationElement : getTypeElementsAnnotatedWith(Configuration.class, roundEnvironment)) {
         ConfigurationDeclaration configurationDeclaration = findMatchingConfiguration(extensionDeclaration, configurationElement);
-        documentConfigurationParameters(configurationDeclaration.getParameters(), configurationElement);
+        documentConfigurationParameters(configurationDeclaration.getAllParameters(), configurationElement);
       }
     } else {
-      documentConfigurationParameters(extensionDeclaration.getConfigurations().get(0).getParameters(), extensionElement);
+      documentConfigurationParameters(extensionDeclaration.getConfigurations().get(0).getAllParameters(), extensionElement);
     }
   }
 

@@ -10,8 +10,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -21,20 +19,17 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpRequestMetadataResolver;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.api.HttpConstants;
@@ -43,7 +38,6 @@ import org.mule.runtime.module.http.internal.HttpParser;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
 
 public class HttpRequestOperations {
 
@@ -55,77 +49,56 @@ public class HttpRequestOperations {
   /**
    * Consumes an HTTP service.
    *
-   * @param path Path where the request will be sent.
-   * @param method The HTTP method for the request.
-   * @param host Host where the requests will be sent.
-   * @param port Port where the requests will be sent.
-   * @param followRedirects Specifies whether to follow redirects or not.
-   * @param parseResponse Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
-   * @param requestStreamingMode Defines if the request should be sent using streaming or not.
-   * @param sendBodyMode Defines if the request should contain a body or not.
-   * @param responseTimeout Maximum time that the request element will block the execution of the flow waiting for the HTTP
-   *        response.
-   * @param responseValidator Configures error handling of the response.
-   * @param config the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from
-   *        it.
-   * @param muleEvent the current {@link Event}
+   * @param path                       Path where the request will be sent.
+   * @param method                     The HTTP method for the request.
+   * @param overrides                  configuration overrides parameter group
+   * @param responseValidationSettings response validation parameter group
+   * @param requestBuilder             configures the request
+   * @param outputSettings             additional settings parameter group
+   * @param client                     the http connection
+   * @param config                     the configuration for this operation. All parameters not configured will be taken from
+   *                                   it.
+   * @param muleEvent                  the current {@link Event}
    * @return an {@link Result} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpRequestMetadataResolver.class)
   public Result<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = "Response Validation Settings") ResponseValidator responseValidator,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES, order = 1) String host,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES, order = 2) Integer port,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES,
-                                                            order = 3) Boolean followRedirects,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES,
-                                                            order = 4) HttpSendBodyMode sendBodyMode,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES,
-                                                            order = 5) HttpStreamingType requestStreamingMode,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES,
-                                                            order = 6) Boolean parseResponse,
-                                                        @Optional @Placement(tab = ADVANCED,
-                                                            group = CONFIGURATION_OVERRIDES,
-                                                            order = 7) Integer responseTimeout,
-                                                        @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
-                                                        @MetadataKeyId @Optional(
-                                                            defaultValue = "ANY") @Placement(
-                                                                tab = ADVANCED,
-                                                                group = OTHER_SETTINGS) HttpMetadataKey outputType,
+                                                        @ParameterGroup(
+                                                            name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
+                                                        @ParameterGroup(
+                                                            name = "Response Validation Settings")
+                                                            ResponseValidationSettings responseValidationSettings,
+                                                        @Optional @NullSafe @Expression(NOT_SUPPORTED)
+                                                            HttpRequesterRequestBuilder requestBuilder,
+                                                        @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                                                         @Connection HttpClient client,
                                                         @UseConfig HttpRequesterConfig config, Event muleEvent)
       throws MuleException {
     HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
     UriParameters uriParameters = client.getDefaultUriParameters();
 
-    String resolvedHost = resolveIfNecessary(host, uriParameters.getHost(), muleEvent);
-    Integer resolvedPort = resolveIfNecessary(port, uriParameters.getPort(), muleEvent);
+    String resolvedHost = resolveIfNecessary(overrides.getHost(), uriParameters.getHost(), muleEvent);
+    Integer resolvedPort = resolveIfNecessary(overrides.getPort(), uriParameters.getPort(), muleEvent);
     String resolvedBasePath = config.getBasePath().apply(muleEvent);
     String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, path));
 
     String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
-    Boolean resolvedFollowRedirects = resolveIfNecessary(followRedirects, config.getFollowRedirects(), muleEvent);
+    Boolean resolvedFollowRedirects = resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects(), muleEvent);
     HttpStreamingType resolvedStreamingMode =
-        resolveIfNecessary(requestStreamingMode, config.getRequestStreamingMode(), muleEvent);
-    HttpSendBodyMode resolvedSendBody = resolveIfNecessary(sendBodyMode, config.getSendBodyMode(), muleEvent);
-    Boolean resolvedParseResponse = resolveIfNecessary(parseResponse, config.getParseResponse(), muleEvent);
-    Integer resolvedTimeout = resolveResponseTimeout(muleEvent, config, responseTimeout);
-    ResponseValidator resolvedValidator =
-        responseValidator != null ? responseValidator : new SuccessStatusCodeValidator("0..399");
+        resolveIfNecessary(overrides.getRequestStreamingMode(), config.getRequestStreamingMode(), muleEvent);
+    HttpSendBodyMode resolvedSendBody = resolveIfNecessary(overrides.getSendBodyMode(), config.getSendBodyMode(), muleEvent);
+    Boolean resolvedParseResponse = resolveIfNecessary(overrides.getParseResponse(), config.getParseResponse(), muleEvent);
+    Integer resolvedTimeout = resolveResponseTimeout(muleEvent, config, overrides.getResponseTimeout());
+    ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
+    responseValidator = responseValidator != null ? responseValidator : new SuccessStatusCodeValidator("0..399");
+
 
     HttpRequester requester =
         new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
             .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody)
             .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
-            .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config)
+            .setResponseTimeout(resolvedTimeout).setResponseValidator(responseValidator).setConfig(config)
             .setTransformationService(muleContext.getTransformationService()).build();
 
     // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved

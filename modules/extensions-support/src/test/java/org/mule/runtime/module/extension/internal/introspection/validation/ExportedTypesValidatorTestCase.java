@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -21,12 +22,11 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -64,13 +64,13 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
   public void invalidModelDueToOperationWithArgumentParameterWithoutGetter() {
     when(invalidParameterModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
     when(invalidParameterModel.getName()).thenReturn("pojo");
-    when(operationModel.getParameterModels()).thenReturn(asList(invalidParameterModel));
+    when(operationModel.getAllParameterModels()).thenReturn(asList(invalidParameterModel));
     validator.validate(extensionModel);
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void invalidModelDueToOperationWithReturnTypeParameterWithoutGetter() {
-    when(operationModel.getParameterModels()).thenReturn(emptyList());
+    when(operationModel.getAllParameterModels()).thenReturn(emptyList());
     when(operationModel.getOutput()).thenReturn(outputModel);
     when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
     validator.validate(extensionModel);
@@ -78,7 +78,7 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void invalidModelDueToSourceWithReturnTypeParameterWithoutGetter() {
-    when(sourceModel.getParameterModels()).thenReturn(emptyList());
+    when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
     when(sourceModel.getOutput()).thenReturn(outputModel);
     when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
     validator.validate(extensionModel);
@@ -87,7 +87,7 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void outputAttributesAreNotValidated() {
     OutputModel outputAttributes = mock(OutputModel.class);
-    when(sourceModel.getParameterModels()).thenReturn(emptyList());
+    when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
     when(sourceModel.getOutput()).thenReturn(outputModel);
     when(sourceModel.getOutputAttributes()).thenReturn(outputAttributes);
     when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithGetter.class));

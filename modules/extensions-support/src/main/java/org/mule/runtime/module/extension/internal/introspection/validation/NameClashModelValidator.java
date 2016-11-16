@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
@@ -118,7 +119,7 @@ public final class NameClashModelValidator implements ModelValidator {
         }
 
         @Override
-        public void onParameter(ParameterizedModel owner, ParameterModel model) {
+        public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
           validateTopLevelParameter(model, owner);
         }
 
@@ -142,7 +143,7 @@ public final class NameClashModelValidator implements ModelValidator {
     private void validateOperation(OperationModel operation) {
       validateParameterNames(operation);
       String operationName = dslSyntaxResolver.resolve(operation).getElementName();
-      operation.getParameterModels().stream().map(parameterModel -> dslSyntaxResolver.resolve(parameterModel))
+      operation.getAllParameterModels().stream().map(parameterModel -> dslSyntaxResolver.resolve(parameterModel))
           .filter(DslElementSyntax::supportsChildDeclaration)
           .forEach(parameterElement -> {
 
@@ -158,7 +159,7 @@ public final class NameClashModelValidator implements ModelValidator {
     }
 
     private void validateParameterNames(ParameterizedModel model) {
-      Set<String> repeatedParameters = collectRepeatedNames(model.getParameterModels());
+      Set<String> repeatedParameters = collectRepeatedNames(model.getAllParameterModels());
       if (!repeatedParameters.isEmpty()) {
         throw new IllegalModelDefinitionException(format("Extension '%s' defines the %s '%s' which has parameters "
             + "with repeated names. Offending parameters are: [%s]",
@@ -300,7 +301,7 @@ public final class NameClashModelValidator implements ModelValidator {
     }
 
     private void validateSingularizedNameClash(ParameterizedModel model, String modelElementName) {
-      List<ParameterModel> parameters = model.getParameterModels();
+      List<ParameterModel> parameters = model.getAllParameterModels();
       parameters.forEach(
                          parameter -> {
                            parameter.getType().accept(new MetadataTypeVisitor() {

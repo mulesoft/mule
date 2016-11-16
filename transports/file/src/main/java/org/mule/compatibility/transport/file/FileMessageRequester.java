@@ -185,6 +185,16 @@ public class FileMessageRequester extends AbstractMessageRequester {
       }
 
       @Override
+      public String getUniqueIdString() {
+        return endpoint.getMuleContext().getUniqueIdString();
+      }
+
+      @Override
+      public String getServerId() {
+        return endpoint.getMuleContext().getId();
+      }
+
+      @Override
       public String getName() {
         return "FileMessageRequester";
       }

@@ -6,19 +6,16 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
-import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mule.extension.db.internal.domain.connection.mysql.MySqlDbUtils.getEffectiveUrl;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
  * {@link DataSourceConfig} implementation for MySQL databases.
@@ -34,14 +31,14 @@ public final class MySqlConnectionParameters extends BaseDbConnectionParameters 
    * Configures the host of the database
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 1)
+  @Placement(order = 1)
   private String host;
 
   /**
    * Configures the port of the database
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 2)
+  @Placement(order = 2)
   private Integer port;
 
   /**
@@ -49,7 +46,7 @@ public final class MySqlConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 3)
+  @Placement(order = 3)
   private String user;
 
   /**
@@ -57,7 +54,7 @@ public final class MySqlConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 4)
+  @Placement(order = 4)
   @Password
   private String password;
 
@@ -66,7 +63,7 @@ public final class MySqlConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 5)
+  @Placement(order = 5)
   private String database;
 
   /**
@@ -74,7 +71,7 @@ public final class MySqlConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED)
+  @Placement(tab = ADVANCED_TAB)
   private Map<String, String> connectionProperties = new HashMap<>();
 
   @Override

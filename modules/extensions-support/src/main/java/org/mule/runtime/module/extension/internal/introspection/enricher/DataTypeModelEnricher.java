@@ -7,18 +7,21 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingMethod;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.api.annotation.DataTypeParameters;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
@@ -52,9 +55,11 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher 
                                                                           + " Mutating the content metadata requires an operation with a return type.",
                                                                       declaration.getName(), declaration.getName()));
             }
-            declaration.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME,
-                                                  "The mime type of the payload that this operation outputs."));
-            declaration
+
+            declaration.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(
+                                                                           newParameter(MIME_TYPE_PARAMETER_NAME,
+                                                                                        "The mime type of the payload that this operation outputs."));
+            declaration.getParameterGroup(DEFAULT_GROUP_NAME)
                 .addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
           }
         }
@@ -68,6 +73,7 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher 
     parameter.setExpressionSupport(SUPPORTED);
     parameter.setType(typeLoader.load(String.class), false);
     parameter.setDescription(description);
+    parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB_NAME).build());
 
     return parameter;
   }

@@ -6,11 +6,9 @@
  */
 package org.mule.extension.email.internal.sender;
 
-import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 /**
  * Abstract implementation of a {@link PoolingConnectionProvider} for email sender connection providers.
@@ -19,12 +17,6 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
  */
 public abstract class AbstractSenderProvider extends AbstractEmailConnectionProvider<SenderConnection>
     implements PoolingConnectionProvider<SenderConnection> {
-
-  /**
-   * A basic set of parameters for email connections.
-   */
-  @ParameterGroup
-  protected EmailConnectionSettings settings;
 
   /**
    * {@inheritDoc}

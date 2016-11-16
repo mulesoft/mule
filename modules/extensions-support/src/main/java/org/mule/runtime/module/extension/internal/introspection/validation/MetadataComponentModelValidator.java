@@ -98,7 +98,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
       keyId.get().getType().accept(new MetadataTypeVisitor() {
 
         public void visitObject(ObjectType objectType) {
-          List<ParameterModel> parts = model.getParameterModels().stream()
+          List<ParameterModel> parts = model.getAllParameterModels().stream()
               .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent()).collect(toList());
 
           List<ParameterModel> defaultParts = parts.stream().filter(p -> p.getDefaultValue() != null).collect(toList());
@@ -165,7 +165,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
 
   private List<InputTypeResolver<Object>> getAllInputResolvers(ComponentModel componentModel,
                                                                MetadataResolverFactory resolverFactory) {
-    return componentModel.getParameterModels().stream().map(NamedObject::getName)
+    return componentModel.getAllParameterModels().stream().map(NamedObject::getName)
         .map(resolverFactory::getInputResolver).collect(toList());
   }
 

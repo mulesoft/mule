@@ -6,54 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.EnrichableModel;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 
-import com.google.common.collect.ImmutableList;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Optional;
-
-
-/**
- * Resolves arguments annotated with {@link ParameterGroup} in a {@link ReflectiveMethodOperationExecutor}.
- * <p/>
- * An implementation of {@link ArgumentResolver} which creates instances of a given
- * {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup#getType()} and maps the fields annotated with
- * {@link Parameter} to parameter values of a {@link ExecutionContext}.
- * <p/>
- * It also looks for fields annotated with {@link ParameterGroup} and recursively populates them too.
- *
- * @param <T> the generic type of the argument instances that will be resolved
- * @since 3.7.0
- */
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {
 
-  private final org.mule.runtime.module.extension.internal.introspection.ParameterGroup<?> group;
-  private final List<ParameterGroupArgumentResolver<? extends Object>> childResolvers;
+  private final ParameterGroupDescriptor group;
 
-  public ParameterGroupArgumentResolver(org.mule.runtime.module.extension.internal.introspection.ParameterGroup<?> group) {
-    checkInstantiable(group.getType());
+  public ParameterGroupArgumentResolver(ParameterGroupDescriptor group) {
+    checkInstantiable(group.getType().getDeclaringClass());
     this.group = group;
-    childResolvers = getNestedParameterGroupResolvers(group);
-  }
-
-  /**
-   * Can be either a {@link Field} or a {@link java.lang.reflect.Parameter}
-   *
-   * @return {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup} container
-   */
-  public Object getContainer() {
-    return group.getContainer();
   }
 
   /**
@@ -62,40 +29,9 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
   @Override
   public T resolve(ExecutionContext executionContext) {
     try {
-      T parameterGroup = (T) group.getType().newInstance();
-
-      for (Field parameterField : group.getParameters()) {
-        final String parameterName = parameterField.getName();
-        if (executionContext.hasParameter(parameterName)) {
-          parameterField.set(parameterGroup, executionContext.getParameter(parameterName));
-        }
-      }
-
-      for (ParameterGroupArgumentResolver<?> childResolver : childResolvers) {
-        ((Field) childResolver.getContainer()).set(parameterGroup, childResolver.resolve(executionContext));
-      }
-
-      return parameterGroup;
+      return new ParameterGroupObjectBuilder<T>(group).build((EventedExecutionContext) executionContext);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create parameter group"), e);
     }
-  }
-
-  /**
-   * Recursively creates {@link ParameterGroupArgumentResolver} for the nested
-   * {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
-   *
-   * @param model enrichable model to check for the presence of {@link ParameterGroupModelProperty}
-   * @return {@link List} with resolvers for the nester
-   *         {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
-   */
-  private List<ParameterGroupArgumentResolver<?>> getNestedParameterGroupResolvers(EnrichableModel model) {
-    Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
-
-    if (parameterGroupModelProperty.isPresent()) {
-      return parameterGroupModelProperty.get().getGroups().stream().map(ParameterGroupArgumentResolver::new).collect(toList());
-    }
-
-    return ImmutableList.of();
   }
 }

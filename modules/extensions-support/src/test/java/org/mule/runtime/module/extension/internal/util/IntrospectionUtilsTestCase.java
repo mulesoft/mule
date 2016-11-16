@@ -11,7 +11,6 @@ import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
@@ -43,16 +42,12 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
-import org.mule.test.heisenberg.extension.model.LifetimeInfo;
 import org.mule.test.petstore.extension.PhoneNumber;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,17 +128,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalArgumentException.class)
   public void getNullFieldDataType() throws Exception {
     getFieldMetadataType(null, TYPE_LOADER);
-  }
-
-  @Test
-  public void getNoAnnotatedExposedPojoFields() {
-    Collection<Field> exposedFields = getExposedFields(LifetimeInfo.class);
-    assertThat(exposedFields, is(not(empty())));
-    assertThat(exposedFields.size(), is(4));
-    assertField("dateOfBirth", TYPE_LOADER.load(Date.class), exposedFields);
-    assertField("dateOfDeath", TYPE_LOADER.load(Calendar.class), exposedFields);
-    assertField("dateOfConception", TYPE_LOADER.load(LocalDateTime.class), exposedFields);
-    assertField("dateOfGraduation", TYPE_LOADER.load(Calendar.class), exposedFields);
   }
 
   @Test

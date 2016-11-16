@@ -6,21 +6,19 @@
  */
 package org.mule.extension.http.internal.listener.server;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
@@ -41,7 +39,6 @@ public class HttpListenerConfig implements Initialisable {
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION)
   private String basePath;
 
   /**
@@ -52,7 +49,7 @@ public class HttpListenerConfig implements Initialisable {
   @Parameter
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS)
+  @Placement(tab = ADVANCED_TAB)
   private Boolean parseRequest;
 
 

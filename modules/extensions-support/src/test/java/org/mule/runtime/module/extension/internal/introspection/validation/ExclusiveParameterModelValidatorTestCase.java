@@ -41,18 +41,13 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidExclusionWithNestedGroup() throws Exception {
-    validate(InvalidExtensionWithNestedGroup.class);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
   public void invalidExclusionWithOneOptionalParameter() throws Exception {
     validate(InvalidExtensionWithoOneOptionalParameters.class);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidExclusionWithNestedCollection() throws Exception {
-    validate(InvalidExtensionWithNestedCollection.class);
+  public void invalidExclusionWithoutOptionals() throws Exception {
+    validate(InvalidExtensionWithoutOptionals.class);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
@@ -61,7 +56,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
   }
 
   @Extension(name = "InvalidExtensionWithNestedCollection")
-  public static class InvalidExtensionWithNestedCollection {
+  public static class InvalidExtensionWithoutOptionals {
 
     @ParameterGroup
     private ExclusionWithNestedCollection group;
@@ -72,13 +67,6 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
 
     @ParameterGroup
     private ExclusionWithoutOneOptionalParameters group;
-  }
-
-  @Extension(name = "InvalidExtensionWithNestedGroup")
-  public static class InvalidExtensionWithNestedGroup {
-
-    @ParameterGroup
-    private ExclusionWithNestedParameterGroup group;
   }
 
   @Extension(name = "InvalidOperationExtension")
@@ -96,8 +84,6 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     private ValidExclusion group;
   }
 
-
-
   @ExclusiveOptionals
   public static class ValidExclusion {
 
@@ -105,11 +91,16 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     @Optional
     private String validType;
 
-    @ParameterGroup
-    private SimpleGroup simpleGroup;
+    @Parameter
+    @Optional
+    private String domain;
 
-    @ParameterGroup
-    private SimplePojo simplePojo;
+    @Parameter
+    @Optional
+    private String url;
+
+    @Parameter
+    private Integer number;
   }
 
   @ExclusiveOptionals
@@ -139,21 +130,6 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
   }
 
   @ExclusiveOptionals
-  public static class ExclusionWithNestedParameterGroup {
-
-    @Parameter
-    @Optional
-    private String validType;
-
-    @Parameter
-    @Optional
-    private Integer otherValidType;
-
-    @ParameterGroup
-    private ExclusivePojo nesterGroup;
-  }
-
-  @ExclusiveOptionals
   public static class ExclusionWithoutOneOptionalParameters {
 
     @Parameter
@@ -176,19 +152,6 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
 
     @Parameter
     private Integer number;
-
-  }
-
-  public static class SimpleGroup {
-
-    @Parameter
-    @Optional
-    private String domain;
-
-    @Parameter
-    @Optional
-    private String url;
-
   }
 
   public static class ValidOperation {

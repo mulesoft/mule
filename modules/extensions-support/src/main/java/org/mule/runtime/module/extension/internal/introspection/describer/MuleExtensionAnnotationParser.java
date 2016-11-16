@@ -134,14 +134,14 @@ public final class MuleExtensionAnnotationParser {
     java.util.Optional<Placement> placementAnnotation = annotatedElement.getAnnotation(Placement.class);
     if (placementAnnotation.isPresent()) {
       Placement placement = placementAnnotation.get();
-      builder.order(placement.order()).groupName(placement.group()).tabName(placement.tab());
+      builder.order(placement.order()).tabName(placement.tab());
     }
   }
 
   private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
     Placement placement = annotatedElement.getAnnotation(Placement.class);
     if (placement != null) {
-      builder.order(placement.order()).groupName(placement.group()).tabName(placement.tab());
+      builder.order(placement.order()).tabName(placement.tab());
     }
   }
 

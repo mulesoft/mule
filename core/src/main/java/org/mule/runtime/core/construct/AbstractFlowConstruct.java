@@ -243,6 +243,16 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   }
 
   @Override
+  public String getUniqueIdString() {
+    return muleContext.getUniqueIdString();
+  }
+
+  @Override
+  public String getServerId() {
+    return muleContext.getId();
+  }
+
+  @Override
   public String toString() {
     return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
   }

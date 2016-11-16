@@ -14,6 +14,7 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -55,7 +56,7 @@ public class ExtensionTypesModelEnricher implements ModelEnricher {
     new IdempotentDeclarationWalker() {
 
       @Override
-      protected void onParameter(ParameterDeclaration declaration) {
+      protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration declaration) {
         registerType(declarer, declaration.getType());
       }
 

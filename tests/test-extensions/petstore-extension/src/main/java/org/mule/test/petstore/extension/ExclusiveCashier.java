@@ -7,9 +7,8 @@
 package org.mule.test.petstore.extension;
 
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 @ExclusiveOptionals
 public class ExclusiveCashier {
@@ -27,10 +26,11 @@ public class ExclusiveCashier {
 
   @Parameter
   @Optional
-  private PhoneNumber phoneNumber;
+  private Integer cash;
 
-  @ParameterGroup
-  private BankAccount account;
+  @Parameter
+  @Optional
+  private Integer debt;
 
   public String getCashierName() {
     return cashierName;
@@ -44,11 +44,11 @@ public class ExclusiveCashier {
     return pensionPlan;
   }
 
-  public BankAccount getAccount() {
-    return account;
+  public Integer getCash() {
+    return cash;
   }
 
-  public PhoneNumber getPhoneNumber() {
-    return phoneNumber;
+  public Integer getDebt() {
+    return debt;
   }
 }

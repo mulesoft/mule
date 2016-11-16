@@ -13,6 +13,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
@@ -20,6 +22,8 @@ import org.mule.runtime.module.extension.internal.introspection.version.StaticVe
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
+
+import javafx.util.Pair;
 
 public abstract class AbstractAnnotationsBasedDescriberTestCase extends AbstractMuleTestCase {
 
@@ -49,6 +53,17 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
   protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
     return (OperationDeclaration) find(declaration.getOperations(),
                                        object -> ((OperationDeclaration) object).getName().equals(operationName));
+  }
+
+  protected Pair<ParameterGroupDeclaration, ParameterDeclaration> findParameterInGroup(ParameterizedDeclaration<?> declaration,
+                                                                                       String name) {
+    return declaration.getParameterGroups().stream()
+        .map(group -> {
+          ParameterDeclaration parameter = findParameter(group.getParameters(), name);
+          return parameter != null ? new Pair<>(group, parameter) : null;
+        })
+        .filter(pair -> pair != null)
+        .findFirst().orElse(null);
   }
 
   protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {

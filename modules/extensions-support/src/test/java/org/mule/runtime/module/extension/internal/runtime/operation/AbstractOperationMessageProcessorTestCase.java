@@ -18,30 +18,32 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.OutputModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.OutputModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
@@ -67,8 +69,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
-
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -147,6 +147,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ConfigurationProvider configurationProvider;
 
+  protected ParameterGroupModel parameterGroupModel;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected PolicyManager mockPolicyManager;
 
@@ -204,7 +206,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
     when(contentMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
-    when(operationModel.getParameterModels()).thenReturn(Arrays.asList(keyParamMock, contentMock));
+    parameterGroupModel = mockParameters(operationModel, keyParamMock, contentMock);
+    when(parameterGroupModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
 
     when(outputMock.getType()).thenReturn(stringType);
     when(outputMock.hasDynamicType()).thenReturn(true);

@@ -147,6 +147,16 @@ public class MuleUniversalConduit extends AbstractConduit {
           }
 
           @Override
+          public String getUniqueIdString() {
+            return configuration.getMuleContext().getUniqueIdString();
+          }
+
+          @Override
+          public String getServerId() {
+            return configuration.getMuleContext().getId();
+          }
+
+          @Override
           public String getName() {
             return "MuleUniversalConduit";
           }

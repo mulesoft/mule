@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Parameter;
 
 /**
@@ -25,7 +26,7 @@ public interface ParameterElement extends ExtensionParameter {
    * {@inheritDoc}
    */
   @Override
-  default boolean isFieldBased() {
-    return false;
+  default AnnotatedElement getDeclaringElement() {
+    return getParameter();
   }
 }

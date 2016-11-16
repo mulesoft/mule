@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.extension.api.tx.OperationTransactionalAction.JOIN_IF_POSSIBLE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
@@ -88,7 +89,7 @@ public class ConnectionModelEnricher extends AbstractAnnotatedModelEnricher {
   }
 
   private void addTransactionalActionParameter(DescribingContext describingContext, OperationDeclaration declaration) {
-    declaration.getParameters().stream().filter(parameter -> TRANSACTIONAL_ACTION_PARAMETER_NAME.equals(parameter.getName()))
+    declaration.getAllParameters().stream().filter(parameter -> TRANSACTIONAL_ACTION_PARAMETER_NAME.equals(parameter.getName()))
         .findAny().ifPresent(p -> {
           throw new IllegalOperationModelDefinitionException(format("Operation '%s' from extension '%s' defines a parameter named '%s' which is a reserved word",
                                                                     declaration.getName(), describingContext
@@ -104,7 +105,7 @@ public class ConnectionModelEnricher extends AbstractAnnotatedModelEnricher {
     transactionParameter.setDescription(TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION);
     transactionParameter.setLayoutModel(LayoutModel.builder().tabName(TRANSACTIONAL_TAB_NAME).build());
 
-    declaration.addParameter(transactionParameter);
+    declaration.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(transactionParameter);
   }
 
   private void addConnectionInterceptors(OperationDeclaration declaration, DescribingContext describingContext,

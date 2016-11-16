@@ -22,27 +22,27 @@
 
     <flow name="success">
         <httpn:request config-ref="requestConfig" path="status">
-            <httpn:response-validator>
-                <httpn:success-status-code-validator values="409" />
-            </httpn:response-validator>
             <httpn:request-builder>
                 <httpn:query-params>
                     #[['code' : code]]
                 </httpn:query-params>
             </httpn:request-builder>
+            <httpn:response-validator>
+                <httpn:success-status-code-validator values="409" />
+            </httpn:response-validator>
         </httpn:request>
     </flow>
 
     <flow name="failure">
         <httpn:request config-ref="requestConfig" path="status">
-            <httpn:response-validator>
-                <httpn:failure-status-code-validator values="201" />
-            </httpn:response-validator>
             <httpn:request-builder>
                 <httpn:query-params>
                     #[['code' : code]]
                 </httpn:query-params>
             </httpn:request-builder>
+            <httpn:response-validator>
+                <httpn:failure-status-code-validator values="201" />
+            </httpn:response-validator>
         </httpn:request>
     </flow>
 

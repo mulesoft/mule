@@ -14,9 +14,9 @@ import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Bui
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;

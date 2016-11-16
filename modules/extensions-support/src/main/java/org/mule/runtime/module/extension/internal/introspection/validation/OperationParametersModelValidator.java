@@ -55,7 +55,7 @@ public final class OperationParametersModelValidator implements ModelValidator {
   }
 
   private void collectOffenses(Multimap<String, String> offenses, OperationModel operationModel) {
-    operationModel.getParameterModels().stream().filter(parameter -> reservedWords.contains(parameter.getName()))
+    operationModel.getAllParameterModels().stream().filter(parameter -> reservedWords.contains(parameter.getName()))
         .forEach(parameter -> offenses.put(parameter.getName(), operationModel.getName()));
   }
 }
