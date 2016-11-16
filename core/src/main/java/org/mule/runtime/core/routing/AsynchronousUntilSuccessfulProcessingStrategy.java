@@ -6,47 +6,45 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Until successful asynchronous processing strategy.
- * <p/>
+ * <p>
  * It will return successfully to the flow executing the router once it was able to store the message in the object store.
- * <p/>
+ * <p>
  * After that it will asynchronously try to process the message through the internal route. If route was not successfully executed
  * after the configured retry count then the message will be routed to the defined dead letter queue route or in case there is no
  * dead letter queue route then it will be handled by the flow exception strategy.
@@ -57,8 +55,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private MessagingExceptionHandler messagingExceptionHandler;
-  private ExecutorService pool;
-  private ScheduledExecutorService scheduledRetriesPool;
+  private Scheduler pool;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -72,19 +69,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   @Override
   public void start() {
-    final String threadPrefix =
-        String.format("%s%s.%s", ThreadNameHelper.getPrefix(getUntilSuccessfulConfiguration().getMuleContext()),
-                      getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful");
-    pool = getUntilSuccessfulConfiguration().getThreadingProfile().createPool(threadPrefix);
-    scheduledRetriesPool = getUntilSuccessfulConfiguration().createScheduledRetriesPool(threadPrefix);
+    pool = muleContext.getSchedulerService().ioScheduler();
 
     scheduleAllPendingEventsForProcessing();
   }
 
   @Override
   public void stop() {
-    scheduledRetriesPool.shutdown();
-    scheduledRetriesPool = null;
     pool.shutdown();
     pool = null;
   }
@@ -128,10 +119,10 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     if (firstTime) {
       submitForProcessing(eventStoreKey);
     } else {
-      this.scheduledRetriesPool.schedule(() -> {
+      this.pool.schedule(() -> {
         submitForProcessing(eventStoreKey);
         return null;
-      }, getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
+      }, getUntilSuccessfulConfiguration().getMillisBetweenRetries(), MILLISECONDS);
     }
   }
 

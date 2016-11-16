@@ -5055,16 +5055,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Threading profile used to process the message processors inside the until-successful.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
-                    </xsd:sequence>
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
                     <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>

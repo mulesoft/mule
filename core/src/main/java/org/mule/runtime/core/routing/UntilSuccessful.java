@@ -6,48 +6,38 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
-import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
  * exception has been raised and, optionally, if the response matches an expression.
- *
+ * <p>
  * UntilSuccessful internal route can be executed synchronously or asynchronously depending on the threading profile defined on
  * it. By default, if no threading profile is defined, then it will use the default threading profile configuration for the
  * application. This means that the default behavior is to process asynchronously.
- *
+ * <p>
  * UntilSuccessful can optionally be configured to synchronously return an acknowledgment message when it has scheduled the event
  * for processing. UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events that are pending
  * (re)processing.
- *
- * To execute until-successful asynchronously the threading profile defined on it must have doThreading attribute set with true
- * value.
- *
- * To execute until-successful synchronously the threading profile defined on it must have doThreading attribute set with false
- * value.
  */
 public class UntilSuccessful extends AbstractOutboundRouter implements UntilSuccessfulConfiguration {
 
@@ -66,7 +56,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   protected Object deadLetterQueue;
   protected Processor dlqMP;
   private boolean synchronous = false;
-  private ThreadingProfile threadingProfile;
   private UntilSuccessfulProcessingStrategy untilSuccessfulStrategy;
 
   @Override
@@ -104,9 +93,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     if (synchronous) {
       this.untilSuccessfulStrategy = new SynchronousUntilSuccessfulProcessingStrategy();
     } else {
-      if (threadingProfile == null) {
-        threadingProfile = muleContext.getDefaultThreadingProfile();
-      }
       this.untilSuccessfulStrategy = new AsynchronousUntilSuccessfulProcessingStrategy();
       ((MessagingExceptionHandlerAware) this.untilSuccessfulStrategy).setMessagingExceptionHandler(messagingExceptionHandler);
     }
@@ -157,12 +143,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     if (untilSuccessfulStrategy instanceof Startable) {
       ((Startable) untilSuccessfulStrategy).start();
     }
-  }
-
-  @Override
-  public ScheduledThreadPoolExecutor createScheduledRetriesPool(final String threadPrefix) {
-    return new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(threadPrefix + "_retries",
-                                                                     Thread.currentThread().getContextClassLoader()));
   }
 
   @Override
@@ -251,15 +231,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   @Override
   public ExpressionFilter getFailureExpressionFilter() {
     return failureExpressionFilter;
-  }
-
-  public void setThreadingProfile(ThreadingProfile threadingProfile) {
-    this.threadingProfile = threadingProfile;
-  }
-
-  @Override
-  public ThreadingProfile getThreadingProfile() {
-    return threadingProfile;
   }
 
   @Override
