@@ -141,8 +141,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         // These are OK to change after init but before start
         mutableConfig.setDefaultSynchronousEndpoints(true);
         mutableConfig.setSystemModelType("direct");
-        mutableConfig.setDefaultResponseTimeout(30000);
-        mutableConfig.setDefaultTransactionTimeout(60000);
         mutableConfig.setClientMode(true);
 
         // These are not OK to change after init
@@ -155,8 +153,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
 
         // These are OK to change after init but before start
         assertEquals("direct", config.getSystemModelType());
-        assertEquals(30000, config.getDefaultResponseTimeout());
-        assertEquals(60000, config.getDefaultTransactionTimeout());
         assertTrue(config.isClientMode());
         
         // These are not OK to change after init
@@ -176,14 +172,10 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
         mutableConfig.setDefaultSynchronousEndpoints(true);
         mutableConfig.setSystemModelType("direct");
-        mutableConfig.setDefaultResponseTimeout(30000);
-        mutableConfig.setDefaultTransactionTimeout(60000);
         mutableConfig.setClientMode(true);
 
         MuleConfiguration config = muleContext.getConfiguration();
         assertFalse("direct".equals(config.getSystemModelType()));
-        assertFalse(30000 == config.getDefaultResponseTimeout());
-        assertFalse(60000 == config.getDefaultTransactionTimeout());
         assertFalse(config.isClientMode());
     }
 
@@ -192,8 +184,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         MuleConfiguration config = muleContext.getConfiguration();
         assertEquals("UTF-16", config.getDefaultEncoding());
         assertEquals("direct", config.getSystemModelType());
-        assertEquals(30000, config.getDefaultResponseTimeout());
-        assertEquals(60000, config.getDefaultTransactionTimeout());
         // on windows this ends up with a c:/ in it
         assertTrue(config.getWorkingDirectory().indexOf(workingDirectory) != -1);
         assertTrue(config.isClientMode());

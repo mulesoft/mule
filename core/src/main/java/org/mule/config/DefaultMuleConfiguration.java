@@ -303,17 +303,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             systemModelType = p;
         }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
-        if (p != null)
-        {
-            responseTimeout = NumberUtils.toInt(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
-        if (p != null)
-        {
-            defaultTransactionTimeout = NumberUtils.toInt(p);
-        }
-
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
         if (p != null)
         {
