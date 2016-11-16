@@ -151,6 +151,7 @@ public class MuleProperties {
   public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
   public static final String OBJECT_CONVERTER_RESOLVER = "_converterResolver";
   public static final String OBJECT_EXPRESSION_LANGUAGE = "_muleExpressionLanguage";
+  public static final String OBJECT_EXPRESSION_MANAGER = "_muleExpressionManager";
   public static final String OBJECT_LOCK_FACTORY = "_muleLockFactory";
   public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
