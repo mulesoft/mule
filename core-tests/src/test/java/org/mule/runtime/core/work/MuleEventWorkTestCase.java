@@ -41,7 +41,7 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testScheduleMuleEventWork() throws Exception {
-    muleContext.getWorkManager().scheduleWork(new TestMuleEventWork(originalEvent));
+    muleContext.getSchedulerService().computationScheduler().submit(new TestMuleEventWork(originalEvent));
 
     assertTrue("Timed out waiting for latch", latch.await(2000, TimeUnit.MILLISECONDS));
 
