@@ -122,7 +122,7 @@ final class LoggerContextCache implements Disposable
         }
     }
 
-    synchronized LoggerContext getLoggerContext(final ClassLoader classLoader)
+    LoggerContext getLoggerContext(final ClassLoader classLoader)
     {
         final LoggerContext ctx;
         try
@@ -155,7 +155,13 @@ final class LoggerContextCache implements Disposable
 
         if (ctx.getState() == LifeCycle.State.INITIALIZED)
         {
-            ctx.start();
+            synchronized (this)
+            {
+                if (ctx.getState() == LifeCycle.State.INITIALIZED)
+                {
+                    ctx.start();
+                }
+            }
         }
 
         return ctx;
