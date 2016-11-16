@@ -18,6 +18,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
+import java.util.concurrent.RejectedExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +70,11 @@ public class AsyncResponseFlowProcessingPhase
     };
 
     if (messageProcessContext.supportsAsynchronousProcessing()) {
-      messageProcessContext.getFlowExecutionExecutor().execute(flowExecutionWork);
+      try {
+        messageProcessContext.getFlowExecutionExecutor().execute(flowExecutionWork);
+      } catch (RejectedExecutionException e) {
+        phaseResultNotifier.phaseFailure(e);
+      }
     } else {
       flowExecutionWork.run();
     }
