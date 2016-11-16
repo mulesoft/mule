@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.compatibility.core.config.i18n.TransportCoreMessages.connectorCausedError;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -348,7 +349,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         @Override
         public void onTransition(String phaseName, Connector object) throws MuleException {
           if (retryPolicyTemplate == null) {
-            retryPolicyTemplate = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+            retryPolicyTemplate = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
           }
 
           if (dispatcherPoolFactory == null) {
@@ -402,6 +403,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       return;
     }
 
+    scheduler = createScheduler();
+
     if (!isConnected()) {
       try {
         // startAfterConnect() will get called from the connect() method once connected.
@@ -435,7 +438,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
     lifecycleManager.fireStartPhase((phaseName, object) -> {
       initWorkManagers();
-      scheduler = createScheduler();
       doStart();
 
       if (receivers != null) {
@@ -489,9 +491,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     // }
 
     lifecycleManager.fireStopPhase((phaseName, object) -> {
-      // shutdown our scheduler service
-      shutdownScheduler();
-
       doStop();
 
       // Stop all the receivers on this connector
@@ -512,8 +511,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       clearDispatchers();
       clearRequesters();
 
-      // make sure the scheduler is gone
-      scheduler = null;
+      // shutdown our scheduler service
+      shutdownScheduler();
     });
   }
 

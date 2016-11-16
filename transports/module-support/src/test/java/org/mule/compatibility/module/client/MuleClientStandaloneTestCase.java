@@ -10,17 +10,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 
 import org.junit.Test;
 
 public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase {
-
-  @Override
-  protected MuleContext createMuleContext() throws Exception {
-    return null;
-  }
 
   @Test
   public void testCreateMuleClient() throws MuleException {

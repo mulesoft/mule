@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.invalidJdk;
@@ -306,6 +307,9 @@ public class DefaultMuleContext implements MuleContext {
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
 
+      setMuleContextIfNeeded(getExceptionListener(), this);
+      getExceptionListener().initialise();
+
       getNotificationManager().initialise();
     } catch (InitialisationException e) {
       disposeManagers();
@@ -398,6 +402,8 @@ public class DefaultMuleContext implements MuleContext {
     getLifecycleManager().checkPhase(Disposable.PHASE_NAME);
 
     fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSING));
+
+    getExceptionListener().dispose();
 
     try {
       getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);

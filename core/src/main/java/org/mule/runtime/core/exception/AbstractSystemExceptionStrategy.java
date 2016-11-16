@@ -9,8 +9,9 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
@@ -51,6 +52,9 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     }
 
     if (ex instanceof ConnectException) {
+      if (retryScheduler == null) {
+        throw new NullPointerException("asdfasdfasdfasd");
+      }
       ((ConnectException) ex).handleReconnection(retryScheduler);
     }
   }
@@ -70,19 +74,17 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   }
 
   @Override
-  public void start() throws MuleException {
+  protected void doInitialise(MuleContext context) throws InitialisationException {
     retryScheduler = muleContext.getSchedulerService().ioScheduler();
-    super.start();
+    super.doInitialise(context);
   }
 
   @Override
-  public void stop() throws MuleException {
-    super.stop();
+  public void dispose() {
+    super.dispose();
     if (retryScheduler != null) {
       retryScheduler.shutdownNow();
       retryScheduler = null;
     }
   }
 }
-
-

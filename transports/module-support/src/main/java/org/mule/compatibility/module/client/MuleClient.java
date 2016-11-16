@@ -8,6 +8,7 @@ package org.mule.compatibility.module.client;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -538,6 +539,7 @@ public class MuleClient implements Disposable {
    */
   @Override
   public void dispose() {
+    scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     // Dispose the muleContext only if the muleContext was created for this
     // client
     if (muleContext.getConfiguration().isClientMode()) {
