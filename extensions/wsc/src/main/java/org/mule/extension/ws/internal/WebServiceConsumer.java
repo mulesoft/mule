@@ -7,6 +7,13 @@
 package org.mule.extension.ws.internal;
 
 import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.security.SecurityStrategy;
+import org.mule.extension.ws.api.security.WssDecryptSecurityStrategy;
+import org.mule.extension.ws.api.security.WssEncryptSecurityStrategy;
+import org.mule.extension.ws.api.security.WssSignSecurityStrategy;
+import org.mule.extension.ws.api.security.WssTimestampSecurityStrategy;
+import org.mule.extension.ws.api.security.WssUsernameTokenSecurityStrategy;
+import org.mule.extension.ws.api.security.WssVerifySignatureSecurityStrategy;
 import org.mule.extension.ws.internal.connection.WscConnectionProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -14,6 +21,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -29,6 +37,9 @@ import javax.inject.Inject;
 @Export(classes = WscException.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
+@SubTypeMapping(baseType = SecurityStrategy.class,
+    subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
+        WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
 @Extension(name = "wsc")
 public class WebServiceConsumer implements Initialisable {
 

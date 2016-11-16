@@ -17,11 +17,13 @@ import org.mule.extension.ws.internal.generator.attachment.MtomResponseEnricher;
 import org.mule.extension.ws.internal.generator.attachment.SoapAttachmentRequestEnricher;
 import org.mule.extension.ws.internal.generator.attachment.SoapAttachmentResponseEnricher;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
+import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -53,12 +55,13 @@ public class WscConnection {
                        String service,
                        String port,
                        SoapVersion soapVersion,
+                       List<SecurityStrategy> securityStrategies,
                        boolean mtomEnabled)
       throws ConnectionException {
     this.wsdlIntrospecter = new WsdlIntrospecter(wsdlLocation, service, port);
     this.typeLoader = new XmlTypeLoader(this.wsdlIntrospecter.getSchemas());
     this.mtomEnabled = mtomEnabled;
-    this.client = clientFactory.create(address, wsdlIntrospecter.getPort(), soapVersion, mtomEnabled);
+    this.client = clientFactory.create(address, wsdlIntrospecter.getPort(), soapVersion, securityStrategies, mtomEnabled);
 
     if (mtomEnabled) {
       this.responseEnricher = new MtomResponseEnricher();

@@ -120,11 +120,22 @@
             <version>${guavaVersion}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>${commonsLangVersion}</version>
         </dependency>
-
         <!--TODO remove MULE-10783-->
         <dependency>
             <groupId>com.squareup.okhttp</groupId>

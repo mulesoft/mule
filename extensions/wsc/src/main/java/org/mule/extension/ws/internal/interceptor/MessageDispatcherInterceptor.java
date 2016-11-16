@@ -13,9 +13,11 @@ import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.ENCODING;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
 import static org.mule.extension.ws.internal.ConsumeOperation.MULE_WSC_ENCODING;
+import static org.mule.runtime.api.metadata.MediaType.MULTIPART_RELATED;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.extension.ws.internal.transport.HttpDispatcher;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.IOUtils;
 
 import com.squareup.okhttp.Response;
@@ -85,6 +87,12 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
       inMessage.put(ENCODING, encoding);
 
       String contentType = response.header(CONTENT_TYPE);
+
+      // TODO: MULE-10783 This is needed when the HTTP message is returned a multipart with only one part.
+      if (body.contains("uid") && !contentType.contains(MULTIPART_RELATED.toString())) {
+        contentType = MediaType.MULTIPART_RELATED.toString();
+      }
+
       inMessage.put(CONTENT_TYPE, contentType);
       inMessage.setContent(InputStream.class, is);
       inMessage.setExchange(exchange);

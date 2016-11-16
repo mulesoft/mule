@@ -6,20 +6,29 @@
  */
 package org.mule.extension.ws.internal.connection;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.extension.ws.api.SoapVersion;
+import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
+import java.util.List;
 
 /**
  * {@link ConnectionProvider} that returns instances of {@link WscConnection}.
  *
  * @since 4.0
  */
-public class WscConnectionProvider implements PoolingConnectionProvider<WscConnection> {
+public class WscConnectionProvider implements PoolingConnectionProvider<WscConnection>, Initialisable {
 
   /**
    * The WSDL file URL remote or local.
@@ -47,11 +56,21 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   private String address;
 
   /**
-   * If should use the MTOM protocol to manage the attachments or not.
+   * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. Allows to create a TLS secured
+   * connections.
    */
   @Parameter
-  @Optional(defaultValue = "false")
-  private boolean mtomEnabled;
+  @Optional
+  @Summary("TLS Configuration for the secure connection of the IMAPS protocol")
+  private TlsContextFactory tlsContextFactory;
+
+  /**
+   * The security strategies configured to protect the SOAP messages.
+   */
+  @Parameter
+  @Optional
+  @NullSafe
+  private List<SecurityStrategy> securityStrategies;
 
   /**
    * The soap version of the WSDL.
@@ -60,16 +79,45 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   @Optional(defaultValue = "SOAP11")
   private SoapVersion soapVersion;
 
+  /**
+   * If should use the MTOM protocol to manage the attachments or not.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  private boolean mtomEnabled;
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Initialises the {@code tlsContextFactory}.
+   */
   @Override
-  public WscConnection connect() throws ConnectionException {
-    return new WscConnection(wsdlLocation, address, service, port, soapVersion, mtomEnabled);
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(tlsContextFactory);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public WscConnection connect() throws ConnectionException {
+    for (SecurityStrategy securityStrategy : securityStrategies) {
+      securityStrategy.initializeTlsContextFactory(tlsContextFactory);
+    }
+    return new WscConnection(wsdlLocation, address, service, port, soapVersion, securityStrategies, mtomEnabled);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void disconnect(WscConnection client) {
     client.disconnect();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ConnectionValidationResult validate(WscConnection client) {
     return client.validateConnection();

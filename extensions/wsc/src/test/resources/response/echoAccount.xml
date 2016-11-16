@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns2:echoAccountResponse xmlns:ns2="http://consumer.ws.extension.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <account>
-        <id>12</id>
         <clientName>Juan</clientName>
+        <id>12</id>
         <items>chocolate</items>
         <items>banana</items>
         <items>dulce de leche</items>

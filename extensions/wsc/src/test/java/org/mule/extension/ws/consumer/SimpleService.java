@@ -6,19 +6,32 @@
  */
 package org.mule.extension.ws.consumer;
 
+import static java.lang.String.format;
+import org.mule.runtime.core.util.IOUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
+import javax.xml.ws.soap.MTOM;
 
 /**
  * Web service used by WS Consumer tests.
  *
  * @since 4.0
  */
+@MTOM
 @WebService(portName = "TestPort", serviceName = "TestService")
-public class TestService {
+public class SimpleService {
 
   @WebResult(name = "text")
   @WebMethod(action = "echoOperation")
@@ -71,5 +84,39 @@ public class TestService {
     a.setItems(account.getItems());
     a.setStartingDate(account.getStartingDate());
     return a;
+  }
+
+  @WebResult(name = "result")
+  @WebMethod(action = "uploadAttachment")
+  public String uploadAttachment(@WebParam(mode = WebParam.Mode.IN, name = "attachment") DataHandler attachment) {
+    try {
+      String received = IOUtils.toString(attachment.getInputStream());
+      if (received.contains("Some Content")) {
+        return "Ok";
+      } else {
+        return format("Unexpected Content: [%s], was expecting [Some Content]", received);
+      }
+    } catch (IOException e) {
+      return "Error: " + e.getMessage();
+    }
+  }
+
+  @WebResult(name = "attachment")
+  @WebMethod(action = "downloadAttachment")
+  public DataHandler downloadAttachment(@WebParam(mode = WebParam.Mode.IN, name = "fileName") String fileName) {
+    File file = new File(getResourceAsUrl(fileName).getPath());
+    return new DataHandler(new FileDataSource(file));
+  }
+
+  private URL getResourceAsUrl(String fileName) {
+    try {
+      return Thread.currentThread().getContextClassLoader().getResource(fileName).toURI().toURL();
+    } catch (MalformedURLException | URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static void main(String[] args) {
+
   }
 }

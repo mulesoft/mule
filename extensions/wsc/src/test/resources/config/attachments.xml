@@ -4,10 +4,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
-    <!-- MTOM must be enabled -->
     <wsc:config name="attachmentsConfig">
-        <wsc:connection wsdlLocation="http://localhost:${attachmentPort}/testAttachments?wsdl" service="TestAttachmentsService"
-                        port="TestAttachmentsPort" mtomEnabled="${mtomEnabled}"/>
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/testService?wsdl" service="TestService" port="TestPort" mtomEnabled="${mtomEnabled}"/>
     </wsc:config>
 
     <flow name="downloadAttachment">
