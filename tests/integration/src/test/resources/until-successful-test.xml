@@ -76,20 +76,4 @@
             </processor-chain>
         </until-successful>
     </flow>
-
-    <flow name="asynchronous-using-threading-profile">
-        <until-successful objectStore-ref="objectStore" maxRetries="3" millisBetweenRetries="0">
-            <threading-profile maxThreadsActive="1" maxThreadsIdle="1" poolExhaustedAction="RUN"/>
-            <processor-chain>
-                <test:invocation-counter name="untilSuccessful2"/>
-                <test:component throwException="true"/>
-            </processor-chain>
-        </until-successful>
-        <error-handler>
-            <on-error-propagate>
-                <test:invocation-counter name="exceptionStrategy2"/>
-            </on-error-propagate>
-        </error-handler>
-    </flow>
-
 </mule>
