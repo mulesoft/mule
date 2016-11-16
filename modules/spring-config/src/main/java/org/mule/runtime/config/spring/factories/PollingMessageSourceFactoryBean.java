@@ -9,23 +9,23 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
+import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 
 import org.springframework.beans.factory.FactoryBean;
 
 public class PollingMessageSourceFactoryBean implements FactoryBean<PollingMessageSource>, MuleContextAware {
 
-  protected ScheduledPollFactory schedulerFactory;
+  protected PeriodicScheduler scheduler;
   protected Processor messageProcessor;
   protected MessageProcessorPollingOverride override;
   protected Long frequency;
   private MuleContext muleContext;
 
-  private FixedFrequencyScheduledPollFactory defaultSchedulerFactory() {
-    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
+  private FixedFrequencyScheduler defaultScheduler() {
+    FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
     factory.setFrequency(frequency);
     return factory;
   }
@@ -42,16 +42,16 @@ public class PollingMessageSourceFactoryBean implements FactoryBean<PollingMessa
     this.frequency = frequency;
   }
 
-  public void setSchedulerFactory(ScheduledPollFactory schedulerFactory) {
-    this.schedulerFactory = schedulerFactory;
+  public void setScheduler(PeriodicScheduler scheduler) {
+    this.scheduler = scheduler;
   }
 
 
   @Override
   public PollingMessageSource getObject() throws Exception {
-    schedulerFactory = schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory;
+    scheduler = scheduler == null ? defaultScheduler() : scheduler;
     override = override != null ? this.override : new MessageProcessorPollingOverride.NullOverride();
-    return new PollingMessageSource(muleContext, messageProcessor, override, schedulerFactory);
+    return new PollingMessageSource(muleContext, messageProcessor, override, scheduler);
   }
 
   @Override

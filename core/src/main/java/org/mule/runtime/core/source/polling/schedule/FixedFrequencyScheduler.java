@@ -11,48 +11,37 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
+import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
- * <p>
- * Implementation of {@link ScheduledPollFactory} for a fixed-frequency {@link ScheduledPoll}.
- * </p>
+ * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
  *
- * @since 3.5.0
+ * @since 3.5.0, moved from {@link org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory}.
  */
-public class FixedFrequencyScheduledPollFactory extends ScheduledPollFactory {
+public class FixedFrequencyScheduler extends PeriodicScheduler {
 
   /**
-   * <p>
    * The {@link TimeUnit} of the scheduler
-   * </p>
    */
   private TimeUnit timeUnit = MILLISECONDS;
 
   /**
-   * <p>
    * The frequency of the scheduler in timeUnit
-   * </p>
    */
   private long frequency = 1000l;
 
   /**
-   * <p>
    * The time in timeUnit that it has to wait before executing the first task
-   * </p>
    */
   private long startDelay = 1000l;
 
 
   @Override
-  public ScheduledPoll doCreate(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name,
-                                final Runnable job) {
-    return new ScheduledPoll(executorSupplier, executorStopper, name, job,
-                             executor -> executor.scheduleAtFixedRate(job, startDelay, frequency, timeUnit));
+  public ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {
+    return executor.scheduleAtFixedRate(job, startDelay, frequency, timeUnit);
   }
 
   public void setTimeUnit(TimeUnit timeUnit) {

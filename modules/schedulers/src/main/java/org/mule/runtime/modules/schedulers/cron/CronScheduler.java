@@ -11,27 +11,22 @@ import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
 
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
-import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
+import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 
 import java.util.TimeZone;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * <p>
- * Factory of the Cron {@link ScheduledPoll}.
- * </p>
+ * Scheduler for Cron scheduled jobs.
  *
- * @since 3.5.0
+ * @since 3.5.0, moved from {@link org.mule.runtime.modules.schedulers.cron.CronSchedulerFactory}.
  */
-public class CronScheduledPollFactory extends ScheduledPollFactory {
+public class CronScheduler extends PeriodicScheduler {
 
-  private static final Logger logger = LoggerFactory.getLogger(CronScheduledPollFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(CronScheduler.class);
 
   private static final String TZ_GMT_ID = "GMT";
 
@@ -40,10 +35,8 @@ public class CronScheduledPollFactory extends ScheduledPollFactory {
   private String timeZone;
 
   @Override
-  protected ScheduledPoll doCreate(Supplier<Scheduler> executorSupplier, Consumer<Scheduler> executorStopper, String name,
-                                   Runnable job) {
-    return new ScheduledPoll(executorSupplier, executorStopper, name, job,
-                             executor -> executor.scheduleWithCronExpression(job, expression, resolveTimeZone(timeZone)));
+  protected ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {
+    return executor.scheduleWithCronExpression(job, expression, resolveTimeZone(timeZone));
   }
 
   protected TimeZone resolveTimeZone(String name) {

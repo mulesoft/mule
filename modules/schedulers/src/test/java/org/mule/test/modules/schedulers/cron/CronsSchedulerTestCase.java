@@ -6,7 +6,9 @@
  */
 package org.mule.test.modules.schedulers.cron;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
@@ -14,11 +16,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 
@@ -32,10 +37,8 @@ public class CronsSchedulerTestCase extends MuleArtifactFunctionalTestCase {
   private static List<String> foo = new ArrayList<>();
   private static List<String> bar = new ArrayList<>();
 
-  @BeforeClass
-  public static void setProperties() {
-    System.setProperty("expression.property", "0/1 * * * * ?");
-  }
+  @ClassRule
+  public static SystemProperty days = new SystemProperty("expression.property", "0/1 * * * * ?");
 
   @Override
   protected String getConfigFile() {
@@ -51,19 +54,20 @@ public class CronsSchedulerTestCase extends MuleArtifactFunctionalTestCase {
 
     stopSchedulers();
 
-    waitForPollElements();
-
     int fooElementsAfterStopping = foo.size();
 
     waitForPollElements();
 
-    assertEquals(fooElementsAfterStopping, foo.size());
+    assertThat(foo.size(), is(fooElementsAfterStopping));
 
+    startSchedulers();
     runSchedulersOnce();
 
-    waitForPollElements();
-
-    assertEquals(fooElementsAfterStopping + 1, foo.size());
+    new PollingProber(2000, 100).check(new JUnitLambdaProbe(() -> {
+      // One for the scheduler run and another for the on-demand one
+      assertThat(foo.size(), is(fooElementsAfterStopping + 2));
+      return true;
+    }));
   }
 
   private void waitForPollElements() throws InterruptedException {
@@ -92,20 +96,20 @@ public class CronsSchedulerTestCase extends MuleArtifactFunctionalTestCase {
 
   private void runSchedulersOnce() throws Exception {
     Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
-    flow.start();
-    try {
-      MessageSource flowSource = flow.getMessageSource();
-      if (flowSource instanceof PollingMessageSource) {
-        ((PollingMessageSource) flowSource).performPoll();
-      }
-    } finally {
-      flow.stop();
+    MessageSource flowSource = flow.getMessageSource();
+    if (flowSource instanceof PollingMessageSource) {
+      ((PollingMessageSource) flowSource).performPoll();
     }
   }
 
   private void stopSchedulers() throws MuleException {
     Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
     flow.stop();
+  }
+
+  private void startSchedulers() throws MuleException {
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    flow.start();
   }
 
   public static class FooComponent {

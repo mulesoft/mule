@@ -92,7 +92,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.source.polling.ScheduledPollFactory;
+import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
@@ -157,7 +157,7 @@ import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequest
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
 import org.mule.runtime.core.transaction.TransactionType;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
@@ -518,10 +518,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("override", fromChildConfiguration(MessageProcessorPollingOverride.class).build())
-        .withSetterParameterDefinition("schedulerFactory", fromChildConfiguration(ScheduledPollFactory.class).build()).build());
+        .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class).build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("fixed-frequency-scheduler")
-        .withTypeDefinition(fromType(FixedFrequencyScheduledPollFactory.class))
+        .withTypeDefinition(fromType(FixedFrequencyScheduler.class))
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());

@@ -9,8 +9,6 @@ package org.mule.compatibility.core.source.polling.schedule;
 
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -22,10 +20,11 @@ import org.mule.compatibility.core.transport.PollingReceiverWorker;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduledPollFactory;
-import org.mule.runtime.core.source.polling.schedule.ScheduledPoll;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.concurrent.ScheduledFuture;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,48 +44,38 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
 
   @Test
   public void testCreatesCorrectInstance() throws MuleException {
-    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
+    FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
     factory.setFrequency(300);
     factory.setStartDelay(400);
     factory.setTimeUnit(DAYS);
 
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
-    ScheduledPoll scheduler = factory.doCreate(() -> schedulerService.ioScheduler(), null, "name", worker);
+    ScheduledFuture<?> scheduler = factory.doSchedule(schedulerService.ioScheduler(), worker);
 
-    scheduler.initialise();
-    scheduler.start();
-
-    verify(schedulerService).ioScheduler();
     Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
     verify(createdScheduler).scheduleAtFixedRate(any(), eq(400l), eq(300l), eq(DAYS));
-
-    assertThat(scheduler.getName(), is("name"));
   }
 
   @Test
   public void testDefaultValues() throws MuleException {
-    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
+    FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
 
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
-    ScheduledPoll scheduler = factory.doCreate(() -> schedulerService.ioScheduler(), null, "name", worker);
+    ScheduledFuture<?> scheduler = factory.doSchedule(schedulerService.ioScheduler(), worker);
 
-    scheduler.initialise();
-    scheduler.start();
-
-    verify(schedulerService).ioScheduler();
     Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
     verify(createdScheduler).scheduleAtFixedRate(any(), eq(1000l), eq(1000l), eq(MILLISECONDS));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeFrequency() {
-    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
+    FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
     factory.setFrequency(-1);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeStartDelay() {
-    FixedFrequencyScheduledPollFactory factory = new FixedFrequencyScheduledPollFactory();
+    FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
     factory.setStartDelay(-1);
   }
 }
