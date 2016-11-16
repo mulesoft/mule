@@ -233,7 +233,7 @@ public final class SchemaBuilder {
   }
 
   public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel) {
-    connectionProviderSchemaDelegate.registerConnectionProviderElement(providerModel);
+    connectionProviderSchemaDelegate.registerConnectionProviderElement(providerModel, dslResolver.resolve(providerModel));
     return this;
   }
 

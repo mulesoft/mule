@@ -12,7 +12,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Banana;
 
-@Alias("banana")
+@Alias("BananaPlantain")
 public class VeganBananaConnectionProvider implements ConnectionProvider<Banana> {
 
   @Override
