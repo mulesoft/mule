@@ -32,7 +32,12 @@ public abstract class AbstractSingleQueryExecutor extends AbstractExecutor imple
 
     prepareQuery(statement, query);
 
-    return doExecuteQuery(connection, statement, query);
+    try {
+    	return doExecuteQuery(connection, statement, query);
+    } catch (SQLException e) {
+    	LOGGER.error("Error executing "+query.getQueryTemplate().getSqlText(), e);
+    	throw e;
+    }
   }
 
   @Override
