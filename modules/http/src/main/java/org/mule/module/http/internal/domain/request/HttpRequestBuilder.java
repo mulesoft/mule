@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.domain.request;
 
+import org.mule.module.http.internal.CaseInsensitiveParameterMap;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.HttpEntity;
@@ -16,7 +17,7 @@ public class HttpRequestBuilder
     private String path;
     private String uri;
     private String method;
-    private ParameterMap headers;
+    private CaseInsensitiveParameterMap headers;
     private ParameterMap queryParams;
     private HttpEntity entity;
 
@@ -35,7 +36,7 @@ public class HttpRequestBuilder
 
     public HttpRequestBuilder setHeaders(ParameterMap headers)
     {
-        this.headers = headers;
+        this.headers = new CaseInsensitiveParameterMap(headers);
         return this;
     }
 

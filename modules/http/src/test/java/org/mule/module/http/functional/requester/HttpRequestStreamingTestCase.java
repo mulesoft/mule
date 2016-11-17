@@ -136,8 +136,19 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
     @Test
     public void streamsWithContentLengthHeaderAndStreamingModeAlways() throws Exception
     {
+        contentLengthStreaming(CONTENT_LENGTH);
+    }
+
+    @Test
+    public void streamsWithLowerCaseContentLengthHeaderAndStreamingModeAlways() throws Exception
+    {
+        contentLengthStreaming(CONTENT_LENGTH.toLowerCase());
+    }
+
+    private void contentLengthStreaming(String key) throws Exception
+    {
         MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
+        event.getMessage().setOutboundProperty(key, TEST_MESSAGE.length());
         assertStreaming("streamingAlways", event);
     }
 

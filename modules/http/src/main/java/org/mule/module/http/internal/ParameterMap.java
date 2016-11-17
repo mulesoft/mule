@@ -6,9 +6,7 @@
  */
 package org.mule.module.http.internal;
 
-import static java.util.Arrays.toString;
 import static java.util.Collections.unmodifiableMap;
-
 import org.mule.module.http.api.HttpParameters;
 
 import java.io.Serializable;
@@ -27,7 +25,7 @@ import java.util.Set;
 public class ParameterMap implements HttpParameters, Serializable
 {
 
-    private final Map<String, LinkedList<String>> paramsMap;
+    protected Map<String, LinkedList<String>> paramsMap;
 
     public ParameterMap(final Map paramsMap)
     {
