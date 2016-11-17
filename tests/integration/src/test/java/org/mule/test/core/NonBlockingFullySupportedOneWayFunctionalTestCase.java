@@ -86,15 +86,14 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends AbstractI
 
   @Test
   public void filterBeforeNonBlockingRejects() throws Exception {
-    assertThat(flowRunner("filterBeforeNonBlockingRejects").withPayload(TEST_MESSAGE).nonBlocking().run(),
-               is(nullValue()));
+    assertThat(flowRunner("filterBeforeNonBlockingRejects").withPayload(TEST_MESSAGE).withExchangePattern(ONE_WAY).nonBlocking()
+        .run(), is(nullValue()));
   }
 
   @Test
   public void filterAfterEnricherBeforeNonBlocking() throws Exception {
     assertThat(flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE).withExchangePattern(ONE_WAY)
-        .nonBlocking().run(),
-               is(nullValue()));
+        .nonBlocking().run(), is(nullValue()));
   }
 
   @Test

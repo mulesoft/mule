@@ -21,6 +21,7 @@ import org.mule.test.AbstractIntegrationTestCase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
 import org.junit.Test;
 
@@ -44,7 +45,10 @@ public class AggregationTimeoutTestCase extends AbstractIntegrationTestCase {
 
     try {
       MuleClient client = muleContext.getClient();
-      flowRunner("main").withPayload(inputData).dispatch();
+
+      // Need to return control to test case as soon as message is sent, and not wait for response.
+      muleContext.getSchedulerService().ioScheduler()
+          .submit(() -> flowRunner("main").withPayload(inputData).withExchangePattern(ONE_WAY).dispatch());
 
       InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
       assertThat(response.getPayload().getValue(), instanceOf(List.class));
