@@ -166,6 +166,7 @@ public class MuleClient implements Disposable {
     }
     logger.info("Initializing Mule...");
     muleContext = muleContextFactory.createMuleContext(builder);
+    scheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
   /**
@@ -210,6 +211,7 @@ public class MuleClient implements Disposable {
               registry.registerObject(schedulerService.getName(), schedulerService);
             }
           }), contextBuilder);
+      scheduler = muleContext.getSchedulerService().ioScheduler();
     } else {
       logger.info("Using existing MuleContext: " + muleContext);
     }
