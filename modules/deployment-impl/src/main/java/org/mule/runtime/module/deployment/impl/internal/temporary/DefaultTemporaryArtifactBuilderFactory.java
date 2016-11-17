@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.internal;
+package org.mule.runtime.module.deployment.impl.internal.temporary;
 
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
@@ -22,6 +22,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilder;

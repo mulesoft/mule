@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.internal;
+package org.mule.runtime.module.deployment.impl.internal;
 
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -27,6 +27,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.ApplicationD
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TemporaryApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TemporaryApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;

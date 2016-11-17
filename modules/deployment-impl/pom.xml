@@ -9,7 +9,7 @@
         <version>4.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mule-module-deployment-impl</artifactId>
+    <artifactId>mule-module-deployment-model-impl</artifactId>
     <packaging>jar</packaging>
     <name>Mule Deployment Model Implementation Module</name>
     <description>Implements the Deployment Model</description>

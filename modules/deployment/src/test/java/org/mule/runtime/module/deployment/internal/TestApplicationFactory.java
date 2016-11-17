@@ -19,6 +19,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.ApplicationC
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TestApplicationWrapper;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;

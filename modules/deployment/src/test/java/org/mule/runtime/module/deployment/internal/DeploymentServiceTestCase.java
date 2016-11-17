@@ -89,6 +89,8 @@ import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibrary
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;

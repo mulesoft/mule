@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-deployment-impl</artifactId>
+            <artifactId>mule-module-deployment-model-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -107,7 +107,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-deployment-impl</artifactId>
+            <artifactId>mule-module-deployment-model-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
             <type>test-jar</type>

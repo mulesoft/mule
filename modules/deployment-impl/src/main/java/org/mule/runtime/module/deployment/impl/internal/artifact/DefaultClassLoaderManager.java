@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.internal;
+package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
