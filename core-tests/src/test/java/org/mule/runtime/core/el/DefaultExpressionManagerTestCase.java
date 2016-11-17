@@ -23,7 +23,6 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -60,7 +59,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   ExpressionLanguage mvelExpressionLanguage = new MVELExpressionLanguage(muleContext);
 
   @Before
-  public void setUp() throws InitialisationException {
+  public void setUp() {
     MuleContext mockMuleContext = spy(muleContext);
     MuleRegistry registry = spy(muleContext.getRegistry());
     doReturn(registry).when(mockMuleContext).getRegistry();
