@@ -38,7 +38,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends AbstractInt
     muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
                                              new EventGroupSerializerObjectStore<Serializable>());
     List<String> list = Arrays.asList("first", "second");
-    flowRunner("splitter").withPayload(list).asynchronously().run();
+    flowRunner("splitter").withPayload(list).run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();

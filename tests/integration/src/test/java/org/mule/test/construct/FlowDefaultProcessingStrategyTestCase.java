@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -43,7 +44,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
 
   @Test
   public void oneWay() throws Exception {
-    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).withExchangePattern(ONE_WAY).run();
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(currentThread().getName())));
   }
@@ -60,7 +61,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
   @Test
   public void oneWayTransacted() throws Exception {
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
-        .asynchronously().run();
+        .withExchangePattern(ONE_WAY).run();
 
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));

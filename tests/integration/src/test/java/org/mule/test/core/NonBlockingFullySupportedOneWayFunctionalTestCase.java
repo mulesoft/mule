@@ -10,6 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
+import static org.mule.runtime.core.MessageExchangePattern.*;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Ignore;
@@ -63,7 +65,8 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends AbstractI
 
   @Test
   public void filterRejects() throws Exception {
-    assertThat(flowRunner("filterRejects").withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run(), is(nullValue()));
+    assertThat(flowRunner("filterRejects").withPayload(TEST_MESSAGE).nonBlocking().withExchangePattern(ONE_WAY).run(),
+               is(nullValue()));
   }
 
   @Test
@@ -83,13 +86,14 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends AbstractI
 
   @Test
   public void filterBeforeNonBlockingRejects() throws Exception {
-    assertThat(flowRunner("filterBeforeNonBlockingRejects").withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run(),
+    assertThat(flowRunner("filterBeforeNonBlockingRejects").withPayload(TEST_MESSAGE).nonBlocking().run(),
                is(nullValue()));
   }
 
   @Test
   public void filterAfterEnricherBeforeNonBlocking() throws Exception {
-    assertThat(flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run(),
+    assertThat(flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE).withExchangePattern(ONE_WAY)
+        .nonBlocking().run(),
                is(nullValue()));
   }
 
@@ -141,7 +145,7 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends AbstractI
   }
 
   private void run(String flowName) throws Exception {
-    flowRunner(flowName).withPayload(TEST_MESSAGE).asynchronously().nonBlocking().run();
+    flowRunner(flowName).withPayload(TEST_MESSAGE).withExchangePattern(ONE_WAY).nonBlocking().run();
   }
 
 }

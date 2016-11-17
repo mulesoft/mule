@@ -12,6 +12,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -278,7 +279,7 @@ public class OnErrorPropagateTestCase extends CompatibilityFunctionalTestCase {
 
   private void verifyFlow(String flowName, Object payload) throws InterruptedException {
     try {
-      flowRunner(flowName).withPayload(payload).asynchronously().run().getMessage();
+      flowRunner(flowName).withPayload(payload).run();
     } catch (Exception e) {
       assertThat(e.getCause(), is(instanceOf(FunctionalTestException.class)));
       if (!CallMessageProcessor.latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {

@@ -34,9 +34,9 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     expectedException.expect(MessagingException.class);
     assertNotNull(flowRunner("service-2").withPayload("hello sweet world").run());
     assertNotNull(flowRunner("service-3").withPayload("hello sweet world").run());
-    flowRunner("service-4").withPayload("goodbye cruel world").asynchronously().run();
+    flowRunner("service-4").withPayload("goodbye cruel world").run();
     client.request("test://ow-out", RECEIVE_TIMEOUT);
-    flowRunner("service-5").withPayload("goodbye cruel world").withInboundProperty("fail", "true").asynchronously().run();
+    flowRunner("service-5").withPayload("goodbye cruel world").withInboundProperty("fail", "true").run();
     client.request("test://owException-out", RECEIVE_TIMEOUT);
 
     assertNotifications();

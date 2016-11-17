@@ -37,7 +37,7 @@ public class CorrelationResequencerTestCase extends AbstractIntegrationTestCase 
 
   @Test
   public void testResequencer() throws Exception {
-    flowRunner("splitter").withPayload(Arrays.asList("a", "b", "c", "d", "e", "f")).asynchronously().run();
+    flowRunner("splitter").withPayload(Arrays.asList("a", "b", "c", "d", "e", "f")).run();
 
     FunctionalTestComponent resequencer = getFunctionalTestComponent("sorted");
 

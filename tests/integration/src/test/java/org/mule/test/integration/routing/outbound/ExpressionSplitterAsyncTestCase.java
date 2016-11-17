@@ -27,7 +27,7 @@ public class ExpressionSplitterAsyncTestCase extends AbstractIntegrationTestCase
     FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
     fruitBowl.addFruit(new Orange());
 
-    flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
+    flowRunner("Distributor").withPayload(fruitBowl).run();
 
     FlowAssert.verify();
   }

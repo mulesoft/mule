@@ -30,7 +30,7 @@ public class AutoTransformerTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testInboundAutoTransform() throws Exception {
     latch = new Latch();
-    flowRunner("test").withPayload(new FruitBowl(new Apple(), new Banana())).asynchronously().run();
+    flowRunner("test").withPayload(new FruitBowl(new Apple(), new Banana())).run();
 
     assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
   }

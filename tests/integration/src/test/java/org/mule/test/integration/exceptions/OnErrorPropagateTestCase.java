@@ -61,7 +61,7 @@ public class OnErrorPropagateTestCase extends AbstractIntegrationTestCase {
 
   private void verifyFlow(String flowName, Object payload) throws InterruptedException {
     try {
-      flowRunner(flowName).withPayload(payload).asynchronously().run().getMessage();
+      flowRunner(flowName).withPayload(payload).dispatch();
     } catch (Exception e) {
       assertThat(e.getCause(), is(instanceOf(FunctionalTestException.class)));
       if (!CallMessageProcessor.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {

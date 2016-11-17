@@ -216,21 +216,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Configures this runner to run this flow as one-way.
-   *
-   * @return this {@link FlowRunner}
-   * @deprecated MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  public R asynchronously() {
-    eventBuilder.asynchronously();
-
-    return (R) this;
-  }
-
-  /**
-   * Configures this runner to run this flow as using the provided {@link MessageExchangePattern}. This is useful if the exchange
-   * pattern needs to be paramatized, otherwise {@link #asynchronously()} can be used.
+   * Configures this runner to run this flow as using the provided {@link MessageExchangePattern}.
    *
    * @return this {@link FlowRunner}
    * @deprecated MULE-10445 Mule 4 - New Threading model
@@ -241,7 +227,6 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
 
     return (R) this;
   }
-
 
   /**
    * Will spy the built {@link Message} and {@link Event}. See {@link Mockito#spy(Object) spy}.

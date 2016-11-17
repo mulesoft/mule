@@ -7,8 +7,10 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -55,7 +57,7 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
       @Override
       public void run() {
         try {
-          flowRunner(flowName).withPayload(payload).asynchronously().run();
+          flowRunner(flowName).withPayload(payload).withExchangePattern(ONE_WAY).dispatch();
 
           InternalMessage response = client.request("test://response", RECEIVE_TIMEOUT).getRight().get();
           results[0] = payload.equals(getPayloadAsString(response));

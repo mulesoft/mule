@@ -10,6 +10,9 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import org.mule.functional.functional.FlowAssert;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -113,18 +116,41 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public Event runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    Event responseEvent = txExecutionTemplate.execute(() -> {
+    Event response = txExecutionTemplate.execute(getFlowExecutionCallback(flow));
+
+    for (String flowNameToVerify : flowNamesToVerify) {
+      FlowAssert.verify(flowNameToVerify);
+    }
+
+    return (Event) responseEventTransformer.transform(response);
+  }
+
+  /**
+   * Dispatchs to the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
+   * afterwards.
+   *
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   *
+   * Dispatch behaves differently to {@link FlowRunner#run()} in that it does not propagate any exceptions to the test case or
+   * return a result.
+   */
+  public void dispatch() {
+    try {
+      run();
+    } catch (Exception e) {
+      // Ignore
+    }
+  }
+
+  private ExecutionCallback getFlowExecutionCallback(final Flow flow) {
+    return () -> {
       if (nonBlocking) {
         return processAsStreamAndBlock(getOrBuildEvent(), flow);
       } else {
         return flow.process(getOrBuildEvent());
       }
-    });
-    for (String flowNameToVerify : flowNamesToVerify) {
-      FlowAssert.verify(flowNameToVerify);
-    }
-
-    return (Event) responseEventTransformer.transform(responseEvent);
+    };
   }
 
   /**

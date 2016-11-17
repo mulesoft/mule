@@ -240,17 +240,6 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to run as one-way.
-   *
-   * @return this {@link TestEventBuilder}
-   */
-  public TestEventBuilder asynchronously() {
-    exchangePattern = ONE_WAY;
-
-    return this;
-  }
-
-  /**
    * Configures the product event to have the provided {@link ReplyToHandler}.
    *
    * @return this {@link TestEventBuilder}

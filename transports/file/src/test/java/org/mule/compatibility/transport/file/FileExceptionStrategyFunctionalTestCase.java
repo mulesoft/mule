@@ -83,7 +83,7 @@ public class FileExceptionStrategyFunctionalTestCase extends CompatibilityFuncti
     latch.await(2000l, MILLISECONDS);
     flow.stop();
     File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-    assertThat(inputFile.exists(), is(false));
+    assertThat(inputFile.exists(), is(true));
     assertThat(outputFile.exists(), is(false));
   }
 
@@ -97,7 +97,7 @@ public class FileExceptionStrategyFunctionalTestCase extends CompatibilityFuncti
     flow.stop();
     File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
     File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
-    assertThat(inputFile.exists(), is(false));
+    assertThat(inputFile.exists(), is(true));
     assertThat(outputFile.exists(), is(false));
     assertThat(workDirFile.exists(), is(false));
   }

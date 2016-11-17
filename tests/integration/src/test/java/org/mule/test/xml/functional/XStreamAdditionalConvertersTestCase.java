@@ -48,7 +48,7 @@ public class XStreamAdditionalConvertersTestCase extends AbstractIntegrationTest
     String timestamp = converter.toString(new Date(System.currentTimeMillis()));
     String input = "<test-bean><createDate>" + timestamp + "</createDate></test-bean>";
 
-    flowRunner(FLOW_NAME).withPayload(input).asynchronously().run();
+    flowRunner(FLOW_NAME).withPayload(input).run();
 
     assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
   }

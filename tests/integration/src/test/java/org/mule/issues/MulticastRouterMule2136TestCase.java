@@ -37,7 +37,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
   }
 
   protected void sendObject() throws Exception {
-    flowRunner("object to xml").withPayload(new Parent(new Child())).asynchronously().run();
+    flowRunner("object to xml").withPayload(new Parent(new Child())).run();
   }
 
   @Test

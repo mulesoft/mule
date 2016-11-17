@@ -78,7 +78,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testDefaultConfiguration() throws Exception {
     final String payload = RandomStringUtils.randomAlphanumeric(20);
-    flowRunner("minimal-config").withPayload(payload).asynchronously().run();
+    flowRunner("minimal-config").withPayload(payload).run();
 
     final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
     assertThat(receivedPayloads, hasSize(1));
@@ -113,7 +113,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testRetryOnEndpoint() throws Exception {
     final String payload = RandomStringUtils.randomAlphanumeric(20);
-    flowRunner("retry-endpoint-config").withPayload(payload).asynchronously().run();
+    flowRunner("retry-endpoint-config").withPayload(payload).run();
 
     final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
     assertThat(receivedPayloads, hasSize(3));

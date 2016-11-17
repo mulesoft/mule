@@ -6,12 +6,16 @@
  */
 package org.mule.compatibility.transport.http.reliability;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 /**
@@ -48,26 +52,21 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
   @Override
   public void testComponentException() throws Exception {
     HttpMethodBase request = createRequest(getBaseUri() + "/componentException");
-    int status = httpClient.executeMethod(request);
-    // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
-    // perspective, the message has been delivered successfully.
-    assertEquals(HttpConstants.SC_OK, status);
+    assertThat(httpClient.executeMethod(request), equalTo(SC_INTERNAL_SERVER_ERROR));
   }
 
   @Test
   @Override
   public void testTransformerException() throws Exception {
     HttpMethodBase request = createRequest(getBaseUri() + "/transformerException");
-    int status = httpClient.executeMethod(request);
-    assertEquals(HttpConstants.SC_OK, status);
+    assertThat(httpClient.executeMethod(request), equalTo(SC_INTERNAL_SERVER_ERROR));
   }
 
   @Test
   @Override
   public void testRouterException() throws Exception {
     HttpMethodBase request = createRequest(getBaseUri() + "/routerException");
-    int status = httpClient.executeMethod(request);
-    assertEquals(HttpConstants.SC_OK, status);
+    assertThat(httpClient.executeMethod(request), equalTo(SC_INTERNAL_SERVER_ERROR));
   }
 
 

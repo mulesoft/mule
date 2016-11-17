@@ -29,7 +29,7 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends AbstractIntegrat
 
   @Test
   public void testFlowExceptionExceptionStrategy() throws Exception {
-    flowRunner("customException").withPayload(TEST_MESSAGE).asynchronously().run();
+    flowRunner("customException").withPayload(TEST_MESSAGE).dispatch();
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
 
