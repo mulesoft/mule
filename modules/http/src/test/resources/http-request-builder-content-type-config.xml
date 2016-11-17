@@ -22,4 +22,16 @@
         </http:request>
     </flow>
 
+    <flow name="requesterContentTypeCaseInsensitiveClient" >
+        <http:listener config-ref="httpConf" path="requestClientCaseInsensitive"/>
+
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+
+        <http:request config-ref="requesterConfig" path="requestServer" method="GET">
+            <http:request-builder>
+                <http:header headerName="content-Type" value="text/x-json"/>
+            </http:request-builder>
+        </http:request>
+    </flow>
+
 </mule>
