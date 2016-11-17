@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+
 import java.io.File;
 
 /**
@@ -18,9 +20,9 @@ public interface DependenciesProvider {
   /**
    * Given a reference to an artifact, it will look up the plugin's location and it will return it in a {@link File}.
    *
-   * @param artifactName reference to an artifact. Non null. // TODO(fernandezlautaro): MULE-10440 same as the class comment, ideally we should rely in an object like org.mule.runtime.module.repository.api.BundleDescriptor
+   * @param bundleDescriptor indicates which bundle to resolve. Non null.
    * @return an {@link File} pointing to the artifact location's folder (it must be unzipped).
    * @throws DependencyNotFoundException if the dependency to look for wasn't found.
    */
-  File resolve(String artifactName);
+  File resolve(BundleDescriptor bundleDescriptor);
 }

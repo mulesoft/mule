@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal.plugin;
 
 import static java.util.Collections.emptySet;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
@@ -18,20 +19,25 @@ import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -119,6 +125,60 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     new PluginDescriptorChecker(pluginFolder).containing(libraries).assertPluginDescriptor(pluginDescriptor);
   }
 
+  @Test
+  public void parsesNamedDefinedPluginDependency() throws Exception {
+    final File pluginFolder = createPluginFolder();
+
+    final String pluginDependencies = "foo";
+    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+
+    BundleDescriptor descriptor =
+        new BundleDescriptor.Builder().setArtifactId("foo").setGroupId("test").setVersion("1.0").build();
+    new PluginDescriptorChecker(pluginFolder).dependingOn(descriptor).assertPluginDescriptor(pluginDescriptor);
+  }
+
+  @Test
+  public void parsesFullyDefinedPluginDependency() throws Exception {
+    final File pluginFolder = createPluginFolder();
+
+    final String pluginDependencies = "org.foo:foo:2.0";
+    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+
+    BundleDescriptor descriptor =
+        new BundleDescriptor.Builder().setArtifactId("foo").setGroupId("org.foo").setVersion("2.0").build();
+    new PluginDescriptorChecker(pluginFolder).dependingOn(descriptor).assertPluginDescriptor(pluginDescriptor);
+  }
+
+  @Test
+  public void parsesMultiplePluginDependencies() throws Exception {
+    final File pluginFolder = createPluginFolder();
+
+    final String pluginDependencies = "org.foo:foo:2.0,org.bar:bar:1.0";
+    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+
+    BundleDescriptor fooDescriptor =
+        new BundleDescriptor.Builder().setArtifactId("foo").setGroupId("org.foo").setVersion("2.0").build();
+    BundleDescriptor barDEscriptor =
+        new BundleDescriptor.Builder().setArtifactId("bar").setGroupId("org.bar").setVersion("1.0").build();
+    new PluginDescriptorChecker(pluginFolder).dependingOn(fooDescriptor).dependingOn(barDEscriptor)
+        .assertPluginDescriptor(pluginDescriptor);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void failsTooParseDescriptorWithIncompletePluginDependency() throws Exception {
+    final File pluginFolder = createPluginFolder();
+    final String pluginDependencies = "org.foo:foo";
+    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+
+    descriptorFactory.create(pluginFolder);
+  }
+
   private File createPluginFolder() {
     final File pluginFolder = new File(pluginsFolder.getRoot(), PLUGIN_NAME);
     assertThat(pluginFolder.mkdir(), is(true));
@@ -137,6 +197,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     private URL[] libraries = new URL[0];;
     private Set<String> resources = emptySet();
     private Set<String> packages = emptySet();
+    private List<BundleDescriptor> dependencies = new ArrayList<>();
 
     public PluginDescriptorChecker(File pluginFolder) {
       this.pluginFolder = pluginFolder;
@@ -159,6 +220,11 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
       return this;
     }
 
+    public PluginDescriptorChecker dependingOn(BundleDescriptor descriptor) {
+      this.dependencies.add(descriptor);
+      return this;
+    }
+
     public void assertPluginDescriptor(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
       assertThat(pluginDescriptor.getName(), equalTo(pluginFolder.getName()));
       try {
@@ -172,6 +238,15 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
       assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
       assertThat(pluginDescriptor.getClassLoaderModel().getExportedResources(), equalTo(resources));
       assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages(), equalTo(packages));
+      assertPluginDependencies(pluginDescriptor.getClassLoaderModel());
+    }
+
+    private void assertPluginDependencies(ClassLoaderModel classLoaderModel) {
+      assertThat(classLoaderModel.getDependencies().size(), equalTo(dependencies.size()));
+
+      for (BundleDependency bundleDependency : classLoaderModel.getDependencies()) {
+        assertThat(dependencies.contains(bundleDependency.getDescriptor()), is(true));
+      }
     }
 
     private void assertUrls(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
@@ -190,6 +265,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     private final File pluginFolder;
     private String exportedClassPackages;
     private String exportedResources;
+    private String pluginDependencies;
 
     public PluginPropertiesBuilder(File pluginFolder) {
       this.pluginFolder = pluginFolder;
@@ -207,6 +283,12 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
       return this;
     }
 
+    public PluginPropertiesBuilder dependingOn(String pluginDependencies) {
+      this.pluginDependencies = pluginDependencies;
+
+      return this;
+    }
+
     public File build() throws IOException {
       final File pluginProperties = new File(pluginFolder, PLUGIN_PROPERTIES);
       if (pluginProperties.exists()) {
@@ -215,12 +297,15 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
       addDescriptorProperty(pluginProperties, EXPORTED_CLASS_PACKAGES_PROPERTY, this.exportedClassPackages);
       addDescriptorProperty(pluginProperties, EXPORTED_RESOURCE_PROPERTY, this.exportedResources);
+      if (!isEmpty(pluginDependencies)) {
+        addDescriptorProperty(pluginProperties, PLUGIN_DEPENDENCIES, pluginDependencies);
+      }
 
       return pluginProperties;
     }
 
     private void addDescriptorProperty(File pluginProperties, String propertyName, String propertyValue) throws IOException {
-      if (!StringUtils.isEmpty(propertyValue)) {
+      if (!isEmpty(propertyValue)) {
         final String descriptorProperty = generateDescriptorProperty(propertyName, propertyValue);
 
         stringToFile(pluginProperties.getAbsolutePath(), descriptorProperty, true);

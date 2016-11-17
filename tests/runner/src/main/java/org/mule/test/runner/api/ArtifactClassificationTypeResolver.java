@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
@@ -30,7 +31,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
  */
 public class ArtifactClassificationTypeResolver {
 
-  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-extension";
   private static final String MULE_MODULE_PROPERTIES = "META-INF/mule-module.properties";
   private static final String PLUGIN_PROPERTIES = "plugin.properties";
@@ -60,7 +60,7 @@ public class ArtifactClassificationTypeResolver {
       if (isMulePlugin(artifact, artifactClassLoader)) {
         return PLUGIN;
       }
-      if (isMuleModule(artifact, artifactClassLoader)) {
+      if (isMuleModule(artifactClassLoader)) {
         return MODULE;
       }
       return APPLICATION;
@@ -72,7 +72,7 @@ public class ArtifactClassificationTypeResolver {
   /**
    * @param artifact {@link Artifact} to check if it is a plugin
    * @param artifactClassLoader {@link ClassLoader} for the given artifact
-   * @return true if it is classified as {@value #MULE_PLUGIN_CLASSIFIER} or {@value #MULE_EXTENSION_CLASSIFIER} or it has a
+   * @return true if it is classified as {@value org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor2#MULE_PLUGIN_CLASSIFIER} or {@value #MULE_EXTENSION_CLASSIFIER} or it has a
    *         {@value #PLUGIN_PROPERTIES} file.
    */
   private boolean isMulePlugin(Artifact artifact, ClassLoader artifactClassLoader) {
@@ -81,11 +81,10 @@ public class ArtifactClassificationTypeResolver {
   }
 
   /**
-   * @param artifact {@link Artifact} to check if it is a plugin.
    * @param artifactClassLoader {@link ClassLoader} for the given artifact.
    * @return true if it has a {@value #MULE_MODULE_PROPERTIES} file.
    */
-  private boolean isMuleModule(Artifact artifact, ClassLoader artifactClassLoader) {
+  private boolean isMuleModule(ClassLoader artifactClassLoader) {
     return hasResource(artifactClassLoader, MULE_MODULE_PROPERTIES);
   }
 

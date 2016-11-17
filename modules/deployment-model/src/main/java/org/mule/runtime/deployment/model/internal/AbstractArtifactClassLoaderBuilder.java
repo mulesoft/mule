@@ -18,7 +18,7 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.deployment.model.internal.plugin.NamePluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -47,7 +47,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
-  private final NamePluginDependenciesResolver namePluginDependenciesResolver;
+  private final BundlePluginDependenciesResolver pluginDependenciesResolver;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
   private ArtifactDescriptor artifactDescriptor;
@@ -76,7 +76,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.namePluginDependenciesResolver = new NamePluginDependenciesResolver(artifactDescriptorFactory, dependenciesProvider);
+    this.pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactDescriptorFactory, dependenciesProvider);
   }
 
   /**
@@ -135,7 +135,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
     List<ArtifactPluginDescriptor> pluginDescriptors = createContainerApplicationPlugins();
     pluginDescriptors.addAll(artifactPluginDescriptors);
-    List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = namePluginDependenciesResolver.resolve(pluginDescriptors);
+    List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = pluginDependenciesResolver.resolve(pluginDescriptors);
 
     final List<ArtifactClassLoader> pluginClassLoaders =
         createPluginClassLoaders(artifactId, regionClassLoader, effectiveArtifactPluginDescriptors);

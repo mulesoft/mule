@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.repository.api;
 
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+
 import java.io.File;
 
 /**
@@ -25,12 +27,12 @@ public interface RepositoryService {
    * If the bundle does not exists in the local repository but was found in an external repository then it will be stored in the
    * local repositories to avoid a remote fetch if the bundle is requested again.
    *
-   * @param bundleDescriptor descriptor to identify the bundle
+   * @param bundleDependency descriptor to identify the bundle
    * @return a {@code File} where the bundle is stored in the local repository
    * @throws BundleNotFoundException when the bundle could not be located in any of the configured repositories.
    * @throws RepositoryConnectionException when there was a problem connecting to one of the external repositories.
    * @throws RepositoryServiceDisabledException when the repository service has not been properly configured.
    */
-  File lookupBundle(BundleDescriptor bundleDescriptor);
+  File lookupBundle(BundleDependency bundleDependency);
 
 }

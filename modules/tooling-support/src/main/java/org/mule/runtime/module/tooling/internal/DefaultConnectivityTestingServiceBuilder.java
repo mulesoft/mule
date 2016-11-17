@@ -10,10 +10,11 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
-import org.mule.runtime.module.repository.api.BundleDescriptor;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
@@ -31,7 +32,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   private final RepositoryService repositoryService;
   private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
   private ServiceRegistry serviceRegistry;
-  private List<BundleDescriptor> bundleDescriptors = new ArrayList<>();
+  private List<BundleDependency> bundleDependencies = new ArrayList<>();
   private ArtifactConfiguration artifactConfiguration;
   private TemporaryArtifact temporaryArtifact;
 
@@ -48,8 +49,11 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
    */
   @Override
   public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
-    this.bundleDescriptors.add(new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId)
-        .setType(EXTENSION_BUNDLE_TYPE).setVersion(artifactVersion).build());
+    BundleDescriptor bundleDescriptor =
+        new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
+            .setType(EXTENSION_BUNDLE_TYPE).build();
+    this.bundleDependencies
+        .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
     return this;
   }
 
@@ -67,7 +71,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   @Override
   public ConnectivityTestingService build() {
     checkState(artifactConfiguration != null, "artifact configuration cannot be null");
-    checkState(!bundleDescriptors.isEmpty(), "no extensions were configured");
+    checkState(!bundleDependencies.isEmpty(), "no extensions were configured");
     TemporaryArtifact temporaryArtifact = buildArtifact();
     return new TemporaryArtifactConnectivityTestingService(temporaryArtifact);
   }
@@ -80,7 +84,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
     TemporaryArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
         .setArtifactConfiguration(artifactConfiguration);
 
-    bundleDescriptors.stream()
+    bundleDependencies.stream()
         .forEach(bundleDescriptor -> temporaryArtifactBuilder
             .addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
     temporaryArtifact = temporaryArtifactBuilder.build();
