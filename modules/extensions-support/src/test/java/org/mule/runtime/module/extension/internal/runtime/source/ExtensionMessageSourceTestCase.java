@@ -391,7 +391,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     Exception e = new RuntimeException();
 
     SchedulerService schedulerService = muleContext.getSchedulerService();
-    when(schedulerService.ioScheduler()).thenThrow(e);
+    doThrow(e).when(schedulerService).cpuLightScheduler();
 
     final Throwable throwable = catchThrowable(messageSource::start);
     assertThat(throwable, is(sameInstance(e)));
@@ -401,8 +401,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void failedToCreateFlowTrigger() throws Exception {
     Exception e = new RuntimeException();
 
-    SchedulerService schedulerService = muleContext.getRegistry().lookupObject(SchedulerService.class);
-    when(schedulerService.cpuLightScheduler()).thenThrow(e);
+    SchedulerService schedulerService = muleContext.getSchedulerService();
+    doThrow(e).when(schedulerService).cpuLightScheduler();
 
     final Throwable throwable = catchThrowable(messageSource::start);
     assertThat(throwable, is(sameInstance(e)));
