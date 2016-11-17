@@ -19,6 +19,7 @@ import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -28,7 +29,6 @@ import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFi
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
