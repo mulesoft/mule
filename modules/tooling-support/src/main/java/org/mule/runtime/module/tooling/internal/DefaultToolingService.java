@@ -8,9 +8,9 @@ package org.mule.runtime.module.tooling.internal;
 
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.module.deployment.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;

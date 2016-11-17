@@ -9,12 +9,12 @@ package org.mule.runtime.module.tooling.internal;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilder;
-import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 

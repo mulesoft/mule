@@ -21,6 +21,7 @@
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>
+        <module>deployment-model-impl</module>
         <module>dsl-api</module>
         <module>extensions-support</module>
         <module>file-extension-common</module>

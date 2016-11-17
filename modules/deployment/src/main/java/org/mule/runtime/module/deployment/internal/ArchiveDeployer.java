@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.artifact.Artifact;
 
 import java.io.File;
