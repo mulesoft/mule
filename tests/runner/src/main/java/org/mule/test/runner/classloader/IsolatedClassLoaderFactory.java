@@ -71,10 +71,10 @@ public class IsolatedClassLoaderFactory {
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
    *
-   * @param extraBootPackages {@link List} of {@link String}s of extra boot packages to be appended to the container
-   *        {@link ClassLoader}
+   * @param extraBootPackages          {@link List} of {@link String}s of extra boot packages to be appended to the container
+   *                                   {@link ClassLoader}
    * @param artifactsUrlClassification the {@link ArtifactsUrlClassification} that defines the different {@link URL}s for each
-   *        {@link ClassLoader}
+   *                                   {@link ClassLoader}
    * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
@@ -152,9 +152,9 @@ public class IsolatedClassLoaderFactory {
    * For each service defined in the classification it creates an {@link ArtifactClassLoader} wit the name defined in
    * classification.
    *
-   * @param parent the parent class loader to be assigned to the new one created here
+   * @param parent                       the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
-   * @param artifactsUrlClassification the url classifications to get service {@link URL}s
+   * @param artifactsUrlClassification   the url classifications to get service {@link URL}s
    * @return a list of {@link ArtifactClassLoader} for service class loaders
    */
   protected List<ArtifactClassLoader> createServiceClassLoaders(ClassLoader parent,
@@ -178,7 +178,7 @@ public class IsolatedClassLoaderFactory {
    * Creates the {@link JarInfo} for the {@link ArtifactsUrlClassification}.
    *
    * @param artifactsUrlClassification the {@link ArtifactsUrlClassification} that defines the different {@link URL}s for each
-   *        {@link ClassLoader}
+   *                                   {@link ClassLoader}
    * @return {@link JarInfo} for the classification
    */
   private JarInfo getJarInfo(ArtifactsUrlClassification artifactsUrlClassification) {
@@ -210,11 +210,12 @@ public class IsolatedClassLoaderFactory {
    * be in the container.
    *
    * @param testContainerClassLoaderFactory {@link TestContainerClassLoaderFactory} that has the logic to create a container class
-   *        loader
-   * @param artifactsUrlClassification the classifications to get plugins {@link URL}s
+   *                                        loader
+   * @param artifactsUrlClassification      the classifications to get plugins {@link URL}s
    * @return an {@link ArtifactClassLoader} for the container
    */
-  protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory,
+  protected ArtifactClassLoader createContainerArtifactClassLoader(
+                                                                   TestContainerClassLoaderFactory testContainerClassLoaderFactory,
                                                                    ArtifactsUrlClassification artifactsUrlClassification) {
     MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
     final List<MuleModule> muleModules = Collections.<MuleModule>emptyList();
@@ -235,7 +236,17 @@ public class IsolatedClassLoaderFactory {
     ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
 
     return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
-                                       new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
+                                       new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.emptySet())) {
+
+      @Override
+      public URL findResource(String name) {
+        URL url = super.findResource(name);
+        if (url == null && getParent() != null) {
+          url = getParent().getResource(name);
+        }
+        return url;
+      }
+    };
   }
 
   private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification) {
@@ -254,9 +265,9 @@ public class IsolatedClassLoaderFactory {
   /**
    * Creates an {@link ArtifactClassLoader} for the application.
    *
-   * @param parent the parent class loader to be assigned to the new one created here
+   * @param parent                       the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
-   * @param artifactsUrlClassification the url classifications to get plugins urls
+   * @param artifactsUrlClassification   the url classifications to get plugins urls
    * @return the {@link ArtifactClassLoader} to be used for running the test
    */
   protected ArtifactClassLoader createApplicationArtifactClassLoader(ClassLoader parent,
@@ -272,7 +283,7 @@ public class IsolatedClassLoaderFactory {
    * Logs the {@link List} of {@link URL}s for the classLoaderName
    *
    * @param classLoaderName the name of the {@link ClassLoader} to be logged
-   * @param urls {@link List} of {@link URL}s that are going to be used for the {@link ClassLoader}
+   * @param urls            {@link List} of {@link URL}s that are going to be used for the {@link ClassLoader}
    */
   protected void logClassLoaderUrls(final String classLoaderName, final List<URL> urls) {
     StringBuilder builder = new StringBuilder(classLoaderName).append(" classloader urls: [");
