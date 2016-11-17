@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
@@ -62,15 +61,13 @@ import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.SplashScreen;
 
-import javax.resource.spi.work.WorkListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link MuleContextBuilder} that uses {@link DefaultMuleContext} as the default {@link MuleContext}
- * implementation and builds it with defaults values for {@link MuleConfiguration}, {@link LifecycleManager}, {@link WorkManager},
- * {@link WorkListener} and {@link ServerNotificationManager}.
+ * implementation and builds it with defaults values for {@link MuleConfiguration}, {@link LifecycleManager} and
+ * {@link ServerNotificationManager}.
  */
 public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
