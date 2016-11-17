@@ -10,10 +10,16 @@ import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
+import static java.util.TimeZone.getDefault;
 import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.service.scheduler.internal.QuartzCronJob.JOB_TASK_KEY;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.ArrayList;
@@ -21,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +39,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +62,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private final ExecutorService executor;
   private final ScheduledExecutorService scheduledExecutor;
+  private final org.quartz.Scheduler quartzScheduler;
+
+  private Class<? extends QuartzCronJob> jobClass = QuartzCronJob.class;
 
   /**
    * Wait condition to support awaitTermination
@@ -70,11 +84,13 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
    */
-  DefaultScheduler(ExecutorService executor, int workers, int totalWorkers, ScheduledExecutorService scheduledExecutor) {
+  DefaultScheduler(ExecutorService executor, int workers, int totalWorkers, ScheduledExecutorService scheduledExecutor,
+                   org.quartz.Scheduler quartzScheduler) {
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
     cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
+    this.quartzScheduler = quartzScheduler;
   }
 
   @Override
@@ -144,8 +160,46 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     return scheduled;
   }
 
+  @Override
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
+    return scheduleWithCronExpression(command, cronExpression, getDefault());
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
+    checkShutdown();
+    requireNonNull(command);
+
+    final RunnableFuture<?> task = new RunnableRepeatableFutureDecorator<>(() -> super.newTaskFor(command, null), t -> {
+      if (t.isCancelled()) {
+        taskFinished(t);
+      }
+    }, this);
+
+    JobDataMap jobDataMap = new JobDataMap();
+    jobDataMap.put(JOB_TASK_KEY, schedulableTask(task));
+    JobDetail job = newJob(jobClass).usingJobData(jobDataMap).build();
+
+    CronTrigger trigger = newTrigger().withSchedule(cronSchedule(cronExpression).inTimeZone(timeZone)).build();
+
+    try {
+      quartzScheduler.scheduleJob(job, trigger);
+    } catch (SchedulerException e) {
+      throw new MuleRuntimeException(e);
+    }
+
+    QuartzScheduledFututre<Object> scheduled = new QuartzScheduledFututre<>(quartzScheduler, trigger, task);
+
+    scheduledTasks.put(task, scheduled);
+    return scheduled;
+  }
+
   private <T> Runnable schedulableTask(RunnableFuture<T> task) {
     return () -> executor.execute(task);
+  }
+
+  public void setJobClass(Class<? extends QuartzCronJob> jobClass) {
+    this.jobClass = jobClass;
   }
 
   @Override

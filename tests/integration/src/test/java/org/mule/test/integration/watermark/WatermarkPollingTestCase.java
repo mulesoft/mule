@@ -8,17 +8,15 @@
 package org.mule.test.integration.watermark;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.config.spring.factories.WatermarkFactoryBean.MULE_WATERMARK_PARTITION;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
-import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.SchedulerFactoryPostProcessor;
-import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.util.store.ObjectStorePartition;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -27,7 +25,6 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
@@ -433,17 +430,21 @@ public class WatermarkPollingTestCase extends AbstractIntegrationTestCase {
   }
 
   private ObjectStore<Serializable> getDefaultObjectStore() {
-    ObjectStoreManager mgr = (ObjectStoreManager) muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
-    return mgr.getObjectStore(WatermarkFactoryBean.MULE_WATERMARK_PARTITION);
+    ObjectStoreManager mgr = (ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
+    return mgr.getObjectStore(MULE_WATERMARK_PARTITION);
   }
 
   private void executePollOf(String flowName) throws Exception {
-    Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers(flowName));
-    for (Scheduler scheduler : schedulers) {
-      scheduler.schedule();
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct(flowName));
+    flow.start();
+    try {
+      MessageSource flowSource = flow.getMessageSource();
+      if (flowSource instanceof PollingMessageSource) {
+        ((PollingMessageSource) flowSource).performPoll();
+      }
+    } finally {
+      flow.stop();
     }
-
   }
 
   public static class FooComponent {
@@ -453,50 +454,6 @@ public class WatermarkPollingTestCase extends AbstractIntegrationTestCase {
         foo.add(s);
       }
 
-    }
-  }
-
-  public static class PollStopper implements SchedulerFactoryPostProcessor {
-
-    @Override
-    public Scheduler process(Object job, final Scheduler scheduler) {
-      return new Scheduler() {
-
-        @Override
-        public void schedule() throws Exception {
-          scheduler.schedule();
-        }
-
-        @Override
-        public void dispose() {
-          scheduler.dispose();
-        }
-
-        @Override
-        public void initialise() throws InitialisationException {
-          scheduler.initialise();
-        }
-
-        @Override
-        public void setName(String name) {
-          scheduler.setName(name);
-        }
-
-        @Override
-        public String getName() {
-          return scheduler.getName();
-        }
-
-        @Override
-        public void start() throws MuleException {
-          // Do nothing
-        }
-
-        @Override
-        public void stop() throws MuleException {
-          // do Nothing
-        }
-      };
     }
   }
 

@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 
 public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
@@ -42,23 +45,39 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
   protected ExecutorService sharedExecutor;
   protected ScheduledExecutorService sharedScheduledExecutor;
+  protected org.quartz.Scheduler sharedQuartzScheduler;
 
   @Before
-  public void before() {
+  public void before() throws SchedulerException {
     sharedExecutor =
         new ThreadPoolExecutor(1, 1, 0, SECONDS, new ArrayBlockingQueue<>(1), new NamedThreadFactory(this.getClass().getName()));
 
     sharedScheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(this.getClass().getName() + "_sched"));
+    StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
+    schedulerFactory.initialize(defaultQuartzProperties());
+    sharedQuartzScheduler = schedulerFactory.getScheduler();
+    sharedQuartzScheduler.start();
+  }
+
+  private Properties defaultQuartzProperties() {
+    Properties factoryProperties = new Properties();
+
+    factoryProperties.setProperty("org.quartz.scheduler.instanceName", getClass().getSimpleName());
+    factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
+    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", getClass().getSimpleName() + "_qz");
+    factoryProperties.setProperty("org.quartz.threadPool.threadCount", "1");
+    return factoryProperties;
   }
 
   @After
-  public void after() {
+  public void after() throws SchedulerException {
     sharedExecutor.shutdownNow();
     sharedScheduledExecutor.shutdownNow();
+    sharedQuartzScheduler.shutdown();
   }
 
   protected ScheduledExecutorService createExecutor() {
-    return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor);
+    return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor, sharedQuartzScheduler);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {

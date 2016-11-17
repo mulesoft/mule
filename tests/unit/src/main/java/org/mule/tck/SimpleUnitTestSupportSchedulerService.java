@@ -7,6 +7,10 @@
 package org.mule.tck;
 
 import static java.util.Collections.unmodifiableList;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -17,6 +21,7 @@ import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 /**
@@ -39,26 +44,31 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler cpuLightScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
   public Scheduler ioScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
   public Scheduler computationScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
     decorators.add(decorator);
     return decorator;
+  }
+
+  protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler() {
+    SimpleUnitTestSupportLifecycleSchedulerDecorator spied = spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+
+    doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
+    doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
+    return spied;
   }
 
   @Override

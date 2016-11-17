@@ -6,198 +6,59 @@
  */
 package org.mule.runtime.core.source.polling.schedule;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
+
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 /**
- * <p>
- * {@link Scheduler} that runs a task giving a fixed period of time.
- * </p>
+ * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
  *
- * @since 3.5.0
+ * @since 3.5.0, moved from {@link org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory}.
  */
-public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T> {
-
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+public class FixedFrequencyScheduler extends PeriodicScheduler {
 
   /**
-   * <p>
-   * Thread executor service
-   * </p>
-   */
-  private ExecutorService executor;
-
-
-  /**
-   * <p>
    * The {@link TimeUnit} of the scheduler
-   * </p>
    */
-  private TimeUnit timeUnit;
+  private TimeUnit timeUnit = MILLISECONDS;
 
   /**
-   * <p>
    * The frequency of the scheduler in timeUnit
-   * </p>
    */
-  private long frequency;
+  private long frequency = 1000l;
 
   /**
-   * <p>
    * The time in timeUnit that it has to wait before executing the first task
-   * </p>
    */
-  private long startDelay;
+  private long startDelay = 1000l;
 
 
+  @Override
+  public ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {
+    return executor.scheduleAtFixedRate(job, startDelay, frequency, timeUnit);
+  }
 
-  /**
-   * <p>
-   * A {@link SimpleLifecycleManager} to manage the {@link Scheduler} lifecycle.
-   * </p>
-   */
-  private final SimpleLifecycleManager<Scheduler> lifecycleManager;
-
-  public FixedFrequencyScheduler(String name, long frequency, long startDelay, T job, TimeUnit timeUnit) {
-    super(name, job);
-    this.frequency = frequency;
-    this.startDelay = startDelay;
-    this.job = job;
+  public void setTimeUnit(TimeUnit timeUnit) {
     this.timeUnit = timeUnit;
-    lifecycleManager = new DefaultLifecycleManager<Scheduler>(name, this);
   }
 
-  /**
-   * <p>
-   * Creates the {@link FixedFrequencyScheduler#executor} that is going to be used to launch schedules
-   * </p>
-   */
-  @Override
-  public void initialise() throws InitialisationException {
-    try {
-      lifecycleManager.fireInitialisePhase(new LifecycleCallback<Scheduler>() {
+  public void setFrequency(long frequency) {
+    checkArgument(frequency > 0, "Frequency must be greater then zero");
 
-        @Override
-        public void onTransition(String phaseName, Scheduler object) throws MuleException {
-          executor = Executors.newSingleThreadScheduledExecutor();
-        }
-      });
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
-
+    this.frequency = frequency;
   }
 
-  /**
-   * <p>
-   * Starts the Scheduling of a Task. Can be called several times, if the {@link Scheduler} is already started or if it is
-   * starting then the start request is omitted
-   * </p>
-   */
-  @Override
-  public void start() throws MuleException {
-    if (isNotStarted()) {
-      lifecycleManager.fireStartPhase(new LifecycleCallback<Scheduler>() {
+  public void setStartDelay(long startDelay) {
+    checkArgument(startDelay >= 0, "Start delay must be greater then zero");
 
-        @Override
-        public void onTransition(String phaseName, Scheduler object) throws MuleException {
-          executor.shutdown();
-          executor = Executors.newSingleThreadScheduledExecutor();
-          ((ScheduledExecutorService) executor).scheduleAtFixedRate(job, startDelay, frequency, timeUnit);
-
-        }
-      });
-    }
+    this.startDelay = startDelay;
   }
 
 
-  /**
-   * <p>
-   * Stops the Scheduling of a Task. Can be called several times, if the {@link Scheduler} is already stopped or if it is stopping
-   * then the stop request is omitted
-   * </p>
-   */
-  @Override
-  public synchronized void stop() throws MuleException {
-    if (isNotStopped()) {
-      lifecycleManager.fireStopPhase(new LifecycleCallback<Scheduler>() {
-
-        @Override
-        public void onTransition(String phaseName, Scheduler object) throws MuleException {
-          executor.shutdown();
-          executor = Executors.newSingleThreadExecutor();
-        }
-      });
-    }
-  }
-
-
-  /**
-   * <p>
-   * Executes the the {@link Scheduler} task
-   * </p>
-   */
-  @Override
-  public void schedule() throws MuleException {
-
-    executor.submit(job);
-  }
-
-  /**
-   * <p>
-   * Checks that the {@link FixedFrequencyScheduler#executor} is terminated and, if not, it terminates the scheduling abruptly
-   * </p>
-   */
-  @Override
-  public void dispose() {
-    try {
-      lifecycleManager.fireDisposePhase(new LifecycleCallback<Scheduler>() {
-
-        @Override
-        public void onTransition(String phaseName, Scheduler object) throws MuleException {
-          try {
-            executor.shutdown();
-            executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
-          } catch (InterruptedException e) {
-            executor.shutdownNow();
-          } finally {
-            if (!executor.isTerminated()) {
-              executor.shutdownNow();
-            }
-          }
-        }
-      });
-    } catch (MuleException e) {
-      logger.error("The Scheduler " + name + " could not be disposed");
-    }
-  }
-
-  private boolean isNotStopped() {
-    return !lifecycleManager.getState().isStopped() && !lifecycleManager.getState().isStopping();
-  }
-
-  private boolean isNotStarted() {
-    return !lifecycleManager.getState().isStarted() && !lifecycleManager.getState().isStarting();
-  }
-
-  public long getFrequency() {
-    return frequency;
-  }
-
-  public TimeUnit getTimeUnit() {
-    return timeUnit;
-  }
 }

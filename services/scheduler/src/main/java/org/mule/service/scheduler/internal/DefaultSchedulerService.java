@@ -15,6 +15,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -29,6 +31,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 
 /**
@@ -67,6 +71,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private ExecutorService ioExecutor;
   private ExecutorService computationExecutor;
   private ScheduledExecutorService scheduledExecutor;
+  private org.quartz.Scheduler quartzScheduler;
 
   @Override
   public String getName() {
@@ -75,17 +80,17 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return new DefaultScheduler(cpuLightExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor);
+    return new DefaultScheduler(cpuLightExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return new DefaultScheduler(ioExecutor, cores * cores, (cores + 4 + 4) * cores, scheduledExecutor);
+    return new DefaultScheduler(ioExecutor, cores * cores, (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return new DefaultScheduler(computationExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor);
+    return new DefaultScheduler(computationExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
   }
 
   @Override
@@ -115,6 +120,15 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
                                                  new SchedulerThreadFactory(computationGroup));
     scheduledExecutor = newScheduledThreadPool(1, new SchedulerThreadFactory(timerGroup, "%s"));
+    StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
+    try {
+      // TODO MULE-10585 Externalize the quartz configuration
+      schedulerFactory.initialize(defaultQuartzProperties());
+      quartzScheduler = schedulerFactory.getScheduler();
+      quartzScheduler.start();
+    } catch (SchedulerException e) {
+      throw new LifecycleException(e, this);
+    }
 
     ((ThreadPoolExecutor) cpuLightExecutor).prestartAllCoreThreads();
     ((ThreadPoolExecutor) ioExecutor).prestartAllCoreThreads();
@@ -132,6 +146,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     ioExecutor.shutdown();
     computationExecutor.shutdown();
     scheduledExecutor.shutdown();
+    try {
+      quartzScheduler.shutdown(true);
+    } catch (SchedulerException e) {
+      throw new LifecycleException(e, this);
+    }
 
     try {
       final long startMillis = currentTimeMillis();
@@ -152,6 +171,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     ioExecutor = null;
     computationExecutor = null;
     scheduledExecutor = null;
+    quartzScheduler = null;
   }
 
   protected void waitForExecutorTermination(final long startMillis, final ExecutorService executor, final String executorLabel)
@@ -163,4 +183,15 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
           + " jobs were cancelled.");
     }
   }
+
+  private Properties defaultQuartzProperties() {
+    Properties factoryProperties = new Properties();
+
+    factoryProperties.setProperty("org.quartz.scheduler.instanceName", getName());
+    factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
+    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", getName() + "_qz");
+    factoryProperties.setProperty("org.quartz.threadPool.threadCount", "1");
+    return factoryProperties;
+  }
+
 }

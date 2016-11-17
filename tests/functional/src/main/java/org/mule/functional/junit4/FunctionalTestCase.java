@@ -12,10 +12,10 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -23,10 +23,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.Schedulers;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
@@ -35,7 +32,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 
 import org.junit.After;
 
@@ -224,24 +220,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     FlowAssert.reset();
   }
 
-  protected void stopFlowSchedulers(String flowName) throws MuleException {
-    final Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers(flowName));
-    for (final Scheduler scheduler : schedulers) {
-      scheduler.stop();
-    }
-  }
-
   protected MessageProcessorChain getSubFlow(String subflowName) {
     return (MessageProcessorChain) muleContext.getRegistry().lookupObject(subflowName);
-  }
-
-  protected void runSchedulersOnce(String flowConstructName) throws Exception {
-    final Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers(flowConstructName));
-
-    for (final Scheduler scheduler : schedulers) {
-      scheduler.schedule();
-    }
   }
 }

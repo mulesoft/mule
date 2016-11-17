@@ -6,24 +6,25 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -71,43 +72,35 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void disposeScheduler() throws Exception {
+    reset(muleContext.getSchedulerService());
+    PollingMessageSource pollingMessageSource = createMessageSource(event -> null);
 
-    PollingMessageSource pollinMessageSource = createMessageSource(event -> null);
+    verify(muleContext.getSchedulerService()).ioScheduler();
+    List<Scheduler> createdSchedulers =
+        ((SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService())).getCreatedSchedulers();
+    pollingMessageSource.start();
 
-    Collection<Scheduler> allSchedulers = getAllSchedulers();
-    assertThat(allSchedulers.size(), is(1));
+    Scheduler pollScheduler = createdSchedulers.get(createdSchedulers.size() - 1);
 
-    Scheduler scheduler = allSchedulers.iterator().next();
+    verify(pollScheduler).scheduleAtFixedRate(any(), anyLong(), anyLong(), any());
 
-    pollinMessageSource.stop();
-    pollinMessageSource.dispose();
+    pollingMessageSource.stop();
+    pollingMessageSource.dispose();
 
-    assertThat(getAllSchedulers().size(), is(0));
-    verify(scheduler).dispose();
-  }
-
-  private Collection<Scheduler> getAllSchedulers() {
-    return muleContext.getRegistry().lookupObjects(Scheduler.class);
+    verify(pollScheduler).stop(anyLong(), any());
   }
 
   private PollingMessageSource createMessageSource(Processor processor) throws Exception {
     PollingMessageSource pollingMessageSource =
-        new PollingMessageSource(muleContext, processor, new NullOverride(), schedulerFactory());
+        new PollingMessageSource(muleContext, processor, new NullOverride(), scheduler());
     pollingMessageSource.setFlowConstruct(getTestFlow(muleContext));
     pollingMessageSource.initialise();
     return pollingMessageSource;
   }
 
-  private FixedFrequencySchedulerFactory schedulerFactory() {
-    FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory() {
-
-      @Override
-      public Scheduler doCreate(String name, final Runnable job) {
-        return spy(super.doCreate(name, job));
-      }
-    };
+  private FixedFrequencyScheduler scheduler() {
+    FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
     factory.setFrequency(1000);
-    factory.setMuleContext(muleContext);
     return factory;
   }
 

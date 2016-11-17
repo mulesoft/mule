@@ -13,15 +13,16 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
@@ -49,8 +50,15 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testPolling() throws Exception {
-    Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(Schedulers.allPollSchedulers());
-    assertEquals(4, schedulers.size());
+    int schedulers = 0;
+    for (FlowConstruct flowConstruct : muleContext.getRegistry().lookupFlowConstructs()) {
+      Flow flow = (Flow) flowConstruct;
+      MessageSource flowSource = flow.getMessageSource();
+      if (flowSource instanceof PollingMessageSource) {
+        schedulers++;
+      }
+    }
+    assertEquals(4, schedulers);
 
     Thread.sleep(5000);
     synchronized (foo) {

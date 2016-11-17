@@ -38,7 +38,6 @@ import org.mule.compatibility.module.cxf.config.ProxyClientWithDecoupledEndpoint
 import org.mule.compatibility.module.cxf.config.SimpleClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.management.agent.DefaultTransportJmxSupportAgent;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
-import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
@@ -89,7 +88,6 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
     registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
     registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
     registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
-    registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
     registerBeanDefinitionParser("response", new ResponseDefinitionParser());
 
     // Connector elements

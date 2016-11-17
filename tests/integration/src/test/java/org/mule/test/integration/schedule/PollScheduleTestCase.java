@@ -7,20 +7,23 @@
 package org.mule.test.integration.schedule;
 
 
-import static org.junit.Assert.assertEquals;
-import org.mule.test.AbstractIntegrationTestCase;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.tck.probe.Prober;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
@@ -28,32 +31,29 @@ import org.junit.Test;
  */
 public class PollScheduleTestCase extends AbstractIntegrationTestCase {
 
-  private static List<String> foo = new ArrayList<String>();
-  private static List<String> bar = new ArrayList<String>();
+  private static List<String> foo = new ArrayList<>();
+  private static List<String> bar = new ArrayList<>();
 
-  Prober workingPollProber = new PollingProber(10000, 100l);
+  @ClassRule
+  public static SystemProperty days = new SystemProperty("frequency.days", "4");
 
-  @BeforeClass
-  public static void setProperties() {
-    System.setProperty("frequency.days", "4");
-    System.setProperty("frequency.millis", "2000");
-  }
+  @ClassRule
+  public static SystemProperty millis = new SystemProperty("frequency.millis", "2000");
 
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/schedule/polling-schedule-config.xml";
   }
 
-
   /**
-   * This test validate that the polls can be stopped and run on demand.
+   * This test validates that the polls can be stopped and run on demand.
    *
    * It checks correct functionality of polls. Stop the schedulers Waits for the polls to be executed (they shouldn't, as they are
    * stopped) Checks that the polls where not executed. Runs the polls on demand Checks that the polls where executed only once.
    */
   @Test
   public void test() throws Exception {
-    workingPollProber.check(new Probe() {
+    new PollingProber(10000, 100l).check(new Probe() {
 
       @Override
       public boolean isSatisfied() {
@@ -66,22 +66,22 @@ public class PollScheduleTestCase extends AbstractIntegrationTestCase {
       }
     });
 
-
     stopSchedulers();
-
-    waitForPollElements();
 
     int fooElementsAfterStopping = foo.size();
 
     waitForPollElements();
 
-    assertEquals(fooElementsAfterStopping, foo.size());
+    assertThat(foo.size(), is(fooElementsAfterStopping));
 
+    startSchedulers();
     runSchedulersOnce();
 
-    Thread.sleep(200);
-
-    assertEquals(fooElementsAfterStopping + 1, foo.size());
+    new PollingProber(200, 10).check(new JUnitLambdaProbe(() -> {
+      // One for the scheduler run and another for the on-demand one
+      assertThat(foo.size(), is(fooElementsAfterStopping + 2));
+      return true;
+    }));
   }
 
   private void waitForPollElements() throws InterruptedException {
@@ -102,21 +102,21 @@ public class PollScheduleTestCase extends AbstractIntegrationTestCase {
 
 
   private void runSchedulersOnce() throws Exception {
-    Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollfoo"));
-
-    for (Scheduler scheduler : schedulers) {
-      scheduler.schedule();
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    MessageSource flowSource = flow.getMessageSource();
+    if (flowSource instanceof PollingMessageSource) {
+      ((PollingMessageSource) flowSource).performPoll();
     }
   }
 
   private void stopSchedulers() throws MuleException {
-    Collection<Scheduler> schedulers =
-        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollfoo"));
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    flow.stop();
+  }
 
-    for (Scheduler scheduler : schedulers) {
-      scheduler.stop();
-    }
+  private void startSchedulers() throws MuleException {
+    Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
+    flow.start();
   }
 
   public static class FooComponent {

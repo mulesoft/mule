@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -54,6 +55,21 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   }
 
   @Override
+  public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    return decorated.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
+    return decorated.scheduleWithCronExpression(command, cronExpression);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
+    return decorated.scheduleWithCronExpression(command, cronExpression, timeZone);
+  }
+
+  @Override
   public void shutdown() {
     this.stopped = true;
     decorated.shutdown();
@@ -63,11 +79,6 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   public List<Runnable> shutdownNow() {
     this.stopped = true;
     return decorated.shutdownNow();
-  }
-
-  @Override
-  public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-    return decorated.scheduleWithFixedDelay(command, initialDelay, delay, unit);
   }
 
   @Override

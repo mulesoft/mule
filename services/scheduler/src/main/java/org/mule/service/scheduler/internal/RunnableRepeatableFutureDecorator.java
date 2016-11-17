@@ -33,6 +33,7 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   private final DefaultScheduler scheduler;
 
+  private volatile boolean running = false;
   private volatile boolean cancelled = false;
   private RunnableFuture<V> task;
 
@@ -52,6 +53,9 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   @Override
   public void run() {
+    if (running) {
+      return;
+    }
     if (cancelled) {
       logger.debug("Task " + this.toString() + " has been cancelled. Retunrning immendiately.");
       return;
@@ -60,6 +64,7 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
     long startTime = beforeRun();
     task = taskSupplier.get();
     try {
+      running = true;
       task.run();
     } finally {
       wrapUp();
@@ -73,6 +78,7 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   protected void wrapUp() {
     super.wrapUp();
     wrapUpCallback.accept(this);
+    running = false;
   }
 
   @Override
