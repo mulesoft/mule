@@ -114,10 +114,21 @@ public final class MuleTestUtils {
     try {
       return just(event)
           .transform(processor)
-          .subscribe()
           .block();
     } catch (Throwable exception) {
       throw rxExceptionToMuleException(exception);
     }
   }
+
+  public static void processAsStream(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
+      throws MuleException {
+    try {
+      just(event)
+          .transform(processor)
+          .subscribe();
+    } catch (Throwable exception) {
+      throw rxExceptionToMuleException(exception);
+    }
+  }
+
 }

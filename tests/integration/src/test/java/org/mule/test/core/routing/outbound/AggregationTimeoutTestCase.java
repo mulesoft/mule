@@ -47,8 +47,7 @@ public class AggregationTimeoutTestCase extends AbstractIntegrationTestCase {
       MuleClient client = muleContext.getClient();
 
       // Need to return control to test case as soon as message is sent, and not wait for response.
-      muleContext.getSchedulerService().ioScheduler()
-          .submit(() -> flowRunner("main").withPayload(inputData).withExchangePattern(ONE_WAY).dispatch());
+      flowRunner("main").withPayload(inputData).withExchangePattern(ONE_WAY).dispatchAsync();
 
       InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
       assertThat(response.getPayload().getValue(), instanceOf(List.class));
