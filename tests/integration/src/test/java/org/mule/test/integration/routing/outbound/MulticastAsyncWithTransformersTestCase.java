@@ -36,7 +36,7 @@ public class MulticastAsyncWithTransformersTestCase extends AbstractIntegrationT
     FruitBowl fruitBowl = new FruitBowl(apple, banana);
     fruitBowl.addFruit(orange);
 
-    flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
+    flowRunner("Distributor").withPayload(fruitBowl).run();
 
     List<Object> results = new ArrayList<Object>(3);
 

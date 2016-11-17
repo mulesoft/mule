@@ -30,7 +30,7 @@
         <flow-ref name="failingFlow"/>
     </flow>
     <flow name="failingFlow" processingStrategy="synchronous">
-        <test:component/>
+        <test:component throwException="true"/>
     </flow>
     <flow name="ComponentException">
         <file:inbound-endpoint path="${workingDirectory}/componentException" />

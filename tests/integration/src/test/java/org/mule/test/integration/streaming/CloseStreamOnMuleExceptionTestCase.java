@@ -51,7 +51,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
 
   @Test
   public void testCloseStreamOnComponentException() throws Exception {
-    flowRunner("echo").withPayload(inputStream).asynchronously().run();
+    flowRunner("echo").withPayload(inputStream).dispatch();
 
     streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
     assertTrue(inputStream.isClosed());
@@ -61,7 +61,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
   public void testCloseXMLInputSourceOnComponentException() throws Exception {
     InputSource stream = new InputSource(inputStream);
 
-    flowRunner("echo").withPayload(stream).asynchronously().run();
+    flowRunner("echo").withPayload(stream).dispatch();
 
     streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
     assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
@@ -71,7 +71,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
   public void testCloseXMLStreamSourceOnComponentException() throws Exception {
     Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
 
-    flowRunner("echo").withPayload(stream).asynchronously().run();
+    flowRunner("echo").withPayload(stream).dispatch();
 
     streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
     assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
@@ -81,7 +81,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
   public void testCloseXMLStreamReaderOnComponentException() throws Exception {
     TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(inputStream));
 
-    flowRunner("echo").withPayload(stream).asynchronously().run();
+    flowRunner("echo").withPayload(stream).dispatch();
 
     streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
     assertTrue(stream.isClosed());
@@ -91,7 +91,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
   public void testCloseSaxSourceOnComponentException() throws Exception {
     SAXSource stream = new SAXSource(new InputSource(inputStream));
 
-    flowRunner("echo").withPayload(stream).asynchronously().run();
+    flowRunner("echo").withPayload(stream).dispatch();
 
     verifyInputStreamIsClosed(((TestByteArrayInputStream) stream.getInputSource().getByteStream()));
   }
@@ -100,14 +100,14 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
   public void testCloseStaxSourceOnComponentException() throws Exception {
     StaxSource stream = new StaxSource(new TestXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(inputStream)));
 
-    flowRunner("echo").withPayload(stream).asynchronously().run();
+    flowRunner("echo").withPayload(stream).dispatch();
 
     verifyInputStreamIsClosed(((TestXMLStreamReader) stream.getXMLStreamReader()));
   }
 
   @Test
   public void testCloseStreamOnInboundFilterException() throws Exception {
-    flowRunner("inboundFilterExceptionBridge").withPayload(inputStream).asynchronously().run();
+    flowRunner("inboundFilterExceptionBridge").withPayload(inputStream).dispatch();
 
     verifyInputStreamIsClosed(inputStream);
   }

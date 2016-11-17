@@ -8,7 +8,7 @@ package org.mule.test.construct;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase {
@@ -20,7 +20,7 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
 
   @Override
   public void oneWay() throws Exception {
-    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).withExchangePattern(ONE_WAY).run();
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }

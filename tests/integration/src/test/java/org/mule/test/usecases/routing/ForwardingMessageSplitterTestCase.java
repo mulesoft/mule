@@ -33,7 +33,7 @@ public class ForwardingMessageSplitterTestCase extends AbstractIntegrationTestCa
     payload.add("hello");
     payload.add(new Integer(3));
     payload.add(new Exception());
-    flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
+    flowRunner("forwardingSplitter").withPayload(payload).run();
     InternalMessage m = client.request("test://component.1", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
     assertThat(m.getPayload().getValue(), instanceOf(String.class));

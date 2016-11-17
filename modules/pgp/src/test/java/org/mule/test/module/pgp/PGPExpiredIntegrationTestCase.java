@@ -38,7 +38,7 @@ public class PGPExpiredIntegrationTestCase extends MuleArtifactFunctionalTestCas
     String payload = "this is a super simple test. Hope it works!!!";
     MuleClient client = muleContext.getClient();
 
-    flowRunner("pgpEncryptProcessor").withPayload(payload).asynchronously().run();
+    flowRunner("pgpEncryptProcessor").withPayload(payload).run();
 
     assertThat(client.request("test://out", 5000).getRight().isPresent(), is(false));
 

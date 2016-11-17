@@ -58,16 +58,14 @@ public class SessionPropertiesTestCase extends CompatibilityFunctionalTestCase {
     assertThat(result.getSession().getProperty("keyNonSerializable"), is(nonSerializable));
   }
 
-
-
   @Test
   public void defaultExceptionStrategy() throws Exception {
-    flowRunner("defaultExceptionStrategy").asynchronously().run();
+    flowRunner("defaultExceptionStrategy").dispatch();
   }
 
   @Test
   public void catchExceptionStrategy() throws Exception {
-    flowRunner("catchExceptionStrategy").asynchronously().run();
+    flowRunner("catchExceptionStrategy").run();
   }
 
 }

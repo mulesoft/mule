@@ -42,7 +42,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     inboundProperties.put("Currency", "MyCurrency");
     inboundProperties.put("AcquirerCountry", "MyCountry");
     inboundProperties.put("Amount", "4999");
-    flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).asynchronously().run();
+    flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT).getRight().get();
@@ -55,7 +55,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     inboundProperties.put("Currency", "MyCurrency");
     inboundProperties.put("AcquirerCountry", "MyCountry");
     inboundProperties.put("Amount", "4999");
-    flowRunner("NestedFilters").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+    flowRunner("NestedFilters").withPayload(new Apple()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
     assertThat(client.request("test://outFilter", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
@@ -66,7 +66,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     Map<String, Serializable> inboundProperties = new HashMap<>();
     inboundProperties.put("AcquirerCountry", "MyCountry");
     inboundProperties.put("Amount", "4999");
-    flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+    flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
@@ -79,7 +79,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     Map<String, Serializable> inboundProperties = new HashMap<>();
     inboundProperties.put("AcquirerCountry", "MyCountry");
     inboundProperties.put("Amount", "5000");
-    flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+    flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();

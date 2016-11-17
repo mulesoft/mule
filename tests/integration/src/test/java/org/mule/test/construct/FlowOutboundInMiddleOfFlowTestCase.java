@@ -24,7 +24,7 @@ public class FlowOutboundInMiddleOfFlowTestCase extends AbstractIntegrationTestC
   public void testOutboundInMiddleOfFlow() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    flowRunner("flowTest").withPayload("message").asynchronously().run();
+    flowRunner("flowTest").withPayload("message").run();
 
     InternalMessage msg = client.request("test://test.out.1", 1000).getRight().get();
     assertEquals("messagehello", getPayloadAsString(msg));

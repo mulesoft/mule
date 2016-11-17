@@ -28,8 +28,8 @@ public class FailingNotificationListenerTestCase extends AbstractIntegrationTest
 
   @Test
   public void testName() throws Exception {
-    flowRunner("testFlow").withPayload(TEST_MESSAGE).asynchronously().run();
-    flowRunner("testFlow").withPayload(TEST_MESSAGE).asynchronously().run();
+    flowRunner("testFlow").withPayload(TEST_MESSAGE).dispatch();
+    flowRunner("testFlow").withPayload(TEST_MESSAGE).dispatch();
 
     Prober prober = new PollingProber(1000, 10);
     prober.check(new Probe() {

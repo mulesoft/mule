@@ -52,7 +52,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
   public void testCollectionAggregator() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    flowRunner("SplitterFlow").withPayload(PAYLOAD).asynchronously().run();
+    flowRunner("SplitterFlow").withPayload(PAYLOAD).run();
     InternalMessage msg = client.request("test://collectionCreated", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertTrue(msg.getPayload().getValue() instanceof List);
@@ -72,7 +72,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testCustomAggregator() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("SplitterFlow2").withPayload(PAYLOAD).asynchronously().run();
+    flowRunner("SplitterFlow2").withPayload(PAYLOAD).run();
     InternalMessage msg = client.request("test://collectionCreated2", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertNotNull(msg.getPayload().getValue());

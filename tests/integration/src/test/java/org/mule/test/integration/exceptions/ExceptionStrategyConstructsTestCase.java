@@ -36,13 +36,13 @@ public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTest
   public void testDefaultExceptionStrategySingleEndpoint() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    flowRunner("testService").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testService").withPayload(TEST_PAYLOAD).dispatch();
     assertExceptionMessage(client.request("test://modelout", RECEIVE_TIMEOUT).getRight().get());
 
-    flowRunner("testService1").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testService1").withPayload(TEST_PAYLOAD).dispatch();
     assertExceptionMessage(client.request("test://service1out", RECEIVE_TIMEOUT).getRight().get());
 
-    flowRunner("testflow1").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testflow1").withPayload(TEST_PAYLOAD).dispatch();
     assertExceptionMessage(client.request("test://flow1out", RECEIVE_TIMEOUT).getRight().get());
   }
 

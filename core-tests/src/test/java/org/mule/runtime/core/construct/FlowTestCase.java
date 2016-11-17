@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.construct;
 
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
@@ -89,7 +92,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(new StringAppendTransformer("b"));
     processors.add(new StringAppendTransformer("c"));
     processors.add(dynamicProcessorContainer);
-    processors.add(event -> Event.builder(event).addVariable("thread", Thread.currentThread()).build());
+    processors.add(event -> Event.builder(event).addVariable("thread", currentThread()).build());
     processors.add(sensingMessageProcessor);
     flow.setMessageProcessors(processors);
   }
@@ -115,7 +118,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.initialise();
     flow.start();
     Event event = eventBuilder()
-        .message(InternalMessage.of("hello"))
+        .message(InternalMessage.of(TEST_PAYLOAD))
         .exchangePattern(ONE_WAY)
         .build();
     Event response = directInboundMessageSource.process(event);
@@ -124,11 +127,8 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
       @Override
       protected boolean test() throws Exception {
-        // While a SedaService returns null, a Flow echos the request when there is async hand-off
-        assertEquals(event.getMessage(), response.getMessage());
-
-        assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
-        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getVariable("thread").getValue());
+        assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
+        assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
         return true;
       }
     });
@@ -140,11 +140,11 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
     Event response = directInboundMessageSource.process(testEvent());
 
-    assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
-    assertEquals(Thread.currentThread(), response.getVariable("thread").getValue());
+    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
+    assertThat(response.getVariable("thread").getValue(), sameInstance(currentThread()));
 
-    assertEquals(TEST_PAYLOAD + "abc", sensingMessageProcessor.event.getMessageAsString(muleContext));
-    assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getVariable("thread").getValue());
+    assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
+    assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), sameInstance(currentThread()));
 
   }
 

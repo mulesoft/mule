@@ -54,7 +54,6 @@ public class MessageChunkingTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testMessageChunkingObject() throws Exception {
     final AtomicInteger messagePartsCount = new AtomicInteger(0);
-    final Latch chunkingReceiverLatch = new Latch();
     final SimpleSerializableObject simpleSerializableObject = new SimpleSerializableObject("Test String", true, 99);
 
     // find number of chunks
@@ -77,7 +76,6 @@ public class MessageChunkingTestCase extends AbstractIntegrationTestCase {
         assertEquals(simpleSerializableObject.b, replySimpleSerializableObject.b);
         assertEquals(simpleSerializableObject.i, replySimpleSerializableObject.i);
         assertEquals(simpleSerializableObject.s, replySimpleSerializableObject.s);
-        chunkingReceiverLatch.countDown();
       }
     }, "ChunkingObjectReceiver");
 
@@ -87,16 +85,13 @@ public class MessageChunkingTestCase extends AbstractIntegrationTestCase {
     flowExecutionListener.addListener(source -> messagePartsCount.getAndIncrement());
 
     MuleClient client = muleContext.getClient();
-    flowRunner("ObjectReceiver").withPayload(simpleSerializableObject).asynchronously().run();
-    // Wait for the message to be received and tested (in the listener above)
-    assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
+    flowRunner("ObjectReceiver").withPayload(simpleSerializableObject).run();
     // Ensure we processed expected number of message parts
     assertEquals(parts, messagePartsCount.get());
   }
 
   protected void doMessageChunking(final String data, int partsCount) throws Exception {
     final AtomicInteger messagePartsCount = new AtomicInteger(0);
-    final Latch chunkingReceiverLatch = new Latch();
 
     // Listen to events fired by the ChunkingReceiver service
     muleContext.registerListener(new FunctionalTestNotificationListener() {
@@ -110,7 +105,6 @@ public class MessageChunkingTestCase extends AbstractIntegrationTestCase {
         // Test that we have received all chunks in the correct order
         Object reply = ((FunctionalTestNotification) notification).getReplyMessage();
         assertEquals(data + " Received", reply);
-        chunkingReceiverLatch.countDown();
       }
     }, "ChunkingReceiver");
 
@@ -118,9 +112,7 @@ public class MessageChunkingTestCase extends AbstractIntegrationTestCase {
     // determine how many message parts have been received
     FlowExecutionListener flowExecutionListener = new FlowExecutionListener("ChunkingReceiver", muleContext);
     flowExecutionListener.addListener(source -> messagePartsCount.getAndIncrement());
-    flowRunner("Receiver").withPayload(data).asynchronously().run();
-    // Wait for the message to be received and tested (in the listener above)
-    assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
+    flowRunner("Receiver").withPayload(data).run();
     // Ensure we processed expected number of message parts
     assertEquals(partsCount, messagePartsCount.get());
   }

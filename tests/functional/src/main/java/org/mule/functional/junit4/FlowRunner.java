@@ -8,8 +8,12 @@ package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.tck.MuleTestUtils.processAsStream;
 import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import org.mule.functional.functional.FlowAssert;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -35,6 +39,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private Transformer responseEventTransformer = input -> input;
   private boolean nonBlocking = false;
+  private Scheduler scheduler;
 
   /**
    * Initializes this flow runner.
@@ -45,6 +50,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   public FlowRunner(MuleContext muleContext, String flowName) {
     super(muleContext);
     this.flowName = flowName;
+    this.scheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
   /**
@@ -113,18 +119,74 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public Event runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    Event responseEvent = txExecutionTemplate.execute(() -> {
+    Event response = txExecutionTemplate.execute(getFlowRunCallback(flow));
+
+    for (String flowNameToVerify : flowNamesToVerify) {
+      FlowAssert.verify(flowNameToVerify);
+    }
+
+    return (Event) responseEventTransformer.transform(response);
+  }
+
+  /**
+   * Dispatchs to the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
+   * afterwards.
+   *
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   *
+   * Dispatch behaves differently to {@link FlowRunner#run()} in that it does not propagate any exceptions to the test case or
+   * return a result.
+   */
+  public void dispatch() throws Exception {
+    Flow flow = (Flow) getFlowConstruct();
+    try {
+      txExecutionTemplate.execute(getFlowDispatchCallback(flow));
+    } catch (Exception e) {
+      // Ignore
+    }
+    FlowAssert.verify(flowName);
+  }
+
+  /**
+   * Dispatchs to the specified flow with the provided event and configuration in a new IO thread, and performs a
+   * {@link FlowAssert#verify(String))} afterwards.
+   *
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   *
+   * Dispatch behaves differently to {@link FlowRunner#run()} in that it does not propagate any exceptions to the test case or
+   * return a result.
+   */
+  public void dispatchAsync() throws Exception {
+    Flow flow = (Flow) getFlowConstruct();
+    try {
+      scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
+    } catch (Exception e) {
+      // Ignore
+    }
+    FlowAssert.verify(flowName);
+  }
+
+  private ExecutionCallback getFlowRunCallback(final Flow flow) {
+    return () -> {
       if (nonBlocking) {
         return processAsStreamAndBlock(getOrBuildEvent(), flow);
       } else {
         return flow.process(getOrBuildEvent());
       }
-    });
-    for (String flowNameToVerify : flowNamesToVerify) {
-      FlowAssert.verify(flowNameToVerify);
-    }
+    };
+  }
 
-    return (Event) responseEventTransformer.transform(responseEvent);
+  private ExecutionCallback getFlowDispatchCallback(final Flow flow) {
+    return () -> {
+      if (nonBlocking) {
+        processAsStream(getOrBuildEvent(), flow);
+      } else {
+        flow.process(getOrBuildEvent());
+      }
+      return null;
+    };
   }
 
   /**

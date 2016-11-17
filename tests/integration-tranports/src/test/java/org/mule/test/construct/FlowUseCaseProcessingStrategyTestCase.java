@@ -62,7 +62,7 @@ public class FlowUseCaseProcessingStrategyTestCase extends CompatibilityFunction
     File tempFile = createTempFile("mule-file-test-async-");
     client.request("vm://exception", 5000);
 
-    assertFalse(tempFile.exists());
+    assertTrue(tempFile.exists());
   }
 
   private File createTempFile(String fileName) throws IOException {

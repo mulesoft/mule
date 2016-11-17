@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.reliability;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -26,8 +27,7 @@ import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 /**
- * Verify that no inbound messages are lost when exceptions occur. The message must either make it all the way to the SEDA queue
- * (in the case of an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * Verify that no inbound messages are lost when exceptions occur.
  *
  * In the case of JMS, this will cause the failed message to be redelivered if JMSRedelivery is configured.
  */
@@ -66,36 +66,25 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
     putMessageOnQueue("noException");
 
     // Delivery was successful
-    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, MILLISECONDS));
   }
 
   @Test
   public void testTransformerException() throws Exception {
     putMessageOnQueue("transformerException");
-
-    // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-    // perspective, the message has been delivered successfully.
-    // Note that this behavior is different from services because the exception occurs before
-    // the SEDA queue for services.
-    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    assertThat("Message should not have been redelivered", messageRedelivered.await(latchTimeout, MILLISECONDS), is(true));
   }
 
   @Test
   public void testRouterException() throws Exception {
-    // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-    // perspective, the message has been delivered successfully.
-    // Note that this behavior is different from services because the exception occurs before
-    // the SEDA queue for services.
-    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    putMessageOnQueue("routerException");
+    assertThat("Message should not have been redelivered", messageRedelivered.await(latchTimeout, MILLISECONDS), is(true));
   }
 
   @Test
   public void testComponentException() throws Exception {
     putMessageOnQueue("componentException");
-
-    // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-    // perspective, the message has been delivered successfully.
-    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    assertThat("Message should not have been redelivered", messageRedelivered.await(latchTimeout, MILLISECONDS), is(true));
   }
 
   @Test
@@ -103,7 +92,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
     putMessageOnQueue("exceptionHandled");
 
     // Exception occurs using on-error-continue that will always consume the message
-    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, MILLISECONDS));
   }
 
   @Test
@@ -117,7 +106,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
       }
     });
     putMessageOnQueue("rollbackOnException");
-    if (!exceptionStrategyListener.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
+    if (!exceptionStrategyListener.await(RECEIVE_TIMEOUT, MILLISECONDS)) {
       fail("Message should have been redelivered");
     }
     assertThat(muleContext.getClient().request("jms://rollbackOnException?connector=jmsConnectorNoRedelivery",
@@ -131,7 +120,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase {
     putMessageOnQueue("commitOnException");
 
     // Exception occurs using on-error-continue that will always consume the message
-    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    assertFalse("Message should not have been redelivered", messageRedelivered.await(latchTimeout, MILLISECONDS));
   }
 
 }

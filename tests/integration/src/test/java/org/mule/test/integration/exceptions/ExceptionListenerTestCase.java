@@ -69,7 +69,7 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
   public void testExceptionStrategyFromComponent() throws Exception {
     assertQueueIsEmpty("test://error.queue");
 
-    flowRunner("mycomponent").withPayload("test").asynchronously().run();
+    flowRunner("mycomponent").withPayload("test").dispatch();
 
     assertQueueIsEmpty("test://component.out");
 

@@ -20,8 +20,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_NONE;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -77,27 +79,27 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     assertNotNull(message);
     Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
-    assertEquals(Thread.currentThread(), thread);
+    assertEquals(currentThread(), thread);
   }
 
   @Test
   public void testFlowAynchronous() throws Exception {
-    flowRunner("asynchronousFlow").withPayload("0").asynchronously().run();
+    flowRunner("asynchronousFlow").withPayload("0").withExchangePattern(ONE_WAY).run();
     InternalMessage message = muleContext.getClient().request("test://asynchronous-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
     Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
-    assertNotSame(Thread.currentThread(), thread);
+    assertNotSame(currentThread(), thread);
   }
 
   @Test
   public void testAsyncAsynchronous() throws Exception {
-    flowRunner("asynchronousAsync").withPayload("0").asynchronously().run();
+    flowRunner("asynchronousAsync").withPayload("0").run();
     InternalMessage message = muleContext.getClient().request("test://asynchronous-async-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
     Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
-    assertNotSame(Thread.currentThread(), thread);
+    assertNotSame(currentThread(), thread);
   }
 
   @Test
@@ -395,7 +397,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
   @Test
   public void testAsyncTransactionalEndpoint() throws Exception {
     Exception e = flowRunner("async-tx").withPayload("0").transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
-        .asynchronously().runExpectingException();
+        .withExchangePattern(ONE_WAY).runExpectingException();
 
     assertThat(e, instanceOf(MessagingException.class));
     assertThat(e.getMessage(), containsString("The <async> element cannot be used with transactions"));
@@ -537,7 +539,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testSubFlowMessageFilter() throws Exception {
-    flowRunner("messagefiltersubflow").withPayload("0").asynchronously().run();
+    flowRunner("messagefiltersubflow").withPayload("0").run();
     InternalMessage message =
         muleContext.getClient().request("test://messagefiltersubflow-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);

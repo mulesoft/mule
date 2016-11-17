@@ -7,8 +7,10 @@
 package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.functional.functional.FunctionalTestNotificationListener;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -32,7 +34,7 @@ public class InOnlyTestCase extends AbstractIntegrationTestCase {
     final Latch latch = new Latch();
     muleContext.registerListener((FunctionalTestNotificationListener) notification -> latch.countDown());
 
-    flowRunner("In-Only-Service").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("In-Only-Service").withPayload(TEST_PAYLOAD).withExchangePattern(ONE_WAY).run();
     assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
   }
 }

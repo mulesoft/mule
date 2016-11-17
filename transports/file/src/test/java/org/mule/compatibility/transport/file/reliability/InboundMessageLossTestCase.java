@@ -6,11 +6,15 @@
  */
 package org.mule.compatibility.transport.file.reliability;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 import static org.mule.compatibility.transport.file.FileTestUtils.createFolder;
-
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.compatibility.transport.file.AbstractFileMoveDeleteTestCase;
+import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.construct.Flow;
@@ -24,16 +28,14 @@ import org.mule.tck.probe.Prober;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Verify that no inbound messages are lost when exceptions occur. The message must either make it all the way to the SEDA queue
- * (in the case of an asynchronous inbound endpoint), or be restored/rolled back at the source. In the case of the File transport,
- * this will cause the file to be restored to its original location from the working directory. Note that a workDirectory must be
- * specified on the connector in order for this to succeed.
+ * Verify that no inbound messages are lost when exceptions occur. In the case of the File transport, this will cause the file to
+ * be restored to its original location from the working directory. Note that a workDirectory must be specified on the connector
+ * in order for this to succeed.
  */
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
 
@@ -75,23 +77,17 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
 
   @Test
   public void testComponentException() throws Exception {
+    final Latch latch = new Latch();
+    FunctionalTestComponent ftc = getFunctionalTestComponent("ComponentException");
+    ftc.setEventCallback((context, component, muleContext) -> latch.countDown());
+
     tmpDir = createFolder(getFileInsideWorkingDirectory("componentException").getAbsolutePath());
     final File file = createDataFile(tmpDir, "test1.txt");
-    prober.check(new Probe() {
 
-      @Override
-      public boolean isSatisfied() {
-        // Component exception occurs after the SEDA queue for an
-        // asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        return !file.exists();
-      }
-
-      @Override
-      public String describeFailure() {
-        return "File should be gone";
-      }
-    });
+    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
+    stopIfNeeded(muleContext.getRegistry().lookupFlowConstruct("ComponentException"));
+    muleContext.getRegistry().lookupObject(FileConnector.class).stop();
+    assertThat(file.exists(), is(true));
   }
 
   @Test
@@ -102,9 +98,6 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
 
       @Override
       public boolean isSatisfied() {
-        // Component exception occurs after the SEDA queue for an
-        // asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
         return !file.exists();
       }
 
@@ -123,9 +116,6 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
 
       @Override
       public boolean isSatisfied() {
-        // Component exception occurs after the SEDA queue for an
-        // asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
         return !file.exists();
       }
 
@@ -154,7 +144,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
 
     tmpDir = createFolder(getFileInsideWorkingDirectory("rollbackOnException").getAbsolutePath());
     final File file = createDataFile(tmpDir, "test1.txt");
-    if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
+    if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, MILLISECONDS)) {
       fail("message should be redelivered");
     }
     prober.check(new Probe() {
@@ -173,46 +163,34 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase {
 
   @Test
   public void testRouterException() throws Exception {
+    final Latch latch = new Latch();
+    FunctionalTestComponent ftc = getFunctionalTestComponent("RouterException");
+    ftc.setEventCallback((context, component, muleContext) -> latch.countDown());
+
     tmpDir = createFolder(getFileInsideWorkingDirectory("routerException").getAbsolutePath());
     final File file = createDataFile(tmpDir, "test1.txt");
-    prober.check(new Probe() {
 
-      @Override
-      public boolean isSatisfied() {
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        // Note that this behavior is different from services because the exception occurs before
-        // the SEDA queue for services.
-        return !file.exists();
-      }
-
-      @Override
-      public String describeFailure() {
-        return "File should be gone";
-      }
-    });
+    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
+    stopIfNeeded(muleContext.getRegistry().lookupFlowConstruct("RouterException"));
+    muleContext.getRegistry().lookupObject(FileConnector.class).stop();
+    assertThat(file.exists(), is(true));
+    file.delete();
   }
 
   @Test
   public void testTransformerException() throws Exception {
+    final Latch latch = new Latch();
+    FunctionalTestComponent ftc = getFunctionalTestComponent("TransformerException");
+    ftc.setEventCallback((context, component, muleContext) -> latch.countDown());
+
     tmpDir = createFolder(getFileInsideWorkingDirectory("transformerException").getAbsolutePath());
     final File file = createDataFile(tmpDir, "test1.txt");
-    prober.check(new Probe() {
 
-      @Override
-      public boolean isSatisfied() {
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        // Note that this behavior is different from services because the exception occurs before
-        // the SEDA queue for services.
-        return !file.exists();
-      }
-
-      @Override
-      public String describeFailure() {
-        return "File should be gone";
-      }
-    });
+    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
+    stopIfNeeded(muleContext.getRegistry().lookupFlowConstruct("TransformerException"));
+    muleContext.getRegistry().lookupObject(FileConnector.class).stop();
+    assertThat(file.exists(), is(true));
+    file.delete();
   }
 
   @Test
