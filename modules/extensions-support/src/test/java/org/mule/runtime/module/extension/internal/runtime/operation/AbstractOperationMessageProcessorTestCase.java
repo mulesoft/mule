@@ -46,6 +46,8 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.policy.NullPolicyProvider;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -145,6 +147,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ConfigurationProvider configurationProvider;
 
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  protected PolicyManager mockPolicyManager;
+
   protected OperationMessageProcessor messageProcessor;
 
   protected String configurationName = CONFIG_NAME;
@@ -161,6 +166,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
       return subject;
     });
 
+    when(extensionModel.getName()).thenReturn("testException");
     when(operationModel.getName()).thenReturn(getClass().getName());
     when(operationModel.getOutput())
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));
@@ -232,6 +238,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationProvider.get(anyObject())).thenReturn(configurationInstance);
     when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(of(configurationProvider));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
+
+    when(mockPolicyManager.lookupPolicyProvider()).thenReturn(new NullPolicyProvider());
 
     messageProcessor = setUpOperationMessageProcessor();
   }

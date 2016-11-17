@@ -326,4 +326,11 @@ public abstract class ExtensionComponent
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();
+
+  /**
+   * @return the extension model where the component has been defined.
+   */
+  public ExtensionModel getExtensionModel() {
+    return extensionModel;
+  }
 }

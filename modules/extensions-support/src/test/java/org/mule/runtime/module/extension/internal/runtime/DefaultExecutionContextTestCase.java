@@ -79,7 +79,8 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
     operationContext =
-        new DefaultExecutionContext(extensionModel, of(configuration), resolverSetResult, operationModel, event, muleContext);
+        new DefaultExecutionContext(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel, event,
+                                    muleContext);
   }
 
   @Test

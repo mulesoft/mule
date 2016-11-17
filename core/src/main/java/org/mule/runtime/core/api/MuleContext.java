@@ -42,6 +42,7 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.util.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.extension.api.ExtensionManager;
@@ -427,5 +428,10 @@ public interface MuleContext extends Lifecycle {
    * @return locator for accessing runtime object created by the mule configuration.
    */
   ConfigurationComponentLocator getConfigurationComponentLocator();
+
+  /**
+   * @return the {@code PolicyManager} for this application.
+   */
+  PolicyManager getPolicyManager();
 }
 

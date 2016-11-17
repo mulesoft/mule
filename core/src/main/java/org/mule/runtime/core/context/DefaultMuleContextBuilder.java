@@ -56,6 +56,7 @@ import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.RegistryDelegatingInjector;

@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -78,6 +80,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -92,7 +95,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                         extensionManager);
+                                         extensionManager, mockPolicyManager);
   }
 
   @Test

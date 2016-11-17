@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessage;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
@@ -95,6 +91,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     private void checkArgument(Object value, String name) {
       Preconditions.checkArgument(value != null, name + " was not set");
     }
+
   }
 
   /**
@@ -127,13 +124,8 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
    */
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
-    Event event = Event.builder(create(flowConstruct, configName))
-        .message((InternalMessage) toMessage(result))
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
-        .build();
-
     messageProcessingManager.processMessage(
-                                            new ExtensionFlowProcessingTemplate(event,
+                                            new ExtensionFlowProcessingTemplate(toMessage(result),
                                                                                 listener,
                                                                                 completionHandlerFactory
                                                                                     .createCompletionHandler(context)),

@@ -96,7 +96,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
     when(muleEvent.getMessage().getPayload().getDataType()).thenReturn(DATA_TYPE);
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-    operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters, operationModel,
+    operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, muleContext);
     operationContext = spy(operationContext);
   }

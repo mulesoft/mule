@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
@@ -20,6 +20,10 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -32,11 +36,17 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.policy.PolicyOperationParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.policy.NextOperation;
+import org.mule.runtime.core.policy.Policy;
+import org.mule.runtime.core.policy.PolicyProvider;
+import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -53,25 +63,34 @@ import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
 /**
  * A {@link Processor} capable of executing extension operations.
  * <p>
- * It obtains a configuration instance, evaluate all the operation parameters and executes a {@link OperationModel} by
- * using a {@link #operationExecutor}. This message processor is capable of serving the execution of any {@link OperationModel} of
- * any {@link ExtensionModel}.
+ * It obtains a configuration instance, evaluate all the operation parameters and executes a {@link OperationModel} by using a
+ * {@link #operationExecutor}. This message processor is capable of serving the execution of any {@link OperationModel} of any
+ * {@link ExtensionModel}.
  * <p>
- * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a
- * {@link OperationExecutorModelProperty} through which a {@link OperationExecutorFactory} is obtained.
- * Models with no such property cannot be used with this class. The obtained {@link OperationExecutor} serve all invocations
- * of {@link #process(Event)} on {@code this} instance but will not be shared with other instances of
- * {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance receives will be propagated to
- * the {@link #operationExecutor}.
+ * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
+ * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
+ * obtained {@link OperationExecutor} serve all invocations of {@link #process(Event)} on {@code this} instance but will not be
+ * shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance
+ * receives will be propagated to the {@link #operationExecutor}.
  * <p>
  * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
+ * <p>
+ * Before executing the operation will use the {@link PolicyManager} to lookup for a {@link Policy} that must be applied
+ * to the operation. If there's a policy to be applied then it will interleave the operation execution with the policy logic
+ * allowing the policy to execute logic over the operation parameters, change those parameters and then execute logic with
+ * the operation response.
  *
  * @since 3.7.0
  */
@@ -89,6 +108,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
 
   private ExecutionMediator executionMediator;
   private OperationExecutor operationExecutor;
+  private PolicyManager policyManager;
   protected ReturnDelegate returnDelegate;
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
@@ -96,21 +116,64 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    ResolverSet resolverSet,
-                                   ExtensionManagerAdapter extensionManager) {
+                                   ExtensionManagerAdapter extensionManager,
+                                   PolicyManager policyManager) {
     super(extensionModel, operationModel, configurationProvider, extensionManager);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.resolverSet = resolverSet;
     this.target = target;
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
+    this.policyManager = policyManager;
   }
 
   @Override
   public Event process(Event event) throws MuleException {
-    return (Event) withContextClassLoader(getExtensionClassLoader(), () -> {
+    return withContextClassLoader(getExtensionClassLoader(), () -> {
       Optional<ConfigurationInstance> configuration = getConfiguration(event);
-      ExecutionContextAdapter operationContext = createExecutionContext(configuration, event);
-      return doProcess(event, operationContext);
+
+      ComponentIdentifier operationIdentifier =
+          new ComponentIdentifier.Builder().withName(operationModel.getName())
+              .withNamespace(extensionModel.getName().toLowerCase()).build();
+      Map<String, Object> originalParameterMap = this.resolverSet.resolve(event).asMap();
+      PolicyProvider policyProvider = policyManager.lookupPolicyProvider();
+      Optional<Policy> policy =
+          policyProvider.findOperationPolicy(event.getContext().getId(), operationIdentifier);
+      if (policy.isPresent()) {
+        Optional<PolicyOperationParametersTransformer> policyOperationParametersTransformer =
+            policyManager.lookupOperationParametersTransformer(operationIdentifier);
+        Event policyEvent;
+        if (policyOperationParametersTransformer.isPresent()) {
+          Message message = policyOperationParametersTransformer.get().fromParametersToMessage(originalParameterMap);
+          policyEvent = Event.builder(event).message((InternalMessage) message).build();
+        } else {
+          policyEvent = event;
+        }
+        AtomicReference<Event> operationResult = new AtomicReference<>();
+        NextOperation executeOperationFunction = (policyExecuteNextEvent) -> {
+          try {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.putAll(originalParameterMap);
+            if (policyOperationParametersTransformer.isPresent()) {
+              parameters.putAll(policyOperationParametersTransformer.get()
+                  .fromMessageToParameters(policyExecuteNextEvent.getMessage()));
+            }
+            ExecutionContextAdapter operationContext = createExecutionContext(configuration, parameters, event);
+            MuleEvent muleEvent = doProcess(policyExecuteNextEvent, operationContext);
+            Event resultEvent = (Event) muleEvent;
+            operationResult.set(resultEvent);
+            return resultEvent;
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(e);
+          }
+        };
+        policy.get().process(policyEvent, executeOperationFunction);
+        return operationResult.get();
+      } else {
+        ExecutionContextAdapter operationContext = createExecutionContext(configuration, originalParameterMap, event);
+        MuleEvent muleEvent = doProcess(event, operationContext);
+        return (Event) muleEvent;
+      }
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     });
@@ -119,7 +182,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, ExecutionContextAdapter operationContext)
       throws MuleException {
     Object result = executeOperation(operationContext, event);
-    return returnDelegate.asReturnValue(result, operationContext);
+    MuleEvent resultEvent = returnDelegate.asReturnValue(result, operationContext);
+    return resultEvent;
   }
 
   private Object executeOperation(ExecutionContextAdapter operationContext, Event event) throws MuleException {
@@ -140,9 +204,10 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   }
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Optional<ConfigurationInstance> configuration,
+                                                                         Map<String, Object> resolvedParameters,
                                                                          Event event)
       throws MuleException {
-    return new DefaultExecutionContext<>(extensionModel, configuration, resolverSet.resolve(event), operationModel, event,
+    return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
                                          muleContext);
   }
 

@@ -617,6 +617,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
@@ -644,13 +650,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!--  We should reenable this as it makes CXF faster

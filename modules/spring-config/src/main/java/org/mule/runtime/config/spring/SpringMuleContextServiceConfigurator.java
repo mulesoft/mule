@@ -37,6 +37,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_OBJECT_NAME_PROCESSOR;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
@@ -92,6 +93,7 @@ import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.locator.DefaultConfigurationComponentLocator;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
+import org.mule.runtime.core.policy.DefaultPolicyManager;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.MuleSecurityManager;
 import org.mule.runtime.core.time.TimeSupplier;
@@ -162,6 +164,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class))
       .put(OBJECT_METADATA_SERVICE, getBeanDefinition(MuleMetadataService.class))
       .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
+      .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
       .put(OBJECT_SERIALIZER,
            getBeanDefinitionBuilder(DefaultObjectSerializerFactoryBean.class).addDependsOn(OBJECT_MULE_CONFIGURATION)
                .getBeanDefinition())

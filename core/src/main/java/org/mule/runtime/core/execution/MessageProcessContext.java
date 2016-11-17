@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.concurrent.Executor;
 
@@ -57,4 +58,10 @@ public interface MessageProcessContext {
    * @return the class loader to be used for processing the message.
    */
   ClassLoader getExecutionClassLoader();
+
+  //TODO MULE-10970 - We may get rid of this once all the information is in each component
+  /**
+   * @return the {@link ComponentIdentifier} of the message source.
+   */
+  ComponentIdentifier getSourceIdentifier();
 }

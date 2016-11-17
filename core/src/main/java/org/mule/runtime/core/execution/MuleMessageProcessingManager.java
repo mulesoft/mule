@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.policy.PolicyManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +48,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
     messageProcessPhaseList.add(new ValidationPhase());
     messageProcessPhaseList.add(new FlowProcessingPhase());
     messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
+    messageProcessPhaseList.add(new ExtensionFlowProcessingPhase(muleContext.getPolicyManager()));
     Collections.sort(messageProcessPhaseList, new Comparator<MessageProcessPhase>() {
 
       @Override
