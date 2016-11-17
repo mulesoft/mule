@@ -1724,7 +1724,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void deploysAppProvidingResourceForPlugin() throws Exception {
     final TestArtifactDescriptor artifactFileBuilder =
         new ApplicationFileBuilder("appProvidingResourceForPlugin").definedBy("app-providing-resource-for-plugin.xml")
-            .containingPlugin(pluginUsingAppResource).usingResource("test-resource.txt", "META-INF/app-resource.txt");
+            .containingPlugin(pluginUsingAppResource)
+            .usingResource("src/test/resources/test-resource.txt", "META-INF/app-resource.txt");
     addPackedAppFromBuilder(artifactFileBuilder);
 
     startDeployment();
