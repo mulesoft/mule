@@ -34,6 +34,8 @@ import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager {
@@ -49,6 +51,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   // Default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
+  @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
     this.muleContext = muleContext;
     mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
