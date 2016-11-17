@@ -221,6 +221,7 @@
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
                 <exclude>org.mule.modules:mule-module-email</exclude>
                 <exclude>org.mule.modules:mule-module-wsc</exclude>
+                <!--<exclude>org.mule.modules:mule-module-jms</exclude>-->
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
                 <exclude>org.mule.modules:mule-module-json</exclude>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <flow name="send-payload">
+        <jmsn:publish config-ref="config" destination="#[dw:initialDestination]" destinationType="TOPIC">
+            <jmsn:message-builder>
+                <jmsn:properties>
+                    #[dw:{(initialProperty): propertyValue}]
+                </jmsn:properties>
+            </jmsn:message-builder>
+        </jmsn:publish>
+    </flow>
+
+    <flow name="bridge">
+        <jmsn:consume config-ref="config" destination="#[dw:initialDestination]" maximumWaitTime="1000">
+            <jmsn:consumer-type>
+                <jmsn:topic-consumer/>
+            </jmsn:consumer-type>
+        </jmsn:consume>
+        <jmsn:publish config-ref="config" destination="#[dw:finalDestination]" destinationType="TOPIC">
+            <jmsn:message-builder jmsxProperties="#[dw:attributes.properties.jmsxProperties]">
+                <jmsn:body>#[dw:bridgePrefix ++ payload]</jmsn:body>
+                <jmsn:properties>#[dw:attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jmsn:properties>
+            </jmsn:message-builder>
+        </jmsn:publish>
+    </flow>
+
+    <flow name="bridge-receiver">
+        <jmsn:consume config-ref="config" destination="#[dw:finalDestination]" maximumWaitTime="1000">
+            <jmsn:consumer-type>
+                <jmsn:topic-consumer/>
+            </jmsn:consumer-type>
+        </jmsn:consume>
+    </flow>
+
+</mule>

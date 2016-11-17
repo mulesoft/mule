@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.model.property;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -19,12 +20,22 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
  */
 public class NullSafeModelProperty implements ModelProperty {
 
+  private final MetadataType defaultType;
+
+  public NullSafeModelProperty(MetadataType defaultType) {
+    this.defaultType = defaultType;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public String getName() {
     return "nullSafe";
+  }
+
+  public MetadataType defaultType() {
+    return defaultType;
   }
 
   /**

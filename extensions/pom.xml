@@ -31,6 +31,7 @@
         <module>validation</module>
         <module>email</module>
         <module>wsc</module>
+        <module>jms</module>
     </modules>
 
     <dependencies>

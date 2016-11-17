@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <jmsn:config name="config">
+        <jmsn:active-mq-connection clientId="myConsumerClient">
+            <jmsn:factory-configuration brokerUrl="vm://localhost?broker.useJmx=false"
+                                       maxRedelivery="3" initialRedeliveryDelay="10" redeliveryDelay="20"/>
+        </jmsn:active-mq-connection>
+        <jmsn:consumer-config ackMode="DUPS_OK" maxRedelivery="5"/>
+        <jmsn:producer-config disableMessageId="true" disableMessageTimestamp="true" priority="6"/>
+    </jmsn:config>
+
+</mule>
