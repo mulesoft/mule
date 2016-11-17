@@ -13,6 +13,7 @@ import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
@@ -113,7 +114,10 @@ public class IsolatedClassLoaderFactory {
             new MuleArtifactClassLoader(artifactId,
                                         new ArtifactDescriptor(pluginUrlClassification.getName()),
                                         pluginUrlClassification.getUrls().toArray(new URL[0]),
-                                        regionClassLoader, childClassLoaderLookupPolicy);
+                                        regionClassLoader,
+                                        buildLookupPolicyForPlugin(pluginUrlClassification,
+                                                                   artifactsUrlClassification.getPluginUrlClassifications(),
+                                                                   childClassLoaderLookupPolicy));
         pluginsArtifactClassLoaders.add(pluginCL);
 
         ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification);
@@ -146,6 +150,58 @@ public class IsolatedClassLoaderFactory {
 
     return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
                                          appClassLoader);
+  }
+
+  /**
+   * Extends the parent look up policies by taking into account dependencies between the current plugin being classified and the whole list
+   * of plugins that will go the region. If the current plugin declares the dependency to a plugin that is in the region too, the packages
+   * exported by the dependent plugin should be added to the lookup policy for the current pluing as {@link ClassLoaderLookupStrategy#PARENT_FIRST},
+   * in order to allow resolve them.
+   * <p/>
+   * Otherwise it should be added as {@link ClassLoaderLookupStrategy#CHILD_FIRST} in order to fail when trying to access classes from other plugins that are not delcared as dependent.
+   *
+   * @param currentPluginClassification {@link PluginUrlClassification} being classified.
+   * @param pluginUrlClassifications list of {@link PluginUrlClassification} that will go to the region, including current being classified too.
+   * @param parentLookupPolicies the parent (region) {@link ClassLoaderLookupPolicy}.
+   * @return the extended {@link ClassLoaderLookupPolicy} that should be used for the current plugin classified.
+   */
+  private ClassLoaderLookupPolicy buildLookupPolicyForPlugin(PluginUrlClassification currentPluginClassification,
+                                                             List<PluginUrlClassification> pluginUrlClassifications,
+                                                             ClassLoaderLookupPolicy parentLookupPolicies) {
+    Map<String, ClassLoaderLookupStrategy> pluginsLookupPolicies = new HashMap<>();
+    for (PluginUrlClassification dependencyPluginClassification : pluginUrlClassifications) {
+      if (dependencyPluginClassification.getArtifactId().equals(currentPluginClassification.getArtifactId())) {
+        continue;
+      }
+
+      ClassLoaderLookupStrategy lookUpPolicyStrategy =
+          getClassLoaderLookupStrategy(currentPluginClassification, dependencyPluginClassification);
+
+      for (String exportedPackage : dependencyPluginClassification.getExportedPackages()) {
+        pluginsLookupPolicies.put(exportedPackage, lookUpPolicyStrategy);
+      }
+
+    }
+    return parentLookupPolicies.extend(pluginsLookupPolicies);
+  }
+
+  /**
+   * If the plugin declares the dependency the {@link PluginUrlClassification} would be {@link ClassLoaderLookupStrategy#PARENT_FIRST}
+   * otherwise {@link ClassLoaderLookupStrategy#CHILD_FIRST}.
+   *
+   * @param currentPluginClassification {@link PluginUrlClassification} being classified.
+   * @param dependencyPluginClassification {@link PluginUrlClassification} from the region.
+   * @return {@link ClassLoaderLookupStrategy} to be used by current plugin for the exported packages defined by the dependencyPluginClassification.
+   */
+  private ClassLoaderLookupStrategy getClassLoaderLookupStrategy(PluginUrlClassification currentPluginClassification,
+                                                                 PluginUrlClassification dependencyPluginClassification) {
+    final ClassLoaderLookupStrategy parentFirst;
+    if (currentPluginClassification.getPluginDependencies().contains(dependencyPluginClassification.getName())) {
+      parentFirst = PARENT_FIRST;
+    } else {
+      parentFirst = CHILD_ONLY;
+    }
+    return parentFirst;
   }
 
   /**
