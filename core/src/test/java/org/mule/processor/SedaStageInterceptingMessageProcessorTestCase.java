@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.api.config.ThreadingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -148,7 +149,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         threadingProfile.setThreadWaitTimeout(threadTimeout);
         // Need 3 threads: 1 for polling, 2 to process work successfully without timeout
         threadingProfile.setMaxThreadsActive(3);
-        threadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
+        threadingProfile.setPoolExhaustedAction(WHEN_EXHAUSTED_WAIT);
         threadingProfile.setMuleContext(muleContext);
 
         MessageProcessor mockListener = mock(MessageProcessor.class);
@@ -188,6 +189,54 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         verify(exceptionHandler, timeout(RECEIVE_TIMEOUT).times(1)).handleException((Exception)any(),
             argThat(notSameEvent));
 
+    }
+
+    @Test
+    public void testProcessOneWayNegativeThreadWaitTimeout() throws Exception
+    {
+        final int threadTimeout = -1;
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
+        threadingProfile.setThreadWaitTimeout(threadTimeout);
+        // Need 2 threads: 1 for polling, 1 to process work
+        threadingProfile.setMaxThreadsActive(2);
+        threadingProfile.setPoolExhaustedAction(WHEN_EXHAUSTED_WAIT);
+        threadingProfile.setMuleContext(muleContext);
+
+        queueProfile.setMaxOutstandingMessages(1);
+
+        MessageProcessor mockListener = mock(MessageProcessor.class);
+        when(mockListener.process((MuleEvent)any())).thenAnswer(new Answer<MuleEvent>()
+        {
+            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
+            {
+                // Use 220 as it's over the default 200ms.
+                Thread.sleep(220);
+                return (MuleEvent)invocation.getArguments()[0];
+            }
+        });
+
+        SedaStageInterceptingMessageProcessor sedaStageInterceptingMessageProcessor = new SedaStageInterceptingMessageProcessor(
+            "testProcessOneWayNegativeThreadWaitTimeout", "testProcessOneWayNegativeThreadWaitTimeout", queueProfile,
+            queueTimeout, threadingProfile, queueStatistics, muleContext);
+        sedaStageInterceptingMessageProcessor.setListener(mockListener);
+        sedaStageInterceptingMessageProcessor.initialise();
+        sedaStageInterceptingMessageProcessor.start();
+
+        MessagingExceptionHandler exceptionHandler = mock(MessagingExceptionHandler.class);
+        Flow flow = mock(Flow.class);
+        when(flow.getExceptionListener()).thenReturn(exceptionHandler);
+        when(flow.getProcessingStrategy()).thenReturn(new AsynchronousProcessingStrategy());
+        final MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
+
+        for (int i = 0; i < 3; i++)
+        {
+            sedaStageInterceptingMessageProcessor.process(event);
+        }
+
+        ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
+
+        // Three events are processed
+        verify(mockListener, timeout(RECEIVE_TIMEOUT).times(3)).process(argThat(notSameEvent));
     }
 
     @Test

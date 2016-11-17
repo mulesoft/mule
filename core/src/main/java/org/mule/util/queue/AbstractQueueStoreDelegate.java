@@ -47,9 +47,9 @@ public abstract class AbstractQueueStoreDelegate implements QueueStoreDelegate
                 long l2 = timeout;
                 while (getSize() >= capacity - room)
                 {
-                    if (l2 <= 0L)
+                    if (l2 < 0L)
                     {
-                        return false;
+                        l2 = 0;
                     }
                     this.wait(l2);
                     l2 = timeout - (System.currentTimeMillis() - l1);

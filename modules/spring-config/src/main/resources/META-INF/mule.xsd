@@ -3791,7 +3791,7 @@
         <xsd:attribute name="threadWaitTimeout" type="substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    How long to wait in milliseconds when the pool exhausted action is WAIT. If the value is negative, it will wait indefinitely.
+                    How long to wait in milliseconds when the pool exhausted action is WAIT. If the value is zero or negative, it will wait indefinitely.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
