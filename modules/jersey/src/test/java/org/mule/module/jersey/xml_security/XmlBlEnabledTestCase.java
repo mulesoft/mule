@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.OperationOptions;
 import org.mule.tck.junit4.rule.SystemProperty;

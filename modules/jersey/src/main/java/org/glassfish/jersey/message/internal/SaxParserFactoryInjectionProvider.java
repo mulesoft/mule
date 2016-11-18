@@ -39,7 +39,7 @@
  */
 package org.glassfish.jersey.message.internal;
 
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
@@ -79,7 +79,7 @@ public class SaxParserFactoryInjectionProvider extends AbstractXmlFactory implem
         SAXParserFactory factory = SAXParserFactory.newInstance();
 
         if (!isXmlSecurityDisabled()) {
-            factory = new XMLSecureFactories().createSaxParserFactory();
+            factory = XMLSecureFactories.createDefault().getSAXParserFactory();
         }
 
         factory.setNamespaceAware(true);

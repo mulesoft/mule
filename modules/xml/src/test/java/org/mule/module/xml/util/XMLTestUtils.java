@@ -7,7 +7,7 @@
 package org.mule.module.xml.util;
 
 import org.mule.util.IOUtils;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,21 +47,21 @@ public class XMLTestUtils
     {
         InputStream is = toInputStream(resource);
 
-        return XMLUtils.toXMLStreamReader(new XMLSecureFactories().createXmlInputFactory(), is);
+        return XMLUtils.toXMLStreamReader(XMLSecureFactories.createDefault().getXMLInputFactory(), is);
     }
 
     public static Source toSource(String resource) throws Exception
     {
         InputStream is = toInputStream(resource);
 
-        return XMLUtils.toXmlSource(new XMLSecureFactories().createXmlInputFactory(), false, is);
+        return XMLUtils.toXmlSource(XMLSecureFactories.createDefault().getXMLInputFactory(), false, is);
     }
 
     public static org.w3c.dom.Document toW3cDocument(String resource) throws IOException, SAXException, ParserConfigurationException
     {
         InputStream is = toInputStream(resource);
 
-        return new XMLSecureFactories().createDocumentBuilderFactory().newDocumentBuilder().parse(is);
+        return XMLSecureFactories.createDefault().getDocumentBuilderFactory().newDocumentBuilder().parse(is);
     }
 
     public static InputSource toInputSource(String resource) throws IOException
