@@ -120,7 +120,7 @@ public class XmlBasedDescriber implements Describer {
    */
   @Override
   public ExtensionDeclarer describe(DescribingContext context) {
-    // We will assume the current class loader will be the one defined for the plugin (which is not filtered and will allow us to access any resource in it
+    // We will assume the context classLoader of the current thread will be the one defined for the plugin (which is not filtered and will allow us to access any resource in it
     URL resource = currentThread().getContextClassLoader().getResource(modulePath);
     if (resource == null) {
       throw new IllegalArgumentException(format("There's no reachable XML in the path '%s'", modulePath));
