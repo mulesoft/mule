@@ -69,6 +69,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   @Override
   public void start() {
+    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),
+    // getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful"
     pool = muleContext.getSchedulerService().ioScheduler();
 
     scheduleAllPendingEventsForProcessing();

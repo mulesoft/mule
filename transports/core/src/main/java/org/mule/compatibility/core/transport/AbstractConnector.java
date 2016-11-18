@@ -140,8 +140,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    */
   public static final int DEFAULT_NUM_CONCURRENT_TX_RECEIVERS = 4;
 
-  private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
-
   public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
   public static final String DEFAULT_CONTEXT_START_TIMEOUT = "15000";
   public static final String MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY =
@@ -1656,6 +1654,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   }
 
   protected Scheduler createScheduler() {
+    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),this.getName() + ".scheduler"
     return muleContext.getSchedulerService().ioScheduler();
   }
 

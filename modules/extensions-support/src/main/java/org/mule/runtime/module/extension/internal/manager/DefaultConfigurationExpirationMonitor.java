@@ -122,6 +122,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
    */
   @Override
   public void beginMonitoring() {
+    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),"extension.expiration.manager"
     // TODO: Change the executor type when MULE-8870 is implemented
     executor = muleContext.getSchedulerService().ioScheduler();
     scheduledMonitoring = executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
