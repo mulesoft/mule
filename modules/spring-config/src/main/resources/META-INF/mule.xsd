@@ -5055,16 +5055,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Threading profile used to process the message processors inside the until-successful.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
-                    </xsd:sequence>
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
                     <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -5148,15 +5139,15 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:element name="threading-profile" type="threadingProfileType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Threading profile used to process the message processors inside the until-successful.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
                         <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
+                    <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Whether threading should be used (default is true).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>
                             <xsd:documentation>

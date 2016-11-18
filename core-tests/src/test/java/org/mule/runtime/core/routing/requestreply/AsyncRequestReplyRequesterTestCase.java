@@ -7,8 +7,10 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static junit.framework.Assert.assertNull;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -30,13 +32,13 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.beans.ExceptionListener;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.resource.spi.work.Work;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -184,31 +186,24 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     final AtomicInteger count = new AtomicInteger();
     for (int i = 0; i < 500; i++) {
-      muleContext.getWorkManager().scheduleWork(new Work() {
+      scheduler.execute(() -> {
+        try {
+          Event resultEvent = asyncReplyMP.process(testEvent());
 
-        @Override
-        public void run() {
-          try {
-            Event resultEvent = asyncReplyMP.process(testEvent());
-
-            // Can't assert same because we copy event for async currently
-            assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
-            count.incrementAndGet();
-            logger.debug("Finished " + count.get());
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        }
-
-        @Override
-        public void release() {
-          // nop
+          // Can't assert same because we copy event for async currently
+          assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
+          count.incrementAndGet();
+          logger.debug("Finished " + count.get());
+        } catch (Exception e) {
+          throw new RuntimeException(e);
         }
       });
     }
-    while (count.get() < 500) {
-      Thread.sleep(10);
-    }
+
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      assertThat(count.get(), greaterThanOrEqualTo(500));
+      return true;
+    }));
   }
 
   @Override

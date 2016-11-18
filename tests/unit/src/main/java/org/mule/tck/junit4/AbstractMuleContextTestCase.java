@@ -49,7 +49,6 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
@@ -252,9 +251,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   /**
    * Override this method to set properties of the MuleContextBuilder before it is used to create the MuleContext.
    */
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    contextBuilder.setWorkListener(new TestingWorkListener());
-  }
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 
   protected ConfigurationBuilder getBuilder() throws Exception {
     return new DefaultsConfigurationBuilder();

@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.compatibility.core.api;
 
 import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;

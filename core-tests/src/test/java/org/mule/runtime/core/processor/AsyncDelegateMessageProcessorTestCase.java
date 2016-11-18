@@ -23,8 +23,6 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -184,14 +182,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Override
   public void exceptionThrown(Exception e) {
     exceptionThrown = e;
-  }
-
-  class TestWorkManagerSource implements WorkManagerSource {
-
-    @Override
-    public WorkManager getWorkManager() throws MuleException {
-      return muleContext.getWorkManager();
-    }
   }
 
 }

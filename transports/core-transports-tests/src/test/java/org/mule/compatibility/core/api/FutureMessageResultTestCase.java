@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.compatibility.core.api;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

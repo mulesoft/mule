@@ -6,18 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import com.google.common.collect.Multimap;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -111,7 +110,8 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
   private TimeUnit timeUnit;
   private BiConsumer<String, ConfigurationInstance> expirationHandler;
 
-  private ScheduledExecutorService executor;
+  private Scheduler executor;
+  private ScheduledFuture<?> scheduledMonitoring;
 
   private DefaultConfigurationExpirationMonitor() {}
 
@@ -122,10 +122,10 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
    */
   @Override
   public void beginMonitoring() {
+    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),"extension.expiration.manager"
     // TODO: Change the executor type when MULE-8870 is implemented
-    executor =
-        Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, getPrefix(muleContext) + "extension.expiration.manager"));
-    executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
+    executor = muleContext.getSchedulerService().ioScheduler();
+    scheduledMonitoring = executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
   }
 
   private void expire() {
@@ -168,13 +168,10 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
    * Shutdowns the scheduler that executes the expiration tasks. It waits up to 30 seconds for it to shutdown and it throws a
    * {@link MuleException} if it could not be stopped
    */
+  @Override
   public void stopMonitoring() {
-    executor.shutdown();
-    try {
-      executor.awaitTermination(30, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      throw new MuleRuntimeException(createStaticMessage("Exception found while waiting for expiration thread to finish"), e);
-    }
+    scheduledMonitoring.cancel(false);
+    executor.stop(30, SECONDS);
   }
 
   private boolean stopChecking() {

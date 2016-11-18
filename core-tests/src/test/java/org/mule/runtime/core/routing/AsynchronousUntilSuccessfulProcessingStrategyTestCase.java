@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -24,18 +23,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
@@ -43,6 +44,7 @@ import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -52,6 +54,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,8 +89,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   private FailCallback failRoute = () -> {
   };
   private CountDownLatch routeCountDownLatch;
-  @Mock
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockContextWithServices();
   @Mock
   private TransformationService transformationService;
 
@@ -99,8 +101,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final InternalMessage mockMessage = InternalMessage.builder().payload("").build();
     event = Event.builder(DefaultEventContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
-    when(mockUntilSuccessfulConfiguration.getThreadingProfile().createPool(anyString())).thenReturn(mockPool);
-    when(mockUntilSuccessfulConfiguration.createScheduledRetriesPool(anyString())).thenReturn(mockScheduledPool);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
     objectStore.clear();
     configureMockPoolToInvokeRunnableInNewThread();
@@ -118,6 +118,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                                                                                                                   .toString()
                                                                                                                   .getBytes())
                                                                                                           .build());
+  }
+
+  @After
+  public void after() {
+    for (Scheduler scheduler : ((SimpleUnitTestSupportSchedulerService) muleContext.getSchedulerService())
+        .getCreatedSchedulers()) {
+      scheduler.shutdown();
+    }
   }
 
   @Test(expected = InitialisationException.class)

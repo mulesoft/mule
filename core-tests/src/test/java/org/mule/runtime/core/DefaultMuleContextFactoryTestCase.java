@@ -8,21 +8,24 @@ package org.mule.runtime.core;
 
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
@@ -201,24 +204,22 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   private void assertMuleContextConfiguration(MuleContext context) {
-    assertNotNull(context);
-    assertEquals(DefaultMuleContext.class, context.getClass());
+    assertThat(context, notNullValue());
+    assertThat(context, instanceOf(DefaultMuleContext.class));
     assertTrue(context.isInitialised());
-    assertNotNull(context.getConfiguration());
-    assertEquals(DefaultMuleConfiguration.class, context.getConfiguration().getClass());
-    assertNotNull(context.getLifecycleManager().getClass());
-    assertNotNull(context.getNotificationManager());
-    assertNotNull(context.getWorkManager());
+    assertThat(context.getConfiguration(), notNullValue());
+    assertThat(context.getConfiguration(), instanceOf(DefaultMuleConfiguration.class));
+    assertThat(context.getLifecycleManager(), notNullValue());
+    assertThat(context.getNotificationManager(), notNullValue());
   }
 
   private void assertCustomMuleContext(MuleContext context) {
-    assertNotNull(context);
-    assertEquals(TestMuleContext.class, context.getClass());
+    assertThat(context, notNullValue());
+    assertThat(context, instanceOf(TestMuleContext.class));
     assertTrue(context.isInitialised());
-    assertNotNull(context.getConfiguration());
-    assertNotNull(context.getLifecycleManager().getClass());
-    assertNotNull(context.getNotificationManager());
-    assertNotNull(context.getWorkManager());
+    assertThat(context.getConfiguration(), notNullValue());
+    assertThat(context.getLifecycleManager(), notNullValue());
+    assertThat(context.getNotificationManager(), notNullValue());
   }
 
   private void assertConfigurationBuilder1Objects(MuleContext context) {

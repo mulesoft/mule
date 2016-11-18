@@ -14,7 +14,6 @@ import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -51,7 +50,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
@@ -158,18 +156,6 @@ public interface MuleContext extends Lifecycle {
    *         service invocations
    */
   SecurityManager getSecurityManager();
-
-  /**
-   * Obtains a workManager instance that can be used to schedule work in a thread pool. This will be used primarially by Agents
-   * wanting to schedule work. This work Manager must <b>never</b> be used by provider implementations as they have their own
-   * workManager accible on the connector.
-   *
-   * @return a workManager instance used by the current MuleManager
-   */
-  @Deprecated
-  WorkManager getWorkManager();
-
-  WorkListener getWorkListener();
 
   SchedulerService getSchedulerService();
 

@@ -8,6 +8,7 @@ package org.mule.compatibility.module.client;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -15,6 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import static org.mule.runtime.core.security.MuleCredentials.createHeader;
 
+import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -23,21 +25,21 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
@@ -102,6 +104,7 @@ public class MuleClient implements Disposable {
   private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<>();
   private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<>();
 
+  private Scheduler scheduler;
 
   /**
    * Creates a Mule client that will use the default serverEndpoint when connecting to a remote server instance.
@@ -118,6 +121,7 @@ public class MuleClient implements Disposable {
 
   public MuleClient(MuleContext context) throws MuleException {
     this.muleContext = context;
+    scheduler = muleContext.getSchedulerService().ioScheduler();
     init(false);
   }
 
@@ -162,6 +166,7 @@ public class MuleClient implements Disposable {
     }
     logger.info("Initializing Mule...");
     muleContext = muleContextFactory.createMuleContext(builder);
+    scheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
   /**
@@ -206,6 +211,7 @@ public class MuleClient implements Disposable {
               registry.registerObject(schedulerService.getName(), schedulerService);
             }
           }), contextBuilder);
+      scheduler = muleContext.getSchedulerService().ioScheduler();
     } else {
       logger.info("Using existing MuleContext: " + muleContext);
     }
@@ -310,8 +316,8 @@ public class MuleClient implements Disposable {
 
     FutureMessageResult result = new FutureMessageResult(call, muleContext);
 
-    if (muleContext.getWorkManager() != null) {
-      result.setExecutor(muleContext.getWorkManager());
+    if (scheduler != null) {
+      result.setExecutor(scheduler);
     }
 
     result.execute();
@@ -534,6 +540,7 @@ public class MuleClient implements Disposable {
    */
   @Override
   public void dispose() {
+    scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     // Dispose the muleContext only if the muleContext was created for this
     // client
     if (muleContext.getConfiguration().isClientMode()) {

@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.tck.TestingWorkListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +62,7 @@ public class ApplicationContextBuilder {
     return context;
   }
 
-  // This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
+  // This shouldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     // No op
@@ -80,7 +79,5 @@ public class ApplicationContextBuilder {
   /**
    * Override this method to set properties of the MuleContextBuilder before it is used to create the MuleContext.
    */
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    contextBuilder.setWorkListener(new TestingWorkListener());
-  }
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 }

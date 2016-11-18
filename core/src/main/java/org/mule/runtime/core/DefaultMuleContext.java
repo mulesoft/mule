@@ -26,6 +26,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.invalidJdk;
@@ -60,7 +63,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -83,7 +85,6 @@ import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.ClusterConfiguration;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
@@ -123,7 +124,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
@@ -170,10 +170,6 @@ public class DefaultMuleContext implements MuleContext {
    * stats used for management
    */
   private AllStatistics stats = new AllStatistics();
-
-  private WorkManager workManager;
-
-  private WorkListener workListener;
 
   private volatile SchedulerService schedulerService;
 
@@ -264,12 +260,10 @@ public class DefaultMuleContext implements MuleContext {
    * @deprecated Use empty constructor instead and use setter for dependencies.
    */
   @Deprecated
-  public DefaultMuleContext(MuleConfiguration config, WorkManager workManager, WorkListener workListener,
-                            MuleContextLifecycleManager lifecycleManager, ServerNotificationManager notificationManager) {
+  public DefaultMuleContext(MuleConfiguration config, MuleContextLifecycleManager lifecycleManager,
+                            ServerNotificationManager notificationManager) {
     this.config = config;
     ((MuleContextAware) config).setMuleContext(this);
-    this.workManager = workManager;
-    this.workListener = workListener;
     this.lifecycleManager = lifecycleManager;
     this.notificationManager = notificationManager;
     this.notificationManager.setMuleContext(this);
@@ -299,9 +293,6 @@ public class DefaultMuleContext implements MuleContext {
     if (getNotificationManager() == null) {
       throw new MuleRuntimeException(objectIsNull(OBJECT_NOTIFICATION_MANAGER));
     }
-    if (workManager == null) {
-      throw new MuleRuntimeException(objectIsNull("workManager"));
-    }
 
     try {
       JdkVersionUtils.validateJdk();
@@ -314,16 +305,12 @@ public class DefaultMuleContext implements MuleContext {
       // The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
       getRegistry().initialise();
 
-      // We need to start the work manager straight away since we need it to fire notifications
-      if (workManager instanceof MuleContextAware) {
-        MuleContextAware contextAware = (MuleContextAware) workManager;
-        contextAware.setMuleContext(this);
-      }
-
-      workManager.start();
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
+
+      setMuleContextIfNeeded(getExceptionListener(), this);
+      initialiseIfNeeded(getExceptionListener());
 
       getNotificationManager().initialise();
     } catch (InitialisationException e) {
@@ -418,6 +405,8 @@ public class DefaultMuleContext implements MuleContext {
 
     fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSING));
 
+    disposeIfNeeded(getExceptionListener(), logger);
+
     try {
       getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
 
@@ -444,7 +433,6 @@ public class DefaultMuleContext implements MuleContext {
 
   private void disposeManagers() {
     notificationManager.dispose();
-    workManager.dispose();
   }
 
   /**
@@ -591,29 +579,6 @@ public class DefaultMuleContext implements MuleContext {
       throw new MuleRuntimeException(CoreMessages.objectIsNull("securityManager"));
     }
     return securityManager;
-  }
-
-  /**
-   * Obtains a workManager instance that can be used to schedule work in a thread pool. This will be used primarially by Agents
-   * wanting to schedule work. This work Manager must <b>never</b> be used by provider implementations as they have their own
-   * workManager accible on the connector.
-   * <p/>
-   * If a workManager has not been set by the time the <code>initialise()</code> method has been called a default
-   * <code>MuleWorkManager</code> will be created using the <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
-   * object.
-   *
-   * @return a workManager instance used by the current MuleManager
-   * @see org.mule.runtime.core.api.config.ThreadingProfile
-   * @see DefaultMuleConfiguration
-   */
-  @Override
-  public WorkManager getWorkManager() {
-    return workManager;
-  }
-
-  @Override
-  public WorkListener getWorkListener() {
-    return workListener;
   }
 
   @Override
@@ -992,14 +957,6 @@ public class DefaultMuleContext implements MuleContext {
 
   public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
     this.config = muleConfiguration;
-  }
-
-  public void setWorkManager(WorkManager workManager) {
-    this.workManager = workManager;
-  }
-
-  public void setworkListener(WorkListener workListener) {
-    this.workListener = workListener;
   }
 
   public void setNotificationManager(ServerNotificationManager notificationManager) {

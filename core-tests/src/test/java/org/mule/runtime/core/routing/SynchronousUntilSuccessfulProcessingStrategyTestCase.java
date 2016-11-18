@@ -22,10 +22,11 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -54,16 +55,9 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-    when(mockUntilSuccessfulConfiguration.getThreadingProfile()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
     setCurrentEvent(null);
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void failWhenThreadingProfileIsConfigured() throws Exception {
-    when(mockUntilSuccessfulConfiguration.getThreadingProfile()).thenReturn(mockThreadingProfile);
-    createProcessingStrategy();
   }
 
   @Test(expected = InitialisationException.class)

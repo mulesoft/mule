@@ -6,31 +6,17 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
 /**
  * Configuration required for UntilSuccessful router processing strategy.
  */
 public interface UntilSuccessfulConfiguration {
-
-  /**
-   * @return threading profile to executes message processing inside until successful. Always returns a not null value.
-   */
-  ThreadingProfile getThreadingProfile();
-
-  /**
-   * @param threadPrefix the prefix for the name of the threads of this executor's pool.
-   * @return an executor responsible for calling the retries for this processing strategy.
-   */
-  ScheduledThreadPoolExecutor createScheduledRetriesPool(final String threadPrefix);
 
   /**
    * @return an ObjectStore to store until successful internal data. Always returns a not null value.

@@ -7,10 +7,8 @@
 
 package org.mule.runtime.core.routing;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import static org.mule.runtime.core.config.i18n.CoreMessages.noEndpointsForRouter;
@@ -21,47 +19,31 @@ import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleExceptio
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
-import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
-import org.mule.runtime.core.util.rx.Exceptions;
-import org.mule.runtime.core.work.ProcessingMuleEventWork;
-import org.mule.runtime.core.work.SerialWorkManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.resource.spi.work.WorkException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -97,6 +79,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private static final Logger logger = LoggerFactory.getLogger(ScatterGatherRouter.class);
 
   /**
+   * Whether threading should be used.
+   */
+  private boolean doThreading = true;
+
+  /**
    * Timeout in milliseconds to be applied to each route. Values lower or equal to zero means no timeout
    */
   private long timeout = 0;
@@ -120,16 +107,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
    * The aggregation strategy. By default is this instance
    */
   private AggregationStrategy aggregationStrategy;
-
-  /**
-   * the {@link ThreadingProfile} used to create the {@link #workManager}
-   */
-  private ThreadingProfile threadingProfile;
-
-  /**
-   * {@link WorkManager} used to execute the routes in parallel
-   */
-  private WorkManager workManager;
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -160,10 +137,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     try {
       buildRouteChains();
 
-      if (threadingProfile == null) {
-        threadingProfile = muleContext.getDefaultThreadingProfile();
-      }
-
       if (aggregationStrategy == null) {
         aggregationStrategy = new CollectAllAggregationStrategy();
       }
@@ -171,37 +144,12 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       if (timeout <= 0) {
         timeout = Long.MAX_VALUE;
       }
-
-      if (threadingProfile.isDoThreading()) {
-        workManager = threadingProfile.createWorkManager(ThreadNameHelper.getPrefix(muleContext) + "ScatterGatherWorkManager",
-                                                         muleContext.getConfiguration().getShutdownTimeout());
-      } else {
-        workManager = new SerialWorkManager();
-      }
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
 
     super.initialise();
     initialised = true;
-  }
-
-  @Override
-  public void start() throws MuleException {
-    workManager.start();
-    super.start();
-  }
-
-  @Override
-  public void dispose() {
-    try {
-      workManager.dispose();
-    } catch (Exception e) {
-      logger.error(
-                   "Exception found while tring to dispose work manager. Will continue with the disposal", e);
-    } finally {
-      super.dispose();
-    }
   }
 
   /**
@@ -246,8 +194,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     this.aggregationStrategy = aggregationStrategy;
   }
 
-  public void setThreadingProfile(ThreadingProfile threadingProfile) {
-    this.threadingProfile = threadingProfile;
+  public void setDoThreading(boolean doThreading) {
+    this.doThreading = doThreading;
   }
 
   public void setTimeout(long timeout) {
