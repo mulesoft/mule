@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.util.xmlsecurity;
 
 import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
@@ -18,46 +17,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Provide XML parser factories configured to avoid XXE and BL attacks according to global configuration (safe by default)
+ * Create different XML factories configured through the same interface for disabling vulnerabilities.
  */
-public class XMLSecureFactories
+public class DefaultXMLSecureFactories
 {
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    private final static Log logger = LogFactory.getLog(DefaultXMLSecureFactories.class);
 
-    public static final String EXTERNAL_ENTITIES_PROPERTY =
-            SYSTEM_PROPERTY_PREFIX + "xml.expandExternalEntities";
-    public static final String EXPAND_ENTITIES_PROPERTY =
-            SYSTEM_PROPERTY_PREFIX + "xml.expandInternalEntities";
-
-    private Boolean externalEntities;
-    private Boolean expandEntities;
-
-    public static XMLSecureFactories createWithConfig(Boolean externalEntities, Boolean expandEntities)
-    {
-        XMLSecureFactories factory = new XMLSecureFactories();
-
-        if (externalEntities != null)
-        {
-            factory.externalEntities = externalEntities;
-        }
-        if (expandEntities != null)
-        {
-            factory.expandEntities = expandEntities;
-        }
-
-        return factory;
-    }
-
-    public XMLSecureFactories()
-    {
-        String externalEntitiesValue = System.getProperty(EXTERNAL_ENTITIES_PROPERTY, "false");
-        externalEntities = Boolean.parseBoolean(externalEntitiesValue);
-
-        String expandEntitiesValue = System.getProperty(EXPAND_ENTITIES_PROPERTY, "false");
-        expandEntities = Boolean.parseBoolean(expandEntitiesValue);
-    }
-
-    public DocumentBuilderFactory createDocumentBuilderFactory()
+    public static DocumentBuilderFactory createDocumentBuilderFactory(Boolean externalEntities, Boolean expandEntities)
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -76,7 +42,7 @@ public class XMLSecureFactories
         return factory;
     }
 
-    public SAXParserFactory createSaxParserFactory()
+    public static SAXParserFactory createSaxParserFactory(Boolean externalEntities, Boolean expandEntities)
     {
         SAXParserFactory factory = SAXParserFactory.newInstance();
 
@@ -94,7 +60,7 @@ public class XMLSecureFactories
         return factory;
     }
 
-    public XMLInputFactory createXmlInputFactory()
+    public static XMLInputFactory createXmlInputFactory(Boolean externalEntities, Boolean expandEntities)
     {
         XMLInputFactory factory = XMLInputFactory.newInstance();
 

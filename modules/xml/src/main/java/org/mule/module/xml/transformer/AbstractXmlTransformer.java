@@ -15,7 +15,7 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +70,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     @Override
     public final void initialise() throws InitialisationException
     {
-        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).createXmlInputFactory();
+        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).getXMLInputFactory();
         useStaxSource = !acceptExternalEntities;
         xmlOutputFactory = XMLOutputFactory.newInstance();
 
@@ -148,7 +148,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
             try
             {
-                DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+                DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
                 result = new DOMResult(factory.newDocumentBuilder().newDocument());
             }
             catch (Exception e)
