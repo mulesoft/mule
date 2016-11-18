@@ -7,7 +7,7 @@
 package org.mule.util.xmlsecurity;
 
 /**
- * Cache key for XMLSecureFactoriesCache. Also creates the corresponding factory.
+ * Cache key for {@link XMLSecureFactoriesCache}. Also creates the corresponding factory.
  */
 public abstract class XMLFactoryConfig
 {

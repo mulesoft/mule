@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Create different XML factories configured through the same interface for disabling vulnerabilities.
  */
-public class XMLSecureFactoriesImpl
+public class DefaultXMLSecureFactories
 {
-    private final static Log logger = LogFactory.getLog(XMLSecureFactoriesImpl.class);
+    private final static Log logger = LogFactory.getLog(DefaultXMLSecureFactories.class);
 
     public static DocumentBuilderFactory createDocumentBuilderFactory(Boolean externalEntities, Boolean expandEntities)
     {

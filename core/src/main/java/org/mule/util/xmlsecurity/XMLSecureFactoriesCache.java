@@ -59,7 +59,7 @@ public class XMLSecureFactoriesCache
             @Override
             public Object createFactory()
             {
-                return XMLSecureFactoriesImpl.createDocumentBuilderFactory(this.externalEntities, this.expandEntities);
+                return DefaultXMLSecureFactories.createDocumentBuilderFactory(this.externalEntities, this.expandEntities);
             }
         };
 
@@ -73,7 +73,7 @@ public class XMLSecureFactoriesCache
             @Override
             public Object createFactory()
             {
-                return XMLSecureFactoriesImpl.createSaxParserFactory(this.externalEntities, this.expandEntities);
+                return DefaultXMLSecureFactories.createSaxParserFactory(this.externalEntities, this.expandEntities);
             }
         };
 
@@ -87,7 +87,7 @@ public class XMLSecureFactoriesCache
             @Override
             public Object createFactory()
             {
-                return XMLSecureFactoriesImpl.createXmlInputFactory(this.externalEntities, this.expandEntities);
+                return DefaultXMLSecureFactories.createXmlInputFactory(this.externalEntities, this.expandEntities);
             }
         };
 
