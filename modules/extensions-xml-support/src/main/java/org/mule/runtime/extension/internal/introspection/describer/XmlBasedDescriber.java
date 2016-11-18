@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.extension.internal.introspection.describer;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.*;
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.Builder;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -64,7 +65,7 @@ public class XmlBasedDescriber implements Describer {
 
   /**
    * The ID which represents {@code this} {@link Describer} that will be used to execute the lookup when reading the descriptor file.
-   * @see org.mule.runtime.module.deployment.internal.plugin.json.MulePluginJsonDescriber#getExtensionModelDescriptor()
+   * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
   public static final String DESCRIBER_ID = "xml-based";
 
