@@ -39,7 +39,7 @@
  */
 package org.glassfish.jersey.message.internal;
 
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
@@ -81,7 +81,7 @@ public class DocumentBuilderFactoryInjectionProvider extends AbstractXmlFactory 
         DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
 
         if (!isXmlSecurityDisabled()) {
-            f = new XMLSecureFactories().createDocumentBuilderFactory();
+            f = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
         }
 
         f.setNamespaceAware(true);

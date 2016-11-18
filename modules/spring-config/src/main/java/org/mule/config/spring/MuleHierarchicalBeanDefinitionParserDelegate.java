@@ -8,7 +8,7 @@ package org.mule.config.spring;
 
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import com.google.common.collect.ImmutableList;
 
@@ -176,7 +176,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // but we need to create a new DOM document from the element first
             try
             {
-                DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+                DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
                 Document doc = factory.newDocumentBuilder().newDocument();
                 doc.appendChild(doc.importNode(element, true));
                 spring.registerBeanDefinitions(doc, getReaderContext());

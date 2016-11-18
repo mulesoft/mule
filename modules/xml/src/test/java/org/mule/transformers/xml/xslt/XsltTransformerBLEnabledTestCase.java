@@ -8,7 +8,7 @@ package org.mule.transformers.xml.xslt;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
-import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
