@@ -54,6 +54,9 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   @Override
   public void run() {
     if (running) {
+      if (logger.isTraceEnabled()) {
+        logger.trace(this.toString() + " still running, returning.");
+      }
       return;
     }
     if (cancelled) {
@@ -77,8 +80,8 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   @Override
   protected void wrapUp() {
     super.wrapUp();
-    wrapUpCallback.accept(this);
     running = false;
+    wrapUpCallback.accept(this);
   }
 
   @Override
