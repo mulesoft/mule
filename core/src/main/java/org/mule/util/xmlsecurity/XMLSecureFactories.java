@@ -29,8 +29,14 @@ public class XMLSecureFactories
     {
         XMLSecureFactories factory = new XMLSecureFactories();
 
-        factory.externalEntities = externalEntities;
-        factory.expandEntities = expandEntities;
+        if (externalEntities != null)
+        {
+            factory.externalEntities = externalEntities;
+        }
+        if (expandEntities != null)
+        {
+            factory.expandEntities = expandEntities;
+        }
 
         return factory;
     }
