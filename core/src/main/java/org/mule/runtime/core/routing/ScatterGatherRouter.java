@@ -79,6 +79,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private static final Logger logger = LoggerFactory.getLogger(ScatterGatherRouter.class);
 
   /**
+   * Whether threading should be used.
+   */
+  private boolean doThreading = true;
+
+  /**
    * Timeout in milliseconds to be applied to each route. Values lower or equal to zero means no timeout
    */
   private long timeout = 0;
@@ -187,6 +192,10 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
     this.aggregationStrategy = aggregationStrategy;
+  }
+
+  public void setDoThreading(boolean doThreading) {
+    this.doThreading = doThreading;
   }
 
   public void setTimeout(long timeout) {
