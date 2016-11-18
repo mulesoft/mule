@@ -54,7 +54,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public Object doGetObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
       //TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
       // be generalized

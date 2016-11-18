@@ -14,21 +14,18 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
-import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.extension.ModuleExtension;
 import org.mule.runtime.config.spring.dsl.model.extension.OperationExtension;
 import org.mule.runtime.config.spring.dsl.model.extension.ParameterExtension;
 import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
-import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -77,6 +74,7 @@ public class ApplicationModel {
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
+  public static final String ERROR_MAPPING = "error-mapping";
   public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
@@ -103,8 +101,8 @@ public class ApplicationModel {
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
   public static final String FLOW_ELEMENT = "flow";
-  public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
 
+  public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
   // TODO MULE-9638 Remove once all bean definitions parsers where migrated
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
@@ -134,12 +132,14 @@ public class ApplicationModel {
    * the value of this field will name the global element as <math:config ../>
    */
   public static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
-  public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
 
+  public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ERROR_HANDLER).build();
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
+  public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ERROR_MAPPING).build();
   public static final ComponentIdentifier MULE_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =

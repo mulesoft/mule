@@ -39,7 +39,11 @@ import java.sql.SQLDataException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Error Handler")
 public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Rule

@@ -173,7 +173,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
 
-    this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
+    this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry, errorTypeRepository);
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();
