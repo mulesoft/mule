@@ -6,6 +6,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="${listenerHttpSource}"/>
     <http:request-config name="config" host="localhost" port="${httpPort}" />
 
     <flow name="queryParamList">
@@ -30,6 +31,15 @@
             <http:request-builder>
                 <http:query-param paramName="testName1" value="testValue1" />
                 <http:query-params expression="#[params]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="multipleQueryParamFromListener">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/multipleQueryParamFromListener"/>
+        <http:request config-ref="config" path="/multipleQueryParamFromListener" method="GET">
+            <http:request-builder>
+                <http:query-params expression="#[message.inboundProperties['http.query.params']]"/>
             </http:request-builder>
         </http:request>
     </flow>

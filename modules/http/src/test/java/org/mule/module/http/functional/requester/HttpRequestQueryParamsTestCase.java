@@ -10,14 +10,22 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
 {
+
+    @Rule
+    public DynamicPort listenerHttpSource = new DynamicPort("listenerHttpSource");
 
     @Override
     protected String getConfigFile()
@@ -76,6 +84,15 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
         flow.process(event);
 
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName1=testValueNew&testName2=testValue2"));
+    }
+
+    @Test
+    public void multipleQueryParamFromListener() throws IOException
+    {
+        String queryString = "/multipleQueryParamFromListener?testName1=testValue1&testName1=testValueNew&testName2=testValue2";
+        Response response = Request.Get(String.format("http://localhost:%s%s", listenerHttpSource.getNumber(), queryString)).execute();
+
+        assertThat(uri, equalTo(queryString));
     }
 
     @Test
