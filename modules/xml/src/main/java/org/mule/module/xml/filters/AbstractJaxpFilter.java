@@ -12,7 +12,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -38,7 +38,7 @@ public abstract class AbstractJaxpFilter
     {
         if (getDocumentBuilderFactory() == null)
         {
-            DocumentBuilderFactory builderFactory = new XMLSecureFactories().createDocumentBuilderFactory();
+            DocumentBuilderFactory builderFactory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
             builderFactory.setNamespaceAware(true);
             setDocumentBuilderFactory(builderFactory);
         }

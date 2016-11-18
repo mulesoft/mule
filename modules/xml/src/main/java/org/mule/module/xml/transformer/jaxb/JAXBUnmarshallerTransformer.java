@@ -12,7 +12,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.InputStream;
@@ -98,7 +98,7 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
             Object result = null;
             if (src instanceof String)
             {
-                SAXParserFactory spf = new XMLSecureFactories().createSaxParserFactory();
+                SAXParserFactory spf = XMLSecureFactories.createDefault().getSAXParserFactory();
                 spf.setNamespaceAware(true);
                 Source xmlSource = new SAXSource(spf.newSAXParser().getXMLReader(), new InputSource(new StringReader((String) src)));
                 result = u.unmarshal(xmlSource);

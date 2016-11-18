@@ -9,7 +9,7 @@ package org.mule.module.xml.expression;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.module.xml.el.XPath3Function;
 import org.mule.module.xml.i18n.XmlMessages;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +34,7 @@ public class XPathNodeExpressionEvaluator extends XPathExpressionEvaluator
     {
         try
         {
-            builder = new XMLSecureFactories().createDocumentBuilderFactory().newDocumentBuilder();
+            builder = XMLSecureFactories.createDefault().getDocumentBuilderFactory().newDocumentBuilder();
         }
         catch (ParserConfigurationException e)
         {
