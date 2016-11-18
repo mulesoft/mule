@@ -23,7 +23,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<ScatterGatherRouter>, MuleContextAware, FlowConstructAware {
 
-  private boolean doThreading = true;
+  private boolean parallel = true;
   private long timeout = 0;
   private List<Processor> messageProcessors;
   private AggregationStrategy aggregationStrategy;
@@ -33,7 +33,7 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
   @Override
   public ScatterGatherRouter getObject() throws Exception {
     ScatterGatherRouter sg = new ScatterGatherRouter();
-    sg.setDoThreading(doThreading);
+    sg.setParallel(parallel);
     sg.setTimeout(timeout);
     sg.setMuleContext(muleContext);
     sg.setFlowConstruct(flowConstruct);
@@ -64,8 +64,8 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
     this.messageProcessors = messageProcessors;
   }
 
-  public void setDoThreading(boolean doThreading) {
-    this.doThreading = doThreading;
+  public void setParallel(boolean parallel) {
+    this.parallel = parallel;
   }
 
   public void setTimeout(long timeout) {

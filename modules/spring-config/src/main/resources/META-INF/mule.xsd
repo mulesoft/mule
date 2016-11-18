@@ -5141,10 +5141,10 @@
                         </xsd:element>
                         <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
-                    <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
+                    <xsd:attribute name="parallel" type="substitutableBoolean" default="true">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Whether threading should be used (default is true).
+                                Whether the configured routes will run in parallel (default is true).
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
