@@ -19,7 +19,6 @@ import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFi
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
-
 import org.mule.runtime.api.deployment.meta.MulePluginLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -104,10 +103,10 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     if (mulePluginJsonFile.exists()) {
 
       MulePluginModel mulePluginModel = getMulePluginJsonDescriber(mulePluginJsonFile);
-      Optional<MulePluginLoaderDescriptor> extensionModelLoaderDescriptor = mulePluginModel.getExtensionModelLoaderDescriptor();
-      if (extensionModelLoaderDescriptor.isPresent()) {
-        loaderDescriber = new LoaderDescriber(extensionModelLoaderDescriptor.get().getId());
-        loaderDescriber.addAttributes(extensionModelLoaderDescriptor.get().getAttributes());
+      Optional<MulePluginLoaderDescriptor> extensionModelDescriptor = mulePluginModel.getExtensionModelLoaderDescriptor();
+      if (extensionModelDescriptor.isPresent()) {
+        loaderDescriber = new LoaderDescriber(extensionModelDescriptor.get().getId());
+        loaderDescriber.addAttributes(extensionModelDescriptor.get().getAttributes());
       }
     }
     return loaderDescriber;

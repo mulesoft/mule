@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.deployment.model.api.plugin;
 
-import static java.util.Optional.*;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 

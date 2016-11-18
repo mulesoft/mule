@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.model.extension;
+package org.mule.runtime.config.spring.dsl.model.extension.xml;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;

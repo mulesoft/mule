@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.
  *
- * TODO MULE-10982: implement a testing framework for XML based connectors.
+ * TODO MULE-10982(fernandezlautaro): implement a testing framework for XML based connectors.
  *
  * @since 4.0
  */
