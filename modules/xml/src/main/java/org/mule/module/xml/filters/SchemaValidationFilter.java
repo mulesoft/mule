@@ -16,7 +16,7 @@ import org.mule.module.xml.util.MuleResourceResolver;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +55,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     private LSResourceResolver resourceResolver;
     private boolean useStaxSource = false;
     private boolean returnResult = true;
-    private XMLInputFactory xmlInputFactory = new XMLSecureFactories().createXmlInputFactory();
+    private XMLInputFactory xmlInputFactory = XMLSecureFactories.createDefault().getXMLInputFactory();
 
     /**
      * Accepts the message if schema validation passes.

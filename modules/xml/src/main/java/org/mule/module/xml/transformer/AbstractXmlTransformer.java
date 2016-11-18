@@ -10,15 +10,17 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.transform.OutputKeys;
@@ -67,7 +69,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     @Override
     public final void initialise() throws InitialisationException
     {
-        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).createXmlInputFactory();
+        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).getXMLInputFactory();
         useStaxSource = !acceptExternalEntities;
         xmlOutputFactory = XMLOutputFactory.newInstance();
 
@@ -141,6 +143,18 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         }
         else if (org.w3c.dom.Document.class.isAssignableFrom(desiredClass))
         {
+            final DOMResult result;
+
+            try
+            {
+                DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
+                result = new DOMResult(factory.newDocumentBuilder().newDocument());
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not create result document"), e);
+            }
+
             return new ResultHolder()
             {
                 DOMResult result = new DOMResult();

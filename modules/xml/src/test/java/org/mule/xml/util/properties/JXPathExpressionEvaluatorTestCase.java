@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
