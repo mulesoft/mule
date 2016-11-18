@@ -23,7 +23,7 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   public static final String MULE_PLUGIN_JSON = "mule-plugin.json";
 
   private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
-  private Optional<DescriptorProperty> extensionModelDescriptorProperty = empty();
+  private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();
 
   /**
    * Creates a new artifact plugin descriptor
@@ -43,19 +43,19 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   }
 
   /**
-   * @return the {@link DescriptorProperty} that will contain all mandatory values to generate an {@link ExtensionModel}
+   * @return the {@link LoaderDescriber} that will contain all mandatory values to generate an {@link ExtensionModel}
    * from it.
    */
-  public Optional<DescriptorProperty> getExtensionModelDescriptorProperty() {
+  public Optional<LoaderDescriber> getExtensionModelDescriptorProperty() {
     return extensionModelDescriptorProperty;
   }
 
   /**
-   * Takes a {@link DescriptorProperty} that should contain the values used to properly initialize an {@link ExtensionModel}
+   * Takes a {@link LoaderDescriber} that should contain the values used to properly initialize an {@link ExtensionModel}
    *
-   * @param extensionModelDescriptorProperty the {@link DescriptorProperty} with the values
+   * @param extensionModelLoaderDescriber the {@link LoaderDescriber} with the values
    */
-  public void setExtensionModelDescriptorProperty(DescriptorProperty extensionModelDescriptorProperty) {
-    this.extensionModelDescriptorProperty = ofNullable(extensionModelDescriptorProperty);
+  public void setExtensionModelDescriptorProperty(LoaderDescriber extensionModelLoaderDescriber) {
+    this.extensionModelDescriptorProperty = ofNullable(extensionModelLoaderDescriber);
   }
 }

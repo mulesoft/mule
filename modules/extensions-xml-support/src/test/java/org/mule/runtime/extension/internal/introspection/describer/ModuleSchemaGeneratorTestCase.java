@@ -14,6 +14,7 @@ import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber.XSD_SUFFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
@@ -76,7 +77,8 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
     };
 
     Function<String, Object[]> stringFunction = moduleName -> {
-      String modulePath = "modules" + separator + moduleName + ".xml";
+      String moduleNamePrefix = "modules" + separator + moduleName;
+      String modulePath = moduleNamePrefix + ".xml";
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
       DescribingContext context = new DefaultDescribingContext(contextClassLoader);
@@ -88,7 +90,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
 
       try {
         return new Object[] {extensionModel,
-            IOUtils.getResourceAsString("modules/" + moduleName + ".xsd", classLoader), extensionModel.getName()
+            IOUtils.getResourceAsString(moduleNamePrefix + XSD_SUFFIX, classLoader), extensionModel.getName()
         };
       } catch (IOException e) {
         throw new IllegalArgumentException(String.format("Couldn't load .xsd for the [%s] module", moduleName));

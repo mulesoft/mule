@@ -90,7 +90,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * @param mulePluginModel the describer to store under {@link ArtifactPluginDescriptor#META_INF}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
    * @return the same builder instance
    */
-  public ArtifactPluginFileBuilder configuredWith(MulePluginModel mulePluginModel) {
+  public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
     checkImmutable();
     checkArgument(mulePluginModel != null, "JSON describer cannot be null");
     this.mulePluginModel = mulePluginModel;

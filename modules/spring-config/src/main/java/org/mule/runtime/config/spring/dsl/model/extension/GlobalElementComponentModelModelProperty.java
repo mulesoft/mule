@@ -20,6 +20,12 @@ public class GlobalElementComponentModelModelProperty implements ModelProperty {
 
   private final List<ComponentModel> globalElements;
 
+  /**
+   * Constructs a {@link ModelProperty} that will hold the Mule global elements to be later macro expanded into a Mule
+   * application.
+   *
+   * @param globalElements that will be expanded in a Mule application.
+   */
   public GlobalElementComponentModelModelProperty(List<ComponentModel> globalElements) {
     this.globalElements = globalElements;
   }

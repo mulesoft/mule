@@ -1526,7 +1526,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-byeSource.xml", moduleFileName)
-        .configuredWith(builder.build());
+        .describedBy(builder.build());
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
         .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);

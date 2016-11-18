@@ -6,10 +6,6 @@
       http://www.mulesoft.org/schema/mule/module-bye http://www.mulesoft.org/schema/mule/module-bye/current/mule-module-bye.xsd">
 
     <flow name="main">
-        <poll frequency="1000">
-            <set-payload value=""/>
-        </poll>
-
         <module-bye:say-bye/>
     </flow>
 </mule>

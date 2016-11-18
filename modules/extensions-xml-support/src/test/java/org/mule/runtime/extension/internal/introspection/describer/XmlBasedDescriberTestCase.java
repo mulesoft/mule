@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.extension.internal.introspection.describer;
 
-import static java.lang.Thread.*;
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber.CONFIG_NAME;

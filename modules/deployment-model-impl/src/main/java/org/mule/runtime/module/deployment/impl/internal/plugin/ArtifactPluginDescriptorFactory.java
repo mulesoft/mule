@@ -19,11 +19,12 @@ import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFi
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
+
 import org.mule.runtime.api.deployment.meta.MulePluginLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.DescriptorProperty;
+import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -97,19 +98,19 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     return descriptor;
   }
 
-  private DescriptorProperty lookupJsonDescriptor(File pluginFolder) {
-    DescriptorProperty descriptorProperty = null;
+  private LoaderDescriber lookupJsonDescriptor(File pluginFolder) {
+    LoaderDescriber loaderDescriber = null;
     final File mulePluginJsonFile = new File(pluginFolder, META_INF + separator + MULE_PLUGIN_JSON);
     if (mulePluginJsonFile.exists()) {
 
       MulePluginModel mulePluginModel = getMulePluginJsonDescriber(mulePluginJsonFile);
       Optional<MulePluginLoaderDescriptor> extensionModelLoaderDescriptor = mulePluginModel.getExtensionModelLoaderDescriptor();
       if (extensionModelLoaderDescriptor.isPresent()) {
-        descriptorProperty = new DescriptorProperty(extensionModelLoaderDescriptor.get().getId());
-        descriptorProperty.addAttributes(extensionModelLoaderDescriptor.get().getAttributes());
+        loaderDescriber = new LoaderDescriber(extensionModelLoaderDescriptor.get().getId());
+        loaderDescriber.addAttributes(extensionModelLoaderDescriptor.get().getAttributes());
       }
     }
-    return descriptorProperty;
+    return loaderDescriber;
   }
 
   private MulePluginModel getMulePluginJsonDescriber(File jsonFile) {

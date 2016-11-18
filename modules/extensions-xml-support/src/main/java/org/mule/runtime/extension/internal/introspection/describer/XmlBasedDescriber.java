@@ -10,7 +10,10 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.*;
+import static org.mule.runtime.dsl.api.component.ComponentIdentifier.Builder;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,6 +25,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModelReader;
@@ -84,27 +88,30 @@ public class XmlBasedDescriber implements Describer {
       .build();
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
   private static final ComponentIdentifier OPERATION_BODY_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
+      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
           .build();
+  private static final String SEPARATOR = "/";
+  public static final String XSD_SUFFIX = ".xsd";
 
   private final String modulePath;
 
   /**
-   * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}.
+   * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
    */
   public XmlBasedDescriber(String modulePath) {
+    checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
   }
 
@@ -125,12 +132,10 @@ public class XmlBasedDescriber implements Describer {
     XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(new SpiServiceRegistry());
     Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
     if (!parseModule.isPresent()) {
-      //this happens in org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
+      // This happens in org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
-    //no support for properties in modules for now.
-    Properties properties = new Properties();
-    ComponentModelReader componentModelReader = new ComponentModelReader(properties);
+    ComponentModelReader componentModelReader = new ComponentModelReader(new Properties());
     ComponentModel componentModel =
         componentModelReader.extractComponentDefinitionModel(parseModule.get(), resource.getFile());
 
@@ -157,19 +162,19 @@ public class XmlBasedDescriber implements Describer {
     String name = moduleModel.getParameters().get(MODULE_NAME);
     String namespace = moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE);
 
-    String version = "4.0"; // TODO(fernandezlautaro): add 'from version' to smart extensions
+    String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 add 'from version' to smart extensions
     declarer.named(name)
         .describedAs("Some description")
-        .fromVendor("MuleSoft") // TODO(fernandezlautaro): add 'vendor' to smart extensions
+        .fromVendor("MuleSoft") // TODO(fernandezlautaro): MULE-11010 add 'vendor' to smart extensions
         .onVersion(version)
         .withMinMuleVersion(new MuleVersion("4.0.0")) //this one should be taken from the pom.xml
-        .withCategory(Category.COMMUNITY) // TODO(fernandezlautaro): add 'category' to smart extensions
+        .withCategory(Category.COMMUNITY) // TODO(fernandezlautaro): MULE-11010 add 'category' to smart extensions
         .withXmlDsl(XmlDslModel.builder()
             .setSchemaVersion(version)
             .setNamespace(name)
             .setNamespaceUri(namespace)
-            .setSchemaLocation(namespace.concat("current/").concat(name).concat(".xsd"))
-            .setXsdFileName(name.concat(".xsd"))
+            .setSchemaLocation(namespace.concat("current" + SEPARATOR).concat(name).concat(XSD_SUFFIX))
+            .setXsdFileName(name.concat(XSD_SUFFIX))
             .build());
     declarer.withModelProperty(new XmlExtensionModelProperty());
     loadPropertiesFrom(declarer, moduleModel);

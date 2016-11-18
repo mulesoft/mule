@@ -41,7 +41,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
    */
   abstract protected String getModulePath();
 
-  // TODO MULE-10982: implement a testing framework for XML based connectors
+  // TODO(fernandezlautaro): MULE-10982 implement a testing framework for XML based connectors
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
