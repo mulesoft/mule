@@ -79,7 +79,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private static final Logger logger = LoggerFactory.getLogger(ScatterGatherRouter.class);
 
   /**
-   * Whether threading should be used.
+   * Whether the configured routes will run in parallel (default is true).
    */
   private boolean parallel = true;
 
