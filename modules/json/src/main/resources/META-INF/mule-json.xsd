@@ -197,7 +197,7 @@
 
     <xsd:complexType name="validateSchemaType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractMessageProcessorType">
+            <xsd:extension base="mule:abstractOperatorType">
                 <xsd:sequence>
                     <xsd:element name="schema-redirects" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
