@@ -8,83 +8,75 @@
 package org.mule.module.http.internal.listener;
 
 
-import org.hamcrest.core.Is;
-import org.junit.Assert;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.api.MuleContext;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.Collection;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
+@RunWith(Parameterized.class)
 public class WildcardPathsTestCase extends FunctionalTestCase
 {
-    private MuleContext muleContext;
-
+    private static final String response1= "V1 Flow invoked";
+    private static final String response2= "V2 flow invoked";
+    private static final String response3= "V2 - Healthcheck";
+    private static final String path1= "/*";
+    private static final String path2= "V2/*";
+    private static final String path3= "V2/taxes/healthcheck";
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
+
+    @Rule
+    public SystemProperty systemPropertyPath1 = new SystemProperty("path1", path1);
+
+    @Rule
+    public SystemProperty systemPropertyPath2 = new SystemProperty("path2", path2);
+
+    @Rule
+    public SystemProperty systemPropertyPath3= new SystemProperty("path3", path3);
+
+    @Rule
+    public SystemProperty systemPropertyResponse1 = new SystemProperty("response1", response1);
+
+    @Rule
+    public SystemProperty systemPropertyResponse2 = new SystemProperty("response2", response2);
+
+    @Rule
+    public SystemProperty systemPropertyResponse3 = new SystemProperty("response3", response3);
+
     private static final String HOST ="http://localhost:%s/%s";
-	@Test
-    public void testFirstLevelWildCardWithPathEmpty() throws Exception
-    {
-        Assert.assertThat("V1 Flow invoked", Is.is(doGet(createURL(""))));
-    }
-	
-	@Test
-    public void testFirstLevelWildcardWithOneLevelPath() throws Exception
-    {
-       Assert.assertThat("V1 Flow invoked",Is.is(doGet(createURL("taxes"))));
-    }
+    private String path;
+    private String response;
 
     @Test
-    public void testFirstLevelWildcardWithTwoLevelPath() throws Exception
-    {
-        Assert.assertThat("V1 Flow invoked",Is.is(doGet(createURL("taxes/healtcheck"))));
+    public void testPath() throws Exception {
+        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+        final Response httpResponse = Request.Get(url).execute();
+        assertThat(httpResponse.returnContent().asString(), is(response));
     }
 
-	@Test
-    public void testFirstLevelWildcardWithTwoLevelPath2() throws Exception
-    {
-        Assert.assertThat("V1 Flow invoked",Is.is(doGet(createURL("taxes/1"))));
+    @org.junit.runners.Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {{"",response1}, {"taxes",response1},{"taxes/healtcheck",response1},
+                {"taxes/1",response1},{"V2",response2},{"V2/taxes",response2}, { "V2/console",response2},
+                {"V2/taxes/1",response2}, {"V2/taxes/healthcheck",response3}});
     }
 
-
-    @Test
-    public void testTwoLevelWildcardWithOneLevelPath() throws Exception
-    {
-        Assert.assertThat("v2 flow invoked",Is.is(doGet(createURL("v2"))));
-    }
-
-    @Test
-    public void testTwoLevelWildcardWithTwoLevelPath() throws Exception
-    {
-        Assert.assertThat("v2 flow invoked",Is.is(doGet(createURL("v2/taxes"))));
-    }
-
-    @Test
-    public void testWildcardWithTwoLevelPath2() throws Exception
-    {
-        Assert.assertThat("v2 flow invoked",Is.is(doGet(createURL("v2/console"))));
-    }
-
-    @Test
-    public void testTwoLevelWildcardWithThreeLevelPath() throws Exception
-    {
-        Assert.assertThat("v2 flow invoked",Is.is(doGet(createURL("v2/taxes/1"))));
-    }
-
-    @Test
-    public void testListenerWithThreeLevelPath() throws Exception
-    {
-        Assert.assertThat("V2 - Healthcheck",Is.is(doGet(createURL("v2/taxes/healthcheck"))));
+    public WildcardPathsTestCase(String path, String response) {
+        this.path = path;
+        this.response = response;
     }
 
     @Override
@@ -97,23 +89,4 @@ public class WildcardPathsTestCase extends FunctionalTestCase
     private String createURL(String path){
         return String.format(HOST,listenPort.getNumber(),path);
     }
-
-
-    private String doGet(String urlString){
-		 URL url;
-		 String inputLine=null;
-		try {
-			url = new URL(urlString);
-		    URLConnection yc = url.openConnection();
-	        BufferedReader in = new BufferedReader(
-	                                new InputStreamReader(
-	                                yc.getInputStream()));
-	        inputLine = in.readLine();
-
-	        in.close();
-		} catch (IOException e) {
-		
-		}
-		return inputLine;
-	}
 }

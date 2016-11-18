@@ -4,15 +4,15 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd" >
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${port}" />
     <flow name="taxes-main-v1">
-        <http:listener path="/*" config-ref="HTTP_Listener_Configuration" />
-        <set-payload value="V1 Flow invoked" />
+        <http:listener path="${path1}" config-ref="HTTP_Listener_Configuration" />
+        <set-payload value="${response1}" />
     </flow>
     <flow name="taxes-main-v2">
-        <http:listener path="v2/*" config-ref="HTTP_Listener_Configuration" />
-        <set-payload value="v2 flow invoked" />
+        <http:listener path="${path2}" config-ref="HTTP_Listener_Configuration" />
+        <set-payload value="${response2}" />
     </flow>
     <flow name="HealthcheckV2">
-        <http:listener path="v2/taxes/healthcheck" config-ref="HTTP_Listener_Configuration"/>
-        <set-payload value="V2 - Healthcheck" />
+        <http:listener path="${path3}" config-ref="HTTP_Listener_Configuration"/>
+        <set-payload value="${response3}" />
     </flow>
 </mule>
