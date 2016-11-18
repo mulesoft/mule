@@ -8,8 +8,8 @@ package org.mule.module.http.internal;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.module.http.api.HttpParameters;
 
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -37,30 +37,54 @@ public class HttpMapParam extends HttpParam
     public void resolve(ParameterMap parameterMap, MuleEvent muleEvent)
     {
         MuleContext muleContext = muleEvent.getMuleContext();
-        Map<Object, Object> paramMap = (Map<Object, Object>) muleContext.getExpressionManager().evaluate(expression, muleEvent);
-        for (Map.Entry<Object, Object> entry : paramMap.entrySet())
+        Object expressionResult = muleContext.getExpressionManager().evaluate(expression, muleEvent);
+
+        if (expressionResult instanceof HttpParameters)
+        {
+            resolveHttpParameters(parameterMap, (HttpParameters) expressionResult);
+        }
+        else
+        {
+            resolveMapObjObj(parameterMap, (Map<Object, Object>) expressionResult);
+        }
+    }
+
+    private static void resolveHttpParameters(ParameterMap parameterMap, HttpParameters expressionResult)
+    {
+        HttpParameters expressionHttpParameters = expressionResult;
+        for (String key : expressionHttpParameters.keySet())
+        {
+            for (String value : expressionHttpParameters.getAll(key))
+            {
+                parameterMap.put(key, value);
+            }
+        }
+    }
+
+    private static void resolveMapObjObj(ParameterMap parameterMap, Map<Object, Object> expressionResult)
+    {
+        Map<Object, Object> expressionParamMap = expressionResult;
+
+        for (Map.Entry<Object, Object> entry : expressionParamMap.entrySet())
         {
             String paramName = entry.getKey().toString();
             Object paramValue = entry.getValue();
 
             if (paramValue instanceof Iterable)
             {
-                Iterable iterable = (Iterable) paramValue;
-                final Iterator iterator = iterable.iterator();
-                while (iterator.hasNext())
+                for (Object value : (Iterable) paramValue)
                 {
-                    parameterMap.put(paramName, toStringIfPossible(iterator.next()));
+                    parameterMap.put(paramName, toStringIfPossible(value));
                 }
             }
             else
             {
                 parameterMap.put(paramName, toStringIfPossible(paramValue));
             }
-
         }
     }
 
-    private String toStringIfPossible(Object paramValue)
+    private static String toStringIfPossible(Object paramValue)
     {
         return paramValue != null ? paramValue.toString() : null;
     }
