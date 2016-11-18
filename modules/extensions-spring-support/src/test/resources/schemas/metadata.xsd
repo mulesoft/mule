@@ -173,10 +173,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="BooleanMetadataKeyType" substitutionGroup="mule:abstract-message-processor" name="boolean-metadata-key"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="BooleanMetadataKeyType" substitutionGroup="mule:abstract-operator" name="boolean-metadata-key"></xs:element>
     <xs:complexType name="BooleanMetadataKeyType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -192,10 +192,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputCacheResolverType" substitutionGroup="mule:abstract-message-processor" name="content-and-output-cache-resolver"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputCacheResolverType" substitutionGroup="mule:abstract-operator" name="content-and-output-cache-resolver"></xs:element>
     <xs:complexType name="ContentAndOutputCacheResolverType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -211,10 +211,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputMetadataWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="content-and-output-metadata-with-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputMetadataWithKeyIdType" substitutionGroup="mule:abstract-operator" name="content-and-output-metadata-with-key-id"></xs:element>
     <xs:complexType name="ContentAndOutputMetadataWithKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -230,10 +230,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputMetadataWithoutKeyIdType" substitutionGroup="mule:abstract-message-processor" name="content-and-output-metadata-without-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputMetadataWithoutKeyIdType" substitutionGroup="mule:abstract-operator" name="content-and-output-metadata-without-key-id"></xs:element>
     <xs:complexType name="ContentAndOutputMetadataWithoutKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -250,10 +250,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentMetadataWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="content-metadata-with-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentMetadataWithKeyIdType" substitutionGroup="mule:abstract-operator" name="content-metadata-with-key-id"></xs:element>
     <xs:complexType name="ContentMetadataWithKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -271,10 +271,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentMetadataWithoutKeyIdType" substitutionGroup="mule:abstract-message-processor" name="content-metadata-without-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentMetadataWithoutKeyIdType" substitutionGroup="mule:abstract-operator" name="content-metadata-without-key-id"></xs:element>
     <xs:complexType name="ContentMetadataWithoutKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -289,10 +289,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentMetadataWithoutKeysWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="content-metadata-without-keys-with-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentMetadataWithoutKeysWithKeyIdType" substitutionGroup="mule:abstract-operator" name="content-metadata-without-keys-with-key-id"></xs:element>
     <xs:complexType name="ContentMetadataWithoutKeysWithKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -303,10 +303,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentOnlyCacheResolverType" substitutionGroup="mule:abstract-message-processor" name="content-only-cache-resolver"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentOnlyCacheResolverType" substitutionGroup="mule:abstract-operator" name="content-only-cache-resolver"></xs:element>
     <xs:complexType name="ContentOnlyCacheResolverType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -322,10 +322,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentOnlyIgnoresOutputType" substitutionGroup="mule:abstract-message-processor" name="content-only-ignores-output"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentOnlyIgnoresOutputType" substitutionGroup="mule:abstract-operator" name="content-only-ignores-output"></xs:element>
     <xs:complexType name="ContentOnlyIgnoresOutputType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -336,10 +336,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EnumMetadataKeyType" substitutionGroup="mule:abstract-message-processor" name="enum-metadata-key"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EnumMetadataKeyType" substitutionGroup="mule:abstract-operator" name="enum-metadata-key"></xs:element>
     <xs:complexType name="EnumMetadataKeyType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -355,10 +355,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailWithResolvingExceptionType" substitutionGroup="mule:abstract-message-processor" name="fail-with-resolving-exception"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailWithResolvingExceptionType" substitutionGroup="mule:abstract-operator" name="fail-with-resolving-exception"></xs:element>
     <xs:complexType name="FailWithResolvingExceptionType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -376,10 +376,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailWithRuntimeExceptionType" substitutionGroup="mule:abstract-message-processor" name="fail-with-runtime-exception"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailWithRuntimeExceptionType" substitutionGroup="mule:abstract-operator" name="fail-with-runtime-exception"></xs:element>
     <xs:complexType name="FailWithRuntimeExceptionType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -395,10 +395,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="KeyIdWithoutKeyResolverType" substitutionGroup="mule:abstract-message-processor" name="key-id-without-key-resolver"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="KeyIdWithoutKeyResolverType" substitutionGroup="mule:abstract-operator" name="key-id-without-key-resolver"></xs:element>
     <xs:complexType name="KeyIdWithoutKeyResolverType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -408,10 +408,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MetadataKeyWithDefaultValueType" substitutionGroup="mule:abstract-message-processor" name="metadata-key-with-default-value"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MetadataKeyWithDefaultValueType" substitutionGroup="mule:abstract-operator" name="metadata-key-with-default-value"></xs:element>
     <xs:complexType name="MetadataKeyWithDefaultValueType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -429,10 +429,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAndMetadataKeyCacheResolverType" substitutionGroup="mule:abstract-message-processor" name="output-and-metadata-key-cache-resolver"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAndMetadataKeyCacheResolverType" substitutionGroup="mule:abstract-operator" name="output-and-metadata-key-cache-resolver"></xs:element>
     <xs:complexType name="OutputAndMetadataKeyCacheResolverType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -447,10 +447,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAndMultipleInputWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="output-and-multiple-input-with-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAndMultipleInputWithKeyIdType" substitutionGroup="mule:abstract-operator" name="output-and-multiple-input-with-key-id"></xs:element>
     <xs:complexType name="OutputAndMultipleInputWithKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -467,10 +467,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="output-metadata-with-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithKeyIdType" substitutionGroup="mule:abstract-operator" name="output-metadata-with-key-id"></xs:element>
     <xs:complexType name="OutputMetadataWithKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -488,10 +488,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithoutKeyIdType" substitutionGroup="mule:abstract-message-processor" name="output-metadata-without-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithoutKeyIdType" substitutionGroup="mule:abstract-operator" name="output-metadata-without-key-id"></xs:element>
     <xs:complexType name="OutputMetadataWithoutKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -508,10 +508,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithoutKeysWithKeyIdType" substitutionGroup="mule:abstract-message-processor" name="output-metadata-without-keys-with-key-id"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputMetadataWithoutKeysWithKeyIdType" substitutionGroup="mule:abstract-operator" name="output-metadata-without-keys-with-key-id"></xs:element>
     <xs:complexType name="OutputMetadataWithoutKeysWithKeyIdType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -526,10 +526,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputOnlyWithoutContentParamType" substitutionGroup="mule:abstract-message-processor" name="output-only-without-content-param"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputOnlyWithoutContentParamType" substitutionGroup="mule:abstract-operator" name="output-only-without-content-param"></xs:element>
     <xs:complexType name="OutputOnlyWithoutContentParamType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -544,10 +544,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritExtensionResolversType" substitutionGroup="mule:abstract-message-processor" name="should-inherit-extension-resolvers"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritExtensionResolversType" substitutionGroup="mule:abstract-operator" name="should-inherit-extension-resolvers"></xs:element>
     <xs:complexType name="ShouldInheritExtensionResolversType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -560,10 +560,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritOperationParentResolversType" substitutionGroup="mule:abstract-message-processor" name="should-inherit-operation-parent-resolvers"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritOperationParentResolversType" substitutionGroup="mule:abstract-operator" name="should-inherit-operation-parent-resolvers"></xs:element>
     <xs:complexType name="ShouldInheritOperationParentResolversType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -576,10 +576,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritOperationResolversType" substitutionGroup="mule:abstract-message-processor" name="should-inherit-operation-resolvers"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritOperationResolversType" substitutionGroup="mule:abstract-operator" name="should-inherit-operation-resolvers"></xs:element>
     <xs:complexType name="ShouldInheritOperationResolversType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
@@ -597,10 +597,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SimpleMultiLevelKeyResolverType" substitutionGroup="mule:abstract-message-processor" name="simple-multi-level-key-resolver"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SimpleMultiLevelKeyResolverType" substitutionGroup="mule:abstract-operator" name="simple-multi-level-key-resolver"></xs:element>
     <xs:complexType name="SimpleMultiLevelKeyResolverType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -632,10 +632,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGenerateListChildElementType" substitutionGroup="mule:abstract-message-processor" name="content-parameter-should-not-generate-list-child-element"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGenerateListChildElementType" substitutionGroup="mule:abstract-operator" name="content-parameter-should-not-generate-list-child-element"></xs:element>
     <xs:complexType name="ContentParameterShouldNotGenerateListChildElementType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="list-content">
                         <xs:complexType>
@@ -653,20 +653,20 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGenerateMapChildElementType" substitutionGroup="mule:abstract-message-processor" name="content-parameter-should-not-generate-map-child-element"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGenerateMapChildElementType" substitutionGroup="mule:abstract-operator" name="content-parameter-should-not-generate-map-child-element"></xs:element>
     <xs:complexType name="ContentParameterShouldNotGenerateMapChildElementType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-contents"></xs:element>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGeneratePojoChildElementType" substitutionGroup="mule:abstract-message-processor" name="content-parameter-should-not-generate-pojo-child-element"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGeneratePojoChildElementType" substitutionGroup="mule:abstract-operator" name="content-parameter-should-not-generate-pojo-child-element"></xs:element>
     <xs:complexType name="ContentParameterShouldNotGeneratePojoChildElementType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="animal-content">
                         <xs:complexType>
@@ -680,10 +680,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoQueryType" substitutionGroup="mule:abstract-message-processor" name="do-query"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoQueryType" substitutionGroup="mule:abstract-operator" name="do-query"></xs:element>
     <xs:complexType name="DoQueryType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query"></xs:element>
                 </xs:sequence>
@@ -695,10 +695,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesPersonTypeMetadataType" substitutionGroup="mule:abstract-message-processor" name="message-attributes-person-type-metadata"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesPersonTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-person-type-metadata"></xs:element>
     <xs:complexType name="MessageAttributesPersonTypeMetadataType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -708,10 +708,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesVoidTypeMetadataType" substitutionGroup="mule:abstract-message-processor" name="message-attributes-void-type-metadata"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesVoidTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-void-type-metadata"></xs:element>
     <xs:complexType name="MessageAttributesVoidTypeMetadataType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -720,10 +720,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAttributesWithDeclaredSubtypesMetadataType" substitutionGroup="mule:abstract-message-processor" name="output-attributes-with-declared-subtypes-metadata"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAttributesWithDeclaredSubtypesMetadataType" substitutionGroup="mule:abstract-operator" name="output-attributes-with-declared-subtypes-metadata"></xs:element>
     <xs:complexType name="OutputAttributesWithDeclaredSubtypesMetadataType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -732,10 +732,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAttributesWithDynamicMetadataType" substitutionGroup="mule:abstract-message-processor" name="output-attributes-with-dynamic-metadata"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAttributesWithDynamicMetadataType" substitutionGroup="mule:abstract-operator" name="output-attributes-with-dynamic-metadata"></xs:element>
     <xs:complexType name="OutputAttributesWithDynamicMetadataType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -745,10 +745,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PagedOperationMetadataType" substitutionGroup="mule:abstract-message-processor" name="paged-operation-metadata"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PagedOperationMetadataType" substitutionGroup="mule:abstract-operator" name="paged-operation-metadata"></xs:element>
     <xs:complexType name="PagedOperationMetadataType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="animal">
                         <xs:complexType>
@@ -773,19 +773,19 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResolverContentWithContextClassLoaderType" substitutionGroup="mule:abstract-message-processor" name="resolver-content-with-context-class-loader"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResolverContentWithContextClassLoaderType" substitutionGroup="mule:abstract-operator" name="resolver-content-with-context-class-loader"></xs:element>
     <xs:complexType name="ResolverContentWithContextClassLoaderType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResolverOutputWithContextClassLoaderType" substitutionGroup="mule:abstract-message-processor" name="resolver-output-with-context-class-loader"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResolverOutputWithContextClassLoaderType" substitutionGroup="mule:abstract-operator" name="resolver-output-with-context-class-loader"></xs:element>
     <xs:complexType name="ResolverOutputWithContextClassLoaderType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -795,10 +795,10 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypeWithDeclaredSubtypesMetadataType" substitutionGroup="mule:abstract-message-processor" name="type-with-declared-subtypes-metadata"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypeWithDeclaredSubtypesMetadataType" substitutionGroup="mule:abstract-operator" name="type-with-declared-subtypes-metadata"></xs:element>
     <xs:complexType name="TypeWithDeclaredSubtypesMetadataType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="plain-shape">
                         <xs:complexType>

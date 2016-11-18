@@ -53,10 +53,6 @@ public final class SchemaConstants {
   public static final QName MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE =
       new QName(MULE_EXTENSION_NAMESPACE, "operationTransactionalActionType", MULE_EXTENSION_PREFIX);
   public static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR =
-      new QName(MULE_NAMESPACE, "abstract-message-processor", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE =
-      new QName(MULE_NAMESPACE, "abstractMessageProcessorType", MULE_PREFIX);
   public static final QName MULE_ABSTRACT_OPERATOR =
       new QName(MULE_NAMESPACE, "abstract-operator", MULE_PREFIX);
   public static final QName MULE_ABSTRACT_OPERATOR_TYPE =
