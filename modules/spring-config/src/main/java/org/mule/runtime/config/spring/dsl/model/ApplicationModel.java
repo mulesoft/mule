@@ -13,9 +13,12 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
+import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
@@ -46,7 +49,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.w3c.dom.Element;
@@ -436,6 +438,7 @@ public class ApplicationModel {
     // validations instead of failing fast.
     validateNameIsNotRepeated();
     validateNameIsOnlyOnTopLevelElements();
+    validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateChoiceExceptionStrategyStructure();
     validateNoDefaultExceptionStrategyAsGlobal();
@@ -501,6 +504,25 @@ public class ApplicationModel {
 
   private boolean isMuleConfigurationFile() {
     return muleComponentModels.get(0).getIdentifier().equals(MULE_IDENTIFIER);
+  }
+
+  private void validateErrorMappings() {
+    executeOnEveryComponentTree(componentModel -> {
+      List<ComponentModel> errorMappings = componentModel.getInnerComponents().stream()
+          .filter(c -> c.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER)).collect(toList());
+      if (!errorMappings.isEmpty()) {
+        List<ComponentModel> anyMappings = errorMappings.stream().filter(this::isErrorMappingWithSourceAny).collect(toList());
+        if (anyMappings.size() > 1) {
+          throw new MuleRuntimeException(createStaticMessage("Only one mapping for ANY or an empty source type is allowed."));
+        } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
+          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
+        }
+      }
+    });
+  }
+
+  private boolean isErrorMappingWithSourceAny(ComponentModel model) {
+    return model.getParameters().get(SOURCE_TYPE).equals(ANY_IDENTIFIER);
   }
 
   private void validateChoiceExceptionStrategyStructure() {
@@ -726,8 +748,7 @@ public class ApplicationModel {
     List<ComponentModel> globalElementsModel = new ArrayList<>();
 
     globalElementsModel.addAll(moduleExtension.getGlobalElements().stream()
-        .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute()))
-        .collect(Collectors.toList()));
+        .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute())).collect(toList()));
 
     ComponentModel muleRootElement = configRefModel.getParent();
     globalElementsModel.stream().forEach(componentModel -> {
