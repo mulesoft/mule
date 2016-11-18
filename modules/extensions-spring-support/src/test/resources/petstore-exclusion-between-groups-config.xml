@@ -10,6 +10,6 @@
     </petstore:config>
 
     <flow name="getCashierNestedParams">
-        <petstore:get-cashier config-ref="config" cashierName="Carl" cash="100" debt="-100"/>
+        <petstore:get-cashier cashierName="Carl" cash="100" debt="-100"/>
     </flow>
 </mule>

@@ -6,10 +6,10 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:query name="updateTemplate">
-        <db:sql>update PLANET set NAME='Mercury' where POSITION= :position</db:sql>
         <db:input-parameters>
             <db:input-parameter key="position" value="4"/>
         </db:input-parameters>
+        <db:sql>update PLANET set NAME='Mercury' where POSITION= :position</db:sql>
     </db:query>
 
     <db:query name="overriddenUpdateParam" template="updateTemplate">

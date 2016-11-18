@@ -6,13 +6,13 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteMetadata">
-        <db:delete parameterValues="#[payload]">
+        <db:delete>
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
         </db:delete>
     </flow>
 
     <flow name="bulkDeleteMetadata">
-        <db:bulk-delete parameterValues="#[payload]">
+        <db:bulk-delete>
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
         </db:bulk-delete>
     </flow>

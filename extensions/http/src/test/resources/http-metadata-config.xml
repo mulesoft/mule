@@ -16,6 +16,7 @@
     <flow name="server">
         <httpn:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true"
                         config-ref="lisConfig"/>
+        <logger/>
     </flow>
 
     <flow name="anyExplicit">

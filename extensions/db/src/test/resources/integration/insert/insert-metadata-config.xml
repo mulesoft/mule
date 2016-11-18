@@ -12,7 +12,7 @@
     </flow>
 
     <flow name="bulkInsertMetadata">
-        <db:bulk-insert parameterValues="#[payload]">
+        <db:bulk-insert>
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</db:sql>
         </db:bulk-insert>
     </flow>

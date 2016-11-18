@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -33,14 +35,25 @@ import org.xml.sax.SAXException;
  *
  * <p>If not found, it will go over the {@link ExtensionManager} and see if there is any <module>s that map to
  * it, and if it does, it will generate an XSD on the fly through {@link SchemaResourceFactory}.
+ *
+ * @since 4.0
  */
 public class ModuleDelegatingEntityResolver implements EntityResolver {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
   private final Optional<ExtensionManager> extensionManager;
   private final EntityResolver entityResolver;
   // TODO(fernandezlautaro): MULE-11024 once implemented, schemaResourceFactory must not be Optional
   private Optional<SchemaResourceFactory> schemaResourceFactory;
 
+  /**
+   * Returns an instance of {@link ModuleDelegatingEntityResolver}
+   *
+   * @param extensionManager fallback object to dynamically generate schemas if the current {@link #entityResolver}
+   *                             delegate when executing the {@link DelegatingEntityResolver#resolveEntity(String, String)}
+   *                             method returns null.
+   */
   public ModuleDelegatingEntityResolver(Optional<ExtensionManager> extensionManager) {
     this.entityResolver = new DelegatingEntityResolver(Thread.currentThread().getContextClassLoader());
     this.extensionManager = extensionManager;
@@ -61,6 +74,11 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   @Override
   public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Looking schema for public identifier(publicId): '%s', system identifier(systemId): '%s'",
+                          publicId == null ? "" : publicId,
+                          systemId));
+    }
     InputSource inputSource = entityResolver.resolveEntity(publicId, systemId);
     if (inputSource == null) {
       inputSource = generateModuleXsd(publicId, systemId);

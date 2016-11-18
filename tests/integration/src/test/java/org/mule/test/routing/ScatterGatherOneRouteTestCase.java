@@ -7,23 +7,22 @@
 package org.mule.test.routing;
 
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import com.yourkit.util.Asserts;
 
 import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.yourkit.util.Asserts;
 
 public class ScatterGatherOneRouteTestCase extends AbstractMuleTestCase {
 
@@ -42,7 +41,7 @@ public class ScatterGatherOneRouteTestCase extends AbstractMuleTestCase {
   }
 
   // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-  @Test(expected = InitialisationException.class)
+  @Test(expected = ConfigurationException.class)
   public void oneRouteOnXml() throws Exception {
     new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("scatter-gather-one-route-test.xml"));
   }
