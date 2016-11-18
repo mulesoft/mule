@@ -39,7 +39,7 @@
  */
 package org.glassfish.jersey.message.internal;
 
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
@@ -73,7 +73,7 @@ public class XmlInputFactoryInjectionProvider extends AbstractXmlFactory impleme
         XMLInputFactory factory = XMLInputFactory.newInstance();
 
         if (!isXmlSecurityDisabled()) {
-            factory = new XMLSecureFactories().createXmlInputFactory();
+            factory = XMLSecureFactories.createDefault().getXMLInputFactory();
         }
 
         return factory;

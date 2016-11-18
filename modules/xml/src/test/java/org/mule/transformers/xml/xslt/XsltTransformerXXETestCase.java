@@ -7,7 +7,7 @@
 package org.mule.transformers.xml.xslt;
 
 import static junit.framework.Assert.assertTrue;
-import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
