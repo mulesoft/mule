@@ -11,7 +11,7 @@ import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANN
 import org.mule.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.util.SystemUtils;
-import org.mule.util.XMLSecureFactories;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -97,7 +97,7 @@ final class MuleDocumentLoader implements DocumentLoader
 
     protected XMLReader createSaxAnnotator(Document doc) throws ParserConfigurationException, SAXException
     {
-        SAXParserFactory saxParserFactory = new XMLSecureFactories().createSaxParserFactory();
+        SAXParserFactory saxParserFactory = XMLSecureFactories.createDefault().getSAXParserFactory();
         SAXParser saxParser = saxParserFactory.newSAXParser();
         XMLReader documentReader = saxParser.getXMLReader();
         documentReader.setContentHandler(new XmlMetadataAnnotator(doc, metadataFactory));
