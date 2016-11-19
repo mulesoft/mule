@@ -7,18 +7,16 @@
 package org.mule.runtime.config.builders;
 
 import static java.util.Arrays.asList;
-
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.MuleServer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.util.FilenameUtils;
@@ -157,7 +155,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener {
    * @return the default config resource location
    */
   protected String getDefaultConfigResource() {
-    return MuleServer.DEFAULT_CONFIGURATION;
+    return DEFAULT_CONFIGURATION_RESOURCE;
   }
 
   @Override

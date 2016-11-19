@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import javax.transaction.TransactionManager;
 
 /**
- * <code>TranactionManagerFactory</code> is a factory class for creating a transaction manager for the MuleServer.
+ * <code>TransactionManagerFactory</code> is a factory class for creating a transaction manager for the Mule container.
  * 
  */
 public interface TransactionManagerFactory {

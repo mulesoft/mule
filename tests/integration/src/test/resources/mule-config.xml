@@ -3,6 +3,6 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <!-- Empty default configuration file for testing MuleServer. -->
+    <!-- Empty default configuration file  for testing -->
 
 </mule>

@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.management.mbean;
 
-import org.mule.runtime.core.MuleServer;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.NetworkUtils;
@@ -199,9 +198,5 @@ public class MuleService implements MuleServiceMBean {
 
   public String getInstanceId() {
     return muleContext.getConfiguration().getId();
-  }
-
-  public String getConfigBuilderClassName() {
-    return MuleServer.getConfigBuilderClassName();
   }
 }

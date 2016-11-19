@@ -4,7 +4,6 @@
    version="1.0"
    xmlns:java="http://xml.apache.org/xslt/java"
    xmlns:mulemanifest="xalan://org.mule.runtime.core.config.MuleManifest"
-   xmlns:muleserver="xalan://org.mule.runtime.core.MuleServer"
    xmlns:mulecontext="xalan://org.mule.runtime.core.api.MuleContext"
    xmlns:configuration="xalan://org.mule.config.MuleConfiguration"
    exclude-result-prefixes="java">
@@ -13,19 +12,6 @@
       <xsl:choose>
          <xsl:when test="function-available('mulemanifest:getBuildDate')">
             <xsl:value-of select="mulemanifest:getBuildDate()"/>
-         </xsl:when>
-         <xsl:otherwise>
-            <xsl:message>No configuration available</xsl:message>
-         </xsl:otherwise>
-      </xsl:choose>
-   </xsl:template>
-
-   <xsl:template name="encoding">
-      <xsl:choose>
-         <xsl:when test="function-available('muleserver:getMuleContext')">
-            <xsl:variable name="mulecontext" select="muleserver:getMuleContext()"/>
-            <xsl:variable name="configuration" select="mulecontext:getConfiguration($mulecontext)"/>
-            <xsl:value-of select="configuration:getDefaultEncoding($configuration)"/>
          </xsl:when>
          <xsl:otherwise>
             <xsl:message>No configuration available</xsl:message>
@@ -110,19 +96,6 @@
       </xsl:choose>
    </xsl:template>
 
-   <xsl:template name="systemModelType">
-      <xsl:choose>
-         <xsl:when test="function-available('muleserver:getMuleContext')">
-            <xsl:variable name="mulecontext" select="muleserver:getMuleContext()"/>
-            <xsl:variable name="configuration" select="mulecontext:getConfiguration($mulecontext)"/>
-            <xsl:value-of select="configuration:getSystemModelType($configuration)"/>
-         </xsl:when>
-         <xsl:otherwise>
-            <xsl:message>No configuration available</xsl:message>
-         </xsl:otherwise>
-      </xsl:choose>
-   </xsl:template>
-
    <xsl:template name="vendorName">
       <xsl:choose>
          <xsl:when test="function-available('mulemanifest:getVendorName')">
@@ -138,19 +111,6 @@
       <xsl:choose>
          <xsl:when test="function-available('mulemanifest:getVendorUrl')">
             <xsl:value-of select="mulemanifest:getVendorUrl()"/>
-         </xsl:when>
-         <xsl:otherwise>
-            <xsl:message>No configuration available</xsl:message>
-         </xsl:otherwise>
-      </xsl:choose>
-   </xsl:template>
-
-   <xsl:template name="workingDirectory">
-      <xsl:choose>
-         <xsl:when test="function-available('muleserver:getMuleContext')">
-            <xsl:variable name="mulecontext" select="muleserver:getMuleContext()"/>
-            <xsl:variable name="configuration" select="mulecontext:getConfiguration($mulecontext)"/>
-            <xsl:value-of select="configuration:getWorkingDirectory($configuration)"/>
          </xsl:when>
          <xsl:otherwise>
             <xsl:message>No configuration available</xsl:message>

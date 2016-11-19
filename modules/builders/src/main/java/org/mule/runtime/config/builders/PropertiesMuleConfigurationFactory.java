@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.config;
+package org.mule.runtime.config.builders;
 
-import org.mule.runtime.core.MuleServer;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FilenameUtils;
@@ -32,7 +33,7 @@ public class PropertiesMuleConfigurationFactory {
 
   public static String getMuleAppConfiguration(String muleConfig) {
     String directory = FilenameUtils.getFullPath(muleConfig);
-    String muleAppConfiguration = directory + MuleServer.DEFAULT_APP_CONFIGURATION;
+    String muleAppConfiguration = directory + DEFAULT_CONFIGURATION_RESOURCE;
     return muleAppConfiguration;
   }
 
