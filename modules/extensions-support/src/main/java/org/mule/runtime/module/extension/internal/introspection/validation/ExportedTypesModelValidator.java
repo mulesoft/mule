@@ -41,7 +41,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
  * </ul>
  *
  * These exported types should comply that for each parameter they contain, there must exist a getter method for that parameter.
- * The viceversa is also required, that implies the fact that for each getter method, there should exist a field named with the
+ * The vice versa is also required, that implies the fact that for each getter method, there should exist a field named with the
  * getter convention.
  *
  * @since 4.0

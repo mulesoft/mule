@@ -9,26 +9,22 @@ package org.mule.extension.http.api.policy;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
-import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.policy.PolicyOperationParametersTransformer;
+import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 /**
- * Implementation that does transformation from http:request operation parameters
- * to {@link Message} and viceversa.
+ * Implementation that does transformation from http:request operation parameters to {@link Message} and vice versa.
  *
  * @since 4.0
  */
-public class HttpPolicyRequestParametersTransformer implements PolicyOperationParametersTransformer {
+public class HttpPolicyRequestParametersTransformer implements OperationPolicyParametersTransformer {
 
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {

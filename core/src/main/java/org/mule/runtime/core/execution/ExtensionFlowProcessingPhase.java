@@ -16,13 +16,14 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.policy.PolicySourceParametersTransformer;
+import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.NextOperation;
 import org.mule.runtime.core.policy.PolicyProvider;
-import org.mule.runtime.core.policy.Policy;
+import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
@@ -75,9 +76,8 @@ public class ExtensionFlowProcessingPhase
           final Event templateEvent =
               Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
                   .message((InternalMessage) template.getMessage()).build();
-          PolicyProvider policyProvider = policyManager.lookupPolicyProvider();
-          Optional<Policy> policy =
-              policyProvider.findSourcePolicyInstance(templateEvent.getContext().getId(), sourceIdentifier);
+          Optional<SourcePolicy> policy =
+              policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), sourceIdentifier);
           try {
             final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
             NextOperation nextOperation = (muleEvent) -> {
@@ -97,9 +97,7 @@ public class ExtensionFlowProcessingPhase
 
             Event flowExecutionResponse;
             if (policy.isPresent()) {
-              nextOperation = buildFlowExecutionWithPolicyFunction(nextOperation, templateEvent, template, sourceIdentifier,
-                                                                   () -> policy.get().getNextOperationEvent());
-              flowExecutionResponse = policy.get().process(templateEvent, nextOperation);
+              flowExecutionResponse = policy.get().process(templateEvent, nextOperation, template);
             } else {
               flowExecutionResponse = nextOperation.execute(templateEvent);
             }
@@ -123,7 +121,7 @@ public class ExtensionFlowProcessingPhase
             template.sendResponseToClient(flowExecutionResponse, responseParameters, responseCompletationCallback);
           } catch (final MessagingException e) {
             Map<String, Object> failureResponseParameters;
-            Optional<PolicySourceParametersTransformer> policySourceParametersTransformer =
+            Optional<SourcePolicyParametersTransformer> policySourceParametersTransformer =
                 policyManager.lookupSourceParametersTransformer(sourceIdentifier);
             if (policy.isPresent() && policySourceParametersTransformer.isPresent()) {
               failureResponseParameters =
@@ -136,7 +134,7 @@ public class ExtensionFlowProcessingPhase
             template.sendFailureResponseToClient(e, failureResponseParameters,
                                                  createSendFailureResponseCompletationCallback(phaseResultNotifier));
           } finally {
-            silentlyDisposePolicy(templateEvent, policyProvider);
+            policyManager.disposePoliciesResources(templateEvent.getContext().getId());
           }
         } catch (Exception e) {
           phaseResultNotifier.phaseFailure(e);
@@ -153,57 +151,6 @@ public class ExtensionFlowProcessingPhase
     } else {
       flowExecutionWork.run();
     }
-  }
-
-  private void silentlyDisposePolicy(Event templateEvent, PolicyProvider policyProvider) {
-    try {
-      if (policyProvider != null) {
-        policyProvider.dispose(templateEvent.getContext().getId());
-      }
-    } catch (Exception e) {
-      logger.warn(e.getMessage());
-      if (logger.isDebugEnabled()) {
-        logger.debug("failure disposing a policy", e);
-      }
-    }
-  }
-
-  private NextOperation buildFlowExecutionWithPolicyFunction(NextOperation nextOperation, Event sourceEvent,
-                                                             ExtensionFlowProcessingPhaseTemplate template,
-                                                             ComponentIdentifier sourceIdentifier,
-                                                             Supplier<Event> lastEventSupplier) {
-    return (processEvent) -> {
-      try {
-        Event flowExecutionResponse = nextOperation.execute(sourceEvent);
-        Optional<PolicySourceParametersTransformer> policySourceParametersTransformer =
-            policyManager.lookupSourceParametersTransformer(sourceIdentifier);
-        if (policySourceParametersTransformer.isPresent()) {
-          Map<String, Object> responseParameters =
-              template.getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
-          return Event.builder(processEvent.getContext())
-              .message((InternalMessage) policySourceParametersTransformer.get()
-                  .fromSuccessResponseParametersToMessage(responseParameters))
-              .build();
-        } else {
-          return Event.builder(flowExecutionResponse).build();
-        }
-      } catch (MessagingException messagingException) {
-        Map<String, Object> failureParameters =
-            template.getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
-        Optional<PolicySourceParametersTransformer> policySourceParametersTransformer =
-            policyManager.lookupSourceParametersTransformer(sourceIdentifier);
-        if (policySourceParametersTransformer.isPresent()) {
-          Message message = policySourceParametersTransformer.get().fromFailureResponseParametersToMessage(failureParameters);
-          Event.Builder eventBuilder =
-              Event.builder(messagingException.getEvent().getContext()).message((InternalMessage) message);
-          lastEventSupplier.get().getVariableNames().forEach(variableName -> {
-            eventBuilder.addVariable(variableName, lastEventSupplier.get().getVariable(variableName));
-          });
-          throw new MessagingException(eventBuilder.build(), messagingException.getCause());
-        }
-        throw messagingException;
-      }
-    };
   }
 
   private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier) {

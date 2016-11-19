@@ -11,15 +11,14 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
  */
-public interface ExtensionFlowProcessingPhaseTemplate extends MessageProcessTemplate {
+public interface ExtensionFlowProcessingPhaseTemplate extends MessageProcessTemplate, MessageSourceResponseParametersProcessor {
 
   /**
    * @return a {@link Message} created from the original message
@@ -65,21 +64,5 @@ public interface ExtensionFlowProcessingPhaseTemplate extends MessageProcessTemp
   void sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
                                    ResponseCompletionCallback responseCompletionCallback)
       throws MuleException;
-
-  /**
-   * Generates the response function parameters. This function is later used to generate the response parameters
-   * and use them create a {@code Message} that will be routed through the source policy pipeline.
-   *
-   * @return a function to resolve the response function parameters.
-   */
-  Function<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction();
-
-  /**
-   * Generates the failure response function parameters. This function is later used to generate the response parameters
-   * and use them create a {@code Message} that will be routed through the source policy pipeline.
-   *
-   * @return a function to resolve the failure response function parameters.
-   */
-  Function<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction();
 
 }

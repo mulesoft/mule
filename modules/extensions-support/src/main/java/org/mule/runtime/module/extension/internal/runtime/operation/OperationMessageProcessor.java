@@ -39,11 +39,11 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.policy.PolicyOperationParametersTransformer;
+import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.NextOperation;
-import org.mule.runtime.core.policy.Policy;
+import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -62,8 +62,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-
-import com.google.common.collect.ImmutableMap;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,10 +86,10 @@ import org.slf4j.Logger;
  * <p>
  * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  * <p>
- * Before executing the operation will use the {@link PolicyManager} to lookup for a {@link Policy} that must be applied
+ * Before executing the operation will use the {@link PolicyManager} to lookup for a {@link OperationPolicy} that must be applied
  * to the operation. If there's a policy to be applied then it will interleave the operation execution with the policy logic
- * allowing the policy to execute logic over the operation parameters, change those parameters and then execute logic with
- * the operation response.
+ * allowing the policy to execute logic over the operation parameters, change those parameters and then execute logic with the
+ * operation response.
  *
  * @since 3.7.0
  */
@@ -135,44 +134,26 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       ComponentIdentifier operationIdentifier =
           new ComponentIdentifier.Builder().withName(operationModel.getName())
               .withNamespace(extensionModel.getName().toLowerCase()).build();
-      Map<String, Object> originalParameterMap = this.resolverSet.resolve(event).asMap();
-      PolicyProvider policyProvider = policyManager.lookupPolicyProvider();
-      Optional<Policy> policy =
-          policyProvider.findOperationPolicy(event.getContext().getId(), operationIdentifier);
-      if (policy.isPresent()) {
-        Optional<PolicyOperationParametersTransformer> policyOperationParametersTransformer =
+      Optional<OperationPolicy> policy = policyManager.findOperationPolicy(event.getContext().getId(), operationIdentifier);
+      NextOperation nextOperation = operationCallEvent -> {
+        Map<String, Object> parametersMap;
+        Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
             policyManager.lookupOperationParametersTransformer(operationIdentifier);
-        Event policyEvent;
-        if (policyOperationParametersTransformer.isPresent()) {
-          Message message = policyOperationParametersTransformer.get().fromParametersToMessage(originalParameterMap);
-          policyEvent = Event.builder(event).message((InternalMessage) message).build();
+        if (policy.isPresent() && operationPolicyParametersTransformer.isPresent()) {
+          parametersMap = new HashMap<>();
+          parametersMap
+              .putAll(operationPolicyParametersTransformer.get().fromMessageToParameters(operationCallEvent.getMessage()));
         } else {
-          policyEvent = event;
+          parametersMap = this.resolverSet.resolve(event).asMap();
         }
-        AtomicReference<Event> operationResult = new AtomicReference<>();
-        NextOperation executeOperationFunction = (policyExecuteNextEvent) -> {
-          try {
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.putAll(originalParameterMap);
-            if (policyOperationParametersTransformer.isPresent()) {
-              parameters.putAll(policyOperationParametersTransformer.get()
-                  .fromMessageToParameters(policyExecuteNextEvent.getMessage()));
-            }
-            ExecutionContextAdapter operationContext = createExecutionContext(configuration, parameters, event);
-            MuleEvent muleEvent = doProcess(policyExecuteNextEvent, operationContext);
-            Event resultEvent = (Event) muleEvent;
-            operationResult.set(resultEvent);
-            return resultEvent;
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        };
-        policy.get().process(policyEvent, executeOperationFunction);
-        return operationResult.get();
-      } else {
-        ExecutionContextAdapter operationContext = createExecutionContext(configuration, originalParameterMap, event);
-        MuleEvent muleEvent = doProcess(event, operationContext);
+        ExecutionContextAdapter operationContext = createExecutionContext(configuration, parametersMap, event);
+        MuleEvent muleEvent = doProcess(operationCallEvent, operationContext);
         return (Event) muleEvent;
+      };
+      if (policy.isPresent()) {
+        return policy.get().process(event, nextOperation, () -> resolverSet.resolve(event).asMap());
+      } else {
+        return nextOperation.execute(event);
       }
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);

@@ -13,7 +13,7 @@ import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBui
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.policy.PolicySourceParametersTransformer;
+import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
@@ -22,12 +22,12 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /**
- * Implementation that does transformation from http:listener response and failure response parameters
- * to {@link Message} and viceversa.
+ * Implementation that does transformation from http:listener response and failure response parameters to {@link Message} and vice
+ * versa.
  *
  * @since 4.0
  */
-public class HttpPolicyListenerParametersTransformer implements PolicySourceParametersTransformer {
+public class HttpListenerPolicyParametersTransformer implements SourcePolicyParametersTransformer {
 
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {

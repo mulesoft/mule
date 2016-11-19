@@ -7,13 +7,11 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.policy.PolicyOperationParametersTransformer;
-import org.mule.runtime.core.api.policy.PolicySourceParametersTransformer;
+import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
+import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
@@ -32,25 +30,47 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   @Inject
   private MuleContext muleContext;
 
-  private Collection<PolicyOperationParametersTransformer> policyOperationParametersTransformerCollection = emptyList();
-  private Collection<PolicySourceParametersTransformer> policySourceParametersTransformerCollection = emptyList();
+  @Inject
+  private PolicyStateHandler policyStateHandler;
+
+  private Collection<OperationPolicyParametersTransformer> operationPolicyParametersTransformerCollection = emptyList();
+  private Collection<SourcePolicyParametersTransformer> sourcePolicyParametersTransformerCollection = emptyList();
   private PolicyProvider policyProvider;
 
   @Override
-  public PolicyProvider lookupPolicyProvider() {
-    return policyProvider;
+  public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier) {
+    Optional<AbstractPolicyChain> sourcePolicyInstance = policyProvider.findSourcePolicyInstance(sourceIdentifier);
+    if (sourcePolicyInstance.isPresent()) {
+      Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer =
+          lookupSourceParametersTransformer(sourceIdentifier);
+      return Optional
+          .of(new DefaultSourcePolicy(sourcePolicyInstance.get(), sourcePolicyParametersTransformer, policyStateHandler));
+    }
+    return Optional.empty();
   }
 
   @Override
-  public Optional<PolicyOperationParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
-    return policyOperationParametersTransformerCollection.stream()
+  public Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, ComponentIdentifier operationIdentifier) {
+    Optional<AbstractPolicyChain> sourcePolicyInstance = policyProvider.findSourcePolicyInstance(operationIdentifier);
+    if (sourcePolicyInstance.isPresent()) {
+      Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
+          lookupOperationParametersTransformer(operationIdentifier);
+      return Optional
+          .of(new DefaultOperationPolicy(sourcePolicyInstance.get(), operationPolicyParametersTransformer, policyStateHandler));
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
+    return operationPolicyParametersTransformerCollection.stream()
         .filter(policyOperationParametersTransformer -> policyOperationParametersTransformer.supports(componentIdentifier))
         .findAny();
   }
 
   @Override
-  public Optional<PolicySourceParametersTransformer> lookupSourceParametersTransformer(ComponentIdentifier componentIdentifier) {
-    return policySourceParametersTransformerCollection.stream()
+  public Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer(ComponentIdentifier componentIdentifier) {
+    return sourcePolicyParametersTransformerCollection.stream()
         .filter(policyOperationParametersTransformer -> policyOperationParametersTransformer.supports(componentIdentifier))
         .findAny();
   }
@@ -63,12 +83,17 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       if (policyProvider == null) {
         policyProvider = new NullPolicyProvider();
       }
-      policySourceParametersTransformerCollection =
-          muleContext.getRegistry().lookupObjects(PolicySourceParametersTransformer.class);
-      policyOperationParametersTransformerCollection =
-          muleContext.getRegistry().lookupObjects(PolicyOperationParametersTransformer.class);
+      sourcePolicyParametersTransformerCollection =
+          muleContext.getRegistry().lookupObjects(SourcePolicyParametersTransformer.class);
+      operationPolicyParametersTransformerCollection =
+          muleContext.getRegistry().lookupObjects(OperationPolicyParametersTransformer.class);
     } catch (RegistrationException e) {
       throw new InitialisationException(e, this);
     }
+  }
+
+  @Override
+  public void disposePoliciesResources(String executionIdentifier) {
+    policyStateHandler.destroyState(executionIdentifier);
   }
 }
