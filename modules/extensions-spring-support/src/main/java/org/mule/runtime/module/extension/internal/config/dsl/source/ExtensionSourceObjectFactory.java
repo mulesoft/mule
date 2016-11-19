@@ -63,7 +63,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   @Override
-  public ExtensionMessageSource getObject() throws ConfigurationException {
+  public ExtensionMessageSource doGetObject() throws ConfigurationException {
     checkParameterGroupExclusivenessForModel(sourceModel, getParameters().keySet());
     ResolverSet nonCallbackParameters = getNonCallbackParameters();
 

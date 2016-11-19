@@ -422,7 +422,38 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-
+    <!--Operators-->
+    <xsd:element name="abstract-operator" abstract="true" type="abstractOperatorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for operator elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractOperatorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="error-mapping" type="errorMappingType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Adds an error mapping.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="errorMappingType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Determines that an error thrown by this operation should be mapped to another.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute type="errorIdentifierType" name="sourceType" default="ANY"/>
+        <xsd:attribute type="errorIdentifierType" name="targetType" use="required"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-observer-message-processor" abstract="true" type="abstractObserverMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>

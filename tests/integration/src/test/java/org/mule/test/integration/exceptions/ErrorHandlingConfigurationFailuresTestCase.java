@@ -7,6 +7,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -14,7 +15,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -34,9 +34,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Validations")
 @RunWith(Parameterized.class)
-public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase {
+public class ErrorHandlingConfigurationFailuresTestCase extends AbstractMuleTestCase {
 
   @Rule
   public SystemProperty useXalan;
@@ -51,7 +55,7 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     return Arrays.asList(new Object[][] {{false}, {true}});
   }
 
-  public ExceptionStrategyConfigurationFailuresTestCase(boolean isUseXalan) {
+  public ErrorHandlingConfigurationFailuresTestCase(boolean isUseXalan) {
     if (isUseXalan) {
       useXalan = new ForceXalanTransformerFactory();
     } else {
@@ -60,28 +64,28 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testNamedFlowExceptionStrategyFails() throws Exception {
+  public void namedFlowExceptionStrategyFails() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testErrorHandlerCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception {
+  public void errorHandlerCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testErrorHandlerCantHaveDefaultExceptionStrategy() throws Exception {
+  public void errorHandlerCantHaveDefaultExceptionStrategy() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-in-choice.xml");
   }
 
   @Test(expected = ConfigurationException.class)
-  public void testDefaultEsFailsAsReferencedExceptionStrategy() throws Exception {
+  public void defaultEsFailsAsReferencedExceptionStrategy() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
   }
 
   // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
   @Test(expected = InitialisationException.class)
-  public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception {
+  public void defaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
   }
 
@@ -98,6 +102,21 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
   @Test(expected = InitialisationException.class)
   public void criticalErrorFilteringNotAllowed() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/critical-error-filtering-config.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void severalAnyMappingsNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/several-any-mappings-config.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void middleAnyMappingsNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/middle-any-mapping-config.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void repeatedMappingsNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/repeated-mappings-config.xml");
   }
 
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {

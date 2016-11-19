@@ -62,7 +62,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   @Override
-  public ConfigurationProvider getObject() throws Exception {
+  public ConfigurationProvider doGetObject() throws Exception {
     if (instance == null) {
       instance = createInnerInstance();
     }

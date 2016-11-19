@@ -10,10 +10,11 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.dsl.api.component.ComponentIdentifier.ANNOTATION_NAME;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
@@ -184,14 +186,22 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
         exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
             : exception;
     ComponentIdentifier componentIdentifier = null;
+    List<ErrorMapping> errorMappings = null;
     if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {
       componentIdentifier =
-          (ComponentIdentifier) ((AnnotatedObject) messageProcessor).getAnnotation(ComponentIdentifier.ANNOTATION_NAME);
+          (ComponentIdentifier) ((AnnotatedObject) messageProcessor).getAnnotation(ANNOTATION_NAME);
+      errorMappings = (List<ErrorMapping>) ((AnnotatedObject) messageProcessor).getAnnotation(ANNOTATION_ERROR_MAPPINGS);
     }
     if (componentIdentifier != null) {
       errorType = muleContext.getErrorTypeLocator().lookupComponentErrorType(componentIdentifier, causeException);
     } else {
       errorType = muleContext.getErrorTypeLocator().lookupErrorType(causeException);
+    }
+    if (errorMappings != null && !errorMappings.isEmpty()) {
+      Optional<ErrorMapping> matchedErrorMapping = errorMappings.stream().filter(mapping -> mapping.match(errorType)).findFirst();
+      if (matchedErrorMapping.isPresent()) {
+        return matchedErrorMapping.get().getTarget();
+      }
     }
     return errorType;
   }

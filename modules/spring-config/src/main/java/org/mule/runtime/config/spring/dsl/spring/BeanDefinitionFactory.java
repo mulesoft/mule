@@ -8,11 +8,13 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
@@ -30,13 +32,21 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.COLLE
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.dsl.api.component.ComponentIdentifier.ANNOTATION_NAME;
+import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.exception.ErrorMapping;
+import org.mule.runtime.core.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -75,10 +85,13 @@ public class BeanDefinitionFactory {
 
   public static final String SPRING_PROTOTYPE_OBJECT = "prototype";
   public static final String SPRING_SINGLETON_OBJECT = "singleton";
+  public static final String SOURCE_TYPE = "sourceType";
+  public static final String TARGET_TYPE = "targetType";
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
           .add(MULE_IDENTIFIER)
+          .add(ERROR_MAPPING_IDENTIFIER)
           .add(DESCRIPTION_IDENTIFIER)
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
@@ -102,14 +115,18 @@ public class BeanDefinitionFactory {
 
   private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private BeanDefinitionCreator componentModelProcessor;
+  private ErrorTypeRepository errorTypeRepository;
   private ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
    *        artifact.
+   * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+  public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                               ErrorTypeRepository errorTypeRepository) {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
+    this.errorTypeRepository = errorTypeRepository;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
   }
 
@@ -168,11 +185,34 @@ public class BeanDefinitionFactory {
             } else {
               annotations = (Map<QName, Object>) propertyValue.getValue();
             }
-            annotations.put(ComponentIdentifier.ANNOTATION_NAME, componentModel.getIdentifier());
+            annotations.put(ANNOTATION_NAME, componentModel.getIdentifier());
+            //add any error mappings if present
+            List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
+                .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
+            if (!errorMappingComponents.isEmpty()) {
+              annotations.put(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+                Map<String, String> parameters = innerComponent.getParameters();
+                ComponentIdentifier source = parseComponentIdentifier(parameters.get(SOURCE_TYPE));
+                ComponentIdentifier target = parseComponentIdentifier(parameters.get(TARGET_TYPE));
+                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(source));
+                ErrorType targetType = resolveErrorType(target);
+                return new ErrorMapping(errorTypeMatcher, targetType);
+              }).collect(toList()));
+            }
           }
         });
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
+  }
+
+  private ErrorType resolveErrorType(ComponentIdentifier errorIdentifier) {
+    ErrorType errorType;
+    try {
+      errorType = errorTypeRepository.lookupErrorType(errorIdentifier);
+    } catch (IllegalStateException e) {
+      errorType = errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
+    }
+    return errorType;
   }
 
   private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry) {

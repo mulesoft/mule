@@ -44,7 +44,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   }
 
   @Override
-  public OperationMessageProcessor getObject() throws Exception {
+  public OperationMessageProcessor doGetObject() throws Exception {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       try {
         ResolverSet resolverSet = getParametersAsResolverSet(operationModel);

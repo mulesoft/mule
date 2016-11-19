@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.lang.System.getProperties;
 import static java.lang.System.getenv;
@@ -13,22 +14,23 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
-import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
+import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.extension.ModuleExtension;
 import org.mule.runtime.config.spring.dsl.model.extension.OperationExtension;
 import org.mule.runtime.config.spring.dsl.model.extension.ParameterExtension;
 import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
-import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -49,7 +51,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.w3c.dom.Element;
@@ -77,6 +78,7 @@ public class ApplicationModel {
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
+  public static final String ERROR_MAPPING = "error-mapping";
   public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
@@ -103,8 +105,8 @@ public class ApplicationModel {
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
   public static final String FLOW_ELEMENT = "flow";
-  public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
 
+  public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
   // TODO MULE-9638 Remove once all bean definitions parsers where migrated
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
@@ -134,12 +136,14 @@ public class ApplicationModel {
    * the value of this field will name the global element as <math:config ../>
    */
   public static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
-  public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
 
+  public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ERROR_HANDLER).build();
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
+  public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ERROR_MAPPING).build();
   public static final ComponentIdentifier MULE_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =
@@ -436,6 +440,7 @@ public class ApplicationModel {
     // validations instead of failing fast.
     validateNameIsNotRepeated();
     validateNameIsOnlyOnTopLevelElements();
+    validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateChoiceExceptionStrategyStructure();
     validateNoDefaultExceptionStrategyAsGlobal();
@@ -501,6 +506,32 @@ public class ApplicationModel {
 
   private boolean isMuleConfigurationFile() {
     return muleComponentModels.get(0).getIdentifier().equals(MULE_IDENTIFIER);
+  }
+
+  private void validateErrorMappings() {
+    executeOnEveryComponentTree(componentModel -> {
+      List<ComponentModel> errorMappings = componentModel.getInnerComponents().stream()
+          .filter(c -> c.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER)).collect(toList());
+      if (!errorMappings.isEmpty()) {
+        List<ComponentModel> anyMappings = errorMappings.stream().filter(this::isErrorMappingWithSourceAny).collect(toList());
+        if (anyMappings.size() > 1) {
+          throw new MuleRuntimeException(createStaticMessage("Only one mapping for ANY or an empty source type is allowed."));
+        } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
+          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
+        }
+        List<String> sources = errorMappings.stream().map(model -> model.getParameters().get(SOURCE_TYPE)).collect(toList());
+        List<String> distinctSources = sources.stream().distinct().collect(toList());
+        if (sources.size() != distinctSources.size()) {
+          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
+                                                                    on(", ").join(disjunction(sources, distinctSources)))));
+        }
+      }
+    });
+  }
+
+  private boolean isErrorMappingWithSourceAny(ComponentModel model) {
+    String sourceType = model.getParameters().get(SOURCE_TYPE);
+    return sourceType == null || sourceType.equals(ANY_IDENTIFIER);
   }
 
   private void validateChoiceExceptionStrategyStructure() {
@@ -726,8 +757,7 @@ public class ApplicationModel {
     List<ComponentModel> globalElementsModel = new ArrayList<>();
 
     globalElementsModel.addAll(moduleExtension.getGlobalElements().stream()
-        .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute()))
-        .collect(Collectors.toList()));
+        .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute())).collect(toList()));
 
     ComponentModel muleRootElement = configRefModel.getParent();
     globalElementsModel.stream().forEach(componentModel -> {
@@ -813,8 +843,9 @@ public class ApplicationModel {
               && componentModel.getIdentifier().getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
               && configParameter.equals(componentModel.getParameters().get(NAME_ATTRIBUTE)))
           .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException(String
-              .format("There's no <%s:config> named [%s] in the current mule app", moduleExtension.getName(), configParameter)));
+          .orElseThrow(() -> new IllegalArgumentException(
+                                                          format("There's no <%s:config> named [%s] in the current mule app",
+                                                                 moduleExtension.getName(), configParameter)));
       valuesMap
           .putAll(extractParameters(configRefComponentModel, moduleExtension.getProperties()));
     }

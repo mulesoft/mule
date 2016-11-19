@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.core.util.func.CompositePredicate;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
@@ -58,7 +59,7 @@ import java.util.function.Predicate;
  * @param <T> the generic type of the instances to be built
  * @since 4.0
  */
-public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory<T> {
+public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotatedObjectFactory<T> {
 
   protected final MuleContext muleContext;
   private Map<String, Object> parameters = new HashMap<>();

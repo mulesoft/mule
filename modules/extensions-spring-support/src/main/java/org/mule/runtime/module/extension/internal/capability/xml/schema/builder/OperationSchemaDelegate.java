@@ -10,12 +10,12 @@ import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TARGET_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
@@ -26,7 +26,7 @@ import org.mule.runtime.module.extension.internal.model.property.ExtendingOperat
 import javax.xml.namespace.QName;
 
 /**
- * Builder delegation class to generate a XSD schema that describes a {@link OperationModel}
+ * Builder delegation class to generate a XSD schema that describes an {@link OperationModel}
  *
  * @since 4.0.0
  */
@@ -52,12 +52,12 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
   }
 
   private void registerOperationType(String name, OperationModel operationModel, DslElementSyntax dslSyntax) {
-    ExtensionType operationType = registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, dslSyntax);
+    ExtensionType operationType = registerExecutableType(name, operationModel, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax);
     addTargetParameter(operationType, operationModel);
   }
 
   private QName getOperationSubstitutionGroup(OperationModel operationModel) {
-    ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_MESSAGE_PROCESSOR);
+    ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_OPERATOR);
     operationModel.getModelProperty(ExtendingOperationModelProperty.class)
         .ifPresent(property -> substitutionGroup.set(getSubstitutionGroup(property.getType())));
 
