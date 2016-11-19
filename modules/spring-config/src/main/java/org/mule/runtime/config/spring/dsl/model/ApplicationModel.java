@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.lang.System.getProperties;
 import static java.lang.System.getenv;
@@ -14,6 +15,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -517,12 +519,19 @@ public class ApplicationModel {
         } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
           throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
         }
+        List<String> sources = errorMappings.stream().map(model -> model.getParameters().get(SOURCE_TYPE)).collect(toList());
+        List<String> distinctSources = sources.stream().distinct().collect(toList());
+        if (sources.size() != distinctSources.size()) {
+          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
+                                                                    on(", ").join(disjunction(sources, distinctSources)))));
+        }
       }
     });
   }
 
   private boolean isErrorMappingWithSourceAny(ComponentModel model) {
-    return model.getParameters().get(SOURCE_TYPE).equals(ANY_IDENTIFIER);
+    String sourceType = model.getParameters().get(SOURCE_TYPE);
+    return sourceType == null || sourceType.equals(ANY_IDENTIFIER);
   }
 
   private void validateChoiceExceptionStrategyStructure() {
@@ -834,8 +843,9 @@ public class ApplicationModel {
               && componentModel.getIdentifier().getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
               && configParameter.equals(componentModel.getParameters().get(NAME_ATTRIBUTE)))
           .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException(String
-              .format("There's no <%s:config> named [%s] in the current mule app", moduleExtension.getName(), configParameter)));
+          .orElseThrow(() -> new IllegalArgumentException(
+                                                          format("There's no <%s:config> named [%s] in the current mule app",
+                                                                 moduleExtension.getName(), configParameter)));
       valuesMap
           .putAll(extractParameters(configRefComponentModel, moduleExtension.getProperties()));
     }

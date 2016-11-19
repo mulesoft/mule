@@ -14,6 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Basic implementation of {@link AnnotatedObjectFactory} that handles all annotation related behavior
+ * including {@link ObjectFactory#getObject()}.
+ *
+ * @param <T> the type of the object to be created, which should be an {@link AnnotatedObject}.
+ */
 public abstract class AbstractAnnotatedObjectFactory<T> implements AnnotatedObjectFactory<T> {
 
   private final Map<QName, Object> annotations = new ConcurrentHashMap<>();

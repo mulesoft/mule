@@ -114,6 +114,11 @@ public class ErrorHandlingConfigurationFailuresTestCase extends AbstractMuleTest
     loadConfiguration("org/mule/test/integration/exceptions/middle-any-mapping-config.xml");
   }
 
+  @Test(expected = ConfigurationException.class)
+  public void repeatedMappingsNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/repeated-mappings-config.xml");
+  }
+
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<>();
