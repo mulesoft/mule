@@ -7,15 +7,14 @@
 package org.mule.test.petstore.extension;
 
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 
 public class PetStoreClient {
 
@@ -23,19 +22,17 @@ public class PetStoreClient {
   private String password;
   private TlsContextFactory tlsContext;
   private String configName;
-  private ThreadingProfile threadingProfile;
   private int disconnectCount;
   private Date openingDate;
   private List<Date> closedForHolidays;
 
   private List<LocalDateTime> discountDates;
 
-  public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile,
-                        String configName, Date openingDate, List<Date> closedForHolidays, List<LocalDateTime> discountDates) {
+  public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, String configName,
+                        Date openingDate, List<Date> closedForHolidays, List<LocalDateTime> discountDates) {
     this.username = username;
     this.password = password;
     this.tlsContext = tlsContextFactory;
-    this.threadingProfile = threadingProfile;
     this.configName = configName;
     this.openingDate = openingDate;
     this.closedForHolidays = closedForHolidays;
@@ -70,10 +67,6 @@ public class PetStoreClient {
 
   public TlsContextFactory getTlsContext() {
     return tlsContext;
-  }
-
-  public ThreadingProfile getThreadingProfile() {
-    return threadingProfile;
   }
 
   public String getConfigName() {

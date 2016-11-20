@@ -13,13 +13,11 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
@@ -32,6 +30,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPR
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -52,11 +51,10 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
@@ -544,11 +542,6 @@ public final class SchemaBuilder {
         final String id = getId(objectType);
         if (id.equals(TlsContextFactory.class.getName())) {
           addTlsSupport(extensionType, all);
-          return;
-        }
-
-        if (id.equals(ThreadingProfile.class.getName())) {
-          addAttributeAndElement(extensionType, all, THREADING_PROFILE_ATTRIBUTE_NAME, MULE_ABSTRACT_THREADING_PROFILE);
           return;
         }
 

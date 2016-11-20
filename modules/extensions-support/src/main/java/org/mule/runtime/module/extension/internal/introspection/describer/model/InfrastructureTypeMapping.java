@@ -7,10 +7,9 @@
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -25,7 +24,7 @@ import java.util.Map;
 public class InfrastructureTypeMapping {
 
   private static Map<Class<?>, String> mapping = ImmutableMap.<Class<?>, String>builder()
-      .put(TlsContextFactory.class, TLS_ATTRIBUTE_NAME).put(ThreadingProfile.class, THREADING_PROFILE_ATTRIBUTE_NAME).build();
+      .put(TlsContextFactory.class, TLS_ATTRIBUTE_NAME).build();
 
   public static Map<Class<?>, String> getMap() {
     return mapping;

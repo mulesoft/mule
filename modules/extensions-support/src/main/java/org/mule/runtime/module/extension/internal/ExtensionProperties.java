@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 
@@ -57,11 +57,6 @@ public class ExtensionProperties {
    * The name of an attribute which allows referencing a {@link TlsContextFactory}
    */
   public static final String TLS_ATTRIBUTE_NAME = "tlsContext";
-
-  /**
-   * The name of an attribute which allows specifying a {@link ThreadingProfile}
-   */
-  public static final String THREADING_PROFILE_ATTRIBUTE_NAME = "threadingProfile";
 
   /**
    * The name of a file which contains each plugin's {@link ExtensionManifest}
