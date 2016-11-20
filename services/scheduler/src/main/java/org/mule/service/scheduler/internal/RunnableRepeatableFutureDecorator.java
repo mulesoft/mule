@@ -33,6 +33,8 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   private final DefaultScheduler scheduler;
 
+  private final String taskAsString;
+
   private volatile boolean running = false;
   private volatile boolean cancelled = false;
   private RunnableFuture<V> task;
@@ -42,13 +44,15 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
    * 
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
+   * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
    */
   RunnableRepeatableFutureDecorator(Supplier<RunnableFuture<V>> taskSupplier,
                                     Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback,
-                                    DefaultScheduler scheduler) {
+                                    DefaultScheduler scheduler, String taskAsString) {
     this.taskSupplier = taskSupplier;
     this.wrapUpCallback = wrapUpCallback;
     this.scheduler = scheduler;
+    this.taskAsString = taskAsString;
   }
 
   @Override
@@ -132,6 +136,6 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   @Override
   public String toString() {
-    return "RunnableRepeatableFutureDecorator[" + taskSupplier.toString() + "]";
+    return taskAsString + "(repeatable)";
   }
 }

@@ -94,6 +94,11 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
     public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
       throw new UnsupportedOperationException("Cron scheduling is not supported in standalone.");
     }
+
+    @Override
+    public String getName() {
+      return StandaloneClientThreadScheduler.class.getSimpleName();
+    }
   }
 
 }

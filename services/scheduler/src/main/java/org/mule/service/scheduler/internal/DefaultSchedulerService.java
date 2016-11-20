@@ -80,17 +80,37 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return new DefaultScheduler(cpuLightExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+    return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return new DefaultScheduler(ioExecutor, cores * cores, (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+    return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
   }
 
   @Override
   public Scheduler computationScheduler() {
-    return new DefaultScheduler(computationExecutor, 4 * cores, (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+    return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+  }
+
+  private String resolveSchedulerCreationLocation(String prefix) {
+    int i = 0;
+    final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+    StackTraceElement ste = stackTrace[i++];
+    // We have to go deep enough, right before the proxy call
+    while (!ste.getClassName().contains("$Proxy") && i < stackTrace.length) {
+      ste = stackTrace[i++];
+    }
+    if (ste.getClassName().contains("$Proxy")) {
+      ste = stackTrace[i++];
+    } else {
+      ste = stackTrace[2];
+    }
+
+    return prefix + "@" + (ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber());
   }
 
   @Override

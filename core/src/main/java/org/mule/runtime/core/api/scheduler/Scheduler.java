@@ -66,4 +66,11 @@ public interface Scheduler extends ScheduledExecutorService {
    * @param unit the time unit of the {@code timeout} argument
    */
   void stop(long gracefulShutdownTimeout, TimeUnit unit);
+
+  /**
+   * Returns a name that indicates where was this scheduler created.
+   * 
+   * @return the name of this scheduler.
+   */
+  String getName();
 }

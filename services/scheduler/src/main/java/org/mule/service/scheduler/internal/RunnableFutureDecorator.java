@@ -30,15 +30,19 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
 
   private final DefaultScheduler scheduler;
 
+  private final String taskAsString;
+
   /**
    * Decorates the given {@code task}
    * 
    * @param task the task to be decorated
    * @param scheduler the owner {@link Executor} of this task
+   * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
    */
-  RunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
+  RunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler, String taskAsString) {
     this.task = task;
     this.scheduler = scheduler;
+    this.taskAsString = taskAsString;
   }
 
   @Override
@@ -92,6 +96,6 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
 
   @Override
   public String toString() {
-    return "RunnableFutureDecorator[" + task.toString() + "]";
+    return taskAsString;
   }
 }
