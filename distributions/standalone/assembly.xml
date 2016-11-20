@@ -143,6 +143,7 @@
                 <include>org.mule.modules:mule-module-cxf</include>
                 <include>org.mule.modules:mule-module-extensions-support</include>
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
+                <include>org.mule.modules:mule-module-extensions-xml-support</include>
                 <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
@@ -215,6 +216,7 @@
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-support</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
+                <exclude>org.mule.modules:mule-module-extensions-xml-support</exclude>
                 <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
                 <exclude>org.mule.modules:mule-module-email</exclude>

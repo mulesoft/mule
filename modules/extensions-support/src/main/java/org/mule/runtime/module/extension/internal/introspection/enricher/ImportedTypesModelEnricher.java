@@ -18,8 +18,10 @@ import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Test the extension type to be annotated with {@link Import}, in which case it adds an {@link ImportedTypeModel} on the
@@ -36,7 +38,11 @@ public final class ImportedTypesModelEnricher extends AbstractAnnotatedModelEnri
     ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
     ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
 
-    final Class<?> type = extractExtensionType(extensionDeclaration);
+    final Optional<ImplementingTypeModelProperty> implementingType = extractExtensionType(extensionDeclaration);
+    if (!implementingType.isPresent()) {
+      return;
+    }
+    final Class<?> type = implementingType.get().getType();
     typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
 
     final List<Import> importTypes = parseRepeatableAnnotation(type, Import.class, c -> ((ImportedTypes) c).value());

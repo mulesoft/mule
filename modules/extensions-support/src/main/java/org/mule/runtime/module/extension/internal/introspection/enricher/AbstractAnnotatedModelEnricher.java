@@ -12,6 +12,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.Annota
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  * Base class for implementations of {@link ModelEnricher} which provides utility methods for enriching {@link BaseDeclaration
@@ -35,8 +36,8 @@ public abstract class AbstractAnnotatedModelEnricher implements ModelEnricher {
    */
   protected <A extends Annotation> A extractAnnotation(BaseDeclaration<? extends BaseDeclaration> declaration,
                                                        Class<A> annotationType) {
-    Class<?> extensionType = extractExtensionType(declaration);
-    return extensionType != null ? extensionType.getAnnotation(annotationType) : null;
+    Optional<ImplementingTypeModelProperty> implementingType = extractExtensionType(declaration);
+    return implementingType.isPresent() ? implementingType.get().getType().getAnnotation(annotationType) : null;
   }
 
   /**
@@ -46,11 +47,9 @@ public abstract class AbstractAnnotatedModelEnricher implements ModelEnricher {
    * property
    *
    * @param declaration a {@link BaseDeclaration} to be enriched
-   * @param <T> the return class's generic type
    * @return a {@link Class} or {@code null} if the model doesn't have a {@link ImplementingTypeModelProperty}
    */
-  protected <T> Class<T> extractExtensionType(BaseDeclaration<? extends BaseDeclaration> declaration) {
-    return (Class<T>) declaration.getModelProperty(ImplementingTypeModelProperty.class)
-        .map(ImplementingTypeModelProperty::getType).orElse(null);
+  protected Optional<ImplementingTypeModelProperty> extractExtensionType(BaseDeclaration<? extends BaseDeclaration> declaration) {
+    return declaration.getModelProperty(ImplementingTypeModelProperty.class);
   }
 }

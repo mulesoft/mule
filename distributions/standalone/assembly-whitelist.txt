@@ -133,6 +133,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-extensions-xml-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
@@ -348,7 +349,7 @@
 /mule-standalone-${productVersion}/lib/opt/wss4j-1.6.18.jar
 /mule-standalone-${productVersion}/lib/opt/xml-resolver-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/xmlpull-1.1.3.1.jar
-/mule-standalone-${productVersion}/lib/opt/xmlschema-core-2.2.1.jar
+/mule-standalone-${productVersion}/lib/opt/xmlschema-core-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmlsec-1.5.8.jar
 /mule-standalone-${productVersion}/lib/opt/xpp3_min-1.1.3.4.O.jar
 /mule-standalone-${productVersion}/lib/opt/xsdlib-2010.1.jar
