@@ -9,7 +9,7 @@
 
     <email:smtp name="config">
         <email:smtps-connection host="127.0.0.1" port="${port}">
-            <tls:context enabledProtocols="TLSv1.2">
+            <tls:context enabledProtocols="TLSv1.2,SSLv3">
                 <tls:trust-store path="greenmail.jks" password="changeit"/>
             </tls:context>
         </email:smtps-connection>
@@ -17,7 +17,7 @@
 
     <email:smtp name="config-custom-headers">
         <email:smtps-connection host="127.0.0.1" port="${port}">
-            <tls:context enabledProtocols="TLSv1.2">
+            <tls:context enabledProtocols="TLSv1.2,SSLv3">
                 <tls:trust-store path="greenmail.jks" password="changeit"/>
             </tls:context>
         </email:smtps-connection>
