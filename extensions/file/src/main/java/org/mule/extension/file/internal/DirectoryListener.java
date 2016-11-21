@@ -364,12 +364,12 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   }
 
   private void shutdownScheduler() {
-    if (scheduler == null) {
-      return;
+    if (listenExecutor != null) {
+      listenExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     }
-
-    listenExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-    scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+    if (scheduler != null) {
+      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+    }
   }
 
   private void closeWatcherService() {
