@@ -32,7 +32,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@link ProcessingType#CPU_LITE cpu-light} if it doesn't block at any time and its duration is less than
    * 10 milliseconds.
    * 
-   * @return a scheduler than manages {@link ThreadType#OTHER} threads.
+   * @return a scheduler that manages {@link ThreadType#OTHER} threads.
    */
   Scheduler cpuLightScheduler();
 
@@ -43,7 +43,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@link ProcessingType#BLOCKING I/O} if it spends most of it's clock duration blocked due to I/O
    * operations.
    * 
-   * @return a scheduler than manages {@link ThreadType#IO I/O} threads.
+   * @return a scheduler that manages {@link ThreadType#IO I/O} threads.
    */
   Scheduler ioScheduler();
 
@@ -54,7 +54,7 @@ public interface SchedulerService extends Service {
    * A task is considered a {@link ProcessingType#CPU computation} if its duration is more than 10 milliseconds and less than 20%
    * of its clock time is due to blocking.
    * 
-   * @return a scheduler than manages {@link ThreadType#CPU_INTENSIVE computation} threads.
+   * @return a scheduler that manages {@link ThreadType#CPU_INTENSIVE computation} threads.
    */
   Scheduler cpuIntensiveScheduler();
 
