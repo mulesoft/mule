@@ -173,13 +173,16 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       final String path = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
       Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
       Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
-
       boolean methodNotAllowed = false;
       RequestHandlerMatcherPair requestHandlerMatcherPair = null;
       while (!foundPaths.empty()) {
         final PathMap pathMap = foundPaths.pop();
         List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = pathMap.getRequestHandlerMatcherPairs();
+        if (requestHandlerMatcherPairs == null && pathMap.getCatchAllPathMap() != null) {
+          requestHandlerMatcherPairs = pathMap.getCatchAllPathMap().requestHandlerMatcherPairs;
+        }
         requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request);
+
         if (requestHandlerMatcherPair != null) {
           break;
         }
@@ -214,6 +217,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
 
     private Stack<PathMap> findPossibleRequestHandlers(String path) {
       PathMap currentPathMap = rootPathMap;
+      PathMap auxPathMap = null;
       final String[] pathParts = splitPath(path);
       Stack<PathMap> foundPaths = new Stack<>();
       foundPaths.add(catchAllPathMap);
@@ -228,11 +232,18 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       for (int i = 1; i < pathParts.length && currentPathMap != null; i++) {
         String currentPath = pathParts[i];
         PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
+
         if (pathMap == null) {
           addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
           pathMap = currentPathMap.getCatchAllCurrentPathMap();
+        } else if (pathMap.getCatchAllPathMap() != null) {
+          auxPathMap = pathMap;
         }
         if (i == pathParts.length - 1) {
+          if (auxPathMap != null) {
+            addCatchAllPathMapIfNotNull(auxPathMap, foundPaths);
+            foundPaths.push(auxPathMap);
+          }
           if (pathMap != null) {
             addCatchAllPathMapIfNotNull(pathMap, foundPaths);
             foundPaths.push(pathMap);
@@ -344,6 +355,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
         subPaths.put(path, pathMap);
       }
     }
+
+    public Map<String, PathMap> getSubPaths() {
+      return subPaths;
+    }
+
 
     public List<RequestHandlerMatcherPair> getRequestHandlerMatcherPairs() {
       return requestHandlerMatcherPairs;
