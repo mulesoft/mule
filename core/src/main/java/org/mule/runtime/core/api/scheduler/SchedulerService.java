@@ -9,8 +9,6 @@ package org.mule.runtime.core.api.scheduler;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 
-import java.util.concurrent.ExecutorService;
-
 /**
  * Provides access to the different schedulers and thread pools that exist in the Mule runtime, allowing an artifact to schedule
  * tasks on those.
@@ -61,8 +59,8 @@ public interface SchedulerService extends Service {
   Scheduler cpuIntensiveScheduler();
 
   /**
-   * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an {@link ExecutorService}
-   * built with the given {@code corePoolSize} threads.
+   * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
+   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads.
    * 
    * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
    */
