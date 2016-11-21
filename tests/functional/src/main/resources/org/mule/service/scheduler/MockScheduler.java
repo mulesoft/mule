@@ -40,7 +40,7 @@ public class MockScheduler extends ScheduledThreadPoolExecutor implements Schedu
   }
   
   @Override
-  public ThreadType getThreadsType() {
+  public ThreadType getType() {
     return CUSTOM;
   }
 

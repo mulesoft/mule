@@ -350,7 +350,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   @Override
-  public ThreadType getThreadsType() {
+  public ThreadType getType() {
     return threadsType;
   }
 
@@ -361,7 +361,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   public String toString() {
-    return getThreadsType() + " - " + getName() + "{" + lineSeparator()
+    return getType() + " - " + getName() + "{" + lineSeparator()
         + "  executor: " + executor.toString() + lineSeparator()
         + "  shutdown: " + shutdown + lineSeparator()
         + "}";

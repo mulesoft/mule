@@ -64,7 +64,7 @@ public interface Scheduler extends ScheduledExecutorService {
   /**
    * @return The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
    */
-  ThreadType getThreadsType();
+  ThreadType getType();
 
   /**
    * Tries to do a graceful shutdown.

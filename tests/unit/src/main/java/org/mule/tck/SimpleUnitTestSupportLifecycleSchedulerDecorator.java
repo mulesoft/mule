@@ -135,8 +135,8 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   }
 
   @Override
-  public ThreadType getThreadsType() {
-    return decorated.getThreadsType();
+  public ThreadType getType() {
+    return decorated.getType();
   }
 
   @Override
