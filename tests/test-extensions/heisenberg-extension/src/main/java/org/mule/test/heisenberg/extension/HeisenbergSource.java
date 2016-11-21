@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -25,7 +26,6 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.math.BigDecimal;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -65,8 +65,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
     }
 
     executor = schedulerService.cpuLightScheduler();
-    executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)),
-                                 0, 200, TimeUnit.MILLISECONDS);
+    executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 100, MILLISECONDS);
   }
 
   @OnSuccess
@@ -84,7 +83,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
     if (executor != null) {
       executor.shutdown();
       try {
-        executor.awaitTermination(500, TimeUnit.MILLISECONDS);
+        executor.awaitTermination(500, MILLISECONDS);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }

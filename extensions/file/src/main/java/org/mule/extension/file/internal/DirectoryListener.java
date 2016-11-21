@@ -348,27 +348,15 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     started = false;
 
     closeWatcherService();
-    shutdownExecutor();
+    shutdownScheduler();
   }
 
-  private void shutdownExecutor() {
+  private void shutdownScheduler() {
     if (scheduler == null) {
       return;
     }
 
-    scheduler.shutdownNow();
-    try {
-      if (!scheduler.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS)) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Could not properly terminate pending events for directory listener on flow " + flowConstruct.getName());
-        }
-      }
-    } catch (InterruptedException e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Got interrupted while trying to terminate pending events for directory listener on flow "
-            + flowConstruct.getName());
-      }
-    }
+    scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
 
   private void closeWatcherService() {
