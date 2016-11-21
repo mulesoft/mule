@@ -61,5 +61,5 @@ public interface SchedulerService extends Service {
   /**
    * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.
    */
-  ThreadType getCurrentThreadType();
+  ThreadType currentThreadType();
 }

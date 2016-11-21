@@ -119,7 +119,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
-  public ThreadType getCurrentThreadType() {
+  public ThreadType currentThreadType() {
     if (currentThread().getThreadGroup() == cpuLightGroup) {
       return CPU_LIGHT;
     } else if (currentThread().getThreadGroup() == ioGroup) {

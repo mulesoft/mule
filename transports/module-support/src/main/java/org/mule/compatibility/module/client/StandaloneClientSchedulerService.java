@@ -62,7 +62,7 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   }
 
   @Override
-  public ThreadType getCurrentThreadType() {
+  public ThreadType currentThreadType() {
     return CUSTOM;
   }
 

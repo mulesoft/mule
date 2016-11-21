@@ -35,7 +35,7 @@ public class MockSchedulerService implements SchedulerService {
   }
   
   @Override
-  public ThreadType getCurrentThreadType() {
+  public ThreadType currentThreadType() {
     return CUSTOM;
   }
 }

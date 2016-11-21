@@ -58,10 +58,10 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
     service.start();
 
-    service.cpuLightScheduler().submit(() -> assertThat(service.getCurrentThreadType(), is(CPU_LIGHT))).get();
-    service.ioScheduler().submit(() -> assertThat(service.getCurrentThreadType(), is(IO))).get();
-    service.computationScheduler().submit(() -> assertThat(service.getCurrentThreadType(), is(COMPUTATION))).get();
-    executor.submit(() -> assertThat(service.getCurrentThreadType(), is(UNKNOWN))).get();
+    service.cpuLightScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_LIGHT))).get();
+    service.ioScheduler().submit(() -> assertThat(service.currentThreadType(), is(IO))).get();
+    service.computationScheduler().submit(() -> assertThat(service.currentThreadType(), is(COMPUTATION))).get();
+    executor.submit(() -> assertThat(service.currentThreadType(), is(UNKNOWN))).get();
 
     service.stop();
     executor.shutdownNow();

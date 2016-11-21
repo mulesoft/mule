@@ -91,7 +91,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   @Override
-  public ThreadType getCurrentThreadType() {
+  public ThreadType currentThreadType() {
     return CUSTOM;
   }
 }
