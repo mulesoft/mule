@@ -36,4 +36,7 @@ public class MockScheduler extends ScheduledThreadPoolExecutor implements Schedu
     throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implelemtation.");
   }
 
+  public String getName() {
+    return MockScheduler.class.getSimpleName();
+  }
 }

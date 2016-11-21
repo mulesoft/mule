@@ -60,6 +60,8 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultScheduler.class);
 
+  private final String name;
+
   private final ExecutorService executor;
   private final ScheduledExecutorService scheduledExecutor;
   private final org.quartz.Scheduler quartzScheduler;
@@ -78,14 +80,17 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private volatile boolean shutdown = false;
 
   /**
+   * @param name the name of this scheduler
    * @param executor the actual executor that will run the dispatched tasks.
    * @param workers an estimate of how many threads will be, at maximum, in the underlying executor
    * @param totalWorkers an estimate of how many threads will be, at maximum, in all the underlying executors
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
    */
-  DefaultScheduler(ExecutorService executor, int workers, int totalWorkers, ScheduledExecutorService scheduledExecutor,
+  DefaultScheduler(String name, ExecutorService executor, int workers, int totalWorkers,
+                   ScheduledExecutorService scheduledExecutor,
                    org.quartz.Scheduler quartzScheduler) {
+    this.name = name + "@" + Integer.toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
     cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;
@@ -130,7 +135,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    }, this);
+    }, this, command.getClass().getName());
 
     final ScheduledFuture<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
@@ -151,7 +156,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       } else {
         taskFinished(t);
       }
-    }, this);
+    }, this, command.getClass().getName());
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
@@ -174,7 +179,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    }, this);
+    }, this, command.getClass().getName());
 
     JobDataMap jobDataMap = new JobDataMap();
     jobDataMap.put(JOB_TASK_KEY, schedulableTask(task));
@@ -268,17 +273,22 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     try {
       // Wait a while for existing tasks to terminate
       if (!awaitTermination(gracefulShutdownTimeout, unit)) {
-        // Cancel currently executing tasks and return list of pending
-        // tasks
+        // Cancel currently executing tasks and return list of pending tasks
         List<Runnable> cancelledJobs = shutdownNow();
         // Wait a while for tasks to respond to being cancelled
         if (!awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT_SECS, SECONDS)) {
           logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + gracefulShutdownTimeout
-              + " " + unit.toString() + ". " + cancelledJobs.size() + " jobs were cancelled.");
+              + " " + unit.toString() + ".");
         } else {
           if (!cancelledJobs.isEmpty()) {
-            logger.warn("Scheduler " + this.toString() + " terminated. " + cancelledJobs.size() + " jobs were cancelled.");
+            logger.warn("Scheduler " + this.toString() + " terminated.");
           }
+        }
+
+        if (logger.isDebugEnabled()) {
+          logger.debug("The jobs " + cancelledJobs + " were cancelled.");
+        } else {
+          logger.info(cancelledJobs.size() + " jobs were cancelled.");
         }
       }
     } catch (InterruptedException ie) {
@@ -291,12 +301,12 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-    return new RunnableFutureDecorator<>(super.newTaskFor(callable), this);
+    return new RunnableFutureDecorator<>(super.newTaskFor(callable), this, callable.getClass().getName());
   }
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-    return new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this);
+    return new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this, runnable.getClass().getName());
   }
 
   @Override
@@ -304,11 +314,12 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     checkShutdown();
     if (command instanceof RunnableFuture) {
       scheduledTasks.put((RunnableFuture<?>) command, NULL_SCHEDULED_FUTURE);
+      executor.execute(command);
     } else {
-      scheduledTasks.put(newTaskFor(command, null), NULL_SCHEDULED_FUTURE);
+      RunnableFuture<Object> runnableFutureCommand = newTaskFor(command, null);
+      scheduledTasks.put(runnableFutureCommand, NULL_SCHEDULED_FUTURE);
+      executor.execute(runnableFutureCommand);
     }
-
-    executor.execute(command);
   }
 
   protected void checkShutdown() {
@@ -332,8 +343,13 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
   public String toString() {
-    return super.toString() + "{" + lineSeparator()
+    return getName() + "{" + lineSeparator()
         + "  executor: " + executor.toString() + lineSeparator()
         + "  shutdown: " + shutdown + lineSeparator()
         + "}";

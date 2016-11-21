@@ -66,4 +66,9 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
   int getScheduledTasks() {
     return scheduledTasks.get();
   }
+
+  @Override
+  public String getName() {
+    return SimpleUnitTestSupportScheduler.class.getSimpleName();
+  }
 }

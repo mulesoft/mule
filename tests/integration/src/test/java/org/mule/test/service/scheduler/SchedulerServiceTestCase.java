@@ -7,9 +7,12 @@
 package org.mule.test.service.scheduler;
 
 import static java.lang.Thread.currentThread;
-import org.mule.runtime.core.api.Event;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -19,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
@@ -34,6 +38,13 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Description("Test that the scheduler service is properly injected into a Mule component")
   public void useSchedulingService() throws Exception {
     flowRunner("willSchedule").run();
+  }
+
+  @Test
+  public void schedulerName() {
+    SchedulerService schedulerService = muleContext.getSchedulerService();
+    assertThat(schedulerService.ioScheduler().getName(),
+               startsWith("SchedulerService_io@" + SchedulerServiceTestCase.class.getName() + ".schedulerName:"));
   }
 
   public static class HasSchedulingService implements Processor {

@@ -133,4 +133,8 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
     return decorated.invokeAny(tasks, timeout, unit);
   }
 
+  @Override
+  public String getName() {
+    return SimpleUnitTestSupportLifecycleSchedulerDecorator.class.getSimpleName() + "(" + decorated.getName() + ")";
+  }
 }
