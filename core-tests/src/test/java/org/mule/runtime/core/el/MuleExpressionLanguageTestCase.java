@@ -110,6 +110,25 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void singleVariableBindings() throws Exception {
+    Event event = getEventWithError(empty());
+    String var1 = "var1";
+    String var2 = "var2";
+    when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
+    String varValue = "mangoose";
+    TypedValue var = new DefaultTypedValue(varValue, STRING);
+    when(event.getVariable(var1)).thenReturn(var);
+    when(event.getVariable(var2)).thenReturn(var);
+
+    TypedValue resultVar1 = expressionLanguage.evaluate(var1, event, BindingContext.builder().build());
+    assertThat(resultVar1.getValue(), is(varValue));
+    assertThat(resultVar1.getDataType(), is(STRING));
+    TypedValue resultVar2 = expressionLanguage.evaluate(var2, event, BindingContext.builder().build());
+    assertThat(resultVar2.getValue(), is(varValue));
+    assertThat(resultVar2.getDataType(), is(STRING));
+  }
+
+  @Test
   public void flowNameBinding() {
     Event event = getEventWithError(empty());
     FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
