@@ -50,7 +50,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * results/'http://foo.com'/value
  * </code>
  */
-public class JsonData implements Serializable
+public class JsonData
 {
     private JsonNode node;
 
