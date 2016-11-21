@@ -9,6 +9,7 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -78,7 +79,7 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
   protected ScheduledExecutorService createExecutor() {
     return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, 1, sharedScheduledExecutor,
-                                sharedQuartzScheduler);
+                                sharedQuartzScheduler, CUSTOM);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {

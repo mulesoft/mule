@@ -6,11 +6,16 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
+import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -19,6 +24,7 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 import org.junit.Test;
 
@@ -45,45 +51,33 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Description("Tests that the isCurrentThreadCpuLight() works correctly")
-  public void cpuLightThreadTypes() throws MuleException, InterruptedException, ExecutionException {
+  @Description("Tests that SchedulerService#getCurrentThreadType() works correctly")
+  public void getCurrentThreadType() throws MuleException, InterruptedException, ExecutionException {
+    final ExecutorService executor = newSingleThreadExecutor();
     final DefaultSchedulerService service = new DefaultSchedulerService();
 
     service.start();
 
-    service.cpuLightScheduler().submit(() -> assertThat(service.isCurrentThreadCpuLight(), is(true))).get();
-    service.ioScheduler().submit(() -> assertThat(service.isCurrentThreadCpuLight(), is(false))).get();
-    service.computationScheduler().submit(() -> assertThat(service.isCurrentThreadCpuLight(), is(false))).get();
+    service.cpuLightScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_LIGHT))).get();
+    service.ioScheduler().submit(() -> assertThat(service.currentThreadType(), is(IO))).get();
+    service.cpuIntensiveScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_INTENSIVE))).get();
+    executor.submit(() -> assertThat(service.currentThreadType(), is(UNKNOWN))).get();
 
     service.stop();
+    executor.shutdownNow();
   }
 
   @Test
-  @Description("Tests that the isCurrentThreadIo() works correctly")
-  public void ioThreadTypes() throws MuleException, InterruptedException, ExecutionException {
+  @Description("Tests that the Scheduler.getThreadsType() works correctly")
+  public void getThreadsType() throws MuleException, InterruptedException, ExecutionException {
     final DefaultSchedulerService service = new DefaultSchedulerService();
 
     service.start();
 
-    service.cpuLightScheduler().submit(() -> assertThat(service.isCurrentThreadIo(), is(false))).get();
-    service.ioScheduler().submit(() -> assertThat(service.isCurrentThreadIo(), is(true))).get();
-    service.computationScheduler().submit(() -> assertThat(service.isCurrentThreadIo(), is(false))).get();
+    assertThat(service.cpuLightScheduler().getThreadType(), is(CPU_LIGHT));
+    assertThat(service.ioScheduler().getThreadType(), is(IO));
+    assertThat(service.cpuIntensiveScheduler().getThreadType(), is(CPU_INTENSIVE));
 
     service.stop();
   }
-
-  @Test
-  @Description("Tests that the isCurrentThreadComputation() works correctly")
-  public void computationThreadTypes() throws MuleException, InterruptedException, ExecutionException {
-    final DefaultSchedulerService service = new DefaultSchedulerService();
-
-    service.start();
-
-    service.cpuLightScheduler().submit(() -> assertThat(service.isCurrentThreadComputation(), is(false))).get();
-    service.ioScheduler().submit(() -> assertThat(service.isCurrentThreadComputation(), is(false))).get();
-    service.computationScheduler().submit(() -> assertThat(service.isCurrentThreadComputation(), is(true))).get();
-
-    service.stop();
-  }
-
 }

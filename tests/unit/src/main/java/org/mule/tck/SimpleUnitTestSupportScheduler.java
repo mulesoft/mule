@@ -6,7 +6,10 @@
  */
 package org.mule.tck;
 
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.ThreadType;
 
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -55,16 +58,21 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
-    throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implelemtation.");
+    throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implementation.");
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
-    throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implelemtation.");
+    throw new UnsupportedOperationException("Cron expression scheduling is not supported in unit tests. You need the productive service implementation.");
   }
 
   int getScheduledTasks() {
     return scheduledTasks.get();
+  }
+
+  @Override
+  public ThreadType getThreadType() {
+    return CUSTOM;
   }
 
   @Override

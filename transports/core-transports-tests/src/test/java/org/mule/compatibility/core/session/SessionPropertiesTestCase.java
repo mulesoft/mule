@@ -49,7 +49,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);
-    scheduler = muleContext.getSchedulerService().computationScheduler();
+    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
   }
 
   @After

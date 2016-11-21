@@ -8,12 +8,14 @@ package org.mule.compatibility.module.client;
 
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.ThreadType;
 
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
@@ -55,23 +57,13 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   }
 
   @Override
-  public Scheduler computationScheduler() {
+  public Scheduler cpuIntensiveScheduler() {
     return scheduler;
   }
 
   @Override
-  public boolean isCurrentThreadCpuLight() {
-    return false;
-  }
-
-  @Override
-  public boolean isCurrentThreadIo() {
-    return false;
-  }
-
-  @Override
-  public boolean isCurrentThreadComputation() {
-    return false;
+  public ThreadType currentThreadType() {
+    return CUSTOM;
   }
 
   private static class StandaloneClientThreadScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
@@ -93,6 +85,11 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
     @Override
     public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
       throw new UnsupportedOperationException("Cron scheduling is not supported in standalone.");
+    }
+
+    @Override
+    public ThreadType getThreadType() {
+      return CUSTOM;
     }
 
     @Override

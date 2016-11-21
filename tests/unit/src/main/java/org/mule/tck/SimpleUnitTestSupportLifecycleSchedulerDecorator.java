@@ -7,6 +7,7 @@
 package org.mule.tck;
 
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.ThreadType;
 
 import java.util.Collection;
 import java.util.List;
@@ -131,6 +132,11 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
     return decorated.invokeAny(tasks, timeout, unit);
+  }
+
+  @Override
+  public ThreadType getThreadType() {
+    return decorated.getThreadType();
   }
 
   @Override

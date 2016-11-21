@@ -31,12 +31,13 @@ public interface Scheduler extends ScheduledExecutorService {
    * the next execution should start, then subsequent executions may start late, but will not concurrently execute.
    *
    * @param command the task to execute
-   * @param cronExpression the cron expression string to base the schedule on.
+   * @param cronExpression the
+   *        <a href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html">cron</a> expression
+   *        string to base the schedule on.
    * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception
    *         upon cancellation
    * @throws RejectedExecutionException if the task cannot be scheduled for execution
    * @throws NullPointerException if command is null
-   * @throws IllegalArgumentException if delay less than or equal to zero
    */
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression);
 
@@ -47,15 +48,21 @@ public interface Scheduler extends ScheduledExecutorService {
    * time before the next execution should start, then subsequent executions may start late, but will not concurrently execute.
    *
    * @param command the task to execute
-   * @param cronExpression the cron expression string to base the schedule on.
+   * @param cronExpression the
+   *        <a href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html">cron</a> expression
+   *        string to base the schedule on.
    * @param timeZone the time-zone for the schedule.
    * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception
    *         upon cancellation
    * @throws RejectedExecutionException if the task cannot be scheduled for execution
    * @throws NullPointerException if command is null
-   * @throws IllegalArgumentException if delay less than or equal to zero
    */
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone);
+
+  /**
+   * @return The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
+   */
+  ThreadType getThreadType();
 
   /**
    * Tries to do a graceful shutdown.

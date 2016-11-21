@@ -21,6 +21,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.ThreadType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,8 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private final ScheduledExecutorService scheduledExecutor;
   private final org.quartz.Scheduler quartzScheduler;
 
+  private final ThreadType threadType;
+
   private Class<? extends QuartzCronJob> jobClass = QuartzCronJob.class;
 
   /**
@@ -86,16 +89,20 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param totalWorkers an estimate of how many threads will be, at maximum, in all the underlying executors
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
+   * @param quartzScheduler the quartz object that will handle tasks scheduled with cron expressions. This will not execute the
+   *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
+   * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, int totalWorkers,
                    ScheduledExecutorService scheduledExecutor,
-                   org.quartz.Scheduler quartzScheduler) {
+                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
     this.name = name + "@" + Integer.toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
     cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
     this.quartzScheduler = quartzScheduler;
+    this.threadType = threadsType;
   }
 
   @Override
@@ -343,13 +350,18 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   @Override
+  public ThreadType getThreadType() {
+    return threadType;
+  }
+
+  @Override
   public String getName() {
     return name;
   }
 
   @Override
   public String toString() {
-    return getName() + "{" + lineSeparator()
+    return getThreadType() + " - " + getName() + "{" + lineSeparator()
         + "  executor: " + executor.toString() + lineSeparator()
         + "  shutdown: " + shutdown + lineSeparator()
         + "}";

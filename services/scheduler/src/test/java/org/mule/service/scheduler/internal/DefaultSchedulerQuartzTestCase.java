@@ -17,6 +17,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -53,7 +54,7 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
   public void before() throws SchedulerException {
     super.before();
     executor = new DefaultScheduler(DefaultSchedulerQuartzTestCase.class.getSimpleName(), sharedExecutor, 1, 1,
-                                    sharedScheduledExecutor, sharedQuartzScheduler);;
+                                    sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM);
   }
 
   @Override
