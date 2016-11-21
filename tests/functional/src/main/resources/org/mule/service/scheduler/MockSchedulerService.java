@@ -30,7 +30,7 @@ public class MockSchedulerService implements SchedulerService {
   }
 
   @Override
-  public Scheduler computationScheduler() {
+  public Scheduler cpuIntensiveScheduler() {
     return new MockScheduler();
   }
   
