@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.reboot;
 
-import org.mule.runtime.core.MuleServer;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -62,14 +60,6 @@ public final class MuleContainerBootstrapUtils {
    */
   public static File getMuleAppDir(String appName) {
     return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
-  }
-
-  /**
-   * @param appName name of the application
-   * @return null if running embedded, otherwise the app default configuration file as a File ref
-   */
-  public static File getMuleAppDefaultConfigFile(String appName) {
-    return isStandalone() ? new File(getMuleAppDir(appName), MuleServer.DEFAULT_CONFIGURATION) : null;
   }
 
   /**

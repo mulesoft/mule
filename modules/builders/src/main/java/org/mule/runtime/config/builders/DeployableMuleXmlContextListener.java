@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.builders;
 
-import org.mule.runtime.core.MuleServer;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -38,7 +38,7 @@ public class DeployableMuleXmlContextListener implements ServletContextListener 
   public void initialize(ServletContext context) {
     String config = context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
     if (config == null) {
-      config = MuleServer.DEFAULT_CONFIGURATION;
+      config = DEFAULT_CONFIGURATION_RESOURCE;
       if (logger.isDebugEnabled()) {
         logger.debug("No Mule config file(s) specified, using default: " + config);
       }

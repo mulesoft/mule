@@ -35,6 +35,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-builders</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <!--for the extensions configuration builder-->
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
