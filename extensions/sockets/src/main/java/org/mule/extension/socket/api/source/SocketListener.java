@@ -35,7 +35,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.io.InputStream;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -72,7 +72,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   private AtomicBoolean stopRequested = new AtomicBoolean(false);
   private Scheduler workManager;
 
-  private ScheduledFuture<?> scheduledListen;
+  private Future<?> submittedListen;
 
   /**
    * {@inheritDoc}
@@ -84,7 +84,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
     stopRequested.set(false);
 
-    scheduledListen = workManager.scheduleWithFixedDelay(() -> listen(sourceCallback), 0, 1, MILLISECONDS);
+    submittedListen = workManager.submit(() -> listen(sourceCallback));
   }
 
   @OnSuccess
@@ -106,7 +106,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
    */
   @Override
   public void onStop() {
-    scheduledListen.cancel(false);
+    submittedListen.cancel(false);
     stopRequested.set(true);
     workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
@@ -124,35 +124,41 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   }
 
   private void listen(SourceCallback<InputStream, SocketAttributes> sourceCallback) {
-    try {
-      SocketWorker worker = connection.listen(sourceCallback);
-      worker.setEncoding(config.getDefaultEncoding());
-      worker.onError(e -> {
-        Throwable t = e;
-        if (t.getCause() != null) {
-          t = t.getCause();
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format("Got exception '%s'. Work being executed was: %s", t.getClass().getName(), worker.toString()));
-        }
-
-        if (t instanceof MessagingException || t instanceof ConnectionException) {
-          sourceCallback.onSourceException(t);
-        }
-      });
-      workManager.execute(worker);
-    } catch (ConnectionException e) {
-      if (!isRequestedToStop()) {
-        sourceCallback.onSourceException(e);
-      }
-    } catch (Exception e) {
+    for (;;) {
       if (isRequestedToStop()) {
         return;
       }
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("An exception occurred while listening for new connections", e);
+      try {
+        SocketWorker worker = connection.listen(sourceCallback);
+        worker.setEncoding(config.getDefaultEncoding());
+        worker.onError(e -> {
+          Throwable t = e;
+          if (t.getCause() != null) {
+            t = t.getCause();
+          }
+
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format("Got exception '%s'. Work being executed was: %s", t.getClass().getName(), worker.toString()));
+          }
+
+          if (t instanceof MessagingException || t instanceof ConnectionException) {
+            sourceCallback.onSourceException(t);
+          }
+        });
+        workManager.execute(worker);
+      } catch (ConnectionException e) {
+        if (!isRequestedToStop()) {
+          sourceCallback.onSourceException(e);
+        }
+      } catch (Exception e) {
+        if (isRequestedToStop()) {
+          return;
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("An exception occurred while listening for new connections", e);
+        }
       }
     }
   }

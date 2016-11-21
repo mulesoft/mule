@@ -73,7 +73,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
@@ -210,7 +210,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private boolean started = false;
 
-  private ScheduledFuture<?> scheduledListen;
+  private Future<?> submittedListen;
 
   @Override
   public void onStart(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) throws MuleException {
@@ -230,7 +230,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
     started = true;
     stopRequested.set(false);
-    scheduledListen = scheduler.scheduleWithFixedDelay(() -> listen(sourceCallback), 0, 1, MILLISECONDS);
+    submittedListen = scheduler.submit(() -> listen(sourceCallback));
   }
 
   private synchronized void initialiseClusterListener(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
@@ -249,17 +249,23 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
   private void listen(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
     try {
-      WatchKey key;
-      try {
-        key = watcher.take();
-      } catch (InterruptedException | ClosedWatchServiceException e) {
-        return;
-      }
+      for (;;) {
+        if (isRequestedToStop()) {
+          return;
+        }
 
-      try {
-        key.pollEvents().forEach(event -> processEvent(event, key, sourceCallback));
-      } finally {
-        resetWatchKey(key);
+        WatchKey key;
+        try {
+          key = watcher.take();
+        } catch (InterruptedException | ClosedWatchServiceException e) {
+          return;
+        }
+
+        try {
+          key.pollEvents().forEach(event -> processEvent(event, key, sourceCallback));
+        } finally {
+          resetWatchKey(key);
+        }
       }
     } catch (Exception e) {
       sourceCallback.onSourceException(e);
@@ -343,7 +349,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
   @Override
   public void onStop() {
-    scheduledListen.cancel(false);
+    submittedListen.cancel(false);
     stopRequested.set(true);
     started = false;
 
