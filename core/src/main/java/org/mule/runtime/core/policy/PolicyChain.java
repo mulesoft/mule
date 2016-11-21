@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.policy;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public abstract class AbstractPolicyChain
+public abstract class PolicyChain
     implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, NextOperation {
 
 
@@ -50,7 +51,7 @@ public abstract class AbstractPolicyChain
 
   @Override
   public final void initialise() throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(processors, muleContext, flowConstruct);
+    initialiseIfNeeded(processors, muleContext, flowConstruct);
     processorChain = new DefaultMessageProcessorChainBuilder().chain(this.processors).build();
     processorChain.setMuleContext(muleContext);
     processorChain.setFlowConstruct(flowConstruct);

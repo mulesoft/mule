@@ -6,6 +6,9 @@
  */
 package org.mule.functional.junit4.rules;
 
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
+import static org.mule.functional.util.http.SimpleHttpServer.createServer;
 import org.mule.functional.util.http.SimpleHttpServer;
 import org.mule.tck.junit4.rule.FreePortFinder;
 
@@ -21,7 +24,6 @@ public class HttpServerRule extends ExternalResource {
   private final String portSystemPropertyKey;
   private SimpleHttpServer simpleHttpServer;
 
-
   /**
    * @param portSystemPropertyKey name of the system property where the server port will be placed.
    */
@@ -32,13 +34,13 @@ public class HttpServerRule extends ExternalResource {
   @Override
   protected void before() throws Throwable {
     Integer port = new FreePortFinder(0, 7000).find();
-    simpleHttpServer = SimpleHttpServer.createServer(port).start();
-    System.setProperty(portSystemPropertyKey, String.valueOf(port));
+    simpleHttpServer = createServer(port).start();
+    setProperty(portSystemPropertyKey, String.valueOf(port));
   }
 
   @Override
   protected void after() {
-    System.clearProperty(portSystemPropertyKey);
+    clearProperty(portSystemPropertyKey);
     simpleHttpServer.stop();
   }
 

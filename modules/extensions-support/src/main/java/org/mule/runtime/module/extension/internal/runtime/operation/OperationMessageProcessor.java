@@ -21,8 +21,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -38,13 +36,12 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.NextOperation;
+import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
-import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -62,12 +59,10 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
@@ -135,23 +130,23 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
           new ComponentIdentifier.Builder().withName(operationModel.getName())
               .withNamespace(extensionModel.getName().toLowerCase()).build();
       Optional<OperationPolicy> policy = policyManager.findOperationPolicy(event.getContext().getId(), operationIdentifier);
+      Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
+      OperationParametersProcessor operationParametersProcessor = () -> operationParameters;
       NextOperation nextOperation = operationCallEvent -> {
-        Map<String, Object> parametersMap;
+        Map<String, Object> parametersMap = new HashMap<>();
+        parametersMap.putAll(operationParameters);
         Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
             policyManager.lookupOperationParametersTransformer(operationIdentifier);
         if (policy.isPresent() && operationPolicyParametersTransformer.isPresent()) {
-          parametersMap = new HashMap<>();
           parametersMap
               .putAll(operationPolicyParametersTransformer.get().fromMessageToParameters(operationCallEvent.getMessage()));
-        } else {
-          parametersMap = this.resolverSet.resolve(event).asMap();
         }
         ExecutionContextAdapter operationContext = createExecutionContext(configuration, parametersMap, event);
         MuleEvent muleEvent = doProcess(operationCallEvent, operationContext);
         return (Event) muleEvent;
       };
       if (policy.isPresent()) {
-        return policy.get().process(event, nextOperation, () -> resolverSet.resolve(event).asMap());
+        return policy.get().process(event, nextOperation, operationParametersProcessor);
       } else {
         return nextOperation.execute(event);
       }

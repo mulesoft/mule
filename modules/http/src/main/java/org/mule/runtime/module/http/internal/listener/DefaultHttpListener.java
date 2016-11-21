@@ -15,6 +15,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
+import static org.mule.runtime.module.http.internal.listener.HttpRequestToMuleEvent.transform;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
@@ -167,8 +168,12 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   }
 
   private Event createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException {
-    Event muleEvent = Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(HttpRequestToMuleEvent
-        .transform(requestContext, SystemUtils.getDefaultEncoding(muleContext), parseRequest, listenerPath))
+    Event muleEvent = Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(
+                                                                                                          transform(requestContext,
+                                                                                                                    SystemUtils
+                                                                                                                        .getDefaultEncoding(muleContext),
+                                                                                                                    parseRequest,
+                                                                                                                    listenerPath))
         .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(new DefaultMuleSession()).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(muleEvent);

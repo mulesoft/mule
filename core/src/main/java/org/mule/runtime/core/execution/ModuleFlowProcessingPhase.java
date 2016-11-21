@@ -20,8 +20,6 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.NextOperation;
-import org.mule.runtime.core.policy.PolicyProvider;
-import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
@@ -29,7 +27,6 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.resource.spi.work.Work;
 
@@ -39,27 +36,27 @@ import org.slf4j.LoggerFactory;
 /**
  * This phase routes the message through the flow.
  * <p>
- * To participate of this phase, {@link MessageProcessTemplate} must implement {@link ExtensionFlowProcessingPhaseTemplate}
+ * To participate of this phase, {@link MessageProcessTemplate} must implement {@link ModuleFlowProcessingPhaseTemplate}
  *
  * This implementation will know how to process messages from extension's sources
  */
-public class ExtensionFlowProcessingPhase
-    extends NotificationFiringProcessingPhase<ExtensionFlowProcessingPhaseTemplate> {
+public class ModuleFlowProcessingPhase
+    extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> {
 
   private final PolicyManager policyManager;
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected static transient Logger logger = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 
-  public ExtensionFlowProcessingPhase(PolicyManager policyManager) {
+  public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
   }
 
   @Override
   public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate) {
-    return messageProcessTemplate instanceof ExtensionFlowProcessingPhaseTemplate;
+    return messageProcessTemplate instanceof ModuleFlowProcessingPhaseTemplate;
   }
 
   @Override
-  public void runPhase(final ExtensionFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext,
+  public void runPhase(final ModuleFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext,
                        final PhaseResultNotifier phaseResultNotifier) {
     Work flowExecutionWork = new Work() {
 
@@ -80,7 +77,7 @@ public class ExtensionFlowProcessingPhase
               policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), sourceIdentifier);
           try {
             final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
-            NextOperation nextOperation = (muleEvent) -> {
+            NextOperation nextOperation = muleEvent -> {
               TransactionalErrorHandlingExecutionTemplate transactionTemplate =
                   createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
                                               messageProcessContext.getFlowConstruct(),
@@ -180,7 +177,7 @@ public class ExtensionFlowProcessingPhase
 
       @Override
       public Event responseSentWithFailure(final MessagingException e, final Event event) {
-        return executeCallback((processEvent) -> {
+        return executeCallback(processEvent -> {
           Event handleException = exceptionListener.handleException(e, processEvent);
           phaseResultNotifier.phaseSuccessfully();
           return handleException;

@@ -125,10 +125,10 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
     messageProcessingManager.processMessage(
-                                            new ExtensionFlowProcessingTemplate(toMessage(result),
-                                                                                listener,
-                                                                                completionHandlerFactory
-                                                                                    .createCompletionHandler(context)),
+                                            new ModuleFlowProcessingTemplate(toMessage(result),
+                                                                             listener,
+                                                                             completionHandlerFactory
+                                                                                 .createCompletionHandler(context)),
                                             processContextSupplier.get());
   }
 

@@ -19,12 +19,12 @@ import java.util.Optional;
 public class NullPolicyProvider implements PolicyProvider {
 
   @Override
-  public Optional<AbstractPolicyChain> findSourcePolicyInstance(ComponentIdentifier sourceIdentifier) {
+  public Optional<PolicyChain> findSourcePolicyChain(ComponentIdentifier sourceIdentifier) {
     return empty();
   }
 
   @Override
-  public Optional<AbstractPolicyChain> findOperationPolicy(ComponentIdentifier operationIdentifier) {
+  public Optional<PolicyChain> findOperationPolicyChain(ComponentIdentifier operationIdentifier) {
     return empty();
   }
 }

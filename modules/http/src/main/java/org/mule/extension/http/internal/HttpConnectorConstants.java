@@ -13,14 +13,14 @@ package org.mule.extension.http.internal;
  */
 public interface HttpConnectorConstants {
 
-  static final String URL_CONFIGURATION = "URL Configuration";
-  static final String RESPONSE_SETTINGS = "Response Settings";
-  static final String REQUEST_SETTINGS = "Request Settings";
-  static final String CONFIGURATION_OVERRIDES = "Configuration Overrides";
-  static final String API_CONFIGURATION = "API Configuration";
-  static final String TLS_CONFIGURATION = "TLS Configuration";
-  static final String OTHER_SETTINGS = "Other Settings";
-  static final String AUTHENTICATION = "Authentication";
-  static final String TLS = "TLS";
+  String URL_CONFIGURATION = "URL Configuration";
+  String RESPONSE_SETTINGS = "Response Settings";
+  String REQUEST_SETTINGS = "Request Settings";
+  String CONFIGURATION_OVERRIDES = "Configuration Overrides";
+  String API_CONFIGURATION = "API Configuration";
+  String TLS_CONFIGURATION = "TLS Configuration";
+  String OTHER_SETTINGS = "Other Settings";
+  String AUTHENTICATION = "Authentication";
+  String TLS = "TLS";
 
 }

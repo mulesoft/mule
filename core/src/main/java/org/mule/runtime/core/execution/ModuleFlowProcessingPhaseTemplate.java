@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
  */
-public interface ExtensionFlowProcessingPhaseTemplate extends MessageProcessTemplate, MessageSourceResponseParametersProcessor {
+public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplate, MessageSourceResponseParametersProcessor {
 
   /**
    * @return a {@link Message} created from the original message

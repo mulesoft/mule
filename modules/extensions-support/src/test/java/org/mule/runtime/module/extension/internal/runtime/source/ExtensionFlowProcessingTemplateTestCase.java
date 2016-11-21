@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -68,11 +67,11 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   private RuntimeException runtimeException = new RuntimeException();
 
-  private ExtensionFlowProcessingTemplate template;
+  private ModuleFlowProcessingTemplate template;
 
   @Before
   public void before() {
-    template = new ExtensionFlowProcessingTemplate(message, messageProcessor, completionHandler);
+    template = new ModuleFlowProcessingTemplate(message, messageProcessor, completionHandler);
   }
 
   @Test

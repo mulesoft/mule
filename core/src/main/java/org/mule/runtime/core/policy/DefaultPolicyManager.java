@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -39,26 +40,25 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   @Override
   public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier) {
-    Optional<AbstractPolicyChain> sourcePolicyInstance = policyProvider.findSourcePolicyInstance(sourceIdentifier);
-    if (sourcePolicyInstance.isPresent()) {
+    Optional<PolicyChain> sourcePolicyChainOptional = policyProvider.findSourcePolicyChain(sourceIdentifier);
+    return sourcePolicyChainOptional.map(sourcePolicyChain -> {
       Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer =
           lookupSourceParametersTransformer(sourceIdentifier);
       return Optional
-          .of(new DefaultSourcePolicy(sourcePolicyInstance.get(), sourcePolicyParametersTransformer, policyStateHandler));
-    }
-    return Optional.empty();
+          .of(new SourcePolicy(sourcePolicyChainOptional.get(), sourcePolicyParametersTransformer, policyStateHandler));
+    }).orElse(empty());
   }
 
   @Override
   public Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, ComponentIdentifier operationIdentifier) {
-    Optional<AbstractPolicyChain> sourcePolicyInstance = policyProvider.findSourcePolicyInstance(operationIdentifier);
-    if (sourcePolicyInstance.isPresent()) {
+    Optional<PolicyChain> operationPolicyChainOptional = policyProvider.findOperationPolicyChain(operationIdentifier);
+    return operationPolicyChainOptional.map(operationPolicyChain -> {
       Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
           lookupOperationParametersTransformer(operationIdentifier);
       return Optional
-          .of(new DefaultOperationPolicy(sourcePolicyInstance.get(), operationPolicyParametersTransformer, policyStateHandler));
-    }
-    return Optional.empty();
+          .of(new OperationPolicy(operationPolicyChainOptional.get(), operationPolicyParametersTransformer,
+                                  policyStateHandler));
+    }).orElse(empty());
   }
 
   @Override

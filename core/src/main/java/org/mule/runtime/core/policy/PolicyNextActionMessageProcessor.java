@@ -41,13 +41,7 @@ public class PolicyNextActionMessageProcessor implements Processor {
           + event.getContext().getId()));
     }
     try {
-      Event result = nextOperation.execute(Event.builder(event.getContext()).message(event.getMessage()).build());
-      Event.Builder eventBuilder = Event.builder(result.getContext()).message(result.getMessage());
-      for (String variableName : event.getVariableNames()) {
-        eventBuilder.addVariable(variableName, event.getVariable(variableName).getValue(),
-                                 event.getVariable(variableName).getDataType());
-      }
-      return eventBuilder.build();
+      return nextOperation.execute(event);
     } catch (MessagingException e) {
       throw e;
     } catch (Exception e) {

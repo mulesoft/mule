@@ -9,10 +9,8 @@ package org.mule.extension.http.internal.listener;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
-import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapping;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
@@ -29,14 +27,13 @@ import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBui
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.internal.HttpConnectorConstants;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
-import org.mule.extension.http.internal.listener.server.ExtensionRequestHandler;
+import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -236,7 +233,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   }
 
   private RequestHandler getRequestHandler(SourceCallback<Object, HttpRequestAttributes> sourceCallback) {
-    return new ExtensionRequestHandler() {
+    return new ModuleRequestHandler() {
 
       @Override
       public Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext)

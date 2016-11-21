@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Default implementation for {@link MessageProcessingManager}.
  */
@@ -26,6 +28,9 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
   private final EndProcessPhase endProcessPhase = new EndProcessPhase();
   private MuleContext muleContext;
   private PhaseExecutionEngine phaseExecutionEngine;
+
+  @Inject
+  private PolicyManager policyManager;
 
   @Override
   public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {
@@ -48,7 +53,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
     messageProcessPhaseList.add(new ValidationPhase());
     messageProcessPhaseList.add(new FlowProcessingPhase());
     messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
-    messageProcessPhaseList.add(new ExtensionFlowProcessingPhase(muleContext.getPolicyManager()));
+    messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager));
     Collections.sort(messageProcessPhaseList, new Comparator<MessageProcessPhase>() {
 
       @Override

@@ -32,8 +32,7 @@ public class ParameterMap implements Map<String, String>, Serializable {
 
   public ParameterMap(final Map parametersMap) {
     this.paramsMap = new HashMap<>();
-    parametersMap.keySet().stream().forEach(key -> {
-      Object value = parametersMap.get(key);
+    parametersMap.forEach((key, value) -> {
       if (value instanceof Collection) {
         Collection values = (Collection) value;
         values.stream().forEach(collectionValue -> {

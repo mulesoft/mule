@@ -17,26 +17,20 @@ import java.util.Optional;
  */
 public interface PolicyProvider {
 
-  // TODO update
   /**
-   * Creates a policy to be applied to a source. The creation must have into consideration the {@code executionIdentifier} to keep
-   * track of the state of the policy. A source policy state may be propagated to an operation policy instance. For the same
-   * message processing, the same {@code executionIdentifier} will be used.
-   * 
+   * Creates a policy chain to be applied to a source.
+   *
    * @param sourceIdentifier the identifier of the message source
    * @return a {@link OperationPolicy} associated to that source.
    */
-  Optional<AbstractPolicyChain> findSourcePolicyInstance(ComponentIdentifier sourceIdentifier);
+  Optional<PolicyChain> findSourcePolicyChain(ComponentIdentifier sourceIdentifier);
 
-  // TODO update
   /**
-   * Creates a policy to be applied to an operation. The creation must have into consideration the {@code executionIdentifier} to
-   * keep track of the state of the policy and correlate any previous policy state for the same execution. For the same message
-   * processing, the same {@code executionIdentifier} will be used.
+   * Creates a policy chain to be applied to an operation.
    *
    * @param operationIdentifier the identifier of the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */
-  Optional<AbstractPolicyChain> findOperationPolicy(ComponentIdentifier operationIdentifier);
+  Optional<PolicyChain> findOperationPolicyChain(ComponentIdentifier operationIdentifier);
 
 }

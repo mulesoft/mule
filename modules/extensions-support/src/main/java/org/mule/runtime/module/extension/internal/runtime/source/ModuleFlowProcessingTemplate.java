@@ -12,23 +12,22 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.execution.ExtensionFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-final class ExtensionFlowProcessingTemplate implements ExtensionFlowProcessingPhaseTemplate {
+final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
   private final Message message;
   private final Processor messageProcessor;
   private final SourceCompletionHandler completionHandler;
 
-  ExtensionFlowProcessingTemplate(Message message,
-                                  Processor messageProcessor,
-                                  SourceCompletionHandler completionHandler) {
+  ModuleFlowProcessingTemplate(Message message,
+                               Processor messageProcessor,
+                               SourceCompletionHandler completionHandler) {
     this.message = message;
     this.messageProcessor = messageProcessor;
     this.completionHandler = completionHandler;

@@ -429,9 +429,5 @@ public interface MuleContext extends Lifecycle {
    */
   ConfigurationComponentLocator getConfigurationComponentLocator();
 
-  /**
-   * @return the {@code PolicyManager} for this application.
-   */
-  PolicyManager getPolicyManager();
 }
 
