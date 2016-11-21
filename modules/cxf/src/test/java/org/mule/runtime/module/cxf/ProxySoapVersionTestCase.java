@@ -18,6 +18,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
+// TODO MULE-11035 - Migrate extension tests that depend on multiple threads to use MuleArtifactFunctionalTestCase has been successfully created.
 public class ProxySoapVersionTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
