@@ -9,6 +9,7 @@ package org.mule.extension.db.internal.domain.executor;
 
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.logger.BulkQueryLogger;
+import org.mule.extension.db.internal.domain.logger.FailedSqlInfo;
 import org.mule.extension.db.internal.domain.logger.PreparedBulkQueryLogger;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
@@ -47,6 +48,9 @@ public class BulkUpdateExecutor extends AbstractExecutor implements BulkExecutor
       queryLogger.logQuery();
 
       return statement.executeBatch();
+    } catch (SQLException e) {
+    	new FailedSqlInfo().logSqlCausingException(LOGGER, bulkQuery);
+    	throw e;
     } finally {
       statement.clearBatch();
       statement.close();
@@ -74,6 +78,9 @@ public class BulkUpdateExecutor extends AbstractExecutor implements BulkExecutor
       queryLogger.logQuery();
 
       return preparedStatement.executeBatch();
+    } catch (SQLException e) {
+    	new FailedSqlInfo().logSqlCausingException(LOGGER, query, paramValues);
+    	throw e;
     } finally {
       preparedStatement.clearParameters();
       statement.close();
