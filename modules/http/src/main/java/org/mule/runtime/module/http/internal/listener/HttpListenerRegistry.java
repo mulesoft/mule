@@ -117,6 +117,9 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
             if (pathMap == null) {
               pathMap = new PathMap();
               currentPathMap.addChildPathMap(currentPath, pathMap);
+              if (currentPath.equals(WILDCARD_CHARACTER)) {
+                currentPathMap.addWildcardRequestHandler(new RequestHandlerMatcherPair(requestMatcher, requestHandler));
+              }
             }
           }
 
@@ -178,10 +181,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       while (!foundPaths.empty()) {
         final PathMap pathMap = foundPaths.pop();
         List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = pathMap.getRequestHandlerMatcherPairs();
-        if (requestHandlerMatcherPairs == null && pathMap.getCatchAllPathMap() != null) {
+
+        if (requestHandlerMatcherPairs.size() == 0 && pathMap.getCatchAllPathMap() != null) {
           requestHandlerMatcherPairs = pathMap.getCatchAllPathMap().requestHandlerMatcherPairs;
         }
-        requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request);
+        requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request, path);
 
         if (requestHandlerMatcherPair != null) {
           break;
@@ -242,7 +246,6 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
         if (i == pathParts.length - 1) {
           if (auxPathMap != null) {
             addCatchAllPathMapIfNotNull(auxPathMap, foundPaths);
-            foundPaths.push(auxPathMap);
           }
           if (pathMap != null) {
             addCatchAllPathMapIfNotNull(pathMap, foundPaths);
@@ -264,10 +267,21 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
     }
 
     private RequestHandlerMatcherPair findRequestHandlerMatcherPair(List<RequestHandlerMatcherPair> requestHandlerMatcherPairs,
-                                                                    HttpRequest request) {
+                                                                    HttpRequest request, String path) {
+      final String[] pathParts = splitPath(path);
       for (RequestHandlerMatcherPair requestHandlerMatcherPair : requestHandlerMatcherPairs) {
         if (requestHandlerMatcherPair.getRequestMatcher().matches(request)) {
-          return requestHandlerMatcherPair;
+          String requestHandlerPath = requestHandlerMatcherPair.getRequestMatcher().getPath();
+          if (requestHandlerPath.contains(WILDCARD_CHARACTER) && !requestHandlerPath.endsWith(WILDCARD_CHARACTER)
+              && !requestHandlerPath.endsWith("*/")) {
+            String vector[] = requestHandlerMatcherPair.getRequestMatcher().getPath().split("\\*");
+            for (String pathPart : pathParts) {
+              if (vector.length > 0 && !pathPart.equals("") && vector[1].contains(pathPart)) {
+                return requestHandlerMatcherPair;
+              }
+            }
+          } else
+            return requestHandlerMatcherPair;
         }
       }
       return null;
