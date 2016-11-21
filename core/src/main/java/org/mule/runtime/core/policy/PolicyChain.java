@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public abstract class PolicyChain
+public class PolicyChain
     implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
 
 
