@@ -39,7 +39,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     InternalMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
     assertThat(response.getPayload().getValue().toString(), is(TEST_PAYLOAD));
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(currentThread().getName())));
   }
 
   @Test

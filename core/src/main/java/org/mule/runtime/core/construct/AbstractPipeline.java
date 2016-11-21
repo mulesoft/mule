@@ -231,10 +231,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Event process(final Event event) throws MuleException {
-          if (event.isSynchronous() || isSynchronous() || isTransactionActive()) {
+          if (isTransactionActive()) {
             return pipeline.process(event);
           } else {
-            return Mono.just(event).transform(this).block();
+            try {
+              return Mono.just(event).transform(this).block();
+            } catch (Exception e) {
+              throw rxExceptionToMuleException(e);
+            }
           }
         }
 
@@ -374,8 +378,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     @Override
-    protected Event handleUnaccepted(Event event) throws LifecycleException {
-      throw new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage());
+    public boolean isThrowOnUnaccepted() {
+      return true;
+    }
+
+    @Override
+    protected MuleException filterUnacceptedException(Event event) {
+      return new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage());
     }
   }
 

@@ -18,6 +18,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
+import org.mule.runtime.core.util.concurrent.WaitPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 public class SimpleUnitTestSupportSchedulerService implements SchedulerService, Stoppable {
 
   private SimpleUnitTestSupportScheduler scheduler =
-      new SimpleUnitTestSupportScheduler(2, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
+      new SimpleUnitTestSupportScheduler(4, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
                                          new AbortPolicy());
 
   private List<Scheduler> decorators = new ArrayList<>();

@@ -40,6 +40,7 @@ import org.slf4j.Logger;
  * This factory's strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors in a single
  * worker thread.
  */
+@Deprecated
 public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   private static final Logger LOGGER = getLogger(LegacyAsynchronousProcessingStrategyFactory.class);
@@ -54,6 +55,7 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
                                                     muleContext);
   }
 
+  @Deprecated
   static class LegacyAsynchronousProcessingStrategy extends AsynchronousProcessingStrategy {
 
 
@@ -89,7 +91,7 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
               .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
               .doOnError(exception -> {
                 if (!(exception instanceof MessagingException))
-                  LOGGER.error("Unhandled exception in async processing " + exception);
+                  LOGGER.error("Unhandled exception in async processing.", exception);
               })
               .subscribe());
     }

@@ -7,16 +7,22 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.context.notification.AsyncMessageNotification;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.rx.TransactionAwareExecutorServiceDecorator;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -48,17 +54,31 @@ public class DefaultFlowProcessingStrategyFactory extends AsynchronousProcessing
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      return publisher -> from(publisher).concatMap(request -> {
-        if (canProcessAsync(request)) {
-          return just(request).transform(super.onPipeline(flowConstruct, pipelineFunction));
-        } else {
-          return just(request).transform(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.onPipeline(flowConstruct, pipelineFunction));
-        }
-      });
+      return publisher -> from(publisher)
+          .doOnNext(fireAsyncScheduledNotification(flowConstruct))
+          .publishOn(fromExecutorService(new TransactionAwareExecutorServiceDecorator(getScheduler())))
+          .transform(pipelineFunction)
+          .doOnNext(request -> fireAsyncCompleteNotification(request, flowConstruct, null))
+          .doOnError(MessagingException.class,
+                     msgException -> fireAsyncCompleteNotification(msgException.getEvent(), flowConstruct, msgException));
     }
 
-    protected boolean canProcessAsync(Event event) {
-      return !(event.isSynchronous() || isTransactionActive());
+    @Override
+    protected Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
+      return event -> {
+        if (!isTransactionActive()) {
+          super.fireAsyncScheduledNotification(flowConstruct).accept(event);
+        }
+      };
     }
+
+    @Override
+    protected void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
+      if (!isTransactionActive()) {
+        super.fireAsyncCompleteNotification(event, flowConstruct, exception);
+      }
+    }
+
   }
+
 }

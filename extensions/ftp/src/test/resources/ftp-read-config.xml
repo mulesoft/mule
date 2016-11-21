@@ -15,7 +15,7 @@
         <ftp:read path="#[path]"/>
     </flow>
 
-    <flow name="readWithLock">
+    <flow name="readWithLock" processingStrategy="synchronous">
         <ftp:read path="files/hello.json" lock="true"/>
     </flow>
 

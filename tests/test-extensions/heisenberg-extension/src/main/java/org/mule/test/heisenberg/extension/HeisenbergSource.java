@@ -60,7 +60,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
 
     executor = newScheduledThreadPool(1);
     executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)),
-                                 0, 100, TimeUnit.MILLISECONDS);
+                                 0, 200, TimeUnit.MILLISECONDS);
   }
 
   @OnSuccess

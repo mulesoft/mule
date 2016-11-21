@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -123,15 +122,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
         .build();
     Event response = directInboundMessageSource.process(event);
 
-    new PollingProber(50, 5).check(new JUnitProbe() {
-
-      @Override
-      protected boolean test() throws Exception {
-        assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
-        assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
-        return true;
-      }
-    });
+    assertSucessfulProcessing(response);
   }
 
   @Test
@@ -140,12 +131,15 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
     Event response = directInboundMessageSource.process(testEvent());
 
+    assertSucessfulProcessing(response);
+  }
+
+  private void assertSucessfulProcessing(Event response) throws MuleException {
     assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
-    assertThat(response.getVariable("thread").getValue(), sameInstance(currentThread()));
+    assertThat(response.getVariable("thread").getValue(), not(sameInstance(currentThread())));
 
     assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
-    assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), sameInstance(currentThread()));
-
+    assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
   }
 
   @Test

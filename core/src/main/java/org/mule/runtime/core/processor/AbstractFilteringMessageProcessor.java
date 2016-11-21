@@ -10,15 +10,17 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -64,13 +66,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
       if (accepted) {
         return applyNext(just(builder.build()));
       } else {
-        if (unacceptedMessageProcessor != null) {
-          return just(event).transform(unacceptedMessageProcessor);
-        } else if (throwOnUnaccepted) {
-          throw propagate(filterUnacceptedException(builder.build()));
-        } else {
-          return empty();
-        }
+        return handleUnaccepted().apply(event);
       }
     });
   }
@@ -80,10 +76,22 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
   protected Event handleUnaccepted(Event event) throws MuleException {
     if (unacceptedMessageProcessor != null) {
       return unacceptedMessageProcessor.process(event);
-    } else if (throwOnUnaccepted) {
+    } else if (isThrowOnUnaccepted()) {
       throw filterUnacceptedException(event);
     } else {
       return null;
+    }
+  }
+
+  private Function<Event, Publisher<Event>> handleUnaccepted() {
+    if (unacceptedMessageProcessor != null) {
+      return event -> just(event).transform(unacceptedMessageProcessor);
+    } else if (isThrowOnUnaccepted()) {
+      return event -> {
+        throw propagate(filterUnacceptedException(event));
+      };
+    } else {
+      return publisher -> empty();
     }
   }
 
