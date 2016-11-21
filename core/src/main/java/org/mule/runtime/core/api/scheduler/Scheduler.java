@@ -38,7 +38,6 @@ public interface Scheduler extends ScheduledExecutorService {
    *         upon cancellation
    * @throws RejectedExecutionException if the task cannot be scheduled for execution
    * @throws NullPointerException if command is null
-   * @throws IllegalArgumentException if delay less than or equal to zero
    */
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression);
 
@@ -57,14 +56,13 @@ public interface Scheduler extends ScheduledExecutorService {
    *         upon cancellation
    * @throws RejectedExecutionException if the task cannot be scheduled for execution
    * @throws NullPointerException if command is null
-   * @throws IllegalArgumentException if delay less than or equal to zero
    */
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone);
 
   /**
    * @return The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
    */
-  ThreadType getType();
+  ThreadType getThreadType();
 
   /**
    * Tries to do a graceful shutdown.

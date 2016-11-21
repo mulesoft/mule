@@ -49,7 +49,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    scheduler = muleContext.getSchedulerService().computationScheduler();
+    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
   }
 
   @Override

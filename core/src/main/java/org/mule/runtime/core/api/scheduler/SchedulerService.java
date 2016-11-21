@@ -54,9 +54,9 @@ public interface SchedulerService extends Service {
    * A task is considered a {@link ProcessingType#CPU computation} if its duration is more than 10 milliseconds and less than 20%
    * of its clock time is due to blocking.
    * 
-   * @return a scheduler than manages {@link ThreadType#COMPUTATION computation} threads.
+   * @return a scheduler than manages {@link ThreadType#CPU_INTENSIVE computation} threads.
    */
-  Scheduler computationScheduler();
+  Scheduler cpuIntensiveScheduler();
 
   /**
    * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.

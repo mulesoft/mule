@@ -57,7 +57,7 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   }
 
   @Override
-  public Scheduler computationScheduler() {
+  public Scheduler cpuIntensiveScheduler() {
     return scheduler;
   }
 
@@ -88,7 +88,7 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
     }
 
     @Override
-    public ThreadType getType() {
+    public ThreadType getThreadType() {
       return CUSTOM;
     }
 

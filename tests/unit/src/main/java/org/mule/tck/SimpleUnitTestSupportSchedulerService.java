@@ -59,7 +59,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   @Override
-  public Scheduler computationScheduler() {
+  public Scheduler cpuIntensiveScheduler() {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
     decorators.add(decorator);
     return decorator;

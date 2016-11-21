@@ -67,7 +67,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private final ScheduledExecutorService scheduledExecutor;
   private final org.quartz.Scheduler quartzScheduler;
 
-  private final ThreadType threadsType;
+  private final ThreadType threadType;
 
   private Class<? extends QuartzCronJob> jobClass = QuartzCronJob.class;
 
@@ -102,7 +102,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;
     this.quartzScheduler = quartzScheduler;
-    this.threadsType = threadsType;
+    this.threadType = threadsType;
   }
 
   @Override
@@ -350,8 +350,8 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   @Override
-  public ThreadType getType() {
-    return threadsType;
+  public ThreadType getThreadType() {
+    return threadType;
   }
 
   @Override
@@ -361,7 +361,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   public String toString() {
-    return getType() + " - " + getName() + "{" + lineSeparator()
+    return getThreadType() + " - " + getName() + "{" + lineSeparator()
         + "  executor: " + executor.toString() + lineSeparator()
         + "  shutdown: " + shutdown + lineSeparator()
         + "}";

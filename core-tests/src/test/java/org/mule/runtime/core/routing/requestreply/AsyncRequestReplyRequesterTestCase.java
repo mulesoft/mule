@@ -53,7 +53,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected void doSetUp() throws Exception {
     super.doSetUp();
     muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
-    scheduler = muleContext.getSchedulerService().computationScheduler();
+    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
   }
 
   @Override

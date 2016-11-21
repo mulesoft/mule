@@ -21,7 +21,7 @@ public enum ThreadType {
   /**
    * The type for {@link Thread}s managed by {@link Scheduler}s obtained with {@link SchedulerService#computationScheduler()}.
    */
-  COMPUTATION,
+  CPU_INTENSIVE,
 
   /**
    * The type for {@link Thread}s managed by {@link Scheduler}s obtained with {@link SchedulerService#cpuLightScheduler()}.

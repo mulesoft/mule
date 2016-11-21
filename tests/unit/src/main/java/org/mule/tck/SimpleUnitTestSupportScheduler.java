@@ -71,7 +71,7 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
   }
 
   @Override
-  public ThreadType getType() {
+  public ThreadType getThreadType() {
     return CUSTOM;
   }
 

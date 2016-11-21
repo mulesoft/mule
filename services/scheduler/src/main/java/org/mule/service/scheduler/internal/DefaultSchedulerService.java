@@ -12,7 +12,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.runtime.core.api.scheduler.ThreadType.COMPUTATION;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
 import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
@@ -96,9 +96,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
-  public Scheduler computationScheduler() {
+  public Scheduler cpuIntensiveScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, COMPUTATION);
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
   }
 
   private String resolveSchedulerCreationLocation(String prefix) {
@@ -125,7 +125,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     } else if (currentThread().getThreadGroup() == ioGroup) {
       return IO;
     } else if (currentThread().getThreadGroup() == computationGroup) {
-      return COMPUTATION;
+      return CPU_INTENSIVE;
     } else {
       return UNKNOWN;
     }
