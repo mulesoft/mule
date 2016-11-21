@@ -31,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
@@ -75,6 +76,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
   public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
   public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "weaponValueMap";
+  public static final String LAB_ADDRESS_EXAMPLE = "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104";
 
   private int initialise = 0;
   private int start = 0;
@@ -177,6 +179,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Parameter
   @Expression(REQUIRED)
   @Optional
+  @Example(LAB_ADDRESS_EXAMPLE)
   private String labAddress;
 
   @Parameter

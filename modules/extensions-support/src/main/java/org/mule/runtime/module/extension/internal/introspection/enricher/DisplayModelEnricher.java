@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -96,8 +97,9 @@ public final class DisplayModelEnricher extends AbstractAnnotatedModelEnricher {
       final Class<?> annotatedType = modelProperty.get().getType();
       final Summary summaryAnnotation = getAnnotation(annotatedType, Summary.class);
       final DisplayName displayNameAnnotation = getAnnotation(annotatedType, DisplayName.class);
+      final Example exampleAnnotation = getAnnotation(annotatedType, Example.class);
 
-      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation);
+      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation);
     }
   }
 
@@ -116,20 +118,24 @@ public final class DisplayModelEnricher extends AbstractAnnotatedModelEnricher {
     if (annotatedElement != null) {
       final Summary summaryAnnotation = annotatedElement.getAnnotation(Summary.class);
       final DisplayName displayNameAnnotation = annotatedElement.getAnnotation(DisplayName.class);
+      final Example exampleAnnotation = annotatedElement.getAnnotation(Example.class);
 
-      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation);
+      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation);
     }
   }
 
   private void createDisplayModelProperty(BaseDeclaration declaration, Summary summaryAnnotation,
-                                          DisplayName displayNameAnnotation) {
+                                          DisplayName displayNameAnnotation,
+                                          Example exampleAnnotation) {
     String summary = summaryAnnotation != null ? summaryAnnotation.value() : null;
     String displayName = displayNameAnnotation != null ? displayNameAnnotation.value() : null;
+    String example = exampleAnnotation != null ? exampleAnnotation.value() : null;
 
-    if (summary != null || displayName != null) {
+    if (summary != null || displayName != null || example != null) {
       declaration.setDisplayModel(DisplayModel.builder()
           .displayName(displayName)
           .summary(summary)
+          .example(example)
           .build());
     }
   }

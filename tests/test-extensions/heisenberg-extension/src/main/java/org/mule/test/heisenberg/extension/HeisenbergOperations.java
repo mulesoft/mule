@@ -22,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -58,10 +59,13 @@ public class HeisenbergOperations {
 
   public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "literalEcho";
   public static final String OPERATION_WITH_SUMMARY = "knockMany";
+  public static final String OPERATION_WITH_EXAMPLE = "alias";
   public static final String OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpression";
   public static final String OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME = "Custom overrided display name";
   public static final String KNOCKEABLE_DOORS_SUMMARY = "List of Knockeable Doors";
   public static final String DOOR_PARAMETER = "doors";
+  public static final String GREETING_PARAMETER = "greeting";
+  public static final String OPERATION_PARAMETER_EXAMPLE = "Hello my friend!";
 
   @Inject
   private ExtensionManager extensionManager;
@@ -141,7 +145,7 @@ public class HeisenbergOperations {
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
-  public String alias(String greeting, @ParameterGroup PersonalInfo info) {
+  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting, @ParameterGroup PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 

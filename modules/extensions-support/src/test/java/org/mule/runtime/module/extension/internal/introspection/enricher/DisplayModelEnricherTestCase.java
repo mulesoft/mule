@@ -10,11 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.LAB_ADDRESS_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_PACKS_SUMMARY;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.DOOR_PARAMETER;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.GREETING_PARAMETER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KNOCKEABLE_DOORS_SUMMARY;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -100,6 +103,26 @@ public class DisplayModelEnricherTestCase extends AbstractMuleTestCase {
     assertParameterSummary(findParameter(parameters, DOOR_PARAMETER), KNOCKEABLE_DOORS_SUMMARY);
   }
 
+  @Test
+  public void parseExampleAnnotationOnConfigParameter() {
+    ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+    List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
+
+    assertParameterExample(findParameter(parameters, "labAddress"), LAB_ADDRESS_EXAMPLE);
+  }
+
+  @Test
+  public void parseExampleAnnotationOnOperationParameter() {
+    ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+    OperationDeclaration operation =
+        getOperation(extensionDeclaration, HeisenbergOperations.OPERATION_WITH_EXAMPLE);
+
+    assertThat(operation, is(notNullValue()));
+    List<ParameterDeclaration> parameters = operation.getParameters();
+
+    assertParameterExample(findParameter(parameters, GREETING_PARAMETER), OPERATION_PARAMETER_EXAMPLE);
+  }
+
   private void assertParameterDisplayName(ParameterDeclaration param, String displayName) {
     DisplayModel display = param.getDisplayModel();
     assertThat(display.getDisplayName(), is(displayName));
@@ -108,6 +131,11 @@ public class DisplayModelEnricherTestCase extends AbstractMuleTestCase {
   private void assertParameterSummary(ParameterDeclaration param, String summary) {
     DisplayModel display = param.getDisplayModel();
     assertThat(display.getSummary(), is(summary));
+  }
+
+  private void assertParameterExample(ParameterDeclaration param, String example) {
+    DisplayModel display = param.getDisplayModel();
+    assertThat(display.getExample(), is(example));
   }
 
   private OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
