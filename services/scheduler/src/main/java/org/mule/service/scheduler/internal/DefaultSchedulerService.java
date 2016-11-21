@@ -111,8 +111,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler customScheduler(int corePoolSize, String name) {
     final DefaultScheduler customScheduler = new DefaultScheduler(resolveSchedulerCreationLocation(name),
-                                newFixedThreadPool(corePoolSize, new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d")),
-                                cores, cores, scheduledExecutor, quartzScheduler, CUSTOM);
+                                                                  newFixedThreadPool(corePoolSize,
+                                                                                     new SchedulerThreadFactory(customGroup, "%s."
+                                                                                         + name + ".%02d")),
+                                                                  cores, cores, scheduledExecutor, quartzScheduler, CUSTOM);
     customSchedulersExecutors.add(customScheduler);
     return customScheduler;
   }
