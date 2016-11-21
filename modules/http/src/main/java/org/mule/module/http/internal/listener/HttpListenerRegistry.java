@@ -37,7 +37,6 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     private static final String WILDCARD_CHARACTER = "*";
     private static final String SLASH = "/";
     private Logger logger = LoggerFactory.getLogger(getClass());
-
     private final ServerAddressMap<Server> serverAddressToServerMap = new ServerAddressMap<>();
     private final Map<Server, ServerAddressRequestHandlerRegistry> requestHandlerPerServerAddress = new HashMap<>();
 
@@ -63,7 +62,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         final Server server = serverAddressToServerMap.get(new ServerAddress(ip, port));
         if (server != null && !server.isStopping() && !server.isStopped())
         {
-            final ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = requestHandlerPerServerAddress.get( server);
+            final ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = requestHandlerPerServerAddress.get(server);
             if (serverAddressRequestHandlerRegistry != null)
             {
                 return serverAddressRequestHandlerRegistry.findRequestHandler(request);
@@ -78,13 +77,14 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
     public class ServerAddressRequestHandlerRegistry
     {
-
         private PathMap serverRequestHandler;
         private PathMap rootPathMap = new PathMap();
         private PathMap catchAllPathMap = new PathMap();
         private Set<String> paths = new HashSet<>();
-        private LoadingCache<String, Stack<PathMap>> pathMapSearchCache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, Stack<PathMap>>() {
-            public Stack<PathMap> load(String path) {
+        private LoadingCache<String, Stack<PathMap>> pathMapSearchCache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, Stack<PathMap>>()
+        {
+            public Stack<PathMap> load(String path)
+            {
                 return findPossibleRequestHandlers(path);
             }
         });
@@ -95,7 +95,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
-            paths.add( getMethodAndPath(requestMatcher.getMethodRequestMatcher().getMethodsList(), requestMatcherPath) );
+            paths.add(getMethodAndPath(requestMatcher.getMethodRequestMatcher().getMethodsList(), requestMatcherPath));
             PathMap currentPathMap = rootPathMap;
             final RequestHandlerMatcherPair addedRequestHandlerMatcherPair;
             final PathMap requestHandlerOwner;
@@ -176,7 +176,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                         if (newListenerRequestMatcher.getMethodRequestMatcher().intersectsWith(requestMatcher.getMethodRequestMatcher()))
                         {
                             String possibleCollisionLastPathPart = getLastPathPortion(possibleCollisionRequestMatcherPath);
-                            String newListenerRequestMatcherLastPathPart  = getLastPathPortion(newListenerRequestMatcherPath);
+                            String newListenerRequestMatcherLastPathPart = getLastPathPortion(newListenerRequestMatcherPath);
                             if (possibleCollisionLastPathPart.equals(newListenerRequestMatcherLastPathPart) ||
                                 (isCatchAllPath(possibleCollisionLastPathPart) && isCatchAllPath(newListenerRequestMatcherLastPathPart)) ||
                                 (isCatchAllPath(possibleCollisionLastPathPart) && isUriParameter(newListenerRequestMatcherLastPathPart)) ||
@@ -196,14 +196,18 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             final String path = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
             Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
             Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
-
             boolean methodNotAllowed = false;
             RequestHandlerMatcherPair requestHandlerMatcherPair = null;
             while (!foundPaths.empty())
             {
                 final PathMap pathMap = foundPaths.pop();
                 List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = pathMap.getRequestHandlerMatcherPairs();
+                if (requestHandlerMatcherPairs == null && pathMap.getCatchAllPathMap() != null)
+                {
+                    requestHandlerMatcherPairs = pathMap.getCatchAllPathMap().requestHandlerMatcherPairs;
+                }
                 requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request);
+
                 if (requestHandlerMatcherPair != null)
                 {
                     break;
@@ -221,7 +225,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                     logger.info("No listener found for request: " + getMethodAndPath(request.getMethod(), request.getPath()));
                     logger.info("Available listeners are: [{}]", Joiner.on(", ").join(this.paths));
                 }
-                if(methodNotAllowed)
+                if (methodNotAllowed)
                 {
                     return NoMethodRequestHandler.getInstance();
                 }
@@ -247,6 +251,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         private Stack<PathMap> findPossibleRequestHandlers(String path)
         {
             PathMap currentPathMap = rootPathMap;
+            PathMap auxPathMap = null;
             final String[] pathParts = splitPath(path);
             Stack<PathMap> foundPaths = new Stack<>();
             foundPaths.add(catchAllPathMap);
@@ -264,13 +269,23 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             {
                 String currentPath = pathParts[i];
                 PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
+
                 if (pathMap == null)
                 {
                     addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
                     pathMap = currentPathMap.getCatchAllCurrentPathMap();
                 }
+                else if (pathMap.getCatchAllPathMap() != null)
+                {
+                    auxPathMap = pathMap;
+                }
                 if (i == pathParts.length - 1)
                 {
+                    if (auxPathMap != null)
+                    {
+                        addCatchAllPathMapIfNotNull(auxPathMap, foundPaths);
+                        foundPaths.push(auxPathMap);
+                    }
                     if (pathMap != null)
                     {
                         addCatchAllPathMapIfNotNull(pathMap, foundPaths);
@@ -337,10 +352,10 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
     private String[] splitPath(String path)
     {
-        if (path.endsWith(SLASH) )
+        if (path.endsWith(SLASH))
         {
             // Remove the last slash
-            path = path.substring(0, path.length()-1);
+            path = path.substring(0, path.length() - 1);
         }
         return path.split(SLASH, -1);
     }
@@ -408,6 +423,12 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 subPaths.put(path, pathMap);
             }
         }
+
+        public Map<String, PathMap> getSubPaths()
+        {
+            return subPaths;
+        }
+
 
         public List<RequestHandlerMatcherPair> getRequestHandlerMatcherPairs()
         {
