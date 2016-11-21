@@ -30,7 +30,6 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.resource.spi.work.Work;
 
