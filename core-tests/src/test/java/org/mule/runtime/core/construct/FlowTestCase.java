@@ -135,7 +135,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
     assertThat(response.getVariable("thread").getValue(), not(sameInstance(currentThread())));
 
-    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
+    assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
     assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
   }
 
