@@ -7,16 +7,23 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory.parseExportedResource;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
+import org.mule.runtime.api.deployment.meta.MulePluginLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -24,13 +31,17 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
@@ -80,10 +91,34 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     }
 
     descriptor.setClassLoaderModel(classLoaderModelBuilder.build());
-
+    descriptor.setExtensionModelDescriptorProperty(lookupJsonDescriptor(pluginFolder));
     descriptor.setBundleDescriptor(createDefaultPluginBundleDescriptor(descriptor.getName()));
 
     return descriptor;
+  }
+
+  private LoaderDescriber lookupJsonDescriptor(File pluginFolder) {
+    LoaderDescriber loaderDescriber = null;
+    final File mulePluginJsonFile = new File(pluginFolder, META_INF + separator + MULE_PLUGIN_JSON);
+    if (mulePluginJsonFile.exists()) {
+
+      MulePluginModel mulePluginModel = getMulePluginJsonDescriber(mulePluginJsonFile);
+      Optional<MulePluginLoaderDescriptor> extensionModelDescriptor = mulePluginModel.getExtensionModelLoaderDescriptor();
+      if (extensionModelDescriptor.isPresent()) {
+        loaderDescriber = new LoaderDescriber(extensionModelDescriptor.get().getId());
+        loaderDescriber.addAttributes(extensionModelDescriptor.get().getAttributes());
+      }
+    }
+    return loaderDescriber;
+  }
+
+  private MulePluginModel getMulePluginJsonDescriber(File jsonFile) {
+    try (InputStream stream = new FileInputStream(jsonFile)) {
+      return new MulePluginModelJsonSerializer().deserialize(IOUtils.toString(stream));
+    } catch (IOException e) {
+      throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s'", jsonFile.getAbsolutePath()),
+                                         e);
+    }
   }
 
   private Set<BundleDependency> getPluginDependencies(String pluginDependencies) {

@@ -20,8 +20,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Test the extension type to be annotated with {@link SubTypeMapping}, in which case it adds an
@@ -38,7 +40,11 @@ public final class SubTypesModelEnricher extends AbstractAnnotatedModelEnricher 
     ExtensionDeclarer declarer = describingContext.getExtensionDeclarer();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
 
-    Class<?> type = extractExtensionType(extensionDeclaration);
+    Optional<ImplementingTypeModelProperty> implementingType = extractExtensionType(extensionDeclaration);
+    if (!implementingType.isPresent()) {
+      return;
+    }
+    Class<?> type = implementingType.get().getType();
     typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
 
     List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(type, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());

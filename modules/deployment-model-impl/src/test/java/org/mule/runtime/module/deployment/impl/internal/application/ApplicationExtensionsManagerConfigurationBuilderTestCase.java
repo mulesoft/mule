@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -20,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXT
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.module.deployment.impl.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -68,7 +68,9 @@ public class ApplicationExtensionsManagerConfigurationBuilderTestCase extends Ab
   public void before() throws Exception {
     when(extensionPlugin.getArtifactClassLoader().findResource(MANIFEST_RESOURCE)).thenReturn(new URL("file:/blah"));
     when(extensionPlugin.getArtifactClassLoader().getClassLoader()).thenReturn(pluginClassLoader);
+    when(extensionPlugin.getDescriptor().getExtensionModelDescriptorProperty()).thenReturn(empty());
     when(notExtensionPlugin.getArtifactClassLoader().findResource(MANIFEST_RESOURCE)).thenReturn(null);
+    when(notExtensionPlugin.getDescriptor().getExtensionModelDescriptorProperty()).thenReturn(empty());
 
     when(extensionManagerAdapterFactory.createExtensionManager(muleContext)).thenReturn(extensionManager);
     when(extensionManager.parseExtensionManifestXml(any())).thenReturn(manifest);

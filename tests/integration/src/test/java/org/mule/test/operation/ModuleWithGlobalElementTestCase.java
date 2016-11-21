@@ -13,7 +13,6 @@ import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -31,7 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ModuleWithGlobalElementTestCase extends AbstractIntegrationTestCase {
+public class ModuleWithGlobalElementTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
@@ -53,27 +52,14 @@ public class ModuleWithGlobalElementTestCase extends AbstractIntegrationTestCase
   }
 
   @Override
+  protected String getModulePath() {
+    return "module/module-global-element/module-global-element.xml";
+  }
+
+  @Override
   protected String getConfigFile() {
     return "module/flows-using-module-global-elements.xml";
   }
-
-  //@Override
-  //protected Class<?>[] getAnnotatedExtensionClasses() {
-  //  //TODO until MULE-10383 is fixed both Socket and Http extensions will be exposed, instead of just the Http one
-  //  return new Class[] {SocketsExtension.class, HttpConnector.class};
-  //}
-  //
-  ///**
-  // * The test cannot run with isolation due to http ext doesn't have anymore the mule-module.properties. This test needs to have
-  // * the complete access to all the classes and resources therefore it just returns the class loader that loaded the test class.
-  // * (taken from AbstractTlsRestrictedProtocolsAndCiphersTestCase test)
-  // *
-  // * @return the {@link ClassLoader} that loaded the test.
-  // */
-  //@Override
-  //protected ClassLoader getExecutionClassLoader() {
-  //  return this.getClass().getClassLoader();
-  //}
 
   @Test
   public void testHttpDoLogin() throws Exception {
