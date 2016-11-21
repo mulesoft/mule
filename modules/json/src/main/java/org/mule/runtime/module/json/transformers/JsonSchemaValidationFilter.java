@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
 import java.util.Map;
@@ -44,7 +44,7 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter {
   private ErrorHandler errorHandler;
   private boolean returnResult;
   private boolean useStaxSource;
-  private XMLInputFactory xmlInputFactory = new XMLSecureFactories().createXmlInputFactory();
+  private XMLInputFactory xmlInputFactory = XMLSecureFactories.createDefault().getXMLInputFactory();
   private Map<String, Object> validatorProperties;
   private Map<String, Boolean> validatorFeatures;
 

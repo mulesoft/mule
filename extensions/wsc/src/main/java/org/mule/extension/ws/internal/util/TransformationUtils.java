@@ -7,6 +7,7 @@
 package org.mule.extension.ws.internal.util;
 
 import org.mule.extension.ws.internal.WebServiceConsumer;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.xml.stax.StaxSource;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +16,6 @@ import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -52,7 +52,7 @@ public class TransformationUtils {
 
   public static Element stringToDomElement(String xml) throws WscTransformationException {
     try {
-      DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      DocumentBuilder db = XMLSecureFactories.createDefault().getDocumentBuilderFactory().newDocumentBuilder();
       InputSource is = new InputSource();
       is.setCharacterStream(new StringReader(xml));
       return db.parse(is).getDocumentElement();
@@ -62,7 +62,7 @@ public class TransformationUtils {
   }
 
   public static Document stringToDocument(String xml) throws WscTransformationException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     try {
       factory.setNamespaceAware(true);
       DocumentBuilder builder = factory.newDocumentBuilder();
@@ -88,7 +88,8 @@ public class TransformationUtils {
 
   public static XMLStreamReader stringToXmlStreamReader(String xml) throws WscTransformationException {
     try {
-      return XMLInputFactory.newInstance().createXMLStreamReader(new ByteArrayInputStream(xml.getBytes()));
+      return XMLSecureFactories.createDefault().getXMLInputFactory()
+          .createXMLStreamReader(new ByteArrayInputStream(xml.getBytes()));
     } catch (Exception e) {
       throw new WscTransformationException("Could not transform xml to XmlStreamReader", e);
     }

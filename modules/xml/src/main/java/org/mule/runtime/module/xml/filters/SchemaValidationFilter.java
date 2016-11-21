@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
 import org.mule.runtime.module.xml.util.MuleResourceResolver;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -56,7 +56,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
   private LSResourceResolver resourceResolver;
   private boolean useStaxSource = false;
   private boolean returnResult = true;
-  private XMLInputFactory xmlInputFactory = new XMLSecureFactories().createXmlInputFactory();
+  private XMLInputFactory xmlInputFactory = XMLSecureFactories.createDefault().getXMLInputFactory();
 
   @Override
   public boolean accept(InternalMessage message, Event.Builder builder) {

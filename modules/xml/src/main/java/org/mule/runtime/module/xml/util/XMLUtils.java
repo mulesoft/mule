@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
@@ -225,7 +225,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   }
 
   private static org.w3c.dom.Document parseXML(InputSource source) throws Exception {
-    DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+    DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     return factory.newDocumentBuilder().parse(source);
   }
 
@@ -367,7 +367,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   }
 
   public static Node toDOMNode(Object src, Event event) throws Exception {
-    DocumentBuilderFactory builderFactory = new XMLSecureFactories().createDocumentBuilderFactory();
+    DocumentBuilderFactory builderFactory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     builderFactory.setNamespaceAware(true);
 
     return toDOMNode(src, event, builderFactory);

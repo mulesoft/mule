@@ -12,7 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.Reader;
@@ -50,7 +50,7 @@ public class XmlToJson extends AbstractToFromXmlTransformer {
    */
   @Override
   protected Object doTransform(Object src, Charset enc) throws TransformerException {
-    XMLInputFactory inputFactory = new XMLSecureFactories().createXmlInputFactory();
+    XMLInputFactory inputFactory = XMLSecureFactories.createDefault().getXMLInputFactory();
     inputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
 
     TransformerInputs inputs = null;

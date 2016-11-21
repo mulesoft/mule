@@ -9,7 +9,7 @@ package org.mule.runtime.module.xml.filters;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLInputFactory;
@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 // @ThreadSafe
 public class IsXmlFilter implements Filter {
 
-  private final XMLInputFactory factory = new XMLSecureFactories().createXmlInputFactory();
+  private final XMLInputFactory factory = XMLSecureFactories.createDefault().getXMLInputFactory();
 
   // TODO: add validation against a DTD, see MULE-1055
 
