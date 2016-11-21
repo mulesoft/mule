@@ -19,6 +19,7 @@ import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCHER;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
@@ -204,6 +205,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private Predicate<FileAttributes> matcher;
   private Set<FileEventType> enabledEventTypes = new HashSet<>();
   private Scheduler scheduler;
+  private Scheduler listenExecutor;
   private PrimaryNodeLifecycleNotificationListener clusterListener;
 
   private final Map<WatchKey, Path> keyPaths = new HashMap<>();
@@ -230,7 +232,11 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
     started = true;
     stopRequested.set(false);
-    submittedListen = scheduler.submit(() -> listen(sourceCallback));
+
+    listenExecutor =
+        schedulerService.customScheduler(1, format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName()));
+
+    submittedListen = listenExecutor.submit(() -> listen(sourceCallback));
   }
 
   private synchronized void initialiseClusterListener(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
@@ -362,6 +368,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
       return;
     }
 
+    listenExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
 

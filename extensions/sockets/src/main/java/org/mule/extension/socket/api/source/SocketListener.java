@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.config.ListenerConfig;
@@ -71,6 +72,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
   private AtomicBoolean stopRequested = new AtomicBoolean(false);
   private Scheduler workManager;
+  private Scheduler listenExecutor;
 
   private Future<?> submittedListen;
 
@@ -84,7 +86,9 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
     stopRequested.set(false);
 
-    submittedListen = workManager.submit(() -> listen(sourceCallback));
+    listenExecutor =
+        schedulerService.customScheduler(1, format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName()));
+    submittedListen = listenExecutor.submit(() -> listen(sourceCallback));
   }
 
   @OnSuccess
@@ -108,6 +112,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   public void onStop() {
     submittedListen.cancel(false);
     stopRequested.set(true);
+    listenExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
 
