@@ -13,7 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -34,7 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 public class SimpleUnitTestSupportSchedulerService implements SchedulerService, Stoppable {
 
   private SimpleUnitTestSupportScheduler scheduler =
-      new SimpleUnitTestSupportScheduler(4, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
+      new SimpleUnitTestSupportScheduler(8, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
                                          new AbortPolicy());
 
   private List<Scheduler> decorators = new ArrayList<>();
