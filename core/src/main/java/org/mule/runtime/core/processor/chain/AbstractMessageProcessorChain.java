@@ -17,6 +17,7 @@ import static org.mule.runtime.core.context.notification.MessageProcessorNotific
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.getErrorTypeFromFailingProcessor;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -121,15 +122,22 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .doOnNext(preNotification(processor))
         .doOnNext(event -> setCurrentEvent(event))
         .transform(stream -> from(stream.transform(processor)))
-        // If there is a messaging exception set the processor that failed.
-        .mapError(MessagingException.class,
-                  exception -> {
-                    exception.setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, muleContext));
-                    return exception;
-                  })
+        .mapError(MessagingException.class, handleMessagingException(processor))
         .doOnNext(result -> setCurrentEvent(result))
         .doOnNext(postNotification(processor))
         .doOnError(MessagingException.class, errorNotification(processor));
+  }
+
+  private Function<MessagingException, MessagingException> handleMessagingException(Processor processor) {
+    return exception -> {
+      Processor failing = exception.getFailingMessageProcessor();
+      if (failing == null) {
+        failing = processor;
+        exception = new MessagingException(exception.getI18nMessage(), exception.getEvent(), exception.getCause(), processor);
+      }
+      exception.setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, muleContext));
+      return putContext(exception, failing, exception.getEvent(), flowConstruct, muleContext);
+    };
   }
 
   private Consumer<Event> preNotification(Processor processor) {

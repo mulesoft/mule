@@ -21,6 +21,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Base implementation of a {@link org.mule.runtime.core.api.processor.Processor} that may performs processing during both the
@@ -60,21 +61,22 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).concatMap(request -> {
-      Flux<Event> stream = just(request).transform(processRequest());
+      Mono<Event> stream = Mono.just(request).transform(processRequest());
       if (next != null) {
         stream = stream.transform(s -> applyNext(s));
       }
-      return stream.transform(processResponse(request));
-    })
-        .doOnNext(result -> processFinally(result, null))
-        .onErrorResumeWith(MessagingException.class, e -> {
-          try {
-            return just(processCatch(e.getEvent(), e));
-          } catch (MessagingException e1) {
-            return error(e1);
-          }
-        })
-        .doOnError(MessagingException.class, checkedConsumer(e -> processFinally(e.getEvent(), e)));
+      return stream.transform(processResponse(request))
+          .doOnSuccess(result -> processFinally(result != null ? result : request, null))
+          .otherwise(MessagingException.class, exception -> {
+            try {
+              return Mono.just(processCatch(exception.getEvent(), exception));
+            } catch (MessagingException me) {
+              return Mono.error(me);
+            } finally {
+              processFinally(exception.getEvent(), exception);
+            }
+          });
+    });
   }
 
   /**

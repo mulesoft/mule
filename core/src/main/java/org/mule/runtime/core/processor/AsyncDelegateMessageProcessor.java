@@ -128,7 +128,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
             .doOnError(exception -> {
               if (!(exception instanceof MessagingException))
-                logger.error("Unhandled exception in async processing " + exception);
+                logger.error("Unhandled exception in async processing.", exception);
             })
             .subscribe());
   }

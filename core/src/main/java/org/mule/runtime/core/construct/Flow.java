@@ -59,7 +59,8 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   public Event process(final Event event) throws MuleException {
-    if (event.isSynchronous() || isSynchronous() || isTransactionActive()) {
+    if (isTransactionActive()) {
+      // TODO MULE-11023	Migrate transaction execution template mechanism to use non-blocking API
       final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
       try {
         ExecutionTemplate<Event> executionTemplate =
@@ -84,7 +85,8 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    if (isSynchronous()) {
+    if (isTransactionActive()) {
+      // TODO MULE-11023	Migrate transaction execution template mechanism to use non-blocking API
       return Processor.super.apply(publisher);
     } else {
       return from(publisher).concatMap(event -> just(event)

@@ -31,6 +31,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 3.7
  */
+@Deprecated
 public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchronousProcessingStrategyFactory {
 
   @Override
@@ -40,6 +41,7 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
                                                        .stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
+  @Deprecated
   public static class LegacyNonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
     private Supplier<Scheduler> schedulerSupplier;

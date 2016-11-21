@@ -63,21 +63,21 @@ public class MessagingException extends MuleException {
    */
   @Deprecated
   public MessagingException(I18nMessage message, InternalMessage muleMessage, MuleContext context) {
-    super();
+    super(message);
     this.muleMessage = muleMessage;
     this.event = null;
     setMessage(generateMessage(message, context));
   }
 
   public MessagingException(I18nMessage message, Event event) {
-    super();
+    super(message);
     this.event = event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, Event event, Processor failingMessageProcessor) {
-    super();
+    super(message);
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
@@ -89,21 +89,21 @@ public class MessagingException extends MuleException {
    */
   @Deprecated
   public MessagingException(I18nMessage message, InternalMessage muleMessage, MuleContext context, Throwable cause) {
-    super(cause);
+    super(message, cause);
     this.muleMessage = muleMessage;
     this.event = null;
     setMessage(generateMessage(message, context));
   }
 
   public MessagingException(I18nMessage message, Event event, Throwable cause) {
-    super(cause);
+    super(message, cause);
     this.event = event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, Event event, Throwable cause, Processor failingMessageProcessor) {
-    super(cause);
+    super(message, cause);
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;

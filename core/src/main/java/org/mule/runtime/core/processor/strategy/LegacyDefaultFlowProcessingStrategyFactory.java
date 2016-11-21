@@ -27,20 +27,23 @@ import org.reactivestreams.Publisher;
  * This factory's processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes
  * it synchronously rather than failing.
  */
+@Deprecated
 public class LegacyDefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
-                                             scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                         MILLISECONDS),
-                                             muleContext);
+    return new LegacyDefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+                                                   scheduler -> scheduler
+                                                       .stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                             MILLISECONDS),
+                                                   muleContext);
   }
 
-  static class DefaultFlowProcessingStrategy extends LegacyAsynchronousProcessingStrategy {
+  @Deprecated
+  static class LegacyDefaultFlowProcessingStrategy extends LegacyAsynchronousProcessingStrategy {
 
-    public DefaultFlowProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
-                                         MuleContext muleContext) {
+    public LegacyDefaultFlowProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
+                                               MuleContext muleContext) {
       super(schedulerSupplier, schedulerStopper, muleContext);
     }
 
