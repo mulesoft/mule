@@ -46,26 +46,34 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler cpuLightScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
   public Scheduler ioScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
   }
 
-  protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler() {
+  @Override
+  public Scheduler customScheduler(int corePoolSize, String name) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        decorateScheduler(new SimpleUnitTestSupportScheduler(corePoolSize, new NamedThreadFactory(name), new AbortPolicy()));
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
     SimpleUnitTestSupportLifecycleSchedulerDecorator spied = spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
 
     doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
