@@ -322,11 +322,15 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 if (requestHandlerMatcherPair.getRequestMatcher().matches(request))
                 {
                     String requestHandlerPath = requestHandlerMatcherPair.getRequestMatcher().getPath();
-                    if(requestHandlerPath.contains("*") && ! requestHandlerPath.endsWith("*") && ! requestHandlerPath.endsWith("*/") ){
-                        String vector [] = requestHandlerMatcherPair.getRequestMatcher().getPath().split("\\*");
-                        for(String pathPart : pathParts){
-                            if(vector.length>0 && ! pathPart.equals("") && vector[1].contains(pathPart))
+                    if (requestHandlerPath.contains(WILDCARD_CHARACTER) && !requestHandlerPath.endsWith(WILDCARD_CHARACTER) && !requestHandlerPath.endsWith("*/"))
+                    {
+                        String vector[] = requestHandlerMatcherPair.getRequestMatcher().getPath().split("\\*");
+                        for (String pathPart : pathParts)
+                        {
+                            if (vector.length > 0 && !pathPart.equals("") && vector[1].contains(pathPart))
+                            {
                                 return requestHandlerMatcherPair;
+                            }
                         }
                     }
                     else

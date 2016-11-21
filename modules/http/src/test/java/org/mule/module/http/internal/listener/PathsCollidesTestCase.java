@@ -35,6 +35,7 @@ public class PathsCollidesTestCase extends FunctionalTestCase
     private static final String path2 = "prefix/keyword/differentSuffix/*";
     private static final String response1 = "First Listener invoked";
     private static final String response2 = "Second Listener invoked";
+    private static final String URL = "http://localhost:%s/%s";
 
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
@@ -53,7 +54,6 @@ public class PathsCollidesTestCase extends FunctionalTestCase
 
     private final String path;
     private final String response;
-    private final String URL = "http://localhost:%s/%s";
 
     public PathsCollidesTestCase(String path, String response)
     {
