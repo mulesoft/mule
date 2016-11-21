@@ -64,7 +64,7 @@ public class HttpListenerResponseStreamingExceptionStrategyTestCase extends Abst
   @Test
   public void exceptionHandledWhenBuildingResponse() throws Exception {
     final Response response =
-        Get(getUrl("exceptionBuildingResponse")).connectTimeout(999999).socketTimeout(999999).execute();
+        Get(getUrl("exceptionBuildingResponse")).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT).execute();
 
     final HttpResponse httpResponse = response.returnResponse();
 

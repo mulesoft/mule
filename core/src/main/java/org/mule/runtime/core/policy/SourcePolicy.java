@@ -84,7 +84,7 @@ public class SourcePolicy {
                   .apply(flowExecutionResponse);
           return sourcePolicyParametersTransformer.get()
               .fromSuccessResponseParametersToMessage(responseParameters);
-        }).orElse(flowExecutionResponse.getMessage());
+        }).orElseGet(flowExecutionResponse::getMessage);
         return policyEventConverter.createEvent(message, lastPolicyEvent);
       } catch (MessagingException messagingException) {
         Message message = messagingException.getEvent().getMessage();
