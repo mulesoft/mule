@@ -8,16 +8,12 @@ package org.mule.test.operation;
 
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.Event;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
-public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
-
-  @Override
-  protected String getModulePath() {
-    return "module/module-properties/module-properties.xml";
-  }
+public class ModuleWithPropertiesTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {
