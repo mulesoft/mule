@@ -62,6 +62,11 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   }
 
   @Override
+  public Scheduler customScheduler(int corePoolSize, String name) {
+    return new StandaloneClientThreadScheduler(corePoolSize);
+  }
+
+  @Override
   public ThreadType currentThreadType() {
     return CUSTOM;
   }
@@ -69,7 +74,11 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   private static class StandaloneClientThreadScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
     public StandaloneClientThreadScheduler() {
-      super(getRuntime().availableProcessors() * 2);
+      this(getRuntime().availableProcessors() * 2);
+    }
+
+    public StandaloneClientThreadScheduler(int corePoolSize) {
+      super(corePoolSize);
     }
 
     @Override

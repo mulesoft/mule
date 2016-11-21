@@ -35,6 +35,11 @@ public class MockSchedulerService implements SchedulerService {
   }
   
   @Override
+  public customScheduler(int corePoolSize, String name) {
+    return new MockScheduler();
+  }
+  
+  @Override
   public ThreadType currentThreadType() {
     return CUSTOM;
   }

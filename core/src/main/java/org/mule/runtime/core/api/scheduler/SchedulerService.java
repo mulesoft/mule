@@ -59,6 +59,14 @@ public interface SchedulerService extends Service {
   Scheduler cpuIntensiveScheduler();
 
   /**
+   * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
+   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads.
+   * 
+   * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
+   */
+  Scheduler customScheduler(int corePoolSize, String name);
+
+  /**
    * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.
    */
   ThreadType currentThreadType();

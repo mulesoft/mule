@@ -9,11 +9,13 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -27,8 +29,10 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.scheduler.ThreadType;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -63,6 +67,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
   private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
   private static final String TIMER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_timer";
+  private static final String CUSTOM_THREADS_NAME = SchedulerService.class.getSimpleName() + "_custom";
 
   private int cores = getRuntime().availableProcessors();
 
@@ -71,10 +76,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private final ThreadGroup ioGroup = new ThreadGroup(schedulerGroup, IO_THREADS_NAME);
   private final ThreadGroup computationGroup = new ThreadGroup(schedulerGroup, COMPUTATION_THREADS_NAME);
   private final ThreadGroup timerGroup = new ThreadGroup(schedulerGroup, TIMER_THREADS_NAME);
+  private final ThreadGroup customGroup = new ThreadGroup(schedulerGroup, CUSTOM_THREADS_NAME);
 
   private ExecutorService cpuLightExecutor;
   private ExecutorService ioExecutor;
   private ExecutorService computationExecutor;
+  private Set<ExecutorService> customSchedulersExecutors = new HashSet<>();
   private ScheduledExecutorService scheduledExecutor;
   private org.quartz.Scheduler quartzScheduler;
 
@@ -99,6 +106,32 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   public Scheduler cpuIntensiveScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
                                 (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
+  }
+
+  @Override
+  public Scheduler customScheduler(int corePoolSize, String name) {
+    final ExecutorService executor =
+        newFixedThreadPool(corePoolSize, new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
+    final DefaultScheduler customScheduler = new DefaultScheduler(resolveSchedulerCreationLocation(name),
+                                                                  executor,
+                                                                  cores, cores, scheduledExecutor, quartzScheduler, CUSTOM) {
+
+      @Override
+      public void shutdown() {
+        super.shutdown();
+        executor.shutdown();
+      }
+
+      @Override
+      public List<Runnable> shutdownNow() {
+        final List<Runnable> cancelledTasks = super.shutdownNow();
+        executor.shutdownNow();
+        customSchedulersExecutors.remove(this);
+        return cancelledTasks;
+      }
+    };
+    customSchedulersExecutors.add(customScheduler);
+    return customScheduler;
   }
 
   private String resolveSchedulerCreationLocation(String prefix) {
@@ -126,6 +159,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       return IO;
     } else if (currentThread().getThreadGroup() == computationGroup) {
       return CPU_INTENSIVE;
+    } else if (currentThread().getThreadGroup() == customGroup) {
+      return CUSTOM;
     } else {
       return UNKNOWN;
     }
@@ -168,6 +203,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     cpuLightExecutor.shutdown();
     ioExecutor.shutdown();
     computationExecutor.shutdown();
+    for (ExecutorService customSchedulerExecutor : customSchedulersExecutors) {
+      customSchedulerExecutor.shutdown();
+    }
     scheduledExecutor.shutdown();
     try {
       quartzScheduler.shutdown(true);
@@ -183,6 +221,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       waitForExecutorTermination(startMillis, cpuLightExecutor, CPU_LIGHT_THREADS_NAME);
       waitForExecutorTermination(startMillis, ioExecutor, IO_THREADS_NAME);
       waitForExecutorTermination(startMillis, computationExecutor, COMPUTATION_THREADS_NAME);
+      for (ExecutorService customSchedulerExecutor : customSchedulersExecutors) {
+        waitForExecutorTermination(startMillis, customSchedulerExecutor, COMPUTATION_THREADS_NAME);
+      }
 
       logger.info("Stopped " + this.toString());
     } catch (InterruptedException e) {
@@ -190,6 +231,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       logger.info("Stop of " + this.toString() + " interrupted", e);
     }
 
+    customSchedulersExecutors.clear();
     cpuLightExecutor = null;
     ioExecutor = null;
     computationExecutor = null;

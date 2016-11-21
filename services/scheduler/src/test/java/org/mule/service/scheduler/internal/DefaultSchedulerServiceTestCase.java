@@ -14,6 +14,7 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
 
@@ -61,6 +62,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
     service.cpuLightScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_LIGHT))).get();
     service.ioScheduler().submit(() -> assertThat(service.currentThreadType(), is(IO))).get();
     service.cpuIntensiveScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_INTENSIVE))).get();
+    service.customScheduler(1, "custom").submit(() -> assertThat(service.currentThreadType(), is(CUSTOM))).get();
     executor.submit(() -> assertThat(service.currentThreadType(), is(UNKNOWN))).get();
 
     service.stop();
@@ -77,6 +79,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
     assertThat(service.cpuLightScheduler().getThreadType(), is(CPU_LIGHT));
     assertThat(service.ioScheduler().getThreadType(), is(IO));
     assertThat(service.cpuIntensiveScheduler().getThreadType(), is(CPU_INTENSIVE));
+    assertThat(service.customScheduler(1, "custom").getThreadType(), is(CUSTOM));
 
     service.stop();
   }
