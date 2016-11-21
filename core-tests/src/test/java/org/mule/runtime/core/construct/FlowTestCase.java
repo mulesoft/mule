@@ -122,11 +122,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
         .build();
     Event response = directInboundMessageSource.process(event);
 
-    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
-    assertThat(response.getVariable("thread").getValue(), not(sameInstance(currentThread())));
-
-    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
-    assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
+    assertSucessfulProcessing(response);
   }
 
   @Test
@@ -135,12 +131,15 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
     Event response = directInboundMessageSource.process(testEvent());
 
+    assertSucessfulProcessing(response);
+  }
+
+  private void assertSucessfulProcessing(Event response) throws MuleException {
     assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
     assertThat(response.getVariable("thread").getValue(), not(sameInstance(currentThread())));
 
-    assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
+    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
     assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
-
   }
 
   @Test

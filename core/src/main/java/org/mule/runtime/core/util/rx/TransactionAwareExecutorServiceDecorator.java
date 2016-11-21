@@ -27,7 +27,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class TransactionAwareExecutorServiceDecorator implements ExecutorService {
 
-  private ExecutorService delgate;
+  private ExecutorService delegate;
   private ExecutorService directExecutor = newDirectExecutorService();
 
   /**
@@ -37,34 +37,34 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
    * @param executorService the delegate executor service to use when no transaction is actice.
    */
   public TransactionAwareExecutorServiceDecorator(ExecutorService executorService) {
-    this.delgate = executorService;
+    this.delegate = executorService;
   }
 
   @Override
   public void shutdown() {
-    delgate.shutdown();
+    delegate.shutdown();
     directExecutor.shutdown();
   }
 
   @Override
   public List<Runnable> shutdownNow() {
     directExecutor.shutdownNow();
-    return delgate.shutdownNow();
+    return delegate.shutdownNow();
   }
 
   @Override
   public boolean isShutdown() {
-    return directExecutor.isShutdown() && delgate.isShutdown();
+    return directExecutor.isShutdown() && delegate.isShutdown();
   }
 
   @Override
   public boolean isTerminated() {
-    return directExecutor.isTerminated() && delgate.isTerminated();
+    return directExecutor.isTerminated() && delegate.isTerminated();
   }
 
   @Override
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-    return directExecutor.awaitTermination(timeout, unit) && delgate.awaitTermination(timeout, unit);
+    return directExecutor.awaitTermination(0, unit) && delegate.awaitTermination(timeout, unit);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.submit(task);
     } else {
-      return delgate.submit(task);
+      return delegate.submit(task);
     }
   }
 
@@ -81,7 +81,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.submit(task, result);
     } else {
-      return delgate.submit(task, result);
+      return delegate.submit(task, result);
     }
   }
 
@@ -90,7 +90,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.submit(task);
     } else {
-      return delgate.submit(task);
+      return delegate.submit(task);
     }
   }
 
@@ -99,7 +99,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.invokeAll(tasks);
     } else {
-      return delgate.invokeAll(tasks);
+      return delegate.invokeAll(tasks);
     }
   }
 
@@ -109,7 +109,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.invokeAll(tasks, timeout, unit);
     } else {
-      return delgate.invokeAll(tasks, timeout, unit);
+      return delegate.invokeAll(tasks, timeout, unit);
     }
   }
 
@@ -118,7 +118,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.invokeAny(tasks);
     } else {
-      return delgate.invokeAny(tasks);
+      return delegate.invokeAny(tasks);
     }
   }
 
@@ -128,7 +128,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       return directExecutor.invokeAny(tasks, timeout, unit);
     } else {
-      return delgate.invokeAny(tasks, timeout, unit);
+      return delegate.invokeAny(tasks, timeout, unit);
     }
   }
 
@@ -137,7 +137,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
     if (isTransactionActive()) {
       directExecutor.execute(command);
     } else {
-      delgate.execute(command);
+      delegate.execute(command);
     }
   }
 
