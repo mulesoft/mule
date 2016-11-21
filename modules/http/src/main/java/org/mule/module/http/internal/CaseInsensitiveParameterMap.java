@@ -11,6 +11,9 @@ import org.mule.util.CaseInsensitiveMapWrapper;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+/**
+ * {@link ParameterMap} where the key's case is not taken into account when looking for it, adding or aggregating it.
+ */
 public class CaseInsensitiveParameterMap extends ParameterMap
 {
     public CaseInsensitiveParameterMap(ParameterMap paramsMap)
