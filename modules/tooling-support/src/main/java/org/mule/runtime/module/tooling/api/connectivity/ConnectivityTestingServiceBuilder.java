@@ -18,6 +18,16 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 public interface ConnectivityTestingServiceBuilder {
 
   /**
+   * Adds a dependency needed by the artifact that must be included in order to do connectivity testing
+   *
+   * @param groupId group id of the artifact
+   * @param artifactId artifact id of the artifact
+   * @param artifactVersion verion of the artifact
+   * @return the builder
+   */
+  ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion);
+
+  /**
    * Adds an extension that must be used to do connectivity testing
    *
    * @param groupId group id of the extension

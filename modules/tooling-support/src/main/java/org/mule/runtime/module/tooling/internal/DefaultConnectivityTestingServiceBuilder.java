@@ -29,10 +29,12 @@ import java.util.List;
 class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder {
 
   private static final String EXTENSION_BUNDLE_TYPE = "zip";
+  private static final String JAR_BUNDLE_TYPE = "jar";
   private final RepositoryService repositoryService;
   private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
   private ServiceRegistry serviceRegistry;
   private List<BundleDependency> bundleDependencies = new ArrayList<>();
+  private List<BundleDependency> extensionsBundleDependencies = new ArrayList<>();
   private ArtifactConfiguration artifactConfiguration;
   private TemporaryArtifact temporaryArtifact;
 
@@ -48,11 +50,24 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
    * {@inheritDoc}
    */
   @Override
+  public ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion) {
+    BundleDescriptor bundleDescriptor =
+        new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
+            .setType(JAR_BUNDLE_TYPE).build();
+    this.bundleDependencies
+        .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
     BundleDescriptor bundleDescriptor =
         new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
             .setType(EXTENSION_BUNDLE_TYPE).build();
-    this.bundleDependencies
+    this.extensionsBundleDependencies
         .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
     return this;
   }
@@ -71,7 +86,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   @Override
   public ConnectivityTestingService build() {
     checkState(artifactConfiguration != null, "artifact configuration cannot be null");
-    checkState(!bundleDependencies.isEmpty(), "no extensions were configured");
+    checkState(!extensionsBundleDependencies.isEmpty(), "no extensions were configured");
     TemporaryArtifact temporaryArtifact = buildArtifact();
     return new TemporaryArtifactConnectivityTestingService(temporaryArtifact);
   }
@@ -84,9 +99,12 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
     TemporaryArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
         .setArtifactConfiguration(artifactConfiguration);
 
-    bundleDependencies.stream()
+    extensionsBundleDependencies.stream()
         .forEach(bundleDescriptor -> temporaryArtifactBuilder
             .addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
+    bundleDependencies.stream()
+        .forEach(bundleDescriptor -> temporaryArtifactBuilder
+            .addArtifactLibraryFile(repositoryService.lookupBundle(bundleDescriptor)));
     temporaryArtifact = temporaryArtifactBuilder.build();
 
     return temporaryArtifact;

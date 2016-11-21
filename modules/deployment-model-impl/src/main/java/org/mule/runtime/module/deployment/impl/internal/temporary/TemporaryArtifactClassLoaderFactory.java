@@ -11,7 +11,6 @@ import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoade
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -27,7 +26,8 @@ public class TemporaryArtifactClassLoaderFactory implements DeployableArtifactCl
   @Override
   public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ArtifactDescriptor descriptor,
                                     List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    return new MuleDeployableArtifactClassLoader(artifactId, descriptor, new URL[0], parent.getClassLoader(),
+    return new MuleDeployableArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
+                                                 parent.getClassLoader(),
                                                  parent.getClassLoaderLookupPolicy(), artifactPluginClassLoaders);
   }
 
