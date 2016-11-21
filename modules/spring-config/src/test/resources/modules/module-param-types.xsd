@@ -1,0 +1,51 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:tns="http://www.mulesoft.org/schema/mule/module-param-types" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.mulesoft.org/schema/mule/module-param-types">
+    <import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+    <element name="boolean-param-operation" substitutionGroup="mule:abstract-message-processor" type="tns:boolean-param-operation-type"/>
+    <complexType name="boolean-param-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType">
+                <attribute name="booleanParam" type="mule:expressionBoolean" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="time-param-operation" substitutionGroup="mule:abstract-message-processor" type="tns:time-param-operation-type"/>
+    <complexType name="time-param-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType">
+                <attribute name="timeParam" type="mule:expressionDateTime" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="date-param-operation" substitutionGroup="mule:abstract-message-processor" type="tns:date-param-operation-type"/>
+    <complexType name="date-param-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType">
+                <attribute name="dateParam" type="mule:expressionDateTime" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="integer-param-operation" substitutionGroup="mule:abstract-message-processor" type="tns:integer-param-operation-type"/>
+    <complexType name="integer-param-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType">
+                <attribute name="integerParam" type="mule:expressionInt" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="datetime-param-operation" substitutionGroup="mule:abstract-message-processor" type="tns:datetime-param-operation-type"/>
+    <complexType name="datetime-param-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType">
+                <attribute name="datetimeParam" type="mule:expressionDateTime" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="string-param-operation" substitutionGroup="mule:abstract-message-processor" type="tns:string-param-operation-type"/>
+    <complexType name="string-param-operation-type">
+        <complexContent>
+            <extension base="mule:abstractMessageProcessorType">
+                <attribute name="stringParam" type="mule:expressionString" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+</schema>

@@ -63,10 +63,8 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 
   @Override
   public void enrich(DescribingContext describingContext) {
-    Optional<ImplementingTypeModelProperty> implementingType =
-        extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
-    if (implementingType.isPresent()) {
-      extensionType = implementingType.get().getType();
+    extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+    if (extensionType != null) {
       typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(currentThread().getContextClassLoader());
 
       new IdempotentDeclarationWalker() {

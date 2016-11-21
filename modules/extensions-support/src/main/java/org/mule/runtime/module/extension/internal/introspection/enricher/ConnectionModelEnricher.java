@@ -58,9 +58,8 @@ public class ConnectionModelEnricher extends AbstractAnnotatedModelEnricher {
 
   @Override
   public void enrich(DescribingContext describingContext) {
-    final Optional<ImplementingTypeModelProperty> implementingType =
-        extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
-    if (implementingType.isPresent()) {
+    final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+    if (extensionType != null) {
       typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
       new IdempotentDeclarationWalker() {
 
