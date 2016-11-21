@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -44,8 +45,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> parameters;
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
-  private final Event event;
   private final MuleContext muleContext;
+  private Event event;
   private Optional<TransactionConfig> transactionConfig = null;
   private Supplier<Optional<TransactionConfig>> transactionConfigSupplier;
 
@@ -59,7 +60,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,
-                                 ResolverSetResult parameters,
+                                 Map<String, Object> parameters,
                                  M componentModel,
                                  Event event,
                                  MuleContext muleContext) {
@@ -68,7 +69,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.configuration = configuration;
     this.event = event;
     this.componentModel = componentModel;
-    this.parameters = new HashMap<>(parameters.asMap());
+    this.parameters = parameters;
     this.muleContext = muleContext;
     transactionConfigSupplier = () -> {
       synchronized (this) {

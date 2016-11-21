@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.NullCompletionHandler;
 import org.mule.runtime.core.util.func.UnsafeRunnable;
@@ -39,11 +38,13 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.model.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -52,8 +53,8 @@ import javax.inject.Inject;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}.
- * It also propagates lifecycle and performs injection of both, dependencies and parameters
+ * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
+ * performs injection of both, dependencies and parameters
  *
  * @since 4.0
  */
@@ -103,7 +104,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
   private SourceCompletionHandlerFactory createCompletionHandlerFactory() {
     return sourceModel.getModelProperty(SourceCallbackModelProperty.class)
         .map(this::doCreateCompletionHandler)
-        .orElse(context -> new NullCompletionHandler<>());
+        .orElse(context -> new NullSourceCompletionHandler());
   }
 
   private SourceCompletionHandlerFactory doCreateCompletionHandler(SourceCallbackModelProperty modelProperty) {
@@ -111,39 +112,39 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
         getMethodExecutor(modelProperty.getOnSuccessMethod(), successCallbackParameters);
     final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod(), errorCallbackParameters);
 
-    return context -> new SourceCompletionHandler(onSuccessExecutor, onErrorExecutor, context);
+    return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, context);
   }
 
   private SourceCallbackExecutor getMethodExecutor(Optional<Method> method, ResolverSet parameters) {
     return method.map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
-                                                                                         sourceModel, source, m, parameters,
+                                                                                         sourceModel, source, m,
                                                                                          muleContext))
         .orElse(new NullSourceCallbackExecutor());
   }
 
 
-  private class SourceCompletionHandler implements CompletionHandler<Event, MessagingException> {
+  public class DefaultSourceCompletionHandler implements SourceCompletionHandler {
 
     private final SourceCallbackExecutor onSuccessExecutor;
     private final SourceCallbackExecutor onErrorExecutor;
     private final SourceCallbackContext context;
 
-    public SourceCompletionHandler(SourceCallbackExecutor onSuccessExecutor,
-                                   SourceCallbackExecutor onErrorExecutor,
-                                   SourceCallbackContext context) {
+    public DefaultSourceCompletionHandler(SourceCallbackExecutor onSuccessExecutor,
+                                          SourceCallbackExecutor onErrorExecutor,
+                                          SourceCallbackContext context) {
       this.onSuccessExecutor = onSuccessExecutor;
       this.onErrorExecutor = onErrorExecutor;
       this.context = context;
     }
 
     @Override
-    public void onCompletion(Event result, ExceptionCallback exceptionCallback) {
-      safely(() -> onSuccessExecutor.execute(result, context), exceptionCallback);
+    public void onCompletion(Event event, Map<String, Object> parameters, ExceptionCallback<Throwable> exceptionCallback) {
+      safely(() -> onSuccessExecutor.execute(event, parameters, context), exceptionCallback);
     }
 
     @Override
-    public void onFailure(MessagingException exception) {
-      safely(() -> onErrorExecutor.execute(exception.getEvent(), context), callbackException -> {
+    public void onFailure(MessagingException exception, Map<String, Object> parameters) {
+      safely(() -> onErrorExecutor.execute(exception.getEvent(), parameters, context), callbackException -> {
         throw new MuleRuntimeException(createStaticMessage(format(
                                                                   "Found exception trying to handle error from source '%s'",
                                                                   sourceModel.getName())),
@@ -156,6 +157,24 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
         task.run();
       } catch (Throwable e) {
         exceptionCallback.onException(e);
+      }
+    }
+
+    public Map<String, Object> createResponseParameters(Event event) {
+      try {
+        ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(event);
+        return parameters.asMap();
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
+
+    public Map<String, Object> createFailureResponseParameters(Event event) {
+      try {
+        ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(event);
+        return parameters.asMap();
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
       }
     }
   }

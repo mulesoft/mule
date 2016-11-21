@@ -10,10 +10,14 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.concurrent.Executor;
 
 public class HttpMessageProcessContext implements MessageProcessContext {
+
+  private static final ComponentIdentifier COMPONENT_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build();
 
   private final DefaultHttpListener listener;
   private final FlowConstruct flowConstruct;
@@ -56,5 +60,10 @@ public class HttpMessageProcessContext implements MessageProcessContext {
   @Override
   public ClassLoader getExecutionClassLoader() {
     return executionClassLoader;
+  }
+
+  @Override
+  public ComponentIdentifier getSourceIdentifier() {
+    return COMPONENT_IDENTIFIER;
   }
 }

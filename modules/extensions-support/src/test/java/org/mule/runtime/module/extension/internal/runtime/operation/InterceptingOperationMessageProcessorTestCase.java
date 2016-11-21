@@ -19,6 +19,9 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.policy.DefaultPolicyManager;
+import org.mule.runtime.core.policy.NullPolicyProvider;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.tck.size.SmallTest;
 
@@ -50,7 +53,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
   protected OperationMessageProcessor createOperationMessageProcessor() {
     InterceptingOperationMessageProcessor messageProcessor =
         new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                  extensionManager);
+                                                  extensionManager, mockPolicyManager);
 
     messageProcessor.setListener(next);
 

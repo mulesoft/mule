@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 /**
- * A factory to create a {@link CompletionHandler} associated to a {@link SourceCallbackContext}
+ * A factory to create a {@link SourceCompletionHandler} associated to a {@link SourceCallbackContext}
  *
  * @since 4.0
  */
@@ -20,10 +17,10 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 public interface SourceCompletionHandlerFactory {
 
   /**
-   * Creates a new {@link CompletionHandler}
+   * Creates a new {@link SourceCompletionHandler}
    *
    * @param context a {@link SourceCallbackContext}
-   * @return a new {@link CompletionHandler}
+   * @return a new {@link SourceCompletionHandler}
    */
-  CompletionHandler<Event, MessagingException> createCompletionHandler(SourceCallbackContext context);
+  SourceCompletionHandler createCompletionHandler(SourceCallbackContext context);
 }

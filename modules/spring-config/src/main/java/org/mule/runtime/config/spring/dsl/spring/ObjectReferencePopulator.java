@@ -8,10 +8,12 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.ExtensionManager;
 
@@ -29,7 +31,8 @@ class ObjectReferencePopulator {
   // TODO MULE-9682: Load this list dynamically and define the whole set of objects that can be injected.
   private static ImmutableMap<Class<?>, String> OBJECT_REFERENCES =
       new ImmutableMap.Builder().put(MuleContext.class, OBJECT_MULE_CONTEXT).put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
-          .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER).build();
+          .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER)
+          .put(PolicyManager.class, OBJECT_POLICY_MANAGER).build();
 
 
   /**

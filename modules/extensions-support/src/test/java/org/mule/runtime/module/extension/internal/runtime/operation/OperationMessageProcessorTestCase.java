@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -18,8 +19,10 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -58,8 +61,12 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.policy.OperationParametersProcessor;
+import org.mule.runtime.core.policy.OperationPolicy;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -78,6 +85,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -85,14 +93,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
 
   private static final String SOME_PARAM_NAME = "someParam";
+  private static final String EXTENSION_NAMESPACE = "extension_namespace";
+  private static final String OPERATION_NAME = "operation_name";
 
   @Rule
   public ExpectedException expectedException = none();
 
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private OperationPolicy mockPolicy;
+
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                         extensionManager);
+                                         extensionManager, mockPolicyManager);
   }
 
   @Test
@@ -297,6 +310,21 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
+  public void executeWithPolicy() throws Exception {
+    String eventContextId = event.getContext().getId();
+    ComponentIdentifier operationIdentifier =
+        new ComponentIdentifier.Builder().withName(OPERATION_NAME).withNamespace(EXTENSION_NAMESPACE).build();
+    when(mockPolicyManager.findOperationPolicy(eventContextId, operationIdentifier)).thenReturn(of(mockPolicy));
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAMESPACE);
+    when(operationModel.getName()).thenReturn(OPERATION_NAME);
+
+    messageProcessor.process(event);
+
+    verify(mockPolicyManager).findOperationPolicy(eventContextId, operationIdentifier);
+    verify(mockPolicy.process(same(event), any(Processor.class), any(OperationParametersProcessor.class)));
+  }
+
+  @Test
   public void getExplicitOperationDynamicMetadata() throws Exception {
     MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());
 
@@ -361,7 +389,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpValueResolvers() throws MuleException {
-    final Optional<ParameterGroupModelProperty> modelProperty = Optional.of(new ParameterGroupModelProperty(emptyList()));
+    final Optional<ParameterGroupModelProperty> modelProperty = of(new ParameterGroupModelProperty(emptyList()));
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(modelProperty);
     final Map<String, ValueResolver> valueResolvers = mock(Map.class);
     when(resolverSet.getResolvers()).thenReturn(valueResolvers);

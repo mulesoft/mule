@@ -327,4 +327,11 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();
+
+  /**
+   * @return the extension model where the component has been defined.
+   */
+  public ExtensionModel getExtensionModel() {
+    return extensionModel;
+  }
 }

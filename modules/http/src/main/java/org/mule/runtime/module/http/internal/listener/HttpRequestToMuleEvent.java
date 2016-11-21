@@ -6,26 +6,13 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.*;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
-import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
-import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
@@ -36,8 +23,7 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,8 +31,8 @@ import java.util.Map;
 
 public class HttpRequestToMuleEvent {
 
-  public static Event transform(final HttpRequestContext requestContext, final MuleContext muleContext,
-                                final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath)
+  public static InternalMessage transform(final HttpRequestContext requestContext, final Charset charset,
+                                          Boolean parseRequest, ListenerPath listenerPath)
       throws HttpRequestParsingException {
     final HttpRequest request = requestContext.getRequest();
     final Collection<String> headerNames = request.getHeaderNames();
@@ -71,7 +57,7 @@ public class HttpRequestToMuleEvent {
 
     Object payload = null;
 
-    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
+    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), charset);
     if (parseRequest) {
       final HttpEntity entity = request.getEntity();
       if (entity != null && !(entity instanceof EmptyHttpEntity)) {
@@ -109,40 +95,7 @@ public class HttpRequestToMuleEvent {
         InternalMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
             .outboundProperties(outboundProperties).build();
     // TODO does a correlation id come as a header that we may use?
-    return Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(message)
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
-  }
-
-  private static URI resolveUri(final HttpRequestContext requestContext) {
-    try {
-      String hostAndPort = resolveTargetHost(requestContext.getRequest());
-      String[] hostAndPortParts = hostAndPort.split(":");
-      String host = hostAndPortParts[0];
-      int port = requestContext.getScheme().equals(HTTP) ? 80 : 4343;
-      if (hostAndPortParts.length > 1) {
-        port = Integer.valueOf(hostAndPortParts[1]);
-      }
-      return new URI(requestContext.getScheme(), null, host, port, requestContext.getRequest().getPath(), null, null);
-    } catch (URISyntaxException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  /**
-   * See <a href="http://www8.org/w8-papers/5c-protocols/key/key.html#SECTION00070000000000000000" >Internet address
-   * conservation</a>.
-   */
-  private static String resolveTargetHost(HttpRequest request) {
-    String hostHeaderValue = request.getHeaderValueIgnoreCase(HOST);
-    if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol())) {
-      return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
-    } else {
-      if (hostHeaderValue == null) {
-        throw new IllegalArgumentException("Missing 'host' header");
-      } else {
-        return hostHeaderValue;
-      }
-    }
+    return message;
   }
 
   private static String resolveRemoteHostAddress(final HttpRequestContext requestContext) {
