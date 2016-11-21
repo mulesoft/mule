@@ -35,13 +35,13 @@ public class PolicyNextActionMessageProcessor implements Processor {
   @Override
   public Event process(Event event) throws MuleException {
     policyStateHandler.updateState(event.getContext().getId(), event);
-    NextOperation nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getId());
+    Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getId());
     if (nextOperation == null) {
       throw new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
           + event.getContext().getId()));
     }
     try {
-      return nextOperation.execute(event);
+      return nextOperation.process(event);
     } catch (MessagingException e) {
       throw e;
     } catch (Exception e) {

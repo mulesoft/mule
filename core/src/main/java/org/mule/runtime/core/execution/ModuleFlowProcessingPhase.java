@@ -11,15 +11,17 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.policy.NextOperation;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
@@ -27,6 +29,8 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.resource.spi.work.Work;
 
@@ -73,62 +77,50 @@ public class ModuleFlowProcessingPhase
           final Event templateEvent =
               Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
                   .message((InternalMessage) template.getMessage()).build();
+
           Optional<SourcePolicy> policy =
               policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), sourceIdentifier);
+
           try {
             final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
-            NextOperation nextOperation = muleEvent -> {
-              TransactionalErrorHandlingExecutionTemplate transactionTemplate =
-                  createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
-                                              messageProcessContext.getFlowConstruct(),
-                                              (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
-                                                  : messageProcessContext.getTransactionConfig()),
-                                              exceptionHandler);
-              final Event response = transactionTemplate.execute(() -> {
-
-                fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
-                return template.routeEvent(muleEvent);
-              });
-              return response;
-            };
-
+            Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler);
             Event flowExecutionResponse;
             if (policy.isPresent()) {
               flowExecutionResponse = policy.get().process(templateEvent, nextOperation, template);
             } else {
-              flowExecutionResponse = nextOperation.execute(templateEvent);
+              flowExecutionResponse = nextOperation.process(templateEvent);
             }
             fireNotification(messageSource, flowExecutionResponse, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
             ResponseCompletionCallback responseCompletationCallback =
                 createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
+
             // This is the case of a filtered flow. This will eventually go away.
             if (flowExecutionResponse == null) {
               flowExecutionResponse =
                   Event.builder(templateEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();
             }
-            Map<String, Object> responseParameters;
-            if (policy.isPresent()) {
-              responseParameters = policyManager.lookupSourceParametersTransformer(sourceIdentifier).get()
-                  .fromMessageToSuccessResponseParameters(flowExecutionResponse.getMessage());
-              template.sendResponseToClient(flowExecutionResponse, responseParameters, responseCompletationCallback);
-            } else {
-              responseParameters = template.getSuccessfulExecutionResponseParametersFunction()
-                  .apply(flowExecutionResponse);
-            }
-            template.sendResponseToClient(flowExecutionResponse, responseParameters, responseCompletationCallback);
-          } catch (final MessagingException e) {
-            Map<String, Object> failureResponseParameters;
+
+            Map<String, Object> responseParameters =
+                generateSuccessfulResponseParameters(sourceIdentifier, policy, flowExecutionResponse, template);
+
             Optional<SourcePolicyParametersTransformer> policySourceParametersTransformer =
                 policyManager.lookupSourceParametersTransformer(sourceIdentifier);
-            if (policy.isPresent() && policySourceParametersTransformer.isPresent()) {
-              failureResponseParameters =
-                  policySourceParametersTransformer.get().fromMessageToErrorResponseParameters(e.getEvent().getMessage());
+            Function<Event, Map<String, Object>> errorResponseParametersFunction =
+                generateErrorResponseParametersFunction(policy, policySourceParametersTransformer,
+                                                        template);
 
-            } else {
-              failureResponseParameters = template.getFailedExecutionResponseParametersFunction().apply(e.getEvent());
-            }
+            template.sendResponseToClient(flowExecutionResponse, responseParameters, errorResponseParametersFunction,
+                                          responseCompletationCallback);
+
+          } catch (final MessagingException e) {
+
+
             fireNotification(messageSource, e.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
-            template.sendFailureResponseToClient(e, failureResponseParameters,
+
+            template.sendFailureResponseToClient(e,
+                                                 generateErrorResponseParametersFunction(policy, policyManager
+                                                     .lookupSourceParametersTransformer(sourceIdentifier), template)
+                                                         .apply(e.getEvent()),
                                                  createSendFailureResponseCompletationCallback(phaseResultNotifier));
           } finally {
             policyManager.disposePoliciesResources(templateEvent.getContext().getId());
@@ -136,6 +128,29 @@ public class ModuleFlowProcessingPhase
         } catch (Exception e) {
           phaseResultNotifier.phaseFailure(e);
         }
+      }
+
+      private Processor createFlowExecutionProcessor(MessageSource messageSource, MessagingExceptionHandler exceptionHandler) {
+        return muleEvent -> {
+          try {
+            TransactionalErrorHandlingExecutionTemplate transactionTemplate =
+                createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
+                                            messageProcessContext.getFlowConstruct(),
+                                            (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
+                                                : messageProcessContext.getTransactionConfig()),
+                                            exceptionHandler);
+            final Event response = transactionTemplate.execute(() -> {
+
+              fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
+              return template.routeEvent(muleEvent);
+            });
+            return response;
+          } catch (MuleException e) {
+            throw e;
+          } catch (Exception e) {
+            throw new DefaultMuleException(e);
+          }
+        };
       }
     };
 
@@ -148,6 +163,37 @@ public class ModuleFlowProcessingPhase
     } else {
       flowExecutionWork.run();
     }
+  }
+
+  private Function<Event, Map<String, Object>> generateErrorResponseParametersFunction(Optional<SourcePolicy> policy,
+                                                                                       Optional<SourcePolicyParametersTransformer> policySourceParametersTransformer,
+                                                                                       ModuleFlowProcessingPhaseTemplate template) {
+    return (failureResponseEvent) -> {
+      Map<String, Object> failureResponseParameters;
+      if (policy.isPresent() && policySourceParametersTransformer.isPresent()) {
+        failureResponseParameters =
+            policySourceParametersTransformer.get().fromMessageToErrorResponseParameters(failureResponseEvent.getMessage());
+
+      } else {
+        failureResponseParameters = template.getFailedExecutionResponseParametersFunction().apply(failureResponseEvent);
+      }
+      return failureResponseParameters;
+    };
+  }
+
+  private Map<String, Object> generateSuccessfulResponseParameters(ComponentIdentifier sourceIdentifier,
+                                                                   Optional<SourcePolicy> policy, Event flowExecutionResponse,
+                                                                   ModuleFlowProcessingPhaseTemplate template)
+      throws MuleException {
+    Map<String, Object> responseParameters;
+    if (policy.isPresent()) {
+      responseParameters = policyManager.lookupSourceParametersTransformer(sourceIdentifier).get()
+          .fromMessageToSuccessResponseParameters(flowExecutionResponse.getMessage());
+    } else {
+      responseParameters = template.getSuccessfulExecutionResponseParametersFunction()
+          .apply(flowExecutionResponse);
+    }
+    return responseParameters;
   }
 
   private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier) {
@@ -177,8 +223,8 @@ public class ModuleFlowProcessingPhase
 
       @Override
       public Event responseSentWithFailure(final MessagingException e, final Event event) {
-        return executeCallback(processEvent -> {
-          Event handleException = exceptionListener.handleException(e, processEvent);
+        return executeCallback(() -> {
+          Event handleException = exceptionListener.handleException(e, event);
           phaseResultNotifier.phaseSuccessfully();
           return handleException;
         }, phaseResultNotifier);
@@ -186,13 +232,19 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private Event executeCallback(final NextOperation callback, PhaseResultNotifier phaseResultNotifier) {
+  private Event executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier) {
     try {
-      return callback.execute(null);
+      return callback.execute();
     } catch (Exception callbackException) {
       phaseResultNotifier.phaseFailure(callbackException);
       throw new MuleRuntimeException(callbackException);
     }
+  }
+
+  private interface Callback {
+
+    Event execute() throws Exception;
+
   }
 
   @Override

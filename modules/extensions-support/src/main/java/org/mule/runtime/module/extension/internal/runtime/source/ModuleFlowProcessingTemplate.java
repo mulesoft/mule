@@ -18,6 +18,7 @@ import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
@@ -55,10 +56,11 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public void sendResponseToClient(Event event, Map<String, Object> parameters,
+                                   Function<Event, Map<String, Object>> errorResponseParametersFunction,
                                    ResponseCompletionCallback responseCompletionCallback)
       throws MuleException {
     Consumer<MessagingException> errorResponseCallback = (messagingException) -> {
-      completionHandler.onFailure(messagingException, parameters);
+      completionHandler.onFailure(messagingException, errorResponseParametersFunction.apply(messagingException.getEvent()));
     };
     ExtensionSourceExceptionCallback exceptionCallback =
         new ExtensionSourceExceptionCallback(responseCompletionCallback, event, errorResponseCallback);

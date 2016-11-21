@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.UUID;
@@ -63,7 +64,7 @@ public class HttpResponseFactory {
   private boolean multipartEntityWithNoMultipartContentyTypeWarned;
   private boolean mapPayloadButNoUrlEncodedContentTypeWarned;
   private TransformationService transformationService;
-  private Transformer objectToByteArray;
+  private final Transformer objectToByteArray = new ObjectToByteArray();
 
   public HttpResponseFactory(HttpStreamingType responseStreaming,
                              TransformationService transformationService) {

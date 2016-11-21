@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Optional;
 
@@ -26,13 +27,13 @@ public interface PolicyStateHandler {
    * @param identifier the identifier of the context
    * @param nextOperation the next operation of the policy
    */
-  void updateNextOperation(String identifier, NextOperation nextOperation);
+  void updateNextOperation(String identifier, Processor nextOperation);
 
   /**
    * @param identifier the identifier of the context
    * @return the next operation for the context.
    */
-  NextOperation retrieveNextOperation(String identifier);
+  Processor retrieveNextOperation(String identifier);
 
   /**
    * @param identifier the identifier of the context

@@ -8,6 +8,7 @@ package org.mule.runtime.core.policy;
 
 import static java.util.Optional.of;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,13 +17,13 @@ import java.util.Optional;
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
   private Map<String, Event> stateMap = new HashMap<>();
-  private Map<String, NextOperation> nextOperationMap = new HashMap<>();
+  private Map<String, Processor> nextOperationMap = new HashMap<>();
 
-  public void updateNextOperation(String identifier, NextOperation nextOperation) {
+  public void updateNextOperation(String identifier, Processor nextOperation) {
     nextOperationMap.put(identifier, nextOperation);
   }
 
-  public NextOperation retrieveNextOperation(String identifier) {
+  public Processor retrieveNextOperation(String identifier) {
     return nextOperationMap.get(identifier);
   }
 

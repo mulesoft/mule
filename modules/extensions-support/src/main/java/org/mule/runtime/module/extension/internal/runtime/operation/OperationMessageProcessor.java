@@ -39,7 +39,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.policy.NextOperation;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
@@ -132,7 +131,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       Optional<OperationPolicy> policy = policyManager.findOperationPolicy(event.getContext().getId(), operationIdentifier);
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
       OperationParametersProcessor operationParametersProcessor = () -> operationParameters;
-      NextOperation nextOperation = operationCallEvent -> {
+      Processor nextOperation = operationCallEvent -> {
         Map<String, Object> parametersMap = new HashMap<>();
         parametersMap.putAll(operationParameters);
         Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
@@ -148,7 +147,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       if (policy.isPresent()) {
         return policy.get().process(event, nextOperation, operationParametersProcessor);
       } else {
-        return nextOperation.execute(event);
+        return nextOperation.process(event);
       }
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);

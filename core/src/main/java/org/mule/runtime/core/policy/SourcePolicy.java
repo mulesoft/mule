@@ -10,6 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * 
  * In order for this class to be able to execute a policy it requires an {@link PolicyChain} with the content of the policy. Such
  * policy may have an {@link PolicyNextActionMessageProcessor} which will be the one used to execute the provided
- * {@link NextOperation} which may be another policy or the actual logic behind the
+ * {@link Processor} which may be another policy or the actual logic behind the
  * {@link org.mule.runtime.core.api.source.MessageSource} which typically is a flow execution.
  * 
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
@@ -60,23 +61,23 @@ public class SourcePolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  public Event process(Event sourceEvent, NextOperation nextOperation,
+  public Event process(Event sourceEvent, Processor nextOperation,
                        MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor)
       throws Exception {
-    NextOperation sourceNextOperation =
+    Processor sourceNextOperation =
         buildFlowExecutionWithPolicyFunction(nextOperation, sourceEvent, messageSourceResponseParametersProcessor);
     policyStateHandler.updateNextOperation(sourceEvent.getContext().getId(), sourceNextOperation);
     Event result = policyChain
-        .execute(policyEventConverter.createEvent(sourceEvent.getMessage(), Event.builder(sourceEvent.getContext()).build()));
+        .process(policyEventConverter.createEvent(sourceEvent.getMessage(), Event.builder(sourceEvent.getContext()).build()));
     return Event.builder(result.getContext()).message(result.getMessage()).build();
   }
 
-  private NextOperation buildFlowExecutionWithPolicyFunction(NextOperation nextOperation, Event sourceEvent,
-                                                             MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+  private Processor buildFlowExecutionWithPolicyFunction(Processor nextOperation, Event sourceEvent,
+                                                         MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return (processEvent) -> {
       Event lastPolicyEvent = policyStateHandler.getLatestState(sourceEvent.getContext().getId()).get();
       try {
-        Event flowExecutionResponse = nextOperation.execute(sourceEvent);
+        Event flowExecutionResponse = nextOperation.process(sourceEvent);
         Message message = sourcePolicyParametersTransformer.map(policyTransformer -> {
           Map<String, Object> responseParameters =
               messageSourceResponseParametersProcessor.getSuccessfulExecutionResponseParametersFunction()

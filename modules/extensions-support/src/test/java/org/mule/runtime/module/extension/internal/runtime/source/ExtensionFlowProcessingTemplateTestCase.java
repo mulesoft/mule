@@ -87,7 +87,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Test
   public void sendResponseToClient() throws MuleException {
-    template.sendResponseToClient(event, mockParameters, responseCompletionCallback);
+    template.sendResponseToClient(event, mockParameters, (event) -> mockParameters, responseCompletionCallback);
     verify(completionHandler).onCompletion(same(event), same(mockParameters), any(ExtensionSourceExceptionCallback.class));
     verify(responseCompletionCallback).responseSentSuccessfully();
   }
@@ -96,7 +96,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   public void failedToSendResponseToClient() throws MuleException {
     doThrow(runtimeException).when(completionHandler).onCompletion(same(event), same(mockParameters),
                                                                    any(ExtensionSourceExceptionCallback.class));
-    template.sendResponseToClient(event, mockParameters, responseCompletionCallback);
+    template.sendResponseToClient(event, mockParameters, (event) -> mockParameters, responseCompletionCallback);
 
     verify(completionHandler, never()).onFailure(any(MessagingException.class), same(mockParameters));
     verify(responseCompletionCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {

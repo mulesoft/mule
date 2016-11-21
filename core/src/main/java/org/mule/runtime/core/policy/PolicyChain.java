@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public abstract class PolicyChain
-    implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, NextOperation {
+    implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
 
 
   @Inject
@@ -74,7 +74,7 @@ public abstract class PolicyChain
   }
 
   @Override
-  public Event execute(Event event) throws Exception {
+  public Event process(Event event) throws MuleException {
     return processorChain.process(event);
   }
 

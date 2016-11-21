@@ -57,18 +57,15 @@ import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.policy.NextOperation;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
-import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -83,8 +80,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -317,7 +312,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void executeWithPolicy() throws Exception {
     String eventContextId = event.getContext().getId();
-    ComponentIdentifier operationIdentifier = new ComponentIdentifier.Builder().withName(OPERATION_NAME).withNamespace(EXTENSION_NAMESPACE).build();
+    ComponentIdentifier operationIdentifier =
+        new ComponentIdentifier.Builder().withName(OPERATION_NAME).withNamespace(EXTENSION_NAMESPACE).build();
     when(mockPolicyManager.findOperationPolicy(eventContextId, operationIdentifier)).thenReturn(of(mockPolicy));
     when(extensionModel.getName()).thenReturn(EXTENSION_NAMESPACE);
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
@@ -325,7 +321,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.process(event);
 
     verify(mockPolicyManager).findOperationPolicy(eventContextId, operationIdentifier);
-    verify(mockPolicy.process(same(event), any(NextOperation.class), any(OperationParametersProcessor.class)));
+    verify(mockPolicy.process(same(event), any(Processor.class), any(OperationParametersProcessor.class)));
   }
 
   @Test
