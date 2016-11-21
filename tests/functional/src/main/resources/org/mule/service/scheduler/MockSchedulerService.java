@@ -6,8 +6,11 @@
  */
 package org.mule.service.scheduler;
 
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.ThreadType;
 
 public class MockSchedulerService implements SchedulerService {
 
@@ -30,19 +33,9 @@ public class MockSchedulerService implements SchedulerService {
   public Scheduler computationScheduler() {
     return new MockScheduler();
   }
-
+  
   @Override
-  public boolean isCurrentThreadCpuLight() {
-    return false;
-  }
-
-  @Override
-  public boolean isCurrentThreadIo() {
-    return false;
-  }
-
-  @Override
-  public boolean isCurrentThreadComputation() {
-    return false;
+  public ThreadType getCurrentThreadType() {
+    return CUSTOM;
   }
 }

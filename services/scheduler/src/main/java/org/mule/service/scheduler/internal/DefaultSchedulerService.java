@@ -12,6 +12,10 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.scheduler.ThreadType.COMPUTATION;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
+import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -20,6 +24,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.ThreadType;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
 import java.util.List;
@@ -81,19 +86,19 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuLightScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT);
   }
 
   @Override
   public Scheduler ioScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, IO);
   }
 
   @Override
   public Scheduler computationScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler);
+                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, COMPUTATION);
   }
 
   private String resolveSchedulerCreationLocation(String prefix) {
@@ -114,18 +119,16 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
-  public boolean isCurrentThreadCpuLight() {
-    return currentThread().getThreadGroup() == cpuLightGroup;
-  }
-
-  @Override
-  public boolean isCurrentThreadIo() {
-    return currentThread().getThreadGroup() == ioGroup;
-  }
-
-  @Override
-  public boolean isCurrentThreadComputation() {
-    return currentThread().getThreadGroup() == computationGroup;
+  public ThreadType getCurrentThreadType() {
+    if (currentThread().getThreadGroup() == cpuLightGroup) {
+      return CPU_LIGHT;
+    } else if (currentThread().getThreadGroup() == ioGroup) {
+      return IO;
+    } else if (currentThread().getThreadGroup() == computationGroup) {
+      return COMPUTATION;
+    } else {
+      return UNKNOWN;
+    }
   }
 
   @Override
@@ -196,7 +199,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   protected void waitForExecutorTermination(final long startMillis, final ExecutorService executor, final String executorLabel)
       throws InterruptedException {
-    if (!executor.awaitTermination(GRACEFUL_SHUTDOWN_TIMEOUT_SECS * 1000 - (currentTimeMillis() - startMillis), MILLISECONDS)) {
+    if (!executor.awaitTermination(SECONDS.toMillis(GRACEFUL_SHUTDOWN_TIMEOUT_SECS) - (currentTimeMillis() - startMillis),
+                                   MILLISECONDS)) {
       final List<Runnable> cancelledJobs = executor.shutdownNow();
       logger.warn("'" + executorLabel + "' " + executor.toString() + " of " + this.toString()
           + " did not shutdown gracefully after " + GRACEFUL_SHUTDOWN_TIMEOUT_SECS + " seconds. " + cancelledJobs.size()

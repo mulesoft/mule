@@ -20,6 +20,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -534,6 +535,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
 
   protected ScheduledExecutorService createScheduledSameThreadExecutor() {
     return new DefaultScheduler(DefaultSchedulerScheduleTestCase.class.getSimpleName(), sharedExecutor, 1, 1,
-                                sharedScheduledExecutor, sharedQuartzScheduler);
+                                sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM);
   }
 }

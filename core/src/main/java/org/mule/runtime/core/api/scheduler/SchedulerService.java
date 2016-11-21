@@ -32,7 +32,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@link ProcessingType#CPU_LITE cpu-light} if it doesn't block at any time and its duration is less than
    * 10 milliseconds.
    * 
-   * @return a scheduler for {@link ProcessingType#CPU_LITE cpu-light} tasks.
+   * @return a scheduler than manages {@link ThreadType#OTHER} threads.
    */
   Scheduler cpuLightScheduler();
 
@@ -43,7 +43,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@link ProcessingType#BLOCKING I/O} if it spends most of it's clock duration blocked due to I/O
    * operations.
    * 
-   * @return a scheduler for {@link ProcessingType#BLOCKING I/O} tasks
+   * @return a scheduler than manages {@link ThreadType#IO I/O} threads.
    */
   Scheduler ioScheduler();
 
@@ -54,24 +54,12 @@ public interface SchedulerService extends Service {
    * A task is considered a {@link ProcessingType#CPU computation} if its duration is more than 10 milliseconds and less than 20%
    * of its clock time is due to blocking.
    * 
-   * @return a scheduler for {@link ProcessingType#CPU computation} tasks
+   * @return a scheduler than manages {@link ThreadType#COMPUTATION computation} threads.
    */
   Scheduler computationScheduler();
 
   /**
-   * @return {@code true} if the current thread belongs to a {@link Scheduler} that was obtained from
-   *         {@link #cpuLightScheduler()}.
+   * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.
    */
-  boolean isCurrentThreadCpuLight();
-
-  /**
-   * @return {@code true} if the current thread belongs to a {@link Scheduler} that was obtained from {@link #ioScheduler()}.
-   */
-  boolean isCurrentThreadIo();
-
-  /**
-   * @return {@code true} if the current thread belongs to a {@link Scheduler} that was obtained from
-   *         {@link #computationScheduler()}.
-   */
-  boolean isCurrentThreadComputation();
+  ThreadType getCurrentThreadType();
 }
