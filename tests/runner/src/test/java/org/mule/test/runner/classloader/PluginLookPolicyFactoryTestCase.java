@@ -18,6 +18,8 @@ import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStra
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.test.runner.api.PluginUrlClassification;
 
 import java.net.URL;
@@ -29,7 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class PluginLookPolicyFactoryTestCase {
+@SmallTest
+public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String BAR_PLUGIN_ID = "org.foo:bar:1.0-SNAPSHOT";
 
