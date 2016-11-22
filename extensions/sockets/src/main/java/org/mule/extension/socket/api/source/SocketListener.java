@@ -72,9 +72,9 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
   private AtomicBoolean stopRequested = new AtomicBoolean(false);
   private Scheduler workManager;
-  private Scheduler listenExecutor;
+  private Scheduler listenerExecutor;
 
-  private Future<?> submittedListen;
+  private Future<?> submittedListenerTask;
 
   /**
    * {@inheritDoc}
@@ -86,9 +86,9 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
     stopRequested.set(false);
 
-    listenExecutor =
-        schedulerService.customScheduler(1, format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName()));
-    submittedListen = listenExecutor.submit(() -> listen(sourceCallback));
+    listenerExecutor =
+        schedulerService.customScheduler(format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName()), 1);
+    submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
   }
 
   @OnSuccess
@@ -110,9 +110,9 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
    */
   @Override
   public void onStop() {
-    submittedListen.cancel(false);
+    submittedListenerTask.cancel(false);
     stopRequested.set(true);
-    listenExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+    listenerExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
 

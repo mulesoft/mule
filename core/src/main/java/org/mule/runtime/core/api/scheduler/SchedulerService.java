@@ -64,7 +64,7 @@ public interface SchedulerService extends Service {
    * 
    * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
    */
-  Scheduler customScheduler(int corePoolSize, String name);
+  Scheduler customScheduler(String name, int corePoolSize);
 
   /**
    * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.

@@ -205,14 +205,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private Predicate<FileAttributes> matcher;
   private Set<FileEventType> enabledEventTypes = new HashSet<>();
   private Scheduler scheduler;
-  private Scheduler listenExecutor;
+  private Scheduler listenerExecutor;
   private PrimaryNodeLifecycleNotificationListener clusterListener;
 
   private final Map<WatchKey, Path> keyPaths = new HashMap<>();
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private boolean started = false;
 
-  private Future<?> submittedListen;
+  private Future<?> submittedListenerTask;
 
   @Override
   public void onStart(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) throws MuleException {
@@ -233,10 +233,10 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     started = true;
     stopRequested.set(false);
 
-    listenExecutor =
-        schedulerService.customScheduler(1, format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName()));
+    listenerExecutor =
+        schedulerService.customScheduler(format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName()), 1);
 
-    submittedListen = listenExecutor.submit(() -> listen(sourceCallback));
+    submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
   }
 
   private synchronized void initialiseClusterListener(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
@@ -355,7 +355,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
   @Override
   public void onStop() {
-    submittedListen.cancel(false);
+    submittedListenerTask.cancel(false);
     stopRequested.set(true);
     started = false;
 
@@ -364,8 +364,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   }
 
   private void shutdownScheduler() {
-    if (listenExecutor != null) {
-      listenExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+    if (listenerExecutor != null) {
+      listenerExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     }
     if (scheduler != null) {
       scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);

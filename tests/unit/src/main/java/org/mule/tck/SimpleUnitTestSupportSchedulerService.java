@@ -66,7 +66,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   @Override
-  public Scheduler customScheduler(int corePoolSize, String name) {
+  public Scheduler customScheduler(String name, int corePoolSize) {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
         decorateScheduler(new SimpleUnitTestSupportScheduler(corePoolSize, new NamedThreadFactory(name), new AbortPolicy()));
     decorators.add(decorator);
