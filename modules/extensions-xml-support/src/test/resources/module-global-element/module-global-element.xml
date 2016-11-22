@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-global-element"
+        namespace="http://www.mulesoft.org/schema/mule/module-global-element"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <property name="someUserConfig" type="string" defaultValue="some-username"/>
+    <property name="somePassConfig" type="string" defaultValue="some-password"/>
+    <property name="port" type="string"/>
+
+    <httpn:request-config name="simple-config" basePath="/basic-auth/">
+        <httpn:request-connection host="localhost" protocol="HTTP" port="#[property.port]">
+            <httpn:authentication>
+                <httpn:basic-authentication username="#[property.someUserConfig]" password="#[property.somePassConfig]"/>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
+
+    <operation name="do-login">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <httpn:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
+                <httpn:request-builder>
+                    <httpn:uri-params>
+                        <httpn:uri-param key="aUser" value="#[param.someUser]"/>
+                        <httpn:uri-param key="aPass" value="#[param.somePass]"/>
+                    </httpn:uri-params>
+                </httpn:request-builder>
+            </httpn:request>
+            <mule:set-payload value="#['success with basic-authentication for user: ' + param.someUser]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

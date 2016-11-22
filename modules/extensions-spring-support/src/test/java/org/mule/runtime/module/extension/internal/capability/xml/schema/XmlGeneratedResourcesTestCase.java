@@ -69,7 +69,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   private SpringHandlerBundleResourceFactory springHandlerFactory = new SpringHandlerBundleResourceFactory();
   private SpringSchemaBundleResourceFactory springSchemaBundleResourceFactory = new SpringSchemaBundleResourceFactory();
-  private SchemaResourceFactory schemaResourceFactory = new SchemaResourceFactory();
+  private SchemaXmlResourceFactory schemaXmlResourceFactory = new SchemaXmlResourceFactory();
 
   @Before
   public void before() {
@@ -87,7 +87,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
     when(extensionModel.getModelProperty(ExportModelProperty.class)).thenReturn(Optional.empty());
 
     generator = new AnnotationProcessorResourceGenerator(asList(springHandlerFactory, springSchemaBundleResourceFactory,
-                                                                schemaResourceFactory),
+                                                                schemaXmlResourceFactory),
                                                          processingEnvironment);
 
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
@@ -96,7 +96,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   @Override
   protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
-    return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaResourceFactory.class,
+    return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaXmlResourceFactory.class,
         SpringSchemaBundleResourceFactory.class};
   }
 
@@ -116,7 +116,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   @Test
   public void generateSchema() throws Exception {
-    GeneratedResource resource = schemaResourceFactory.generateResource(extensionModel).get();
+    GeneratedResource resource = schemaXmlResourceFactory.generateResource(extensionModel).get();
     assertThat(isBlank(new String(resource.getContent())), is(false));
   }
 

@@ -9,7 +9,8 @@ package org.mule.runtime.config.spring;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -47,11 +48,23 @@ public class XmlConfigurationDocumentLoader {
     return loadDocument(empty(), inputStream);
   }
 
-  public Document loadDocument(Optional<ModuleExtensionStore> moduleExtensionStore, InputStream inputStream) {
+  /**
+   * Creates a {@link Document} from an {@link InputStream} with the required configuration
+   * of a mule configuration file parsing.
+   *
+   * @param extensionManager if the current {@code inputStream} relies in other schemas pending to be loaded from an
+   * {@link ExtensionModel}, then it will delegate to the manager for the lookup on them.
+   *
+   * @param inputStream the input stream with the XML configuration content.
+   * @return a new {@link Document} object with the provided content.
+   *
+   * @see ModuleDelegatingEntityResolver#getSchema(ExtensionModel)
+   */
+  public Document loadDocument(Optional<ExtensionManager> extensionManager, InputStream inputStream) {
     try {
       Document document = new MuleDocumentLoader()
           .loadDocument(new InputSource(inputStream),
-                        new ModuleDelegatingEntityResolver(moduleExtensionStore), new MuleLoggerErrorHandler(),
+                        new ModuleDelegatingEntityResolver(extensionManager), new MuleLoggerErrorHandler(),
                         VALIDATION_XSD, true);
       return document;
     } catch (Exception e) {

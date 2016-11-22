@@ -109,6 +109,10 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    */
   private ExtensionManagerAdapter createExtensionManager(final MuleContext muleContext) throws InitialisationException {
     try {
+      if (muleContext.getExtensionManager() != null) {
+        // TODO MULE-10982: implement a testing framework for XML based connectors, for now we workaround the current generation of the ExtensionManager if it was already created (see org.mule.test.operation.AbstractXmlExtensionMuleArtifactFunctionalTestCase)
+        return (ExtensionManagerAdapter) muleContext.getExtensionManager();
+      }
       return extensionManagerAdapterFactory.createExtensionManager(muleContext);
     } catch (Exception e) {
       throw new InitialisationException(e, muleContext);

@@ -84,13 +84,6 @@
             <version>${springCglibVersion}</version>
         </dependency>
 
-        <dependency>
-            <!--TODO MULE-10866 once we move to extension model mechanism, this dependency must be removed -->
-            <groupId>org.apache.ws.xmlschema</groupId>
-            <artifactId>xmlschema-core</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-
         <!-- Unit tests -->
         <dependency>
             <groupId>junit</groupId>
