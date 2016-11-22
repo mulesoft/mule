@@ -11,18 +11,22 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ATTRIBUTES;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ERROR;
+import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.FLOW;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.PAYLOAD;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.VARIABLES;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -32,11 +36,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
 import org.mule.runtime.core.message.BaseAttributes;
+import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.Sets;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -107,6 +113,46 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
+  }
+
+  @Test
+  public void singleVariableBindings() throws Exception {
+    Event event = getEventWithError(empty());
+    String var1 = "var1";
+    String var2 = "var2";
+    when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
+    String varValue = "mangoose";
+    TypedValue var = new DefaultTypedValue(varValue, STRING);
+    when(event.getVariable(var1)).thenReturn(var);
+    when(event.getVariable(var2)).thenReturn(var);
+
+    TypedValue resultVar1 = expressionLanguage.evaluate(var1, event, BindingContext.builder().build());
+    assertThat(resultVar1.getValue(), is(varValue));
+    assertThat(resultVar1.getDataType(), is(STRING));
+    TypedValue resultVar2 = expressionLanguage.evaluate(var2, event, BindingContext.builder().build());
+    assertThat(resultVar2.getValue(), is(varValue));
+    assertThat(resultVar2.getDataType(), is(STRING));
+  }
+
+  @Test
+  public void variablesCannotOverrideEventBindings() throws MuleException {
+    Event event = spy(testEvent());
+    HashSet<String> variables = Sets.newHashSet(PAYLOAD, ATTRIBUTES, ERROR, VARIABLES, FLOW);
+    when(event.getVariableNames()).thenReturn(variables);
+    TypedValue varValue = mock(TypedValue.class);
+    variables.forEach(var -> doReturn(varValue).when(event).getVariable(var));
+    FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
+    String flowName = "myFlowName";
+    when(mockFlowConstruct.getName()).thenReturn(flowName);
+
+    assertThat(expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build()).getValue(), is(TEST_PAYLOAD));
+    assertThat(expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build()).getValue(), is(instanceOf(
+                                                                                                                          NullAttributes.class)));
+    assertThat(expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build()).getValue(), is(nullValue()));
+    assertThat(expressionLanguage.evaluate(VARIABLES, event, BindingContext.builder().build()).getValue(),
+               is(instanceOf(Map.class)));
+    assertThat(expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build()).getValue(),
+               is(flowName));
   }
 
   @Test

@@ -115,16 +115,20 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
 
   private void addEventBindings(Event event, BindingContext.Builder contextBuilder) {
     if (event != null) {
+      Map<String, TypedValue> flowVars = new HashMap<>();
+      event.getVariableNames().forEach(name -> {
+        TypedValue value = event.getVariable(name);
+        flowVars.put(name, value);
+        contextBuilder.addBinding(name, value);
+      });
+      contextBuilder.addBinding(VARIABLES,
+                                new DefaultTypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
       Message message = event.getMessage();
       Attributes attributes = message.getAttributes();
       contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
       contextBuilder.addBinding(PAYLOAD, message.getPayload());
       Error error = event.getError().isPresent() ? event.getError().get() : null;
       contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
-      Map<String, TypedValue> flowVars = new HashMap<>();
-      event.getVariableNames().forEach(name -> flowVars.put(name, event.getVariable(name)));
-      contextBuilder.addBinding(VARIABLES,
-                                new DefaultTypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
     }
   }
 
