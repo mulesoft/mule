@@ -81,11 +81,11 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
   @Override
   public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
     return of(new WSPasswordCallbackHandler(USERNAME_TOKEN,
-                                                               cb -> {
-                                                                 if (cb.getIdentifier().equals(username)) {
-                                                                   cb.setPassword(password);
-                                                                 }
-                                                               }));
+                                            cb -> {
+                                              if (cb.getIdentifier().equals(username)) {
+                                                cb.setPassword(password);
+                                              }
+                                            }));
   }
 
   @Override

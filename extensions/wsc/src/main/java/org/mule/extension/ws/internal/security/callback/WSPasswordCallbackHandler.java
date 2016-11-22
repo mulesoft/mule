@@ -42,7 +42,7 @@ public class WSPasswordCallbackHandler implements CallbackHandler {
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
     Stream.of(callbacks)
-      .filter(callback -> callback instanceof WSPasswordCallback && ((WSPasswordCallback) callback).getUsage() == usage)
-      .forEach(callback -> handler.accept((WSPasswordCallback) callback));
+        .filter(callback -> callback instanceof WSPasswordCallback && ((WSPasswordCallback) callback).getUsage() == usage)
+        .forEach(callback -> handler.accept((WSPasswordCallback) callback));
   }
 }

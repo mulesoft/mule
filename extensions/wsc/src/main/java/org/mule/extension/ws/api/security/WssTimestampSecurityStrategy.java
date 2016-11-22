@@ -35,17 +35,17 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
    */
   @Parameter
   @Optional(defaultValue = "60")
-  private long timeToExpire;
+  private long timeToLive;
 
   /**
-   * A {@link TimeUnit} which qualifies the {@link #timeToExpire} parameter.
+   * A {@link TimeUnit} which qualifies the {@link #timeToLive} parameter.
    * <p>
    * Defaults to {@code SECONDS}
    */
   @Parameter
   @Optional(defaultValue = "SECONDS")
-  @Summary("Time unit to be used in the timeToExpire parameter")
-  private TimeUnit timeoutUnit;
+  @Summary("Time unit to be used in the timeToLive parameter")
+  private TimeUnit timeToLiveUnit;
 
 
   @Override
@@ -70,6 +70,6 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
-    return ImmutableMap.<String, Object>builder().put(TTL_TIMESTAMP, valueOf(timeoutUnit.toSeconds(timeToExpire))).build();
+    return ImmutableMap.<String, Object>builder().put(TTL_TIMESTAMP, valueOf(timeToLiveUnit.toSeconds(timeToLive))).build();
   }
 }
