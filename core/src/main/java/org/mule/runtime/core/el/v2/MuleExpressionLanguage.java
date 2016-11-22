@@ -115,12 +115,6 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
 
   private void addEventBindings(Event event, BindingContext.Builder contextBuilder) {
     if (event != null) {
-      Message message = event.getMessage();
-      Attributes attributes = message.getAttributes();
-      contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
-      contextBuilder.addBinding(PAYLOAD, message.getPayload());
-      Error error = event.getError().isPresent() ? event.getError().get() : null;
-      contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
       Map<String, TypedValue> flowVars = new HashMap<>();
       event.getVariableNames().forEach(name -> {
         TypedValue value = event.getVariable(name);
@@ -129,6 +123,12 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
       });
       contextBuilder.addBinding(VARIABLES,
                                 new DefaultTypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
+      Message message = event.getMessage();
+      Attributes attributes = message.getAttributes();
+      contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
+      contextBuilder.addBinding(PAYLOAD, message.getPayload());
+      Error error = event.getError().isPresent() ? event.getError().get() : null;
+      contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
     }
   }
 
