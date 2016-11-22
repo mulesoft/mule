@@ -13,7 +13,6 @@ public class TransactionalPetStoreConnectionProvider extends PetStoreConnectionP
 
   @Override
   public TransactionalPetStoreClient connect() {
-    return new TransactionalPetStoreClient(username, password, tls, configName, openingDate, closedForHolidays,
-                                           discountDates);
+    return new TransactionalPetStoreClient(username, password, tls, configName, openingDate, closedForHolidays, discountDates);
   }
 }
