@@ -53,7 +53,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -130,9 +129,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Mock
   private Supplier<MessageProcessContext> processContextSupplier;
-
-  @Mock
-  private ThreadingProfile threadingProfile;
 
   @Mock
   Scheduler ioScheduler;

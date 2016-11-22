@@ -62,7 +62,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
     service.cpuLightScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_LIGHT))).get();
     service.ioScheduler().submit(() -> assertThat(service.currentThreadType(), is(IO))).get();
     service.cpuIntensiveScheduler().submit(() -> assertThat(service.currentThreadType(), is(CPU_INTENSIVE))).get();
-    service.customScheduler(1, "custom").submit(() -> assertThat(service.currentThreadType(), is(CUSTOM))).get();
+    service.customScheduler("custom", 1).submit(() -> assertThat(service.currentThreadType(), is(CUSTOM))).get();
     executor.submit(() -> assertThat(service.currentThreadType(), is(UNKNOWN))).get();
 
     service.stop();
@@ -79,7 +79,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
     assertThat(service.cpuLightScheduler().getThreadType(), is(CPU_LIGHT));
     assertThat(service.ioScheduler().getThreadType(), is(IO));
     assertThat(service.cpuIntensiveScheduler().getThreadType(), is(CPU_INTENSIVE));
-    assertThat(service.customScheduler(1, "custom").getThreadType(), is(CUSTOM));
+    assertThat(service.customScheduler("custom", 1).getThreadType(), is(CUSTOM));
 
     service.stop();
   }

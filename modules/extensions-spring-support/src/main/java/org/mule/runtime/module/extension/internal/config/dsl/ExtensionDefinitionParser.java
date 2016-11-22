@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -27,6 +26,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -36,7 +36,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -44,14 +43,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -105,7 +101,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.joda.time.DateTime;
@@ -135,8 +130,7 @@ public abstract class ExtensionDefinitionParser {
   protected final ExtensionParsingContext parsingContext;
   protected final List<ObjectParsingDelegate> objectParsingDelegates = ImmutableList
       .of(new FixedTypeParsingDelegate(PoolingProfile.class), new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
-          new FixedTypeParsingDelegate(TlsContextFactory.class), new FixedTypeParsingDelegate(ThreadingProfile.class),
-          new DefaultObjectParsingDelegate());
+          new FixedTypeParsingDelegate(TlsContextFactory.class), new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslResolver;
   protected final Builder baseDefinitionBuilder;
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();

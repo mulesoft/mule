@@ -35,7 +35,7 @@ public class MockSchedulerService implements SchedulerService {
   }
   
   @Override
-  public Scheduler customScheduler(int corePoolSize, String name) {
+  public Scheduler customScheduler(String name, int corePoolSize) {
     return new MockScheduler();
   }
   
