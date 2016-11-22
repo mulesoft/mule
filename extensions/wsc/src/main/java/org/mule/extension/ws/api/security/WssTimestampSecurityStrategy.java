@@ -7,6 +7,7 @@
 package org.mule.extension.ws.api.security;
 
 import static java.lang.Long.valueOf;
+import static java.util.Optional.empty;
 import static org.apache.ws.security.handler.WSHandlerConstants.TIMESTAMP;
 import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
@@ -33,6 +34,7 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
    * The time difference between creation and expiry time in seconds. After this time the message is invalid.
    */
   @Parameter
+  @Optional(defaultValue = "60")
   private long timeToExpire;
 
   /**
@@ -53,7 +55,7 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
 
   @Override
   public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return java.util.Optional.empty();
+    return empty();
   }
 
   @Override

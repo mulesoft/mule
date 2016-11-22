@@ -7,6 +7,7 @@
 package org.mule.extension.ws.api.security;
 
 
+import static java.util.Optional.*;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
@@ -50,7 +51,7 @@ public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return Optional.empty();
+    return empty();
   }
 
   @Override

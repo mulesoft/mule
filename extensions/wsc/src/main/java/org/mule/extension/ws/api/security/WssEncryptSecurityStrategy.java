@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ws.api.security;
 
+import static java.util.Optional.empty;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPTION_USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENC_PROP_REF_ID;
@@ -58,7 +59,7 @@ public class WssEncryptSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return Optional.empty();
+    return empty();
   }
 
   @Override

@@ -8,6 +8,7 @@ package org.mule.extension.ws.internal.security.callback;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -29,9 +30,9 @@ public class WSPasswordCallbackHandler implements CallbackHandler {
   /**
    * Creates a new instance.
    *
-   * @param usage A constant from {@link WSPasswordCallback} indicating the usage of this callback.
+   * @param usage   A constant from {@link WSPasswordCallback} indicating the usage of this callback.
    * @param handler {@link Consumer} that handles a {@link WSPasswordCallback}. This function will be called with the
-   *                                password callback that matches the {@code usage} also provided.
+   *                password callback that matches the {@code usage} also provided.
    */
   public WSPasswordCallbackHandler(int usage, Consumer<WSPasswordCallback> handler) {
     this.usage = usage;
@@ -40,15 +41,8 @@ public class WSPasswordCallbackHandler implements CallbackHandler {
 
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-    for (Callback callback : callbacks) {
-      if (callback instanceof WSPasswordCallback) {
-        WSPasswordCallback passwordCallback = (WSPasswordCallback) callback;
-        if (passwordCallback.getUsage() == usage) {
-          handler.accept(passwordCallback);
-        }
-      }
-    }
+    Stream.of(callbacks)
+      .filter(callback -> callback instanceof WSPasswordCallback && ((WSPasswordCallback) callback).getUsage() == usage)
+      .forEach(callback -> handler.accept((WSPasswordCallback) callback));
   }
-
-
 }

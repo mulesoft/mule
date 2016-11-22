@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ws.api.security;
 
+import static java.util.Optional.of;
 import static org.apache.ws.security.WSPasswordCallback.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE_USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
@@ -52,8 +53,9 @@ public class WssSignSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
+    validateTls();
     final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
-    return Optional.of(new WSPasswordCallbackHandler(SIGNATURE, cb -> cb.setPassword(keyStoreConfig.getKeyPassword())));
+    return of(new WSPasswordCallbackHandler(SIGNATURE, cb -> cb.setPassword(keyStoreConfig.getKeyPassword())));
   }
 
   @Override
@@ -63,6 +65,7 @@ public class WssSignSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
+    validateTls();
     final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
     Properties signProperties = encryptionHelper.createKeyStoreProperties(keyStoreConfig);
 
@@ -71,5 +74,11 @@ public class WssSignSecurityStrategy implements SecurityStrategy {
         .put(WS_SIGN_PROPERTIES_KEY, signProperties)
         .put(SIGNATURE_USER, keyStoreConfig.getAlias())
         .build();
+  }
+
+  private void validateTls() {
+    if (tlsContextFactory == null) {
+      throw new IllegalStateException("Tls Context Factory was not initialized, cannot apply Sign security");
+    }
   }
 }

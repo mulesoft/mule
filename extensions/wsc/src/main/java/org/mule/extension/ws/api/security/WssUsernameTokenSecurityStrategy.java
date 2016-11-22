@@ -7,6 +7,7 @@
 
 package org.mule.extension.ws.api.security;
 
+import static java.util.Optional.of;
 import static org.apache.ws.security.WSConstants.CREATED_LN;
 import static org.apache.ws.security.WSConstants.NONCE_LN;
 import static org.apache.ws.security.WSPasswordCallback.USERNAME_TOKEN;
@@ -79,7 +80,7 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
 
   @Override
   public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return java.util.Optional.of(new WSPasswordCallbackHandler(USERNAME_TOKEN,
+    return of(new WSPasswordCallbackHandler(USERNAME_TOKEN,
                                                                cb -> {
                                                                  if (cb.getIdentifier().equals(username)) {
                                                                    cb.setPassword(password);

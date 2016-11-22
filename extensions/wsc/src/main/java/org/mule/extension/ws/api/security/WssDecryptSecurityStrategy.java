@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ws.api.security;
 
+import static java.util.Optional.of;
 import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.DEC_PROP_REF_ID;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
@@ -55,12 +56,14 @@ public class WssDecryptSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
+    validateTls();
     TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
-    return Optional.of(new WSPasswordCallbackHandler(DECRYPT, cb -> cb.setPassword(keyStoreConfig.getKeyPassword())));
+    return of(new WSPasswordCallbackHandler(DECRYPT, cb -> cb.setPassword(keyStoreConfig.getKeyPassword())));
   }
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
+    validateTls();
     TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
     Properties decryptionProperties = encryptionHelper.createKeyStoreProperties(keyStoreConfig);
 
@@ -68,5 +71,11 @@ public class WssDecryptSecurityStrategy implements SecurityStrategy {
         .put(DEC_PROP_REF_ID, WS_DECRYPT_PROPERTIES_KEY)
         .put(WS_DECRYPT_PROPERTIES_KEY, decryptionProperties)
         .build();
+  }
+
+  private void validateTls() {
+    if (tlsContextFactory == null) {
+      throw new IllegalStateException("Tls Context Factory was not initialized, cannot apply Decrypt security");
+    }
   }
 }
