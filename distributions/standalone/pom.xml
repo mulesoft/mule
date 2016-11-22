@@ -234,39 +234,6 @@
             <version>${xalanVersion}</version>
         </dependency>
 
-        <!-- make sure we package the test frameworks, too -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-service</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-artifact</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.mulesoft.weave</groupId>
-                    <artifactId>mule-plugin-weave</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-        </dependency>
-
         <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
         <dependency>
             <groupId>org.apache.ant</groupId>

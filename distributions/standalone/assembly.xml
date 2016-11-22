@@ -251,19 +251,6 @@
                 <!-- lib/plugins (these artifacts are zip type) -->
                 <exclude>*:zip:*</exclude>
 
-                <!-- mule-tests-functional dependencies -->
-                <exclude>org.apache.ftpserver:ftpserver-core</exclude>
-                <exclude>org.apache.ftpserver:ftplet-api</exclude>
-                <exclude>org.apache.sshd:sshd-core</exclude>
-                <exclude>org.apache.mina:mina-core</exclude>
-
-                <!-- lib/user -->
-                <exclude>junit:junit</exclude>
-                <exclude>xmlunit:xmlunit</exclude>
-                <exclude>org.mule.tests:mule-tests-functional</exclude>
-                <exclude>org.mule.tests:mule-tests-runner</exclude>
-                <exclude>org.mule.tests:mule-tests-unit</exclude>
-
                 <!-- lib/boot -->
                 <exclude>commons-cli:commons-cli</exclude>
                 <exclude>tanukisoft:wrapper</exclude>
@@ -288,20 +275,6 @@
                 <exclude>com.yourkit:yjp-controller-api-redist</exclude>
 
             </excludes>
-        </dependencySet>
-
-        <!-- Mule testing framework -->
-        <dependencySet>
-            <outputDirectory>lib/user</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <scope>test</scope>
-            <includes>
-                <include>junit:junit</include>
-                <include>xmlunit:xmlunit</include>
-                <include>org.mule.tests:mule-tests-functional</include>
-                <include>org.mule.tests:mule-tests-runner</include>
-                <include>org.mule.tests:mule-tests-unit</include>
-            </includes>
         </dependencySet>
 
         <!--

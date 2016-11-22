@@ -212,11 +212,9 @@
 /mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
-/mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang3-3.4.jar
-/mule-standalone-${productVersion}/lib/opt/commons-net-3.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-pool-1.6.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-api-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-management-2.7.18.jar
@@ -254,8 +252,6 @@
 /mule-standalone-${productVersion}/lib/opt/gson-2.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.4-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
-/mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
-/mule-standalone-${productVersion}/lib/opt/hamcrest-library-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/httpclient-4.2.6.jar
 /mule-standalone-${productVersion}/lib/opt/httpcore-4.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.2.jar
@@ -360,13 +356,12 @@
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yecht-1.1-jruby.jar
+
+#
+# /lib/user
+#
 /mule-standalone-${productVersion}/lib/user
-/mule-standalone-${productVersion}/lib/user/junit-4.11.jar
-/mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/user/mule-tests-runner-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/user/mule-tests-unit-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/user/README.txt
-/mule-standalone-${productVersion}/lib/user/xmlunit-1.6.jar
 
 
 #
