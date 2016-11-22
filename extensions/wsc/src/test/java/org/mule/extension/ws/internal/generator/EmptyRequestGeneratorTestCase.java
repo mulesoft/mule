@@ -15,7 +15,7 @@ import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
-import org.mule.extension.ws.AbstracWscUnitTestCase;
+import org.mule.extension.ws.WscUnitTestCase;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 
@@ -31,7 +31,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Web Service Consumer")
 @Stories("Request Generation")
-public class EmptyRequestGeneratorTestCase extends AbstracWscUnitTestCase {
+public class EmptyRequestGeneratorTestCase extends WscUnitTestCase {
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -40,7 +40,7 @@ public class EmptyRequestGeneratorTestCase extends AbstracWscUnitTestCase {
   @Test
   @Description("Checks the generation of a body request for an operation that don't require any parameters")
   public void noParams() throws Exception {
-    String request = generator.generateRequest(serviceIntrospecter, operationsTypeLoader, NO_PARAMS);
+    String request = generator.generateRequest(introspecter, loader, NO_PARAMS);
     assertSimilarXml(request, getRequestResource(NO_PARAMS));
   }
 
@@ -49,7 +49,7 @@ public class EmptyRequestGeneratorTestCase extends AbstracWscUnitTestCase {
   public void withParams() throws Exception {
     exception.expect(WscException.class);
     exception.expectMessage("Cannot build default body request for operation [echo], the operation requires input parameters");
-    generator.generateRequest(serviceIntrospecter, operationsTypeLoader, ECHO);
+    generator.generateRequest(introspecter, loader, ECHO);
   }
 
   @Test
@@ -66,6 +66,6 @@ public class EmptyRequestGeneratorTestCase extends AbstracWscUnitTestCase {
     when(bop.getBindingInput()).thenReturn(bi);
     when(introspecter.getBindingOperation(anyString())).thenReturn(bop);
 
-    generator.generateRequest(introspecter, operationsTypeLoader, FAIL);
+    generator.generateRequest(introspecter, loader, FAIL);
   }
 }

@@ -9,7 +9,6 @@ package org.mule.extension.ws.runtime;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
@@ -45,12 +44,13 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
   @Test
   @Description("Consumes an operation that does not exist and throws a SOAP Fault because of it and asserts the thrown exception")
-  public void missingHeadersOperation() throws Exception {
-    MessagingException e = flowRunner(FAIL_FLOW).withPayload(getRequestResource(DOWNLOAD_ATTACHMENT)).runExpectingException();
+  public void noExistentOperation() throws Exception {
+    String badRequest = "<con:noOperation xmlns:con=\"http://consumer.ws.extension.mule.org/\"/>";
+    MessagingException e = flowRunner(FAIL_FLOW).withPayload(badRequest).runExpectingException();
     Exception causeException = e.getCauseException();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
     assertThat(sf.getFaultCode().getLocalPart(), is("Client"));
-    assertThat(sf.getMessage(), is("Cannot find dispatch method for {http://consumer.ws.extension.mule.org/}downloadAttachment"));
+    assertThat(sf.getMessage(), is("Cannot find dispatch method for {http://consumer.ws.extension.mule.org/}noOperation"));
   }
 }

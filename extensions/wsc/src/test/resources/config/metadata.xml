@@ -12,13 +12,6 @@
                        wsdlLocation="http://localhost:${servicePort}/testService?wsdl"/>
     </ws:config>
 
-    <ws:config name="attachmentsConfig">
-        <ws:connection soapVersion="SOAP11"
-                       service="TestAttachmentsService"
-                       port="TestAttachmentsPort"
-                       wsdlLocation="http://localhost:${attachmentPort}/testAttachments?wsdl"/>
-    </ws:config>
-
     <flow name="getEchoMetadata">
         <ws:consume config-ref="config" operation="echo">
             <ws:message>
@@ -52,7 +45,7 @@
     </flow>
 
     <flow name="downloadAttachment">
-        <ws:consume config-ref="attachmentsConfig" operation="downloadAttachment">
+        <ws:consume config-ref="config" operation="downloadAttachment">
             <ws:message>
                 <ws:body>#[payload]</ws:body>
             </ws:message>
@@ -60,7 +53,7 @@
     </flow>
 
     <flow name="uploadAttachment">
-        <ws:consume config-ref="attachmentsConfig" operation="uploadAttachment">
+        <ws:consume config-ref="config" operation="uploadAttachment">
             <ws:message>
                 <ws:body>#[payload]</ws:body>
             </ws:message>

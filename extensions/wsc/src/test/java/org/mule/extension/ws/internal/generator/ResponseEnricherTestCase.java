@@ -10,7 +10,7 @@ import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
 import static org.mule.extension.ws.WscTestUtils.getResponseResource;
 import static org.mule.extension.ws.internal.util.TransformationUtils.stringToDocument;
-import org.mule.extension.ws.AbstracWscUnitTestCase;
+import org.mule.extension.ws.WscUnitTestCase;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentResponseEnricher;
 
 import org.apache.cxf.message.Exchange;
@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import ru.yandex.qatools.allure.annotations.Description;
 
-abstract class ResponseEnricherTestCase extends AbstracWscUnitTestCase {
+abstract class ResponseEnricherTestCase extends WscUnitTestCase {
 
   @Test
   @Description("Enrich a response that contains attachments")
@@ -27,7 +27,7 @@ abstract class ResponseEnricherTestCase extends AbstracWscUnitTestCase {
     ExchangeImpl exchange = new ExchangeImpl();
     Document doc = stringToDocument(getResponse());
     AttachmentResponseEnricher enricher = getEnricher();
-    String result = enricher.enrich(doc, attachmentsServiceIntrospecter, attachmentsTypeLoader, DOWNLOAD_ATTACHMENT, exchange);
+    String result = enricher.enrich(doc, introspecter, loader, DOWNLOAD_ATTACHMENT, exchange);
     assertSimilarXml(getResponseResource(DOWNLOAD_ATTACHMENT), result);
     assertAttachment(exchange);
   }

@@ -10,12 +10,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS_HEADER;
+import static org.mule.extension.ws.WscTestUtils.UPLOAD_ATTACHMENT;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -31,7 +33,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("Metadata")
 public class KeysMetadataTestCase extends AbstractMetadataTestCase {
 
-  public static final String[] OPERATIONS = {ECHO, ECHO_ACCOUNT, ECHO_HEADERS, FAIL, NO_PARAMS_HEADER, NO_PARAMS};
+  public static final String[] OPERATIONS =
+      {ECHO, ECHO_ACCOUNT, ECHO_HEADERS, FAIL, NO_PARAMS_HEADER, NO_PARAMS, UPLOAD_ATTACHMENT, DOWNLOAD_ATTACHMENT};
 
   @Test
   @Description("Checks the MetadataKeys for the WSC")

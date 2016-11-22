@@ -11,14 +11,14 @@ import static org.mule.extension.ws.WscTestUtils.UPLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import static org.mule.extension.ws.WscTestUtils.getTestAttachment;
-import org.mule.extension.ws.AbstracWscUnitTestCase;
+import org.mule.extension.ws.WscUnitTestCase;
 import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentRequestEnricher;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 
-public abstract class AbstractRequestEnricherTestCase extends AbstracWscUnitTestCase {
+public abstract class AbstractRequestEnricherTestCase extends WscUnitTestCase {
 
   @Test
   @Description("Enrich a request that contains attachments")

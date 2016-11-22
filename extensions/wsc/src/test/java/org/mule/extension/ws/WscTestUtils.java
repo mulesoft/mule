@@ -32,7 +32,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -81,7 +80,6 @@ public class WscTestUtils {
 
   public static void assertSimilarXml(String expected, String result) throws Exception {
     Diff diff = compareXML(result, expected);
-    XMLUnit.setIgnoreWhitespace(true);
     if (!diff.similar()) {
       System.out.println("Expected xml is:\n");
       System.out.println(prettyPrint(expected));

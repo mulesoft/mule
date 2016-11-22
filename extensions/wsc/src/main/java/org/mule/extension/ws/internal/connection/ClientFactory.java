@@ -6,8 +6,15 @@
  */
 package org.mule.extension.ws.internal.connection;
 
+import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.cxf.message.Message.MTOM_ENABLED;
+import static org.apache.ws.security.handler.WSHandlerConstants.ACTION;
+import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;
+import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
+import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
 import org.mule.extension.ws.api.SoapVersion;
+import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.extension.ws.internal.WebServiceConsumer;
 import org.mule.extension.ws.internal.interceptor.NamespaceRestorerStaxInterceptor;
 import org.mule.extension.ws.internal.interceptor.NamespaceSaverStaxInterceptor;
@@ -15,11 +22,19 @@ import org.mule.extension.ws.internal.interceptor.OutputMtomSoapAttachmentsInter
 import org.mule.extension.ws.internal.interceptor.OutputSoapHeadersInterceptor;
 import org.mule.extension.ws.internal.interceptor.SoapActionInterceptor;
 import org.mule.extension.ws.internal.interceptor.StreamClosingInterceptor;
+import org.mule.extension.ws.internal.security.SecurityStrategyType;
+import org.mule.extension.ws.internal.security.callback.CompositeCallbackHandler;
 import org.mule.extension.ws.internal.transport.WscTransportFactory;
 import org.mule.runtime.api.connection.ConnectionException;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+
+import javax.security.auth.callback.CallbackHandler;
 import javax.wsdl.Port;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
@@ -34,6 +49,8 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 /**
  * Factory class that creates instances of cxf {@link Client}s.
@@ -60,8 +77,12 @@ final class ClientFactory {
    * @return a new configured {@link Client}.
    * @throws ConnectionException if the client couldn't be created.
    */
-  Client create(String address, Port port, SoapVersion soapVersion, boolean mtomEnabled) throws ConnectionException {
-
+  Client create(String address,
+                Port port,
+                SoapVersion soapVersion,
+                List<SecurityStrategy> securityStrategies,
+                boolean mtomEnabled)
+      throws ConnectionException {
     if (address == null) {
       address = getSoapAddress(port);
     }
@@ -71,28 +92,81 @@ final class ClientFactory {
 
     client.getEndpoint().put(MTOM_ENABLED, mtomEnabled);
 
-    // Request Interceptors
-    client.getOutInterceptors().add(new SoapActionInterceptor());
+    addSecurityInterceptors(client, securityStrategies);
+    addRequestInterceptors(client);
+    addResponseInterceptors(client, mtomEnabled);
+    removeUnnecessaryCxfInterceptors(client);
 
-    // Response Interceptors
-    client.getInInterceptors().add(new NamespaceRestorerStaxInterceptor());
-    client.getInInterceptors().add(new NamespaceSaverStaxInterceptor());
-    client.getInInterceptors().add(new StreamClosingInterceptor());
-    client.getInInterceptors().add(new CheckFaultInterceptor());
-    client.getInInterceptors().add(new OutputSoapHeadersInterceptor());
-    client.getInInterceptors().add(new SoapActionInterceptor());
+    return client;
+  }
 
-    if (mtomEnabled) {
-      client.getInInterceptors().add(new OutputMtomSoapAttachmentsInterceptor());
+  private void addSecurityInterceptors(Client client, List<SecurityStrategy> securityStrategies) {
+    Map<String, Object> requestProps = buildSecurityProperties(securityStrategies, OUTGOING);
+    if (!requestProps.isEmpty()) {
+      client.getOutInterceptors().add(new WSS4JOutInterceptor(requestProps));
     }
 
+    Map<String, Object> responseProps = buildSecurityProperties(securityStrategies, INCOMING);
+    if (!responseProps.isEmpty()) {
+      client.getInInterceptors().add(new WSS4JInInterceptor(responseProps));
+    }
+  }
+
+  private Map<String, Object> buildSecurityProperties(List<SecurityStrategy> strategies, SecurityStrategyType type) {
+
+    if (strategies.isEmpty()) {
+      return emptyMap();
+    }
+
+    ImmutableMap.Builder<String, Object> propsBuilder = ImmutableMap.builder();
+    StringJoiner actionsJoiner = new StringJoiner(" ");
+
+    ImmutableList.Builder<CallbackHandler> callbackHandlersBuilder = ImmutableList.builder();
+    strategies.stream()
+        .filter(s -> s.securityType().equals(type))
+        .forEach(s -> {
+          propsBuilder.putAll(s.buildSecurityProperties());
+          actionsJoiner.add(s.securityAction());
+          s.buildPasswordCallbackHandler().ifPresent(callbackHandlersBuilder::add);
+        });
+
+    List<CallbackHandler> handlers = callbackHandlersBuilder.build();
+    if (!handlers.isEmpty()) {
+      propsBuilder.put(PW_CALLBACK_REF, new CompositeCallbackHandler(handlers));
+    }
+
+    String actions = actionsJoiner.toString();
+    if (isNotBlank(actions)) {
+      propsBuilder.put(ACTION, actions);
+    }
+
+    return propsBuilder.build();
+  }
+
+  private void addRequestInterceptors(Client client) {
+    List<Interceptor<? extends Message>> outInterceptors = client.getOutInterceptors();
+    outInterceptors.add(new SoapActionInterceptor());
+  }
+
+  private void addResponseInterceptors(Client client, boolean mtomEnabled) {
+    List<Interceptor<? extends Message>> inInterceptors = client.getInInterceptors();
+    inInterceptors.add(new NamespaceRestorerStaxInterceptor());
+    inInterceptors.add(new NamespaceSaverStaxInterceptor());
+    inInterceptors.add(new StreamClosingInterceptor());
+    inInterceptors.add(new CheckFaultInterceptor());
+    inInterceptors.add(new OutputSoapHeadersInterceptor());
+    inInterceptors.add(new SoapActionInterceptor());
+    if (mtomEnabled) {
+      inInterceptors.add(new OutputMtomSoapAttachmentsInterceptor());
+    }
+  }
+
+  private void removeUnnecessaryCxfInterceptors(Client client) {
     Binding binding = client.getEndpoint().getBinding();
     removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
     removeInterceptor(binding.getInInterceptors(), Soap11FaultInInterceptor.class.getName());
     removeInterceptor(binding.getInInterceptors(), Soap12FaultInInterceptor.class.getName());
     removeInterceptor(binding.getInInterceptors(), CheckFaultInterceptor.class.getName());
-
-    return client;
   }
 
   private void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
