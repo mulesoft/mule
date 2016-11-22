@@ -223,6 +223,21 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="skeleton-source" type="skeletonSourceType" substitutionGroup="mule:abstract-message-source">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that provides access to the Processor set by the owner Flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="skeletonSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageSourceType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="shared-source" type="sharedSourceType" substitutionGroup="mule:abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
