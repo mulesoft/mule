@@ -6,6 +6,7 @@
  */
 package org.mule.test.service.scheduler;
 
+import static java.lang.Runtime.getRuntime;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -28,7 +29,6 @@ import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Inject;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ru.yandex.qatools.allure.annotations.Description;
@@ -56,12 +56,14 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
-  @Ignore("This is flaky because when the RejectedExcecutionException occurs when scheduling a task as part of a processing strategy, the Mono in Flow.process remians blocked forever.")
+  // @Ignore("This is flaky because when the RejectedExcecutionException occurs when scheduling a task as part of a processing
+  // strategy, the Mono in Flow.process remians blocked forever.")
   @Description("Tests that the exception that happens when a thread pool is full is properly handled.")
   public void overloadErrorHandling() throws Exception {
-    for (int i = 0; i < 100; ++i) {
-      // TODO MULE-10585 this 64 below is based on the value set on DefaultSchedulerService.
-      if (i >= 63) {
+    // TODO MULE-10585 this cores * cores below is based on the value set on DefaultSchedulerService.
+    int cores = getRuntime().availableProcessors();
+    for (int i = 0; i < cores * cores + 50; ++i) {
+      if (i >= cores * cores - 1) {
         MessagingException exception = flowRunner("delaySchedule").runExpectingException();
 
         assertThat(exception.getEvent().getError().isPresent(), is(true));
