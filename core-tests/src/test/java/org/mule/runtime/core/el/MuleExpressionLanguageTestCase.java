@@ -48,7 +48,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("Support DW")
 public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
 
-  private MuleExpressionLanguage expressionLanguage = new MuleExpressionLanguage();
+  private MuleExpressionLanguage expressionLanguage = new MuleExpressionLanguage(Thread.currentThread().getContextClassLoader());
 
   @Test
   public void stringExpression() throws Exception {

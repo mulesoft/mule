@@ -46,8 +46,8 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
 
-  public MuleExpressionLanguage() {
-    Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class).iterator();
+  public MuleExpressionLanguage(ClassLoader lookupClassloader) {
+    Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
 
     while (executors.hasNext()) {
       try {

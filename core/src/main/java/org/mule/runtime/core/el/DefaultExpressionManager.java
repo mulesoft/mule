@@ -45,7 +45,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   private MuleContext muleContext;
   //DW based expression language
-  private MuleExpressionLanguage muleExpressionLanguage = new MuleExpressionLanguage();
+  private MuleExpressionLanguage muleExpressionLanguage;
   //MVEL based expression language
   private MVELExpressionLanguage mvelExpressionLanguage;
   // Default style parser
@@ -54,6 +54,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
     this.muleContext = muleContext;
+    this.muleExpressionLanguage = new MuleExpressionLanguage(muleContext.getExecutionClassLoader());
     mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
   }
 
