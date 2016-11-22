@@ -319,13 +319,20 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   @Override
   public void execute(Runnable command) {
     checkShutdown();
+
+    RunnableFuture<Object> runnableFutureCommand;
     if (command instanceof RunnableFuture) {
-      scheduledTasks.put((RunnableFuture<?>) command, NULL_SCHEDULED_FUTURE);
-      executor.execute(command);
+      runnableFutureCommand = (RunnableFuture<Object>) command;
     } else {
-      RunnableFuture<Object> runnableFutureCommand = newTaskFor(command, null);
-      scheduledTasks.put(runnableFutureCommand, NULL_SCHEDULED_FUTURE);
+      runnableFutureCommand = newTaskFor(command, null);
+    }
+
+    scheduledTasks.put(runnableFutureCommand, NULL_SCHEDULED_FUTURE);
+    try {
       executor.execute(runnableFutureCommand);
+    } catch (Exception e) {
+      scheduledTasks.remove(runnableFutureCommand);
+      throw e;
     }
   }
 

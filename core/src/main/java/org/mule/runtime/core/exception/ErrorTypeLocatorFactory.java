@@ -10,6 +10,7 @@ import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_ERROR_TYPE
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
@@ -17,6 +18,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURI
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -28,6 +30,7 @@ import org.mule.runtime.core.message.ErrorTypeBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import java.io.IOException;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Factory for {@link ErrorTypeLocator}.
@@ -68,6 +71,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED))
             .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY))
             .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY))
+            .addExceptionMapping(RejectedExecutionException.class, errorTypeRepository.lookupErrorType(OVERLOAD))
             .addExceptionMapping(MessageRedeliveredException.class, errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED))
             .addExceptionMapping(Exception.class, UNKNOWN_ERROR_TYPE)
             .addExceptionMapping(Error.class, CRITICAL_ERROR_TYPE)

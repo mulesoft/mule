@@ -6,12 +6,14 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
@@ -19,15 +21,20 @@ import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -82,5 +89,38 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
     assertThat(service.customScheduler("custom", 1).getThreadType(), is(CUSTOM));
 
     service.stop();
+  }
+
+  @Rule
+  public ExpectedException expected = none();
+
+  @Test
+  public void executorRejects() throws MuleException {
+    final Latch latch = new Latch();
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    final Scheduler custom = service.customScheduler("custom", 1);
+
+    custom.execute(() -> {
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
+    });
+
+    expected.expect(RejectedExecutionException.class);
+
+    final Runnable task = () -> {
+    };
+    try {
+      custom.submit(task);
+    } finally {
+      assertThat(custom.shutdownNow(), not(hasItem(task)));
+      service.stop();
+    }
+
   }
 }

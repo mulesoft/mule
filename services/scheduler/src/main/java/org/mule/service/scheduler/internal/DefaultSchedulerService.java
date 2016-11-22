@@ -9,7 +9,6 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -39,6 +38,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -111,7 +111,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler customScheduler(String name, int corePoolSize) {
     final ExecutorService executor =
-        newFixedThreadPool(corePoolSize, new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
+        new ThreadPoolExecutor(corePoolSize, corePoolSize,
+                               0L, TimeUnit.MILLISECONDS,
+                               new SynchronousQueue<Runnable>(),
+                               new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
     final DefaultScheduler customScheduler = new DefaultScheduler(resolveSchedulerCreationLocation(name),
                                                                   executor,
                                                                   cores, cores, scheduledExecutor, quartzScheduler, CUSTOM) {
