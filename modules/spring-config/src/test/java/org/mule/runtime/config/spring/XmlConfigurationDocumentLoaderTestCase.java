@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isNull;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class XmlConfigurationDocumentLoaderTestCase {
+public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase {
 
   /**
    * The following {@link #LINE_NUMBER_ERROR} and {@link #COLUMN_NUMBER_ERROR} are directly related to the mule-config-malformed.xml
