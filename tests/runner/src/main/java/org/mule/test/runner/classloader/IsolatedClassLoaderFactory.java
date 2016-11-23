@@ -67,6 +67,7 @@ public class IsolatedClassLoaderFactory {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
+  private PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -113,7 +114,11 @@ public class IsolatedClassLoaderFactory {
             new MuleArtifactClassLoader(artifactId,
                                         new ArtifactDescriptor(pluginUrlClassification.getName()),
                                         pluginUrlClassification.getUrls().toArray(new URL[0]),
-                                        regionClassLoader, childClassLoaderLookupPolicy);
+                                        regionClassLoader,
+                                        pluginLookupPolicyGenerator.createLookupPolicy(pluginUrlClassification,
+                                                                                       artifactsUrlClassification
+                                                                                           .getPluginUrlClassifications(),
+                                                                                       childClassLoaderLookupPolicy));
         pluginsArtifactClassLoaders.add(pluginCL);
 
         ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification);
