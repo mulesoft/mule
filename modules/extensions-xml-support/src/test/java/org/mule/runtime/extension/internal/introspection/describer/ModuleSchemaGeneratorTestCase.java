@@ -71,8 +71,8 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
         add("module-param-types");
         add("module-properties-default-types");
         add("module-properties-types");
-        add("module-single-operation");
         add("module-single-op-with-property");
+        add("module-single-operation");
       }
     };
 

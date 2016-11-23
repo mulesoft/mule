@@ -23,6 +23,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
@@ -39,6 +40,9 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -177,8 +181,12 @@ public class XmlBasedDescriber implements Describer {
             .setXsdFileName(name.concat(XSD_SUFFIX))
             .build());
     declarer.withModelProperty(new XmlExtensionModelProperty());
-    loadPropertiesFrom(declarer, moduleModel);
-    loadOperationsFrom(declarer, moduleModel);
+    final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel);
+    if (configurationDeclarer.isPresent()) {
+      loadOperationsFrom(configurationDeclarer.get(), moduleModel);
+    } else {
+      loadOperationsFrom(declarer, moduleModel);
+    }
   }
 
   private List<ComponentModel> extractGlobalElementsFrom(ComponentModel moduleModel) {
@@ -188,7 +196,7 @@ public class XmlBasedDescriber implements Describer {
         .collect(Collectors.toList());
   }
 
-  private void loadPropertiesFrom(ExtensionDeclarer declarer, ComponentModel moduleModel) {
+  private Optional<ConfigurationDeclarer> loadPropertiesFrom(ExtensionDeclarer declarer, ComponentModel moduleModel) {
 
     List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
 
@@ -198,19 +206,36 @@ public class XmlBasedDescriber implements Describer {
 
     if (!properties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
+      // TODO(fernandezlautaro): MULE-11057	validate with SDK team if it's really mandatory to configure a factory for configs
+      configurationDeclarer.withModelProperty(new ConfigurationFactoryModelProperty(new ConfigurationFactory() {
+
+        @Override
+        public Object newInstance() {
+          // TODO(fernandezlautaro): MULE-11057	clean this
+          return null;
+        }
+
+        @Override
+        public Class<?> getObjectType() {
+          // TODO(fernandezlautaro): MULE-11057	clean this
+          return String.class;
+        }
+      }));
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
 
       properties.stream().forEach(param -> extractParameter(configurationDeclarer, param));
+      return of(configurationDeclarer);
     }
+    return empty();
   }
 
-  private void loadOperationsFrom(ExtensionDeclarer declarer, ComponentModel moduleModel) {
+  private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel) {
     moduleModel.getInnerComponents().stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
         .forEach(operationModel -> extractOperationExtension(declarer, operationModel));
   }
 
-  private void extractOperationExtension(ExtensionDeclarer declarer, ComponentModel operationModel) {
+  private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel) {
 
     String operationName = operationModel.getNameAttribute();
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
@@ -224,6 +249,13 @@ public class XmlBasedDescriber implements Describer {
 
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer, operationModel);
+
+    if (declarer instanceof ConfigurationDeclarer) {
+      // TODO(fernandezlautaro): MULE-11057	clean this
+      operationDeclarer.withModelProperty(new ConfigTypeModelProperty(
+                                                                      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader()
+                                                                          .load(String.class)));
+    }
   }
 
   private void extractOperationParameters(OperationDeclarer operationDeclarer, ComponentModel componentModel) {

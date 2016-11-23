@@ -6,11 +6,11 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:query name="namedParamsQueryTemplate">
-        <db:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</db:sql>
         <db:input-parameters>
             <db:input-parameter key="position" value="4"/>
             <db:input-parameter key="name" value="Venus"/>
         </db:input-parameters>
+        <db:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</db:sql>
     </db:query>
 
     <db:query name="overridenQueryParamByName" template="namedParamsQueryTemplate">
