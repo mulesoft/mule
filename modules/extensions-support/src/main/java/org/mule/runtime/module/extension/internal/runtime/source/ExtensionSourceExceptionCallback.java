@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
+import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 import java.util.function.Consumer;
@@ -25,20 +27,22 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
   private final ResponseCompletionCallback completionCallback;
   private final Event event;
   private final Consumer<MessagingException> errorResponseHandler;
+  private final MessageProcessContext messageProcessorContext;
 
   /**
    * Creates a new instance
-   *
    * @param completionCallback    the callback used to send the failure response
    * @param event                 the related {@link MuleEvent}
    * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link Event} which results
-   *                              from handling exceptions
+   * @param messageProcessContext
    */
   public ExtensionSourceExceptionCallback(ResponseCompletionCallback completionCallback, Event event,
-                                          Consumer<MessagingException> errorResponseCallback) {
+                                          Consumer<MessagingException> errorResponseCallback,
+                                          MessageProcessContext messageProcessContext) {
     this.completionCallback = completionCallback;
     this.event = event;
     this.errorResponseHandler = errorResponseCallback;
+    this.messageProcessorContext = messageProcessContext;
   }
 
   /**
@@ -50,7 +54,13 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
    */
   @Override
   public void onException(Throwable exception) {
-    Event errorHandlingEvent = completionCallback.responseSentWithFailure(new MessagingException(event, exception), event);
-    errorResponseHandler.accept(new MessagingException(errorHandlingEvent, exception));
+    MessagingException messagingException = exception instanceof MessagingException ? (MessagingException) exception
+        : new MessagingException(event, exception);
+    Event errorEvent = createErrorEvent(event, messageProcessorContext.getMessageSource(), messagingException,
+                                        messageProcessorContext.getErrorTypeLocator());
+    messagingException.setProcessedEvent(errorEvent);
+    Event errorHandlingEvent = completionCallback.responseSentWithFailure(messagingException, errorEvent);
+    messagingException.setProcessedEvent(errorHandlingEvent);
+    errorResponseHandler.accept(messagingException);
   }
 }

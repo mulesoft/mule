@@ -17,51 +17,35 @@
         <httpn:listener-connection host="localhost" port="${port}"/>
     </httpn:listener-config>
 
+    <flow name="exceptionBuildingResponseParameters">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseParameters">
+            <httpn:response-builder>
+                <httpn:headers>
+                    #[dw:{ Content-Type: contentType}]
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+        <error-handler>
+            <on-error-continue type="EXPRESSION">
+                <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+                <set-payload value="#[dw:'Exception Handled']"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
     <flow name="exceptionBuildingResponse">
         <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
         <set-payload value="#[inputStreamPayload]"/>
-
         <error-handler>
-            <on-error-continue>
+            <on-error-continue type="ANY">
                 <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#['Exception Handled']"/>
+                <set-payload value="#[dw:'Exception Handled']"/>
             </on-error-continue>
         </error-handler>
     </flow>
 
-    <flow name="exceptionSendingResponse">
-        <httpn:listener config-ref="listenerConfig" path="/exceptionSendingResponse" responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[inputStreamPayload]"/>
-
-        <error-handler>
-            <on-error-continue>
-                <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#['Exception Handled']"/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
-    <flow name="exceptionBuildingResponseFailAgain">
-        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseFailAgain" responseStreamingMode="NEVER"/>
-        <set-payload value="#[inputStreamPayload]"/>
-
-        <error-handler>
-            <on-error-continue>
-                <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#[inputStreamPayload]"/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
-    <flow name="exceptionSendingResponseFailAgain">
-        <httpn:listener config-ref="listenerConfig" path="/exceptionSendingResponseFailAgain" responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[inputStreamPayload]"/>
-
-        <error-handler>
-            <on-error-continue>
-                <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#[inputStreamPayload]"/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
 </mule>

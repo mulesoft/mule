@@ -9,6 +9,7 @@ package org.mule.runtime.module.http.internal.listener;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
@@ -23,13 +24,15 @@ public class HttpMessageProcessContext implements MessageProcessContext {
   private final FlowConstruct flowConstruct;
   private final Executor workManager;
   private final ClassLoader executionClassLoader;
+  private ErrorTypeLocator errorTypeLocator;
 
   HttpMessageProcessContext(final DefaultHttpListener listener, final FlowConstruct flowConstruct, final Executor workManager,
-                            final ClassLoader executionClassLoader) {
+                            final ClassLoader executionClassLoader, ErrorTypeLocator errorTypeLocator) {
     this.listener = listener;
     this.flowConstruct = flowConstruct;
     this.workManager = workManager;
     this.executionClassLoader = executionClassLoader;
+    this.errorTypeLocator = errorTypeLocator;
   }
 
   @Override
@@ -65,5 +68,10 @@ public class HttpMessageProcessContext implements MessageProcessContext {
   @Override
   public ComponentIdentifier getSourceIdentifier() {
     return COMPONENT_IDENTIFIER;
+  }
+
+  @Override
+  public ErrorTypeLocator getErrorTypeLocator() {
+    return errorTypeLocator;
   }
 }
