@@ -61,13 +61,13 @@ public class SubTypesMappingConnector {
   private ExtensiblePojo pojoWithExtension;
 
   @Parameter
-  private List<PojoForList> pojoListOne;
+  private List<PojoForList> onePojos;
 
   @Parameter
-  private List<PojoForList> pojoListTwo;
+  private List<PojoForList> twoPojos;
 
   @Parameter
-  private List<Weapon> weaponList;
+  private List<Weapon> weapons;
 
   @Parameter
   private Map<String, Weapon> weaponMap;
@@ -76,20 +76,20 @@ public class SubTypesMappingConnector {
     return weaponMap;
   }
 
-  public List<Weapon> getWeaponList() {
-    return weaponList;
+  public List<Weapon> getWeapons() {
+    return weapons;
   }
 
-  public void setWeaponList(List<Weapon> weaponList) {
-    this.weaponList = weaponList;
+  public void setWeapons(List<Weapon> weapons) {
+    this.weapons = weapons;
   }
 
-  public List<PojoForList> getPojoListOne() {
-    return pojoListOne;
+  public List<PojoForList> getOnePojos() {
+    return onePojos;
   }
 
-  public List<PojoForList> getPojoListTwo() {
-    return pojoListTwo;
+  public List<PojoForList> getTwoPojos() {
+    return twoPojos;
   }
 
   public ExtensiblePojo getPojoWithExtension() {

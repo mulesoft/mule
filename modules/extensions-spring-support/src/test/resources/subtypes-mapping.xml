@@ -39,10 +39,10 @@
         <subtypes:triangle>
             <subtypes:triangle-alias height="4" area="2"/>
         </subtypes:triangle>
-        <subtypes:pojo-list-one>
+        <subtypes:one-pojos>
             <subtypes:pojo-for-list id="inner"/>
-        </subtypes:pojo-list-one>
-        <subtypes:weapon-list>
+        </subtypes:one-pojos>
+        <subtypes:weapons>
             <subtypes:revolver bullets="6"/>
             <heisenberg:ricin microgramsPerKilo="10">
                 <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
@@ -51,7 +51,7 @@
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
             <subtypes:revolver bullets="0"/>
-        </subtypes:weapon-list>
+        </subtypes:weapons>
         <subtypes:weapon-maps>
             <subtypes:weapon-map key="ricinChild">
                 <heisenberg:ricin microgramsPerKilo="20">

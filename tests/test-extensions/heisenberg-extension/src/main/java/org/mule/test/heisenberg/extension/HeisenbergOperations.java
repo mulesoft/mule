@@ -103,16 +103,16 @@ public class HeisenbergOperations {
     return knockedDoor.knock();
   }
 
-  public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricinList) {
-    return ricinList;
+  public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricins) {
+    return ricins;
   }
 
   public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon) {
     return format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
   }
 
-  public List<String> killWithMultiplesWeapons(@Optional(defaultValue = PAYLOAD) List<Weapon> weaponList) {
-    return weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
+  public List<String> killWithMultiplesWeapons(@Optional(defaultValue = PAYLOAD) List<Weapon> weapons) {
+    return weapons.stream().map(Weapon::kill).collect(Collectors.toList());
   }
 
   public List<String> killWithMultipleWildCardWeapons(List<? extends Weapon> wildCardWeapons) {

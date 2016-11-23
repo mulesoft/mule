@@ -188,7 +188,7 @@
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="pojo-list-one">
+                        <xs:element minOccurs="0" maxOccurs="1" name="one-pojos">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -198,7 +198,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="pojo-list-two">
+                        <xs:element minOccurs="0" maxOccurs="1" name="two-pojos">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -208,7 +208,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="weapon-list">
+                        <xs:element minOccurs="0" maxOccurs="1" name="weapons">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -244,9 +244,9 @@
                     <xs:attribute type="xs:string" use="optional" name="extensibleWeapon"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="triangle"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="pojoWithExtension"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="pojoListOne"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="pojoListTwo"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="weaponList"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="onePojos"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="twoPojos"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="weapons"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="weaponMap"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>

@@ -110,7 +110,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     private String validType;
 
     @Parameter
-    private List<String> complexType;
+    private List<String> complexTypes;
   }
 
   @ExclusiveOptionals

@@ -192,7 +192,7 @@ public class MetadataOperations {
                                                                @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) Map<String, Object> mapContent) {}
 
   public void contentParameterShouldNotGenerateListChildElement(
-                                                                @TypeResolver(TestInputResolverWithoutKeyResolver.class) List<String> listContent) {}
+                                                                @TypeResolver(TestInputResolverWithoutKeyResolver.class) List<String> contents) {}
 
   public void contentParameterShouldNotGeneratePojoChildElement(
                                                                 @TypeResolver(TestInputResolverWithoutKeyResolver.class) Bear animalContent) {}

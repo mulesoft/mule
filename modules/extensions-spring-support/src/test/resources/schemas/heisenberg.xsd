@@ -279,6 +279,7 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="family-informations">
                         <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
                             <xs:complexType>
                                 <xs:sequence>
@@ -441,6 +442,7 @@
                     <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="familyInfo"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="familyInformations"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
                     <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
@@ -450,7 +452,7 @@
                     <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="optional" name="weaponTypeFunction"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="wildCardList"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="wildCards"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="weaponValueMap"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
@@ -968,7 +970,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="weapon-list">
+                    <xs:element minOccurs="0" maxOccurs="1" name="weapons">
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -979,7 +981,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="weaponList"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="weapons"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -993,7 +995,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="ricin-list">
+                    <xs:element minOccurs="0" maxOccurs="1" name="ricins">
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
@@ -1001,7 +1003,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="ricinList"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="ricins"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

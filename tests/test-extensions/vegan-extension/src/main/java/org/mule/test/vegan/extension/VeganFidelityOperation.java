@@ -22,9 +22,9 @@ public class VeganFidelityOperation {
     throw new IllegalArgumentException("I SHALL NEVER EAT " + food.toString());
   }
 
-  public List<Map<String, String>> tryToEatThisListOfMaps(List<Map<String, String>> food) {
-    if (food != null) {
-      return food;
+  public List<Map<String, String>> tryToEatThisListOfMaps(List<Map<String, String>> foods) {
+    if (foods != null) {
+      return foods;
     }
     throw new IllegalArgumentException("I CAN'T EAT THAT TYPE, IS IMPOSSIBLE!");
   }

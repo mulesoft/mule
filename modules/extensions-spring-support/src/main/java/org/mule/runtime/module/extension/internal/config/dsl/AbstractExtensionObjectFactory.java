@@ -185,7 +185,8 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
                                                                        "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
                                                                            + "One of the following should be set: [%s]",
                                                                        group.getName(),
-                                                                       Joiner.on(", ").join(exclusiveModel.getExclusiveParameterNames())))));
+                                                                       Joiner.on(", ")
+                                                                           .join(exclusiveModel.getExclusiveParameterNames())))));
         } else if (definedExclusiveParameters.size() > 1) {
           throw buildExclusiveParametersException(model, definedExclusiveParameters);
         }

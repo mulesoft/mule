@@ -376,7 +376,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertParameter(parameters, "weaponTypeFunction", "", toMetadataType(WeaponType.class), false, SUPPORTED, null);
     assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED,
                     null);
-    assertParameter(parameters, "wildCardList", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
+    assertParameter(parameters, "wildCards", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
     assertParameter(parameters,
                     "wildCardWeaponMap", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                         .ofKey(objectTypeBuilder(Weapon.class)).ofValue(objectTypeBuilder(Object.class)).build(),
@@ -481,13 +481,13 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     operation = getOperation(extensionDeclaration, KILL_WITH_RICINS);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(1));
-    assertParameter(operation.getAllParameters(), "ricinList", "", arrayOf(List.class, objectTypeBuilder(Ricin.class)), false,
+    assertParameter(operation.getAllParameters(), "ricins", "", arrayOf(List.class, objectTypeBuilder(Ricin.class)), false,
                     SUPPORTED, "#[payload]");
 
     operation = getOperation(extensionDeclaration, KILL_WITH_MULTIPLES_WEAPONS);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(1));
-    assertParameter(operation.getAllParameters(), "weaponList", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false,
+    assertParameter(operation.getAllParameters(), "weapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false,
                     SUPPORTED, "#[payload]");
 
     operation = getOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS);

@@ -169,7 +169,7 @@
     </flow>
 
     <flow name="killWithMultipleWeapons">
-        <heisenberg:kill-with-multiples-weapons weaponList="#[weapons]"/>
+        <heisenberg:kill-with-multiples-weapons weapons="#[weapons]"/>
     </flow>
 
     <flow name="killWithMultipleWildCardWeapons">
@@ -182,14 +182,14 @@
 
     <flow name="killWithRicinAsChildElement">
         <heisenberg:kill-with-ricins>
-            <heisenberg:ricin-list>
+            <heisenberg:ricins>
                 <heisenberg:ricin microgramsPerKilo="20">
                     <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
                 </heisenberg:ricin>
                 <heisenberg:ricin microgramsPerKilo="22">
                     <heisenberg:destination address="pollos hermanos" victim="Gustavo Fring"/>
                 </heisenberg:ricin>
-            </heisenberg:ricin-list>
+            </heisenberg:ricins>
         </heisenberg:kill-with-ricins>
     </flow>
 
