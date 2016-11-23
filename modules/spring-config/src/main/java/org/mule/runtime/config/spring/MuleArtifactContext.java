@@ -205,6 +205,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       for (Resource springResource : artifactConfigResources) {
         Document document =
             xmlConfigurationDocumentLoader.loadDocument(ofNullable(muleContext.getExtensionManager()),
+                                                        springResource.getFilename(),
                                                         springResource.getInputStream());
         ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
         applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));

@@ -146,7 +146,7 @@ public class XmlBasedDescriber implements Describer {
 
   private Document getModuleDocument(XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader, URL resource) {
     try {
-      return xmlConfigurationDocumentLoader.loadDocument(empty(), resource.openStream());
+      return xmlConfigurationDocumentLoader.loadDocument(empty(), resource.getFile(), resource.openStream());
     } catch (IOException e) {
       throw new MuleRuntimeException(
                                      createStaticMessage(format("There was an issue reading the stream for the resource %s",

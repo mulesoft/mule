@@ -158,10 +158,10 @@
             </subtypes:door>
             <subtypes:door-registries>
                 <subtypes:door-registry key="leftDoor">
-                    <subtypes:car-door handle="left"/>
+                    <subtypes:car-door handle="left" color="red"/>
                 </subtypes:door-registry>
                 <subtypes:door-registry key="rightDoor">
-                    <subtypes:car-door handle="right"/>
+                    <subtypes:car-door handle="right" color="red"/>
                 </subtypes:door-registry>
             </subtypes:door-registries>
         </subtypes:process-door>

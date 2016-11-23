@@ -14,11 +14,11 @@
     </httpn:request-config>
 
     <flow name="requestWithBasePath">
-        <httpn:request config-ref="configWithBasePath" path="#[requestPath]" key="InputStream"/>
+        <httpn:request config-ref="configWithBasePath" path="#[requestPath]"/>
     </flow>
 
     <flow name="requestWithoutBasePath">
-        <httpn:request config-ref="configWithoutBasePath" host="localhost" port="${httpPort}" path="#[requestPath]" key="InputStream"/>
+        <httpn:request config-ref="configWithoutBasePath" host="localhost" port="${httpPort}" path="#[requestPath]"/>
     </flow>
 
 </mule>

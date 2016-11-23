@@ -89,7 +89,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
 
   private MinimalApplicationModelGenerator createGeneratorForConfig(String configFileName) throws Exception {
     Optional<ConfigLine> configLine = xmlApplicationParser.parse(documentLoader
-        .loadDocument(getClass().getClassLoader().getResourceAsStream("model-generator/" + configFileName)).getDocumentElement());
+        .loadDocument(configFileName, getClass().getClassLoader().getResourceAsStream("model-generator/" + configFileName))
+        .getDocumentElement());
     ConfigFile configFile = new ConfigFile("test", Arrays.asList(configLine.get()));
     ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     CoreComponentBuildingDefinitionProvider coreComponentBuildingDefinitionProvider =

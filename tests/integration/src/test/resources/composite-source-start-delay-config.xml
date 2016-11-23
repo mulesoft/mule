@@ -10,7 +10,7 @@
             http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <httpn:listener-config name="listenerConfig" host="localhost" port="${httpPort}">
+    <httpn:listener-config name="listenerConfig">
     	<httpn:listener-connection host="localhost" port="${httpPort}"/>
     </httpn:listener-config>
 
