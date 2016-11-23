@@ -7,7 +7,7 @@
 
     <flow name="ExclusiveParameterRequiredSource">
         <petstore:pet-source/>
-        <logger/>
+        <echo-component/>
     </flow>
 
 </mule>
