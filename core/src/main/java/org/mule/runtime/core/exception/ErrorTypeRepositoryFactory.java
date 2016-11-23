@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_ERROR_TYPE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
+
 import org.mule.runtime.api.message.ErrorType;
 
 /**
@@ -38,6 +41,7 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addErrorType(RETRY_EXHAUSTED, connectivityErrorType);
     errorTypeRepository.addErrorType(ROUTING, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(SECURITY, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(OVERLOAD, CRITICAL_ERROR_TYPE);
     return errorTypeRepository;
   }
 

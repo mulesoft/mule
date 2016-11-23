@@ -11,6 +11,7 @@ import org.mule.functional.functional.InvocationCountMessageProcessor;
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
 import org.mule.functional.functional.SharedConfig;
 import org.mule.functional.functional.SharedSource;
+import org.mule.functional.functional.SkeletonSource;
 import org.mule.functional.testmodels.services.TestServiceComponent;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
@@ -39,6 +40,8 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerMuleBeanDefinitionParser("assert-intercepting",
                                      new MessageProcessorDefinitionParser(ResponseAssertionMessageProcessor.class));
     registerBeanDefinitionParser("queue", new QueueWriterMessageProcessorBeanDefinitionParser());
+
+    registerBeanDefinitionParser("skeleton-source", new ChildDefinitionParser("messageSource", SkeletonSource.class));
 
     registerBeanDefinitionParser("shared-source", new ChildDefinitionParser("messageSource", SharedSource.class));
     registerBeanDefinitionParser("shared-config", new MuleOrphanDefinitionParser(SharedConfig.class, true));
