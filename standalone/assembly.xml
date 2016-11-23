@@ -1,6 +1,6 @@
 <!-- Assembly descriptor for the full Mule distribution. -->
 <assembly>
-    <id>full</id>
+    <id>standalone</id>
     <formats>
         <format>zip</format>
         <format>tar.gz</format>
