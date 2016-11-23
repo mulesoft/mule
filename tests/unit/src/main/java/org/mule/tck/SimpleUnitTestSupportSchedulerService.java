@@ -73,6 +73,14 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     return decorator;
   }
 
+  @Override
+  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        decorateScheduler(new SimpleUnitTestSupportScheduler(corePoolSize, new NamedThreadFactory(name), new AbortPolicy()));
+    decorators.add(decorator);
+    return decorator;
+  }
+
   protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
     SimpleUnitTestSupportLifecycleSchedulerDecorator spied = spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
 

@@ -9,6 +9,10 @@ package org.mule.runtime.core.api.scheduler;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+
 /**
  * Provides access to the different schedulers and thread pools that exist in the Mule runtime, allowing an artifact to schedule
  * tasks on those.
@@ -60,11 +64,21 @@ public interface SchedulerService extends Service {
 
   /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
-   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads.
+   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads, a {@link SynchronousQueue}
+   * and an {@link AbortPolicy abort} rejection policy.
    * 
    * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
    */
   Scheduler customScheduler(String name, int corePoolSize);
+
+  /**
+   * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
+   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads a {@link LinkedBlockingQueue}
+   * with the given {@code queueSize} and an {@link AbortPolicy abort} rejection policy.
+   * 
+   * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
+   */
+  Scheduler customScheduler(String name, int corePoolSize, int queueSize);
 
   /**
    * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.

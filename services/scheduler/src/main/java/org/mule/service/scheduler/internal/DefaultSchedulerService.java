@@ -38,7 +38,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -111,30 +110,48 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler customScheduler(String name, int corePoolSize) {
     final ExecutorService executor =
-        new ThreadPoolExecutor(corePoolSize, corePoolSize,
-                               0L, TimeUnit.MILLISECONDS,
-                               new SynchronousQueue<Runnable>(),
+        new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new SynchronousQueue<Runnable>(),
                                new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new DefaultScheduler(resolveSchedulerCreationLocation(name),
-                                                                  executor,
-                                                                  cores, cores, scheduledExecutor, quartzScheduler, CUSTOM) {
+    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores, cores,
+                                                                 scheduledExecutor, quartzScheduler, CUSTOM);
+    return customScheduler;
+  }
 
-      @Override
-      public void shutdown() {
-        super.shutdown();
-        executor.shutdown();
-      }
-
-      @Override
-      public List<Runnable> shutdownNow() {
-        final List<Runnable> cancelledTasks = super.shutdownNow();
-        executor.shutdownNow();
-        customSchedulersExecutors.remove(this);
-        return cancelledTasks;
-      }
-    };
+  @Override
+  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+    final ExecutorService executor =
+        new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new LinkedBlockingQueue<Runnable>(queueSize),
+                               new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
+    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores, cores,
+                                                                 scheduledExecutor, quartzScheduler, CUSTOM);
     customSchedulersExecutors.add(customScheduler);
     return customScheduler;
+  }
+
+  private class CustomScheduler extends DefaultScheduler {
+
+    private final ExecutorService executor;
+
+    private CustomScheduler(String name, ExecutorService executor, int workers, int totalWorkers,
+                            ScheduledExecutorService scheduledExecutor, org.quartz.Scheduler quartzScheduler,
+                            ThreadType threadsType) {
+      super(name, executor, workers, totalWorkers, scheduledExecutor, quartzScheduler, threadsType);
+      this.executor = executor;
+    }
+
+    @Override
+    public void shutdown() {
+      super.shutdown();
+      executor.shutdown();
+    }
+
+    @Override
+    public List<Runnable> shutdownNow() {
+      final List<Runnable> cancelledTasks = super.shutdownNow();
+      executor.shutdownNow();
+      customSchedulersExecutors.remove(this);
+      return cancelledTasks;
+    }
   }
 
   private String resolveSchedulerCreationLocation(String prefix) {

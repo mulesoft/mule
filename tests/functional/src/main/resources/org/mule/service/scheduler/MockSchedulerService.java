@@ -40,6 +40,11 @@ public class MockSchedulerService implements SchedulerService {
   }
   
   @Override
+  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+    return new MockScheduler();
+  }
+  
+  @Override
   public ThreadType currentThreadType() {
     return CUSTOM;
   }
