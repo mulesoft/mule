@@ -15,6 +15,7 @@ import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -74,7 +75,7 @@ public class MacroExpansionModuleModel {
     this.applicationModel = applicationModel;
     this.extensions = extensions.stream()
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
-        .collect(toMap(extensionModel -> extensionModel.getName(), identity()));;
+        .collect(toMap(extensionModel -> extensionModel.getName(), identity()));
   }
 
   /**
@@ -104,8 +105,16 @@ public class MacroExpansionModuleModel {
         }
         ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
         if (extensionModel != null) {
+
+          // TODO(fernandezlautaro): MULE-11057	clean the usage of the HasOperationModels
+          HasOperationModels hasOperationModels = extensionModel;
+          final Optional<ConfigurationModel> configurationModel =
+              extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME);
+          if (configurationModel.isPresent()) {
+            hasOperationModels = configurationModel.get();
+          }
           //config elements will be worked later on, that's why we are skipping this element
-          OperationModel operationModel = extensionModel.getOperationModel(identifierName)
+          OperationModel operationModel = hasOperationModels.getOperationModel(identifierName)
               .orElseThrow(() -> new IllegalArgumentException(format("The operation '%s' is missing in the module '%s'",
                                                                      identifierName, extensionModel.getName())));
           ComponentModel replacementModel = createOperationInstance(operationRefModel, extensionModel, operationModel);
