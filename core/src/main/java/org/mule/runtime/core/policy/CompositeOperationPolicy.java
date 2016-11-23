@@ -10,34 +10,33 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
-import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link OperationPolicy} created from a list of {@link ParameterizedPolicy}.
+ * {@link OperationPolicy} created from a list of {@link Policy}.
  * <p>
- * Takes care of chaining the list of {@link ParameterizedPolicy} to create a single
+ * Takes care of chaining the list of {@link Policy} to create a single
  * policy that can be applied to a source.
  *
  * @since 4.0
  */
 public class CompositeOperationPolicy implements OperationPolicy {
 
-  private List<ParameterizedPolicy> parameterizedPolicies;
+  private List<Policy> parameterizedPolicies;
   private Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer;
   private PolicyStateHandler policyStateHandler;
 
   /**
    * Creates a new composite policy.
    *
-   * @param parameterizedPolicies list of {@link ParameterizedPolicy} to chain together.
+   * @param parameterizedPolicies                list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param policyStateHandler state handler for policies execution.
+   * @param policyStateHandler                   state handler for policies execution.
    */
-  public CompositeOperationPolicy(List<ParameterizedPolicy> parameterizedPolicies,
+  public CompositeOperationPolicy(List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                   PolicyStateHandler policyStateHandler) {
     this.parameterizedPolicies = parameterizedPolicies;
@@ -46,7 +45,12 @@ public class CompositeOperationPolicy implements OperationPolicy {
   }
 
   /**
-   * {@inheritDoc}
+   * When this policy is processed, it will use the {@link NextOperationCall} which will keep track of the different policies to be applied and
+   * the current index of the policy under execution.
+   * <p>
+   * The first time, the first policy in the {@code parameterizedPolicies} will be executed, it will receive as it next operation the same
+   * instance of {@link NextOperationCall}, and since {@link NextOperationCall} keeps track of the policy executed, it will execute the following
+   * policy in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation execution.
    */
   @Override
   public Event process(Event operationEvent, Processor nextProcessor, OperationParametersProcessor operationParametersProcessor)
@@ -78,10 +82,10 @@ public class CompositeOperationPolicy implements OperationPolicy {
         operationResponseEvent = operationProcessor.process(event);
         return operationResponseEvent;
       }
-      ParameterizedPolicy parameterizedPolicy = parameterizedPolicies.get(index);
+      Policy policy = parameterizedPolicies.get(index);
       index++;
       DefaultOperationPolicy defaultOperationPolicy =
-          new DefaultOperationPolicy(parameterizedPolicy.getPolicyChain(), operationPolicyParametersTransformer,
+          new DefaultOperationPolicy(policy.getPolicyChain(), operationPolicyParametersTransformer,
                                      policyStateHandler);
       try {
         defaultOperationPolicy.process(operationEvent, this, operationParametersProcessor);

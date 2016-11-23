@@ -41,6 +41,14 @@ public class DefaultSourcePolicy implements SourcePolicy {
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
 
+  /**
+   * Creates a new {@code DefaultSourcePolicy}.
+   *
+   * @param policyChain the policy chain to execute before and after the source.
+   * @param sourcePolicyParametersTransformer transformer from the response and failure response parameters to a message and vice
+   *        versa.
+   * @param policyStateHandler the state handler for the policy.
+   */
   public DefaultSourcePolicy(PolicyChain policyChain,
                              Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                              PolicyStateHandler policyStateHandler) {
@@ -73,6 +81,19 @@ public class DefaultSourcePolicy implements SourcePolicy {
     return Event.builder(result.getContext()).message(result.getMessage()).build();
   }
 
+  /**
+   * Creates the actual behaviour to be executed by {@link PolicyNextActionMessageProcessor}.
+   *
+   * It delegates the execution to the {@code nextOperation} which may be another policy/flow chain
+   * and based on the output of the policy/flow it generates a {@link Message} using {@code messageSourceResponseParametersProcessor}
+   * which is used as response of the {@link PolicyNextActionMessageProcessor} to continue the execution of the policy.
+   *
+   * @param nextOperation a processor which may be another policy or the flow.
+   * @param sourceEvent the event generated from the source.
+   * @param messageSourceResponseParametersProcessor a processor to convert an {@link Event} to the set of parameters used to
+   *        execute the successful or failure response function of the source.
+   * @return the processor to be executed by the {@link PolicyNextActionMessageProcessor} of the policy chain.
+   */
   private Processor buildFlowExecutionWithPolicyFunction(Processor nextOperation, Event sourceEvent,
                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return (processEvent) -> {

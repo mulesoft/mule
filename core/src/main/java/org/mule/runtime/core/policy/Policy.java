@@ -6,29 +6,47 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
+import static java.util.Collections.emptyMap;
+import org.mule.runtime.api.metadata.TypedValue;
 
-import java.util.Optional;
+import java.util.Map;
 
 /**
- * A policy has a chain of {@link org.mule.runtime.core.api.processor.Processor}s to be applied to a source
- * and another chain to be applied to an operation.
- * 
- * Both of them are optionals since a policy may apply only to a source or only to an operation.
- * 
- * @since 4.0
+ * This class represents a policy injection.
+ * <p>
+ * It contains the set of parameters configured to apply the policy and the chain of
+ * {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
  */
-public interface Policy extends Initialisable, Startable {
+public class Policy {
+
+  private final PolicyChain policyChain;
 
   /**
-   * @return chain of processors to intercept the source execution
+   * Creates a new {@code ParameterizedPolicy}.
+   * 
+   * @param policyChain the chain of {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
    */
-  Optional<PolicyChain> getSourcePolicyChain();
+  public Policy(PolicyChain policyChain) {
+    this.policyChain = policyChain;
+  }
 
   /**
-   * @return chain of processors to intercept an operation execution.
+   * Retrieves the set of parameters values to execute the policy. This parameters are expected to be part accessible from the
+   * expression language.
+   * 
+   * @return parameters to be used to execute the policy.
    */
-  Optional<PolicyChain> getOperationPolicyChain();
+  public Map<String, TypedValue> getParameters() {
+    return emptyMap();
+  }
+
+  /**
+   * Retrieves the chain with the logic related to the policy.
+   *
+   * @return a chain of {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
+   */
+  public PolicyChain getPolicyChain() {
+    return policyChain;
+  }
 
 }

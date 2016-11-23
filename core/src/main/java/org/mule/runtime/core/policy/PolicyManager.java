@@ -29,7 +29,7 @@ public interface PolicyManager {
    *
    * @param executionIdentifier the unique identifier associated to the exection of a policy instance.
    * @param sourceIdentifier the identifier of the message source
-   * @return a {@link DefaultOperationPolicy} associated to that source.
+   * @return a {@link SourcePolicy} associated to that source.
    */
   Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier);
 
@@ -40,7 +40,7 @@ public interface PolicyManager {
    *
    * @param executionIdentifier the unique identifier associated to the exection of a policy instance.
    * @param operationIdentifier the identifier of the operation.
-   * @return a {@link DefaultOperationPolicy} associated to that source.
+   * @return a {@link OperationPolicy} associated to that source.
    */
   Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, ComponentIdentifier operationIdentifier);
 

@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 
 
 //TODO MULE-10963 - Remove FlowConstruct implementation once MPs don't depend on FlowConstructAware anymore.
-public class DefaultPolicy implements Policy, FlowConstruct, MuleContextAware, Lifecycle {
+public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
 
-  private final static Logger logger = LoggerFactory.getLogger(DefaultPolicy.class);
+  private final static Logger logger = LoggerFactory.getLogger(DefaultPolicyInstance.class);
 
   private PolicyChain operationPolicyChain;
   private PolicyChain sourcePolicyChain;

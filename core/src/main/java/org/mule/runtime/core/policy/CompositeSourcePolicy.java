@@ -16,27 +16,26 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link SourcePolicy} created from a list of {@link ParameterizedPolicy}.
+ * {@link SourcePolicy} created from a list of {@link Policy}.
  * <p>
- * Takes care of chaining the list of {@link ParameterizedPolicy} to create a single
- * policy that can be applied to a source.
+ * Takes care of chaining the list of {@link Policy} to create a single policy that can be applied to a source.
  *
  * @since 4.0
  */
 public class CompositeSourcePolicy implements SourcePolicy {
 
-  private List<ParameterizedPolicy> parameterizedPolicies;
+  private List<Policy> parameterizedPolicies;
   private Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
   private PolicyStateHandler policyStateHandler;
 
   /**
    * Creates a new composite policy.
    *
-   * @param parameterizedPolicies list of {@link ParameterizedPolicy} to chain together.
+   * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param sourcePolicyParametersTransformer transformer from the response parameters to a message and vice versa.
    * @param policyStateHandler state handler for policies execution.
    */
-  public CompositeSourcePolicy(List<ParameterizedPolicy> parameterizedPolicies,
+  public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                                PolicyStateHandler policyStateHandler) {
     this.parameterizedPolicies = parameterizedPolicies;
@@ -45,7 +44,13 @@ public class CompositeSourcePolicy implements SourcePolicy {
   }
 
   /**
-   * {@inheritDoc}
+   * When this policy is processed, it will use the {@link CompositeSourcePolicy.NextOperationCall} which will keep track of the
+   * different policies to be applied and the current index of the policy under execution.
+   * <p>
+   * The first time, the first policy in the {@code parameterizedPolicies} will be executed, it will receive as it next operation
+   * the same instance of {@link CompositeSourcePolicy.NextOperationCall}, and since
+   * {@link CompositeSourcePolicy.NextOperationCall} keeps track of the policy executed, it will execute the following policy in
+   * the chain until the finally policy it's executed in which case then next operation of it, it will be the flow execution.
    */
   @Override
   public Event process(Event sourceEvent, Processor nextOperation,
@@ -76,10 +81,10 @@ public class CompositeSourcePolicy implements SourcePolicy {
       if (index >= parameterizedPolicies.size()) {
         return nonPolicyNextOperation.process(event);
       }
-      ParameterizedPolicy parameterizedPolicy = parameterizedPolicies.get(index);
+      Policy policy = parameterizedPolicies.get(index);
       index++;
       DefaultSourcePolicy defaultSourcePolicy =
-          new DefaultSourcePolicy(parameterizedPolicy.getPolicyChain(), sourcePolicyParametersTransformer, policyStateHandler);
+          new DefaultSourcePolicy(policy.getPolicyChain(), sourcePolicyParametersTransformer, policyStateHandler);
       try {
         return defaultSourcePolicy.process(sourceEvent, this, messageSourceResponseParametersProcessor);
       } catch (MuleException e) {

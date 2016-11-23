@@ -19,12 +19,12 @@ import java.util.List;
 public class NullPolicyProvider implements PolicyProvider {
 
   @Override
-  public List<ParameterizedPolicy> findSourceParameterizedPolicies(ComponentIdentifier sourceIdentifier) {
+  public List<Policy> findSourceParameterizedPolicies(ComponentIdentifier sourceIdentifier) {
     return emptyList();
   }
 
   @Override
-  public List<ParameterizedPolicy> findOperationParameterizedPolicies(ComponentIdentifier operationIdentifier) {
+  public List<Policy> findOperationParameterizedPolicies(ComponentIdentifier operationIdentifier) {
     return emptyList();
   }
 }

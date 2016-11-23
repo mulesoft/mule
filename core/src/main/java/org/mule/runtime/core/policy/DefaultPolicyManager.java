@@ -42,7 +42,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   @Override
   public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier) {
-    List<ParameterizedPolicy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourceIdentifier);
+    List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourceIdentifier);
     if (parameterizedPolicies.isEmpty()) {
       return empty();
     }
@@ -52,7 +52,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   @Override
   public Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, ComponentIdentifier operationIdentifier) {
-    List<ParameterizedPolicy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(operationIdentifier);
+    List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(operationIdentifier);
     if (parameterizedPolicies.isEmpty()) {
       return empty();
     }
