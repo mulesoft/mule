@@ -258,7 +258,6 @@
         <war.plugin.version>2.6</war.plugin.version>
         <shade.plugin.version>2.4.3</shade.plugin.version>
         <build.helper.maven.plugin.version>1.10</build.helper.maven.plugin.version>
-        <shitty.maven.plugin.version>1.0-alpha-3</shitty.maven.plugin.version>
         <assembly.verifier.version>1.4</assembly.verifier.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
@@ -1750,11 +1749,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>${build.helper.maven.plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>shitty-maven-plugin</artifactId>
-                    <version>${shitty.maven.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.mule.tools</groupId>
