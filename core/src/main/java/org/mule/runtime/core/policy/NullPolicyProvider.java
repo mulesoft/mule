@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.policy;
 
-import static java.util.Optional.empty;
+import static java.util.Collections.emptyList;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * A policy provider that returns no policy.
@@ -19,12 +19,12 @@ import java.util.Optional;
 public class NullPolicyProvider implements PolicyProvider {
 
   @Override
-  public Optional<PolicyChain> findSourcePolicyChain(ComponentIdentifier sourceIdentifier) {
-    return empty();
+  public List<ParameterizedPolicy> findSourceParameterizedPolicies(ComponentIdentifier sourceIdentifier) {
+    return emptyList();
   }
 
   @Override
-  public Optional<PolicyChain> findOperationPolicyChain(ComponentIdentifier operationIdentifier) {
-    return empty();
+  public List<ParameterizedPolicy> findOperationParameterizedPolicies(ComponentIdentifier operationIdentifier) {
+    return emptyList();
   }
 }

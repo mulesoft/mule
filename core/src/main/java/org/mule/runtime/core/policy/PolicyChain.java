@@ -30,12 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract policy chain for handling the message processor associated to a policy.
+ * Policy chain for handling the message processor associated to a policy.
  *
  * @since 4.0
  */
-public class PolicyChain
-    implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
+public class PolicyChain implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
 
 
   @Inject

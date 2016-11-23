@@ -6,48 +6,16 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
-
-import java.util.Map;
-import java.util.Optional;
 
 /**
- * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
- * 
- * In order for this class to be able to execute a policy it requires an {@link PolicyChain} with the content of the policy. Such
- * policy may have an {@link PolicyNextActionMessageProcessor} which will be the one used to execute the provided
- * {@link Processor} which may be another policy or the actual logic behind the
- * {@link org.mule.runtime.core.api.source.MessageSource} which typically is a flow execution.
- * 
- * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link Event} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link Event}
- * from the policy to the next operation {@link Event} or from the next operation result to the {@link Event} that must continue
- * the execution of the policy.
- * 
- * If a non-empty {@code sourcePolicyParametersTransformer} is passed to this class, then it will be used to convert the result of
- * the policy chain execution to the set of parameters that the success response function or the failure response function will be
- * used to execute.
+ * Interceptor of a {@link Processor} that executes logic before and after it. It allows to modify the content of the response (if
+ * any) to be sent by a {@link org.mule.runtime.core.api.source.MessageSource}
+ *
+ * @since 4.0
  */
-public class SourcePolicy {
-
-  private final PolicyChain policyChain;
-  private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
-  private final PolicyStateHandler policyStateHandler;
-  private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
-
-  public SourcePolicy(PolicyChain policyChain,
-                      Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                      PolicyStateHandler policyStateHandler) {
-    this.policyChain = policyChain;
-    this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
-    this.policyStateHandler = policyStateHandler;
-  }
+public interface SourcePolicy {
 
   /**
    * Process the source policy chain of processors. The provided {@code nextOperation} function has the behaviour to be executed
@@ -61,43 +29,8 @@ public class SourcePolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  public Event process(Event sourceEvent, Processor nextOperation,
-                       MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor)
-      throws Exception {
-    Processor sourceNextOperation =
-        buildFlowExecutionWithPolicyFunction(nextOperation, sourceEvent, messageSourceResponseParametersProcessor);
-    policyStateHandler.updateNextOperation(sourceEvent.getContext().getId(), sourceNextOperation);
-    Event result = policyChain
-        .process(policyEventConverter.createEvent(sourceEvent.getMessage(), Event.builder(sourceEvent.getContext()).build()));
-    return Event.builder(result.getContext()).message(result.getMessage()).build();
-  }
+  Event process(Event sourceEvent, Processor nextOperation,
+                MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor)
+      throws Exception;
 
-  private Processor buildFlowExecutionWithPolicyFunction(Processor nextOperation, Event sourceEvent,
-                                                         MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-    return (processEvent) -> {
-      Event lastPolicyEvent = policyStateHandler.getLatestState(sourceEvent.getContext().getId()).get();
-      try {
-        Event flowExecutionResponse = nextOperation.process(sourceEvent);
-        Message message = sourcePolicyParametersTransformer.map(policyTransformer -> {
-          Map<String, Object> responseParameters =
-              messageSourceResponseParametersProcessor.getSuccessfulExecutionResponseParametersFunction()
-                  .apply(flowExecutionResponse);
-          return sourcePolicyParametersTransformer.get()
-              .fromSuccessResponseParametersToMessage(responseParameters);
-        }).orElseGet(flowExecutionResponse::getMessage);
-        return policyEventConverter.createEvent(message, lastPolicyEvent);
-      } catch (MessagingException messagingException) {
-        Message message = messagingException.getEvent().getMessage();
-        Map<String, Object> failureParameters =
-            messageSourceResponseParametersProcessor.getFailedExecutionResponseParametersFunction()
-                .apply(messagingException.getEvent());
-        if (sourcePolicyParametersTransformer.isPresent()) {
-          message = sourcePolicyParametersTransformer.get().fromFailureResponseParametersToMessage(failureParameters);
-          throw new MessagingException(Event.builder(lastPolicyEvent).message((InternalMessage) message).build(),
-                                       messagingException.getCause());
-        }
-        throw messagingException;
-      }
-    };
-  }
 }

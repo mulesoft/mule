@@ -8,6 +8,8 @@ package org.mule.runtime.core.policy;
 
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,19 +20,23 @@ import java.util.Optional;
 public interface PolicyProvider {
 
   /**
-   * Creates a policy chain to be applied to a source.
+   * Creates a collection of {@link ParameterizedPolicy} with the policy chain to be applied to a source.
+   * <p>
+   * The provided collection must be in the correct order in which the policies must be applied.
    *
    * @param sourceIdentifier the identifier of the message source
-   * @return a {@link OperationPolicy} associated to that source.
+   * @return a {@link DefaultOperationPolicy} associated to that source.
    */
-  Optional<PolicyChain> findSourcePolicyChain(ComponentIdentifier sourceIdentifier);
+  List<ParameterizedPolicy> findSourceParameterizedPolicies(ComponentIdentifier sourceIdentifier);
 
   /**
-   * Creates a policy chain to be applied to an operation.
+   * Creates a collection of {@link ParameterizedPolicy} with the policy chain be applied to an operation.
+   * <p>
+   * The provided collection must be in the correct order in which the policies must be applied.
    *
    * @param operationIdentifier the identifier of the operation.
-   * @return a {@link OperationPolicy} associated to that source.
+   * @return a {@link DefaultOperationPolicy} associated to that source.
    */
-  Optional<PolicyChain> findOperationPolicyChain(ComponentIdentifier operationIdentifier);
+  List<ParameterizedPolicy> findOperationParameterizedPolicies(ComponentIdentifier operationIdentifier);
 
 }
