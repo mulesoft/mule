@@ -12,13 +12,6 @@
     <flow name="delaySchedule" processingStrategy="synchronous">
         <test:skeleton-source/>
         <custom-processor class="org.mule.test.service.scheduler.SchedulerServiceTestCase$WaitingProcessor"/>
-        <error-handler>
-            <on-error-continue>
-            	<test:component throwException="true"
-            		exceptionToThrow="junit.framework.AssertionFailedError"
-            		exceptionText="OVERLOAD error must not be handled by an error handler."/>
-            </on-error-continue>
-        </error-handler>
     </flow>
 
 </mule>

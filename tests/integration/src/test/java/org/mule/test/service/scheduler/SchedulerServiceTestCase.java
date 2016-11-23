@@ -19,6 +19,9 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import org.mule.functional.functional.SkeletonSource;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -36,7 +39,6 @@ import java.util.concurrent.RejectedExecutionException;
 import javax.inject.Inject;
 
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -87,8 +89,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   public ExpectedException expected = none();
 
   @Test
-  @Ignore("Check ErrorHandler.handleException")
-  @Description("Tests that an OVERLOAD error is handled only by the message source.")
+  @Description("Tests that an OVERLOAD error is handled only by the message source."
+      + " This assumes org.mule.test.integration.exceptions.ErrorHandlerTestCase#criticalNotHandled")
   public void overloadErrorHandlingFromSource() throws Exception {
     FlowConstruct delayScheduleFlow = getFlowConstruct("delaySchedule");
     MessageSource messageSource = ((Flow) delayScheduleFlow).getMessageSource();
@@ -115,7 +117,6 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
         errorTypeId = item.getEvent().getError().get().getErrorType().getIdentifier();
         return "OVERLOAD".equals(errorTypeId);
       }
-
     });
     expected.expectCause(instanceOf(RejectedExecutionException.class));
 
@@ -146,9 +147,9 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  public static class WaitingProcessor implements Processor {
+  public static class WaitingProcessor implements Processor, Initialisable, Disposable {
 
-    public static final Latch latch = new Latch();
+    public static Latch latch = new Latch();
 
     @Inject
     private SchedulerService schedulerService;
@@ -156,15 +157,13 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     private volatile Scheduler scheduler;
 
     @Override
-    public Event process(Event event) throws MuleException {
-      if (scheduler == null) {
-        synchronized (this) {
-          if (scheduler == null) {
-            scheduler = schedulerService.ioScheduler();
-          }
-        }
-      }
+    public void initialise() throws InitialisationException {
+      latch = new Latch();
+      scheduler = schedulerService.ioScheduler();
+    }
 
+    @Override
+    public Event process(Event event) throws MuleException {
       scheduler.submit(() -> {
         try {
           latch.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
@@ -173,6 +172,11 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
         }
       });
       return event;
+    }
+
+    @Override
+    public void dispose() {
+      scheduler.shutdownNow();
     }
   }
 }
