@@ -7,7 +7,6 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
@@ -18,80 +17,42 @@ import java.util.Optional;
 /**
  * {@link SourcePolicy} created from a list of {@link Policy}.
  * <p>
- * Takes care of chaining the list of {@link Policy} to create a single policy that can be applied to a source.
+ * Implements the template methods from {@link AbstractCompositePolicy} required to work with source policies.
  *
  * @since 4.0
  */
-public class CompositeSourcePolicy implements SourcePolicy {
+public class CompositeSourcePolicy extends
+    AbstractCompositePolicy<SourcePolicyParametersTransformer, MessageSourceResponseParametersProcessor> implements SourcePolicy {
 
-  private List<Policy> parameterizedPolicies;
-  private Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
-  private PolicyStateHandler policyStateHandler;
+  private SourcePolicyFactory sourcePolicyFactory;
 
-  /**
-   * Creates a new composite policy.
-   *
-   * @param parameterizedPolicies list of {@link Policy} to chain together.
-   * @param sourcePolicyParametersTransformer transformer from the response parameters to a message and vice versa.
-   * @param policyStateHandler state handler for policies execution.
-   */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                               PolicyStateHandler policyStateHandler) {
-    this.parameterizedPolicies = parameterizedPolicies;
-    this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
-    this.policyStateHandler = policyStateHandler;
+                               SourcePolicyFactory sourcePolicyFactory) {
+    super(parameterizedPolicies, sourcePolicyParametersTransformer);
+    this.sourcePolicyFactory = sourcePolicyFactory;
   }
 
   /**
-   * When this policy is processed, it will use the {@link CompositeSourcePolicy.NextOperationCall} which will keep track of the
-   * different policies to be applied and the current index of the policy under execution.
-   * <p>
-   * The first time, the first policy in the {@code parameterizedPolicies} will be executed, it will receive as it next operation
-   * the same instance of {@link CompositeSourcePolicy.NextOperationCall}, and since
-   * {@link CompositeSourcePolicy.NextOperationCall} keeps track of the policy executed, it will execute the following policy in
-   * the chain until the finally policy it's executed in which case then next operation of it, it will be the flow execution.
+   * Executes the flow and returns it's value since it's going to be used by the policy wrapping the flow.
    */
   @Override
-  public Event process(Event sourceEvent, Processor nextOperation,
-                       MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor)
-      throws Exception {
-    return new NextOperationCall(sourceEvent, nextOperation, messageSourceResponseParametersProcessor).process(sourceEvent);
+  protected Event processNextOperation(Processor nextOperation, Event event) throws MuleException {
+    return nextOperation.process(event);
   }
 
   /**
-   * Inner class that implements the actually chaining of policies.
+   * Always return the policy execution / flow execution result so the next policy executes with the modified version of the
+   * wrapped policy / flow.
    */
-  public class NextOperationCall implements Processor {
-
-    private int index = 0;
-    private Processor nonPolicyNextOperation;
-    private Event sourceEvent;
-    private MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
-
-    public NextOperationCall(Event sourceEvent, Processor nonPolicyNextOperation,
-                             MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-      this.nonPolicyNextOperation = nonPolicyNextOperation;
-      this.sourceEvent = sourceEvent;
-      this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
-    }
-
-    @Override
-    public Event process(Event event) throws MuleException {
-      if (index >= parameterizedPolicies.size()) {
-        return nonPolicyNextOperation.process(event);
-      }
-      Policy policy = parameterizedPolicies.get(index);
-      index++;
-      DefaultSourcePolicy defaultSourcePolicy =
-          new DefaultSourcePolicy(policy.getPolicyChain(), sourcePolicyParametersTransformer, policyStateHandler);
-      try {
-        return defaultSourcePolicy.process(sourceEvent, this, messageSourceResponseParametersProcessor);
-      } catch (MuleException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new DefaultMuleException(e);
-      }
-    }
+  @Override
+  protected Event processPolicy(Policy policy, Processor nextProcessor,
+                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
+                                MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
+                                Event event)
+      throws Exception {
+    SourcePolicy defaultSourcePolicy = sourcePolicyFactory.createSourcePolicy(policy, sourcePolicyParametersTransformer);
+    return defaultSourcePolicy.process(event, nextProcessor, messageSourceResponseParametersProcessor);
   }
+
 }

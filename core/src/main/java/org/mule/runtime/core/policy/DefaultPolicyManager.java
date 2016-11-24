@@ -39,6 +39,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   private Collection<OperationPolicyParametersTransformer> operationPolicyParametersTransformerCollection = emptyList();
   private Collection<SourcePolicyParametersTransformer> sourcePolicyParametersTransformerCollection = emptyList();
   private PolicyProvider policyProvider;
+  private OperationPolicyFactory operationPolicyFactory;
+  private SourcePolicyFactory sourcePolicyFactory;
 
   @Override
   public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier) {
@@ -47,7 +49,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       return empty();
     }
     return of(new CompositeSourcePolicy(parameterizedPolicies, lookupSourceParametersTransformer(sourceIdentifier),
-                                        policyStateHandler));
+                                        sourcePolicyFactory));
   }
 
   @Override
@@ -57,7 +59,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       return empty();
     }
     return of(new CompositeOperationPolicy(parameterizedPolicies, lookupOperationParametersTransformer(operationIdentifier),
-                                           policyStateHandler));
+                                           operationPolicyFactory));
   }
 
   @Override
@@ -78,6 +80,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   @Override
   public void initialise() throws InitialisationException {
     try {
+      operationPolicyFactory = new DefaultOperationPolicyFactory(policyStateHandler);
+      sourcePolicyFactory = new DefaultSourcePolicyFactory(policyStateHandler);
       policyProvider = muleContext.getRegistry().lookupObject(PolicyProvider.class);
       if (policyProvider == null) {
         policyProvider = new NullPolicyProvider();

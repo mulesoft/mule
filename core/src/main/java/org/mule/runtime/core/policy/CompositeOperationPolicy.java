@@ -7,7 +7,6 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
@@ -18,83 +17,55 @@ import java.util.Optional;
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
  * <p>
- * Takes care of chaining the list of {@link Policy} to create a single
- * policy that can be applied to a source.
+ * Implements the template methods from {@link AbstractCompositePolicy} required to work with operation policies.
  *
  * @since 4.0
  */
-public class CompositeOperationPolicy implements OperationPolicy {
+public class CompositeOperationPolicy extends
+    AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationParametersProcessor> implements OperationPolicy {
 
-  private List<Policy> parameterizedPolicies;
-  private Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer;
-  private PolicyStateHandler policyStateHandler;
+
+  private Event nextOperationResponse;
+  private OperationPolicyFactory operationPolicyFactory;
 
   /**
    * Creates a new composite policy.
    *
-   * @param parameterizedPolicies                list of {@link Policy} to chain together.
+   * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param policyStateHandler                   state handler for policies execution.
+   * @param operationPolicyFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
    */
   public CompositeOperationPolicy(List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                  PolicyStateHandler policyStateHandler) {
-    this.parameterizedPolicies = parameterizedPolicies;
-    this.operationPolicyParametersTransformer = operationPolicyParametersTransformer;
-    this.policyStateHandler = policyStateHandler;
+                                  OperationPolicyFactory operationPolicyFactory) {
+    super(parameterizedPolicies, operationPolicyParametersTransformer);
+    this.operationPolicyFactory = operationPolicyFactory;
   }
 
   /**
-   * When this policy is processed, it will use the {@link NextOperationCall} which will keep track of the different policies to be applied and
-   * the current index of the policy under execution.
-   * <p>
-   * The first time, the first policy in the {@code parameterizedPolicies} will be executed, it will receive as it next operation the same
-   * instance of {@link NextOperationCall}, and since {@link NextOperationCall} keeps track of the policy executed, it will execute the following
-   * policy in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation execution.
+   * Stores the operation result so all the chains after the operation execution are executed with the actual operation result and
+   * not a modified version from another policy.
    */
   @Override
-  public Event process(Event operationEvent, Processor nextProcessor, OperationParametersProcessor operationParametersProcessor)
-      throws Exception {
-    return new NextOperationCall(operationEvent, nextProcessor, operationParametersProcessor).process(operationEvent);
+  protected Event processNextOperation(Processor nextOperation, Event event) throws MuleException {
+    nextOperationResponse = nextOperation.process(event);
+    return nextOperationResponse;
   }
 
   /**
-   * Inner class that implements the actually chaining of policies.
+   * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
+   * with the actual operation result and not a modified version from another policy.
    */
-  public class NextOperationCall implements Processor {
-
-    private int index = 0;
-    private Processor operationProcessor;
-    private Event operationEvent;
-    private OperationParametersProcessor operationParametersProcessor;
-    private Event operationResponseEvent;
-
-    public NextOperationCall(Event operationEvent, Processor operationProcessor,
-                             OperationParametersProcessor operationParametersProcessor) {
-      this.operationEvent = operationEvent;
-      this.operationProcessor = operationProcessor;
-      this.operationParametersProcessor = operationParametersProcessor;
-    }
-
-    @Override
-    public Event process(Event event) throws MuleException {
-      if (index >= parameterizedPolicies.size()) {
-        operationResponseEvent = operationProcessor.process(event);
-        return operationResponseEvent;
-      }
-      Policy policy = parameterizedPolicies.get(index);
-      index++;
-      DefaultOperationPolicy defaultOperationPolicy =
-          new DefaultOperationPolicy(policy.getPolicyChain(), operationPolicyParametersTransformer,
-                                     policyStateHandler);
-      try {
-        defaultOperationPolicy.process(operationEvent, this, operationParametersProcessor);
-        return operationResponseEvent;
-      } catch (MuleException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new DefaultMuleException(e);
-      }
-    }
+  @Override
+  protected Event processPolicy(Policy policy, Processor nextProcessor,
+                                Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
+                                OperationParametersProcessor operationParametersProcessor,
+                                Event event)
+      throws Exception {
+    OperationPolicy defaultOperationPolicy =
+        operationPolicyFactory.createOperationPolicy(policy, operationPolicyParametersTransformer);
+    defaultOperationPolicy.process(event, nextProcessor, operationParametersProcessor);
+    return nextOperationResponse;
   }
+
 }
