@@ -29,8 +29,7 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
    *
    * @return the processing type for this processor.
    */
-  default ProcessingType getProccesingType()
-  {
+  default ProcessingType getProccesingType() {
     return CPU_LITE;
   }
 
