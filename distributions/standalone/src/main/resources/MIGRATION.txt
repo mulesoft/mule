@@ -11,6 +11,7 @@ MULE-9931: Transaction log files size are now restricted by size, using a defaul
 MULE-10100: Processing after a synchronous until successful resulting in a VoidMuleEvent will now continue with the original event.
 MULE-10306: XML entity expansion in XML transformers is now disabled by default because it allows DoS attacks. To restore previous behaviour use the expandInternalEntities="true" attribute.
 MULE-10686: XML entity expansion in Jersey is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
+MULE-10979: mule.timeout.synchronous and mule.timeout.transaction properties can't already been set through system properties. To a similar behaviour, use the configuration element.
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
