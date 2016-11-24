@@ -28,6 +28,7 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
 /**
  * Factory to create a {@link RepositorySystem} from Eclipse Aether to work in {@code offline} mode and resolve dependencies
@@ -53,17 +54,41 @@ public class RepositorySystemFactory {
    * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to resolve artifactId's {@link Path}s from workspace. Not
    *        {@code null}.
    */
-  public static DependencyResolver newLocalDependencyResolver(List<URL> classPath,
-                                                              WorkspaceLocationResolver workspaceLocationResolver,
-                                                              File mavenLocalRepositoryLocation) {
-    DefaultRepositorySystemSession session = newSession();
+  public static DependencyResolver newOfflineDependencyResolver(List<URL> classPath,
+                                                                WorkspaceLocationResolver workspaceLocationResolver,
+                                                                File mavenLocalRepositoryLocation) {
+    DefaultRepositorySystemSession session = newDefaultRepositorySystemSession();
     session.setOffline(true);
+    session.setIgnoreArtifactDescriptorRepositories(true);
+    RepositorySystem system = newRepositorySystem(classPath, workspaceLocationResolver, mavenLocalRepositoryLocation, session);
+    return new DependencyResolver(system, session);
+  }
+
+  /**
+   * Creates an instance of the {@link RepositorySystemFactory} to collect Maven dependencies.
+   *
+   * @param classPath {@link URL}'s from class path
+   * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to resolve artifactId's {@link Path}s from workspace. Not
+   *        {@code null}.
+   */
+  public static DependencyResolver newOnlineDependencyResolver(List<URL> classPath,
+                                                               WorkspaceLocationResolver workspaceLocationResolver,
+                                                               File mavenLocalRepositoryLocation) {
+    DefaultRepositorySystemSession session = newDefaultRepositorySystemSession();
+    RepositorySystem system = newRepositorySystem(classPath, workspaceLocationResolver, mavenLocalRepositoryLocation, session);
+    return new DependencyResolver(system, session);
+  }
+
+  private static DefaultRepositorySystemSession newDefaultRepositorySystemSession() {
+    DefaultRepositorySystemSession session = newSession();
 
     session.setUpdatePolicy(UPDATE_POLICY_NEVER);
     session.setChecksumPolicy(CHECKSUM_POLICY_IGNORE);
+    return session;
+  }
 
-    session.setIgnoreArtifactDescriptorRepositories(true);
-
+  private static RepositorySystem newRepositorySystem(List<URL> classPath, WorkspaceLocationResolver workspaceLocationResolver,
+                                                      File mavenLocalRepositoryLocation, DefaultRepositorySystemSession session) {
     RepositorySystem system = newRepositorySystem();
 
     // We have to set to use a "simple" aether local repository so it will not cache artifacts (enhanced is supported for doing
@@ -74,8 +99,7 @@ public class RepositorySystemFactory {
     session.setWorkspaceReader(new DefaultWorkspaceReader(classPath, workspaceLocationResolver));
 
     session.setRepositoryListener(new LoggerRepositoryListener());
-
-    return new DependencyResolver(system, session);
+    return system;
   }
 
   /**
@@ -91,6 +115,7 @@ public class RepositorySystemFactory {
     DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
     locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
     locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+    locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
 
     locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
 
@@ -102,5 +127,7 @@ public class RepositorySystemFactory {
 
     return locator.getService(RepositorySystem.class);
   }
+
+
 
 }
