@@ -68,9 +68,9 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(0));
 
-    assertThat(extensionModel.getOperationModels().size(), is(5));
+    assertThat(configurationModel.getOperationModels().size(), is(5));
 
-    Optional<OperationModel> operationModel = extensionModel.getOperationModel("set-payload-add-param-and-property-values");
+    Optional<OperationModel> operationModel = configurationModel.getOperationModel("set-payload-add-param-and-property-values");
     assertThat(operationModel.isPresent(), is(true));
     assertThat(operationModel.get().getParameterModels().size(), is(1));
     assertThat(operationModel.get().getParameterModels().get(0).getName(), is("value1"));
@@ -101,9 +101,9 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
-    assertThat(extensionModel.getOperationModels().size(), is(1));
+    assertThat(configurationModel.getOperationModels().size(), is(1));
 
-    Optional<OperationModel> operationModel = extensionModel.getOperationModel("do-login");
+    Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-login");
     assertThat(operationModel.isPresent(), is(true));
     assertThat(operationModel.get().getParameterModels().size(), is(2));
     assertThat(operationModel.get().getParameterModels().get(0).getName(), is("someUser"));
