@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.api.transport;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -65,4 +66,10 @@ public interface MessageDispatcher extends Connectable, Processor, LifecycleStat
   InternalMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
   InternalMessage createMuleMessage(Object transportMessage) throws MuleException;
+
+  @Override
+  default ProcessingType getProccesingType() {
+    return BLOCKING;
+  }
+
 }

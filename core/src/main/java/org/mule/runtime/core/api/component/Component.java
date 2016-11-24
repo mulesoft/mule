@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.component;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -25,4 +26,10 @@ public interface Component extends Processor, FlowConstructAware {
    * execution time.
    */
   ComponentStatistics getStatistics();
+
+  @Override
+  default ProcessingType getProccesingType() {
+    return BLOCKING;
+  }
+
 }

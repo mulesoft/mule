@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -95,4 +98,10 @@ public interface Transformer extends Processor, Initialisable, Disposable, Namea
    * @since 3.0.0
    */
   DataType getReturnDataType();
+
+  @Override
+  default ProcessingType getProccesingType() {
+    return CPU_INTENSIVE;
+  }
+
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.config.i18n.CoreMessages.responseTimedOutWaitingForId;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -343,5 +344,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
       return event;
     }
+  }
+
+  @Override
+  public ProcessingType getProccesingType() {
+    return BLOCKING;
   }
 }
