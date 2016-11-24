@@ -11,11 +11,23 @@
     </httpn:request-config>
 
     <flow name="payloadSourceFlow">
-        <httpn:request config-ref="config" path="test" method="POST" source="#[payload]"/>
+        <httpn:request config-ref="config" path="test" method="POST">
+            <httpn:request-builder>
+                <httpn:body>
+                    #[dw:payload]
+                </httpn:body>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="customSourceFlow">
-        <httpn:request config-ref="config" path="test" method="POST" source="#[customSource]"/>
+        <httpn:request config-ref="config" path="test" method="POST">
+            <httpn:request-builder>
+                <httpn:body>
+                    #[dw:customSource]
+                </httpn:body>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="payloadTargetFlow">

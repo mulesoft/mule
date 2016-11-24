@@ -20,6 +20,7 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -145,7 +146,6 @@ public class HttpRequester {
     private boolean followRedirects;
     private HttpStreamingType requestStreamingMode;
     private HttpSendBodyMode sendBodyMode;
-    private String source;
     private HttpAuthentication authentication;
 
     private int responseTimeout;
@@ -153,6 +153,7 @@ public class HttpRequester {
     private ResponseValidator responseValidator;
 
     private HttpRequesterConfig config;
+    private TransformationService transformationService;
 
     public Builder setUri(String uri) {
       this.uri = uri;
@@ -176,11 +177,6 @@ public class HttpRequester {
 
     public Builder setSendBodyMode(HttpSendBodyMode sendBodyMode) {
       this.sendBodyMode = sendBodyMode;
-      return this;
-    }
-
-    public Builder setSource(String source) {
-      this.source = source;
       return this;
     }
 
@@ -209,9 +205,14 @@ public class HttpRequester {
       return this;
     }
 
+    public Builder setTransformationService(TransformationService transformationService) {
+      this.transformationService = transformationService;
+      return this;
+    }
+
     public HttpRequester build() {
       MuleEventToHttpRequest eventToHttpRequest =
-          new MuleEventToHttpRequest(config, uri, method, requestStreamingMode, sendBodyMode, source);
+          new MuleEventToHttpRequest(config, uri, method, requestStreamingMode, sendBodyMode, transformationService);
       return new HttpRequester(eventToHttpRequest, followRedirects, authentication, parseResponse, responseTimeout,
                                responseValidator, config);
     }

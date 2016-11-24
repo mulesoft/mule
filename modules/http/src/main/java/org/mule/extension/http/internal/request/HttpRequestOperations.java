@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -21,13 +22,16 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpRequestMetadataResolver;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -55,8 +59,6 @@ public class HttpRequestOperations {
    * @param method The HTTP method for the request.
    * @param host Host where the requests will be sent.
    * @param port Port where the requests will be sent.
-   * @param source The expression used to obtain the body that will be sent in the request. Default is empty, so the payload will
-   *        be used as the body.
    * @param followRedirects Specifies whether to follow redirects or not.
    * @param parseResponse Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
    * @param requestStreamingMode Defines if the request should be sent using streaming or not.
@@ -78,7 +80,6 @@ public class HttpRequestOperations {
                                                             group = CONFIGURATION_OVERRIDES, order = 1) String host,
                                                         @Optional @Placement(tab = ADVANCED,
                                                             group = CONFIGURATION_OVERRIDES, order = 2) Integer port,
-                                                        @Optional String source,
                                                         @Optional @Placement(tab = ADVANCED,
                                                             group = CONFIGURATION_OVERRIDES,
                                                             order = 3) Boolean followRedirects,
@@ -94,7 +95,7 @@ public class HttpRequestOperations {
                                                         @Optional @Placement(tab = ADVANCED,
                                                             group = CONFIGURATION_OVERRIDES,
                                                             order = 7) Integer responseTimeout,
-                                                        @Optional HttpRequesterRequestBuilder requestBuilder,
+                                                        @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
                                                         @MetadataKeyId @Optional(
                                                             defaultValue = "ANY") @Placement(
                                                                 tab = ADVANCED,
@@ -122,9 +123,10 @@ public class HttpRequestOperations {
 
     HttpRequester requester =
         new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
-            .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody).setSource(source)
+            .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody)
             .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
-            .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config).build();
+            .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config)
+            .setTransformationService(muleContext.getTransformationService()).build();
 
     // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
     final Flow flowConstruct = new Flow("httpRequestOperation", muleContext);
