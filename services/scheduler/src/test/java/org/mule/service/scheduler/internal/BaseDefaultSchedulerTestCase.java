@@ -78,7 +78,7 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
   }
 
   protected ScheduledExecutorService createExecutor() {
-    return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, 1, sharedScheduledExecutor,
+    return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
                                 sharedQuartzScheduler, CUSTOM);
   }
 

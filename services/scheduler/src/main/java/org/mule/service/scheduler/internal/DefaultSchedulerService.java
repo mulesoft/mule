@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
 import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
+import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.loadThreadPoolsConfig;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -26,11 +27,11 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.scheduler.ThreadType;
+import org.mule.service.scheduler.internal.config.ThreadPoolsConfig;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -59,9 +60,6 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   private static final Logger logger = getLogger(DefaultSchedulerService.class);
 
-  // TODO MULE-10585 Externalize this timeout
-  private static final int GRACEFUL_SHUTDOWN_TIMEOUT_SECS = 60;
-
   private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
   private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
   private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
@@ -69,6 +67,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private static final String CUSTOM_THREADS_NAME = SchedulerService.class.getSimpleName() + "_custom";
 
   private int cores = getRuntime().availableProcessors();
+  private ThreadPoolsConfig threadPoolsConfig;
 
   private final ThreadGroup schedulerGroup = new ThreadGroup(getName());
   private final ThreadGroup cpuLightGroup = new ThreadGroup(schedulerGroup, CPU_LIGHT_THREADS_NAME);
@@ -92,19 +91,19 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuLightScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT);
+                                scheduledExecutor, quartzScheduler, CPU_LIGHT);
   }
 
   @Override
   public Scheduler ioScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, IO);
+                                scheduledExecutor, quartzScheduler, IO);
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
     return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                                (cores + 4 + 4) * cores, scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
+                                scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
   }
 
   @Override
@@ -112,7 +111,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     final ExecutorService executor =
         new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new SynchronousQueue<Runnable>(),
                                new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores, cores,
+    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores,
                                                                  scheduledExecutor, quartzScheduler, CUSTOM);
     return customScheduler;
   }
@@ -122,7 +121,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     final ExecutorService executor =
         new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new LinkedBlockingQueue<Runnable>(queueSize),
                                new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores, cores,
+    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores,
                                                                  scheduledExecutor, quartzScheduler, CUSTOM);
     customSchedulersExecutors.add(customScheduler);
     return customScheduler;
@@ -132,10 +131,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     private final ExecutorService executor;
 
-    private CustomScheduler(String name, ExecutorService executor, int workers, int totalWorkers,
-                            ScheduledExecutorService scheduledExecutor, org.quartz.Scheduler quartzScheduler,
-                            ThreadType threadsType) {
-      super(name, executor, workers, totalWorkers, scheduledExecutor, quartzScheduler, threadsType);
+    private CustomScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
+                            org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
+      super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType);
       this.executor = executor;
     }
 
@@ -190,18 +188,20 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   public void start() throws MuleException {
     logger.info("Starting " + this.toString() + "...");
 
-    // TODO MULE-10585 Externalize the threads configuration
-    cpuLightExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
-                                              new SchedulerThreadFactory(cpuLightGroup));
-    ioExecutor = new ThreadPoolExecutor(cores, cores * cores, 30, SECONDS, new SynchronousQueue<>(),
-                                        new SchedulerThreadFactory(ioGroup));
-    computationExecutor = new ThreadPoolExecutor(2 * cores, 2 * cores, 0, SECONDS, new LinkedBlockingQueue<>(),
-                                                 new SchedulerThreadFactory(computationGroup));
+    threadPoolsConfig = loadThreadPoolsConfig();
+
+    cpuLightExecutor = new ThreadPoolExecutor(threadPoolsConfig.getCpuLightPoolSize(), threadPoolsConfig.getCpuLightPoolSize(),
+                                              0, SECONDS, new LinkedBlockingQueue<>(), new SchedulerThreadFactory(cpuLightGroup));
+    ioExecutor = new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize(), threadPoolsConfig.getIoMaxPoolSize(),
+                                        30, SECONDS, new SynchronousQueue<>(), new SchedulerThreadFactory(ioGroup));
+    computationExecutor =
+        new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize(), threadPoolsConfig.getCpuIntensivePoolSize(),
+                               0, SECONDS, new LinkedBlockingQueue<>(),
+                               new SchedulerThreadFactory(computationGroup));
     scheduledExecutor = newScheduledThreadPool(1, new SchedulerThreadFactory(timerGroup, "%s"));
     StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     try {
-      // TODO MULE-10585 Externalize the quartz configuration
-      schedulerFactory.initialize(defaultQuartzProperties());
+      schedulerFactory.initialize(threadPoolsConfig.defaultQuartzProperties(getName()));
       quartzScheduler = schedulerFactory.getScheduler();
       quartzScheduler.start();
     } catch (SchedulerException e) {
@@ -261,23 +261,13 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   protected void waitForExecutorTermination(final long startMillis, final ExecutorService executor, final String executorLabel)
       throws InterruptedException {
-    if (!executor.awaitTermination(SECONDS.toMillis(GRACEFUL_SHUTDOWN_TIMEOUT_SECS) - (currentTimeMillis() - startMillis),
-                                   MILLISECONDS)) {
+    if (!executor.awaitTermination(SECONDS.toMillis(threadPoolsConfig.getGracefulShutdownTimeoutSeconds())
+        - (currentTimeMillis() - startMillis), MILLISECONDS)) {
       final List<Runnable> cancelledJobs = executor.shutdownNow();
       logger.warn("'" + executorLabel + "' " + executor.toString() + " of " + this.toString()
-          + " did not shutdown gracefully after " + GRACEFUL_SHUTDOWN_TIMEOUT_SECS + " seconds. " + cancelledJobs.size()
-          + " jobs were cancelled.");
+          + " did not shutdown gracefully after " + threadPoolsConfig.getGracefulShutdownTimeoutSeconds() + " seconds. "
+          + cancelledJobs.size() + " jobs were cancelled.");
     }
-  }
-
-  private Properties defaultQuartzProperties() {
-    Properties factoryProperties = new Properties();
-
-    factoryProperties.setProperty("org.quartz.scheduler.instanceName", getName());
-    factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
-    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", getName() + "_qz");
-    factoryProperties.setProperty("org.quartz.threadPool.threadCount", "1");
-    return factoryProperties;
   }
 
 }

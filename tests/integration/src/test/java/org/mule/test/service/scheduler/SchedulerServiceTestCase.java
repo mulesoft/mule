@@ -71,7 +71,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Description("Tests that the exception that happens when a thread pool is full is properly handled.")
   public void overloadErrorHandling() throws Exception {
     int cores = getRuntime().availableProcessors();
-    // TODO MULE-10585 this cores * cores below is based on the value set on DefaultSchedulerService.
+    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize().
     for (int i = 0; i < cores * cores; ++i) {
       flowRunner("delaySchedule").run();
     }
@@ -96,7 +96,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     MessageSource messageSource = ((Flow) delayScheduleFlow).getMessageSource();
 
     int cores = getRuntime().availableProcessors();
-    // TODO MULE-10585 this cores * cores below is based on the value set on DefaultSchedulerService.
+    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize().
     for (int i = 0; i < cores * cores; ++i) {
       ((SkeletonSource) messageSource).getListener()
           .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).build());
