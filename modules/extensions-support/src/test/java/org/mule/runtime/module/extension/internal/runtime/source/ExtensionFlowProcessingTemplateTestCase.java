@@ -17,13 +17,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.execution.ExceptionCallback;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.execution.ExceptionCallback;
+import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -51,6 +51,9 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   private Processor messageProcessor;
 
   @Mock
+  private MessageProcessContext messageProcessorContext;
+
+  @Mock
   private SourceCompletionHandler completionHandler;
 
   @Mock
@@ -71,7 +74,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Before
   public void before() {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, completionHandler);
+    template = new ModuleFlowProcessingTemplate(message, messageProcessor, completionHandler, messageProcessorContext);
   }
 
   @Test

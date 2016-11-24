@@ -9,6 +9,7 @@ package org.mule.runtime.core.execution;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.concurrent.Executor;
@@ -63,4 +64,9 @@ public interface MessageProcessContext {
    * @return the {@link ComponentIdentifier} of the message source.
    */
   ComponentIdentifier getSourceIdentifier();
+
+  /**
+   * @return the {@link ErrorTypeLocator} for this context
+   */
+  ErrorTypeLocator getErrorTypeLocator();
 }

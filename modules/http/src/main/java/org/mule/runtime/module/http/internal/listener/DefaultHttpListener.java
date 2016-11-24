@@ -132,7 +132,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                                                errorResponseBuilder);
           final HttpMessageProcessContext messageProcessContext =
               new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(),
-                                            muleContext.getExecutionClassLoader());
+                                            muleContext.getExecutionClassLoader(), muleContext.getErrorTypeLocator());
           messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
         } catch (HttpRequestParsingException | IllegalArgumentException e) {
           logger.warn("Exception occurred parsing request:", e);

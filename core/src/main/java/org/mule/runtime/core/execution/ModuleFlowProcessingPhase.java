@@ -11,6 +11,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -80,10 +81,10 @@ public class ModuleFlowProcessingPhase
           Optional<SourcePolicy> policy =
               policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), sourceIdentifier);
 
+          Event flowExecutionResponse = null;
           try {
             final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
             Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler);
-            Event flowExecutionResponse;
             if (policy.isPresent()) {
               flowExecutionResponse = policy.get().process(templateEvent, nextOperation, template);
             } else {
@@ -111,15 +112,23 @@ public class ModuleFlowProcessingPhase
             template.sendResponseToClient(flowExecutionResponse, responseParameters, errorResponseParametersFunction,
                                           responseCompletationCallback);
 
-          } catch (final MessagingException e) {
+          } catch (final Exception e) {
+            MessagingException me;
+            if (e instanceof MessagingException) {
+              me = (MessagingException) e;
+            } else if (flowExecutionResponse != null) {
+              me = new MessagingException(flowExecutionResponse, e);
+            } else {
+              throw e;
+            }
+            me.setProcessedEvent(createErrorEvent(me.getEvent(), messageSource, me, messageProcessContext.getErrorTypeLocator()));
 
+            fireNotification(messageSource, me.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
 
-            fireNotification(messageSource, e.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
-
-            template.sendFailureResponseToClient(e,
+            template.sendFailureResponseToClient(me,
                                                  generateErrorResponseParametersFunction(policy, policyManager
                                                      .lookupSourceParametersTransformer(sourceIdentifier), template)
-                                                         .apply(e.getEvent()),
+                                                         .apply(me.getEvent()),
                                                  createSendFailureResponseCompletationCallback(phaseResultNotifier));
           } finally {
             policyManager.disposePoliciesResources(templateEvent.getContext().getId());

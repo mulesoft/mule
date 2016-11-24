@@ -12,26 +12,28 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
   private final Message message;
   private final Processor messageProcessor;
   private final SourceCompletionHandler completionHandler;
+  private final MessageProcessContext messageProcessorContext;
 
   ModuleFlowProcessingTemplate(Message message,
                                Processor messageProcessor,
-                               SourceCompletionHandler completionHandler) {
+                               SourceCompletionHandler completionHandler, MessageProcessContext messageProcessContext) {
     this.message = message;
     this.messageProcessor = messageProcessor;
     this.completionHandler = completionHandler;
+    this.messageProcessorContext = messageProcessContext;
   }
 
   @Override
@@ -63,7 +65,7 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
       completionHandler.onFailure(messagingException, errorResponseParametersFunction.apply(messagingException.getEvent()));
     };
     ExtensionSourceExceptionCallback exceptionCallback =
-        new ExtensionSourceExceptionCallback(responseCompletionCallback, event, errorResponseCallback);
+        new ExtensionSourceExceptionCallback(responseCompletionCallback, event, errorResponseCallback, messageProcessorContext);
     runAndNotify(() -> completionHandler.onCompletion(event, parameters, exceptionCallback), event, responseCompletionCallback);
   }
 

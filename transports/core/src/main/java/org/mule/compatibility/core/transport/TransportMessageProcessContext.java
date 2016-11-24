@@ -10,6 +10,7 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
@@ -94,5 +95,9 @@ public class TransportMessageProcessContext implements MessageProcessContext {
     throw new UnsupportedOperationException("source identifier not supported for transports");
   }
 
+  @Override
+  public ErrorTypeLocator getErrorTypeLocator() {
+    return messageReceiver.getEndpoint().getMuleContext().getErrorTypeLocator();
+  }
 }
 

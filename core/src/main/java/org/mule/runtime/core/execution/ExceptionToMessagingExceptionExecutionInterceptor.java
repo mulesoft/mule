@@ -6,22 +6,14 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.ErrorBuilder;
-import org.mule.runtime.core.util.ExceptionUtils;
-
-import java.util.Optional;
 
 /**
  * Replace any exception thrown with a MessagingException
@@ -42,11 +34,12 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         messagingException = (MessagingException) exception;
         // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
         // messagingException.causedExactlyBy(..) condition.
-        event = createErrorEvent(event, messageProcessor, messagingException, muleContext);
+        event = createErrorEvent(event, messageProcessor, messagingException, muleContext.getErrorTypeLocator());
       } else {
         //Create a ME and an error, both using the exception
         messagingException = new MessagingException(event, getRootCauseException(exception), messageProcessor);
-        messagingException.setProcessedEvent(createErrorEvent(event, messageProcessor, messagingException, muleContext));
+        messagingException
+            .setProcessedEvent(createErrorEvent(event, messageProcessor, messagingException, muleContext.getErrorTypeLocator()));
       }
 
       if (messagingException.getFailingMessageProcessor() == null) {

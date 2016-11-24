@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
@@ -255,6 +256,11 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
       public ComponentIdentifier getSourceIdentifier() {
         return new ComponentIdentifier.Builder().withNamespace(getExtensionModel().getName().toLowerCase())
             .withName(sourceModel.getName()).build();
+      }
+
+      @Override
+      public ErrorTypeLocator getErrorTypeLocator() {
+        return muleContext.getErrorTypeLocator();
       }
     };
   }
