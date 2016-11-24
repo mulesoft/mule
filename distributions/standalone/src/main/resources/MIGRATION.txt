@@ -22,3 +22,4 @@ MULE-7470: Model/Service interfaces and implementations have been removed, as ha
            Use Mule Flow's which provide the same functionality with more flexibility.
 MULE-7723: ScriptConfigurationBuilder and related resources have been removed
 MULE-9068: The TransformationService should now be used to transform MuleMessages's rather than using the message 'applyTransformers' methods.
+MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
