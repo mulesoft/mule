@@ -7,9 +7,15 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber.DESCRIBER_ID;
+import static java.lang.String.join;
+import static java.lang.System.lineSeparator;
+import static java.lang.Thread.currentThread;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.groupingBy;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,22 +25,20 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link ConfigurationBuilder} that registers a {@link ExtensionManager}
@@ -44,12 +48,11 @@ import org.slf4j.LoggerFactory;
 public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder {
 
   public static final String META_INF_FOLDER = "META-INF";
-  // TODO(fernandezlautaro): MULE-10876 the constant RESOURCE_XML will be moved to the concrete loader when implemented making this class agnostic of how to properly read the content of a plugin
-  public static final String RESOURCE_XML = "resource-xml";
-  private static Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
+  private static Logger LOGGER = getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
 
   private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
   private final List<ArtifactPlugin> artifactPlugins;
+  private final Map<String, ExtensionModelLoader> extensionsModelLoaders;
 
   public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins) {
     this(artifactPlugins, new DefaultExtensionManagerAdapterFactory());
@@ -59,6 +62,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
                                                           ExtensionManagerAdapterFactory extensionManagerAdapterFactory) {
     this.artifactPlugins = artifactPlugins;
     this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
+    this.extensionsModelLoaders = getExtensionModelLoaders();
   }
 
   @Override
@@ -84,30 +88,22 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
    * Looks for an extension using the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file, where if available it will parse it calling the
    * {@link XmlBasedDescriber} describer.
    *
-   * TODO(fernandezlautaro): MULE-10876 all this code will be merged within the {@link ExtensionManagerAdapterFactory} where the {@link ExtensionManifest} will be dropped and the correct {@link Describer} will be picked up (either Java or XML based)
-   *
    * @param artifactPlugin to introspect for the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} and further resources from its {@link ClassLoader}
    * @param extensionManager object to store the generated {@link ExtensionModel} if exists
+   * @throws IllegalArgumentException if the {@link MulePluginModel#getExtensionModelLoaderDescriptor()} is present, and
+   * the ID in it wasn't discovered through SPI.
    */
   private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, ExtensionManagerAdapter extensionManager) {
     artifactPlugin.getDescriptor().getExtensionModelDescriptorProperty().ifPresent(descriptorProperty -> {
-      if (!descriptorProperty.getId().equals(DESCRIBER_ID)) {
-        // TODO(fernandezlautaro): MULE-10876 work this ID with SPI, JAVA vs XML implementation should be discovered and validated against them
-        throw new IllegalArgumentException(format("The id '%s' does not match with the describers available to generate an ExtensionModel (working with the plugin '%s')",
-                                                  descriptorProperty.getId(), artifactPlugin.getDescriptor().getName()));
+      if (!extensionsModelLoaders.containsKey(descriptorProperty.getId())) {
+        throw new IllegalArgumentException(format("The identifier '%s' does not match with the describers available to generate an ExtensionModel (working with the plugin '%s', existing identifiers to generate the %s are '%s')",
+                                                  descriptorProperty.getId(), artifactPlugin.getDescriptor().getName(),
+                                                  ExtensionModel.class.getName(),
+                                                  join(",", extensionsModelLoaders.keySet())));
       }
-      // TODO(fernandezlautaro): MULE-10876 the code below where it casts to a String must be moved to each concrete Describer implementation (it should receive the Map<String,Object> held by the muleArtifactDescriber.getExtensionModelLoaderDescriptor().getAttributes() messages
-      String modulePath = (String) descriptorProperty.getAttributes().get(RESOURCE_XML);
-
-      ClassLoader pluginClassLoader = artifactPlugin.getArtifactClassLoader().getClassLoader();
-      DescribingContext context = new DefaultDescribingContext(pluginClassLoader);
-      ExtensionFactory defaultExtensionFactory =
-          new DefaultExtensionFactory(new SpiServiceRegistry(), artifactPlugin.getArtifactClassLoader().getClassLoader());
-      XmlBasedDescriber describer = new XmlBasedDescriber(modulePath);
-      ExtensionModel extensionModel =
-          withContextClassLoader(pluginClassLoader,
-                                 () -> defaultExtensionFactory.createFrom(describer.describe(context), context));
-
+      final ExtensionModelLoader extensionModelLoader = extensionsModelLoaders.get(descriptorProperty.getId());
+      final ExtensionModel extensionModel = extensionModelLoader
+          .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(), descriptorProperty.getAttributes());
       extensionManager.registerExtension(extensionModel);
     });
   }
@@ -118,5 +114,44 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
     } catch (Exception e) {
       throw new InitialisationException(e, muleContext);
     }
+  }
+
+  /**
+   * Will look through SPI every class that implements the {@code providerClass} and if there are repeated IDs, it will
+   * collect them all to throw an exception with the detailed message.
+   * <p/>
+   * The exception, if thrown, will have the following message:
+   * <pre>
+   *   There are several loaders that return the same ID when looking up providers for 'org.mule.runtime.module.artifact.ExtensionModelLoader'. Full error list:
+   *   ID [some-id] is being returned by the following classes [org.foo.FooLoader, org.bar.BarLoader]
+   *   ID [another-id] is being returned by the following classes [org.foo2.FooLoader2, org.bar2.BarLoader2]
+   * </pre>
+   *
+   * @return a {@link Map} with all the loaders.
+   * @throws IllegalStateException if there are loaders with repeated IDs.
+   */
+  private Map<String, ExtensionModelLoader> getExtensionModelLoaders() {
+    final Class<ExtensionModelLoader> providerClass = ExtensionModelLoader.class;
+    final SpiServiceRegistry spiServiceRegistry = new SpiServiceRegistry();
+    final ClassLoader classLoader = currentThread().getContextClassLoader();
+
+    final Collection<ExtensionModelLoader> extensionModelLoaders =
+        spiServiceRegistry.lookupProviders(providerClass, classLoader);
+    final StringBuilder sb = new StringBuilder();
+    extensionModelLoaders.stream().collect(groupingBy(ExtensionModelLoader::getId))
+        .entrySet().stream().filter(entry -> entry.getValue().size() > 1)
+        .forEach(
+                 entry -> {
+                   // At this point we are sure there are at least 2 classes that return the same ID, we will append it to the builder
+                   final String classes = entry.getValue().stream()
+                       .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(Collectors.joining(", "));
+                   sb.append(lineSeparator()).append("ID [").append(entry.getKey())
+                       .append("] is being returned by the following classes [").append(classes).append("]");
+                 });
+    if (isNotBlank(sb.toString())) {
+      throw new IllegalStateException(format("There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
+                                             providerClass.getName(), sb.toString()));
+    }
+    return extensionModelLoaders.stream().collect(Collectors.toMap(ExtensionModelLoader::getId, identity()));
   }
 }

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.operation;
+package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
@@ -17,12 +17,12 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Override
   protected String getModulePath() {
-    return "module/module-simple/module-simple.xml";
+    return "module-simple/module-simple.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "module/flows-using-module-simple.xml";
+    return "functional/flows-using-module-simple.xml";
   }
 
   @Test
