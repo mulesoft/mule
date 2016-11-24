@@ -166,6 +166,14 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     validator.validate(extensionModel);
   }
 
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void invalidModelDueToListWithoutPluralName() {
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
+    when(invalidParameterModel.getName()).thenReturn("thing");
+    when(operationModel.getAllParameterModels()).thenReturn(asList(invalidParameterModel));
+    validator.validate(extensionModel);
+  }
+
   private static class InvalidPojo {
 
     public InvalidPojo() {
