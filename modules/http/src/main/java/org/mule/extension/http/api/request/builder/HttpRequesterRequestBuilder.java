@@ -7,7 +7,9 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.extension.http.api.HttpMessageBuilder;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -42,6 +44,15 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Content
   private Map<String, String> uriParams = new HashMap<>();
 
+  /**
+   * The mediaType of the body to respond
+   */
+  //TODO: MULE-10877 this should be replaced by having body as a TypedValue
+  @Parameter
+  @Optional(defaultValue = "#[message.dataType.mediaType]")
+  private MediaType mediaType = ANY;
+
+
   // For now, only handle single params
   public String replaceUriParams(String path) {
     for (String uriParamName : uriParams.keySet()) {
@@ -70,5 +81,10 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   public void setUriParams(Map<String, String> uriParams) {
     this.uriParams = uriParams;
+  }
+
+  @Override
+  public MediaType getMediaType() {
+    return mediaType;
   }
 }

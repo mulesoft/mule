@@ -7,8 +7,6 @@
 package org.mule.extension.http.api.listener.builder;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -18,13 +16,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  * @since 4.0
  */
 public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
-
-  /**
-   * The body of the response message
-   */
-  @Parameter
-  @Content(primary = true)
-  private Object body;
 
   /**
    * HTTP status code the response should have.
@@ -39,16 +30,6 @@ public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
   @Parameter
   @Optional
   private String reasonPhrase;
-
-  public Object getBody() {
-    return body;
-  }
-
-  public void setBody(Object body) {
-    this.body = body;
-  }
-
-  public abstract MediaType getMediaType();
 
   public Integer getStatusCode() {
     return statusCode;

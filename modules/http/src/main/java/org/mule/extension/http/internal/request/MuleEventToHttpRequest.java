@@ -15,23 +15,23 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.model.ParameterMap;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
@@ -70,17 +70,17 @@ public class MuleEventToHttpRequest {
   private final HttpRequesterConfig config;
   private final HttpStreamingType streamingMode;
   private final HttpSendBodyMode sendBodyMode;
-  private final String source;
+  private final TransformationService transformationService;
 
 
   public MuleEventToHttpRequest(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
-                                HttpSendBodyMode sendBodyMode, String source) {
+                                HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
     this.config = config;
     this.uri = uri;
     this.method = method;
     this.streamingMode = streamingMode;
     this.sendBodyMode = sendBodyMode;
-    this.source = source;
+    this.transformationService = transformationService;
   }
 
   /**
@@ -104,10 +104,10 @@ public class MuleEventToHttpRequest {
     builder.setHeaders(toParameterMap(requestBuilder.getHeaders()));
     builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
 
+    MediaType mediaType = requestBuilder.getMediaType();
     if (!builder.getHeaders().containsKey(CONTENT_TYPE)) {
-      DataType dataType = event.getMessage().getPayload().getDataType();
-      if (!MediaType.ANY.matches(dataType.getMediaType())) {
-        builder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
+      if (!MediaType.ANY.matches(mediaType)) {
+        builder.addHeader(CONTENT_TYPE, mediaType.toRfcString());
       }
     }
 
@@ -127,7 +127,7 @@ public class MuleEventToHttpRequest {
 
     }
 
-    builder.setEntity(createRequestEntity(builder, event, this.method, muleContext));
+    builder.setEntity(createRequestEntity(builder, event, this.method, muleContext, requestBuilder.getBody(), mediaType));
 
     if (authentication != null) {
       authentication.authenticate(event, builder);
@@ -143,30 +143,24 @@ public class MuleEventToHttpRequest {
   }
 
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, Event muleEvent, String resolvedMethod,
-                                         MuleContext muleContext)
+                                         MuleContext muleContext, Object body, MediaType mediaType)
       throws MessagingException {
     HttpEntity entity;
 
-    if (!StringUtils.isEmpty(this.source) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(this.source))) {
-      Object newPayload = this.source;
-      muleEvent =
-          Event.builder(muleEvent).message(InternalMessage.builder(muleEvent.getMessage()).payload(newPayload).build()).build();
-    }
-
-    if (isEmptyBody(muleEvent, resolvedMethod)) {
+    if (isEmptyBody(body, resolvedMethod)) {
       entity = new EmptyHttpEntity();
     } else {
-      entity = createRequestEntityFromPayload(requestBuilder, muleEvent, muleContext);
+      entity = createRequestEntityFromPayload(requestBuilder, muleEvent, body, muleContext, mediaType);
     }
 
     return entity;
   }
 
-  private boolean isEmptyBody(Event event, String method) {
+  private boolean isEmptyBody(Object body, String method) {
     boolean emptyBody;
 
     // TODO MULE-9986 Use multi-part payload
-    if (event.getMessage().getPayload().getValue() == null) {
+    if (body == null) {
       emptyBody = true;
     } else {
       emptyBody = DEFAULT_EMPTY_BODY_METHODS.contains(method);
@@ -179,10 +173,9 @@ public class MuleEventToHttpRequest {
     return emptyBody;
   }
 
-  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent,
-                                                    MuleContext muleContext)
+  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent, Object payload,
+                                                    MuleContext muleContext, MediaType mediaType)
       throws MessagingException {
-    Object payload = muleEvent.getMessage().getPayload().getValue();
 
     if (payload instanceof MultiPartPayload) {
       try {
@@ -193,13 +186,13 @@ public class MuleEventToHttpRequest {
       }
     }
 
-    if (doStreaming(requestBuilder, muleEvent)) {
+    if (doStreaming(requestBuilder, payload)) {
 
       if (payload instanceof InputStream) {
         return new InputStreamHttpEntity((InputStream) payload);
       } else {
         try {
-          return new InputStreamHttpEntity(new ByteArrayInputStream(muleEvent.getMessageAsBytes(muleContext)));
+          return new InputStreamHttpEntity(new ByteArrayInputStream(getMessageAsBytes(payload)));
         } catch (Exception e) {
           throw new MessagingException(muleEvent, e);
         }
@@ -210,8 +203,8 @@ public class MuleEventToHttpRequest {
 
       if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.startsWith(APPLICATION_JAVA)) {
-        if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
-          String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
+        if (payload instanceof Map) {
+          String body = HttpParser.encodeString(mediaType.getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
@@ -219,18 +212,24 @@ public class MuleEventToHttpRequest {
       }
 
       try {
-        return new ByteArrayHttpEntity(muleEvent.getMessageAsBytes(muleContext));
+        return new ByteArrayHttpEntity(getMessageAsBytes(payload));
       } catch (Exception e) {
         throw new MessagingException(muleEvent, e);
       }
     }
   }
 
-  private boolean doStreaming(HttpRequestBuilder requestBuilder, Event event) throws MessagingException {
+  private byte[] getMessageAsBytes(Object payload) {
+    try {
+      return (byte[]) transformationService.transform(InternalMessage.of(payload), BYTE_ARRAY).getPayload().getValue();
+    } catch (TransformerException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  private boolean doStreaming(HttpRequestBuilder requestBuilder, Object payload) throws MessagingException {
     String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
     String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
-
-    Object payload = event.getMessage().getPayload().getValue();
 
     if (streamingMode == HttpStreamingType.AUTO) {
       if (contentLengthHeader != null) {

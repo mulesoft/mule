@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api;
 
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -18,7 +19,15 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class HttpMessageBuilder {
+public abstract class HttpMessageBuilder {
+
+  /**
+   * The body of the response message
+   */
+  @Parameter
+  @Content(primary = true)
+  private Object body;
+
 
   /**
    * HTTP headers the message should include.
@@ -27,6 +36,16 @@ public class HttpMessageBuilder {
   @Optional
   @Content
   protected Map<String, String> headers = new HashMap<>();
+
+  public Object getBody() {
+    return body;
+  }
+
+  public abstract MediaType getMediaType();
+
+  public void setBody(Object body) {
+    this.body = body;
+  }
 
   public Map<String, String> getHeaders() {
     return headers;

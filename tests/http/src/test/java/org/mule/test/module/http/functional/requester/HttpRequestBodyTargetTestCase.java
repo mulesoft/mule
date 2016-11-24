@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.junit.Test;
 
 
-public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase {
+public class HttpRequestBodyTargetTestCase extends AbstractHttpRequestTestCase {
 
   @Override
   protected String getConfigFile() {
