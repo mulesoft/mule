@@ -16,6 +16,9 @@ import java.util.Optional;
  *
  * Keeps track of the operation associated with a certain context of execution. Such context of execution is defined by the unique
  * identifier of the generated {@link Event}.
+ * 
+ * Implementations will be executed concurrently but always using different identifiers. There will be no concurrent invocation
+ * for the same identifier.
  *
  * @since 4.0
  */
@@ -24,23 +27,30 @@ public interface PolicyStateHandler {
   /**
    * Associated the {@code identifier} with the policy next operation to execute
    * 
-   * @param identifier the identifier of the context
+   * @param executionIdentifier the identifier of the context
    * @param nextOperation the next operation of the policy
    */
-  void updateNextOperation(String identifier, Processor nextOperation);
+  void updateNextOperation(String executionIdentifier, Processor nextOperation);
 
   /**
-   * @param identifier the identifier of the context
+   * @param executionIdentifier the identifier of the context
    * @return the next operation for the context.
    */
-  Processor retrieveNextOperation(String identifier);
+  Processor retrieveNextOperation(String executionIdentifier);
+
+  /**
+   * Frees resources associated with the given context identifier
+   *
+   * @param executionIdentifier the identifier of the context
+   */
+  void destroyState(String executionIdentifier);
 
   /**
    * @param identifier the identifier of the context
    * @return the latest state of the policy for the given identifier. It may be empty if no other policy was executed before for
    *         this context.
    */
-  Optional<Event> getLatestState(String identifier);
+  Optional<Event> getLatestState(PolicyStateId identifier);
 
   /**
    * Updates the event of the policy for the context with the given identifier.
@@ -48,13 +58,6 @@ public interface PolicyStateHandler {
    * @param identifier the identifier of the context
    * @param lastStateEvent the last state of the event
    */
-  void updateState(String identifier, Event lastStateEvent);
-
-  /**
-   * Frees resources associated with the given context identifier
-   *
-   * @param identifier the identifier of the context
-   */
-  void destroyState(String identifier);
+  void updateState(PolicyStateId identifier, Event lastStateEvent);
 
 }

@@ -14,9 +14,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 
 /**
@@ -34,7 +31,6 @@ public class PolicyNextActionMessageProcessor implements Processor {
 
   @Override
   public Event process(Event event) throws MuleException {
-    policyStateHandler.updateState(event.getContext().getId(), event);
     Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getId());
     if (nextOperation == null) {
       throw new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "

@@ -65,6 +65,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
+import org.mule.runtime.core.policy.DefaultOperationPolicy;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;

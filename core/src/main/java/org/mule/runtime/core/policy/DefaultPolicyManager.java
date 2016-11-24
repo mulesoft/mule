@@ -8,6 +8,7 @@ package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -37,28 +39,27 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   private Collection<OperationPolicyParametersTransformer> operationPolicyParametersTransformerCollection = emptyList();
   private Collection<SourcePolicyParametersTransformer> sourcePolicyParametersTransformerCollection = emptyList();
   private PolicyProvider policyProvider;
+  private OperationPolicyFactory operationPolicyFactory;
+  private SourcePolicyFactory sourcePolicyFactory;
 
   @Override
   public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier) {
-    Optional<PolicyChain> sourcePolicyChainOptional = policyProvider.findSourcePolicyChain(sourceIdentifier);
-    return sourcePolicyChainOptional.map(sourcePolicyChain -> {
-      Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer =
-          lookupSourceParametersTransformer(sourceIdentifier);
-      return Optional
-          .of(new SourcePolicy(sourcePolicyChainOptional.get(), sourcePolicyParametersTransformer, policyStateHandler));
-    }).orElse(empty());
+    List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourceIdentifier);
+    if (parameterizedPolicies.isEmpty()) {
+      return empty();
+    }
+    return of(new CompositeSourcePolicy(parameterizedPolicies, lookupSourceParametersTransformer(sourceIdentifier),
+                                        sourcePolicyFactory));
   }
 
   @Override
   public Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, ComponentIdentifier operationIdentifier) {
-    Optional<PolicyChain> operationPolicyChainOptional = policyProvider.findOperationPolicyChain(operationIdentifier);
-    return operationPolicyChainOptional.map(operationPolicyChain -> {
-      Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
-          lookupOperationParametersTransformer(operationIdentifier);
-      return Optional
-          .of(new OperationPolicy(operationPolicyChainOptional.get(), operationPolicyParametersTransformer,
-                                  policyStateHandler));
-    }).orElse(empty());
+    List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(operationIdentifier);
+    if (parameterizedPolicies.isEmpty()) {
+      return empty();
+    }
+    return of(new CompositeOperationPolicy(parameterizedPolicies, lookupOperationParametersTransformer(operationIdentifier),
+                                           operationPolicyFactory));
   }
 
   @Override
@@ -79,6 +80,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   @Override
   public void initialise() throws InitialisationException {
     try {
+      operationPolicyFactory = new DefaultOperationPolicyFactory(policyStateHandler);
+      sourcePolicyFactory = new DefaultSourcePolicyFactory(policyStateHandler);
       policyProvider = muleContext.getRegistry().lookupObject(PolicyProvider.class);
       if (policyProvider == null) {
         policyProvider = new NullPolicyProvider();
