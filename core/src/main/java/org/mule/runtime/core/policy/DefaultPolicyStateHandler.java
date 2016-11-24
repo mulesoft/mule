@@ -42,7 +42,9 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
   public void destroyState(String identifier) {
     Collection<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.getCollection(identifier);
-    policyStateIds.stream().forEach(stateMap::remove);
+    if (policyStateIds != null) {
+      policyStateIds.stream().forEach(stateMap::remove);
+    }
     policyStateIdsByExecutionIdentifier.remove(identifier);
     nextOperationMap.remove(identifier);
   }
