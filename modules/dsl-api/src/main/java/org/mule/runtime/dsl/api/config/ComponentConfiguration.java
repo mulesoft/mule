@@ -28,6 +28,7 @@ public class ComponentConfiguration {
   private String identifier;
   private Map<String, String> parameters = new HashMap<>();
   private List<ComponentConfiguration> nestedComponentConfiguration = new ArrayList<>();
+  private String textContent;
 
   /**
    * @return the namespace where the component is located. i.e.: In file:read the namespace is file.
@@ -49,6 +50,13 @@ public class ComponentConfiguration {
    */
   public Map<String, String> getParameters() {
     return unmodifiableMap(parameters);
+  }
+
+  /**
+   * @return content of the configuration element.
+   */
+  public String getTextContent() {
+    return textContent;
   }
 
   /**
@@ -94,6 +102,17 @@ public class ComponentConfiguration {
      */
     public Builder addParameter(String name, String value) {
       componentConfiguration.parameters.put(name, value);
+      return this;
+    }
+
+    /**
+     * Sets the inner content of the configuration element.
+     *
+     * @param textContent inner text content from the configuration
+     * @return the builder
+     */
+    public Builder setTextContent(String textContent) {
+      componentConfiguration.textContent = textContent;
       return this;
     }
 

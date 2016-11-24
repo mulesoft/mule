@@ -335,6 +335,9 @@ public class ApplicationModel {
     for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponentConfiguration()) {
       builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration, false));
     }
+    if (componentConfiguration.getTextContent() != null) {
+      builder.setTextContent(componentConfiguration.getTextContent());
+    }
     return builder.build();
 
   }

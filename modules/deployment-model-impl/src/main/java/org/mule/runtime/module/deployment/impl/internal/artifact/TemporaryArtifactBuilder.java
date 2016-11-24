@@ -18,6 +18,14 @@ import java.io.File;
 public interface TemporaryArtifactBuilder {
 
   /**
+   * Allows to add a library to the tooling artifact. The file type must be a jar.
+   *
+   * @param artifactLibraryFile a file pointer to a jar
+   * @return the builder
+   */
+  TemporaryArtifactBuilder addArtifactLibraryFile(File artifactLibraryFile);
+
+  /**
    * Allows to add an extensions to be used in the tooling artifact. The file type must be zip and be an extension.
    *
    * @param artifactPluginFile a file pointer to an extension file

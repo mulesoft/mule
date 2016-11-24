@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.temporary;
 
+import static com.google.common.collect.Lists.newArrayList;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
@@ -15,8 +16,16 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarExplorer;
+import org.mule.runtime.module.artifact.util.JarInfo;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders used by mule artifacts such as domains or applications.
@@ -29,6 +38,7 @@ import java.io.IOException;
 public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<TemporaryArtifactClassLoaderBuilder> {
 
   private ArtifactClassLoader parentClassLoader;
+  private List<URL> urls = newArrayList();
 
   /**
    * Creates an {@link TemporaryArtifactClassLoaderBuilder}.
@@ -56,12 +66,49 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
   }
 
   /**
+   * Adds a {@link URL} to the {@link ArtifactDescriptor}.
+   *
+   * @param url {@link URL} to be included as part of the {@link ArtifactDescriptor} definition.
+   * @return the builder
+   */
+  public TemporaryArtifactClassLoaderBuilder addUrl(URL url) {
+    this.urls.add(url);
+    return this;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public MuleDeployableArtifactClassLoader build() throws IOException {
-    setArtifactDescriptor(new ArtifactDescriptor("temp"));
+    final ArtifactDescriptor artifactDescriptor = new ArtifactDescriptor("temp");
+    if (!urls.isEmpty()) {
+      ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
+
+      JarInfo jarInfo = createJarInfo(this.urls);
+      classLoaderModelBuilder.exportingPackages(jarInfo.getPackages())
+          .exportingResources(jarInfo.getResources());
+
+      this.urls.stream().forEach(url -> classLoaderModelBuilder.containing(url));
+
+      artifactDescriptor.setClassLoaderModel(classLoaderModelBuilder.build());
+    }
+    setArtifactDescriptor(artifactDescriptor);
     return (MuleDeployableArtifactClassLoader) super.build();
+  }
+
+  private JarInfo createJarInfo(List<URL> urls) {
+    Set<String> packages = new HashSet<>();
+    Set<String> resources = new HashSet<>();
+    final JarExplorer jarExplorer = new FileJarExplorer();
+
+    for (URL library : urls) {
+      final JarInfo jarInfo = jarExplorer.explore(library);
+      packages.addAll(jarInfo.getPackages());
+      resources.addAll(jarInfo.getResources());
+    }
+
+    return new JarInfo(packages, resources);
   }
 
   @Override
