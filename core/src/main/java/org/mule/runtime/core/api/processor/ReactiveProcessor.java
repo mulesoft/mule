@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
@@ -24,11 +25,14 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
   /**
    * In order for Mule to determine the best way to execute different processors based on the chosen {@link ProcessingStrategy} it
    * needs to know the type of work the message processor will be performing and if it is {@link ProcessingType#BLOCKING},
-   * {@link ProcessingType#CPU} intensive or neither ({@link ProcessingType#CPU_LITE}).
+   * {@link ProcessingType#CPU_INTENSIVE} intensive or neither ({@link ProcessingType#CPU_LITE}).
    *
    * @return the processing type for this processor.
    */
-  ProcessingType getProccesingType();
+  default ProcessingType getProccesingType()
+  {
+    return CPU_LITE;
+  }
 
   /**
    * Defines the type of processing that the processor will be doing.
@@ -38,15 +42,21 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
     /**
      * CPU intensive processing such as calculation or transformation.
      */
-    CPU,
+    CPU_INTENSIVE,
     /**
-     * Processing which neither blocks nor is CPU intensive such as message passing, filtering and routing etc.
+     * Processing which neither blocks nor is CPU intensive such as message passing, filtering, routing or non-blocking IO..
      */
     CPU_LITE,
     /**
-     * Blocking processing such as blocking IO or anything that may block the current thread.
+     * Blocking processing that use Thead.sleep or any other technique to block the current thread during processing.
      */
-    BLOCKING
+    BLOCKING,
+    /**
+     * Blocking IO read/write operations. This is treated seperatly to {@link #BLOCKING} to allow for potential optimizations when
+     * IO is fast and/or message sizes smalls.
+     */
+    IO_RW
+
   }
 
 }

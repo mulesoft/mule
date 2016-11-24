@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -441,4 +442,10 @@ public class XsltTransformer extends AbstractXmlTransformer {
 
     return value;
   }
+
+  @Override
+  public ProcessingType getProccesingType() {
+    return CPU_INTENSIVE;
+  }
+
 }

@@ -53,14 +53,4 @@ public interface Processor extends ReactiveProcessor {
     return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
-  /**
-   * Given existing processor may be doing anything we need to be conservative and use the {@link ProcessingType#BLOCKING} type.
-   * Implementations can of course easily override this and should do so.
-   * 
-   * @return default {@link ProcessingType#BLOCKING} processing type.
-   */
-  @Override
-  default ReactiveProcessor.ProcessingType getProccesingType() {
-    return ProcessingType.BLOCKING;
-  }
 }
