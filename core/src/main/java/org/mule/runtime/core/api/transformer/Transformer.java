@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import org.mule.runtime.api.metadata.DataType;
@@ -100,11 +101,7 @@ public interface Transformer extends Processor, Initialisable, Disposable, Namea
 
   @Override
   default ProcessingType getProccesingType() {
-    if (getSourceDataTypes().stream().filter(dataType -> !dataType.isStreamType()).count() > 0) {
-      return IO_RW;
-    } else {
-      return CPU_LITE;
-    }
+    return CPU_INTENSIVE;
   }
 
 }

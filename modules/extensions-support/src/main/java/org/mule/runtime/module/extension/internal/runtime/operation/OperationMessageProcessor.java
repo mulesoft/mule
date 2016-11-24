@@ -278,6 +278,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
 
   @Override
   public ProcessingType getProccesingType() {
+    // TODO MULE-10569 Support non-blocking API in Ext-API operations
     return BLOCKING;
   }
 
