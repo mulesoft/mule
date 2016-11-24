@@ -87,6 +87,7 @@ import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -219,6 +220,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
   private static final String ERROR_HANDLER = "error-handler";
   private static final String SET_PAYLOAD = "set-payload";
+  private static final String LOGGER = "logger";
   private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
@@ -320,6 +322,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
             .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
             .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(LOGGER).withTypeDefinition(fromType(LoggerMessageProcessor.class))
+            .withSetterParameterDefinition("message", fromSimpleParameter("message").build())
+            .withSetterParameterDefinition("category", fromSimpleParameter("category").build())
+            .withSetterParameterDefinition("level", fromSimpleParameter("level").build()).build());
 
     componentBuildingDefinitions
         .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyProcessor.class),
