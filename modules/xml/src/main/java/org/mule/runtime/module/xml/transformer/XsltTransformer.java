@@ -443,9 +443,4 @@ public class XsltTransformer extends AbstractXmlTransformer {
     return value;
   }
 
-  @Override
-  public ProcessingType getProccesingType() {
-    return CPU_INTENSIVE;
-  }
-
 }
