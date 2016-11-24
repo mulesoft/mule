@@ -6,17 +6,21 @@
  */
 package org.mule.runtime.core.policy;
 
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.collections.map.MultiValueMap;
+
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
-  private Map<String, Event> stateMap = new HashMap<>();
+  private MultiValueMap policyStateIdsByExecutionIdentifier = new MultiValueMap();
+  private Map<PolicyStateId, Event> stateMap = new HashMap<>();
   private Map<String, Processor> nextOperationMap = new HashMap<>();
 
   public void updateNextOperation(String identifier, Processor nextOperation) {
@@ -27,16 +31,19 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     return nextOperationMap.get(identifier);
   }
 
-  public Optional<Event> getLatestState(String identifier) {
-    return of(this.stateMap.get(identifier));
+  public Optional<Event> getLatestState(PolicyStateId identifier) {
+    return ofNullable(stateMap.get(identifier));
   }
 
-  public void updateState(String identifier, Event lastStateEvent) {
-    this.stateMap.put(identifier, lastStateEvent);
+  public void updateState(PolicyStateId identifier, Event lastStateEvent) {
+    stateMap.put(identifier, lastStateEvent);
+    policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIndentifier(), identifier);
   }
 
   public void destroyState(String identifier) {
-    stateMap.remove(identifier);
+    Collection<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.getCollection(identifier);
+    policyStateIds.stream().forEach(stateMap::remove);
+    policyStateIdsByExecutionIdentifier.remove(identifier);
     nextOperationMap.remove(identifier);
   }
 

@@ -36,7 +36,7 @@ import java.util.Optional;
  */
 public class DefaultSourcePolicy implements SourcePolicy {
 
-  private final PolicyChain policyChain;
+  private final Policy policy;
   private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
@@ -44,15 +44,15 @@ public class DefaultSourcePolicy implements SourcePolicy {
   /**
    * Creates a new {@code DefaultSourcePolicy}.
    *
-   * @param policyChain the policy chain to execute before and after the source.
+   * @param policy the policy to execute before and after the source.
    * @param sourcePolicyParametersTransformer transformer from the response and failure response parameters to a message and vice
    *        versa.
    * @param policyStateHandler the state handler for the policy.
    */
-  public DefaultSourcePolicy(PolicyChain policyChain,
+  public DefaultSourcePolicy(Policy policy,
                              Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                              PolicyStateHandler policyStateHandler) {
-    this.policyChain = policyChain;
+    this.policy = policy;
     this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
     this.policyStateHandler = policyStateHandler;
   }
@@ -76,7 +76,7 @@ public class DefaultSourcePolicy implements SourcePolicy {
     Processor sourceNextOperation =
         buildFlowExecutionWithPolicyFunction(nextOperation, sourceEvent, messageSourceResponseParametersProcessor);
     policyStateHandler.updateNextOperation(sourceEvent.getContext().getId(), sourceNextOperation);
-    Event result = policyChain
+    Event result = policy.getPolicyChain()
         .process(policyEventConverter.createEvent(sourceEvent.getMessage(), Event.builder(sourceEvent.getContext()).build()));
     return Event.builder(result.getContext()).message(result.getMessage()).build();
   }
@@ -97,8 +97,10 @@ public class DefaultSourcePolicy implements SourcePolicy {
   private Processor buildFlowExecutionWithPolicyFunction(Processor nextOperation, Event sourceEvent,
                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return (processEvent) -> {
-      Event lastPolicyEvent = policyStateHandler.getLatestState(sourceEvent.getContext().getId()).get();
+      PolicyStateId policyStateId = new PolicyStateId(sourceEvent.getContext().getId(), policy.getPolicyId());
+      Event lastPolicyEvent = processEvent;
       try {
+        policyStateHandler.updateState(policyStateId, lastPolicyEvent);
         Event flowExecutionResponse = nextOperation.process(sourceEvent);
         Message message = sourcePolicyParametersTransformer.map(policyTransformer -> {
           Map<String, Object> responseParameters =
@@ -107,7 +109,8 @@ public class DefaultSourcePolicy implements SourcePolicy {
           return sourcePolicyParametersTransformer.get()
               .fromSuccessResponseParametersToMessage(responseParameters);
         }).orElseGet(flowExecutionResponse::getMessage);
-        return policyEventConverter.createEvent(message, lastPolicyEvent);
+        return policyEventConverter.createEvent(message,
+                                                policyStateHandler.getLatestState(policyStateId).orElse(lastPolicyEvent));
       } catch (MessagingException messagingException) {
         Message message = messagingException.getEvent().getMessage();
         Map<String, Object> failureParameters =

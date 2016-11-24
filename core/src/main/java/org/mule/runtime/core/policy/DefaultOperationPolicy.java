@@ -36,15 +36,15 @@ import java.util.Optional;
  */
 public class DefaultOperationPolicy implements OperationPolicy {
 
-  private final PolicyChain policyChain;
+  private final Policy policy;
   private final Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
 
-  public DefaultOperationPolicy(PolicyChain policyChain,
+  public DefaultOperationPolicy(Policy policy,
                                 Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                 PolicyStateHandler policyStateHandler) {
-    this.policyChain = policyChain;
+    this.policy = policy;
     this.operationPolicyParametersTransformer = operationPolicyParametersTransformer;
     this.policyStateHandler = policyStateHandler;
   }
@@ -63,17 +63,19 @@ public class DefaultOperationPolicy implements OperationPolicy {
   @Override
   public Event process(Event operationEvent, Processor nextProcessor, OperationParametersProcessor operationParametersProcessor)
       throws Exception {
-    Optional<Event> latestPolicyState = policyStateHandler.getLatestState(operationEvent.getContext().getId());
+    PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
+    Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
     Event variablesProviderEvent = latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).build());
+    policyStateHandler.updateState(policyStateId, variablesProviderEvent);
     Map<String, Object> originalParametersMap = operationParametersProcessor.getOperationParameters();
     Message message = operationEvent.getMessage();
     message = operationPolicyParametersTransformer
         .map(parametersTransformer -> parametersTransformer.fromParametersToMessage(originalParametersMap)).orElse(message);
     Event policyEvent = policyEventConverter.createEvent(message, variablesProviderEvent);
     Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor);
-    policyStateHandler.updateNextOperation(operationEvent.getContext().getId(), operationCall);
-    Event policyChainResult = policyChain.process(policyEvent);
-    policyStateHandler.updateState(operationEvent.getContext().getId(), policyChainResult);
+    policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
+    Event policyChainResult = policy.getPolicyChain().process(policyEvent);
+    policyStateHandler.updateState(policyStateId, policyChainResult);
     return policyEventConverter.createEvent(policyChainResult.getMessage(), operationEvent);
   }
 
@@ -81,7 +83,8 @@ public class DefaultOperationPolicy implements OperationPolicy {
       throws Exception {
     return policyExecuteNextEvent -> {
       try {
-        policyStateHandler.updateState(policyExecuteNextEvent.getContext().getId(), policyExecuteNextEvent);
+        PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
+        policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
         Event operationResult = nextOperation.process(policyExecuteNextEvent);
         return policyEventConverter.createEvent(operationResult.getMessage(), policyExecuteNextEvent);
       } catch (MuleException e) {

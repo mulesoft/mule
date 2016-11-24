@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -106,6 +107,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
 
     @Override
     public Event process(Event event) throws MuleException {
+      checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
       if (index == parameterizedPolicies.size()) {
         return processNextOperation(nextProcessor, event);
       }

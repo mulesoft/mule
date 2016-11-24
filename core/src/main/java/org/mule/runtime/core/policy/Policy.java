@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.core.util.UUID.getUUID;
 import org.mule.runtime.api.metadata.TypedValue;
 
 import java.util.Map;
@@ -20,14 +21,24 @@ import java.util.Map;
 public class Policy {
 
   private final PolicyChain policyChain;
+  private String id;
 
   /**
    * Creates a new {@code ParameterizedPolicy}.
    * 
    * @param policyChain the chain of {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
+   * @param policyId unique id of this policy.
    */
-  public Policy(PolicyChain policyChain) {
+  public Policy(PolicyChain policyChain, String policyId) {
     this.policyChain = policyChain;
+    this.id = policyId;
+  }
+
+  /**
+   * @return the unique id for this policy.
+   */
+  public String getPolicyId() {
+    return id;
   }
 
   /**

@@ -19,6 +19,11 @@ public class DefaultSourcePolicyFactory implements SourcePolicyFactory {
 
   private final PolicyStateHandler policyStateHandler;
 
+  /**
+   * Creates a new instance of the default factory for {@link SourcePolicy}s.
+   *
+   * @param policyStateHandler the state handler for policies.
+   */
   public DefaultSourcePolicyFactory(PolicyStateHandler policyStateHandler) {
     this.policyStateHandler = policyStateHandler;
   }
@@ -26,6 +31,6 @@ public class DefaultSourcePolicyFactory implements SourcePolicyFactory {
   @Override
   public SourcePolicy createSourcePolicy(Policy policy,
                                          Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer) {
-    return new DefaultSourcePolicy(policy.getPolicyChain(), sourcePolicyParametersTransformer, policyStateHandler);
+    return new DefaultSourcePolicy(policy, sourcePolicyParametersTransformer, policyStateHandler);
   }
 }

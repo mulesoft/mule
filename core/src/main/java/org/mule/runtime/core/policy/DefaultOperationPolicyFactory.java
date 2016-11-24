@@ -26,6 +26,6 @@ public class DefaultOperationPolicyFactory implements OperationPolicyFactory {
   @Override
   public OperationPolicy createOperationPolicy(Policy policy,
                                                Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer) {
-    return new DefaultOperationPolicy(policy.getPolicyChain(), operationPolicyParametersTransformer, policyStateHandler);
+    return new DefaultOperationPolicy(policy, operationPolicyParametersTransformer, policyStateHandler);
   }
 }
