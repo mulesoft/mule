@@ -10,6 +10,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 public final class ConfigurationOverrides {
@@ -17,6 +18,7 @@ public final class ConfigurationOverrides {
   /**
    * Host where the requests will be sent.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 1)
   private String host;
@@ -24,6 +26,7 @@ public final class ConfigurationOverrides {
   /**
    * Port where the requests will be sent.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 2)
   private Integer port;
@@ -31,6 +34,7 @@ public final class ConfigurationOverrides {
   /**
    * Specifies whether to follow redirects or not.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 3)
   private Boolean followRedirects;
@@ -38,6 +42,7 @@ public final class ConfigurationOverrides {
   /**
    * Defines if the request should contain a body or not.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 4)
   private HttpSendBodyMode sendBodyMode;
@@ -45,6 +50,7 @@ public final class ConfigurationOverrides {
   /**
    * Defines if the request should be sent using streaming or not.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 5)
   private HttpStreamingType requestStreamingMode;
@@ -52,6 +58,7 @@ public final class ConfigurationOverrides {
   /**
    * Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 6)
   private Boolean parseResponse;
@@ -59,6 +66,7 @@ public final class ConfigurationOverrides {
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
    */
+  @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 7)
   private Integer responseTimeout;

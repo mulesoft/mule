@@ -26,6 +26,7 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
@@ -46,6 +47,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderD
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
@@ -594,10 +596,15 @@ public final class AnnotationsBasedDescriber implements Describer {
 
     final String groupName = getGroupName(type.getDeclaringClass(), groupAnnotation);
     ParameterGroupDeclarer declarer = component.withParameterGroup(groupName);
-    if (!declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
-      declarer.withModelProperty(
-                                 new ParameterGroupModelProperty(new ParameterGroupDescriptor(groupName, type, groupParameter
-                                     .getDeclaringElement())));
+    if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
+                                                                groupName,
+                                                                getComponentModelTypeName(component),
+                                                                ((NamedDeclaration) component.getDeclaration()).getName()));
+    } else {
+      declarer.withModelProperty(new ParameterGroupModelProperty(new ParameterGroupDescriptor(
+                                                                                              groupName, type, groupParameter
+                                                                                                  .getDeclaringElement())));
     }
 
     type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {

@@ -67,10 +67,8 @@ public class HttpRequestOperations {
                                                         @ParameterGroup(
                                                             name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
                                                         @ParameterGroup(
-                                                            name = "Response Validation Settings")
-                                                            ResponseValidationSettings responseValidationSettings,
-                                                        @Optional @NullSafe @Expression(NOT_SUPPORTED)
-                                                            HttpRequesterRequestBuilder requestBuilder,
+                                                            name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
+                                                        @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
                                                         @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                                                         @Connection HttpClient client,
                                                         @UseConfig HttpRequesterConfig config, Event muleEvent)
