@@ -12,6 +12,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
+/**
+ * Groups parameters regarding response validation
+ *
+ * @since 4.0
+ */
 public final class ResponseValidationSettings {
 
   /**

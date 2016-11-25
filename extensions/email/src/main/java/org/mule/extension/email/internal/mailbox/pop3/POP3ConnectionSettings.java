@@ -27,6 +27,7 @@ public final class POP3ConnectionSettings extends EmailConnectionSettings {
   @Placement(order = 2)
   private String port;
 
+  @Override
   public String getPort() {
     return port;
   }

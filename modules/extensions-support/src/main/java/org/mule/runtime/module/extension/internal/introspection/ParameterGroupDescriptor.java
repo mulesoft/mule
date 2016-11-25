@@ -12,10 +12,15 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
+/**
+ * Describes the the class in which a parameter group is being implemented and the
+ * element which contains it
+ *
+ * @since 4.0
+ */
 public final class ParameterGroupDescriptor {
 
   private final String name;
@@ -47,16 +52,6 @@ public final class ParameterGroupDescriptor {
    */
   public AnnotatedElement getContainer() {
     return container;
-  }
-
-  public String getContainerName() {
-    if (container instanceof Member) {
-      return ((Member) container).getName();
-    } else if (container instanceof Parameter) {
-      return ((Parameter) container).getName();
-    } else {
-      throw new UnsupportedOperationException();
-    }
   }
 
   public String getName() {

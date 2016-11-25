@@ -10,6 +10,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -19,10 +20,21 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * An {@link ObjectBuilder} used to build pojos which are used with the {@link ParameterGroup}
+ * annotation.
+ *
+ * @param <T> the generic type of the object being built
+ */
 public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private final ParameterGroupDescriptor groupDescriptor;
 
+  /**
+   * Create a new instance
+   *
+   * @param groupDescriptor the descriptor for the group being built
+   */
   public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor) {
     super(groupDescriptor.getType().getDeclaringClass());
     this.groupDescriptor = groupDescriptor;

@@ -62,4 +62,9 @@ public abstract class EmailConnectionSettings {
   public String getPassword() {
     return password;
   }
+
+  /**
+   * @return The connection port
+   */
+  public abstract String getPort();
 }

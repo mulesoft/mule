@@ -27,6 +27,7 @@ public final class SMTPConnectionSettings extends EmailConnectionSettings {
   @Placement(order = 2)
   private String port;
 
+  @Override
   public String getPort() {
     return port;
   }

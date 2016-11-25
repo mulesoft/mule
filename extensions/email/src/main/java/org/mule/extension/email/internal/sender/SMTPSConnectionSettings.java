@@ -41,6 +41,7 @@ public final class SMTPSConnectionSettings extends EmailConnectionSettings {
   @DisplayName(TLS_CONFIGURATION)
   private TlsContextFactory tlsContextFactory;
 
+  @Override
   public String getPort() {
     return port;
   }

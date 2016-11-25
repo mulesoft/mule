@@ -17,6 +17,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.function.Function;
 
+/**
+ * Groups parameters which configure how a request is done
+ *
+ * @since 4.0
+ */
 public final class RequestSettings {
 
   /**

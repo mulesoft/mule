@@ -29,6 +29,7 @@ public final class IMAPSConnectionSettings extends EmailConnectionSettings {
   @Parameter
   @Optional(defaultValue = IMAPS_PORT)
   @Placement(order = 2)
+  @Summary("The port number of the mail server. '993' by default.")
   private String port;
 
   /**
@@ -41,6 +42,7 @@ public final class IMAPSConnectionSettings extends EmailConnectionSettings {
   @DisplayName(TLS_CONFIGURATION)
   private TlsContextFactory tlsContextFactory;
 
+  @Override
   public String getPort() {
     return port;
   }

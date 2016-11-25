@@ -19,6 +19,11 @@ import org.mule.runtime.module.http.api.HttpConstants;
 
 import java.util.function.Function;
 
+/**
+ * Groups parameters related to a requester connection
+ *
+ * @since 4.0
+ */
 public final class RequestConnectionParams {
 
   /**

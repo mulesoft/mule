@@ -78,11 +78,6 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
   public T build(Event event) throws MuleException {
     T object = createInstance(prototypeClass);
 
-    //resolvers.forEach((field, resolver) -> {
-    //  if (Function.class.isAssignableFrom(field.getType())) {
-    //    new Func
-    //  }
-    //});
     for (Map.Entry<Field, ValueResolver<Object>> resolver : resolvers.entrySet()) {
       setField(resolver.getKey(), object, resolver.getValue().resolve(event));
     }

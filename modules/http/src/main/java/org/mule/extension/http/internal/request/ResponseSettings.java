@@ -15,6 +15,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.function.Function;
 
+/**
+ * Groups parameters regarding how to generate responses
+ *
+ * @since 4.0
+ */
 public final class ResponseSettings {
 
   /**

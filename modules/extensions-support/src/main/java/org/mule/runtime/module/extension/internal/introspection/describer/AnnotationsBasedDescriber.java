@@ -16,6 +16,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -54,7 +55,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -571,7 +571,7 @@ public final class AnnotationsBasedDescriber implements Describer {
     }
 
     final String groupName = groupAnnotation.value();
-    if (ParameterGroupModel.DEFAULT_GROUP_NAME.equals(groupName)) {
+    if (DEFAULT_GROUP_NAME.equals(groupName)) {
       throw new IllegalParameterModelDefinitionException(
                                                          format("%s '%s' defines parameter group of name '%s' which is the default one. "
                                                              + "@%s cannot be used with the default group name",

@@ -13,6 +13,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
+/**
+ * Group which holds operation parameters which overrides config settings
+ *
+ * @since 4.0
+ */
 public final class ConfigurationOverrides {
 
   /**

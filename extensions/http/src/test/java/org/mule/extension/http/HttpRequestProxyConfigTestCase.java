@@ -9,6 +9,7 @@
 
 package org.mule.extension.http;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -119,6 +120,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
     // Request should go through the proxy.
     assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
     assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
+    latch.await(1, SECONDS);
   }
 
   private enum ProxyType {
