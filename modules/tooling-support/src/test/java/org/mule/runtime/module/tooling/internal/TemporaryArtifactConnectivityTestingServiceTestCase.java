@@ -13,6 +13,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -62,6 +63,16 @@ public class TemporaryArtifactConnectivityTestingServiceTestCase extends Abstrac
 
     expectedException.expect(MuleRuntimeException.class);
     connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+  }
+
+  @Test
+  public void connectionExceptionDuringArtifactStartup() throws MuleException {
+    when(mockTemporaryArtifact.isStarted()).thenReturn(false);
+    doThrow(ConnectionException.class).when(mockTemporaryArtifact).start();
+
+    ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    assertThat(connectionResult.isValid(), is(false));
+    assertThat(connectionResult.getException(), instanceOf(ConnectionException.class));
   }
 
 }
