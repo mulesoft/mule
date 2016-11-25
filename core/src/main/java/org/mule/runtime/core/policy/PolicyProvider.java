@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-
 import java.util.List;
 
 /**
@@ -22,19 +20,19 @@ public interface PolicyProvider {
    * <p>
    * The provided collection must be in the correct order in which the policies must be applied.
    *
-   * @param sourceIdentifier the identifier of the message source
+   * @param policyPointcutParameters the parameters to use to match against the pointcut configured for each policy.
    * @return a {@link DefaultOperationPolicy} associated to that source.
    */
-  List<Policy> findSourceParameterizedPolicies(ComponentIdentifier sourceIdentifier);
+  List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
   /**
    * Creates a collection of {@link Policy} with the policy chain be applied to an operation.
    * <p>
    * The provided collection must be in the correct order in which the policies must be applied.
    *
-   * @param operationIdentifier the identifier of the operation.
+   * @param policyPointcutParameters the parameters to use to match against the pointcut configured for each policy.
    * @return a {@link DefaultOperationPolicy} associated to that source.
    */
-  List<Policy> findOperationParameterizedPolicies(ComponentIdentifier operationIdentifier);
+  List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
 }

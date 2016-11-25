@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
@@ -19,6 +20,7 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -38,27 +40,33 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   private Collection<OperationPolicyParametersTransformer> operationPolicyParametersTransformerCollection = emptyList();
   private Collection<SourcePolicyParametersTransformer> sourcePolicyParametersTransformerCollection = emptyList();
+  private Collection<SourcePolicyPointcutParametersFactory> sourcePointcutFactories = emptyList();
+  private Collection<OperationPolicyPointcutParametersFactory> operationPointcutFactories = emptyList();
   private PolicyProvider policyProvider;
   private OperationPolicyFactory operationPolicyFactory;
   private SourcePolicyFactory sourcePolicyFactory;
 
   @Override
-  public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, ComponentIdentifier sourceIdentifier) {
-    List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourceIdentifier);
+  public Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier,
+                                                         PolicyPointcutParameters policyPointcutParameters) {
+    List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
       return empty();
     }
-    return of(new CompositeSourcePolicy(parameterizedPolicies, lookupSourceParametersTransformer(sourceIdentifier),
+    return of(new CompositeSourcePolicy(parameterizedPolicies,
+                                        lookupSourceParametersTransformer(policyPointcutParameters.getComponentIdentifier()),
                                         sourcePolicyFactory));
   }
 
   @Override
-  public Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, ComponentIdentifier operationIdentifier) {
-    List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(operationIdentifier);
+  public Optional<OperationPolicy> findOperationPolicy(String executionIdentifier,
+                                                       PolicyPointcutParameters policyPointcutParameters) {
+    List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
       return empty();
     }
-    return of(new CompositeOperationPolicy(parameterizedPolicies, lookupOperationParametersTransformer(operationIdentifier),
+    return of(new CompositeOperationPolicy(parameterizedPolicies, lookupOperationParametersTransformer(policyPointcutParameters
+        .getComponentIdentifier()),
                                            operationPolicyFactory));
   }
 
@@ -90,13 +98,39 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
           muleContext.getRegistry().lookupObjects(SourcePolicyParametersTransformer.class);
       operationPolicyParametersTransformerCollection =
           muleContext.getRegistry().lookupObjects(OperationPolicyParametersTransformer.class);
+      sourcePointcutFactories = muleContext.getRegistry().lookupObjects(SourcePolicyPointcutParametersFactory.class);
+      operationPointcutFactories = muleContext.getRegistry().lookupObjects(OperationPolicyPointcutParametersFactory.class);
     } catch (RegistrationException e) {
       throw new InitialisationException(e, this);
     }
   }
 
   @Override
+  public PolicyPointcutParameters createSourcePointcutParameters(ComponentIdentifier sourceIdentifier, Event sourceEvent) {
+    return sourcePointcutFactories.stream()
+        .filter(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
+            .supportsSourceIdentifier(sourceIdentifier))
+        .findAny()
+        .map(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
+            .createPolicyPointcutParameters(sourceIdentifier, sourceEvent.getMessage().getAttributes()))
+        .orElse(new PolicyPointcutParameters(sourceIdentifier));
+  }
+
+  @Override
+  public PolicyPointcutParameters createOperationPointcutParameters(ComponentIdentifier operationIdentifier,
+                                                                    Map<String, Object> operationParameters) {
+    return operationPointcutFactories.stream()
+        .filter(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
+            .supportsOperationIdentifier(operationIdentifier))
+        .findAny()
+        .map(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
+            .createPolicyPointcutParameters(operationIdentifier, operationParameters))
+        .orElse(new PolicyPointcutParameters(operationIdentifier));
+  }
+
+  @Override
   public void disposePoliciesResources(String executionIdentifier) {
     policyStateHandler.destroyState(executionIdentifier);
   }
+
 }

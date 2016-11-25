@@ -75,7 +75,7 @@ public class SimpleHttpServer {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-      httpRequests.push(new HttpMessage(exchange));
+      httpRequests.addLast(new HttpMessage(exchange));
       String response = "This is the response";
       exchange.sendResponseHeaders(200, response.length());
       OutputStream os = exchange.getResponseBody();

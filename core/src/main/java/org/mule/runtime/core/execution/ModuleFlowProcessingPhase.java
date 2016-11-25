@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -78,8 +79,10 @@ public class ModuleFlowProcessingPhase
               Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
                   .message((InternalMessage) template.getMessage()).build();
 
+          PolicyPointcutParameters policyPointcutParameters =
+              policyManager.createSourcePointcutParameters(sourceIdentifier, templateEvent);
           Optional<SourcePolicy> policy =
-              policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), sourceIdentifier);
+              policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), policyPointcutParameters);
 
           Event flowExecutionResponse = null;
           try {

@@ -43,6 +43,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -129,8 +130,14 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       ComponentIdentifier operationIdentifier =
           new ComponentIdentifier.Builder().withName(operationModel.getName())
               .withNamespace(extensionModel.getName().toLowerCase()).build();
-      Optional<OperationPolicy> policy = policyManager.findOperationPolicy(event.getContext().getId(), operationIdentifier);
+
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
+      PolicyPointcutParameters operationPointcutParameters =
+          policyManager.createOperationPointcutParameters(operationIdentifier, operationParameters);
+
+      Optional<OperationPolicy> policy =
+          policyManager.findOperationPolicy(event.getContext().getId(), operationPointcutParameters);
+
       OperationParametersProcessor operationParametersProcessor = () -> operationParameters;
       Processor nextOperation = operationCallEvent -> {
         Map<String, Object> parametersMap = new HashMap<>();
