@@ -37,7 +37,7 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled {
   MuleContext getMuleContext();
 
   /**
-   * Generate a unique ID string; this will begin with the cluster node ID followed by a dash, e.g. "3-XXXYYY"
+   * Generate a unique ID string
    */
   String getUniqueIdString();
 
