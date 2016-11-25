@@ -30,4 +30,10 @@
         <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
     </flow>
 
+    <flow name="serverMtoM">
+        <http:listener path="helloMtoM" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldMtomImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldMtomImpl"/>
+    </flow>
+
 </mule>
