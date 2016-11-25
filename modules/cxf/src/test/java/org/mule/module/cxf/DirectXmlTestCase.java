@@ -6,8 +6,11 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -56,7 +59,7 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        assertNotNull(xml);
+        assertThat(xml, not(nullValue()));
 
         test(client, xml);
     }
@@ -70,13 +73,13 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
 
         MuleMessage result = client.send("vm://echoWithTransform", xml, null);
         String resultStr = result.getPayloadAsString();
-        assertTrue("echoResponse not found in result: " + resultStr, resultStr.indexOf("echoResponse") != -1);
+        assertThat("echoResponse not found in result: " + resultStr, result.getPayloadAsString(), containsString("echoResponse"));
     }
 
     private void test(MuleClient client, Object xml) throws MuleException, Exception
     {
         MuleMessage result = client.send("vm://echo", xml, null);
-        assertTrue(result.getPayloadAsString().indexOf("echoResponse") != -1);
+        assertThat(result.getPayloadAsString(), containsString("echoResponse"));
     }
 
     @Test
