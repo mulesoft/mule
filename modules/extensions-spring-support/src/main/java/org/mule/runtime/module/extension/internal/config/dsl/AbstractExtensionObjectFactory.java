@@ -104,9 +104,9 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
           }
 
           if (isNullSafe(p)) {
-            MetadataType defaultType = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+            MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
             ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
-            resolver = NullSafeValueResolverWrapper.of(delegate, model, p, muleContext);
+            resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
           }
 
           if (resolver != null) {

@@ -47,22 +47,20 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
   /**
    * Creates a new instance
    *
-   * @param delegate           the {@link ValueResolver} to wrap
-   * @param parameterizedModel the model of the group which owns the {@code parameter}
-   * @param parameterModel     the model of the null safe parameter
-   * @param muleContext        the current {@link MuleContext}
-   * @param <T>                the generic type of the produced values
+   * @param delegate    the {@link ValueResolver} to wrap
+   * @param type        the type of the value this resolver returns
+   * @param muleContext the current {@link MuleContext}
+   * @param <T>         the generic type of the produced values
    * @return a new null safe {@link ValueResolver}
    * @throws IllegalParameterModelDefinitionException if used on parameters of not supported types
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate,
-                                        ParameterizedModel parameterizedModel,
-                                        ParameterModel parameterModel,
+                                        MetadataType type,
                                         MuleContext muleContext) {
     checkArgument(delegate != null, "delegate cannot be null");
 
     ValueHolder<ValueResolver> value = new ValueHolder<>();
-    parameterModel.getType().accept(new MetadataTypeVisitor() {
+    type.accept(new MetadataTypeVisitor() {
 
       @Override
       public void visitObject(ObjectType objectType) {
@@ -86,7 +84,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
         });
 
         ObjectBuilder<T> objectBuilder =
-            new DefaultResolverSetBasedObjectBuilder(clazz, parameterizedModel, resolverSet);
+            new DefaultResolverSetBasedObjectBuilder(clazz, resolverSet);
 
         value.set(new ObjectBuilderValueResolver(objectBuilder));
       }
