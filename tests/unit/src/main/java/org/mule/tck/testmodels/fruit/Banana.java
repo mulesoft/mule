@@ -7,6 +7,7 @@
 package org.mule.tck.testmodels.fruit;
 
 import java.util.EventObject;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ public class Banana implements Fruit {
 
   private boolean peeled = false;
   private boolean bitten = false;
+
+  private String origin;
 
   public void peel() {
     peeled = true;
@@ -49,31 +52,27 @@ public class Banana implements Fruit {
     return bitten;
   }
 
+  public String getOrigin() {
+    return origin;
+  }
+
+  public void setOrigin(String origin) {
+    this.origin = origin;
+  }
+
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof Banana)) {
-      return false;
-    }
-
-    Banana banana = (Banana) o;
-
-    if (bitten != banana.bitten) {
-      return false;
-    }
-    if (peeled != banana.peeled) {
-      return false;
+    if (o instanceof Banana) {
+      Banana other = (Banana) o;
+      return this.bitten == other.bitten && this.peeled == other.peeled
+          && Objects.equals(origin, other.origin);
     }
 
-    return true;
+    return false;
   }
 
   @Override
   public int hashCode() {
-    int result = (peeled ? 1 : 0);
-    result = 31 * result + (bitten ? 1 : 0);
-    return result;
+    return Objects.hash(peeled, bitten, origin);
   }
 }

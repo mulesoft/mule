@@ -19,6 +19,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -42,9 +43,9 @@ final class ConnectionProviderSchemaDelegate {
     this.builder = builder;
   }
 
-  public void registerConnectionProviderElement(ConnectionProviderModel providerModel) {
+  public void registerConnectionProviderElement(ConnectionProviderModel providerModel, DslElementSyntax elementSyntax) {
     Element providerElement = new TopLevelElement();
-    providerElement.setName(providerModel.getName());
+    providerElement.setName(elementSyntax.getElementName());
     providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
 
     LocalComplexType complexType = new LocalComplexType();

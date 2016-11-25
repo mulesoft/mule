@@ -160,13 +160,14 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="banana-connection">
+    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="banana-plantain-connection">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     </xs:sequence>
+                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="Ecuador" name="originCountry"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
