@@ -39,7 +39,7 @@ public class ActiveMQConnectionProvider extends BaseConnectionProvider {
   /**
    * a provider for an {@link ActiveMQConnectionFactory}
    */
-  @ParameterGroup
+  @ParameterGroup("Connection Factory")
   private ActiveMQConnectionFactoryProvider connectionFactoryProvider;
 
   private ConnectionFactory connectionFactory;

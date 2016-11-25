@@ -7,9 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isBasic;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import org.mule.metadata.api.model.MetadataType;
@@ -20,7 +18,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
@@ -76,20 +73,6 @@ public final class ExclusiveParameterModelValidator implements ModelValidator {
                                                                       optionalParameters.size()));
           }
 
-          String complexParameters = optionalParameters.stream()
-              .filter(p -> !isBasic(p.getType()))
-              .map(ParameterModel::getName)
-              .collect(joining(","));
-
-          if (!StringUtils.isBlank(complexParameters)) {
-            throw new IllegalModelDefinitionException(format(
-                                                             "In %s '%s', parameter group '%s' defines exclusive optional parameters and thus cannot contain any complex parameters,"
-                                                                 + "but the following were found: [%s]",
-                                                             getComponentModelTypeName(owner),
-                                                             getModelName(owner),
-                                                             model.getName(),
-                                                             complexParameters));
-          }
         });
       }
     }.walk(extensionModel);

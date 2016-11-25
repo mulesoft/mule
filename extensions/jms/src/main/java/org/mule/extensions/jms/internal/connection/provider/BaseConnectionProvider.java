@@ -16,6 +16,7 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
@@ -58,7 +59,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
 
   private static final Logger LOGGER = getLogger(BaseConnectionProvider.class);
 
-  @ParameterGroup
+  @ParameterGroup(CONNECTION)
   private GenericConnectionParameters connectionParameters;
 
   @Parameter

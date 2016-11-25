@@ -7,14 +7,11 @@
 package org.mule.extensions.jms.api.config;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.concurrent.TimeUnit;
@@ -57,8 +54,8 @@ public class JmsProducerConfig {
   @Parameter
   @Optional(defaultValue = "0")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = "Time To Live", order = 0)
   @Summary("Defines the default time the message will be in the broker before it expires and is discarded")
+  //TODO MULE-11091: Bundle with unit
   private long timeToLive;
 
   /**
@@ -69,8 +66,8 @@ public class JmsProducerConfig {
   @Parameter
   @Optional(defaultValue = "MILLISECONDS")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = "Time To Live", order = 1)
   @Summary("Time unit to be used in the timeToLive configurations")
+  //TODO MULE-11091: Bundle with unit
   private TimeUnit timeToLiveUnit;
 
   /**
@@ -105,8 +102,8 @@ public class JmsProducerConfig {
   @Parameter
   @Expression(NOT_SUPPORTED)
   @Optional
-  @Placement(tab = ADVANCED, group = "Delivery Delay", order = 0)
   @Summary("Only used by JMS 2.0:  Sets the delivery delay to be applied in order to postpone the Message delivery")
+  //TODO MULE-11091: Bundle with unit
   private Long deliveryDelay;
 
   /**
@@ -117,8 +114,8 @@ public class JmsProducerConfig {
   @Parameter
   @Optional(defaultValue = "MILLISECONDS")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = "Delivery Delay", order = 1)
   @Summary("Only used by JMS 2.0: Time unit to be used in the deliveryDelay configurations.")
+  //TODO MULE-11091: Bundle with unit
   private TimeUnit deliveryDelayUnit;
 
   /**
