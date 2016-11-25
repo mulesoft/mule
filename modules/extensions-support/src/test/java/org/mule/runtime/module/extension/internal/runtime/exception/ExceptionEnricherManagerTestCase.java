@@ -36,7 +36,7 @@ import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.error.MuleErrors;
-import org.mule.runtime.extension.api.exception.ExtensionTypedException;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.tck.size.SmallTest;
@@ -128,11 +128,11 @@ public class ExceptionEnricherManagerTestCase {
   public void handleThrowingOfNotDeclaredErrorType() {
     when(sourceModel.getErrorModels()).thenReturn(singleton(newError(TRANSFORMATION_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     manager = new ExceptionEnricherManager(extensionModel, sourceModel, typeRepository);
-    ExtensionTypedException extensionTypedException =
-        new ExtensionTypedException(new RuntimeException(), MuleErrors.CONNECTIVITY);
-    when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(extensionTypedException);
+    ModuleException moduleException =
+        new ModuleException(new RuntimeException(), MuleErrors.CONNECTIVITY);
+    when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(moduleException);
 
-    assertThatThrownBy(() -> manager.processException(extensionTypedException))
+    assertThatThrownBy(() -> manager.processException(moduleException))
         .isInstanceOf(MuleRuntimeException.class)
         .hasMessageContaining("The component 'Test Source' from the connector 'Test Extension' attempted to throw 'TEST-EXTENSION:CONNECTIVITY'");
   }
@@ -147,10 +147,10 @@ public class ExceptionEnricherManagerTestCase {
         .build(),
                                 typeRepository.getAnyErrorType());
 
-    ExtensionTypedException extensionTypedException =
-        new ExtensionTypedException(new RuntimeException(), MuleErrors.CONNECTIVITY);
-    when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(extensionTypedException);
-    Exception exception = manager.processException(extensionTypedException);
+    ModuleException moduleException =
+        new ModuleException(new RuntimeException(), MuleErrors.CONNECTIVITY);
+    when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(moduleException);
+    Exception exception = manager.processException(moduleException);
 
     assertThat(exception, is(instanceOf(TypedException.class)));
     ErrorType errorType = ((TypedException) exception).getErrorType();

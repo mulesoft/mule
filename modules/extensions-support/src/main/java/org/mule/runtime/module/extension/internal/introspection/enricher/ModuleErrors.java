@@ -11,7 +11,8 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 
 import java.util.Optional;
 
-enum ExtensionErrors implements ErrorTypeDefinition<ExtensionErrors> {
+enum ModuleErrors implements ErrorTypeDefinition<ModuleErrors> {
+
   CONNECTIVITY {
 
     @Override

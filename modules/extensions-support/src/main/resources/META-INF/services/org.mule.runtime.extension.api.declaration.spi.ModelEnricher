@@ -12,4 +12,5 @@ org.mule.runtime.module.extension.internal.introspection.enricher.DynamicMetadat
 org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionTypesModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.SourceCallbackSanitizerModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ContentParameterModelEnricher
-org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionErrorsModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ErrorsModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionErrorsModelEnricher

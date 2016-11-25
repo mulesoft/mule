@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
@@ -14,16 +13,16 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.exception.ExtensionTypedException;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
 
@@ -65,8 +64,8 @@ public final class ExceptionEnricherManager {
   public Exception processException(Throwable t) {
     Exception handledException = handleException(t);
     Exception exception = exceptionEnricher.enrichException(handledException);
-    if (exception instanceof ExtensionTypedException) {
-      ErrorTypeDefinition errorDefinition = ((ExtensionTypedException) exception).getType();
+    if (exception instanceof ModuleException) {
+      ErrorTypeDefinition errorDefinition = ((ModuleException) exception).getType();
       exception = handleTypedException(exception, errorDefinition);
     }
     return exception != null ? exception : handledException;

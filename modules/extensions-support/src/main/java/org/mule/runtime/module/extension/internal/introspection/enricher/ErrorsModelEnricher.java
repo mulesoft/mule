@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionErrors.CONNECTIVITY;
-import static org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionErrors.RETRY_EXHAUSTED;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,7 +23,6 @@ import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ExtensionTypeWrapper;
@@ -43,9 +40,9 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ExtensionErrorsModelEnricher implements ModelEnricher {
+public class ErrorsModelEnricher implements ModelEnricher {
 
-  private ExtensionErrorModelFactory errorModelDescriber;
+  private ErrorsModelFactory errorModelDescriber;
 
   @Override
   public void enrich(DescribingContext describingContext) {
@@ -62,7 +59,7 @@ public class ExtensionErrorsModelEnricher implements ModelEnricher {
         ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorTypesAnnotation.value().getEnumConstants();
 
         if (errorTypes.length > 0) {
-          errorModelDescriber = new ExtensionErrorModelFactory(errorTypes, extensionNamespace);
+          errorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
           errorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
           new IdempotentDeclarationWalker() {
@@ -84,7 +81,7 @@ public class ExtensionErrorsModelEnricher implements ModelEnricher {
   }
 
   private void registerOperationErrorTypes(MethodElement operationMethod, OperationDeclaration operation,
-                                           ExtensionErrorModelFactory errorModelDescriber,
+                                           ErrorsModelFactory errorModelDescriber,
                                            ErrorTypeDefinition<?>[] extensionErrorTypes) {
     operationMethod.getAnnotation(Throws.class)
         .ifPresent(throwsAnnotation -> {
@@ -104,11 +101,6 @@ public class ExtensionErrorsModelEnricher implements ModelEnricher {
             }
           });
         });
-
-    if (operation.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
-      operation.addError(errorModelDescriber.getErrorModel(CONNECTIVITY));
-      operation.addError(errorModelDescriber.getErrorModel(RETRY_EXHAUSTED));
-    }
   }
 
   private ErrorTypeDefinition validateOperationThrows(ErrorTypeDefinition<?>[] errorTypes, ErrorTypeDefinition error) {

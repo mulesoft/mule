@@ -39,13 +39,13 @@ public abstract class Errors {
     public static final String EXPRESSION_ERROR_IDENTIFIER = "EXPRESSION";
 
     /**
-     * Indicate that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has
+     * Indicates that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has
      * been exhausted
      */
     public static final String REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER = "REDELIVERY_EXHAUSTED";
 
     /**
-     * Indicates that the retrial of a certain execution block has been exhausted
+     * Indicates that the retry of a certain execution block has been exhausted
      */
     public static final String RETRY_EXHAUSTED_ERROR_IDENTIFIER = "RETRY_EXHAUSTED";
 
@@ -55,17 +55,17 @@ public abstract class Errors {
     public static final String ROUTING_ERROR_IDENTIFIER = "ROUTING";
 
     /**
-     * Indicates that was a problem and could not establish a connection
+     * Indicates that a problem occurred and a connection could not be established
      */
     public static final String CONNECTIVITY_ERROR_IDENTIFIER = "CONNECTIVITY";
 
     /**
-     * Indicates a problem of security type, eg: invalid credentials, expired token, etc.
+     * Indicates a security type problem occurred, eg: invalid credentials, expired token, etc.
      */
     public static final String SECURITY_ERROR_IDENTIFIER = "SECURITY";
 
     /**
-     * Indicates a problem of overloading and the execution was rejected
+     * Indicates a problem of overloading occ urredand the execution was rejected
      */
     public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
 

@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 
 /**
  * Internal {@link RuntimeException} implementation to throw {@link Throwable throwables} that indicates explicitly
  * the {@link ErrorType} that is wanted to throw.
- * Also gives the possibility to declare to add a message and detailed message for the {@link Error} to built.
+ * Also gives the possibility to declare a message for the {@link Error} being built.
  *
- * @since 1.0
+ * @since 4.0
  */
-public class TypedException extends RuntimeException {
+public class TypedException extends MuleRuntimeException {
 
   private ErrorType errorType;
 
@@ -38,7 +40,7 @@ public class TypedException extends RuntimeException {
    * @param message         error message to override the once from the original exception
    */
   public TypedException(Throwable throwable, ErrorType errorType, String message) {
-    super(message, throwable);
+    super(createStaticMessage(message), throwable);
     checkArgument(errorType != null, "The 'errorType' argument can not be null");
     this.errorType = errorType;
   }

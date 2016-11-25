@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionErrors.ANY;
-import static org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionErrors.CONNECTIVITY;
-import static org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionErrors.RETRY_EXHAUSTED;
+import static org.mule.runtime.module.extension.internal.introspection.enricher.ModuleErrors.ANY;
+import static org.mule.runtime.module.extension.internal.introspection.enricher.ModuleErrors.CONNECTIVITY;
+import static org.mule.runtime.module.extension.internal.introspection.enricher.ModuleErrors.RETRY_EXHAUSTED;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-class ExtensionErrorModelFactory {
+class ErrorsModelFactory {
 
   private static final String MULE = CORE_NAMESPACE.toUpperCase();
   private final String extensionNamespace;
@@ -51,7 +51,7 @@ class ExtensionErrorModelFactory {
    * @param errorTypesEnum     an {@link ErrorTypeDefinition} implementation indicating all the errors from an extension
    * @param extensionNamespace the namespace for the {@link ErrorModel} to be generated
    */
-  ExtensionErrorModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)
+  ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)
       throws IllegalModelDefinitionException {
     this.extensionNamespace = extensionNamespace.toUpperCase();
     final DirectedGraph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph = toGraph(errorTypesEnum);

@@ -42,7 +42,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public class ExtensionErrorsModelEnricherTestCase extends AbstractMuleTestCase {
+public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
 
   private static final String HEISENBERG = "HEISENBERG";
   private static final String MULE_NAMESPACE = "MULE";
