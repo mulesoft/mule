@@ -170,7 +170,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   public void invalidModelDueToListWithoutPluralName() {
     when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
     when(invalidParameterModel.getName()).thenReturn("thing");
-    when(operationModel.getAllParameterModels()).thenReturn(asList(invalidParameterModel));
+    mockParameters(operationModel, invalidParameterModel);
     validator.validate(extensionModel);
   }
 

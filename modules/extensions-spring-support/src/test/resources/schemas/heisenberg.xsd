@@ -279,7 +279,6 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="family-informations">
                         <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
                             <xs:complexType>
                                 <xs:sequence>
@@ -309,7 +308,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="family-info">
+                        <xs:element minOccurs="0" maxOccurs="1" name="family-informations">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-personal-info"></xs:element>
@@ -441,7 +440,6 @@
                     <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="familyInfo"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="familyInformations"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
