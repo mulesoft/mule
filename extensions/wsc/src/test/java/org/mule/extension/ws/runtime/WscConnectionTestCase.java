@@ -7,10 +7,14 @@
 package org.mule.extension.ws.runtime;
 
 import static java.lang.Thread.currentThread;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 
 import java.net.URL;
@@ -26,6 +30,7 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
 
   private static final String SAME_INSTANCE_FLOW = "operationShareInstance";
   private static final String LOCAL_WSDL_FLOW = "withLocalWsdlConnection";
+  private static final String RPC_CONNETION = "rpcConnection";
 
   @Override
   protected String getConfigFile() {
@@ -38,6 +43,16 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
     Message msg = flowRunner(SAME_INSTANCE_FLOW).withVariable("req", getRequestResource(ECHO)).run().getMessage();
     String out = (String) msg.getPayload().getValue();
     assertSoapResponse(ECHO, out);
+  }
+
+  // TODO: MULE-11082 remove this test
+  @Test
+  @Description("Tries to instantiate a connection with an RPC WSDL and fails.")
+  public void rpcWsdlFails() throws Exception {
+    URL wsdl = currentThread().getContextClassLoader().getResource("wsdl/rpc.wsdl");
+    Exception e = flowRunner(RPC_CONNETION).withVariable("wsdl", wsdl.getPath()).runExpectingException().getCauseException();
+    assertThat(e.getMessage(), containsString("RPC WSDLs are not supported"));
+    assertThat(e, instanceOf(ConnectionException.class));
   }
 
   @Test

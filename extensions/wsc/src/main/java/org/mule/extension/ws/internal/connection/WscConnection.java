@@ -59,6 +59,12 @@ public class WscConnection {
                        boolean mtomEnabled)
       throws ConnectionException {
     this.wsdlIntrospecter = new WsdlIntrospecter(wsdlLocation, service, port);
+
+    if (wsdlIntrospecter.isRpcStyle()) {
+      // TODO: MULE-11082
+      throw new ConnectionException(format("The provided WSDL [%s] is RPC style, RPC WSDLs are not supported", wsdlLocation));
+    }
+
     this.typeLoader = new XmlTypeLoader(this.wsdlIntrospecter.getSchemas());
     this.mtomEnabled = mtomEnabled;
     this.client = clientFactory.create(address, wsdlIntrospecter.getPort(), soapVersion, securityStrategies, mtomEnabled);

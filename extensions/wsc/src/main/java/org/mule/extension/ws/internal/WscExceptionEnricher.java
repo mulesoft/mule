@@ -6,7 +6,9 @@
  */
 package org.mule.extension.ws.internal;
 
+import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.extension.ws.api.exception.SoapFaultException;
+import org.mule.extension.ws.api.exception.WscEncodingException;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 
@@ -30,9 +32,19 @@ public class WscExceptionEnricher implements ExceptionEnricher {
   public Exception enrichException(Exception e) {
     if (e instanceof SoapFault) {
       SoapFault sf = (SoapFault) e;
+      // TODO build proper error type.
       return new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), sf.getMessage(), sf.getDetail());
     }
     if (e instanceof WscException) {
+      // TODO build proper error type.
+      return e;
+    }
+    if (e instanceof WscEncodingException) {
+      // TODO build proper error type.
+      return e;
+    }
+    if (e instanceof InvalidWsdlException) {
+      // TODO build proper error type.
       return e;
     }
     return new WscException("Unexpected error while consuming web service", e);

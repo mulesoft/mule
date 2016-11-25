@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ws;
 
+import org.mule.extension.ws.consumer.Simple11Service;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -21,7 +22,7 @@ public abstract class WscUnitTestCase {
   public static DynamicPort operationsPort = new DynamicPort("operationsPort");
 
   @ClassRule
-  public static WebServiceRule service = new WebServiceRule(operationsPort.getValue());
+  public static WebServiceRule service = new WebServiceRule(operationsPort.getValue(), "/test", new Simple11Service());
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -31,7 +32,7 @@ public abstract class WscUnitTestCase {
 
   @Before
   public void setup() {
-    introspecter = new WsdlIntrospecter(service.getAddress() + "?wsdl", "TestService", "TestPort");
+    introspecter = new WsdlIntrospecter(service.get11Address() + "?wsdl", "TestService", "TestPort");
     loader = new XmlTypeLoader(introspecter.getSchemas());
   }
 }
