@@ -6,12 +6,14 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapping;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
@@ -35,7 +37,6 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -225,7 +226,12 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       throw new MuleRuntimeException(e);
     }
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    knownErrors = Lists.newArrayList(errorTypeRepository.lookupErrorType(SECURITY));
+    java.util.Optional<ErrorType> errorType = errorTypeRepository.lookupErrorType(SECURITY);
+    if (errorType.isPresent()) {
+      knownErrors = Lists.newArrayList(errorType.get());
+    } else {
+      throw new MuleRuntimeException(createStaticMessage("Unable to find %s error in the Error Type Repository", SECURITY));
+    }
     requestHandlerManager.start();
   }
 
@@ -375,17 +381,18 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
         String uriParamName = pathPart.substring(1, pathPart.length() - 1);
         if (uriParamNames.contains(uriParamName)) {
           // TODO: MULE-8946 This should throw a MuleException
-          throw new MuleRuntimeException(CoreMessages
-              .createStaticMessage(String.format(
-                                                 "Http Listener with path %s contains duplicated uri param names", this.path)));
+          throw new MuleRuntimeException(
+                                         createStaticMessage(format(
+                                                                    "Http Listener with path %s contains duplicated uri param names",
+                                                                    this.path)));
         }
         uriParamNames.add(uriParamName);
       } else {
         if (pathPart.contains("*") && pathPart.length() > 1) {
           // TODO: MULE-8946 This should throw a MuleException
-          throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(
-                                                                                        "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
-                                                                                        this.path)));
+          throw new MuleRuntimeException(createStaticMessage(format(
+                                                                    "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
+                                                                    this.path)));
         }
       }
     }

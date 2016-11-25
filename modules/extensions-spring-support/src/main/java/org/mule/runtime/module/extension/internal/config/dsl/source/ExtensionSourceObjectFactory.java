@@ -80,7 +80,8 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                    getSourceFactory(nonCallbackParameters, responseCallbackParameters, errorCallbackParameters),
                                    configurationProvider,
                                    getRetryPolicyTemplate(),
-                                   (ExtensionManagerAdapter) muleContext.getExtensionManager());
+                                   (ExtensionManagerAdapter) muleContext.getExtensionManager(),
+                                   muleContext.getErrorTypeRepository());
     try {
       muleContext.getInjector().inject(messageSource);
     } catch (MuleException e) {

@@ -39,6 +39,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.s
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -89,6 +90,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String MULESOFT = "MuleSoft";
   private static final String OTHER_VENDOR = "OtherVendor";
+  private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setNamespace("extension-namespace").build();
   private ExtensionManagerAdapter extensionsManager;
 
   private static final String EXTENSION1_NAME = "extension1";
@@ -147,6 +149,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
     when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
     mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+
+    when(extensionModel1.getXmlDslModel()).thenReturn(XML_DSL_MODEL);
+    when(extensionModel2.getXmlDslModel()).thenReturn(XML_DSL_MODEL);
 
     when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
     when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);

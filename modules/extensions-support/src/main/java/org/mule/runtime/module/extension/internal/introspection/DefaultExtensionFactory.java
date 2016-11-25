@@ -168,6 +168,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                       extensionDeclaration.getSubTypes(),
                                       extensionDeclaration.getTypes(),
                                       extensionDeclaration.getImportedTypes(),
+                                      extensionDeclaration.getErrorModels(),
                                       extensionDeclaration.getModelProperties());
 
       return extensionModel;
@@ -238,6 +239,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                                       toOutputModel(declaration.getOutput()),
                                                                       toOutputModel(declaration.getOutputAttributes()),
                                                                       declaration.getDisplayModel(),
+                                                                      declaration.getErrorModels(),
                                                                       declaration.getModelProperties()));
     }
 

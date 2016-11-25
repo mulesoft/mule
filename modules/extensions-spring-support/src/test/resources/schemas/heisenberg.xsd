@@ -771,6 +771,12 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="FailToExecuteType" substitutionGroup="heisenberg-empire" name="fail-to-execute"></xs:element>
+    <xs:complexType name="FailToExecuteType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="FailingPagedOperationType" substitutionGroup="heisenberg-empire" name="failing-paged-operation"></xs:element>
     <xs:complexType name="FailingPagedOperationType">
         <xs:complexContent>

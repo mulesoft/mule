@@ -9,6 +9,8 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -18,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -31,6 +34,7 @@ import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KillParameters;
@@ -44,13 +48,12 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 public class HeisenbergOperations {
 
@@ -119,6 +122,7 @@ public class HeisenbergOperations {
     return wildCardWeapons.stream().map(Weapon::kill).collect(Collectors.toList());
   }
 
+  @Throws(HeisenbergErrorTyperProvider.class)
   public String killMany(@RestrictedTo(HeisenbergExtension.class) List<NestedProcessor> killOperations, String reason)
       throws Exception {
     StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
@@ -167,6 +171,7 @@ public class HeisenbergOperations {
   }
 
   @OnException(CureCancerExceptionEnricher.class)
+  @Throws(HeisenbergErrorTyperProvider.class)
   public String cureCancer() throws HealthException {
     throw new HealthException(CURE_CANCER_MESSAGE);
   }
@@ -207,6 +212,11 @@ public class HeisenbergOperations {
   public ParameterResolver<Weapon> processWeaponWithDefaultValue(@Optional(
       defaultValue = "#[payload]") ParameterResolver<Weapon> weapon) {
     return weapon;
+  }
+
+  @OnException(NullExceptionEnricher.class)
+  public void failToExecute() throws HeisenbergException {
+    callGusFring();
   }
 
   @Ignore

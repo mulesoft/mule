@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -264,8 +265,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithExceptionEnricher() throws Throwable {
-    expectedException.expect(HeisenbergException.class);
-    expectedException.expectMessage(is(CURE_CANCER_MESSAGE));
+    expectedException.expectCause(is(instanceOf(HeisenbergException.class)));
+    expectedException.expectMessage(containsString(CURE_CANCER_MESSAGE));
     runFlowAndThrowCause("cureCancer");
   }
 

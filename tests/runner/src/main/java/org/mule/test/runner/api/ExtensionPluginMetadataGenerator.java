@@ -13,6 +13,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.ErrorTypeLocatorFactory;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -85,10 +89,24 @@ public class ExtensionPluginMetadataGenerator {
     DefaultExtensionManager extensionManager = new DefaultExtensionManager();
     extensionManager.setMuleContext(new DefaultMuleContext() {
 
+      private ErrorTypeRepository errorTypeRepository = ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository();
+      private ErrorTypeLocator errorTypeLocator = ErrorTypeLocatorFactory.createDefaultErrorTypeLocator(errorTypeRepository);
+
       @Override
       public MuleRegistry getRegistry() {
         return new MuleRegistryHelper(new DefaultRegistryBroker(this), this);
       }
+
+      @Override
+      public ErrorTypeLocator getErrorTypeLocator() {
+        return errorTypeLocator;
+      }
+
+      @Override
+      public ErrorTypeRepository getErrorTypeRepository() {
+        return errorTypeRepository;
+      }
+
     });
     try {
       extensionManager.initialise();

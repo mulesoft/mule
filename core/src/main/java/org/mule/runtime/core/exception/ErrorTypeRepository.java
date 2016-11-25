@@ -7,14 +7,17 @@
 package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Repository for the different {@link ErrorType}s in a mule artifact.
@@ -50,12 +53,8 @@ public class ErrorTypeRepository {
     return errorType;
   }
 
-  public ErrorType lookupErrorType(ComponentIdentifier errorTypeComponentIdentifier) {
-    ErrorType errorType = this.errorTypes.get(errorTypeComponentIdentifier);
-    if (errorType == null) {
-      throw new IllegalStateException(format("there's no error type for %s", errorTypeComponentIdentifier));
-    }
-    return errorType;
+  public Optional<ErrorType> lookupErrorType(ComponentIdentifier errorTypeComponentIdentifier) {
+    return ofNullable(this.errorTypes.get(errorTypeComponentIdentifier));
   }
 
   /**
@@ -66,5 +65,4 @@ public class ErrorTypeRepository {
   public ErrorType getAnyErrorType() {
     return ANY_ERROR_TYPE;
   }
-
 }

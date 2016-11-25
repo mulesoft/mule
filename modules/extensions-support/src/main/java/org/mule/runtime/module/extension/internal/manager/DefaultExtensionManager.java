@@ -7,39 +7,42 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.apache.commons.io.IOUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.time.Time;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,11 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI as a discovery mechanism.
@@ -77,11 +75,14 @@ public final class DefaultExtensionManager
   private ExtensionRegistry extensionRegistry;
   private ExtensionFactory extensionFactory;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
+  private ExtensionErrorsRegistrant extensionErrorsRegistrant;
 
   @Override
   public void initialise() throws InitialisationException {
     extensionRegistry = new ExtensionRegistry(muleContext.getRegistry());
     extensionFactory = new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader());
+    extensionErrorsRegistrant =
+        new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(), muleContext.getErrorTypeLocator());
   }
 
   /**
@@ -123,6 +124,7 @@ public final class DefaultExtensionManager
       }
     } else {
       extensionRegistry.registerExtension(extensionName, extensionModel);
+      extensionErrorsRegistrant.registerErrors(extensionModel);
     }
   }
 

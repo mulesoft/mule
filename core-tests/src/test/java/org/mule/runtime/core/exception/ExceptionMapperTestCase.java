@@ -32,10 +32,10 @@ public class ExceptionMapperTestCase extends AbstractMuleTestCase {
         .addExceptionMapping(NumberFormatException.class, numberFormatExceptionErrorType)
         .addExceptionMapping(IllegalArgumentException.class, illegalArgumentExceptionErrorType).build();
 
-    assertThat(exceptionMapper.resolveErrorType(new IllegalArgumentException()).get(), is(illegalArgumentExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new NumberFormatException()).get(), is(numberFormatExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new RuntimeException()).get(), is(runtimeExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new Exception()).isPresent(), is(false));
+    assertThat(exceptionMapper.resolveErrorType(IllegalArgumentException.class).get(), is(illegalArgumentExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(NumberFormatException.class).get(), is(numberFormatExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(RuntimeException.class).get(), is(runtimeExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(Exception.class).isPresent(), is(false));
   }
 
   @Test
@@ -45,10 +45,10 @@ public class ExceptionMapperTestCase extends AbstractMuleTestCase {
         .addExceptionMapping(ClassCastException.class, classCastExceptionErrorType)
         .addExceptionMapping(ArrayStoreException.class, arrayStoreExceptionErrorType).build();
 
-    assertThat(exceptionMapper.resolveErrorType(new NumberFormatException()).get(), is(numberFormatExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new ArrayStoreException()).get(), is(arrayStoreExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new ClassCastException()).get(), is(classCastExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new Exception()).isPresent(), is(false));
+    assertThat(exceptionMapper.resolveErrorType(NumberFormatException.class).get(), is(numberFormatExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(ArrayStoreException.class).get(), is(arrayStoreExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(ClassCastException.class).get(), is(classCastExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(Exception.class).isPresent(), is(false));
   }
 
   /**
@@ -65,14 +65,14 @@ public class ExceptionMapperTestCase extends AbstractMuleTestCase {
         .addExceptionMapping(ArrayStoreException.class, arrayStoreExceptionErrorType)
         .build();
 
-    assertThat(exceptionMapper.resolveErrorType(new RuntimeException()).get(), is(runtimeExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new IllegalArgumentException()).get(), is(runtimeExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new NumberFormatException()).get(), is(numberFormatExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new ArrayStoreException()).get(), is(arrayStoreExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new ArrayStoreChildException()).get(), is(arrayStoreChildExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new ClassCastException()).get(), is(classCastExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new ClassCastChildException()).get(), is(classCastExceptionErrorType));
-    assertThat(exceptionMapper.resolveErrorType(new Exception()).isPresent(), is(false));
+    assertThat(exceptionMapper.resolveErrorType(RuntimeException.class).get(), is(runtimeExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(IllegalArgumentException.class).get(), is(runtimeExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(NumberFormatException.class).get(), is(numberFormatExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(ArrayStoreException.class).get(), is(arrayStoreExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(ArrayStoreChildException.class).get(), is(arrayStoreChildExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(ClassCastException.class).get(), is(classCastExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(ClassCastChildException.class).get(), is(classCastExceptionErrorType));
+    assertThat(exceptionMapper.resolveErrorType(Exception.class).isPresent(), is(false));
   }
 
   @Test(expected = MuleRuntimeException.class)

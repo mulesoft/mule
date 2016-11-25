@@ -24,8 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.runtime.operation.PagedOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
-import javax.inject.Inject;
-
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
  *

@@ -36,6 +36,11 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+import com.google.common.reflect.TypeToken;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.VoidType;
@@ -93,8 +98,6 @@ import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
 
-import com.google.common.reflect.TypeToken;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -104,11 +107,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -154,6 +152,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   private static final String PROCESS_WEAPON = "processWeapon";
   private static final String PROCESS_WEAPON_WITH_DEFAULT_VALUE = "processWeaponWithDefaultValue";
   private static final String PROCESS_INFO = "processSale";
+  private static final String FAIL_TO_EXECUTE = "failToExecute";
 
   @Before
   public void setUp() {
@@ -417,7 +416,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(25));
+    assertThat(extensionDeclaration.getOperations(), hasSize(26));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(8));
@@ -450,6 +449,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertOperation(extensionDeclaration, PROCESS_INFO, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE, "");
+    assertOperation(extensionDeclaration, FAIL_TO_EXECUTE, "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -584,6 +584,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertThat(operation, is(notNullValue()));
     assertParameter(operation.getAllParameters(), "weapon", "",
                     TYPE_LOADER.load(Weapon.class), false, SUPPORTED, PAYLOAD);
+
+    operation = getOperation(extensionDeclaration, FAIL_TO_EXECUTE);
+    assertThat(operation, is(notNullValue()));
+    assertThat(operation.getAllParameters(), is(empty()));
+    assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
   }
 
   private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception {

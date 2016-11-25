@@ -13,6 +13,7 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.ANNOTATION_NAME;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -237,15 +238,26 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
     if (!error.isPresent() || !error.get().getCause().equals(causeException)
         || !messagingException.causedExactlyBy(error.get().getCause().getClass())) {
 
-
-      ErrorType errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
-      Event event = Event.builder(messagingException.getEvent())
-          .error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
+      Error newError = getErrorFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
+      Event event = Event.builder(messagingException.getEvent()).error(newError).build();
       messagingException.setProcessedEvent(event);
       return event;
     } else {
       return currentEvent;
     }
+  }
+
+  private static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,
+                                                    ErrorTypeLocator errorTypeLocator) {
+    ErrorType errorType;
+    if (causeException instanceof TypedException) {
+      errorType = ((TypedException) causeException).getErrorType();
+      causeException = causeException.getCause();
+    } else {
+      errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
+    }
+
+    return ErrorBuilder.builder(causeException).errorType(errorType).build();
   }
 
   /**

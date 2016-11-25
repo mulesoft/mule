@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -45,13 +46,12 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT,
     minMuleVersion = "4.1")
@@ -63,6 +63,7 @@ import javax.inject.Inject;
 @Export(classes = {HeisenbergException.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
+@ErrorTypes(HeisenbergErrors.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public static final String HEISENBERG = "Heisenberg";

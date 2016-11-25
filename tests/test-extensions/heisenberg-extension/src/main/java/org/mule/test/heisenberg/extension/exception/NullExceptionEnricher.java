@@ -6,16 +6,12 @@
  */
 package org.mule.test.heisenberg.extension.exception;
 
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
 
-public class HeisenbergConnectionExceptionEnricher implements ExceptionEnricher {
-
-  public static final String ENRICHED_MESSAGE = "Enriched Connection Exception: ";
+public class NullExceptionEnricher implements ExceptionEnricher {
 
   @Override
   public Exception enrichException(Exception e) {
-    return new ConnectionException(ENRICHED_MESSAGE + e.getMessage(), e);
+    return e;
   }
 }

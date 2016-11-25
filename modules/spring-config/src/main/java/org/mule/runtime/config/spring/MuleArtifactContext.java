@@ -162,18 +162,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
             ((MuleContextAware) componentBuildingDefinitionProvider).setMuleContext(muleContext);
           }
           componentBuildingDefinitionProvider.init();
-          componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream()
+          componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
               .forEach(componentBuildingDefinitionRegistry::register);
         });
 
-    ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
-    ErrorTypeLocator errorTypeLocator = createComponentErrorTypeLocator(errorTypeRepository);
-    ((DefaultMuleContext) muleContext).setErrorTypeLocator(errorTypeLocator);
-    ((DefaultMuleContext) muleContext).setErrorTypeRepository(errorTypeRepository);
-
     xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
-
-    this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry, errorTypeRepository);
+    this.beanDefinitionFactory =
+        new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();

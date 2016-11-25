@@ -6,12 +6,14 @@
  */
 package org.mule.test.heisenberg.extension.exception;
 
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.test.heisenberg.extension.HeisenbergErrors;
 
 public class CureCancerExceptionEnricher implements ExceptionEnricher {
 
   @Override
-  public Exception enrichException(Exception e) {
-    return new HeisenbergException(e.getMessage(), e);
+  public ModuleException enrichException(Exception e) {
+    return new ModuleException(new HeisenbergException(e.getMessage(), e), HeisenbergErrors.HEALTH);
   }
 }

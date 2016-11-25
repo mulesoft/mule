@@ -199,6 +199,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -638,7 +639,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       String[] errorTypeIdentifiers = value.split(",");
       List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
         String parsedIdentifier = identifier.trim();
-        ErrorType errorType = muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
+        Optional<ErrorType> optional =
+            muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
+        ErrorType errorType = optional
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
+                                                                            parsedIdentifier)));
         return new SingleErrorTypeMatcher(errorType);
       }).collect(toList());
       return new DisjunctiveErrorTypeMatcher(matchers);

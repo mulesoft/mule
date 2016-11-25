@@ -50,7 +50,18 @@ public class ErrorTypeLocator {
    *         returned.
    */
   public ErrorType lookupErrorType(Throwable exception) {
-    return defaultExceptionMapper.resolveErrorType(exception).get();
+    return lookupErrorType(exception.getClass());
+  }
+
+  /**
+   * Finds the {@code ErrorType} related to the provided {@code exception} based on the general mapping rules of the runtime.
+   *
+   * @param exceptionType the exception {@link Class} related to the error type
+   * @return the error type related to the exception. If there's no mapping then the error type related to UNKNOWN will be
+   *         returned.
+   */
+  public ErrorType lookupErrorType(Class<? extends Throwable> exceptionType) {
+    return defaultExceptionMapper.resolveErrorType(exceptionType).get();
   }
 
   /**
@@ -64,13 +75,38 @@ public class ErrorTypeLocator {
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
-  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Throwable exception) {
+  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Class<? extends Throwable> exception) {
     ExceptionMapper exceptionMapper = componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
       errorType = exceptionMapper.resolveErrorType(exception);
     }
     return errorType.orElseGet(() -> defaultExceptionMapper.resolveErrorType(exception).get());
+  }
+
+  /**
+   * Finds the {@code ErrorType} related to a component defined by the {@link ComponentIdentifier} based on the exception thrown
+   * by the component and the mappings configured in the {@code ErrorTypeLocator}.
+   *
+   * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
+   *
+   * @param componentIdentifier the identifier of the component that throw the exception.
+   * @param exception the exception thrown by the component.
+   * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
+   *         related to UNKNOWN will be returned.
+   */
+  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Throwable exception) {
+    return lookupComponentErrorType(componentIdentifier, exception.getClass());
+  }
+
+  /**
+   * Adds an {@link ExceptionMapper} for a particular component identified by a {@link ComponentIdentifier}.
+   *
+   * @param componentIdentifier identifier of a component.
+   * @param exceptionMapper exception mapper for the component.
+   */
+  public void addComponentExceptionMapper(ComponentIdentifier componentIdentifier, ExceptionMapper exceptionMapper) {
+    this.componentExceptionMappers.put(componentIdentifier, exceptionMapper);
   }
 
   /**

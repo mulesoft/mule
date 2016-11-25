@@ -50,6 +50,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -188,6 +189,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     reset(muleContext.getSchedulerService());
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(of(mock(Attributes.class)));
+
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
 
     sourceCallback = spy(DefaultSourceCallback.builder()
         .setConfigName(CONFIG_NAME)
@@ -480,7 +483,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
-                                   retryPolicyTemplate, extensionManager);
+                                   retryPolicyTemplate, extensionManager, muleContext.getErrorTypeRepository());
     messageSource.setListener(messageProcessor);
     messageSource.setFlowConstruct(flowConstruct);
     muleContext.getInjector().inject(messageSource);
