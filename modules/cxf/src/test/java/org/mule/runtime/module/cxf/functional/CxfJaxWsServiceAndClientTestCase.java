@@ -7,10 +7,17 @@
 package org.mule.runtime.module.cxf.functional;
 
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
@@ -49,5 +56,20 @@ public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensi
     InternalMessage result = client.send(url, InternalMessage.of(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS).getRight();
 
     assertEquals(RESPONSE_PAYLOAD, getPayloadAsString(result));
+  }
+
+  @Test
+  public void jaxWsServerWithMtoMServiceHasCorrectContentType() throws Exception {
+    String url = "http://localhost:" + port.getNumber() + "/helloMtoM";
+    MuleClient client = muleContext.getClient();
+
+    InternalMessage result = client.send(url, InternalMessage.of(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS).getRight();
+
+    assertThat(result.getPayload().getDataType().getMediaType().toRfcString(),
+               allOf(startsWith("multipart/related; charset=UTF-8; boundary=\"uuid:"),
+                     endsWith("\"; start=\"<root.message@cxf.apache.org>\"; type=\"application/xop+xml\"; start-info=\"text/xml\"")));
+    final Object payloadValue = result.getPayload().getValue();
+    assertThat(payloadValue, instanceOf(MultiPartPayload.class));
+    assertThat(getPayloadAsString(((MultiPartPayload) payloadValue).getParts().get(0)), containsString(RESPONSE_PAYLOAD));
   }
 }

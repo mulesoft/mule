@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.xml.stax.StaxSource;
@@ -41,7 +44,7 @@ public class DirectXmlTestCase extends AbstractCxfOverHttpExtensionTestCase {
   @Test
   public void testInputStream() throws Exception {
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-    assertNotNull(xml);
+    assertThat(xml, not(nullValue()));
 
     test(xml);
   }
@@ -54,12 +57,12 @@ public class DirectXmlTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     InternalMessage result = flowRunner("echoWithTransform").withPayload(xml).run().getMessage();
     String resultStr = getPayloadAsString(result);
-    assertTrue("echoResponse not found in result: " + resultStr, resultStr.indexOf("echoResponse") != -1);
+    assertThat("echoResponse not found in result: " + resultStr, resultStr, containsString("echoResponse"));
   }
 
   private void test(Object xml) throws Exception {
     InternalMessage result = flowRunner("echoService").withPayload(xml).run().getMessage();
-    assertTrue(getPayloadAsString(result).indexOf("echoResponse") != -1);
+    assertThat(getPayloadAsString(result), containsString("echoResponse"));
   }
 
   @Test

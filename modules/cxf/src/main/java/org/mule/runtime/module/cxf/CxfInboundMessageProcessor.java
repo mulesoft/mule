@@ -18,20 +18,21 @@ import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
+
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpConstants.HttpStatus;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.model.ParameterMap;
@@ -377,9 +378,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     } else {
       final Optional<Charset> charset = message.getPayload().getDataType().getMediaType().getCharset();
       if (charset.isPresent()) {
-        builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
+        builder.payload(getResponseOutputHandler(exchange))
+            .mediaType(message.getPayload().getDataType().getMediaType().withCharset(charset.get()));
       } else {
-        builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+        builder.payload(getResponseOutputHandler(exchange)).mediaType(message.getPayload().getDataType().getMediaType());
       }
     }
 
