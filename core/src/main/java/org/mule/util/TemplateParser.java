@@ -27,8 +27,6 @@ public final class TemplateParser
     public static final String SQUARE_TEMPLATE_STYLE = "square";
     public static final String CURLY_TEMPLATE_STYLE = "curly";
     public static final String WIGGLY_MULE_TEMPLATE_STYLE = "mule";
-
-    private static final String DOLLAR_ESCAPE = "@@@";
     private static final String NULL_AS_STRING = "null";
 
     private static final Map<String, PatternInfo> patterns = new HashMap<String, PatternInfo>();
@@ -168,26 +166,31 @@ public final class TemplateParser
             {
                 String matchRegex = Pattern.quote(match);
                 String valueString = value.toString();
-                //need to escape $ as they resolve into group references, escaping them was not enough
-                //This smells a bit like a hack, but one way or another these characters need to be escaped
-                if (valueString.indexOf('$') != -1)
-                {
-                    valueString = valueString.replaceAll("\\$", DOLLAR_ESCAPE);
-                }
-
-                if (valueString.indexOf('\\') != -1)
-                {
-                    valueString = valueString.replaceAll("\\\\", "\\\\\\\\");
-                }
+                valueString = replaceBlackSlash(valueString);
+                valueString =replaceDollarSign(valueString);
 
                 result = result.replaceAll(matchRegex, valueString);
             }
         }
-        if (result.indexOf(DOLLAR_ESCAPE) != -1)
-        {
-            result = result.replaceAll(DOLLAR_ESCAPE, "\\$");
-        }
         return result;
+    }
+
+    private String replaceDollarSign (String valueString)
+    {
+        if (valueString.indexOf('$')!= -1)
+        {
+            valueString = valueString.replace("$","\\$");
+        }
+        return valueString;
+    }
+
+    private String replaceBlackSlash(String valueString)
+    {
+
+        if(valueString.indexOf("\\")!=-1){
+            valueString = valueString.replace("\\", "\\\\");
+        }
+        return valueString;
     }
 
     /**
