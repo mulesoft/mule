@@ -29,7 +29,7 @@ MULE-9501: The wildcard-filter will only work with prefix (*.log), suffix (java.
     This also affects the wildcard patterns allowed by the file-wildcard-filter, request-wildcard-filter, expression-filter, message-property-filter, exceptions strategies commit-transaction and rollback transaction exception patterns, wildcard patterns used in expressions, among others (complete list can be found in https://www.mulesoft.org/jira/browse/MULE-9501).
 MULE-10686: XML entity expansion in Jersey is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
 MULE-10306: XML entity expansion in XML transformers is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
-
+MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
 
 Migration changes from 3.5.x to 3.6.x
 
