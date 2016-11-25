@@ -9,13 +9,13 @@ package org.mule.test.integration.message;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.test.IntegrationTestCaseRunnerConfig;
 
 import org.junit.Test;
 
-public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
+public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase implements IntegrationTestCaseRunnerConfig {
 
   @Override
   protected String getConfigFile() {

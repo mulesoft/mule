@@ -9,8 +9,8 @@ package org.mule.test.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.AbstractConfigBuilderTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCaseRunnerConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -26,7 +26,8 @@ import org.junit.Test;
  * lost quite a few tests on merging. So I am afraid we are left with two rather rambling, parallel tests. But these tests examing
  * "corner cases" no other tests cover, so are quite valuable...
  */
-public class SpringNamespaceConfigBuilderV2CompatibilityTestCase extends AbstractConfigBuilderTestCase {
+public class SpringNamespaceConfigBuilderV2CompatibilityTestCase extends AbstractConfigBuilderTestCase implements
+    CompatibilityFunctionalTestCaseRunnerConfig {
 
   public SpringNamespaceConfigBuilderV2CompatibilityTestCase() {
     super(true);

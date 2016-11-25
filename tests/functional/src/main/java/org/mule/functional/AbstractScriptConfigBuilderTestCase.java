@@ -9,18 +9,14 @@ package org.mule.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractScriptConfigBuilderTestCase extends MuleArtifactFunctionalTestCase {
 
   // use legacy entry point resolver?

@@ -406,8 +406,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
 
       for (ArtifactClassificationNode pluginClassifiedNode : pluginsClassified.values()) {
-        generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
-                                  pluginClassifiedNode.getUrls());
+        List<URL> urls = generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
+                                                   pluginClassifiedNode.getUrls());
+        pluginClassifiedNode.setUrls(urls);
       }
 
       extensionPluginMetadataGenerator.generateDslResources();

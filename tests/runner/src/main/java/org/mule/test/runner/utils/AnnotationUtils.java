@@ -7,6 +7,8 @@
 
 package org.mule.test.runner.utils;
 
+import static org.apache.commons.lang.ClassUtils.getAllInterfaces;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -66,15 +68,21 @@ public class AnnotationUtils {
    */
   public static <T> List<T> getAnnotationAttributeFromHierarchy(Class<?> klass, Class<? extends Annotation> annotationClass,
                                                                 String methodName) {
-    List<T> extensions = new ArrayList<>();
+    List<T> list = new ArrayList<>();
     Class<?> currentClass = klass;
     while (currentClass != Object.class) {
       T attributeFrom = getAnnotationAttributeFrom(currentClass, annotationClass, methodName);
       if (attributeFrom != null) {
-        extensions.add(attributeFrom);
+        list.add(attributeFrom);
       }
       currentClass = currentClass.getSuperclass();
     }
-    return extensions;
+    getAllInterfaces(klass).forEach(currentInterfaceClass -> {
+      T attributeFrom = getAnnotationAttributeFrom((Class<?>) currentInterfaceClass, annotationClass, methodName);
+      if (attributeFrom != null) {
+        list.add(attributeFrom);
+      }
+    });
+    return list;
   }
 }

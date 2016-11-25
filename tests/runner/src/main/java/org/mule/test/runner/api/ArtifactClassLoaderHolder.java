@@ -59,4 +59,5 @@ public final class ArtifactClassLoaderHolder {
   public Class<?> loadClassWithApplicationClassLoader(String name) throws ClassNotFoundException {
     return applicationClassLoader.getClassLoader().loadClass(name);
   }
+
 }

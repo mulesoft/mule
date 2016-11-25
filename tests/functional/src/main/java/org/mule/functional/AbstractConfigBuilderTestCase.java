@@ -9,7 +9,6 @@ package org.mule.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;

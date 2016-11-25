@@ -8,9 +8,11 @@ package org.mule.test.config.spring.parsers;
 
 import static java.lang.String.format;
 
+import org.mule.test.IntegrationTestCaseRunnerConfig;
+
 import org.junit.Test;
 
-public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase {
+public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase implements IntegrationTestCaseRunnerConfig {
 
   private static final String REPEATED_GLOBAL_NAME = "LenderService";
 

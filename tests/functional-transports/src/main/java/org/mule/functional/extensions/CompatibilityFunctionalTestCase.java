@@ -7,15 +7,13 @@
 package org.mule.functional.extensions;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 /**
  * Provides the extension dependencies of the compatibility plugin for runnint its tests in an isolated manner.
  * 
  * @since 4.0
  */
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
-public abstract class CompatibilityFunctionalTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class CompatibilityFunctionalTestCase extends MuleArtifactFunctionalTestCase
+    implements CompatibilityFunctionalTestCaseRunnerConfig {
 
 }
