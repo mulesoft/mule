@@ -33,47 +33,56 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   }
 
   @Override
-  protected void assertSingleCpuLight() {
+  public void singleCpuLight() throws Exception {
+    super.singleCpuLight();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertSingleCpuLightConcurrent() {
+  public void singleCpuLightConcurrent() throws Exception {
+    super.singleCpuLightConcurrent();
     assertSynchronousIOScheduler(2);
   }
 
   @Override
-  protected void assertMultipleCpuLight() {
+  public void multipleCpuLight() throws Exception {
+    super.multipleCpuLight();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertSingleBlocking() {
+  public void singleBlocking() throws Exception {
+    super.singleBlocking();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertMultipleBlocking() {
+  public void multipleBlocking() throws Exception {
+    super.multipleBlocking();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertSingleCpuIntensive() {
+  public void singleCpuIntensive() throws Exception {
+    super.singleCpuIntensive();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertMultipleCpuIntensive() {
+  public void multipleCpuIntensive() throws Exception {
+    super.multipleCpuIntensive();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertMix() {
+  public void mix() throws Exception {
+    super.mix();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
-  protected void assertMix2() {
+  public void mix2() throws Exception {
+    super.mix2();
     assertSynchronousIOScheduler(1);
   }
 

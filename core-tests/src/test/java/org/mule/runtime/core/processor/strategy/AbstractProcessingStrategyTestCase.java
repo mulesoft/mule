@@ -12,6 +12,7 @@ import static java.util.Collections.singletonList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
@@ -106,13 +107,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.setMessageProcessors(singletonList(cpuLightProcessor));
     flow.initialise();
     flow.start();
-
     process(flow, testEvent());
-
-    assertSingleCpuLight();
   }
-
-  protected abstract void assertSingleCpuLight();
 
   @Test
   public void singleCpuLightConcurrent() throws Exception {
@@ -127,11 +123,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     latchedProcessor.awaitFirst();
     process(flow, testEvent());
     latchedProcessor.releaseFirst();
-
-    assertSingleCpuLightConcurrent();
   }
-
-  protected abstract void assertSingleCpuLightConcurrent();
 
   @Test
   public void multipleCpuLight() throws Exception {
@@ -140,24 +132,16 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.start();
 
     process(flow, testEvent());
-
-    assertMultipleCpuLight();
   }
 
-  protected abstract void assertMultipleCpuLight();
-
   @Test
-  public void blocking() throws Exception {
+  public void singleBlocking() throws Exception {
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();
 
     process(flow, testEvent());
-
-    assertSingleBlocking();
   }
-
-  protected abstract void assertSingleBlocking();
 
   @Test
   public void multipleBlocking() throws Exception {
@@ -166,11 +150,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.start();
 
     process(flow, testEvent());
-
-    assertMultipleBlocking();
   }
-
-  protected abstract void assertMultipleBlocking();
 
   @Test
   public void singleCpuIntensive() throws Exception {
@@ -179,11 +159,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.start();
 
     process(flow, testEvent());
-
-    assertSingleCpuIntensive();
   }
-
-  protected abstract void assertSingleCpuIntensive();
 
   @Test
   public void multipleCpuIntensive() throws Exception {
@@ -192,11 +168,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.start();
 
     process(flow, testEvent());
-
-    assertMultipleCpuIntensive();
   }
-
-  protected abstract void assertMultipleCpuIntensive();
 
   @Test
   public void mix() throws Exception {
@@ -205,11 +177,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.start();
 
     process(flow, testEvent());
-
-    assertMix();
   }
-
-  protected abstract void assertMix();
 
   @Test
   public void mix2() throws Exception {
@@ -219,11 +187,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.start();
 
     process(flow, testEvent());
-
-    assertMix2();
   }
-
-  protected abstract void assertMix2();
 
   @Test
   public abstract void tx() throws Exception;

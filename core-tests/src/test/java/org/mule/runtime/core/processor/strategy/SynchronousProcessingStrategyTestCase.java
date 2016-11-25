@@ -30,47 +30,56 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  protected void assertSingleCpuLight() {
+  public void singleCpuLight() throws Exception {
+    super.singleCpuLight();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertSingleCpuLightConcurrent() {
+  public void singleCpuLightConcurrent() throws Exception {
+    super.singleCpuLightConcurrent();
     assertSynchronous(2);
   }
 
   @Override
-  protected void assertMultipleCpuLight() {
+  public void multipleCpuLight() throws Exception {
+    super.multipleCpuLight();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertSingleBlocking() {
+  public void singleBlocking() throws Exception {
+    super.singleBlocking();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertMultipleBlocking() {
+  public void multipleBlocking() throws Exception {
+    super.multipleBlocking();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertSingleCpuIntensive() {
+  public void singleCpuIntensive() throws Exception {
+    super.singleCpuIntensive();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertMultipleCpuIntensive() {
+  public void multipleCpuIntensive() throws Exception {
+    super.multipleCpuIntensive();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertMix() {
+  public void mix() throws Exception {
+    super.mix();
     assertSynchronous(1);
   }
 
   @Override
-  protected void assertMix2() {
+  public void mix2() throws Exception {
+    super.mix2();
     assertSynchronous(1);
   }
 

@@ -33,12 +33,14 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
   }
 
   @Override
-  protected void assertSingleCpuLight() {
+  public void singleCpuLight() throws Exception {
+    super.singleCpuLight();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertSingleCpuLightConcurrent() {
+  public void singleCpuLightConcurrent() throws Exception {
+    super.singleCpuLightConcurrent();
     assertThat(threads.size(), equalTo(2));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT.name())).count(), equalTo(2l));
     assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), equalTo(0l));
@@ -46,37 +48,44 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
   }
 
   @Override
-  protected void assertMultipleCpuLight() {
+  public void multipleCpuLight() throws Exception {
+    super.multipleCpuLight();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertSingleBlocking() {
+  public void singleBlocking() throws Exception {
+    super.singleBlocking();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertMultipleBlocking() {
+  public void multipleBlocking() throws Exception {
+    super.multipleBlocking();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertSingleCpuIntensive() {
+  public void singleCpuIntensive() throws Exception {
+    super.singleCpuIntensive();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertMultipleCpuIntensive() {
+  public void multipleCpuIntensive() throws Exception {
+    super.multipleCpuIntensive();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertMix() {
+  public void mix() throws Exception {
+    super.mix();
     assertEverythingOnEventLoop();
   }
 
   @Override
-  protected void assertMix2() {
+  public void mix2() throws Exception {
+    super.mix2();
     assertEverythingOnEventLoop();
   }
 
