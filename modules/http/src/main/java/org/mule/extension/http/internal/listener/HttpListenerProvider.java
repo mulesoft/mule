@@ -15,6 +15,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.internal.listener.server.HttpListenerConnectionManager;
@@ -39,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.listener.Server;
@@ -134,8 +136,15 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @ParameterGroup(ParameterGroup.CONNECTION)
   private ConnectionParams connectionParams;
 
-  @ParameterGroup(TLS_CONFIGURATION)
-  private HttpTlsParams tlsParams;
+  /**
+   * Reference to a TLS config element. This will enable HTTPS for this config.
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  @DisplayName(TLS_CONFIGURATION)
+  @Placement(tab = SECURITY_TAB)
+  private TlsContextFactory tlsContext;
 
   @Inject
   private HttpListenerConnectionManager connectionManager;
@@ -157,13 +166,11 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
       connectionParams.port = connectionParams.protocol.getDefaultPort();
     }
 
-    final TlsContextFactory tlsContext = tlsParams.getTlsContext();
-
-    if (connectionParams.protocol.equals(HTTP) && tlsParams.getTlsContext() != null) {
+    if (connectionParams.protocol.equals(HTTP) && tlsContext != null) {
       throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP. "
           + "If you defined a tls:context element in your listener-config then you must set protocol=\"HTTPS\""), this);
     }
-    if (connectionParams.protocol.equals(HTTPS) && tlsParams.getTlsContext() == null) {
+    if (connectionParams.protocol.equals(HTTPS) && tlsContext == null) {
       throw new InitialisationException(createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured"),
                                         this);
     }
@@ -237,10 +244,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
 
   public ConnectionParams getConnectionParams() {
     return connectionParams;
-  }
-
-  public HttpTlsParams getTlsParams() {
-    return tlsParams;
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {

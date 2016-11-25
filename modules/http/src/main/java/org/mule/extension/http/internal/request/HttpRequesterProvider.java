@@ -8,17 +8,18 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
-import static org.mule.extension.http.internal.HttpConnectorConstants.TLS;
+import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
-import org.mule.extension.http.internal.listener.HttpTlsParams;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
 import org.mule.extension.http.internal.request.client.HttpClientFactory;
@@ -33,10 +34,12 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.http.api.HttpConstants;
@@ -67,8 +70,15 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @ParameterGroup(CONNECTION)
   private RequestConnectionParams connectionParams;
 
-  @ParameterGroup(TLS)
-  private HttpTlsParams tlsParams;
+  /**
+   * Reference to a TLS config element. This will enable HTTPS for this config.
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  @DisplayName(TLS_CONFIGURATION)
+  @Placement(tab = SECURITY_TAB)
+  private TlsContextFactory tlsContext;
 
   /**
    * Reusable configuration element for outbound connections through a proxy. A proxy element must define a host name and a port
@@ -102,26 +112,24 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Override
   public void initialise() throws InitialisationException {
     final HttpConstants.Protocols protocol = connectionParams.getProtocol();
-    TlsContextFactory tlsContextFactory = tlsParams.getTlsContext();
 
     if (connectionParams.getPort() == null) {
       connectionParams.setPort(muleEvent -> protocol.getDefaultPort());
     }
 
-    if (protocol.equals(HTTP) && tlsContextFactory != null) {
+    if (protocol.equals(HTTP) && tlsContext != null) {
       throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, "
           + "when using tls:context you must set attribute protocol=\"HTTPS\""),
                                         this);
     }
 
-    if (protocol.equals(HTTPS) && tlsContextFactory == null) {
+    if (protocol.equals(HTTPS) && tlsContext == null) {
       // MULE-9480
       initialiseIfNeeded(defaultTlsContextFactoryBuilder);
-      tlsContextFactory = defaultTlsContextFactoryBuilder.buildDefault();
-      tlsParams.setTlsContext(tlsContextFactory);
+      tlsContext = defaultTlsContextFactoryBuilder.buildDefault();
     }
-    if (tlsContextFactory != null) {
-      initialiseIfNeeded(tlsContextFactory);
+    if (tlsContext != null) {
+      initialiseIfNeeded(tlsContext);
     }
     if (authentication != null) {
       initialiseIfNeeded(authentication);
@@ -152,7 +160,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
         .setUriParameters(new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                    connectionParams.getPort()))
         .setAuthentication(authentication)
-        .setTlsContextFactory(tlsParams.getTlsContext())
+        .setTlsContextFactory(tlsContext)
         .setProxyConfig(proxyConfig)
         .setClientSocketProperties(connectionParams.getClientSocketProperties())
         .setMaxConnections(connectionParams.getMaxConnections())
@@ -184,7 +192,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   }
 
   public TlsContextFactory getTlsContext() {
-    return tlsParams.getTlsContext();
+    return tlsContext;
   }
 
   public HttpAuthentication getAuthentication() {

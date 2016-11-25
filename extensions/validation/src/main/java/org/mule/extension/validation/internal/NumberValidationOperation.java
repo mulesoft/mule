@@ -40,7 +40,7 @@ public class NumberValidationOperation extends ValidationSupport {
    * @param event the current {@link Event}
    */
   public void isNumber(String value, @Optional String locale, @Optional String pattern, @Optional String minValue,
-                       @Optional String maxValue, NumberType numberType, @ParameterGroup ValidationOptions options,
+                       @Optional String maxValue, NumberType numberType, @ParameterGroup(ERROR_GROUP) ValidationOptions options,
                        Event event, @UseConfig ValidationExtension config)
       throws Exception {
 

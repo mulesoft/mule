@@ -47,7 +47,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws Exception if the value is not {@code true}
    */
-  public void isTrue(boolean expression, @ParameterGroup ValidationOptions options, Event event,
+  public void isTrue(boolean expression, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                      @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -63,7 +63,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws Exception if the value is not {@code true}
    */
-  public void isFalse(boolean expression, @ParameterGroup ValidationOptions options, Event event,
+  public void isFalse(boolean expression, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                       @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -78,7 +78,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isEmail(String email, @ParameterGroup ValidationOptions options, Event event,
+  public void isEmail(String email, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                       @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -93,7 +93,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isIp(String ip, @ParameterGroup ValidationOptions options, Event event, @UseConfig ValidationExtension config)
+  public void isIp(String ip, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
+                   @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
     validateWith(new IpValidator(ip, context), context, event);
@@ -111,7 +112,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    */
   public void validateSize(Object value, @Optional(defaultValue = "0") int min, @Optional Integer max,
-                           @ParameterGroup ValidationOptions options, Event event, @UseConfig ValidationExtension config)
+                           @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
+                           @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
     validateWith(new SizeValidator(value, min, max, context), context, event);
@@ -128,7 +130,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
    */
-  public void isNotEmpty(Object value, @ParameterGroup ValidationOptions options, Event event,
+  public void isNotEmpty(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                          @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -146,7 +148,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
    */
-  public void isEmpty(Object value, @ParameterGroup ValidationOptions options, Event event,
+  public void isEmpty(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                       @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -161,7 +163,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isNotNull(Object value, @ParameterGroup ValidationOptions options, Event event,
+  public void isNotNull(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                         @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -176,7 +178,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isNull(Object value, @ParameterGroup ValidationOptions options, Event event,
+  public void isNull(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                      @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -194,7 +196,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isTime(String time, @Optional String locale, @Optional String pattern, @ParameterGroup ValidationOptions options,
+  public void isTime(String time, @Optional String locale, @Optional String pattern,
+                     @ParameterGroup(ERROR_GROUP) ValidationOptions options,
                      Event event, @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -209,7 +212,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isUrl(String url, @ParameterGroup ValidationOptions options, Event event, @UseConfig ValidationExtension config)
+  public void isUrl(String url, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
+                    @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
     validateWith(new UrlValidator(url, context), context, event);
@@ -226,7 +230,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    */
   public void matchesRegex(String value, String regex, @Optional(defaultValue = "true") boolean caseSensitive,
-                           @ParameterGroup ValidationOptions options, Event event, @UseConfig ValidationExtension config)
+                           @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
+                           @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
     validateWith(new MatchesRegexValidator(value, regex, caseSensitive, context), context, event);

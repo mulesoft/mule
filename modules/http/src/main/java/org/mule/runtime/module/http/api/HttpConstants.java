@@ -17,7 +17,7 @@ public abstract class HttpConstants {
     POST, GET, PUT, OPTIONS, HEAD, DELETE;
   }
 
-  public static enum Protocols {
+  public enum Protocols {
     HTTP("http", 80), HTTPS("https", 443);
 
     private final String scheme;
