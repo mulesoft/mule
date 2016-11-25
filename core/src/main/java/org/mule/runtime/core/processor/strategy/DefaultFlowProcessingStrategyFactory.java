@@ -33,8 +33,6 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
                                              () -> muleContext.getSchedulerService().cpuIntensiveScheduler(),
                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                          MILLISECONDS),
-                                             scheduler -> scheduler.getThreadType() == muleContext.getSchedulerService()
-                                                 .currentThreadType(),
                                              muleContext);
   }
 
@@ -42,9 +40,8 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
 
     public DefaultFlowProcessingStrategy(Supplier<Scheduler> eventLoop, Supplier<Scheduler> io, Supplier<Scheduler> cpu,
                                          Consumer<Scheduler> schedulerStopper,
-                                         Predicate<Scheduler> schedulePredicate,
                                          MuleContext muleContext) {
-      super(eventLoop, io, cpu, schedulerStopper, schedulePredicate, muleContext);
+      super(eventLoop, io, cpu, schedulerStopper, muleContext);
     }
 
     protected Consumer<Event> assertCanProcess() {
@@ -55,7 +52,7 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
 
     @Override
     protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> super.scheduleOverridePredicate().evaluate(scheduler) || isTransactionActive();
+      return scheduler -> isTransactionActive();
     }
   }
 

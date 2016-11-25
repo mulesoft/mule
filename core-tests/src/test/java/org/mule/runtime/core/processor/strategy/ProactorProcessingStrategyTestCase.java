@@ -32,11 +32,8 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext) {
-    return new ProactorProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive,
-                                          scheduler -> {
-                                          },
-                                          scheduler -> currentThread().getName().startsWith(scheduler.getThreadType().name()),
-                                          muleContext);
+    return new ProactorProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive, scheduler -> {
+    }, muleContext);
   }
 
   @Override
@@ -70,8 +67,10 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
 
   @Override
   protected void assertMultipleBlocking() {
-    assertThat(threads.size(), equalTo(1));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), equalTo(1l));
+    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), allOf(
+                                                                                          greaterThanOrEqualTo(1l),
+                                                                                          lessThanOrEqualTo(3l)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT.name())).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(), equalTo(0l));
   }
@@ -86,8 +85,10 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
 
   @Override
   protected void assertMultipleCpuIntensive() {
-    assertThat(threads.size(), equalTo(1));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(), equalTo(1l));
+    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(), allOf(
+                                                                                                     greaterThanOrEqualTo(1l),
+                                                                                                     lessThanOrEqualTo(3l)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT.name())).count(), equalTo(0l));
   }
@@ -104,9 +105,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   @Override
   protected void assertMix2() {
 
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(3), lessThanOrEqualTo(5)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), equalTo(1l));
+    assertThat(threads.size(), allOf(greaterThanOrEqualTo(3), lessThanOrEqualTo(7)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(),
+               allOf(greaterThanOrEqualTo(1l), lessThanOrEqualTo(2l)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(),
+               allOf(greaterThanOrEqualTo(1l), lessThanOrEqualTo(2l)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT.name())).count(), allOf(
                                                                                                  greaterThanOrEqualTo(1l),
                                                                                                  lessThanOrEqualTo(3l)));

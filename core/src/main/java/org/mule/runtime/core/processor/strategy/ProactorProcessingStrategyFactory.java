@@ -7,11 +7,9 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.*;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutor;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -49,8 +47,6 @@ public class ProactorProcessingStrategyFactory implements ProcessingStrategyFact
                                           () -> muleContext.getSchedulerService().cpuIntensiveScheduler(),
                                           scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                       MILLISECONDS),
-                                          scheduler -> scheduler.getThreadType() == muleContext.getSchedulerService()
-                                              .currentThreadType(),
                                           muleContext);
   }
 
@@ -60,17 +56,15 @@ public class ProactorProcessingStrategyFactory implements ProcessingStrategyFact
     private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
-    private Predicate<Scheduler> scheduleOverridePredicate;
 
     public ProactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
                                       Supplier<Scheduler> blockingSchedulerSupplier,
                                       Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                      Consumer<Scheduler> schedulerStopper, Predicate<Scheduler> scheduleOverridePredicate,
+                                      Consumer<Scheduler> schedulerStopper,
                                       MuleContext muleContext) {
       super(cpuLightSchedulerSupplier, schedulerStopper, muleContext);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
-      this.scheduleOverridePredicate = scheduleOverridePredicate;
     }
 
     @Override
@@ -94,18 +88,21 @@ public class ProactorProcessingStrategyFactory implements ProcessingStrategyFact
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
                                                                     Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-      if (messageProcessor.getProccesingType() == CPU_LITE) {
-        return publisher -> from(publisher).publishOn(createReactorScheduler(cpuLightScheduler)).transform(processorFunction);
+      if (messageProcessor.getProccesingType() == BLOCKING) {
+        return proactor(processorFunction, blockingScheduler);
       } else if (messageProcessor.getProccesingType() == CPU_INTENSIVE) {
-        return publisher -> from(publisher).publishOn(createReactorScheduler(cpuIntensiveScheduler)).transform(processorFunction);
+        return proactor(processorFunction, cpuIntensiveScheduler);
       } else {
-        return publisher -> from(publisher).publishOn(createReactorScheduler(blockingScheduler)).transform(processorFunction);
+        return publisher -> from(publisher).transform(processorFunction);
       }
     }
 
-    @Override
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduleOverridePredicate;
+    private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
+                                                                  Scheduler scheduler) {
+      return publisher -> from(publisher)
+          .publishOn(createReactorScheduler(scheduler))
+          .transform(processorFunction)
+          .publishOn(createReactorScheduler(cpuLightScheduler));
     }
 
   }

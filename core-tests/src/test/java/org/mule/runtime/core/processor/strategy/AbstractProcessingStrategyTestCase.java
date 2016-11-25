@@ -82,9 +82,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Before
   public void before() throws RegistrationException {
-    cpuLight = new TestScheduler(2, ThreadType.CPU_LIGHT);
-    blocking = new TestScheduler(2, ThreadType.IO);
-    cpuIntensive = new TestScheduler(2, ThreadType.CPU_INTENSIVE);
+    cpuLight = new TestScheduler(3, ThreadType.CPU_LIGHT);
+    blocking = new TestScheduler(3, ThreadType.IO);
+    cpuIntensive = new TestScheduler(3, ThreadType.CPU_INTENSIVE);
     asyncExecutor = newSingleThreadExecutor();
 
     flow = new Flow("test", muleContext);

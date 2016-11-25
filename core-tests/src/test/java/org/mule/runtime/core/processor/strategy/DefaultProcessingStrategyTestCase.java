@@ -31,7 +31,6 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
     return new DefaultFlowProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive,
                                              scheduler -> {
                                              },
-                                             scheduler -> currentThread().getName().startsWith(scheduler.getThreadType().name()),
                                              muleContext);
   }
 
