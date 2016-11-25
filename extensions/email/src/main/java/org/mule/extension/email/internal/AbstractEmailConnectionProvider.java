@@ -24,7 +24,7 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
 
   private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
 
-  @ParameterGroup(name = TIMEOUT_CONFIGURATION)
+  @ParameterGroup(TIMEOUT_CONFIGURATION)
   private TimeoutSettings timeoutSettings;
 
   /**

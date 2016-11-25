@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.api.param.ParameterType;
 import org.mule.extension.db.api.param.ParameterizedStatementDefinition;
@@ -39,7 +40,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class with common functionality for Database operations
@@ -48,8 +48,10 @@ import org.slf4j.LoggerFactory;
  */
 abstract class BaseDbOperations {
 
+  private static final Logger LOGGER = getLogger(DmlOperations.class);
   protected static final int DEFAULT_FETCH_SIZE = 10;
-  private static final Logger LOGGER = LoggerFactory.getLogger(DmlOperations.class);
+  protected static final String QUERY_GROUP = "Query";
+
   protected final QueryResolver<ParameterizedStatementDefinition> queryResolver = new ParameterizedQueryResolver<>();
 
   protected QueryStatementFactory getStatementFactory(StatementAttributes statementAttributes,

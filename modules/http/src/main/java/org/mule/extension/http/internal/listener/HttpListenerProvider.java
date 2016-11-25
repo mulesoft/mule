@@ -131,10 +131,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @ConfigName
   private String configName;
 
-  @ParameterGroup(name = ParameterGroup.CONNECTION)
+  @ParameterGroup(ParameterGroup.CONNECTION)
   private ConnectionParams connectionParams;
 
-  @ParameterGroup(name = TLS_CONFIGURATION)
+  @ParameterGroup(TLS_CONFIGURATION)
   private HttpTlsParams tlsParams;
 
   @Inject

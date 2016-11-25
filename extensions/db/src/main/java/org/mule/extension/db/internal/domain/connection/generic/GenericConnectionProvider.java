@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 @Alias("generic")
 public class GenericConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private GenericConnectionParameters connectionParameters;
 
   @Override

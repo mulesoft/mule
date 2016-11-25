@@ -93,6 +93,13 @@ public class IdempotentDeclarationWalker extends DeclarationWalker {
    */
   protected void onSource(SourceDeclaration declaration) {}
 
+  /**
+   * Invoked when an {@link ParameterGroupDeclaration} is found in the traversed {@code extensionDeclaration}
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param declaration the {@link SourceDeclaration}
+   */
   protected void onParameterGroup(ParameterGroupDeclaration declaration) {}
 
   /**

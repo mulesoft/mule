@@ -44,19 +44,19 @@ import javax.inject.Inject;
 @Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable {
 
-  @ParameterGroup(name = URL_CONFIGURATION)
+  @ParameterGroup(URL_CONFIGURATION)
   @NullSafe
   private RequestUrlConfiguration urlConfiguration = new RequestUrlConfiguration();
 
-  @ParameterGroup(name = REQUEST_SETTINGS)
+  @ParameterGroup(REQUEST_SETTINGS)
   @NullSafe
   private RequestSettings requestSettings = new RequestSettings();
 
-  @ParameterGroup(name = RESPONSE_SETTINGS)
+  @ParameterGroup(RESPONSE_SETTINGS)
   @NullSafe
   private ResponseSettings responseSettings = new ResponseSettings();
 
-  @ParameterGroup(name = OTHER_SETTINGS)
+  @ParameterGroup(OTHER_SETTINGS)
   @NullSafe
   private OtherRequestSettings otherSettings = new OtherRequestSettings();
 

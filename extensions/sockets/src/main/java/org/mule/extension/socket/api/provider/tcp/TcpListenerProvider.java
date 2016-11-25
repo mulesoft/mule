@@ -64,13 +64,13 @@ public final class TcpListenerProvider implements CachedConnectionProvider<TcpLi
   /**
    * This configuration parameter refers to the address where the TCP socket should listen for incoming connections.
    */
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private ConnectionSettings connectionSettings;
 
   /**
    * {@link ServerSocket} configuration properties
    */
-  @ParameterGroup(name = ADVANCED)
+  @ParameterGroup(ADVANCED)
   private TcpServerSocketProperties tcpServerSocketProperties;
 
   /**

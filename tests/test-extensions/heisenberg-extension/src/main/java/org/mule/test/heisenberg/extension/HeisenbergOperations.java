@@ -24,7 +24,6 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -96,7 +95,7 @@ public class HeisenbergOperations {
     return killWithCustomMessage(new KillParameters(victim, goodbyeMessage));
   }
 
-  public String killWithCustomMessage(@ParameterGroup(name = KILL_WITH_GROUP) KillParameters killParameters) {
+  public String killWithCustomMessage(@ParameterGroup(KILL_WITH_GROUP) KillParameters killParameters) {
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }
 

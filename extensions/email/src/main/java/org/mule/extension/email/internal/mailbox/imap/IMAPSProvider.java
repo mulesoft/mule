@@ -30,7 +30,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 @DisplayName("IMAPS Connection")
 public class IMAPSProvider extends AbstractMailboxConnectionProvider<MailboxConnection> implements Initialisable {
 
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private IMAPSConnectionSettings connectionSettings;
 
   /**

@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 @Alias("derby")
 public class DerbyConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private DerbyConnectionParameters derbyParameters;
 
   @Override

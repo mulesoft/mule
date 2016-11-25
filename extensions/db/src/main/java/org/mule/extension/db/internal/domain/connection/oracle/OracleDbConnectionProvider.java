@@ -29,7 +29,7 @@ import javax.sql.DataSource;
 @Alias("oracle")
 public class OracleDbConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private OracleConnectionParameters oracleConnectionParameters;
 
   @Override

@@ -65,11 +65,11 @@ public class HttpRequestOperations {
   @OutputResolver(output = HttpRequestMetadataResolver.class)
   public Result<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
                                                         @ParameterGroup(
-                                                            name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
+                                                            value = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
                                                         @ParameterGroup(
-                                                            name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
+                                                            value = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
                                                         @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
-                                                        @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
+                                                        @ParameterGroup(OTHER_SETTINGS) OutputSettings outputSettings,
                                                         @Connection HttpClient client,
                                                         @UseConfig HttpRequesterConfig config, Event muleEvent)
       throws MuleException {

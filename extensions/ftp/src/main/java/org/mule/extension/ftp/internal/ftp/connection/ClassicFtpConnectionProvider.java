@@ -32,7 +32,7 @@ import org.apache.commons.net.ftp.FTPReply;
 @Summary("Connection to connect against an FTP server")
 public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<ClassicFtpFileSystem> {
 
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private FtpConnectionSettings connectionSettings;
 
   /**

@@ -64,10 +64,10 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @ConfigName
   private String configName;
 
-  @ParameterGroup(name = CONNECTION)
+  @ParameterGroup(CONNECTION)
   private RequestConnectionParams connectionParams;
 
-  @ParameterGroup(name = TLS)
+  @ParameterGroup(TLS)
   private HttpTlsParams tlsParams;
 
   /**

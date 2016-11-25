@@ -20,7 +20,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
-import static org.mule.runtime.extension.api.util.NameUtils.getGroupName;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
@@ -54,6 +53,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -569,6 +569,17 @@ public final class AnnotationsBasedDescriber implements Describer {
       return false;
     }
 
+    final String groupName = groupAnnotation.value();
+    if (ParameterGroupModel.DEFAULT_GROUP_NAME.equals(groupName)) {
+      throw new IllegalParameterModelDefinitionException(
+          format("%s '%s' defines parameter group of name '%s' which is the default one. "
+                     + "@%s cannot be used with the default group name",
+                 getComponentModelTypeName(component),
+                 ((NamedDeclaration) component.getDeclaration()).getName(),
+                 groupName,
+                 ParameterGroup.class.getSimpleName()));
+    }
+
     final Type type = groupParameter.getType();
 
     final List<FieldElement> nestedGroups = type.getAnnotatedFields(ParameterGroup.class);
@@ -594,7 +605,6 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                 groupParameter.getName()));
     }
 
-    final String groupName = getGroupName(type.getDeclaringClass(), groupAnnotation);
     ParameterGroupDeclarer declarer = component.withParameterGroup(groupName);
     if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
