@@ -15,6 +15,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,8 +25,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.Predicate;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -56,19 +57,16 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
   }
 
   @Deprecated
-  static class LegacyAsynchronousProcessingStrategy extends AsynchronousProcessingStrategy {
+  static class LegacyAsynchronousProcessingStrategy extends AbstractSchedulingProcessingStrategy {
 
+
+    private Supplier<Scheduler> schedulerSupplier;
+    private Scheduler scheduler;
 
     public LegacyAsynchronousProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
                                                 MuleContext muleContext) {
-      super(schedulerSupplier, schedulerStopper, muleContext);
-    }
-
-    @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-
-      return onPipeline(flowConstruct, pipelineFunction, flowConstruct.getExceptionListener());
+      super(schedulerStopper, muleContext);
+      this.schedulerSupplier = schedulerSupplier;
     }
 
     @Override
@@ -80,11 +78,11 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
       // i) The request event is echoed rather than the the result of async processing returned
       // ii) Any exceptions that occur due to async processing are not propagated upwards
       return publisher -> from(publisher)
-          .doOnNext(assertCanProcessAsync())
+          .doOnNext(assertCanProcess())
           .doOnNext(fireAsyncScheduledNotification(flowConstruct))
           .doOnNext(request -> just(request)
               .map(event -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
-              .publishOn(fromExecutorService(getScheduler()))
+              .publishOn(fromExecutorService(scheduler))
               .transform(pipelineFunction)
               .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
               .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
@@ -96,7 +94,7 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
               .subscribe());
     }
 
-    private Consumer<Event> assertCanProcessAsync() {
+    protected Consumer<Event> assertCanProcess() {
       return event -> {
         if (event.isSynchronous() || isTransactionActive()) {
           throw propagate(new DefaultMuleException(createStaticMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE)));
@@ -104,6 +102,20 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
       };
     }
 
+    @Override
+    protected Predicate<Scheduler> scheduleOverridePredicate() {
+      return scheduler -> false;
+    }
+
+    @Override
+    public void start() throws MuleException {
+      this.scheduler = schedulerSupplier.get();
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      getSchedulerStopper().accept(scheduler);
+    }
   }
 
 }
