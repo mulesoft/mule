@@ -11,6 +11,7 @@ import static org.springframework.util.xml.DomUtils.getChildElementByTagName;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.module.db.internal.domain.type.ArrayResolvedDbType;
+import org.mule.module.db.internal.domain.type.ClobResolvedDataType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
@@ -121,6 +122,10 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
                     {
                         customDbTypes.add(new StructuredDbType(id, name));
                     }
+                }
+                else if (id == Types.CLOB)
+                {
+                    customDbTypes.add(new ClobResolvedDataType(id, name));
                 }
                 else
                 {

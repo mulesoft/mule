@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="usesStringOnImplicitParam">
+        <db:insert>
+           <db:parameterized-query>
+               INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', #[payload])
+           </db:parameterized-query>
+        </db:insert>
+
+        <flow-ref name="obtainClobValue"/>
+    </flow>
+
+    <flow name="usesStringOnExplicitParam">
+        <db:insert>
+            <db:parameterized-query>
+                INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)
+            </db:parameterized-query>
+
+            <db:in-param name="description" value="#[payload]" type="CLOB"/>
+        </db:insert>
+
+        <flow-ref name="obtainClobValue"/>
+    </flow>
+
+    <sub-flow name="obtainClobValue">
+        <transactional>
+            <db:select>
+                <db:parameterized-query>select description from Planet where name = 'Pluto'</db:parameterized-query>
+            </db:select>
+            <!-- Get the CLOB field value -->
+            <set-payload value="#[payload.get(0).get('DESCRIPTION')]"/>
+            <component class="org.mule.module.db.integration.ClobToString"/>
+        </transactional>
+    </sub-flow>
+</mule>
