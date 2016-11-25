@@ -55,7 +55,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
-import static org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber.DESCRIBER_ID;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
@@ -87,6 +87,7 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -1522,7 +1523,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     MulePluginModelBuilder builder =
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
-    builder.withExtensionModelDescriber().setId(DESCRIBER_ID).addProperty("resource-xml", moduleFileName);
+    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML, moduleFileName);
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-byeSource.xml", moduleFileName)
@@ -1535,6 +1536,26 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void failsToDeployWithExtensionThatHasNonExistingIdForExtensionModel() throws Exception {
+    String extensionName = "extension-with-extension-model-id-non-existing";
+
+    MulePluginModelBuilder builder =
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+    builder.withExtensionModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
+
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
+        .describedBy(builder.build());
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPluginFails")
+        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
   }
 
   @Test

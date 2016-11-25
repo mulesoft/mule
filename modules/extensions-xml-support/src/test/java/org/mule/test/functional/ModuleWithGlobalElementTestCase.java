@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.operation;
+package org.mule.test.functional;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -53,12 +53,12 @@ public class ModuleWithGlobalElementTestCase extends AbstractXmlExtensionMuleArt
 
   @Override
   protected String getModulePath() {
-    return "module/module-global-element/module-global-element.xml";
+    return "module-global-element/module-global-element.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "module/flows-using-module-global-elements.xml";
+    return "functional/flows-using-module-global-elements.xml";
   }
 
   @Test

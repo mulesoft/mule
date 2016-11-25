@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.operation;
+package org.mule.test.functional;
 
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.Event;
@@ -16,12 +16,12 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
 
   @Override
   protected String getModulePath() {
-    return "module/module-properties/module-properties.xml";
+    return "module-properties/module-properties.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "module/flows-using-module-properties.xml";
+    return "functional/flows-using-module-properties.xml";
   }
 
   @Test

@@ -16,7 +16,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.Builder;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -66,12 +65,6 @@ import org.w3c.dom.Document;
  * @since 4.0
  */
 public class XmlBasedDescriber implements Describer {
-
-  /**
-   * The ID which represents {@code this} {@link Describer} that will be used to execute the lookup when reading the descriptor file.
-   * @see MulePluginModel#getExtensionModelLoaderDescriptor()
-   */
-  public static final String DESCRIBER_ID = "xml-based";
 
   private static final String PARAMETER_NAME = "name";
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
