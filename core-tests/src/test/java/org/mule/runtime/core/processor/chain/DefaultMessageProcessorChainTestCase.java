@@ -130,8 +130,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   private Flow flow;
 
-  public DefaultMessageProcessorChainTestCase(ProcessingStrategyFactory processingStrategyFactory, boolean reavtive) {
-    super(reavtive);
+  public DefaultMessageProcessorChainTestCase(ProcessingStrategyFactory processingStrategyFactory, boolean reactive) {
+    super(reactive);
     this.processingStrategyFactory = processingStrategyFactory;
   }
 

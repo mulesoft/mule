@@ -44,7 +44,8 @@ import reactor.core.scheduler.Schedulers;
  * synchronously on the worker thread until completion.
  *
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
- * 
+ *
+ * @since 4.0
  */
 public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFactory {
 
@@ -81,12 +82,8 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
 
       return publisher -> from(publisher)
           .doOnNext(assertCanProcessAsync())
-          .doOnNext(fireAsyncScheduledNotification(flowConstruct))
           .publishOn(fromExecutorService(scheduler))
-          .transform(pipelineFunction)
-          .doOnNext(request -> fireAsyncCompleteNotification(request, flowConstruct, null))
-          .doOnError(MessagingException.class,
-                     msgException -> fireAsyncCompleteNotification(msgException.getEvent(), flowConstruct, msgException));
+          .transform(pipelineFunction);
     }
 
     @Override

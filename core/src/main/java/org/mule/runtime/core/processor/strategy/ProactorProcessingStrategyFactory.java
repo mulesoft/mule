@@ -38,6 +38,7 @@ import org.reactivestreams.Publisher;
  *
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
+ * @since 4.0
  */
 public class ProactorProcessingStrategyFactory implements ProcessingStrategyFactory {
 

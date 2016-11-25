@@ -35,16 +35,6 @@ abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrateg
     this.muleContext = muleContext;
   }
 
-  protected Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
-    return event -> muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_SCHEDULED));
-  }
-
-  protected void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
-    muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_COMPLETE, exception));
-  }
-
   protected Consumer<Scheduler> getSchedulerStopper() {
     return this.schedulerStopper;
   }

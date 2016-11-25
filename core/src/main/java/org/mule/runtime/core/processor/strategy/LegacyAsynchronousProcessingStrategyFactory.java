@@ -8,6 +8,8 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -24,6 +26,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.Predicate;
@@ -116,6 +119,17 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
     public void stop() throws MuleException {
       getSchedulerStopper().accept(scheduler);
     }
+
+    protected Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
+      return event -> getMuleContext().getNotificationManager()
+          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_SCHEDULED));
+    }
+
+    protected void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
+      getMuleContext().getNotificationManager()
+          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_COMPLETE, exception));
+    }
+
   }
 
 }

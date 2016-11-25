@@ -10,13 +10,13 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -25,7 +25,6 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
-import org.mule.tck.size.SmallTest;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,34 +46,25 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   protected Flow flow;
   protected volatile Set<String> threads = new HashSet<>();
-  protected Processor cpuLightProcessor = event -> {
-    threads.add(currentThread().getName());
-    return event;
-  };
-  protected Processor cpuIntensiveProcessor = new Processor() {
-
-    @Override
-    public Event process(Event event) {
-      threads.add(currentThread().getName());
-      return event;
-    }
+  protected Processor cpuLightProcessor = new ThreadTrackingProcessor() {
 
     @Override
     public ProcessingType getProccesingType() {
-      return CPU_INTENSIVE;
+      return ProcessingType.CPU_LITE;
     }
   };
-  protected Processor blockingProcessor = new Processor() {
-
-    @Override
-    public Event process(Event event) {
-      threads.add(currentThread().getName());
-      return event;
-    }
+  protected Processor cpuIntensiveProcessor = new ThreadTrackingProcessor() {
 
     @Override
     public ProcessingType getProccesingType() {
-      return BLOCKING;
+      return ProcessingType.CPU_INTENSIVE;
+    }
+  };
+  protected Processor blockingProcessor = new ThreadTrackingProcessor() {
+
+    @Override
+    public ProcessingType getProccesingType() {
+      return ProcessingType.BLOCKING;
     }
   };
 
@@ -126,7 +116,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleCpuLightConcurrent() throws Exception {
-    FirstInvocationLatchedProcessor latchedProcessor = new FirstInvocationLatchedProcessor(CPU_LITE);
+    FirstInvocationLatchedProcessor latchedProcessor = new FirstInvocationLatchedProcessor(ProcessingType.CPU_LITE);
 
     flow.setMessageProcessors(singletonList(latchedProcessor));
     flow.initialise();
@@ -317,6 +307,16 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
     public String getName() {
       return TestScheduler.class.getSimpleName();
+    }
+
+  }
+
+  class ThreadTrackingProcessor implements Processor {
+
+    @Override
+    public Event process(Event event) {
+      threads.add(currentThread().getName());
+      return event;
     }
 
   }
