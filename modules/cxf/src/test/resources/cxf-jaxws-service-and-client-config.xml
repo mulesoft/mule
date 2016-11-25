@@ -27,4 +27,10 @@
         <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
     </flow>
 
+    <flow name="serverMtoM">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port}" path="helloMtoM"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldMtomImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldMtomImpl"/>
+    </flow>
+
 </mule>

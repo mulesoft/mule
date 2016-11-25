@@ -7,18 +7,28 @@
 package org.mule.module.cxf.functional;
 
 
+import static java.nio.charset.Charset.forName;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.NullPayload;
+import org.mule.util.IOUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.activation.DataHandler;
+
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,5 +92,20 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
         MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
 
         assertEquals(RESPONSE_PAYLOAD, result.getPayloadAsString());
+    }
+
+    @Test
+    public void jaxWsServerWithMtoMServiceHasCorrectContentType() throws Exception
+    {
+        String url = "http://localhost:" + port.getNumber() + "/helloMtoM";
+        MuleClient client = muleContext.getClient();
+
+        MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
+
+        assertThat(result.getDataType().getMimeType(), is("multipart/related"));
+        assertThat(result.getPayload(), Is.<Object> is(NullPayload.getInstance()));
+
+        final DataHandler part = result.getInboundAttachment(result.getInboundAttachmentNames().iterator().next());
+        assertThat(IOUtils.toString(part.getInputStream(), forName("UTF-8")), containsString(RESPONSE_PAYLOAD));
     }
 }
