@@ -100,7 +100,7 @@ public class MetadataMediator {
   public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key) {
     try {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
-      return getMetadata(context, (p) -> resolvedKey);
+      return getMetadata(context, p -> resolvedKey);
     } catch (MetadataResolvingException e) {
       return failure(e, e.getFailure());
     }
@@ -146,7 +146,7 @@ public class MetadataMediator {
   }
 
   private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
-    return componentModel.getParameterModels().stream()
+    return componentModel.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
         .collect(toList());
   }

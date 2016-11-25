@@ -7,6 +7,11 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -15,7 +20,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.UUID;
@@ -23,13 +27,12 @@ import org.mule.runtime.core.util.UUID;
 import java.util.Optional;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 //TODO MULE-10963 - Remove FlowConstruct implementation once MPs don't depend on FlowConstructAware anymore.
 public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
 
-  private final static Logger logger = LoggerFactory.getLogger(DefaultPolicyInstance.class);
+  private final static Logger logger = getLogger(DefaultPolicyInstance.class);
 
   private PolicyChain operationPolicyChain;
   private PolicyChain sourcePolicyChain;
@@ -41,16 +44,16 @@ public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, Mul
 
   @Override
   public void initialise() throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(operationPolicyChain, muleContext, this);
-    LifecycleUtils.initialiseIfNeeded(sourcePolicyChain, muleContext, this);
+    initialiseIfNeeded(operationPolicyChain, muleContext, this);
+    initialiseIfNeeded(sourcePolicyChain, muleContext, this);
     lifecycleStateManager.fireInitialisePhase((phaseNam, object) -> {
     });
   }
 
   @Override
   public void start() throws MuleException {
-    LifecycleUtils.startIfNeeded(operationPolicyChain);
-    LifecycleUtils.startIfNeeded(sourcePolicyChain);
+    startIfNeeded(operationPolicyChain);
+    startIfNeeded(sourcePolicyChain);
     lifecycleStateManager.fireStartPhase((phaseNam, object) -> {
     });
 
@@ -72,6 +75,16 @@ public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, Mul
   }
 
   @Override
+  public String getUniqueIdString() {
+    return muleContext.getUniqueIdString();
+  }
+
+  @Override
+  public String getServerId() {
+    return muleContext.getId();
+  }
+
+  @Override
   public String getName() {
     return this.name;
   }
@@ -88,16 +101,16 @@ public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, Mul
 
   @Override
   public void dispose() {
-    LifecycleUtils.disposeIfNeeded(operationPolicyChain, logger);
-    LifecycleUtils.disposeIfNeeded(sourcePolicyChain, logger);
+    disposeIfNeeded(operationPolicyChain, logger);
+    disposeIfNeeded(sourcePolicyChain, logger);
     lifecycleStateManager.fireDisposePhase((phaseNam, object) -> {
     });
   }
 
   @Override
   public void stop() throws MuleException {
-    LifecycleUtils.stopIfNeeded(operationPolicyChain);
-    LifecycleUtils.stopIfNeeded(sourcePolicyChain);
+    stopIfNeeded(operationPolicyChain);
+    stopIfNeeded(sourcePolicyChain);
     lifecycleStateManager.fireStopPhase((phaseNam, object) -> {
     });
   }

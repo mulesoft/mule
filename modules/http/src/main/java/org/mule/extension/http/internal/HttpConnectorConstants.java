@@ -21,6 +21,5 @@ public interface HttpConnectorConstants {
   String TLS_CONFIGURATION = "TLS Configuration";
   String OTHER_SETTINGS = "Other Settings";
   String AUTHENTICATION = "Authentication";
-  String TLS = "TLS";
 
 }

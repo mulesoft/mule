@@ -72,7 +72,7 @@ final class ConnectionProviderSchemaDelegate {
       addConnectionProviderPoolingProfile(choice);
     }
 
-    builder.registerParameters(providerType, choice, providerModel.getParameterModels());
+    builder.registerParameters(providerType, choice, providerModel.getAllParameterModels());
   }
 
   private void addConnectionProviderPoolingProfile(ExplicitGroup choice) {

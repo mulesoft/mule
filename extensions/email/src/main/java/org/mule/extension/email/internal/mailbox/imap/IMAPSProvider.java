@@ -6,25 +6,18 @@
  */
 package org.mule.extension.email.internal.mailbox.imap;
 
-import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.IMAPS;
-import static org.mule.extension.email.internal.util.EmailConnectorConstants.IMAPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.email.internal.mailbox.AbstractMailboxConnectionProvider;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * A {@link ConnectionProvider} that returns instances of imaps (secure) based {@link MailboxConnection}s.
@@ -37,30 +30,15 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 @DisplayName("IMAPS Connection")
 public class IMAPSProvider extends AbstractMailboxConnectionProvider<MailboxConnection> implements Initialisable {
 
-  /**
-   * The port number of the mail server. '993' by default.
-   */
-  @Parameter
-  @Optional(defaultValue = IMAPS_PORT)
-  @Placement(group = CONNECTION, order = 2)
-  private String port;
-
-  /**
-   * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. Allows to create a TLS secured
-   * connections.
-   */
-  @Parameter
-  @Summary("TLS Configuration for the secure connection of the IMAPS protocol")
-  @Placement(group = CONNECTION, order = 5)
-  @DisplayName(TLS_CONFIGURATION)
-  private TlsContextFactory tlsContextFactory;
+  @ParameterGroup(CONNECTION)
+  private IMAPSConnectionSettings connectionSettings;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(tlsContextFactory);
+    initialiseIfNeeded(connectionSettings.getTlsContextFactory());
   }
 
   /**
@@ -68,8 +46,15 @@ public class IMAPSProvider extends AbstractMailboxConnectionProvider<MailboxConn
    */
   @Override
   public MailboxConnection connect() throws ConnectionException {
-    return new MailboxConnection(IMAPS, settings.getUser(), settings.getPassword(), settings.getHost(), port,
-                                 getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties(),
-                                 tlsContextFactory);
+    return new MailboxConnection(IMAPS,
+                                 connectionSettings.getUser(),
+                                 connectionSettings.getPassword(),
+                                 connectionSettings.getHost(),
+                                 connectionSettings.getPort(),
+                                 getConnectionTimeout(),
+                                 getReadTimeout(),
+                                 getWriteTimeout(),
+                                 getProperties(),
+                                 connectionSettings.getTlsContextFactory());
   }
 }

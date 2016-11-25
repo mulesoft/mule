@@ -8,8 +8,8 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.util.List;
@@ -25,11 +25,11 @@ public class PetStoreOperations {
     return client;
   }
 
-  public ExclusivePetBreeder getBreeder(@ParameterGroup ExclusivePetBreeder breeder) {
+  public ExclusivePetBreeder getBreeder(@ParameterGroup("Exclusive") ExclusivePetBreeder breeder) {
     return breeder;
   }
 
-  public ExclusiveCashier getCashier(@ParameterGroup ExclusiveCashier cashier) {
+  public ExclusiveCashier getCashier(@ParameterGroup("Exclusive") ExclusiveCashier cashier) {
     return cashier;
   }
 

@@ -6,8 +6,6 @@
  */
 package org.mule.extension.email.internal.sender;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.GENERAL;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -17,7 +15,6 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import javax.inject.Inject;
 
@@ -40,7 +37,6 @@ public class SMTPConfiguration implements Initialisable {
    */
   @Parameter
   @Optional
-  @Placement(group = GENERAL)
   private String from;
 
   /**
@@ -49,7 +45,6 @@ public class SMTPConfiguration implements Initialisable {
    */
   @Parameter
   @Optional
-  @Placement(group = ADVANCED)
   private String defaultCharset;
 
   /**

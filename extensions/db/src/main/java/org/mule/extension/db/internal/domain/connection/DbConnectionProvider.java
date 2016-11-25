@@ -8,11 +8,11 @@ package org.mule.extension.db.internal.domain.connection;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
@@ -27,16 +27,17 @@ import org.mule.extension.db.internal.domain.xa.XADbConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -48,9 +49,7 @@ import javax.sql.DataSource;
 import javax.sql.XAConnection;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates a generic DB connection through an URL
@@ -59,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DbConnectionProvider implements ConnectionProvider<DbConnection>, Initialisable, Disposable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DbConnectionProvider.class);
+  private static final Logger LOGGER = getLogger(DbConnectionProvider.class);
 
   @ConfigName
   private String configName;
@@ -81,7 +80,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED)
+  @Placement(tab = ADVANCED_TAB)
   private DbPoolingProfile poolingProfile;
 
   private DataSourceFactory dataSourceFactory;

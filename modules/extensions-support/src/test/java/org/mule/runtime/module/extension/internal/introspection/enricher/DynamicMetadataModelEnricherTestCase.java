@@ -57,7 +57,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
   public void parseMetadataAnnotationsOnParameter() {
     final OperationDeclaration operationDeclaration =
         getDeclaration(declaration.getConfigurations().get(0).getOperations(), CONTENT_METADATA_WITH_KEY_ID);
-    final List<ParameterDeclaration> parameters = operationDeclaration.getParameters();
+    final List<ParameterDeclaration> parameters = operationDeclaration.getAllParameters();
 
     assertParameterIsMetadataKeyPart(getDeclaration(parameters, "type"));
     assertParameterIsMetadataContent(getDeclaration(parameters, "content"));
@@ -71,21 +71,21 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
     OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
     assertOutputType(dynamicContent.getOutput(), toMetadataType(Object.class), true);
     assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
-    params = dynamicContent.getParameters();
+    params = dynamicContent.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
     assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class));
 
     OperationDeclaration dynamicOutput = getDeclaration(operations, "outputMetadataWithKeyId");
     assertOutputType(dynamicOutput.getOutput(), toMetadataType(Object.class), true);
     assertOutputType(dynamicOutput.getOutputAttributes(), toMetadataType(void.class), false);
-    params = dynamicOutput.getParameters();
+    params = dynamicOutput.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
     assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class));
 
     OperationDeclaration dynaimcContentAndOutput = getDeclaration(operations, "contentAndOutputMetadataWithKeyId");
     assertOutputType(dynaimcContentAndOutput.getOutput(), toMetadataType(Object.class), true);
     assertOutputType(dynaimcContentAndOutput.getOutputAttributes(), toMetadataType(void.class), false);
-    params = dynaimcContentAndOutput.getParameters();
+    params = dynaimcContentAndOutput.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
     assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class));
 
@@ -93,7 +93,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
     OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
     assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
     assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
-    params = dynamicOutputAndAttributes.getParameters();
+    params = dynamicOutputAndAttributes.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
 
     OperationDeclaration staticOutputOnly = getDeclaration(operations, "typeWithDeclaredSubtypesMetadata");
@@ -114,7 +114,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
     assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
         .ofKey(TYPE_LOADER.load(String.class)).ofValue(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
-    assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class));
+    assertParameterType(getDeclaration(sourceDynamicAttributes.getAllParameters(), "type"), toMetadataType(String.class));
 
     messageSources = declaration.getMessageSources();
     SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
@@ -123,7 +123,7 @@ public class DynamicMetadataModelEnricherTestCase extends AbstractMuleTestCase {
         .ofKey(TYPE_LOADER.load(String.class)).ofValue(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
-    List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
+    List<ParameterDeclaration> locationKey = sourceStaticAttributes.getAllParameters();
     assertParameterType(getDeclaration(locationKey, "continent"), toMetadataType(String.class));
     assertParameterType(getDeclaration(locationKey, "country"), toMetadataType(String.class));
     assertParameterType(getDeclaration(locationKey, "city"), toMetadataType(String.class));

@@ -126,11 +126,11 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
 
     when(connectedSource.getModelProperty(ImplementingTypeModelProperty.class))
         .thenReturn(Optional.of(connectedSourceImplementingTypeModelProperty));
-    when(connectedSource.getParameters()).thenReturn(emptyList());
+    when(connectedSource.getAllParameters()).thenReturn(emptyList());
     when(connectedSource.getName()).thenReturn(CONNECTED_SOURCE);
     when(notConnectedSource.getModelProperty(ImplementingTypeModelProperty.class))
         .thenReturn(Optional.of(notConnectedSourceImplementingTypeModelProperty));
-    when(notConnectedSource.getParameters()).thenReturn(emptyList());
+    when(notConnectedSource.getAllParameters()).thenReturn(emptyList());
     when(notConnectedSource.getName()).thenReturn(NOT_CONNECTED_SOURCE);
   }
 
@@ -174,7 +174,7 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
   public void transactionalActionParameter() {
     ParameterDeclaration offending = mock(ParameterDeclaration.class);
     when(offending.getName()).thenReturn(TRANSACTIONAL_ACTION_PARAMETER_NAME);
-    when(connectedOperation.getParameters()).thenReturn(singletonList(offending));
+    when(connectedOperation.getAllParameters()).thenReturn(singletonList(offending));
 
     enricher.enrich(describingContext);
   }
@@ -185,14 +185,10 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
     OperationDeclaration operationDeclaration =
         getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getOperations(), CONNECTED_OPERATION);
 
-    doAnswer(new Answer<BaseDeclaration>() {
-
-      @Override
-      public BaseDeclaration answer(InvocationOnMock invocationOnMock) throws Throwable {
-        ConnectivityModelProperty property = (ConnectivityModelProperty) invocationOnMock.getArguments()[0];
-        assertThat(property.getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
-        return (BaseDeclaration) invocationOnMock.callRealMethod();
-      }
+    doAnswer(invocationOnMock -> {
+      ConnectivityModelProperty property = (ConnectivityModelProperty) invocationOnMock.getArguments()[0];
+      assertThat(property.getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
+      return invocationOnMock.callRealMethod();
     }).when(operationDeclaration).addModelProperty(isA(ConnectivityModelProperty.class));
 
     verify(operationDeclaration, times(1)).addModelProperty(isA(ConnectivityModelProperty.class));

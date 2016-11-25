@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -15,21 +22,13 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
 /**
  * Validates that the exported types used as:
@@ -54,7 +53,7 @@ public final class ExportedTypesModelValidator implements ModelValidator {
 
       @Override
       public void onOperation(OperationModel model) {
-        model.getParameterModels().stream()
+        model.getAllParameterModels().stream()
             .forEach(parameterModel -> validateJavaType(model, parameterModel.getType()));
 
         validateJavaType(model, model.getOutput().getType());

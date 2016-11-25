@@ -17,6 +17,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -29,27 +30,31 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.model.config.ImmutableConfigurationModel;
 import org.mule.runtime.extension.api.model.connection.ImmutableConnectionProviderModel;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
-import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
-import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderNameModelValidator;
@@ -95,7 +100,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
    * Creates a new instance and uses the given {@code serviceRegistry} to locate instances of {@link ModelEnricher}
    *
    * @param serviceRegistry a {@link ServiceRegistry}
-   * @param classLoader the {@link ClassLoader} on which the {@code serviceRegistry} will search into
+   * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
    */
   public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader) {
     modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
@@ -199,7 +204,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
       return fromCache(declaration,
                        () -> new ImmutableConfigurationModel(declaration.getName(),
                                                              declaration.getDescription(),
-                                                             toParameters(declaration.getParameters()),
+                                                             toParameterGroups(declaration.getParameterGroups()),
                                                              toOperations(declaration.getOperations()),
                                                              toConnectionProviders(declaration.getConnectionProviders()),
                                                              toMessageSources(declaration.getMessageSources()),
@@ -215,7 +220,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
       return fromCache(declaration,
                        () -> new ImmutableSourceModel(declaration.getName(), declaration.getDescription(),
                                                       declaration.hasResponse(),
-                                                      toParameters(declaration.getParameters()),
+                                                      toParameterGroups(declaration.getParameterGroups()),
                                                       toOutputModel(declaration.getOutput()),
                                                       toOutputModel(declaration.getOutputAttributes()),
                                                       declaration.getDisplayModel(),
@@ -227,17 +232,13 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
     }
 
     private OperationModel toOperation(OperationDeclaration declaration) {
-      return fromCache(declaration, () -> {
-        List<ParameterModel> parameterModels = toOperationParameters(declaration.getParameters());
-
-        return new ImmutableOperationModel(declaration.getName(),
-                                           declaration.getDescription(),
-                                           parameterModels,
-                                           toOutputModel(declaration.getOutput()),
-                                           toOutputModel(declaration.getOutputAttributes()),
-                                           declaration.getDisplayModel(),
-                                           declaration.getModelProperties());
-      });
+      return fromCache(declaration, () -> new ImmutableOperationModel(declaration.getName(),
+                                                                      declaration.getDescription(),
+                                                                      toParameterGroups(declaration.getParameterGroups()),
+                                                                      toOutputModel(declaration.getOutput()),
+                                                                      toOutputModel(declaration.getOutputAttributes()),
+                                                                      declaration.getDisplayModel(),
+                                                                      declaration.getModelProperties()));
     }
 
     private List<ConnectionProviderModel> toConnectionProviders(List<ConnectionProviderDeclaration> declarations) {
@@ -255,14 +256,34 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
       return fromCache(declaration,
                        () -> new ImmutableConnectionProviderModel(declaration.getName(),
                                                                   declaration.getDescription(),
-                                                                  toParameters(declaration.getParameters()),
+                                                                  toParameterGroups(declaration.getParameterGroups()),
                                                                   declaration.getConnectionManagementType(),
                                                                   declaration.getDisplayModel(),
                                                                   declaration.getModelProperties()));
     }
 
-    private List<ParameterModel> toOperationParameters(List<ParameterDeclaration> declarations) {
-      return toParameters(declarations);
+    private List<ParameterGroupModel> toParameterGroups(List<ParameterGroupDeclaration> declarations) {
+      if (declarations.isEmpty()) {
+        return ImmutableList.of();
+      }
+
+      return declarations.stream().map(this::toParameterGroup).collect(toList());
+    }
+
+    private ParameterGroupModel toParameterGroup(ParameterGroupDeclaration declaration) {
+      return new ImmutableParameterGroupModel(declaration.getName(),
+                                              declaration.getDescription(),
+                                              toParameters(declaration.getParameters()),
+                                              toExclusiveParametersModels(declaration),
+                                              declaration.getDisplayModel(),
+                                              declaration.getLayoutModel(),
+                                              declaration.getModelProperties());
+    }
+
+    private List<ExclusiveParametersModel> toExclusiveParametersModels(ParameterGroupDeclaration groupDeclaration) {
+      return groupDeclaration.getExclusiveParameters().stream()
+          .map(exclusive -> new ImmutableExclusiveParametersModel(exclusive.getParameterNames(), exclusive.isRequiresOne()))
+          .collect(new ImmutableListCollector<>());
     }
 
     private List<ParameterModel> toParameters(List<ParameterDeclaration> declarations) {

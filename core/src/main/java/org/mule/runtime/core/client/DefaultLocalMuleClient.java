@@ -8,27 +8,22 @@ package org.mule.runtime.core.client;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
-
-import java.io.Serializable;
-import java.util.Map;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
@@ -36,12 +31,16 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 public class DefaultLocalMuleClient implements MuleClient {
@@ -232,6 +231,16 @@ public class DefaultLocalMuleClient implements MuleClient {
     @Override
     public String getName() {
       return "MuleClient";
+    }
+
+    @Override
+    public String getUniqueIdString() {
+      return muleContext.getUniqueIdString();
+    }
+
+    @Override
+    public String getServerId() {
+      return muleContext.getId();
     }
 
     @Override

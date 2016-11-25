@@ -271,8 +271,9 @@ public class XmlBasedDescriber implements Describer {
 
 
     ParameterDeclarer parameterDeclarer =
-        parameterDefaultValue == null ? parameterizedDeclarer.withRequiredParameter(parameterName)
-            : parameterizedDeclarer.withOptionalParameter(parameterName).defaultingTo(parameterDefaultValue);
+        parameterDefaultValue == null ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
+            : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
+                .defaultingTo(parameterDefaultValue);
     parameterDeclarer.ofType(parameterType);
   }
 

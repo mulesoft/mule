@@ -195,7 +195,7 @@ final class MetadataKeyIdObjectResolver {
   }
 
   private Optional<QueryParameterModelProperty> getQueryModelProperty() {
-    return component.getParameterModels().stream()
+    return component.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(QueryParameterModelProperty.class).isPresent())
         .map(p -> p.getModelProperty(QueryParameterModelProperty.class).get())
         .findAny();
@@ -261,7 +261,7 @@ final class MetadataKeyIdObjectResolver {
   }
 
   private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
-    return componentModel.getParameterModels().stream()
+    return componentModel.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
         .collect(toList());
   }

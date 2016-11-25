@@ -6,6 +6,7 @@
  */
 package org.mule.extension.db.internal.domain.connection.generic;
 
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -25,7 +26,7 @@ import javax.sql.DataSource;
 @Alias("generic")
 public class GenericConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup
+  @ParameterGroup(CONNECTION)
   private GenericConnectionParameters connectionParameters;
 
   @Override

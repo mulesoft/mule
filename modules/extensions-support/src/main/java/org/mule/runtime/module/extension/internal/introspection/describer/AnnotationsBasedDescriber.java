@@ -7,12 +7,16 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -22,6 +26,8 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentDeclarationTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
@@ -42,8 +48,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderD
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -60,6 +68,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -79,6 +88,7 @@ import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.FunctionParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.ParameterDeclarerContributor;
@@ -92,7 +102,6 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.Type;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
@@ -117,6 +126,7 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingTyp
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
@@ -126,13 +136,17 @@ import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFa
 import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
+
 
 /**
  * Implementation of {@link Describer} which generates a {@link ExtensionDeclarer} by scanning annotations on a type provided in
@@ -494,78 +508,136 @@ public final class AnnotationsBasedDescriber implements Describer {
   private List<ParameterDeclarer> declareFieldBasedParameters(ParameterizedDeclarer component,
                                                               List<ExtensionParameter> parameters,
                                                               ParameterDeclarationContext componentName) {
-    return declareParameters(component, parameters, fieldParameterContributors, componentName, null);
+    return declareParameters(component, parameters, fieldParameterContributors, componentName, empty());
   }
 
   private List<ParameterDeclarer> declareMethodBasedParameters(ParameterizedDeclarer component,
                                                                List<ExtensionParameter> parameters,
                                                                ParameterDeclarationContext componentName) {
-    return declareParameters(component, parameters, methodParameterContributors, componentName, null);
+    return declareParameters(component, parameters, methodParameterContributors, componentName, empty());
   }
 
-  private List<ParameterDeclarer> declareParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters,
+  private List<ParameterDeclarer> declareParameters(ParameterizedDeclarer component,
+                                                    List<? extends ExtensionParameter> parameters,
                                                     List<ParameterDeclarerContributor> contributors,
                                                     ParameterDeclarationContext declarationContext,
-                                                    ExtensionParameter parameterGroupOwner) {
+                                                    Optional<ParameterGroupDeclarer> parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
     checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, UseConfig.class, MetadataKeyId.class);
+
     for (ExtensionParameter extensionParameter : parameters) {
-      if (extensionParameter.shouldBeAdvertised()) {
-        ParameterDeclarer parameter =
-            extensionParameter.isRequired() ? component.withRequiredParameter(extensionParameter.getAlias())
-                : component.withOptionalParameter(extensionParameter.getAlias())
-                    .defaultingTo(extensionParameter.defaultValue().isPresent() ? extensionParameter.defaultValue().get() : null);
 
-        parameter.ofType(extensionParameter.getMetadataType(typeLoader)).describedAs(EMPTY);
-
-        parseParameterRole(extensionParameter, parameter);
-        parseExpressionSupport(extensionParameter, parameter);
-        parseNullSafe(extensionParameter, parameter);
-        addTypeRestrictions(extensionParameter, parameter);
-        parseLayout(extensionParameter, parameter);
-        addImplementingTypeModelProperty(extensionParameter, parameter);
-        parseXmlHints(extensionParameter, parameter);
-        contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
-        declarerList.add(parameter);
+      if (!extensionParameter.shouldBeAdvertised()) {
+        continue;
       }
 
-      if (extensionParameter.isAnnotatedWith(ParameterGroup.class)) {
-        final Type type = extensionParameter.getType();
-        final List<ExtensionParameter> annotatedParameters =
-            ImmutableList.<ExtensionParameter>builder().addAll(type.getAnnotatedFields(Parameter.class))
-                .addAll(type.getAnnotatedFields(ParameterGroup.class)).build();
-
-        // TODO: MULE-9220: Add a syntax validator for this
-        if (extensionParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
-          throw new IllegalParameterModelDefinitionException(format("@%s can not be applied along with @%s. Affected field [%s].",
-                                                                    org.mule.runtime.extension.api.annotation.param.Optional.class
-                                                                        .getSimpleName(),
-                                                                    ParameterGroup.class
-                                                                        .getSimpleName(),
-                                                                    extensionParameter.getName()));
-        }
-
-        if (!annotatedParameters.isEmpty()) {
-          if (extensionParameter.equals(parameterGroupOwner)) {
-            throw new IllegalParameterModelDefinitionException(
-                                                               format(
-                                                                      "@%s cannot be applied recursively within the same class but field '%s' was found inside class '%s'",
-                                                                      ParameterGroup.class
-                                                                          .getSimpleName(),
-                                                                      parameterGroupOwner.getName(),
-                                                                      parameterGroupOwner.getType().getName()));
-          } else {
-            declareParameters(component, annotatedParameters, contributors, declarationContext, extensionParameter);
-          }
-
-        } else {
-          declareParameters(component, getFieldsWithGetters(type.getDeclaringClass()).stream().map(FieldWrapper::new)
-              .collect(toList()), contributors, declarationContext, extensionParameter);
-        }
+      if (declaredAsGroup(component, contributors, declarationContext, extensionParameter)) {
+        continue;
       }
+
+      ParameterGroupDeclarer groupDeclarer = parameterGroupDeclarer.orElseGet(component::onDefaultParameterGroup);
+
+      ParameterDeclarer parameter;
+      if (extensionParameter.isRequired()) {
+        parameter = groupDeclarer.withRequiredParameter(extensionParameter.getAlias());
+      } else {
+        parameter = groupDeclarer.withOptionalParameter(extensionParameter.getAlias())
+            .defaultingTo(extensionParameter.defaultValue().isPresent() ? extensionParameter.defaultValue().get() : null);
+      }
+
+      parameter.ofType(extensionParameter.getMetadataType(typeLoader)).describedAs(extensionParameter.getDescription());
+      parseParameterRole(extensionParameter, parameter);
+      parseExpressionSupport(extensionParameter, parameter);
+      parseNullSafe(extensionParameter, parameter);
+      addTypeRestrictions(extensionParameter, parameter);
+      parseLayout(extensionParameter, parameter);
+      addImplementingTypeModelProperty(extensionParameter, parameter);
+      parseXmlHints(extensionParameter, parameter);
+      contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
+      declarerList.add(parameter);
     }
 
     return declarerList;
+  }
+
+  private boolean declaredAsGroup(ParameterizedDeclarer component,
+                                  List<ParameterDeclarerContributor> contributors,
+                                  ParameterDeclarationContext declarationContext,
+                                  ExtensionParameter groupParameter) {
+
+    ParameterGroup groupAnnotation = groupParameter.getAnnotation(ParameterGroup.class).orElse(null);
+    if (groupAnnotation == null) {
+      return false;
+    }
+
+    final String groupName = groupAnnotation.value();
+    if (DEFAULT_GROUP_NAME.equals(groupName)) {
+      throw new IllegalParameterModelDefinitionException(
+                                                         format("%s '%s' defines parameter group of name '%s' which is the default one. "
+                                                             + "@%s cannot be used with the default group name",
+                                                                getComponentModelTypeName(component),
+                                                                ((NamedDeclaration) component.getDeclaration()).getName(),
+                                                                groupName,
+                                                                ParameterGroup.class.getSimpleName()));
+    }
+
+    final Type type = groupParameter.getType();
+
+    final List<FieldElement> nestedGroups = type.getAnnotatedFields(ParameterGroup.class);
+    if (!nestedGroups.isEmpty()) {
+      throw new IllegalParameterModelDefinitionException(format(
+                                                                "Class '%s' is used as a @%s but contains fields which also hold that annotation. Nesting groups is not allowed. "
+                                                                    + "Offending fields are: [%s]",
+                                                                type.getName(),
+                                                                ParameterGroup.class.getSimpleName(),
+                                                                nestedGroups.stream().map(element -> element.getName())
+                                                                    .collect(joining(","))));
+    }
+
+    final List<FieldElement> annotatedParameters = type.getAnnotatedFields(Parameter.class);
+
+    // TODO: MULE-9220: Add a syntax validator for this
+    if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
+      throw new IllegalParameterModelDefinitionException(format(
+                                                                "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
+                                                                org.mule.runtime.extension.api.annotation.param.Optional.class
+                                                                    .getSimpleName(),
+                                                                ParameterGroup.class.getSimpleName(),
+                                                                groupParameter.getName()));
+    }
+
+    ParameterGroupDeclarer declarer = component.withParameterGroup(groupName);
+    if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
+      throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
+                                                                groupName,
+                                                                getComponentDeclarationTypeName(component),
+                                                                ((NamedDeclaration) component.getDeclaration()).getName()));
+    } else {
+      declarer.withModelProperty(new ParameterGroupModelProperty(new ParameterGroupDescriptor(
+                                                                                              groupName, type, groupParameter
+                                                                                                  .getDeclaringElement())));
+    }
+
+    type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {
+      Set<String> optionalParamNames = annotatedParameters.stream()
+          .filter(f -> !f.isRequired())
+          .map(f -> f.getAlias())
+          .collect(toSet());
+
+      declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
+    });
+
+
+    parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
+
+    if (!annotatedParameters.isEmpty()) {
+      declareParameters(component, annotatedParameters, contributors, declarationContext, ofNullable(declarer));
+    } else {
+      declareParameters(component, getFieldsWithGetters(type.getDeclaringClass()).stream().map(FieldWrapper::new)
+          .collect(toList()), contributors, declarationContext, ofNullable(declarer));
+    }
+
+    return true;
   }
 
   private void checkConfigurationIsNotAnOperation(Class<?> configurationType) {
@@ -618,7 +690,8 @@ public final class AnnotationsBasedDescriber implements Describer {
   private void parseNullSafe(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     if (extensionParameter.isAnnotatedWith(NullSafe.class)) {
       if (extensionParameter.isRequired()) {
-        throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is required but annotated with '@%s', which is redundant",
+        throw new IllegalParameterModelDefinitionException(
+                                                           format("Parameter '%s' is required but annotated with '@%s', which is redundant",
                                                                   extensionParameter.getName(), NullSafe.class.getSimpleName()));
       }
 
@@ -626,8 +699,9 @@ public final class AnnotationsBasedDescriber implements Describer {
 
         @Override
         protected void visitBasicType(MetadataType metadataType) {
-          throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-              + "used with complex types (Pojos, Lists, Maps)",
+          throw new IllegalParameterModelDefinitionException(
+                                                             format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                 + "used with complex types (Pojos, Lists, Maps)",
                                                                     extensionParameter.getName(), NullSafe.class.getSimpleName(),
                                                                     extensionParameter.getType().getName()));
         }
@@ -650,7 +724,7 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                    .build()));
   }
 
-  private void checkAnnotationsNotUsedMoreThanOnce(List<ExtensionParameter> parameters,
+  private void checkAnnotationsNotUsedMoreThanOnce(List<? extends ExtensionParameter> parameters,
                                                    Class<? extends Annotation>... annotations) {
     for (Class<? extends Annotation> annotation : annotations) {
       final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
@@ -671,10 +745,10 @@ public final class AnnotationsBasedDescriber implements Describer {
   }
 
   private void addImplementingTypeModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    parameter.withModelProperty(extensionParameter.isFieldBased()
-        ? new DeclaringMemberModelProperty(((FieldElement) extensionParameter).getField())
-        : new ImplementingParameterModelProperty(
-                                                 ((ParameterElement) extensionParameter).getParameter()));
+    AnnotatedElement element = extensionParameter.getDeclaringElement();
+    parameter.withModelProperty(element instanceof Field
+        ? new DeclaringMemberModelProperty(((Field) element))
+        : new ImplementingParameterModelProperty((java.lang.reflect.Parameter) element));
   }
 
   private void addPagedOperationModelProperty(MethodElement operationMethod, OperationDeclarer operation,

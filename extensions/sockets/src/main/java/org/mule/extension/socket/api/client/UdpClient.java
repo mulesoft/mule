@@ -9,7 +9,7 @@ package org.mule.extension.socket.api.client;
 import static java.util.Arrays.copyOf;
 import static org.mule.extension.socket.internal.SocketUtils.createPacket;
 import static org.mule.extension.socket.internal.SocketUtils.getUdpAllowedByteArray;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.api.exceptions.ReadingTimeoutException;
@@ -34,7 +34,7 @@ public final class UdpClient implements SocketClient {
   private final DatagramSocket socket;
   private final SocketAddress socketAddress;
 
-  public UdpClient(DatagramSocket socket, ConnectionSettings connectionSettings, UdpSocketProperties socketProperties,
+  public UdpClient(DatagramSocket socket, SocketConnectionSettings connectionSettings, UdpSocketProperties socketProperties,
                    ObjectSerializer objectSerializer) {
     this.objectSerializer = objectSerializer;
     this.socketProperties = socketProperties;

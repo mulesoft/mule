@@ -6,21 +6,20 @@
  */
 package org.mule.extension.db.internal.operation;
 
+import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
+import static org.mule.extension.db.internal.domain.query.QueryType.DDL;
 import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.query.Query;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 import java.sql.SQLException;
-
-import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
-import static org.mule.extension.db.internal.domain.query.QueryType.DDL;
 
 /**
  * Operations to manipulate data definitions in a relational Database
@@ -40,14 +39,14 @@ public class DdlOperations extends BaseDbOperations {
    */
   @DisplayName("Execute DDL")
   public int executeDdl(@DisplayName(SQL_QUERY_TEXT) @Text String sql,
-                        @ParameterGroup QuerySettings settings,
+                        @ParameterGroup(QUERY_SETTINGS) QuerySettings settings,
                         @UseConfig DbConnector connector,
                         @Connection DbConnection connection)
       throws SQLException {
 
     QueryDefinition query = new QueryDefinition();
     query.setSql(sql);
-    query.setSettings(settings);
+    query.copyInto(settings);
 
     final Query resolvedQuery = resolveQuery(query, connector, connection, DDL);
     return executeUpdate(query, null, null, connection, resolvedQuery).getAffectedRows();

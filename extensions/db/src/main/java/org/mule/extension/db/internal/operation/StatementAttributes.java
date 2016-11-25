@@ -6,11 +6,10 @@
  */
 package org.mule.extension.db.internal.operation;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 
 /**
  * Parameters to configure the executed statements
@@ -25,7 +24,7 @@ public class StatementAttributes {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED)
+  @Placement(tab = ADVANCED_TAB)
   private Integer fetchSize;
 
   /**
@@ -34,7 +33,7 @@ public class StatementAttributes {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED)
+  @Placement(tab = ADVANCED_TAB)
   private Integer maxRows;
 
   public Integer getFetchSize() {

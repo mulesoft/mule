@@ -132,7 +132,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(configurationModel.getName(), equalTo(CONFIG_NAME));
     assertThat(configurationModel.getDescription(), equalTo(CONFIG_DESCRIPTION));
 
-    List<ParameterModel> parameterModels = configurationModel.getParameterModels();
+    List<ParameterModel> parameterModels = configurationModel.getAllParameterModels();
     assertThat(parameterModels, hasSize(4));
     assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, SUPPORTED, true, toMetadataType(String.class),
                     StringType.class, null);
@@ -224,14 +224,14 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void operationWithParameterNamedName() {
-    extensionDeclarer.withOperation("invalidOperation").describedAs("").withRequiredParameter("name")
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").onDefaultParameterGroup().withRequiredParameter("name")
         .ofType(toMetadataType(String.class));
     factory.createFrom(extensionDeclarer, createDescribingContext());
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void fixedParameterWithExpressionDefault() {
-    extensionDeclarer.withOperation("invalidOperation").describedAs("").withOptionalParameter("fixed")
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").onDefaultParameterGroup().withOptionalParameter("fixed")
         .ofType(toMetadataType(String.class)).withExpressionSupport(NOT_SUPPORTED).defaultingTo("#['hello']");
 
     factory.createFrom(extensionDeclarer, createDescribingContext());
@@ -239,7 +239,8 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   @Test(expected = IllegalOperationModelDefinitionException.class)
   public void operationWithParameterNamedTarget() {
-    extensionDeclarer.withOperation("invalidOperation").describedAs("").withOptionalParameter(TARGET_ATTRIBUTE)
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_ATTRIBUTE)
         .ofType(toMetadataType(String.class));
 
     factory.createFrom(extensionDeclarer, createDescribingContext());
@@ -247,7 +248,8 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void expressionParameterWithFixedValue() {
-    extensionDeclarer.withOperation("invalidOperation").describedAs("").withOptionalParameter("expression")
+    extensionDeclarer.withOperation("invalidOperation").describedAs("").onDefaultParameterGroup()
+        .withOptionalParameter("expression")
         .ofType(toMetadataType(String.class)).withExpressionSupport(REQUIRED).defaultingTo("static");
 
     factory.createFrom(extensionDeclarer, createDescribingContext());
@@ -328,7 +330,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(connectionProvider.getName(), is(CONNECTION_PROVIDER_NAME));
     assertThat(connectionProvider.getDescription(), is(CONNECTION_PROVIDER_DESCRIPTION));
 
-    List<ParameterModel> parameters = connectionProvider.getParameterModels();
+    List<ParameterModel> parameters = connectionProvider.getAllParameterModels();
     assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class),
                     StringType.class, null);
     assertParameter(parameters.get(1), PASSWORD, PASSWORD_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class),
@@ -345,7 +347,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(getType(sourceModel.getOutput().getType()), is(equalTo(InputStream.class)));
     assertThat(getType(sourceModel.getOutputAttributes().getType()), is(equalTo(Serializable.class)));
 
-    List<ParameterModel> parameters = sourceModel.getParameterModels();
+    List<ParameterModel> parameters = sourceModel.getAllParameterModels();
     assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class,
                     null);
     assertParameter(parameters.get(1), PORT, PORT_DESCRIPTION, SUPPORTED, false, toMetadataType(Integer.class), NumberType.class,
@@ -369,7 +371,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(operationModel.getName(), equalTo(CONSUMER));
     assertThat(operationModel.getDescription(), equalTo(GO_GET_THEM_TIGER));
 
-    List<ParameterModel> parameterModels = operationModel.getParameterModels();
+    List<ParameterModel> parameterModels = operationModel.getAllParameterModels();
     assertThat(parameterModels, hasSize(2));
     assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, toMetadataType(String.class),
                     StringType.class, null);
@@ -385,7 +387,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(operationModel.getName(), equalTo(BROADCAST));
     assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
 
-    List<ParameterModel> parameterModels = operationModel.getParameterModels();
+    List<ParameterModel> parameterModels = operationModel.getAllParameterModels();
     assertThat(parameterModels, hasSize(3));
     assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true,
                     arrayOf(List.class, TYPE_BUILDER.stringType().id(String.class.getName())), ArrayType.class, null);
@@ -403,7 +405,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(operationModel.getName(), equalTo(ARG_LESS));
     assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));
 
-    List<ParameterModel> parameterModels = operationModel.getParameterModels();
+    List<ParameterModel> parameterModels = operationModel.getAllParameterModels();
     assertThat(parameterModels.isEmpty(), is(true));
   }
 

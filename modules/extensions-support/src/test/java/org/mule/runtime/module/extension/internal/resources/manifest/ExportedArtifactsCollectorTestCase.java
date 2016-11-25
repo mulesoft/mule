@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -25,18 +27,18 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.vegan.extension.VeganAttributes;
 
+import com.google.common.reflect.TypeToken;
+
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExportedArtifactsCollectorTestCase {
@@ -96,7 +98,7 @@ public class ExportedArtifactsCollectorTestCase {
     when(op.getOutput()).thenReturn(output);
     when(op.getOutputAttributes()).thenReturn(attributes);
     if (params != null) {
-      when(op.getParameterModels()).thenReturn(asList(params));
+      mockParameters(op, params);
     }
     return op;
   }

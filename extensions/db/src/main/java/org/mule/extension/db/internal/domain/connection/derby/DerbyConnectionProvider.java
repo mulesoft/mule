@@ -6,6 +6,9 @@
  */
 package org.mule.extension.db.internal.domain.connection.derby;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -25,16 +28,16 @@ import javax.sql.DataSource;
 @Alias("derby")
 public class DerbyConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup
+  @ParameterGroup(CONNECTION)
   private DerbyConnectionParameters derbyParameters;
 
   @Override
   public Optional<DataSource> getDataSource() {
-    return Optional.empty();
+    return empty();
   }
 
   @Override
   public Optional<DataSourceConfig> getDataSourceConfig() {
-    return Optional.ofNullable(derbyParameters);
+    return ofNullable(derbyParameters);
   }
 }

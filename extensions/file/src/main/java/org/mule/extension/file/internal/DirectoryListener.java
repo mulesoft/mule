@@ -16,11 +16,9 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
-import static org.mule.extension.file.common.api.FileDisplayConstants.MATCHER;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -48,7 +46,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -187,7 +184,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   @Parameter
   @Optional
   @Alias("matchWith")
-  @Placement(group = MATCHER)
   @DisplayName(MATCH_WITH)
   private FilePredicateBuilder<FilePredicateBuilder, FileAttributes> predicateBuilder;
 

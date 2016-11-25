@@ -33,7 +33,7 @@ public abstract class AbstractSocketProperties implements SocketProperties {
    */
   @Parameter
   @Optional
-  @Placement(group = BUFFER_CONFIGURATION)
+  @Placement(tab = BUFFER_CONFIGURATION)
   protected Integer sendBufferSize;
 
   /**
@@ -41,7 +41,7 @@ public abstract class AbstractSocketProperties implements SocketProperties {
    */
   @Parameter
   @Optional
-  @Placement(group = BUFFER_CONFIGURATION)
+  @Placement(tab = BUFFER_CONFIGURATION)
   protected Integer receiveBufferSize;
 
   /**
@@ -53,7 +53,7 @@ public abstract class AbstractSocketProperties implements SocketProperties {
   @Parameter
   @Optional
   @Summary("Time, in milliseconds, that the socket will wait in a blocking operation before failing")
-  @Placement(group = TIMEOUT_CONFIGURATION)
+  @Placement(tab = TIMEOUT_CONFIGURATION)
   protected Integer clientTimeout;
 
   /**

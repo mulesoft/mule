@@ -6,9 +6,11 @@
  */
 package org.mule.extension.socket.api.provider.udp;
 
-import org.mule.extension.socket.api.ConnectionSettings;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.connection.udp.UdpListenerConnection;
 import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
+import org.mule.extension.socket.api.socket.SocketProperties;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.internal.SocketUtils;
@@ -33,13 +35,13 @@ public class UdpListenerProvider implements CachedConnectionProvider<UdpListener
   /**
    * This configuration parameter refers to the address where the UDP socket should listen for incoming packets.
    */
-  @ParameterGroup
-  private ConnectionSettings connectionSettings;
+  @ParameterGroup(CONNECTION)
+  private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link DatagramSocket} configuration properties
    */
-  @ParameterGroup
+  @ParameterGroup(SocketProperties.GROUP_NAME)
   private UdpSocketProperties udpSocketProperties;
 
   @Override

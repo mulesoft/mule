@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-public final class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
+public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
   private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();

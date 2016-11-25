@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -22,16 +23,17 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withReturnType;
-import org.mule.runtime.extension.api.annotation.DataTypeParameters;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.declaration.DescribingContext;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -77,18 +79,21 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase {
     when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
     when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
     when(extensionDeclaration.getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
-    when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
-    when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
+    when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(empty());
     when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class))
         .thenReturn(Optional.of(new ImplementingMethodModelProperty(method)));
-    when(notAnnotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.empty());
+    mockParameters(annotatedOperation, new ParameterDeclaration[] {});
+
+    when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(empty());
+    when(notAnnotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(empty());
+    mockParameters(notAnnotatedOperation, new ParameterDeclaration[] {});
   }
 
   @Test
   public void enrichAnnotated() {
     enricher.enrich(describingContext);
     ArgumentCaptor<ParameterDeclaration> captor = ArgumentCaptor.forClass(ParameterDeclaration.class);
-    verify(annotatedOperation, times(2)).addParameter(captor.capture());
+    verify(annotatedOperation.getParameterGroups().get(0), times(2)).addParameter(captor.capture());
 
     assertThat(captor.getAllValues(), hasSize(2));
     assertParameter(captor.getAllValues().get(0), MIME_TYPE_PARAMETER_NAME);
@@ -98,7 +103,7 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase {
   @Test
   public void skipNotAnnotated() {
     enricher.enrich(describingContext);
-    verify(notAnnotatedOperation, never()).addParameter(any(ParameterDeclaration.class));
+    verify(notAnnotatedOperation.getParameterGroups().get(0), never()).addParameter(any(ParameterDeclaration.class));
   }
 
   @Test(expected = IllegalModelDefinitionException.class)

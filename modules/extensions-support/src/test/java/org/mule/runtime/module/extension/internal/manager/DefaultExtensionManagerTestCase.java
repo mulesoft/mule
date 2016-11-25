@@ -34,6 +34,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
@@ -165,7 +166,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockInterceptors(extension1ConfigurationModel, null);
     when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(ImmutableList.of());
+    mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 
     when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
@@ -341,7 +342,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     ParameterModel parameterOfRepeatedEnumType = mock(ParameterModel.class);
     when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
 
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter, parameterOfRepeatedEnumType));
+    mockParameters(extension1ConfigurationModel, parameter, parameterOfRepeatedEnumType);
     extensionsManager.registerExtension(extensionModel1);
 
     verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
@@ -357,7 +358,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(parameter.getType())
         .thenReturn(create(JAVA).arrayType().of(toMetadataType(TimeUnit.class)).build());
 
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter));
+    mockParameters(extension1ConfigurationModel, parameter);
     extensionsManager.registerExtension(extensionModel1);
 
     verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
@@ -367,7 +368,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     ParameterModel parameterModel1 = mock(ParameterModel.class);
     when(parameterModel1.isRequired()).thenReturn(true);
 
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
+    mockParameters(extension1ConfigurationModel, parameterModel1, parameterModel1);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
   }
 

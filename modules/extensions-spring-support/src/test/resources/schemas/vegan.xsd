@@ -365,6 +365,16 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConvinceAnimalKillerType" substitutionGroup="mule:abstract-operator" name="convince-animal-killer"></xs:element>
+    <xs:complexType name="ConvinceAnimalKillerType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:attribute type="mule:expressionString" use="optional" name="argument1"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="argument2"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="argument3"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatWatermelonType" substitutionGroup="mule:abstract-operator" name="eat-watermelon"></xs:element>
     <xs:complexType name="org.mule.tck.testmodels.fruit.WaterMelon">
         <xs:complexContent>

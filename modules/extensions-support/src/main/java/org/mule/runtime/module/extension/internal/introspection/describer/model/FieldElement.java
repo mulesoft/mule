@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 
 /**
@@ -24,8 +25,8 @@ public interface FieldElement extends ExtensionParameter {
   /**
    * {@inheritDoc}
    */
-  default boolean isFieldBased() {
-    return true;
+  @Override
+  default AnnotatedElement getDeclaringElement() {
+    return getField();
   }
-
 }

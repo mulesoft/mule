@@ -6,18 +6,16 @@
  */
 package org.mule.extension.db.internal.domain.connection;
 
+import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.param.TransactionIsolation;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
-public class BaseDbConnectionParameters {
+public abstract class BaseDbConnectionParameters {
 
   private static final String TRANSACTION_CONFIGURATION = "Transaction Configuration";
 
@@ -27,7 +25,7 @@ public class BaseDbConnectionParameters {
   @Parameter
   @Optional(defaultValue = "NOT_CONFIGURED")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = TRANSACTION_CONFIGURATION)
+  @Placement(tab = TRANSACTION_CONFIGURATION)
   private TransactionIsolation transactionIsolation = NOT_CONFIGURED;
 
   /**
@@ -36,7 +34,7 @@ public class BaseDbConnectionParameters {
   @Parameter
   @Optional(defaultValue = "false")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = TRANSACTION_CONFIGURATION)
+  @Placement(tab = TRANSACTION_CONFIGURATION)
   @DisplayName("Use XA Transactions")
   private boolean useXaTransactions = false;
 
@@ -46,9 +44,5 @@ public class BaseDbConnectionParameters {
 
   public boolean isUseXaTransactions() {
     return useXaTransactions;
-  }
-
-  public void setUseXaTransactions(boolean useXaTransactions) {
-    this.useXaTransactions = useXaTransactions;
   }
 }

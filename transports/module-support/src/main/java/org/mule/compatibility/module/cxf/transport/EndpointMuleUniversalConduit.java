@@ -112,6 +112,16 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
           }
 
           @Override
+          public String getUniqueIdString() {
+            return muleContext.getUniqueIdString();
+          }
+
+          @Override
+          public String getServerId() {
+            return muleContext.getId();
+          }
+
+          @Override
           public String getName() {
             return "EndpointNotificationLoggerAgent";
           }

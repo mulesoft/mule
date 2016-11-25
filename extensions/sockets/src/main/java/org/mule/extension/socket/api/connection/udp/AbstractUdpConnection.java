@@ -7,7 +7,7 @@
 package org.mule.extension.socket.api.connection.udp;
 
 import static java.lang.String.format;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.connection.AbstractSocketConnection;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -32,7 +32,7 @@ public abstract class AbstractUdpConnection extends AbstractSocketConnection {
   @Inject
   protected ObjectSerializer objectSerializer;
 
-  public AbstractUdpConnection(ConnectionSettings connectionSettings, UdpSocketProperties socketProperties)
+  public AbstractUdpConnection(SocketConnectionSettings connectionSettings, UdpSocketProperties socketProperties)
       throws ConnectionException {
     super(connectionSettings);
     this.socketProperties = socketProperties;
@@ -52,7 +52,7 @@ public abstract class AbstractUdpConnection extends AbstractSocketConnection {
     return ConnectionValidationResult.success();
   }
 
-  protected DatagramSocket newSocket(ConnectionSettings connectionSettings) throws ConnectionException {
+  protected DatagramSocket newSocket(SocketConnectionSettings connectionSettings) throws ConnectionException {
     try {
       return new DatagramSocket(connectionSettings.getInetSocketAddress());
     } catch (Exception e) {

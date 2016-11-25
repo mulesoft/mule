@@ -17,13 +17,12 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
 
 /**
@@ -47,7 +46,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    */
   default boolean shouldBeAdvertised() {
     return !(assignableFromAny(getType().getDeclaringClass(), IMPLICIT_ARGUMENT_TYPES)
-        || (isAnnotatedWith(UseConfig.class) || isAnnotatedWith(Connection.class)) || isAnnotatedWith(ParameterGroup.class));
+        || (isAnnotatedWith(UseConfig.class) || isAnnotatedWith(Connection.class)));
   }
 
   /**
@@ -74,7 +73,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
   }
 
   /**
-   * @return A {@code boolean} indicating whether the parameter is based as a {@link Field}
+   * @return The {@link AnnotatedElement} form which {@code this} instance was derived
    */
-  boolean isFieldBased();
+  AnnotatedElement getDeclaringElement();
 }

@@ -156,7 +156,7 @@ public class ContentParameterModelValidator implements ModelValidator {
   }
 
   private List<ParameterModel> getContentParameters(ParameterizedModel model) {
-    return model.getParameterModels().stream().filter(ExtensionModelUtils::isContent).collect(toList());
+    return model.getAllParameterModels().stream().filter(ExtensionModelUtils::isContent).collect(toList());
   }
 
   private String join(List<ParameterModel> offending) {

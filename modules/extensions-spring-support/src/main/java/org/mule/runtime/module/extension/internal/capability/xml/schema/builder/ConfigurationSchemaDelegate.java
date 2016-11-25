@@ -55,7 +55,7 @@ final class ConfigurationSchemaDelegate {
 
     addConnectionProviderElement(choice, configurationModel);
     addDynamicConfigPolicyElement(choice, configurationModel);
-    builder.registerParameters(config, choice, configurationModel.getParameterModels());
+    builder.registerParameters(config, choice, configurationModel.getAllParameterModels());
     config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
   }
 

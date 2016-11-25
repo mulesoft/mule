@@ -54,6 +54,6 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
 
-    parseParameters(sourceModel.getParameterModels());
+    parseParameters(sourceModel.getAllParameterModels());
   }
 }

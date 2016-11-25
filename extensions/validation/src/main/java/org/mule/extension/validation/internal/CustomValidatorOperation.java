@@ -45,7 +45,8 @@ public final class CustomValidatorOperation extends ValidationSupport {
         }
       });
 
-  public void customValidator(@ParameterGroup ObjectSource<Validator> source, @ParameterGroup ValidationOptions options,
+  public void customValidator(@ParameterGroup("Validator") ObjectSource<Validator> source,
+                              @ParameterGroup(ERROR_GROUP) ValidationOptions options,
                               Event event, @UseConfig ValidationExtension config)
       throws Exception {
     ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
@@ -56,8 +57,8 @@ public final class CustomValidatorOperation extends ValidationSupport {
 
   @Override
   protected void logSuccessfulValidation(Validator validator, Event event) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Successfully executed custom validator of type {} on message: {}", validator.getClass().getName(),
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Successfully executed custom validator of type {} on message: {}", validator.getClass().getName(),
                    event.getMessage());
     }
   }

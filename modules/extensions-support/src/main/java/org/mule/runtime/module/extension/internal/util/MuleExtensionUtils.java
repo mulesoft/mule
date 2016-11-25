@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOI
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
@@ -50,12 +51,12 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -269,6 +270,10 @@ public class MuleExtensionUtils {
     return getDefaultValue(object.getAnnotation(Optional.class));
   }
 
+  public static Event getInitialiserEvent() {
+    return getInitialiserEvent(null);
+  }
+
   public static Event getInitialiserEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
       // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
@@ -276,6 +281,16 @@ public class MuleExtensionUtils {
       @Override
       public MuleContext getMuleContext() {
         return muleContext;
+      }
+
+      @Override
+      public String getServerId() {
+        return "InitialiserServer";
+      }
+
+      @Override
+      public String getUniqueIdString() {
+        return getUUID();
       }
 
       @Override

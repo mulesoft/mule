@@ -64,7 +64,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   @Override
   public ExtensionMessageSource doGetObject() throws ConfigurationException {
-    checkParameterGroupExclusivenessForModel(sourceModel, getParameters().keySet());
+    checkParameterGroupExclusiveness(sourceModel, getParameters().keySet());
     ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
     if (nonCallbackParameters.isDynamic()) {

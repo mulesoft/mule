@@ -6,6 +6,7 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -25,7 +26,7 @@ import javax.sql.DataSource;
 @Alias("my-sql")
 public class MySqlConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup
+  @ParameterGroup(CONNECTION)
   private MySqlConnectionParameters mySqlParameters;
 
   @Override

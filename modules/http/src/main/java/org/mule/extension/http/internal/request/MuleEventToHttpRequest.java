@@ -19,7 +19,6 @@ import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;

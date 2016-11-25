@@ -58,6 +58,6 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withSetterParameterDefinition(TARGET_ATTRIBUTE, fromSimpleParameter(TARGET_ATTRIBUTE).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
 
-    parseParameters(operationModel.getParameterModels());
+    parseParameters(operationModel.getAllParameterModels());
   }
 }

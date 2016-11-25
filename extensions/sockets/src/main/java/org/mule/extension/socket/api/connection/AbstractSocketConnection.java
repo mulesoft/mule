@@ -6,7 +6,7 @@
  */
 package org.mule.extension.socket.api.connection;
 
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSocketConnection implements SocketConnection {
 
   protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
-  protected final ConnectionSettings connectionSettings;
+  protected final SocketConnectionSettings connectionSettings;
   protected boolean wasDisconnected = false;
 
-  protected AbstractSocketConnection(ConnectionSettings connectionSettings) {
+  protected AbstractSocketConnection(SocketConnectionSettings connectionSettings) {
     this.connectionSettings = connectionSettings;
   }
 

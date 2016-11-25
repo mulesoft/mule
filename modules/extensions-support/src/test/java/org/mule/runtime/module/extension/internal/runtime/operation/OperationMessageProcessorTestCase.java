@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -71,14 +70,12 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Rule;
@@ -390,8 +387,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpValueResolvers() throws MuleException {
-    final Optional<ParameterGroupModelProperty> modelProperty = of(new ParameterGroupModelProperty(emptyList()));
-    when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(modelProperty);
     final Map<String, ValueResolver> valueResolvers = mock(Map.class);
     when(resolverSet.getResolvers()).thenReturn(valueResolvers);
     final ValueResolver valueResolver = mock(ValueResolver.class);

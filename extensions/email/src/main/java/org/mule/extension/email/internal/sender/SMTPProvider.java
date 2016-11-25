@@ -7,16 +7,12 @@
 package org.mule.extension.email.internal.sender;
 
 import static org.mule.extension.email.internal.EmailProtocol.SMTP;
-import static org.mule.extension.email.internal.util.EmailConnectorConstants.SMTP_PORT;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * A {@link ConnectionProvider} that returns instances of smtp based {@link SenderConnection}s.
@@ -27,20 +23,21 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 @DisplayName("SMTP Connection")
 public class SMTPProvider extends AbstractSenderProvider {
 
-  /**
-   * The port number of the mail server. '25' by default.
-   */
-  @Parameter
-  @Optional(defaultValue = SMTP_PORT)
-  @Placement(group = CONNECTION, order = 2)
-  private String port;
+  @ParameterGroup(CONNECTION)
+  private SMTPConnectionSettings connectionSettings;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public SenderConnection connect() throws ConnectionException {
-    return new SenderConnection(SMTP, settings.getUser(), settings.getPassword(), settings.getHost(), port,
-                                getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
+    return new SenderConnection(SMTP, connectionSettings.getUser(),
+                                connectionSettings.getPassword(),
+                                connectionSettings.getHost(),
+                                connectionSettings.getPort(),
+                                getConnectionTimeout(),
+                                getReadTimeout(),
+                                getWriteTimeout(),
+                                getProperties());
   }
 }

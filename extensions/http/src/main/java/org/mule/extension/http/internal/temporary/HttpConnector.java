@@ -20,7 +20,7 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpOperations;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -56,3 +56,4 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 public class HttpConnector {
 
 }
+

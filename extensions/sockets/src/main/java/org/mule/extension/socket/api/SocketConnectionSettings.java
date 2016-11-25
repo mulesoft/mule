@@ -9,8 +9,6 @@ package org.mule.extension.socket.api;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
@@ -24,13 +22,13 @@ import java.net.InetSocketAddress;
  *
  * @since 4.0
  */
-public class ConnectionSettings {
+public class SocketConnectionSettings {
 
   private static final int PORT_CHOSEN_BY_SYSTEM_MASK = 0;
 
-  public ConnectionSettings() {}
+  public SocketConnectionSettings() {}
 
-  public ConnectionSettings(Integer port, String host) {
+  public SocketConnectionSettings(Integer port, String host) {
     this.port = port;
     this.host = host;
   }
@@ -39,14 +37,14 @@ public class ConnectionSettings {
    * Connection's port number
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 2)
+  @Placement(order = 2)
   private Integer port;
 
   /**
    * Connection's host name
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 1)
+  @Placement(order = 1)
   private String host;
 
   public Integer getPort() {

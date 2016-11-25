@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
  */
 abstract class ValidationSupport {
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected static final String ERROR_GROUP = "Error options";
+  protected final static Logger LOGGER = LoggerFactory.getLogger(ValidationSupport.class);
+
   @Inject
   protected MuleContext muleContext;
 
@@ -68,8 +70,8 @@ abstract class ValidationSupport {
   }
 
   protected void logSuccessfulValidation(Validator validator, Event event) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
     }
   }
 }

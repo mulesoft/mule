@@ -5,9 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <petstore:phone-number name="number" mobile="555" home="444"/>
-
-    <petstore:config name="invalidConfigWithExclusion" cashierName="Cashier name" cash="100" phoneNumber="number">
+    <petstore:config name="invalidConfigWithExclusion" cashierName="Cashier name" cash="100" debt="100">
         <petstore:connection username="john" password="doe"/>
     </petstore:config>
 

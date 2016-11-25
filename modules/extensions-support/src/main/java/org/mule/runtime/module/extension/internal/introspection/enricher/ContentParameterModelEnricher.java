@@ -58,7 +58,7 @@ public class ContentParameterModelEnricher implements ModelEnricher {
   }
 
   private void doEnrich(ParameterizedDeclaration declaration) {
-    List<ParameterDeclaration> contentParameters = getContentParameters(declaration.getParameters());
+    List<ParameterDeclaration> contentParameters = getContentParameters(declaration.getAllParameters());
     if (isEmpty(contentParameters)) {
       return;
     }

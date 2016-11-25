@@ -606,10 +606,10 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

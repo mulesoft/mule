@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -14,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
-import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
+import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -124,6 +126,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
   private enum ProxyType {
     ANONYMOUS, USER_PASS, NTLM
   }
+
 
   private class MockProxy extends Thread {
 

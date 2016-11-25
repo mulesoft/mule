@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.internal;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
@@ -18,13 +16,13 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  *
  * @since 4.0
  */
-public class EmailConnectionSettings {
+public abstract class EmailConnectionSettings {
 
   /**
    * Host name of the mail server.
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 1)
+  @Placement(order = 1)
   protected String host;
 
   /**
@@ -32,7 +30,7 @@ public class EmailConnectionSettings {
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 3)
+  @Placement(order = 3)
   protected String user;
 
   /**
@@ -41,7 +39,7 @@ public class EmailConnectionSettings {
   @Parameter
   @Password
   @Optional
-  @Placement(group = CONNECTION, order = 4)
+  @Placement(order = 4)
   protected String password;
 
   /**
@@ -64,4 +62,9 @@ public class EmailConnectionSettings {
   public String getPassword() {
     return password;
   }
+
+  /**
+   * @return The connection port
+   */
+  public abstract String getPort();
 }

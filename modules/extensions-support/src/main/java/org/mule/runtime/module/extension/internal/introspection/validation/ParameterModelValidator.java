@@ -6,6 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.meta.model.parameter.ParameterModel.RESERVED_NAMES;
+import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.supportsTopLevelDeclaration;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -16,13 +26,14 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.declaration.type.annotation.XmlHintsAnnotation;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
@@ -30,17 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.meta.model.parameter.ParameterModel.RESERVED_NAMES;
-import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.supportsTopLevelDeclaration;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -88,7 +88,8 @@ public final class ParameterModelValidator implements ModelValidator {
 
             String fieldName = field.getKey().getName().getLocalPart();
             if (RESERVED_NAMES.contains(fieldName)) {
-              throw new IllegalParameterModelDefinitionException(format("The field named '%s' [%s] from class [%s] cannot have that name since it is a reserved one",
+              throw new IllegalParameterModelDefinitionException(
+                                                                 format("The field named '%s' [%s] from class [%s] cannot have that name since it is a reserved one",
                                                                         fieldName, getId(field.getValue()), getId(objectType)));
             }
 
@@ -104,13 +105,13 @@ public final class ParameterModelValidator implements ModelValidator {
     new ExtensionWalker() {
 
       @Override
-      public void onParameter(ParameterizedModel owner, ParameterModel model) {
+      public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
         String ownerName = owner.getName();
         String ownerModelType = getComponentModelTypeName(owner);
         validateParameter(model, visitor, ownerName, ownerModelType, extensionModelName);
-        validateParameterGroup(model, ownerName, ownerModelType, extensionModelName);
+        validateParameterGroup(groupModel);
         validateNameCollisionWithTypes(model, ownerName, ownerModelType, extensionModelName,
-                                       owner.getParameterModels().stream().map(p -> hyphenize(p.getName())).collect(toList()));
+                                       owner.getAllParameterModels().stream().map(p -> hyphenize(p.getName())).collect(toList()));
       }
     }.walk(extensionModel);
   }
@@ -150,7 +151,8 @@ public final class ParameterModelValidator implements ModelValidator {
         .filter(subtype -> parameterNames.contains(getTopLevelTypeName(subtype))).findFirst();
     if (subTypeWithNameCollision.isPresent()) {
       throw new IllegalParameterModelDefinitionException(
-                                                         format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of the declared subType [%s] for parameter [%s]",
+                                                         format(
+                                                                "The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of the declared subType [%s] for parameter [%s]",
                                                                 getTopLevelTypeName(subTypeWithNameCollision.get()),
                                                                 ownerModelType, ownerName, extensionName,
                                                                 getType(subTypeWithNameCollision.get()).getSimpleName(),
@@ -158,14 +160,15 @@ public final class ParameterModelValidator implements ModelValidator {
     }
   }
 
-  private void validateParameterGroup(ParameterModel parameterModel, String ownerName, String ownerModelType,
-                                      String extensionName) {
-    parameterModel.getModelProperty(ParameterGroupModelProperty.class)
-        .ifPresent(parameterGroupModelProperty -> parameterGroupModelProperty.getGroups().stream()
-            .filter(p -> !isInstantiable(p.getType())).findFirst().ifPresent(p -> {
-              throw new IllegalParameterModelDefinitionException(format("The parameter group of type '%s' in %s [%s] from the extension [%s] should be non abstract with a default constructor.",
-                                                                        p.getType(), ownerModelType, ownerName, extensionName));
-            }));
+  private void validateParameterGroup(ParameterGroupModel groupModel) {
+    groupModel.getModelProperty(ParameterGroupModelProperty.class).map(ParameterGroupModelProperty::getDescriptor)
+        .ifPresent(group -> {
+          if (!isInstantiable(group.getType().getDeclaringClass())) {
+            throw new IllegalParameterModelDefinitionException(
+                                                               format("The parameter group of type '%s' should be non abstract with a default constructor.",
+                                                                      group.getType().getDeclaringClass()));
+          }
+        });
   }
 
   private SubTypesMappingContainer loadSubtypesMapping(ExtensionModel extensionModel) {

@@ -7,8 +7,8 @@
 
 package org.mule.extension.http;
 
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 

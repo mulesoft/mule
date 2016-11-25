@@ -4,18 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request.validator;
+package org.mule.extension.http.internal.request;
 
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
-import static org.mule.extension.http.internal.HttpConnectorConstants.TLS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -25,21 +24,21 @@ import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
 import org.mule.extension.http.internal.request.client.HttpClientFactory;
 import org.mule.extension.http.internal.request.grizzly.GrizzlyHttpClient;
-import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -68,44 +67,18 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @ConfigName
   private String configName;
 
-  /**
-   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
-   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user can customize the
-   * tls/ssl configuration by defining the tls:context child element of this listener-config. If not tls:context is defined then
-   * the default JVM certificates are going to be used to establish communication.
-   */
-  @Parameter
-  @Optional(defaultValue = "HTTP")
-  @Expression(NOT_SUPPORTED)
-  @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
-  @Placement(group = CONNECTION, order = 1)
-  private HttpConstants.Protocols protocol;
-
-  /**
-   * Host where the requests will be sent.
-   */
-  @Parameter
-  @Optional
-  @Placement(group = CONNECTION, order = 2)
-  private Function<Event, String> host;
-
-  /**
-   * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
-   * protocol attribute is HTTPS then the default value is 443.
-   */
-  @Parameter
-  @Optional
-  @Placement(group = CONNECTION, order = 3)
-  private Function<Event, Integer> port;
+  @ParameterGroup(CONNECTION)
+  private RequestConnectionParams connectionParams;
 
   /**
    * Reference to a TLS config element. This will enable HTTPS for this config.
    */
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   @DisplayName(TLS_CONFIGURATION)
-  @Placement(tab = TLS, group = TLS_CONFIGURATION)
-  private TlsContextFactory tlsContextFactory;
+  @Placement(tab = SECURITY_TAB)
+  private TlsContextFactory tlsContext;
 
   /**
    * Reusable configuration element for outbound connections through a proxy. A proxy element must define a host name and a port
@@ -116,41 +89,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Summary("Reusable configuration element for outbound connections through a proxy")
   @Placement(tab = "Proxy")
   private ProxyConfig proxyConfig;
-
-  /**
-   * If false, each connection will be closed after the first request is completed.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
-  private Boolean usePersistentConnections;
-
-  /**
-   * The maximum number of outbound connections that will be kept open at the same time. By default the number of connections is
-   * unlimited.
-   */
-  @Parameter
-  @Optional(defaultValue = "-1")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION, order = 2)
-  private Integer maxConnections;
-
-  /**
-   * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
-   * when persistent connections are enabled.
-   */
-  @Parameter
-  @Optional(defaultValue = "30000")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION, order = 3)
-  private Integer connectionIdleTimeout;
-
-  @Parameter
-  @Optional
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION, order = 4)
-  private TcpClientSocketProperties clientSocketProperties;
 
   /**
    * Authentication method to use for the HTTP request.
@@ -173,22 +111,25 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
 
   @Override
   public void initialise() throws InitialisationException {
-    if (port == null) {
-      port = muleEvent -> protocol.getDefaultPort();
+    final HttpConstants.Protocols protocol = connectionParams.getProtocol();
+
+    if (connectionParams.getPort() == null) {
+      connectionParams.setPort(muleEvent -> protocol.getDefaultPort());
     }
 
-    if (protocol.equals(HTTP) && tlsContextFactory != null) {
+    if (protocol.equals(HTTP) && tlsContext != null) {
       throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, "
-          + "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
+          + "when using tls:context you must set attribute protocol=\"HTTPS\""),
+                                        this);
     }
 
-    if (protocol.equals(HTTPS) && tlsContextFactory == null) {
+    if (protocol.equals(HTTPS) && tlsContext == null) {
       // MULE-9480
       initialiseIfNeeded(defaultTlsContextFactoryBuilder);
-      tlsContextFactory = defaultTlsContextFactoryBuilder.buildDefault();
+      tlsContext = defaultTlsContextFactoryBuilder.buildDefault();
     }
-    if (tlsContextFactory != null) {
-      initialiseIfNeeded(tlsContextFactory);
+    if (tlsContext != null) {
+      initialiseIfNeeded(tlsContext);
     }
     if (authentication != null) {
       initialiseIfNeeded(authentication);
@@ -200,13 +141,14 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
-    if (maxConnections < UNLIMITED_CONNECTIONS || maxConnections == 0) {
-      throw new InitialisationException(createStaticMessage("The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."),
+    if (connectionParams.getMaxConnections() < UNLIMITED_CONNECTIONS || connectionParams.getMaxConnections() == 0) {
+      throw new InitialisationException(createStaticMessage(
+                                                            "The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."),
                                         this);
     }
 
-    if (!usePersistentConnections) {
-      connectionIdleTimeout = 0;
+    if (!connectionParams.getUsePersistentConnections()) {
+      connectionParams.setConnectionIdleTimeout(0);
     }
   }
 
@@ -215,10 +157,18 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
     String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
 
     HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-        .setUriParameters(new DefaultUriParameters(protocol, host, port)).setAuthentication(authentication)
-        .setTlsContextFactory(tlsContextFactory).setProxyConfig(proxyConfig).setClientSocketProperties(clientSocketProperties)
-        .setMaxConnections(maxConnections).setUsePersistentConnections(usePersistentConnections)
-        .setConnectionIdleTimeout(connectionIdleTimeout).setThreadNamePrefix(threadNamePrefix).setOwnerName(configName).build();
+        .setUriParameters(new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
+                                                   connectionParams.getPort()))
+        .setAuthentication(authentication)
+        .setTlsContextFactory(tlsContext)
+        .setProxyConfig(proxyConfig)
+        .setClientSocketProperties(connectionParams.getClientSocketProperties())
+        .setMaxConnections(connectionParams.getMaxConnections())
+        .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
+        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setThreadNamePrefix(threadNamePrefix)
+        .setOwnerName(configName)
+        .build();
 
     HttpClient httpClient;
     if (httpClientFactory == null) {
@@ -234,7 +184,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   public void disconnect(HttpClient httpClient) {}
 
   public Function<Event, Integer> getPort() {
-    return port;
+    return connectionParams.getPort();
   }
 
   public ProxyConfig getProxyConfig() {
@@ -242,7 +192,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   }
 
   public TlsContextFactory getTlsContext() {
-    return tlsContextFactory;
+    return tlsContext;
   }
 
   public HttpAuthentication getAuthentication() {

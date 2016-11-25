@@ -18,8 +18,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
-import org.mule.test.heisenberg.extension.model.LifetimeInfo;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.lang.reflect.Field;
@@ -36,10 +35,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
-  private static Class<?> PROTOTYPE_CLASS = ExtendedPersonalInfo.class;
+  private static Class<?> PROTOTYPE_CLASS = PersonalInfo.class;
   private static final String NAME = "heisenberg";
   private static final int AGE = 50;
-  private static LifetimeInfo LIFETIME_INFO = new LifetimeInfo();
 
   @Mock
   private Event event;
@@ -47,7 +45,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   @Mock
   private MuleContext muleContext;
 
-  private DefaultObjectBuilder<ExtendedPersonalInfo> builder;
+  private DefaultObjectBuilder<PersonalInfo> builder;
   private Field nameField;
   private Field ageField;
   private Field lifetimeInfoField;
@@ -59,22 +57,21 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
     nameField = getField(PROTOTYPE_CLASS, "name").get();
     ageField = getField(PROTOTYPE_CLASS, "age").get();
-    lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo").get();
   }
 
   @Test
   public void build() throws Exception {
     populate(false);
-    ExtendedPersonalInfo personalInfo = builder.build(event);
+    PersonalInfo personalInfo = builder.build(event);
     verify(personalInfo);
   }
 
   @Test
   public void reusable() throws Exception {
     populate(false);
-    ExtendedPersonalInfo info1 = builder.build(event);
-    ExtendedPersonalInfo info2 = builder.build(event);
-    ExtendedPersonalInfo info3 = builder.build(event);
+    PersonalInfo info1 = builder.build(event);
+    PersonalInfo info2 = builder.build(event);
+    PersonalInfo info3 = builder.build(event);
 
     assertThat(info1, is(not(sameInstance(info2))));
     assertThat(info1, is(not(sameInstance(info3))));
@@ -83,10 +80,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
     verify(info3);
   }
 
-  private void verify(ExtendedPersonalInfo personalInfo) {
+  private void verify(PersonalInfo personalInfo) {
     assertThat(personalInfo.getName(), is(NAME));
     assertThat(personalInfo.getAge(), is(AGE));
-    assertThat(personalInfo.getLifetimeInfo(), is(sameInstance(LIFETIME_INFO)));
   }
 
   @Test
@@ -130,7 +126,6 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   private void populate(boolean dynamic) throws Exception {
     builder.addPropertyResolver(nameField.getName(), getResolver(NAME, dynamic));
     builder.addPropertyResolver(ageField.getName(), getResolver(AGE, dynamic));
-    builder.addPropertyResolver(lifetimeInfoField.getName(), getResolver(LIFETIME_INFO, dynamic));
   }
 
   private ValueResolver getResolver(Object value, boolean dynamic) throws Exception {

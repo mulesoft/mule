@@ -9,11 +9,13 @@ package org.mule.extension.socket.api.provider.tcp;
 import static org.mule.extension.socket.api.SocketsExtension.TLS;
 import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-import org.mule.extension.socket.api.ConnectionSettings;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION_TAB;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.connection.tcp.TcpRequesterConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
+import org.mule.extension.socket.api.socket.SocketProperties;
 import org.mule.extension.socket.api.socket.factory.SimpleSocketFactory;
 import org.mule.extension.socket.api.socket.factory.SslSocketFactory;
 import org.mule.extension.socket.api.socket.factory.TcpSocketFactory;
@@ -24,14 +26,14 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -55,20 +57,20 @@ public final class TcpRequesterProvider implements PoolingConnectionProvider<Tcp
    */
   @Parameter
   @Optional
-  @Placement(group = TLS_CONFIGURATION, tab = TLS)
+  @Placement(tab = TLS)
   @DisplayName(TLS_CONFIGURATION)
   private TlsContextFactory tlsContext;
 
   /**
    * This configuration parameter refers to the address where the {@link Socket} should connect to.
    */
-  @ParameterGroup
-  private ConnectionSettings connectionSettings;
+  @ParameterGroup(CONNECTION)
+  private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link Socket} configuration properties
    */
-  @ParameterGroup
+  @ParameterGroup(SocketProperties.GROUP_NAME)
   private TcpClientSocketProperties tcpClientSocketProperties;
 
   /**
@@ -76,8 +78,8 @@ public final class TcpRequesterProvider implements PoolingConnectionProvider<Tcp
    */
   @Parameter
   @Optional
-  @Placement(group = "Local Address Settings")
-  ConnectionSettings localAddressSettings = new ConnectionSettings();
+  @Placement(tab = "Local Address Settings")
+  SocketConnectionSettings localAddressSettings = new SocketConnectionSettings();
 
 
   /**
@@ -87,7 +89,7 @@ public final class TcpRequesterProvider implements PoolingConnectionProvider<Tcp
   @Parameter
   @Optional
   @Summary("TCP Protocol to use when doing requests")
-  @Placement(group = CONNECTION, order = 3)
+  @Placement(tab = CONNECTION_TAB, order = 3)
   private TcpProtocol protocol = new SafeProtocol();
 
   /**

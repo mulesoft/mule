@@ -40,9 +40,9 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("set-payload-concat-params-values");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getParameterModels().size(), is(2));
-    assertThat(operationModel.get().getParameterModels().get(0).getName(), is("value1"));
-    assertThat(operationModel.get().getParameterModels().get(1).getName(), is("value2"));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("value1"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is("value2"));
 
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
@@ -59,9 +59,9 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getParameterModels().size(), is(2));
-    assertThat(configurationModel.getParameterModels().get(0).getName(), is("configParam"));
-    assertThat(configurationModel.getParameterModels().get(1).getName(), is("defaultConfigParam"));
+    assertThat(configurationModel.getAllParameterModels().size(), is(2));
+    assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("configParam"));
+    assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("defaultConfigParam"));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
@@ -72,8 +72,8 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("set-payload-add-param-and-property-values");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getParameterModels().size(), is(1));
-    assertThat(operationModel.get().getParameterModels().get(0).getName(), is("value1"));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(1));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("value1"));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =
@@ -91,10 +91,10 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getParameterModels().size(), is(3));
-    assertThat(configurationModel.getParameterModels().get(0).getName(), is("someUserConfig"));
-    assertThat(configurationModel.getParameterModels().get(1).getName(), is("somePassConfig"));
-    assertThat(configurationModel.getParameterModels().get(2).getName(), is("port"));
+    assertThat(configurationModel.getAllParameterModels().size(), is(3));
+    assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("someUserConfig"));
+    assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("somePassConfig"));
+    assertThat(configurationModel.getAllParameterModels().get(2).getName(), is("port"));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
@@ -105,9 +105,9 @@ public class XmlBasedDescriberTestCase extends AbstractMuleTestCase {
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-login");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getParameterModels().size(), is(2));
-    assertThat(operationModel.get().getParameterModels().get(0).getName(), is("someUser"));
-    assertThat(operationModel.get().getParameterModels().get(1).getName(), is("somePass"));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("someUser"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is("somePass"));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =

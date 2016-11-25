@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.Thread.currentThread;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -17,6 +16,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -32,7 +32,6 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -45,7 +44,6 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -82,7 +80,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
         }
 
         @Override
-        public void onParameter(ParameterDeclaration declaration) {
+        protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration declaration) {
           enrichParameter(declaration);
         }
       }.walk(describingContext.getExtensionDeclarer().getDeclaration());
@@ -141,7 +139,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 
 
   private void addQueryModelProperties(OperationDeclaration declaration, Query query) {
-    ParameterDeclaration parameterDeclaration = declaration.getParameters()
+    ParameterDeclaration parameterDeclaration = declaration.getAllParameters()
         .stream()
         .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).isPresent())
         .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class).get()
@@ -165,7 +163,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
   private void declareInputResolvers(ComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
     if (metadataScope.hasInputResolvers()) {
       Set<String> dynamicParameters = metadataScope.getInputResolvers().keySet();
-      declaration.getParameters().stream()
+      declaration.getAllParameters().stream()
           .filter(p -> dynamicParameters.contains(p.getName()))
           .forEach(this::declareDynamicType);
     }
@@ -186,35 +184,33 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
   }
 
   private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
-    Optional<MetadataKeyIdModelProperty> metadataKeyModelProperty = getMetadataKeyModelProperty(component);
-
-    if (!metadataKeyModelProperty.isPresent() && component.getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
-      metadataKeyModelProperty =
-          getMetadataKeyModelProperty(component.getModelProperty(ParameterGroupModelProperty.class).get().getGroups());
-    }
-
-    if (metadataKeyModelProperty.isPresent()) {
-      component.addModelProperty(metadataKeyModelProperty.get());
-    }
+    getMetadataKeyModelProperty(component).ifPresent(property -> component.addModelProperty(property));
   }
 
-  private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(List<ParameterGroup> groups) {
-    final Optional<ParameterGroup> keyId = groups.stream()
-        .filter(g -> g.getContainer().isAnnotationPresent(MetadataKeyId.class))
+  private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(
+                                                                           ComponentDeclaration<? extends ComponentDeclaration> component) {
+    Optional<MetadataKeyIdModelProperty> keyId = findMetadataKeyIdInGroups(component);
+    return keyId.isPresent() ? keyId : findMetadataKeyIdInParameters(component);
+  }
+
+  private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInGroups(
+                                                                         ComponentDeclaration<? extends ComponentDeclaration> component) {
+    return component.getParameterGroups().stream()
+        .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
+        .filter(group -> group != null)
+        .filter(group -> group.getDescriptor().getContainer().getAnnotation(MetadataKeyId.class) != null)
+        .map(group -> new MetadataKeyIdModelProperty(typeLoader.load(group.getDescriptor().getType().getDeclaringClass()),
+                                                     group.getDescriptor().getName()))
         .findFirst();
-
-    return keyId.isPresent()
-        ? Optional.of(new MetadataKeyIdModelProperty(typeLoader.load(keyId.get().getType()), keyId.get().getContainerName()))
-        : empty();
   }
 
-  private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(ComponentDeclaration<? extends ComponentDeclaration> component) {
-    Optional<ParameterDeclaration> keyId = component.getParameters().stream()
+  private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInParameters(
+                                                                             ComponentDeclaration<? extends ComponentDeclaration> component) {
+    return component.getParameterGroups().stream()
+        .flatMap(g -> g.getParameters().stream())
         .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))
+        .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName()))
         .findFirst();
-
-    return keyId.isPresent() ? Optional.of(new MetadataKeyIdModelProperty(keyId.get().getType(), keyId.get().getName()))
-        : empty();
   }
 
   /**

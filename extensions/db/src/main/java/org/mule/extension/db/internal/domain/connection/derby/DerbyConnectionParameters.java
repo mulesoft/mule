@@ -6,17 +6,15 @@
  */
 package org.mule.extension.db.internal.domain.connection.derby;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
  * {@link DataSourceConfig} implementation for Derby databases.
@@ -33,7 +31,7 @@ public final class DerbyConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION, order = 1)
+  @Placement(order = 1)
   private String database;
 
   /**
@@ -42,7 +40,7 @@ public final class DerbyConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional(defaultValue = "directory")
-  @Placement(group = CONNECTION, order = 2)
+  @Placement(order = 2)
   private String subsubProtocol;
 
   /**
@@ -50,7 +48,7 @@ public final class DerbyConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional(defaultValue = "false")
-  @Placement(group = CONNECTION, order = 3)
+  @Placement(order = 3)
   private boolean create;
 
   /**
@@ -58,7 +56,7 @@ public final class DerbyConnectionParameters extends BaseDbConnectionParameters 
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED)
+  @Placement(tab = ADVANCED_TAB)
   private Map<String, String> connectionProperties = new HashMap<>();
 
   /**

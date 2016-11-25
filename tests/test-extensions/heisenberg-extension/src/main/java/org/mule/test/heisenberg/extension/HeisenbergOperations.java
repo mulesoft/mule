@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.message.Message;
@@ -14,25 +15,25 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
+import org.mule.test.heisenberg.extension.model.KillParameters;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.RecursiveChainA;
@@ -91,12 +92,11 @@ public class HeisenbergOperations {
   }
 
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {
-    return killWithCustomMessage(victim, goodbyeMessage);
+    return killWithCustomMessage(new KillParameters(victim, goodbyeMessage));
   }
 
-  public String killWithCustomMessage(@Optional(defaultValue = PAYLOAD) @Placement(group = KILL_WITH_GROUP,
-      order = 1) String victim, @Placement(group = KILL_WITH_GROUP, order = 2) String goodbyeMessage) {
-    return String.format("%s, %s", goodbyeMessage, victim);
+  public String killWithCustomMessage(@ParameterGroup(KILL_WITH_GROUP) KillParameters killParameters) {
+    return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }
 
   public String knock(KnockeableDoor knockedDoor) {
@@ -108,7 +108,7 @@ public class HeisenbergOperations {
   }
 
   public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon) {
-    return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
+    return format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
   }
 
   public List<String> killWithMultiplesWeapons(@Optional(defaultValue = PAYLOAD) List<Weapon> weaponList) {
@@ -145,7 +145,7 @@ public class HeisenbergOperations {
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
-  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting, @ParameterGroup PersonalInfo info) {
+  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting, @ParameterGroup("Personal Info") PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 
@@ -187,7 +187,8 @@ public class HeisenbergOperations {
     return connection.getSaulPhoneNumber();
   }
 
-  public ParameterResolver<String> literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
+  public ParameterResolver<String> literalEcho(
+                                               @DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
     return literalExpression;
   }
 

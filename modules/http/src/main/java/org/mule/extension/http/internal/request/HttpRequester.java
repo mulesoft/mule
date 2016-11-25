@@ -18,7 +18,6 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;

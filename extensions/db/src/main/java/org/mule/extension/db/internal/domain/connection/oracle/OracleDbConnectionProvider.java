@@ -6,6 +6,8 @@
  */
 package org.mule.extension.db.internal.domain.connection.oracle;
 
+import static java.util.Optional.empty;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
@@ -18,8 +20,6 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-import static java.util.Optional.empty;
-
 /**
  * Creates connections to a Oracle database
  *
@@ -29,7 +29,7 @@ import static java.util.Optional.empty;
 @Alias("oracle")
 public class OracleDbConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup
+  @ParameterGroup(CONNECTION)
   private OracleConnectionParameters oracleConnectionParameters;
 
   @Override

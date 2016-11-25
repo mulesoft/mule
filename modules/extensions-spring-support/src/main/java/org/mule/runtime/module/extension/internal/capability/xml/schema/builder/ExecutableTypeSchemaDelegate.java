@@ -84,7 +84,7 @@ abstract class ExecutableTypeSchemaDelegate {
     final ExplicitGroup all = new ExplicitGroup();
     complexContentExtension.setSequence(all);
 
-    for (final ParameterModel parameterModel : parameterizedModel.getParameterModels()) {
+    for (final ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       MetadataType parameterType = parameterModel.getType();
 
       if (isOperation(parameterType)) {

@@ -7,10 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-
-import java.util.Optional;
 
 /**
  * Default implementation of {@link ResolverSetBasedObjectBuilder} which uses reflection
@@ -19,13 +17,12 @@ import java.util.Optional;
  * @param <T> the generic type of the produced objects
  * @since 4.0
  */
-public class DefaultResolvesetBasedObjectBuilder<T> extends ResolverSetBasedObjectBuilder<T> {
+public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
 
-  public DefaultResolvesetBasedObjectBuilder(Class<T> prototypeClass, Optional<ParameterGroupModelProperty> groupModelProperty,
-                                             ResolverSet resolverSet) {
-    super(prototypeClass, groupModelProperty, resolverSet);
+  public DefaultResolverSetBasedObjectBuilder(Class<T> prototypeClass, ParameterizedModel model, ResolverSet resolverSet) {
+    super(prototypeClass, model, resolverSet);
     this.prototypeClass = prototypeClass;
   }
 

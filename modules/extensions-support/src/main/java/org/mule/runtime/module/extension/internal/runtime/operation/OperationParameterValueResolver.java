@@ -8,13 +8,12 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * {@link ParameterValueResolver} implementation for {@link OperationMessageProcessor}
@@ -36,21 +35,17 @@ public class OperationParameterValueResolver implements ParameterValueResolver {
    */
   @Override
   public Object getParameterValue(String containerName) {
-    final Optional<ParameterGroup> parameterGroup = getParameterGroup(containerName);
-    if (parameterGroup.isPresent()) {
-      return new ParameterGroupArgumentResolver<>(parameterGroup.get()).resolve(executionContext);
-    } else {
-      return executionContext.getParameter(containerName);
-    }
+    return getParameterGroup(containerName)
+        .map(group -> new ParameterGroupArgumentResolver<>(group).resolve(executionContext))
+        .orElseGet(() -> executionContext.getParameter(containerName));
   }
 
-  private Optional<ParameterGroup> getParameterGroup(String parameterGroupName) {
-    final AtomicReference<ParameterGroup> atomicReference = new AtomicReference<>();
-    operationModel.getModelProperty(ParameterGroupModelProperty.class)
-        .ifPresent(paraGroup -> paraGroup.getGroups()
-            .stream().filter(paramGroup -> paramGroup.getContainerName().equals(parameterGroupName))
-            .findFirst()
-            .ifPresent(atomicReference::set));
-    return Optional.ofNullable(atomicReference.get());
+  private Optional<ParameterGroupDescriptor> getParameterGroup(String parameterGroupName) {
+    return operationModel.getParameterGroupModels().stream()
+        .filter(group -> group.getName().equals(parameterGroupName))
+        .findFirst()
+        .map(group -> group.getModelProperty(ParameterGroupModelProperty.class))
+        .filter(Optional::isPresent)
+        .map(group -> group.get().getDescriptor());
   }
 }

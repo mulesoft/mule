@@ -7,18 +7,14 @@
 package org.mule.extension.email.internal.mailbox.pop3;
 
 import static org.mule.extension.email.internal.EmailProtocol.POP3;
-import static org.mule.extension.email.internal.util.EmailConnectorConstants.POP3_PORT;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.email.internal.mailbox.AbstractMailboxConnectionProvider;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * A {@link ConnectionProvider} that returns instances of pop3 based {@link MailboxConnection}s.
@@ -29,20 +25,22 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 @DisplayName("POP3 Connection")
 public class POP3Provider extends AbstractMailboxConnectionProvider<MailboxConnection> {
 
-  /**
-   * The port number of the mail server. '110' by default.
-   */
-  @Parameter
-  @Optional(defaultValue = POP3_PORT)
-  @Placement(group = CONNECTION, order = 2)
-  private String port;
+  @ParameterGroup(CONNECTION)
+  private POP3ConnectionSettings connectionSettings;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public MailboxConnection connect() throws ConnectionException {
-    return new MailboxConnection(POP3, settings.getUser(), settings.getPassword(), settings.getHost(), port,
-                                 getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
+    return new MailboxConnection(POP3,
+                                 connectionSettings.getUser(),
+                                 connectionSettings.getPassword(),
+                                 connectionSettings.getHost(),
+                                 connectionSettings.getPort(),
+                                 getConnectionTimeout(),
+                                 getReadTimeout(),
+                                 getWriteTimeout(),
+                                 getProperties());
   }
 }

@@ -27,7 +27,7 @@ public class TcpClientSocketProperties extends AbstractTcpSocketProperties {
    */
   @Parameter
   @Optional(defaultValue = "30000")
-  @Placement(group = TIMEOUT_CONFIGURATION)
+  @Placement(tab = TIMEOUT_CONFIGURATION)
   private int connectionTimeout = 30000;
 
   /**
