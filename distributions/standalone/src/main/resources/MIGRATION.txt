@@ -37,7 +37,7 @@ MULE-9501: The wildcard-filter will only work with prefix (*.log), suffix (java.
 MULE-9531: async-http-client was upgraded to 1.9.37.
 MULE-10686: XML entity expansion in Jersey is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
 MULE-10306: XML entity expansion in XML transformers is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
-
+MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
 
 Migration changes from 3.6.x to 3.7.x
 
