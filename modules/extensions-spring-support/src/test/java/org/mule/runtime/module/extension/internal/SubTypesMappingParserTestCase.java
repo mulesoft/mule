@@ -94,18 +94,18 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(payload.getRicin(), instanceOf(Ricin.class));
     assertThat(payload.getTriangle(), instanceOf(Triangle.class));
 
-    assertThat(payload.getPojoListOne(), is(notNullValue()));
-    assertThat(payload.getPojoListOne(), hasSize(1));
-    assertThat(payload.getPojoListOne().get(0), instanceOf(PojoForList.class));
-    assertThat(payload.getPojoListOne().get(0).getId(), is("inner"));
+    assertThat(payload.getOnePojos(), is(notNullValue()));
+    assertThat(payload.getOnePojos(), hasSize(1));
+    assertThat(payload.getOnePojos().get(0), instanceOf(PojoForList.class));
+    assertThat(payload.getOnePojos().get(0).getId(), is("inner"));
 
-    assertThat(payload.getWeaponList(), is(notNullValue()));
-    assertThat(payload.getWeaponList(), hasSize(4));
+    assertThat(payload.getWeapons(), is(notNullValue()));
+    assertThat(payload.getWeapons(), hasSize(4));
 
-    assertRevolver(payload.getWeaponList().get(0), 6);
-    assertRicin(payload.getWeaponList().get(1), 10L, "Krazy-8");
-    assertRicin(payload.getWeaponList().get(2), 20L, "Lidia");
-    assertRevolver(payload.getWeaponList().get(3), 0);
+    assertRevolver(payload.getWeapons().get(0), 6);
+    assertRicin(payload.getWeapons().get(1), 10L, "Krazy-8");
+    assertRicin(payload.getWeapons().get(2), 20L, "Lidia");
+    assertRevolver(payload.getWeapons().get(3), 0);
 
     assertThat(payload.getWeaponMap(), is(notNullValue()));
     assertThat(payload.getWeaponMap().entrySet(), hasSize(3));

@@ -29,6 +29,7 @@ import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer
 import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.BROADCAST_DESCRIPTION;
 import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CALLBACK;
 import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CALLBACK_DESCRIPTION;
+import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.COLLECTION_PARAMETER;
 import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONFIG_DESCRIPTION;
 import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONFIG_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_DESCRIPTION;
@@ -389,7 +390,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
 
     List<ParameterModel> parameterModels = operationModel.getAllParameterModels();
     assertThat(parameterModels, hasSize(3));
-    assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true,
+    assertParameter(parameterModels.get(0), COLLECTION_PARAMETER, THE_OPERATION_TO_USE, SUPPORTED, true,
                     arrayOf(List.class, TYPE_BUILDER.stringType().id(String.class.getName())), ArrayType.class, null);
     assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class),
                     BooleanType.class, true);

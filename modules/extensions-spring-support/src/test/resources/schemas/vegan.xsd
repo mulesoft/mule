@@ -409,6 +409,22 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetAllApplesType" substitutionGroup="mule:abstract-operator" name="get-all-apples"></xs:element>
+    <xs:complexType name="GetAllApplesType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TryEatType" substitutionGroup="mule:abstract-operator" name="try-eat"></xs:element>
     <xs:complexType name="TryEatType">
         <xs:complexContent>
@@ -426,7 +442,7 @@
     <xs:complexType name="TryToEatThisListOfMapsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:attribute type="mule:expressionList" use="required" name="food"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="required" name="foods"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

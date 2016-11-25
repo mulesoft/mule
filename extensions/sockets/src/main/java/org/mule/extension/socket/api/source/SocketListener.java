@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import org.mule.runtime.api.message.Error;
 
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.config.ListenerConfig;
