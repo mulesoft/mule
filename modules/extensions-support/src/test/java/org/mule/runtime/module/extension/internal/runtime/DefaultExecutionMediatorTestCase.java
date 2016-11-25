@@ -29,6 +29,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
@@ -136,7 +137,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getExtensionModel().getName()).thenReturn(DUMMY_NAME);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
 
-    mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
+    mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                            muleContext.getErrorTypeRepository());
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null, false, new SimpleRetryPolicyTemplate(10, RETRY_COUNT));
@@ -229,8 +232,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     expectedException.expect(HeisenbergException.class);
     expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
-    new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext))
-        .execute(operationExceptionExecutor, operationContext);
+    new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                 muleContext.getErrorTypeRepository())
+                                     .execute(operationExceptionExecutor, operationContext);
   }
 
   @Test

@@ -131,7 +131,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
-    when(errorTypeLocator.lookupErrorType(any())).thenReturn(errorType);
+    when(errorTypeLocator.lookupErrorType((Exception) any())).thenReturn(errorType);
     mockFlow = new Flow("flow", muleContext);
     mockFlow.setProcessingStrategyFactory(nonBlocking ? new LegacyNonBlockingProcessingStrategyFactory()
         : new DefaultFlowProcessingStrategyFactory());

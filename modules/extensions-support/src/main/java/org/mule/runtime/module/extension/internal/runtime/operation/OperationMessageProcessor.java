@@ -250,7 +250,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   }
 
   protected ExecutionMediator createExecutionMediator() {
-    return new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
+    return new DefaultExecutionMediator(extensionModel, operationModel, connectionManager, muleContext.getErrorTypeRepository());
   }
 
   /**

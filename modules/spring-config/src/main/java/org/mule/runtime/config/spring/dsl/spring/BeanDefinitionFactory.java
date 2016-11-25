@@ -194,7 +194,13 @@ public class BeanDefinitionFactory {
                 Map<String, String> parameters = innerComponent.getParameters();
                 ComponentIdentifier source = parseComponentIdentifier(parameters.get(SOURCE_TYPE));
                 ComponentIdentifier target = parseComponentIdentifier(parameters.get(TARGET_TYPE));
-                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(source));
+
+                ErrorType errorType = errorTypeRepository
+                    .lookupErrorType(source)
+                    .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Unable to find error '%s' from Error Type Repository",
+                                                                                    source)));
+
+                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
                 ErrorType targetType = resolveErrorType(target);
                 return new ErrorMapping(errorTypeMatcher, targetType);
               }).collect(toList()));
@@ -206,13 +212,10 @@ public class BeanDefinitionFactory {
   }
 
   private ErrorType resolveErrorType(ComponentIdentifier errorIdentifier) {
-    ErrorType errorType;
-    try {
-      errorType = errorTypeRepository.lookupErrorType(errorIdentifier);
-    } catch (IllegalStateException e) {
-      errorType = errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
-    }
-    return errorType;
+    Optional<ErrorType> optionalErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
+    return optionalErrorType.isPresent()
+        ? optionalErrorType.get()
+        : errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
   }
 
   private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry) {

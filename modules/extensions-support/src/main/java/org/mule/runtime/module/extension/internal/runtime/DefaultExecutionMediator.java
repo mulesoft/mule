@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
@@ -72,9 +73,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
 
   public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel,
-                                  ConnectionManagerAdapter connectionManager) {
+                                  ConnectionManagerAdapter connectionManager, ErrorTypeRepository typeRepository) {
     this.connectionManager = connectionManager;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel);
+    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel, typeRepository);
   }
 
   /**

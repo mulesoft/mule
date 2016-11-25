@@ -26,9 +26,11 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -525,6 +527,24 @@ public class MuleExtensionUtils {
    */
   public static IllegalModelDefinitionException noClassLoaderException(String extensionName) {
     return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
+  }
+
+  /**
+   * @return the extension's error namespace for a given {@link ExtensionModel}
+   */
+  public static String getExtensionsErrorNamespace(ExtensionModel extensionModel) {
+    return getExtensionsErrorNamespace(extensionModel.getXmlDslModel());
+  }
+
+  /**
+   * @return the extension's error namespace for a given {@link ExtensionDeclaration}
+   */
+  public static String getExtensionsErrorNamespace(ExtensionDeclaration extensionDeclaration) {
+    return getExtensionsErrorNamespace(extensionDeclaration.getXmlDslModel());
+  }
+
+  private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
+    return dslModel.getNamespace().toUpperCase();
   }
 
   private static class NamedObjectComparator implements Comparator<NamedObject> {

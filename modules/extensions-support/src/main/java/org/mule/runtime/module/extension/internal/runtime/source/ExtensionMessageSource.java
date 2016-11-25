@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
@@ -81,13 +82,12 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   public ExtensionMessageSource(ExtensionModel extensionModel, SourceModel sourceModel, SourceAdapterFactory sourceAdapterFactory,
                                 ConfigurationProvider configurationProvider, RetryPolicyTemplate retryPolicyTemplate,
-                                ExtensionManagerAdapter managerAdapter) {
+                                ExtensionManagerAdapter managerAdapter, ErrorTypeRepository errorTypeRepository) {
     super(extensionModel, sourceModel, configurationProvider, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
-
+    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel, errorTypeRepository);
   }
 
   private synchronized void createSource() throws Exception {

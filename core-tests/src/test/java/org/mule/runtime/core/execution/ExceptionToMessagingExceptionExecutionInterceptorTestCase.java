@@ -66,7 +66,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     when(mockMuleEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockMuleEvent.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
     when(mockMuleEvent.getError()).thenReturn(of(mockError));
-    when(mockErrorTypeLocator.lookupErrorType(any())).thenReturn(mockErrorType);
+    when(mockErrorTypeLocator.lookupErrorType((Exception) any())).thenReturn(mockErrorType);
 
     cut = new ExceptionToMessagingExceptionExecutionInterceptor();
     cut.setMuleContext(mockMuleContext);

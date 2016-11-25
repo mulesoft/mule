@@ -28,16 +28,60 @@ public abstract class Errors {
 
   public static final class Identifiers {
 
+    /**
+     * Indicates that a problem occurred when transforming a value
+     */
     public static final String TRANSFORMATION_ERROR_IDENTIFIER = "TRANSFORMATION";
+
+    /**
+     * Indicates that a problem occurred when resolving an expression
+     */
     public static final String EXPRESSION_ERROR_IDENTIFIER = "EXPRESSION";
+
+    /**
+     * Indicate that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has
+     * been exhausted
+     */
     public static final String REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER = "REDELIVERY_EXHAUSTED";
+
+    /**
+     * Indicates that the retrial of a certain execution block has been exhausted
+     */
     public static final String RETRY_EXHAUSTED_ERROR_IDENTIFIER = "RETRY_EXHAUSTED";
+
+    /**
+     * Indicates that a problem occurred when routing a message
+     */
     public static final String ROUTING_ERROR_IDENTIFIER = "ROUTING";
+
+    /**
+     * Indicates that was a problem and could not establish a connection
+     */
     public static final String CONNECTIVITY_ERROR_IDENTIFIER = "CONNECTIVITY";
+
+    /**
+     * Indicates a problem of security type, eg: invalid credentials, expired token, etc.
+     */
     public static final String SECURITY_ERROR_IDENTIFIER = "SECURITY";
+
+    /**
+     * Indicates a problem of overloading and the execution was rejected
+     */
     public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
+
+    /**
+     * Indicates that an unknown and unexpected error occurred
+     */
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
+
+    /**
+     * Indicates that a severe and un handleable error occurred
+     */
     public static final String CRITICAL_IDENTIFIER = "CRITICAL";
+
+    /**
+     * Wild card that matches with any error
+     */
     public static final String ANY_IDENTIFIER = "ANY";
 
   }
@@ -63,5 +107,4 @@ public abstract class Errors {
     public static final ComponentIdentifier UNKNOWN =
         new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
   }
-
 }

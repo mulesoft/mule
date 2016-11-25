@@ -32,5 +32,4 @@ public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher {
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
     declarer.withXmlDsl(createXmlLanguageModel(xml, extensionDeclaration.getName(), extensionDeclaration.getVersion()));
   }
-
 }
