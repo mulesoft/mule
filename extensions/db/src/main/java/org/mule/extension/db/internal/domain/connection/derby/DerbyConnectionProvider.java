@@ -6,6 +6,8 @@
  */
 package org.mule.extension.db.internal.domain.connection.derby;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
@@ -31,11 +33,11 @@ public class DerbyConnectionProvider extends DbConnectionProvider {
 
   @Override
   public Optional<DataSource> getDataSource() {
-    return Optional.empty();
+    return empty();
   }
 
   @Override
   public Optional<DataSourceConfig> getDataSourceConfig() {
-    return Optional.ofNullable(derbyParameters);
+    return ofNullable(derbyParameters);
   }
 }

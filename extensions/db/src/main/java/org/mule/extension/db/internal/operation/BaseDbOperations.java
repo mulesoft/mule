@@ -51,6 +51,7 @@ abstract class BaseDbOperations {
   private static final Logger LOGGER = getLogger(DmlOperations.class);
   protected static final int DEFAULT_FETCH_SIZE = 10;
   protected static final String QUERY_GROUP = "Query";
+  protected static final String QUERY_SETTINGS = "Query Settings";
 
   protected final QueryResolver<ParameterizedStatementDefinition> queryResolver = new ParameterizedQueryResolver<>();
 

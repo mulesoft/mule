@@ -9,7 +9,12 @@ package org.mule.extension.ftp.internal;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-public abstract class ConnectionSettings {
+/**
+ * Base class for groups of FTP/SFTP connection parameters
+ *
+ * @since 1.0
+ */
+public abstract class BaseFtpConnectionSettings {
 
   /**
    * The FTP server host, such as www.mulesoft.com, localhost, or 192.168.0.1, etc

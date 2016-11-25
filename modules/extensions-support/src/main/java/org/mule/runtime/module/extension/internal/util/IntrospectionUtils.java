@@ -43,7 +43,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -662,6 +666,21 @@ public final class IntrospectionUtils {
     } else if (component instanceof ConnectionProviderModel) {
       return CONNECTION_PROVIDER;
     } else if (component instanceof SourceModel) {
+      return SOURCE;
+    }
+
+    throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",
+                                              component.toString(), CONFIGURATION, CONNECTION_PROVIDER, OPERATION, SOURCE));
+  }
+
+  public static String getComponentDeclarationTypeName(Object component) {
+    if (component instanceof OperationDeclaration) {
+      return OPERATION;
+    } else if (component instanceof ConfigurationDeclaration) {
+      return CONFIGURATION;
+    } else if (component instanceof ConnectionProviderDeclaration) {
+      return CONNECTION_PROVIDER;
+    } else if (component instanceof SourceDeclaration) {
       return SOURCE;
     }
 

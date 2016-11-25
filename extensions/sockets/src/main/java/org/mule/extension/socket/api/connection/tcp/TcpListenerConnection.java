@@ -8,7 +8,7 @@ package org.mule.extension.socket.api.connection.tcp;
 
 import static java.lang.String.format;
 import static org.mule.extension.socket.internal.SocketUtils.configureConnection;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.ListenerConnection;
 import org.mule.extension.socket.api.connection.udp.UdpListenerConnection;
@@ -44,7 +44,7 @@ public final class TcpListenerConnection extends AbstractTcpConnection implement
   private final SimpleServerSocketFactory serverSocketFactory;
   private ServerSocket serverSocket;
 
-  public TcpListenerConnection(ConnectionSettings connectionSettings, TcpProtocol protocol,
+  public TcpListenerConnection(SocketConnectionSettings connectionSettings, TcpProtocol protocol,
                                TcpServerSocketProperties socketProperties, SimpleServerSocketFactory serverSocketFactory)
       throws ConnectionException {
     super(connectionSettings, protocol);

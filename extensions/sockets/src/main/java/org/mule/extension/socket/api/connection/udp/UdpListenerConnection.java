@@ -8,7 +8,7 @@ package org.mule.extension.socket.api.connection.udp;
 
 import static org.mule.extension.socket.internal.SocketUtils.configureConnection;
 import static org.mule.extension.socket.internal.SocketUtils.createPacket;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.ListenerConnection;
 import org.mule.extension.socket.api.exceptions.ReadingTimeoutException;
@@ -27,7 +27,7 @@ import java.net.SocketTimeoutException;
 
 public class UdpListenerConnection extends AbstractUdpConnection implements ListenerConnection {
 
-  public UdpListenerConnection(ConnectionSettings connectionSettings, UdpSocketProperties socketProperties)
+  public UdpListenerConnection(SocketConnectionSettings connectionSettings, UdpSocketProperties socketProperties)
       throws ConnectionException {
     super(connectionSettings, socketProperties);
   }

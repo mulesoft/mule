@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -33,7 +34,7 @@ public class ParameterType {
   @Expression(NOT_SUPPORTED)
   private String key;
 
-  @ParameterGroup
+  @ParameterGroup("Type")
   private TypeClassifier typeClassifier;
 
   public String getKey() {

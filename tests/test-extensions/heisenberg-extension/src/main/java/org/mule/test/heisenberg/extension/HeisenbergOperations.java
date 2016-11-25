@@ -145,7 +145,7 @@ public class HeisenbergOperations {
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
-  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting, @ParameterGroup PersonalInfo info) {
+  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting, @ParameterGroup("Personal Info") PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 

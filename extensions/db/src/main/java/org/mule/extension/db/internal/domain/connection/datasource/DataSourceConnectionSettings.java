@@ -11,7 +11,12 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
-public final class ConnectionSettings {
+/**
+ * Groups DataSource related parameters
+ *
+ * @since 4.0
+ */
+public final class DataSourceConnectionSettings {
 
   /**
    * Reference to a JDBC {@link DataSource} object. This object is typically created using Spring.

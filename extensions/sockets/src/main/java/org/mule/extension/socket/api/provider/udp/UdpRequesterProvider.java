@@ -6,10 +6,12 @@
  */
 package org.mule.extension.socket.api.provider.udp;
 
-import org.mule.extension.socket.api.ConnectionSettings;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.connection.udp.UdpRequesterConnection;
 import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
+import org.mule.extension.socket.api.socket.SocketProperties;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -35,13 +37,13 @@ public final class UdpRequesterProvider implements PoolingConnectionProvider<Udp
   /**
    * This configuration parameter refers to the address where the {@link DatagramSocket} should send packages to.
    */
-  @ParameterGroup
-  private ConnectionSettings connectionSettings;
+  @ParameterGroup(CONNECTION)
+  private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link DatagramSocket} configuration properties
    */
-  @ParameterGroup
+  @ParameterGroup(SocketProperties.GROUP_NAME)
   private UdpSocketProperties udpSocketProperties;
 
   /**
@@ -49,7 +51,7 @@ public final class UdpRequesterProvider implements PoolingConnectionProvider<Udp
    */
   @Parameter
   @Optional
-  private ConnectionSettings localAddressSettings = new ConnectionSettings();
+  private SocketConnectionSettings localAddressSettings = new SocketConnectionSettings();
 
   @Override
   public UdpRequesterConnection connect() throws ConnectionException, UnresolvableHostException {

@@ -680,7 +680,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
   public static class HeisenbergWithParameterGroupAsOptional extends HeisenbergExtension {
 
-    @ParameterGroup
+    @ParameterGroup("personalInfo")
     @Optional
     private PersonalInfo personalInfo;
 
@@ -689,7 +689,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
   public static class HeisenbergWithRecursiveParameterGroup extends HeisenbergExtension {
 
-    @ParameterGroup
+    @ParameterGroup("recursive")
     private RecursiveParameterGroup group;
   }
 
@@ -765,7 +765,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
   private static class RecursiveParameterGroup {
 
-    @ParameterGroup
+    @ParameterGroup("recursive")
     private RecursiveParameterGroup recursiveParameterGroup;
   }
 }

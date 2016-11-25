@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 public class DataSourceReferenceConnectionProvider extends DbConnectionProvider {
 
   @ParameterGroup(CONNECTION)
-  private ConnectionSettings connectionSettings;
+  private DataSourceConnectionSettings connectionSettings;
 
   @Override
   public Optional<DataSource> getDataSource() {

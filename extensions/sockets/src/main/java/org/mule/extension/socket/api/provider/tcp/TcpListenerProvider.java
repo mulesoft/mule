@@ -11,7 +11,7 @@ import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
 import org.mule.extension.socket.api.socket.factory.SimpleServerSocketFactory;
@@ -65,7 +65,7 @@ public final class TcpListenerProvider implements CachedConnectionProvider<TcpLi
    * This configuration parameter refers to the address where the TCP socket should listen for incoming connections.
    */
   @ParameterGroup(CONNECTION)
-  private ConnectionSettings connectionSettings;
+  private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link ServerSocket} configuration properties

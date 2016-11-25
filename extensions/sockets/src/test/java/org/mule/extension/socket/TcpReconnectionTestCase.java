@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.socket.SocketExtensionTestCase.POLL_DELAY_MILLIS;
 import static org.mule.extension.socket.SocketExtensionTestCase.TIMEOUT_MILLIS;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.connection.tcp.TcpRequesterConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
@@ -54,7 +54,7 @@ public class TcpReconnectionTestCase extends AbstractMuleTestCase {
   private MuleContext muleContext;
 
   @Mock
-  private ConnectionSettings connectionSettings;
+  private SocketConnectionSettings connectionSettings;
 
   @Mock
   private SourceCallback sourceCallback;
@@ -84,14 +84,14 @@ public class TcpReconnectionTestCase extends AbstractMuleTestCase {
 
     listenerConnection =
         new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
-    requesterConnection = new TcpRequesterConnection(connectionSettings, new ConnectionSettings(), new SafeProtocol(),
+    requesterConnection = new TcpRequesterConnection(connectionSettings, new SocketConnectionSettings(), new SafeProtocol(),
                                                      clientSocketProperties, new TcpSocketFactory());
   }
 
   @Test
   public void failOnInvalidPort() throws Exception {
     int invalidPort = -1;
-    connectionSettings = new ConnectionSettings(invalidPort, host);
+    connectionSettings = new SocketConnectionSettings(invalidPort, host);
     listenerConnection =
         new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
     expectedException.expect(IllegalArgumentException.class);

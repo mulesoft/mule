@@ -9,11 +9,13 @@ package org.mule.extension.socket.api.provider.tcp;
 import static org.mule.extension.socket.api.SocketsExtension.TLS;
 import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION_TAB;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.connection.tcp.TcpRequesterConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
+import org.mule.extension.socket.api.socket.SocketProperties;
 import org.mule.extension.socket.api.socket.factory.SimpleSocketFactory;
 import org.mule.extension.socket.api.socket.factory.SslSocketFactory;
 import org.mule.extension.socket.api.socket.factory.TcpSocketFactory;
@@ -62,13 +64,13 @@ public final class TcpRequesterProvider implements PoolingConnectionProvider<Tcp
   /**
    * This configuration parameter refers to the address where the {@link Socket} should connect to.
    */
-  @ParameterGroup
-  private ConnectionSettings connectionSettings;
+  @ParameterGroup(CONNECTION)
+  private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link Socket} configuration properties
    */
-  @ParameterGroup
+  @ParameterGroup(SocketProperties.GROUP_NAME)
   private TcpClientSocketProperties tcpClientSocketProperties;
 
   /**
@@ -77,7 +79,7 @@ public final class TcpRequesterProvider implements PoolingConnectionProvider<Tcp
   @Parameter
   @Optional
   @Placement(tab = "Local Address Settings")
-  ConnectionSettings localAddressSettings = new ConnectionSettings();
+  SocketConnectionSettings localAddressSettings = new SocketConnectionSettings();
 
 
   /**

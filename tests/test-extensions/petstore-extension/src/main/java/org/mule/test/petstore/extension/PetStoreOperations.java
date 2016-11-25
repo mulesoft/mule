@@ -25,11 +25,11 @@ public class PetStoreOperations {
     return client;
   }
 
-  public ExclusivePetBreeder getBreeder(@ParameterGroup ExclusivePetBreeder breeder) {
+  public ExclusivePetBreeder getBreeder(@ParameterGroup("Exclusive") ExclusivePetBreeder breeder) {
     return breeder;
   }
 
-  public ExclusiveCashier getCashier(@ParameterGroup ExclusiveCashier cashier) {
+  public ExclusiveCashier getCashier(@ParameterGroup("Exclusive") ExclusiveCashier cashier) {
     return cashier;
   }
 

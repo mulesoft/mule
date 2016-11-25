@@ -41,6 +41,9 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled {
    */
   String getUniqueIdString();
 
+  /**
+   * @return the id of the running mule server
+   */
   String getServerId();
 
 }

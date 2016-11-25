@@ -7,7 +7,7 @@
 package org.mule.extension.socket.api.connection.udp;
 
 import static org.mule.extension.socket.internal.SocketUtils.configureConnection;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.client.SocketClient;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 public class UdpRequesterConnection extends AbstractUdpConnection implements RequesterConnection {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UdpRequesterConnection.class);
-  private final ConnectionSettings localAddressSettings;
+  private final SocketConnectionSettings localAddressSettings;
 
-  public UdpRequesterConnection(ConnectionSettings connectionSettings, ConnectionSettings localAddressSettings,
+  public UdpRequesterConnection(SocketConnectionSettings connectionSettings, SocketConnectionSettings localAddressSettings,
                                 UdpSocketProperties socketProperties)
       throws ConnectionException {
     super(connectionSettings, socketProperties);

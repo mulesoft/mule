@@ -6,13 +6,18 @@
  */
 package org.mule.extension.ftp.internal.ftp.connection;
 
-import org.mule.extension.ftp.internal.ConnectionSettings;
+import org.mule.extension.ftp.internal.BaseFtpConnectionSettings;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-public final class FtpConnectionSettings extends ConnectionSettings {
+/**
+ * Groups FTP connection parameters
+ *
+ * @since 4.0
+ */
+public final class FtpConnectionSettings extends BaseFtpConnectionSettings {
 
   /**
    * The port number of the FTP server to connect

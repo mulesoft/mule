@@ -22,13 +22,13 @@ import java.net.InetSocketAddress;
  *
  * @since 4.0
  */
-public class ConnectionSettings {
+public class SocketConnectionSettings {
 
   private static final int PORT_CHOSEN_BY_SYSTEM_MASK = 0;
 
-  public ConnectionSettings() {}
+  public SocketConnectionSettings() {}
 
-  public ConnectionSettings(Integer port, String host) {
+  public SocketConnectionSettings(Integer port, String host) {
     this.port = port;
     this.host = host;
   }

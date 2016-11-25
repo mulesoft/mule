@@ -28,7 +28,7 @@ public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, St
   private static final String ERROR_MESSAGE = "LocationKey field was not injected properly";
 
   @MetadataKeyId
-  @ParameterGroup
+  @ParameterGroup("Location")
   public LocationKey key;
 
   @Override

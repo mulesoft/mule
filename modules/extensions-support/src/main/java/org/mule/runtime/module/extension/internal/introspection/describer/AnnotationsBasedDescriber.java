@@ -25,6 +25,7 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
@@ -572,12 +573,12 @@ public final class AnnotationsBasedDescriber implements Describer {
     final String groupName = groupAnnotation.value();
     if (ParameterGroupModel.DEFAULT_GROUP_NAME.equals(groupName)) {
       throw new IllegalParameterModelDefinitionException(
-          format("%s '%s' defines parameter group of name '%s' which is the default one. "
-                     + "@%s cannot be used with the default group name",
-                 getComponentModelTypeName(component),
-                 ((NamedDeclaration) component.getDeclaration()).getName(),
-                 groupName,
-                 ParameterGroup.class.getSimpleName()));
+                                                         format("%s '%s' defines parameter group of name '%s' which is the default one. "
+                                                             + "@%s cannot be used with the default group name",
+                                                                getComponentModelTypeName(component),
+                                                                ((NamedDeclaration) component.getDeclaration()).getName(),
+                                                                groupName,
+                                                                ParameterGroup.class.getSimpleName()));
     }
 
     final Type type = groupParameter.getType();
@@ -609,7 +610,7 @@ public final class AnnotationsBasedDescriber implements Describer {
     if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
                                                                 groupName,
-                                                                getComponentModelTypeName(component),
+                                                                getComponentDeclarationTypeName(component),
                                                                 ((NamedDeclaration) component.getDeclaration()).getName()));
     } else {
       declarer.withModelProperty(new ParameterGroupModelProperty(new ParameterGroupDescriptor(
@@ -626,7 +627,8 @@ public final class AnnotationsBasedDescriber implements Describer {
       declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
     });
 
-    parseLayoutAnnotations(type, LayoutModel.builder()).ifPresent(declarer::withLayout);
+
+    parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 
     if (!annotatedParameters.isEmpty()) {
       declareParameters(component, annotatedParameters, contributors, declarationContext, ofNullable(declarer));

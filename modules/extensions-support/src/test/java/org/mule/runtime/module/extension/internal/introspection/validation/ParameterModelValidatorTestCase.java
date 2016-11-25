@@ -23,6 +23,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeWrapper;
@@ -208,7 +209,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static class InvalidPojoParameterGroup {
 
-    @org.mule.runtime.extension.api.annotation.param.ParameterGroup
+    @ParameterGroup("exclusion")
     private Serializable nonInstantiableField;
   }
 

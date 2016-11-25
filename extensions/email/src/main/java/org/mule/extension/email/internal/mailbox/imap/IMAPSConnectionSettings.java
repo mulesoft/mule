@@ -16,6 +16,11 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
+/**
+ * Groups IMAPS connection parameters
+ *
+ * @since 4.0
+ */
 public final class IMAPSConnectionSettings extends EmailConnectionSettings {
 
   /**

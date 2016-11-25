@@ -153,7 +153,7 @@ public class MetadataOperations {
   }
 
   public LocationKey simpleMultiLevelKeyResolver(@Connection MetadataConnection connection,
-                                                 @ParameterGroup @MetadataKeyId(TestMultiLevelKeyResolver.class) LocationKey locationKey,
+                                                 @ParameterGroup("key") @MetadataKeyId(TestMultiLevelKeyResolver.class) LocationKey locationKey,
                                                  @Optional @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKey;
   }
