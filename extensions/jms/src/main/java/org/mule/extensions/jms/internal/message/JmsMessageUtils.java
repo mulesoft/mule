@@ -52,6 +52,10 @@ public class JmsMessageUtils {
   private static final char REPLACEMENT_CHAR = '_';
 
   public static Message toMessage(Object object, Session session) throws JMSException {
+    if (object == null) {
+      throw new JMSException("Message body was 'null', which is not a value of a supported type");
+    }
+
     if (object instanceof Message) {
       return (Message) object;
     } else if (object instanceof String) {
@@ -76,9 +80,9 @@ public class JmsMessageUtils {
       return outputHandlerToMessage((OutputHandler) object, session);
 
     } else {
-      throw new JMSException(
-                             "Source was not of a supported type. Valid types are Message, String, Map, InputStream, List, byte[], Serializable or OutputHandler, "
-                                 + "but was " + getClassName(object));
+      throw new JMSException("Message body was not of a supported type. "
+          + "Valid types are Message, String, Map, InputStream, List, byte[], Serializable or OutputHandler, "
+          + "but was " + getClassName(object));
     }
   }
 
