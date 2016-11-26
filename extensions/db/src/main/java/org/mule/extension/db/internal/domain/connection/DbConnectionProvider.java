@@ -67,14 +67,6 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   private MuleContext muleContext;
 
   /**
-   * Specifies non-standard custom data types
-   */
-  @Parameter
-  @Optional
-  @Expression(NOT_SUPPORTED)
-  private List<CustomDataType> customDataTypes = emptyList();
-
-  /**
    * Provides a way to configure database connection pooling.
    */
   @Parameter
@@ -82,6 +74,15 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB)
   private DbPoolingProfile poolingProfile;
+
+  /**
+   * Specifies non-standard custom data types
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  private List<CustomDataType> customDataTypes = emptyList();
+
 
   private DataSourceFactory dataSourceFactory;
   private List<DbType> resolvedCustomTypes = emptyList();
