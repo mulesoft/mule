@@ -9,7 +9,7 @@
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
