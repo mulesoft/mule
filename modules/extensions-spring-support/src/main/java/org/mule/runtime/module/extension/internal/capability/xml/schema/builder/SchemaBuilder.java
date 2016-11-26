@@ -111,14 +111,6 @@ public final class SchemaBuilder {
   private final Set<StringType> registeredEnums = new LinkedHashSet<>();
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  //private final ConfigurationSchemaDelegate configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
-  //private final ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
-  //private final OperationSchemaDelegate operationSchemaDelegate = new OperationSchemaDelegate(this);
-  //private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this);
-  //private final CollectionSchemaDelegate collectionDelegate = new CollectionSchemaDelegate(this);
-  //private final ObjectTypeSchemaDelegate objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
-  //private final MapSchemaDelegate mapDelegate = new MapSchemaDelegate(this);
-
   private Schema schema;
   private boolean requiresTls = false;
 
@@ -280,18 +272,13 @@ public final class SchemaBuilder {
     return this;
   }
 
-  //void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels) {
   Map<String, TopLevelElement> registerParameters(ExtensionType type, Collection<ParameterModel> parameterModels) {
     LinkedHashMap<String, TopLevelElement> all = new LinkedHashMap<>();
     for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels)) {
-      //declareAsParameter(parameterModel.getType(), type, choice, parameterModel);
       DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
       declareAsParameter(parameterModel.getType(), type, parameterModel, paramDsl, all);
     }
     return all;
-    //if (!choice.getParticle().isEmpty()) {
-    //  type.setSequence(choice);
-    //}
   }
 
   /**
