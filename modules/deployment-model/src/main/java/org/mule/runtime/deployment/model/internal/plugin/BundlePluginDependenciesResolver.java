@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -142,7 +143,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                                    List<ArtifactPluginDescriptor> resolvedPlugins) {
     Set<String> exportedPackages = new HashSet<>();
     for (BundleDependency pluginDependency : pluginDependencies) {
-      if (MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().get())) {
+      final Optional<String> classifier = pluginDependency.getDescriptor().getClassifier();
+      if (classifier.isPresent() && MULE_PLUGIN_CLASSIFIER.equals(classifier.get())) {
         ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(pluginDependency, resolvedPlugins);
         exportedPackages.addAll(dependencyDescriptor.getClassLoaderModel().getExportedPackages());
         exportedPackages

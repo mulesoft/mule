@@ -59,6 +59,7 @@ import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.MAVEN_ID_CLASSLOADER_MODEL_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
@@ -98,6 +99,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -1517,7 +1519,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deploysAppZipWithExtensionXmlPlugin() throws Exception {
+  public void deploysWithExtensionXmlPlugin() throws Exception {
     String moduleFileName = "module-bye.xml";
     String extensionName = "bye-extension";
 
@@ -1531,6 +1533,32 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
         .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void deploysWithExtensionXmlPluginWithDependencies() throws Exception {
+    String moduleFileName = "module-bye.xml";
+    String extensionName = "bye-extension";
+
+    MulePluginModelBuilder builder =
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML, moduleFileName);
+    builder.withClassLoaderModelDescriber().setId(MAVEN_ID_CLASSLOADER_MODEL_DESCRIPTOR)
+        .addProperty(ArtifactPluginDescriptorFactory.EXPORTED_PACKAGES, Arrays.asList("org.foo"));
+
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
+        .containingResource("module-byeSource.xml", moduleFileName)
+        .containingMetaInfResource("module-bye-pom-with-mule-plugin-dependencies.xml", "pom.xml")
+        .describedBy(builder.build());
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
+        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin)
+        .containingPlugin(echoPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -1556,6 +1584,27 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     startDeployment();
 
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void failsToDeployWithExtensionThatHasNonExistingIdForClassLoaderModel() throws Exception {
+    String extensionName = "extension-with-classloader-model-id-non-existing";
+
+    MulePluginModelBuilder builder =
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+    builder.withClassLoaderModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
+
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
+        .describedBy(builder.build());
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPluginFails")
+        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see one deploy, for some reason tries to redeploy two times so I added until this bug gets fixed
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId(), times(2));
   }
 
   @Test
@@ -1742,6 +1791,22 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       assertThat(e.getCause().getCause(), instanceOf(NoClassDefFoundError.class));
       assertThat(e.getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
     }
+  }
+
+  @Test
+  public void failsToDeployApplicationWithPluginDependantOnPluginNotShipped() throws Exception {
+    ArtifactPluginFileBuilder dependantPlugin =
+        new ArtifactPluginFileBuilder("dependantPlugin")
+            .dependingOn(echoPlugin.getId());
+
+    final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
+        .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(dependantPlugin);
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see one deploy, for some reason tries to redeploy two times so I added until this bug gets fixed
+    assertDeploymentFailure(applicationDeploymentListener, artifactFileBuilder.getId(), times(2));
   }
 
   @Test
