@@ -69,7 +69,7 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
    * @param builder     a {@link BaseTypeBuilder} to create the type.
    * @param attachments the list of attachments required by the operation.
    */
-  public MetadataType getInputAttachmentsType(BaseTypeBuilder builder, List<ObjectFieldType> attachments) {
+  private MetadataType getInputAttachmentsType(BaseTypeBuilder builder, List<ObjectFieldType> attachments) {
     if (attachments.isEmpty()) {
       return NULL_TYPE;
     }
@@ -88,7 +88,7 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
    * @param attachments the attachments fields on found in the type.
    * @return the body {@link MetadataType} without the attachment fields.
    */
-  public MetadataType getInputBodyType(MetadataType bodyType, List<ObjectFieldType> attachments) {
+  private MetadataType getInputBodyType(MetadataType bodyType, List<ObjectFieldType> attachments) {
     if (!attachments.isEmpty() && bodyType instanceof ObjectType) {
       ObjectType operationType = getOperationType(bodyType);
       attachments.forEach(a -> operationType.getFields().removeIf(f -> getLocalPart(f).equals(getLocalPart(a))));

@@ -7,6 +7,7 @@
 package org.mule.extension.ws.internal.introspection;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -34,7 +35,10 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.mime.MIMEPart;
+import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
+import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
@@ -47,6 +51,9 @@ import javax.xml.namespace.QName;
  */
 @SuppressWarnings("unchecked")
 public class WsdlIntrospecter {
+
+  private static final String DOCUMENT_STYLE = "document";
+  private static final String RPC_STYLE = "rpc";
 
   private static final WsdlSchemasCollector schemaCollector = new WsdlSchemasCollector();
 
@@ -116,15 +123,15 @@ public class WsdlIntrospecter {
     List elements = delegate.getBindingType(bindingOperation).getExtensibilityElements();
     if (elements != null) {
       //TODO: MULE-10796 - what about other type of SOAP body out there? (e.g.: SOAP12Body)
-      Optional<SOAPBody> body = elements.stream().filter(e -> e instanceof SOAPBody).findFirst();
-      if (body.isPresent()) {
-        List bodyParts = body.get().getParts();
-        if (!bodyParts.isEmpty()) {
-          if (bodyParts.size() > 1) {
-            throw new InvalidWsdlException("Multipart body operations are not supported");
-          }
-          return ofNullable((String) bodyParts.get(0));
-        }
+
+      Optional<List> bodyParts = elements.stream()
+          .filter(e -> e instanceof SOAPBody || e instanceof SOAP12Body)
+          .map(e -> e instanceof SOAPBody ? ((SOAPBody) e).getParts() : ((SOAP12Body) e).getParts())
+          .map(parts -> parts == null ? emptyList() : parts)
+          .findFirst();
+
+      if (bodyParts.isPresent() && !bodyParts.get().isEmpty()) {
+        return ofNullable((String) bodyParts.get().get(0));
       }
     }
     return empty();
@@ -147,6 +154,29 @@ public class WsdlIntrospecter {
 
   public Port getPort() {
     return port;
+  }
+
+  public boolean isRpcStyle() {
+    return isWsdlStyle(RPC_STYLE);
+  }
+
+  public boolean isDocumentStyle() {
+    return isWsdlStyle(DOCUMENT_STYLE);
+  }
+
+  private boolean isWsdlStyle(String style) {
+    List elements = port.getBinding().getExtensibilityElements();
+
+    Optional<String> bindingStyle = elements.stream()
+        .filter(e -> e instanceof SOAP12Binding || e instanceof SOAPBinding)
+        .map(e -> e instanceof SOAP12Binding ? ((SOAP12Binding) e).getStyle() : ((SOAPBinding) e).getStyle())
+        .findAny();
+
+    if (!bindingStyle.isPresent()) {
+      throw new InvalidWsdlException(format("No SOAP binding found for the specified port [%s]", port.getName()));
+    }
+
+    return bindingStyle.get().equalsIgnoreCase(style);
   }
 
   /**

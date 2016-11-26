@@ -17,10 +17,12 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.ws.api.SoapVersion.SOAP11;
+import static org.mule.extension.ws.api.SoapVersion.SOAP12;
 import org.mule.extension.ws.WscUnitTestCase;
 import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.extension.ws.api.security.WssDecryptSecurityStrategy;
@@ -72,7 +74,8 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks the creation of a basic client without security")
   public void basicClient() throws ConnectionException {
-    Client client = factory.create(service.getAddress(), null, SOAP11, emptyList(), false);
+    Client client = factory.create(service.get11Address(), null, SOAP12, emptyList(), false);
+    assertThat(client.getEndpoint().getBinding().getBindingInfo().getBindingId(), containsString("soap12"));
     assertThat(client.getEndpoint().get(MTOM_ENABLED), is(false));
 
     assertThat(inInterceptorNames(client),
@@ -84,7 +87,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks the creation of a client that works with MTOM but with no security")
   public void basicClientMtom() throws ConnectionException {
-    Client client = factory.create(service.getAddress(), null, SOAP11, emptyList(), true);
+    Client client = factory.create(service.get11Address(), null, SOAP11, emptyList(), true);
     assertThat(client.getEndpoint().get(MTOM_ENABLED), is(true));
 
     assertThat(inInterceptorNames(client),
@@ -104,7 +107,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
     decrypt.initializeTlsContextFactory(tlsContext);
     verify.initializeTlsContextFactory(tlsContext);
 
-    Client client = factory.create(service.getAddress(), null, SOAP11, asList(sign, decrypt, verify), false);
+    Client client = factory.create(service.get11Address(), null, SOAP11, asList(sign, decrypt, verify), false);
 
     assertThat(inInterceptorNames(client),
                hasItems(NAMESPACE_RESTORER, NAMESPACE_SAVER, STREAM_CLOSING, CHECK_FAULT, OUT_SOAP_HEADERS, SOAP_ACTION, WSS_IN));

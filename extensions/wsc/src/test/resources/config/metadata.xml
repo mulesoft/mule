@@ -5,11 +5,11 @@
       http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <ws:config name="config">
-        <ws:connection address="http://localhost:${servicePort}/testService"
-                       soapVersion="SOAP11"
+        <ws:connection address="http://localhost:${servicePort}/${servicePath}"
                        service="TestService"
                        port="TestPort"
-                       wsdlLocation="http://localhost:${servicePort}/testService?wsdl"/>
+                       wsdlLocation="http://localhost:${servicePort}/${servicePath}?wsdl"
+                       soapVersion="${soapVersion}"/>
     </ws:config>
 
     <flow name="getEchoMetadata">

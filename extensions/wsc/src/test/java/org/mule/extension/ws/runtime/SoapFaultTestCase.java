@@ -8,6 +8,7 @@ package org.mule.extension.ws.runtime;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
@@ -38,7 +39,9 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
     Exception causeException = me.getCauseException();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
-    assertThat(sf.getFaultCode().getLocalPart(), is("Server"));
+
+    // Receiver is for SOAP12. Server is for SOAP11
+    assertThat(sf.getFaultCode().getLocalPart(), isOneOf("Server", "Receiver"));
     assertThat(sf.getMessage(), is("Fail Message"));
   }
 
@@ -50,7 +53,9 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
     Exception causeException = e.getCauseException();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
-    assertThat(sf.getFaultCode().getLocalPart(), is("Client"));
+
+    // Sender is for SOAP12. Client is for SOAP11
+    assertThat(sf.getFaultCode().getLocalPart(), isOneOf("Client", "Sender"));
     assertThat(sf.getMessage(), is("Cannot find dispatch method for {http://consumer.ws.extension.mule.org/}noOperation"));
   }
 }

@@ -7,6 +7,8 @@
 package org.mule.extension.ws.internal.transport;
 
 
+import static org.mule.extension.ws.internal.ConsumeOperation.MULE_SOAP_ACTION;
+
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -23,6 +25,8 @@ public class HttpDispatcher {
 
   public Response dispatch(String address, Message message) {
 
+    String soapAction = (String) message.getExchange().get(MULE_SOAP_ACTION);
+
     OutputStream os = message.getContent(OutputStream.class);
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse((String) message.get(Message.CONTENT_TYPE));
@@ -31,6 +35,7 @@ public class HttpDispatcher {
         .url(address)
         .post(body)
         .addHeader("cache-control", "no-cache")
+        .addHeader("SOAPAction", soapAction)
         .build();
     try {
       return client.newCall(request).execute();

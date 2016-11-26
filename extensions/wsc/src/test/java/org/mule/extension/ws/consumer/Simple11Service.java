@@ -25,13 +25,13 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.soap.MTOM;
 
 /**
- * Web service used by WS Consumer tests.
+ * Web service11 used by WS Consumer tests.
  *
  * @since 4.0
  */
 @MTOM
 @WebService(portName = "TestPort", serviceName = "TestService")
-public class SimpleService {
+public class Simple11Service {
 
   @WebResult(name = "text")
   @WebMethod(action = "echoOperation")

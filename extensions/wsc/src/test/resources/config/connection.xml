@@ -5,13 +5,19 @@
       http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="single-instance">
-        <wsc:connection wsdlLocation="http://localhost:${servicePort}/testService?wsdl" service="TestService" port="TestPort">
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/${servicePath}?wsdl" service="TestService" port="TestPort" soapVersion="${soapVersion}">
             <pooling-profile maxActive="1"/>
         </wsc:connection>
     </wsc:config>
 
     <wsc:config name="localWsdl">
-        <wsc:connection address="http://localhost:${servicePort}/testService" service="TestService" port="TestPort" wsdlLocation="#[flowVars.wsdl]">
+        <wsc:connection address="http://localhost:${servicePort}/${servicePath}" service="TestService" port="TestPort" wsdlLocation="#[flowVars.wsdl]" soapVersion="${soapVersion}">
+            <pooling-profile maxActive="1"/>
+        </wsc:connection>
+    </wsc:config>
+
+    <wsc:config name="rpcWsdl">
+        <wsc:connection service="SoapResponder" port="SoapResponderPortType" wsdlLocation="#[flowVars.wsdl]" soapVersion="${soapVersion}">
             <pooling-profile maxActive="1"/>
         </wsc:connection>
     </wsc:config>
@@ -35,6 +41,10 @@
                 <wsc:body>#[flowVars.req]</wsc:body>
             </wsc:message>
         </wsc:consume>
+    </flow>
+
+    <flow name="rpcConnection">
+        <wsc:consume config-ref="rpcWsdl" operation="Method1"/>
     </flow>
 
 </mule>

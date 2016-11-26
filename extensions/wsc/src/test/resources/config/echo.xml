@@ -5,7 +5,7 @@
       http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="config">
-        <wsc:connection wsdlLocation="http://localhost:${servicePort}/testService?wsdl" service="TestService" port="TestPort"/>
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/${servicePath}?wsdl" service="TestService" port="TestPort" soapVersion="${soapVersion}"/>
     </wsc:config>
 
     <flow name="echoOperation">
@@ -35,5 +35,4 @@
             </wsc:message>
         </wsc:consume>
     </flow>
-
 </mule>
