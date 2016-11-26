@@ -60,11 +60,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   private static final Logger logger = getLogger(DefaultSchedulerService.class);
 
-  private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_cpuLight";
-  private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_io";
-  private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_compute";
+  private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + CPU_LIGHT.getName();
+  private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + IO.getName();
+  private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + CPU_INTENSIVE.getName();
   private static final String TIMER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_timer";
-  private static final String CUSTOM_THREADS_NAME = SchedulerService.class.getSimpleName() + "_custom";
+  private static final String CUSTOM_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + CUSTOM.getName();
 
   private int cores = getRuntime().availableProcessors();
   private ThreadPoolsConfig threadPoolsConfig;
@@ -261,11 +261,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   protected void waitForExecutorTermination(final long startMillis, final ExecutorService executor, final String executorLabel)
       throws InterruptedException {
-    if (!executor.awaitTermination(SECONDS.toMillis(threadPoolsConfig.getGracefulShutdownTimeoutSeconds())
-        - (currentTimeMillis() - startMillis), MILLISECONDS)) {
+    if (!executor.awaitTermination(threadPoolsConfig.getGracefulShutdownTimeout() - (currentTimeMillis() - startMillis),
+                                   MILLISECONDS)) {
       final List<Runnable> cancelledJobs = executor.shutdownNow();
       logger.warn("'" + executorLabel + "' " + executor.toString() + " of " + this.toString()
-          + " did not shutdown gracefully after " + threadPoolsConfig.getGracefulShutdownTimeoutSeconds() + " seconds. "
+          + " did not shutdown gracefully after " + threadPoolsConfig.getGracefulShutdownTimeout() + " milliseconds. "
           + cancelledJobs.size() + " jobs were cancelled.");
     }
   }

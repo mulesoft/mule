@@ -16,25 +16,35 @@ public enum ThreadType {
   /**
    * The type for {@link Thread}s managed by {@link Scheduler}s obtained with {@link SchedulerService#ioScheduler()}.
    */
-  IO,
+  IO("io"),
 
   /**
    * The type for {@link Thread}s managed by {@link Scheduler}s obtained with {@link SchedulerService#computationScheduler()}.
    */
-  CPU_INTENSIVE,
+  CPU_INTENSIVE("cpuIntensive"),
 
   /**
    * The type for {@link Thread}s managed by {@link Scheduler}s obtained with {@link SchedulerService#cpuLightScheduler()}.
    */
-  CPU_LIGHT,
+  CPU_LIGHT("cpuLight"),
 
   /**
    * The type for {@link Thread}s managed by custom {@link Scheduler}s.
    */
-  CUSTOM,
+  CUSTOM("custom"),
 
   /**
    * The type for {@link Thread}s not managed by {@link Scheduler}s obtained from {@link SchedulerService}.
    */
-  UNKNOWN;
+  UNKNOWN("unknown");
+
+  private String name;
+
+  private ThreadType(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
 }

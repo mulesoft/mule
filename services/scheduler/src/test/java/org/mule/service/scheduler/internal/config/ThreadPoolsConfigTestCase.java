@@ -13,7 +13,11 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.PROP_PREFIX;
+import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.loadThreadPoolsConfig;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -34,7 +38,7 @@ import org.junit.rules.TemporaryFolder;
 
 public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
-  private int cores = getRuntime().availableProcessors();
+  private static int cores = getRuntime().availableProcessors();
 
   @Rule
   public TemporaryFolder tempMuleHome = new TemporaryFolder();
@@ -59,12 +63,12 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
   protected Properties buildDefaultConfigProps() {
     final Properties props = new Properties();
-    props.setProperty(PROP_PREFIX + "gracefulShutdownTimeoutSeconds", "15");
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "2*C");
-    props.setProperty(PROP_PREFIX + "io.coreThreadPoolSize", "C");
-    props.setProperty(PROP_PREFIX + "io.maxThreadPoolSize", "C*C");
-    props.setProperty(PROP_PREFIX + "io.threadKeepAliveSeconds", "30");
-    props.setProperty(PROP_PREFIX + "cpuIntensive.threadPoolSize", "2*C");
+    props.setProperty(PROP_PREFIX + "gracefulShutdownTimeout", "15000");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "2*cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".core", "cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".max", "cores*cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + ".threadKeepAlive", "30");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "2*cores");
     return props;
   }
 
@@ -74,11 +78,11 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
 
-    assertThat(config.getGracefulShutdownTimeoutSeconds(), is(15));
+    assertThat(config.getGracefulShutdownTimeout(), is(15000));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getIoCorePoolSize(), is(cores));
     assertThat(config.getIoMaxPoolSize(), is(cores * cores));
-    assertThat(config.getIoKeepAliveSeconds(), is(30));
+    assertThat(config.getIoKeepAlive(), is(30));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
   }
 
@@ -86,11 +90,11 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   public void noConfigFile() throws IOException, MuleException {
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
 
-    assertThat(config.getGracefulShutdownTimeoutSeconds(), is(15));
+    assertThat(config.getGracefulShutdownTimeout(), is(15000));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getIoCorePoolSize(), is(cores));
     assertThat(config.getIoMaxPoolSize(), is(cores * cores));
-    assertThat(config.getIoKeepAliveSeconds(), is(30));
+    assertThat(config.getIoKeepAlive(), is(30));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
   }
 
@@ -101,37 +105,37 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
 
-    assertThat(config.getGracefulShutdownTimeoutSeconds(), is(15));
+    assertThat(config.getGracefulShutdownTimeout(), is(15000));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getIoCorePoolSize(), is(cores));
     assertThat(config.getIoMaxPoolSize(), is(cores * cores));
-    assertThat(config.getIoKeepAliveSeconds(), is(30));
+    assertThat(config.getIoKeepAlive(), is(30));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
   }
 
   @Test
   public void defaultConfigSpaced() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "2 *C");
-    props.setProperty(PROP_PREFIX + "io.maxThreadPoolSize", "C* C");
-    props.setProperty(PROP_PREFIX + "cpuIntensive.threadPoolSize", "2  *   C");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "2 *cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".max", "cores* cores");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "2  *   cores");
     props.store(new FileOutputStream(schedulerConfigFile), "defaultConfigSpaced");
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
 
-    assertThat(config.getGracefulShutdownTimeoutSeconds(), is(15));
+    assertThat(config.getGracefulShutdownTimeout(), is(15000));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getIoCorePoolSize(), is(cores));
     assertThat(config.getIoMaxPoolSize(), is(cores * cores));
-    assertThat(config.getIoKeepAliveSeconds(), is(30));
+    assertThat(config.getIoKeepAlive(), is(30));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
   }
 
   @Test
   public void withDecimalsConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "0.5 *C");
-    props.setProperty(PROP_PREFIX + "io.maxThreadPoolSize", "C / 0.25");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "0.5 *cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".max", "cores / 0.25");
     props.store(new FileOutputStream(schedulerConfigFile), "withDecimalsConfig");
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
@@ -143,9 +147,9 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void withPlusAndMinusConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "C + C");
-    props.setProperty(PROP_PREFIX + "io.maxThreadPoolSize", "2 + C");
-    props.setProperty(PROP_PREFIX + "cpuIntensive.threadPoolSize", "C - 1");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "cores + cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".max", "2 + cores");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "cores - 1");
     props.store(new FileOutputStream(schedulerConfigFile), "withPlusAndMinusConfig");
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
@@ -158,9 +162,9 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void expressionConfigFixed() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "2");
-    props.setProperty(PROP_PREFIX + "io.maxThreadPoolSize", "8");
-    props.setProperty(PROP_PREFIX + "cpuIntensive.threadPoolSize", "4");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "2");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".max", "8");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "4");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigFixed");
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
@@ -173,79 +177,79 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void expressionConfigNegative() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "C - " + (cores + 1));
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "cores - " + (cores + 1));
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigNegative");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + "cpuLight.threadPoolSize: Value has to be greater than 0"));
+    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + ".threadPoolSize: Value has to be greater than 0"));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void invalidExpressionConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "invalid");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "invalid");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigNegative");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + "cpuLight.threadPoolSize: Expression not valid"));
+    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + ".threadPoolSize: Expression not valid"));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void nastyExpressionConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "cpuLight.threadPoolSize", "; print('aha!')");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "; print('aha!')");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigNegative");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + "cpuLight.threadPoolSize: Expression not valid"));
+    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + ".threadPoolSize: Expression not valid"));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void invalidShutdownTimeConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "gracefulShutdownTimeoutSeconds", "C");
+    props.setProperty(PROP_PREFIX + "gracefulShutdownTimeout", "cores");
     props.store(new FileOutputStream(schedulerConfigFile), "invalidShutdownTimeConfig");
 
     expected.expect(DefaultMuleException.class);
     expected.expectCause(instanceOf(NumberFormatException.class));
-    expected.expectMessage(is(PROP_PREFIX + "gracefulShutdownTimeoutSeconds: For input string: \"C\""));
+    expected.expectMessage(is(PROP_PREFIX + "gracefulShutdownTimeout: For input string: \"cores\""));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void invalidIoKeepAliveConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "io.threadKeepAliveSeconds", "notANumber");
+    props.setProperty(PROP_PREFIX + IO.getName() + ".threadKeepAlive", "notANumber");
     props.store(new FileOutputStream(schedulerConfigFile), "invalidIoKeepAliveConfig");
 
     expected.expect(DefaultMuleException.class);
     expected.expectCause(instanceOf(NumberFormatException.class));
-    expected.expectMessage(is(PROP_PREFIX + "io.threadKeepAliveSeconds: For input string: \"notANumber\""));
+    expected.expectMessage(is(PROP_PREFIX + IO.getName() + ".threadKeepAlive: For input string: \"notANumber\""));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void negativeShutdownTimeConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "gracefulShutdownTimeoutSeconds", "-1");
+    props.setProperty(PROP_PREFIX + "gracefulShutdownTimeout", "-1");
     props.store(new FileOutputStream(schedulerConfigFile), "negativeShutdownTimeConfig");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + "gracefulShutdownTimeoutSeconds: Value has to be greater than 0"));
+    expected.expectMessage(is(PROP_PREFIX + "gracefulShutdownTimeout: Value has to be greater than 0"));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void negativeIoKeepAliveConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + "io.threadKeepAliveSeconds", "-2");
+    props.setProperty(PROP_PREFIX + IO.getName() + ".threadKeepAlive", "-2");
     props.store(new FileOutputStream(schedulerConfigFile), "negativeIoKeepAliveConfig");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + "io.threadKeepAliveSeconds: Value has to be greater than 0"));
+    expected.expectMessage(is(PROP_PREFIX + IO.getName() + ".threadKeepAlive: Value has to be greater than 0"));
     loadThreadPoolsConfig();
   }
 }
