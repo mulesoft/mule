@@ -12,6 +12,7 @@ import static java.lang.System.setProperty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.PROP_PREFIX;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.loadThreadPoolsConfig;
 
@@ -48,12 +49,12 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     final File confDir = new File(tempMuleHome.getRoot(), "conf");
     confDir.mkdir();
     schedulerConfigFile = new File(confDir, "scheduler-pools.conf");
-    setProperty("mule.home", tempMuleHome.getRoot().getAbsolutePath());
+    setProperty(MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
   }
 
   @After
   public void after() {
-    clearProperty("mule.home");
+    clearProperty(MULE_HOME_DIRECTORY_PROPERTY);
   }
 
   protected Properties buildDefaultConfigProps() {
@@ -69,7 +70,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
   @Test
   public void noMuleHome() throws IOException, MuleException {
-    clearProperty("mule.home");
+    clearProperty(MULE_HOME_DIRECTORY_PROPERTY);
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
 

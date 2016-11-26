@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.config;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.FatalException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -204,7 +206,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
     if (containerMode) {
-      final String muleHome = System.getProperty("mule.home");
+      final String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
       // in container mode the id is the app name, have each app isolate its work dir
       if (!isStandalone()) {
         // fallback to current dir as a parent

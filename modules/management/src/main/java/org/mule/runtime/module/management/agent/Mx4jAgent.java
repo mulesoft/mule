@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.management.agent;
 
-import org.mule.runtime.core.AbstractAgent;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.MuleManifest;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.AbstractAgent;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -34,14 +36,15 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management, statistics and configuration viewing of a Mule
@@ -78,7 +81,7 @@ public class Mx4jAgent extends AbstractAgent {
 
   // TODO AH check how an embedded scenario can be handled (no mule home)
   private String xslFilePath =
-      System.getProperty("mule.home") + "/lib/mule/mule-module-management-" + MuleManifest.getProductVersion() + ".jar";
+      System.getProperty(MULE_HOME_DIRECTORY_PROPERTY) + "/lib/mule/mule-module-management-" + getProductVersion() + ".jar";
 
   private String pathInJar = DEFAULT_PATH_IN_JAR;
 
@@ -136,6 +139,7 @@ public class Mx4jAgent extends AbstractAgent {
     return adaptor;
   }
 
+  @Override
   public void initialise() throws InitialisationException {
     try {
       jmxSupport = jmxSupportFactory.getJmxSupport();
@@ -159,6 +163,7 @@ public class Mx4jAgent extends AbstractAgent {
     }
   }
 
+  @Override
   public void start() throws MuleException {
     if (mBeanServer == null) {
       throw new InitialisationException(I18nMessageFactory.createStaticMessage("mBeanServer has not yet been created"), this);
@@ -175,6 +180,7 @@ public class Mx4jAgent extends AbstractAgent {
     }
   }
 
+  @Override
   public void stop() throws MuleException {
     if (mBeanServer == null) {
       return;
@@ -200,6 +206,7 @@ public class Mx4jAgent extends AbstractAgent {
     }
   }
 
+  @Override
   public void dispose() {
     try {
       stop();

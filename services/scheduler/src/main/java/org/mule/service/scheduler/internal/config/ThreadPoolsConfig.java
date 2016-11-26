@@ -11,6 +11,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -50,12 +51,13 @@ public class ThreadPoolsConfig {
    * @throws MuleException for any trouble that happens while parsing the file.
    */
   public static ThreadPoolsConfig loadThreadPoolsConfig() throws MuleException {
-    File muleHome = getProperty("mule.home") != null ? new File(getProperty("mule.home")) : null;
+    File muleHome =
+        getProperty(MULE_HOME_DIRECTORY_PROPERTY) != null ? new File(getProperty(MULE_HOME_DIRECTORY_PROPERTY)) : null;
 
     final ThreadPoolsConfig config = new ThreadPoolsConfig();
 
     if (muleHome == null) {
-      logger.info("No mule.home defined. Using default values for thread pools.");
+      logger.info("No " + MULE_HOME_DIRECTORY_PROPERTY + " defined. Using default values for thread pools.");
       return config;
     }
 

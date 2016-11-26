@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.reboot;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -43,7 +45,7 @@ public final class MuleContainerBootstrapUtils {
    * @return null if running embedded
    */
   public static File getMuleHome() {
-    final String muleHome = System.getProperty("mule.home");
+    final String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
     return muleHome != null ? new File(muleHome) : null;
   }
 
@@ -119,30 +121,18 @@ public final class MuleContainerBootstrapUtils {
    * @see org.mule.runtime.core.util.ClassUtils#getResource
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    URL url = AccessController.doPrivileged(new PrivilegedAction<URL>() {
-
-      public URL run() {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return cl != null ? cl.getResource(resourceName) : null;
-      }
+    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      return cl != null ? cl.getResource(resourceName) : null;
     });
 
     if (url == null) {
-      url = AccessController.doPrivileged(new PrivilegedAction<URL>() {
-
-        public URL run() {
-          return MuleContainerBootstrap.class.getClassLoader().getResource(resourceName);
-        }
-      });
+      url = AccessController
+          .doPrivileged((PrivilegedAction<URL>) () -> MuleContainerBootstrap.class.getClassLoader().getResource(resourceName));
     }
 
     if (url == null) {
-      url = AccessController.doPrivileged(new PrivilegedAction<URL>() {
-
-        public URL run() {
-          return callingClass.getClassLoader().getResource(resourceName);
-        }
-      });
+      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
     }
 
     return url;

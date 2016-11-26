@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.reboot;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,14 +65,15 @@ public class MuleContainerBootstrap {
 
   public static File lookupMuleHome() throws Exception {
     File muleHome = null;
-    String muleHomeVar = System.getProperty("mule.home");
+    String muleHomeVar = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
 
     if (muleHomeVar != null && !muleHomeVar.trim().equals("") && !muleHomeVar.equals("%MULE_HOME%")) {
       muleHome = new File(muleHomeVar).getCanonicalFile();
     }
 
     if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory()) {
-      throw new IllegalArgumentException("Either the system property mule.home is not set or does not contain a valid directory.");
+      throw new IllegalArgumentException("Either the system property " + MULE_HOME_DIRECTORY_PROPERTY
+          + " is not set or does not contain a valid directory.");
     }
     return muleHome;
   }
@@ -115,8 +118,8 @@ public class MuleContainerBootstrap {
    */
   private static CommandLine parseCommandLine(String[] args) throws ParseException {
     Options options = new Options();
-    for (int i = 0; i < CLI_OPTIONS.length; i++) {
-      options.addOption(CLI_OPTIONS[i][0], "true".equalsIgnoreCase(CLI_OPTIONS[i][1]), CLI_OPTIONS[i][2]);
+    for (String[] element : CLI_OPTIONS) {
+      options.addOption(element[0], "true".equalsIgnoreCase(element[1]), element[2]);
     }
     return new BasicParser().parse(options, args, true);
   }
