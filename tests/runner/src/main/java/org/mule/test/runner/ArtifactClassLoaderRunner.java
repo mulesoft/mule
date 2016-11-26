@@ -7,6 +7,7 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
@@ -34,9 +35,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.aether.repository.LocalRepository;
 import org.junit.internal.builders.AnnotatedBuilder;
@@ -100,7 +103,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
 
-  private static String userHome = System.getProperty(USER_HOME);
+  private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
   private static Exception errorCreatingClassLoaderTestRunner;
   private static boolean staticFieldsInjected = false;
@@ -180,7 +183,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       throw new RuntimeException("Error while reading excluded properties", e);
     }
     List<String> excludedArtifactsList = getExcludedArtifacts(excludedProperties);
-
     builder.setExcludedArtifacts(excludedArtifactsList);
     builder.setExtraBootPackages(getExtraBootPackages(excludedProperties));
 
@@ -193,11 +195,12 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
     final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newLocalDependencyResolver(classPath,
-                                    workspaceLocationResolver,
-                                    getMavenLocalRepository());
+        .newOfflineDependencyResolver(classPath,
+                                      workspaceLocationResolver,
+                                      getMavenLocalRepository());
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
-                                                                 new ArtifactClassificationTypeResolver(dependencyResolver)));
+                                                                 new ArtifactClassificationTypeResolver(
+                                                                                                        dependencyResolver)));
 
     return builder.build();
   }
@@ -264,7 +267,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    * @return a {@link LocalRepository} that points to the local m2 repository folder
    */
   private static File getMavenLocalRepository() {
-    String localRepositoryProperty = System.getProperty("localRepository");
+    String localRepositoryProperty = getProperty("localRepository");
     if (localRepositoryProperty == null) {
       localRepositoryProperty = userHome + M2_REPO;
       LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);
