@@ -14,6 +14,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -29,6 +30,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link DictionaryType}
@@ -45,15 +47,15 @@ final class MapSchemaDelegate {
   }
 
   void generateMapElement(DictionaryType metadataType, DslElementSyntax paramDsl, String description, boolean required,
-                          ExplicitGroup all) {
+                          Map<String, TopLevelElement> all) {
     BigInteger minOccurs = required ? ONE : ZERO;
     LocalComplexType mapComplexType = generateMapComplexType(paramDsl, metadataType);
 
-    TopLevelElement mapElement = builder.createTopLevelElement(paramDsl.getElementName(), minOccurs, "1");
+    TopLevelElement mapElement = builder.createTopLevelElement(paramDsl.getElementName(), minOccurs, MAX_ONE);
     mapElement.setAnnotation(builder.createDocAnnotation(description));
-    all.getParticle().add(objectFactory.createElement(mapElement));
-
     mapElement.setComplexType(mapComplexType);
+
+    all.put(paramDsl.getElementName(), mapElement);
   }
 
   private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final DictionaryType metadataType) {

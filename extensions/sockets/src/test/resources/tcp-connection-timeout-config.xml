@@ -10,8 +10,8 @@
         <sockets:tcp-requester-connection host="10.255.255.255" port="${port}"
                                           connectionTimeout="100"
                                           sendTcpNoDelay="true">
-            <pooling-profile maxActive="1"/>
             <reconnect blocking="false" />
+            <pooling-profile maxActive="1"/>
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 

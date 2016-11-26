@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -21,6 +22,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ex
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+
+import java.util.Map;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ArrayType}
@@ -37,14 +40,16 @@ class CollectionSchemaDelegate {
   }
 
   void generateCollectionElement(ArrayType metadataType, DslElementSyntax collectionDsl, String description, boolean required,
-                                 ExplicitGroup all) {
+                                 Map<String, TopLevelElement> all) {
     LocalComplexType collectionComplexType = generateCollectionComplexType(collectionDsl, metadataType);
 
-    TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(), required ? ONE : ZERO, "1");
+    TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(),
+                                                                      required ? ONE : ZERO,
+                                                                      MAX_ONE);
     collectionElement.setAnnotation(builder.createDocAnnotation(description));
-    all.getParticle().add(objectFactory.createElement(collectionElement));
-
     collectionElement.setComplexType(collectionComplexType);
+
+    all.put(collectionDsl.getElementName(), collectionElement);
   }
 
   private LocalComplexType generateCollectionComplexType(DslElementSyntax collectionDsl, final ArrayType metadataType) {

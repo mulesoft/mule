@@ -9,8 +9,8 @@
 
     <sockets:request-config name="tcp-requester">
         <sockets:tcp-requester-connection host="localhost" port="${port}" clientTimeout="100" sendTcpNoDelay="true">
-            <pooling-profile maxActive="1"/>
             <reconnect blocking="false" />
+            <pooling-profile maxActive="1"/>
             <sockets:protocol>
                 <!--Necessary to catch the exception in the test-->
                 <sockets:length-protocol rethrowExceptionOnRead="true"/>

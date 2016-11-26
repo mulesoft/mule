@@ -8,13 +8,14 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.Optional.empty;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDynamicParameters;
 import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
@@ -27,6 +28,10 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Builder delegation class to generate a XSD schema that describes a {@link ConfigurationModel}
  *
@@ -38,25 +43,48 @@ final class ConfigurationSchemaDelegate {
   private final SchemaBuilder builder;
   private Schema schema;
 
-  public ConfigurationSchemaDelegate(SchemaBuilder builder) {
+  ConfigurationSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
   }
 
-  public void registerConfigElement(Schema schema, final ConfigurationModel configurationModel,
-                                    DslElementSyntax dslConfigElement) {
+  void registerConfigElement(Schema schema, final ConfigurationModel configurationModel,
+                             DslElementSyntax dslConfigElement) {
     this.schema = schema;
 
     ExtensionType config = registerExtension(dslConfigElement.getElementName());
     config.getAttributeOrAttributeGroup().add(builder.createNameAttribute(true));
-
-    final ExplicitGroup choice = new ExplicitGroup();
-    choice.setMinOccurs(ZERO);
-    choice.setMaxOccurs(UNBOUNDED);
-
-    addConnectionProviderElement(choice, configurationModel);
-    addDynamicConfigPolicyElement(choice, configurationModel);
-    builder.registerParameters(config, choice, configurationModel.getAllParameterModels());
     config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
+
+    Optional<TopLevelElement> connectionElement = addConnectionProviderElement(configurationModel);
+    Optional<TopLevelElement> policyElement = addDynamicConfigPolicyElement(configurationModel);
+
+    Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
+    configurationModel.getParameterGroupModels()
+        .forEach(g -> groups.put(g.getName(), builder.registerParameters(config, g.getParameterModels())));
+
+    if (connectionElement.isPresent() || policyElement.isPresent() || !groups.isEmpty()) {
+      final ExplicitGroup sequence = new ExplicitGroup();
+      sequence.setMinOccurs(ZERO);
+      sequence.setMaxOccurs(MAX_ONE);
+
+      connectionElement.ifPresent(connection -> {
+        sequence.getParticle().add(objectFactory.createElement(connection));
+        if (builder.isRequired(connection)) {
+          sequence.setMinOccurs(ONE);
+        }
+      });
+
+      policyElement.ifPresent(policy -> {
+        sequence.getParticle().add(objectFactory.createElement(policy));
+        if (builder.isRequired(policy)) {
+          sequence.setMinOccurs(ONE);
+        }
+      });
+
+      builder.addOrderedParameterGroupsToSequence(groups, sequence);
+
+      config.setSequence(sequence);
+    }
   }
 
   private ExtensionType registerExtension(String name) {
@@ -75,32 +103,36 @@ final class ConfigurationSchemaDelegate {
 
     schema.getSimpleTypeOrComplexTypeOrGroup().add(extension);
 
-
     return complexContentExtension;
   }
 
-  private void addConnectionProviderElement(ExplicitGroup all, ConfigurationModel configurationModel) {
+  private Optional<TopLevelElement> addConnectionProviderElement(ConfigurationModel configurationModel) {
     ExtensionModel extensionModel = builder.getExtensionModel();
     if (!extensionModel.getConnectionProviders().isEmpty() || !configurationModel.getConnectionProviders().isEmpty()) {
       TopLevelElement objectElement = new TopLevelElement();
 
-      objectElement.setMinOccurs(getFirstImplicit(extensionModel.getConnectionProviders()) != null ? ZERO : ONE);
+      boolean hasImplicitConnection = getFirstImplicit(extensionModel.getConnectionProviders()) != null
+          || getFirstImplicit(configurationModel.getConnectionProviders()) != null;
 
-      objectElement.setMaxOccurs("1");
+      objectElement.setMinOccurs(hasImplicitConnection ? ZERO : ONE);
+      objectElement.setMaxOccurs(MAX_ONE);
       objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
 
-      all.getParticle().add(objectFactory.createElement(objectElement));
+      return Optional.of(objectElement);
     }
+    return empty();
   }
 
-  private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel) {
+  private Optional<TopLevelElement> addDynamicConfigPolicyElement(ConfigurationModel configurationModel) {
     if (!getDynamicParameters(configurationModel).isEmpty()) {
       TopLevelElement objectElement = new TopLevelElement();
       objectElement.setMinOccurs(ZERO);
       objectElement.setMaxOccurs("1");
       objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
 
-      all.getParticle().add(objectFactory.createElement(objectElement));
+      return Optional.of(objectElement);
     }
+
+    return empty();
   }
 }
