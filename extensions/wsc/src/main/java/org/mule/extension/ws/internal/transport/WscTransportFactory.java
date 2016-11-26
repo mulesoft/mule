@@ -57,8 +57,6 @@ public class WscTransportFactory extends AbstractTransportFactory {
     factory.getFeatures().add(new StaxDataBindingFeature());
     factory.setAddress(address);
     factory.setBus(bus);
-
-    // TODO check protocol Y HACE UN TEST HIJO DE RE MIL PUTA
     factory.setBindingId(getBindingIdForSoapVersion(soapVersion));
 
     return factory.create();
