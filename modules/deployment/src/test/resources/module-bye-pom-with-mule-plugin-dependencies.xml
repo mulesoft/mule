@@ -28,7 +28,6 @@
             <version>1.0</version>
             <classifier>mule-plugin</classifier>
             <scope>provided</scope>
-            <!--BundleDescriptor{groupId='test', artifactId='echoPlugin', version='1.0', type='zip', classifier=Optional[mule-plugin]}-->
         </dependency>
     </dependencies>
 </project>

@@ -35,7 +35,6 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   private Properties properties = new Properties();
   private MulePluginModel mulePluginModel;
 
-
   /**
    * Creates a new builder
    *

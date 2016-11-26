@@ -55,7 +55,6 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
@@ -1520,7 +1519,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deploysWithExtensionXmlPluginWithoutPom() throws Exception {
+  public void deploysWithExtensionXmlPlugin() throws Exception {
     String moduleFileName = "module-bye.xml";
     String extensionName = "bye-extension";
 
@@ -1542,33 +1541,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deploysWithExtensionXmlPluginWithPomWithoutMulePluginDependencies() throws Exception {
-    String moduleFileName = "module-bye.xml";
-    String extensionName = "bye-extension";
-
-    MulePluginModelBuilder builder =
-        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
-    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID)
-        .addProperty(RESOURCE_XML, moduleFileName);
-    builder.withClassLoaderModelDescriber().setId(MAVEN_ID_CLASSLOADER_MODEL_DESCRIPTOR)
-        .addProperty(ArtifactPluginDescriptorFactory.EXPORTED_PACKAGES, Arrays.asList("org.foo"));
-
-    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
-        .containingResource("module-byeSource.xml", moduleFileName)
-        .containingMetaInfResource("module-bye-pom-without-mule-plugin-dependencies.xml", MULE_PLUGIN_POM)
-        .describedBy(builder.build());
-
-    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
-        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-  }
-
-  @Test
-  public void deploysWithExtensionXmlPluginWithPomWithMulePluginDependenciesThatArePresentInTheClasspath() throws Exception {
+  public void deploysWithExtensionXmlPluginWithDependencies() throws Exception {
     String moduleFileName = "module-bye.xml";
     String extensionName = "bye-extension";
 
@@ -1592,33 +1565,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
   }
-
-  @Test
-  public void failsToDeployWithExtensionXmlPluginWithPomWithMulePluginDependenciesThatAreAbsentInTheClasspath() throws Exception {
-    String moduleFileName = "module-bye.xml";
-    String extensionName = "bye-extension";
-
-    MulePluginModelBuilder builder =
-        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
-    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML, moduleFileName);
-    builder.withClassLoaderModelDescriber().setId(MAVEN_ID_CLASSLOADER_MODEL_DESCRIPTOR)
-        .addProperty(ArtifactPluginDescriptorFactory.EXPORTED_PACKAGES, Arrays.asList("org.foo"));
-
-    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
-        .containingResource("module-byeSource.xml", moduleFileName)
-        .containingMetaInfResource("module-bye-pom-with-mule-plugin-dependencies.xml", "pom.xml")
-        .describedBy(builder.build());
-
-    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
-        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see two deploys when it MUST be just one, for some reason tries to redeploy two times so I added until this bug gets fixed
-    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId(), times(2));
-  }
-
 
   @Test
   public void failsToDeployWithExtensionThatHasNonExistingIdForExtensionModel() throws Exception {
@@ -1657,7 +1603,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     startDeployment();
 
-    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see two deploys when it MUST be just one, for some reason tries to redeploy two times so I added until this bug gets fixed
+    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see one deploy, for some reason tries to redeploy two times so I added until this bug gets fixed
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId(), times(2));
   }
 
@@ -1859,7 +1805,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     startDeployment();
 
-    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see two deploys when it MUST be just one, for some reason tries to redeploy two times so I added until this bug gets fixed
+    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see one deploy, for some reason tries to redeploy two times so I added until this bug gets fixed
     assertDeploymentFailure(applicationDeploymentListener, artifactFileBuilder.getId(), times(2));
   }
 

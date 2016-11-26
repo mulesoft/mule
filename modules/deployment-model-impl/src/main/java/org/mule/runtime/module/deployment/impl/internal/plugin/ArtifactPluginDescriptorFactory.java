@@ -31,6 +31,7 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateExcep
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor.Builder;
 import org.mule.runtime.module.artifact.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
@@ -80,9 +81,6 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     return artifactPluginDescriptor;
   }
 
-  /**
-   * // TODO(fernandezlautaro): MULE-11092 once implemented, drop this message and everything around it.
-   */
   private ArtifactPluginDescriptor loadFromPluginProperties(File pluginFolder) {
     final String pluginName = pluginFolder.getName();
     final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginName);
@@ -138,9 +136,6 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     }
   }
 
-  /**
-   * // TODO(fernandezlautaro): MULE-11092 once implemented, drop this.
-   */
   private Set<BundleDependency> getPluginDependencies(String pluginDependencies) {
     Set<BundleDependency> plugins = new HashSet<>();
     final String[] split = pluginDependencies.split(",");
@@ -150,9 +145,6 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     return plugins;
   }
 
-  /**
-   * // TODO(fernandezlautaro): MULE-11092 once implemented, drop this.
-   */
   private BundleDependency createBundleDescriptor(String bundle) {
     String[] bundleProperties = bundle.trim().split(BUNDLE_DESCRIPTOR_SEPARATOR);
 
@@ -162,7 +154,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
       String groupId = bundleProperties[0];
       String artifactId = bundleProperties[1];
       String version = bundleProperties[2];
-      bundleDescriptor = new BundleDescriptor.Builder().setArtifactId(artifactId).setGroupId(groupId).setVersion(version)
+      bundleDescriptor = new Builder().setArtifactId(artifactId).setGroupId(groupId).setVersion(version)
           .setType(EXTENSION_BUNDLE_TYPE).setClassifier(MULE_PLUGIN_CLASSIFIER).build();
     } else if (isNameOnlyDefinedBundle(bundleProperties)) {
       // TODO(pablo.kraan): MULE-10966: remove this once extensions and plugins are properly migrated to the new model
@@ -175,25 +167,16 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     return new BundleDependency.Builder().setDescriptor(bundleDescriptor).setScope(COMPILE).build();
   }
 
-  /**
-   * // TODO(fernandezlautaro): MULE-11092 once implemented, drop this.
-   */
   private boolean isNameOnlyDefinedBundle(String[] bundleProperties) {
     return bundleProperties.length == 1;
   }
 
-  /**
-   * // TODO(fernandezlautaro): MULE-11092 once implemented, drop this.
-   */
   private boolean isFullyDefinedBundle(String[] bundleProperties) {
     return bundleProperties.length == 3;
   }
 
-  /**
-   * // TODO(fernandezlautaro): MULE-11092 once implemented, drop this.
-   */
   private BundleDescriptor createDefaultPluginBundleDescriptor(String pluginName) {
-    return new BundleDescriptor.Builder().setArtifactId(pluginName).setGroupId("test").setVersion("1.0")
+    return new Builder().setArtifactId(pluginName).setGroupId("test").setVersion("1.0")
         .setClassifier(MULE_PLUGIN_CLASSIFIER).setType(EXTENSION_BUNDLE_TYPE).build();
   }
 
@@ -239,6 +222,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   private void loadClassLoaderModelBuilderFromDescriptor(File pluginFolder, ArtifactPluginDescriptor descriptor,
                                                          ClassLoaderModelBuilder classLoaderModelBuilder,
                                                          MulePluginLoaderDescriptor classLoaderModel) {
+    // TODO(fernandezlautaro): MULE-11094 once implemented, the loaders for ClassLoaderModels should be treated dynamically
     if (!classLoaderModel.getId().equals(MAVEN_ID_CLASSLOADER_MODEL_DESCRIPTOR)) {
       throw new ArtifactDescriptorCreateException(format("The identifier '%s' for a class loader model descriptor is not supported (error found while reading plugin '%s')",
                                                          classLoaderModel.getId(), descriptor.getName()));
@@ -259,7 +243,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     final Set<BundleDependency> plugins = model.getDependencies().stream()
         .filter(dependency -> isMulePlugin(dependency))
         .map(dependency -> {
-          final BundleDescriptor.Builder bundleDescriptorBuilder = new BundleDescriptor.Builder()
+          final Builder bundleDescriptorBuilder = new Builder()
               .setArtifactId(dependency.getArtifactId())
               .setGroupId(dependency.getGroupId())
               .setVersion(dependency.getVersion())
@@ -276,7 +260,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
         .collect(Collectors.toSet());
     classLoaderModelBuilder.dependingOn(plugins);
 
-    final BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder()
+    final BundleDescriptor bundleDescriptor = new Builder()
         .setArtifactId(model.getArtifactId())
         .setGroupId(model.getGroupId())
         .setVersion(model.getVersion())
@@ -286,8 +270,14 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     descriptor.setBundleDescriptor(bundleDescriptor);
   }
 
+  /**
+   * Dependency validator to keep those that are Mule plugins.
+   * TODO(fernandezlautaro): MULE-11095 We will keep only Mule plugins dependencies or org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver.getArtifactsWithDependencies() will fail looking them up.
+   *
+   * @param dependency to validate
+   * @return true if the {@link Dependency#getClassifier()} is {@link ArtifactPluginDescriptor#MULE_PLUGIN_CLASSIFIER}, false otherwise
+   */
   private boolean isMulePlugin(Dependency dependency) {
-    // We will keep only Mule plugins dependencies or org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver.getArtifactsWithDependencies() will fail looking them up.
     return MULE_PLUGIN_CLASSIFIER.equals(dependency.getClassifier());
   }
 
