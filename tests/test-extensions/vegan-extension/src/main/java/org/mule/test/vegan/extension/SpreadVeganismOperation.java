@@ -26,6 +26,10 @@ public class SpreadVeganismOperation {
     return policy;
   }
 
+  public FarmedFood getProduction(@Optional @NullSafe(defaultImplementingType = HealthyFood.class) FarmedFood food) {
+    return food;
+  }
+
   public void convinceAnimalKiller(@ParameterGroup("arguments") @Placement(tab = ARGUMENTS_TAB) VeganArguments arguments) {
 
   }

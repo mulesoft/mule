@@ -147,13 +147,14 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
           return;
         }
 
-        if (!parsingContext.isRegistered(name, namespace)) {
-          parsingContext.registerObjectType(name, namespace, type);
-          parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport,
-                               false, acceptsReferences, fieldDsl.get(), emptySet());
+        DslElementSyntax dsl = fieldDsl.get();
+        if (!parsingContext.isRegistered(dsl.getElementName(), dsl.getNamespace())) {
+          parsingContext.registerObjectType(dsl.getElementName(), dsl.getNamespace(), type);
+          parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
+                               dsl, emptySet());
         } else {
           parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
-                      fieldDsl.get(), emptySet());
+                      dsl, emptySet());
         }
       }
 

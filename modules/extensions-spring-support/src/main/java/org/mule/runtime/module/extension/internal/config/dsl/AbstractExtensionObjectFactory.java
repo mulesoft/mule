@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.core.util.func.CompositePredicate;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
@@ -102,8 +104,9 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
           }
 
           if (isNullSafe(p)) {
-            resolver = resolver != null ? resolver : new StaticValueResolver<>(null);
-            resolver = NullSafeValueResolverWrapper.of(resolver, model, p, muleContext);
+            MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+            ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
+            resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
           }
 
           if (resolver != null) {
@@ -196,7 +199,8 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
   private ConfigurationException buildExclusiveParametersException(ParameterizedModel model,
                                                                    Collection<String> definedExclusiveParameters) {
-    return new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+    return new ConfigurationException(
+                                      createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
                                                                  getComponentModelTypeName(model), getModelName(model),
                                                                  Joiner.on(", ").join(definedExclusiveParameters))));
   }

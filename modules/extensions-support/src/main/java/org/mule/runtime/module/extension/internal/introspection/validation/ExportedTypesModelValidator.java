@@ -28,7 +28,6 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Validates that the exported types used as:
@@ -81,7 +80,7 @@ public final class ExportedTypesModelValidator implements ModelValidator {
       public void visitObject(ObjectType objectType) {
         Collection<ObjectFieldType> parameters = objectType.getFields();
         Set<String> fieldsWithGetters =
-            getFieldsWithGetters(parameterType).stream().map(TypeUtils::getAlias).collect(Collectors.toSet());
+            getFieldsWithGetters(parameterType).stream().map(TypeUtils::getAlias).collect(toSet());
         Set<String> parameterWithoutGetters =
             parameters.stream().map(f -> f.getKey().getName().getLocalPart())
                 .filter(fieldName -> !fieldsWithGetters.contains(fieldName)).collect(toSet());

@@ -247,8 +247,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
       @Override
       public void visitObject(ObjectType objectType) {
         DslElementSyntax pojoDsl = dslElement.get();
-        if (pojoDsl.supportsTopLevelDeclaration() ||
-            (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped()) ||
+        if (pojoDsl.supportsTopLevelDeclaration() || (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped()) ||
             parsingContext.getAllSubTypes().contains(objectType)) {
 
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
@@ -312,7 +311,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                           ExtensionParsingContext parsingContext) {
 
     parameters.filter(ExtensionMetadataTypeUtils::isInstantiable)
-        .filter(MetadataTypeUtils::hasExposedFields)
         .forEach(subType -> registerTopLevelParameter(subType,
                                                       definitionBuilder,
                                                       extensionClassLoader,

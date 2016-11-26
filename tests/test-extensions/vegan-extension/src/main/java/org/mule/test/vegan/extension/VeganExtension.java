@@ -10,10 +10,12 @@ package org.mule.test.vegan.extension;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 
 @Extension(name = VeganExtension.VEGAN)
 @Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class, PeachConfig.class, PearConfig.class})
 @Operations(VeganFidelityOperation.class)
+@SubTypeMapping(baseType = FarmedFood.class, subTypes = {RottenFood.class, HealthyFood.class})
 public class VeganExtension {
 
   public static final String VEGAN = "vegan";

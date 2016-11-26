@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.extensions.jms.test.infra;
+
+
+import org.mule.functional.jndi.TestContextFactory;
+
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.NamingException;
+
+public class JmsJndiTestContextFactory extends TestContextFactory {
+
+  public static boolean failWhenRetrievingInitialContext = false;
+
+  @Override
+  protected void populateTestData(Context context) throws NamingException {
+    super.populateTestData(context);
+    context.bind("jms/connectionFactory", new JmsTestConnectionFactory());
+  }
+
+  @Override
+  public Context getInitialContext(Hashtable environment) throws NamingException {
+    if (failWhenRetrievingInitialContext) {
+      throw new NamingException("Initial context not ready");
+    }
+    return super.getInitialContext(environment);
+  }
+
+  @Override
+  public Context getInitialContext() throws NamingException {
+    if (failWhenRetrievingInitialContext) {
+      throw new NamingException("Initial context not ready");
+    }
+    return super.getInitialContext();
+  }
+}

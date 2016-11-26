@@ -12,6 +12,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
@@ -26,6 +27,7 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
 import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
@@ -33,7 +35,10 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
@@ -695,6 +700,11 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                   extensionParameter.getName(), NullSafe.class.getSimpleName()));
       }
 
+      Class<?> defaultType = extensionParameter.getAnnotation(NullSafe.class).get().defaultImplementingType();
+      final boolean hasDefaultOverride = !defaultType.isAssignableFrom(Object.class);
+
+      MetadataType nullSafeType = !hasDefaultOverride ? parameter.getDeclaration().getType() : typeLoader.load(defaultType);
+
       parameter.getDeclaration().getType().accept(new BasicTypeMetadataVisitor() {
 
         @Override
@@ -705,9 +715,62 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                     extensionParameter.getName(), NullSafe.class.getSimpleName(),
                                                                     extensionParameter.getType().getName()));
         }
+
+        @Override
+        public void visitArrayType(ArrayType arrayType) {
+          if (hasDefaultOverride) {
+            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
+                + " but a 'defaultImplementingType' was provided."
+                + " Type override is not allowed for Collections",
+                                                                      extensionParameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      extensionParameter.getType().getName()));
+          }
+        }
+
+        @Override
+        public void visitObject(ObjectType objectType) {
+          if (hasDefaultOverride && isInstantiable(parameter.getDeclaration().getType())) {
+            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
+                + " but a 'defaultImplementingType' was provided."
+                + " Type override is not allowed for concrete types",
+                                                                      extensionParameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      extensionParameter.getType().getName()));
+          }
+
+          if (!isInstantiable(nullSafeType)) {
+            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                + "used with complex instantiable types (Pojos, Lists, Maps)",
+                                                                      extensionParameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      extensionParameter.getType().getName()));
+          }
+
+          if (!getType(parameter.getDeclaration().getType()).isAssignableFrom(getType(nullSafeType))) {
+            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
+                + " is not a subtype of the parameter's type",
+                                                                      extensionParameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      extensionParameter.getType().getName(),
+                                                                      getType(nullSafeType).getName()));
+          }
+        }
+
+        @Override
+        public void visitDictionary(DictionaryType dictionaryType) {
+          if (hasDefaultOverride) {
+            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
+                + " but a 'defaultImplementingType' was provided."
+                + " Type override is not allowed for Maps",
+                                                                      extensionParameter.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      extensionParameter.getType().getName()));
+          }
+        }
       });
 
-      parameter.withModelProperty(new NullSafeModelProperty());
+      parameter.withModelProperty(new NullSafeModelProperty(nullSafeType));
     }
   }
 

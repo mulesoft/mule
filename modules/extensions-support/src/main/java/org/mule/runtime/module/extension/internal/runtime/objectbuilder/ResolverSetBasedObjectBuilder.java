@@ -19,6 +19,8 @@ import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
 import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -35,10 +37,14 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   private final List<ValueSetter> singleValueSetters;
   private final List<ValueSetter> groupValueSetters;
 
+  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ResolverSet resolverSet) {
+    this(prototypeClass, null, resolverSet);
+  }
+
   public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ParameterizedModel model, ResolverSet resolverSet) {
     this.resolverSet = resolverSet;
     singleValueSetters = createSingleValueSetters(prototypeClass, resolverSet);
-    groupValueSetters = GroupValueSetter.settersFor(model);
+    groupValueSetters = model != null ? GroupValueSetter.settersFor(model) : ImmutableList.of();
   }
 
   /**

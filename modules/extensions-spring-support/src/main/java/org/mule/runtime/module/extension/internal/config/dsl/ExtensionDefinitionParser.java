@@ -229,7 +229,14 @@ public abstract class ExtensionDefinitionParser {
           if (isNestedProcessor(objectType)) {
             parseNestedProcessor(parameter);
           } else {
-            parseObjectParameter(parameter, paramDsl);
+            if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getNamespace())) {
+              parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getNamespace(), objectType);
+              parseObjectParameter(parameter, paramDsl);
+            } else {
+              parseObject(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
+                          parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
+                          paramDsl, parameter.getModelProperties());
+            }
           }
         }
 
@@ -651,15 +658,15 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseObjectParameter(ParameterModel parameterModel, DslElementSyntax paramDsl) {
     if (isContent(parameterModel)) {
-      parseFromTextExpression(parameterModel, paramDsl, () -> value -> resolverOf(
-                                                                                  parameterModel.getName(),
-                                                                                  parameterModel.getType(),
-                                                                                  value,
-                                                                                  parameterModel.getDefaultValue(),
-                                                                                  parameterModel.getExpressionSupport(),
-                                                                                  parameterModel.isRequired(),
-                                                                                  parameterModel.getModelProperties(),
-                                                                                  acceptsReferences(parameterModel)));
+      parseFromTextExpression(parameterModel, paramDsl,
+                              () -> value -> resolverOf(parameterModel.getName(),
+                                                        parameterModel.getType(),
+                                                        value,
+                                                        parameterModel.getDefaultValue(),
+                                                        parameterModel.getExpressionSupport(),
+                                                        parameterModel.isRequired(),
+                                                        parameterModel.getModelProperties(),
+                                                        acceptsReferences(parameterModel)));
     } else {
       parseObjectParameter(getKey(parameterModel), parameterModel.getName(), (ObjectType) parameterModel.getType(),
                            parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(), parameterModel.isRequired(),
@@ -688,8 +695,7 @@ public abstract class ExtensionDefinitionParser {
     final String elementNamespace = elementDsl.getNamespace();
     final String elementName = elementDsl.getElementName();
 
-    if (elementDsl.supportsChildDeclaration() && !elementDsl.isWrapped()
-        && !parsingContext.isRegistered(elementName, elementNamespace)) {
+    if (elementDsl.supportsChildDeclaration() && !elementDsl.isWrapped()) {
       try {
         new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), elementName, elementNamespace, type, getContextClassLoader(),
                                       dslResolver, parsingContext, muleContext).parse()

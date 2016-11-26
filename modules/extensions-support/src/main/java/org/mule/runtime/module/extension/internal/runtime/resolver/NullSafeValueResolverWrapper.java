@@ -8,17 +8,20 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ValueHolder;
@@ -47,46 +50,48 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
   /**
    * Creates a new instance
    *
-   * @param delegate           the {@link ValueResolver} to wrap
-   * @param parameterizedModel the model of the group which owns the {@code parameter}
-   * @param parameterModel     the model of the null safe parameter
-   * @param muleContext        the current {@link MuleContext}
-   * @param <T>                the generic type of the produced values
+   * @param delegate    the {@link ValueResolver} to wrap
+   * @param type        the type of the value this resolver returns
+   * @param muleContext the current {@link MuleContext}
+   * @param <T>         the generic type of the produced values
    * @return a new null safe {@link ValueResolver}
    * @throws IllegalParameterModelDefinitionException if used on parameters of not supported types
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate,
-                                        ParameterizedModel parameterizedModel,
-                                        ParameterModel parameterModel,
+                                        MetadataType type,
                                         MuleContext muleContext) {
     checkArgument(delegate != null, "delegate cannot be null");
 
     ValueHolder<ValueResolver> value = new ValueHolder<>();
-    parameterModel.getType().accept(new MetadataTypeVisitor() {
+    type.accept(new MetadataTypeVisitor() {
 
       @Override
       public void visitObject(ObjectType objectType) {
         Class<?> clazz = getType(objectType);
+
+        String requiredFields = objectType.getFields().stream()
+            .filter(ObjectFieldType::isRequired).map(f -> f.getKey().getName().getLocalPart())
+            .collect(joining(", "));
+        if (!isBlank(requiredFields)) {
+          throw new IllegalParameterModelDefinitionException(
+                                                             format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields: [%s]",
+                                                                    clazz.getName(), NullSafe.class.getSimpleName(),
+                                                                    requiredFields));
+        }
+
         ResolverSet resolverSet = new ResolverSet();
+        getFields(clazz).forEach(field -> objectType.getFieldByName(getAlias(field))
+            .ifPresent(objectField -> getDefaultValue(objectField)
+                .ifPresent(defaultValue -> resolverSet.add(field.getName(),
+                                                           new TypeSafeExpressionValueResolver(defaultValue,
+                                                                                               field
+                                                                                                   .getType(),
+                                                                                               muleContext))
 
-        objectType.getFields().forEach(field -> {
-          final Class<?> fieldClass = getType(field.getValue());
-
-          if (field.isRequired()) {
-            throw new IllegalParameterModelDefinitionException(
-                                                               format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields",
-                                                                      clazz.getName(), NullSafe.class.getSimpleName()));
-          }
-
-          getDefaultValue(field).ifPresent(defaultValue -> resolverSet.add(field.getKey().getName().getLocalPart(),
-                                                                           new TypeSafeExpressionValueResolver(defaultValue,
-                                                                                                               fieldClass,
-                                                                                                               muleContext)));
-
-        });
+        )));
 
         ObjectBuilder<T> objectBuilder =
-            new DefaultResolverSetBasedObjectBuilder(clazz, parameterizedModel, resolverSet);
+            new DefaultResolverSetBasedObjectBuilder(clazz, resolverSet);
 
         value.set(new ObjectBuilderValueResolver(objectBuilder));
       }

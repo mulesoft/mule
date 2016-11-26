@@ -5,6 +5,39 @@
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
+    <xs:complexType name="org.mule.test.vegan.extension.FarmedFood">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-farmed-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" abstract="true" name="abstract-farmed-food"></xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.RottenFood">
+        <xs:complexContent>
+            <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.FarmedFood"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.RottenFood" substitutionGroup="vegan:abstract-farmed-food" abstract="true" name="abstract-rotten-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-rotten-food" name="rotten-food">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.RottenFood"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.HealthyFood">
+        <xs:complexContent>
+            <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.FarmedFood"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.HealthyFood" substitutionGroup="vegan:abstract-farmed-food" abstract="true" name="abstract-healthy-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-healthy-food" name="healthy-food">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="pear-config">
         <xs:complexType>
             <xs:complexContent>
@@ -417,6 +450,29 @@
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetProductionType" substitutionGroup="mule:abstract-operator" name="get-production"></xs:element>
+    <xs:complexType name="GetProductionType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
@@ -21,8 +20,8 @@ public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObj
 
   private final Class<T> prototypeClass;
 
-  public DefaultResolverSetBasedObjectBuilder(Class<T> prototypeClass, ParameterizedModel model, ResolverSet resolverSet) {
-    super(prototypeClass, model, resolverSet);
+  public DefaultResolverSetBasedObjectBuilder(Class<T> prototypeClass, ResolverSet resolverSet) {
+    super(prototypeClass, resolverSet);
     this.prototypeClass = prototypeClass;
   }
 

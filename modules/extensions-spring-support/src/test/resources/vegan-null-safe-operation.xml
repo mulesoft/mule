@@ -12,4 +12,8 @@
         <vegan:apply-policy/>
     </flow>
 
+    <flow name="implementingType">
+        <vegan:get-production/>
+    </flow>
+
 </mule>

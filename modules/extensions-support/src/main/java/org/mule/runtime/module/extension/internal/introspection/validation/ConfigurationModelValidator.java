@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 
 import java.util.Optional;
 
@@ -43,14 +46,14 @@ public final class ConfigurationModelValidator implements ModelValidator {
               .map(modelProperty -> getType(modelProperty.getConfigType()));
 
           if (operationConfigParameterType.isPresent() && !operationConfigParameterType.get().isAssignableFrom(configType)) {
-            throw new IllegalConfigurationModelDefinitionException(String.format(
-                                                                                 "Extension '%s' defines operation '%s' which requires a configuration of type '%s'. However, the operation is "
-                                                                                     + "reachable from configuration '%s' of incompatible type '%s'.",
-                                                                                 model.getName(),
-                                                                                 operationModel.getName(),
-                                                                                 operationConfigParameterType.get().getName(),
-                                                                                 ((ConfigurationModel) owner).getName(),
-                                                                                 configType.getName()));
+            throw new IllegalConfigurationModelDefinitionException(format(
+                                                                          "Extension '%s' defines operation '%s' which requires a configuration of type '%s'. However, the operation is "
+                                                                              + "reachable from configuration '%s' of incompatible type '%s'.",
+                                                                          model.getName(),
+                                                                          operationModel.getName(),
+                                                                          operationConfigParameterType.get().getName(),
+                                                                          ((ConfigurationModel) owner).getName(),
+                                                                          configType.getName()));
           }
         }
       }
