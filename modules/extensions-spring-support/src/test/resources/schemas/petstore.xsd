@@ -13,7 +13,7 @@
                     <xs:annotation>
                         <xs:documentation>Default configuration</xs:documentation>
                     </xs:annotation>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:sequence minOccurs="1" maxOccurs="1">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
@@ -60,7 +60,7 @@
     <xs:complexType name="org.mule.test.petstore.extension.PetCage">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:sequence>
+              <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="birds">
                         <xs:complexType>
                             <xs:sequence>
@@ -104,7 +104,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
@@ -145,7 +145,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                     <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
                         <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
@@ -187,7 +187,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                      <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
@@ -340,7 +340,7 @@
     <xs:complexType name="GetForbiddenPetsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+                 <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="forbidden-pets">
                         <xs:complexType>
                             <xs:sequence>

@@ -83,17 +83,17 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     final Map<Class<?>, String> extensions = new LinkedHashMap<Class<?>, String>() {
 
       {
-        put(HeisenbergExtension.class, "heisenberg.xsd");
-        put(TestConnector.class, "basic.xsd");
-        put(GlobalPojoConnector.class, "global-pojo.xsd");
-        put(GlobalInnerPojoConnector.class, "global-inner-pojo.xsd");
         put(MapConnector.class, "map.xsd");
         put(ListConnector.class, "list.xsd");
+        put(TestConnector.class, "basic.xsd");
         put(StringListConnector.class, "string-list.xsd");
+        put(GlobalPojoConnector.class, "global-pojo.xsd");
+        put(GlobalInnerPojoConnector.class, "global-inner-pojo.xsd");
         put(VeganExtension.class, "vegan.xsd");
-        put(SubTypesMappingConnector.class, "subtypes.xsd");
         put(PetStoreConnector.class, "petstore.xsd");
         put(MetadataExtension.class, "metadata.xsd");
+        put(HeisenbergExtension.class, "heisenberg.xsd");
+        put(SubTypesMappingConnector.class, "subtypes.xsd");
       }
     };
 

@@ -36,11 +36,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.VoidType;
@@ -98,6 +93,8 @@ import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import com.google.common.reflect.TypeToken;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -107,6 +104,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -199,7 +201,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getAllParameters(), hasSize(29));
+    assertThat(configuration.getAllParameters(), hasSize(30));
     assertParameter(configuration.getAllParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED,
                     null);
   }
@@ -339,7 +341,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getAllParameters();
-    assertThat(parameters, hasSize(28));
+    assertThat(parameters, hasSize(29));
 
     assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);

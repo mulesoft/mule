@@ -46,12 +46,13 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT,
     minMuleVersion = "4.1")
@@ -91,9 +92,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @ConfigName
   private String configName;
 
-  @ParameterGroup(PERSONAL_INFORMATION_GROUP_NAME)
-  private PersonalInfo personalInfo = new PersonalInfo();
-
   @Parameter
   @Optional
   private List<PersonalInfo> familyInformations;
@@ -117,6 +115,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   @ParameterGroup(RICIN_GROUP_NAME)
   private RicinGroup ricinGroup;
+
+  @ParameterGroup(PERSONAL_INFORMATION_GROUP_NAME)
+  private PersonalInfo personalInfo = new PersonalInfo();
 
   @Parameter
   private BigDecimal money;

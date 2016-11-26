@@ -12,10 +12,10 @@ import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.GROUP_SUFFIX;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -60,9 +61,11 @@ abstract class ExecutableTypeSchemaDelegate {
   protected final SchemaBuilder builder;
   protected final ObjectFactory objectFactory = new ObjectFactory();
   private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
+  private final DslSyntaxResolver dsl;
 
   ExecutableTypeSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
+    this.dsl = builder.getDslResolver();
   }
 
   protected ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
@@ -81,42 +84,58 @@ abstract class ExecutableTypeSchemaDelegate {
       complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
     }
 
-    final ExplicitGroup all = new ExplicitGroup();
-    complexContentExtension.setSequence(all);
+    Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
+    parameterizedModel.getParameterGroupModels()
+        .forEach(g -> {
+          LinkedHashMap<String, TopLevelElement> childElements = new LinkedHashMap<>();
+          g.getParameterModels().forEach(parameter -> {
+            DslElementSyntax paramDsl = dsl.resolve(parameter);
+            MetadataType parameterType = parameter.getType();
 
-    for (final ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
-      MetadataType parameterType = parameterModel.getType();
+            if (isOperation(parameterType)) {
+              String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
+              childElements.put(paramDsl.getElementName(), generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
+            } else {
+              this.builder.declareAsParameter(parameterType, complexContentExtension, parameter, paramDsl, childElements);
+            }
+          });
 
-      if (isOperation(parameterType)) {
-        String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : "1";
-        generateNestedProcessorElement(all, parameterModel, maxOccurs);
-      } else {
-        builder.declareAsParameter(parameterType, complexContentExtension, all, parameterModel);
-      }
-    }
+          groups.put(g.getName(), childElements);
+        });
 
-    if (all.getParticle().isEmpty()) {
+
+    if (groups.isEmpty() || groups.values().stream().allMatch(Map::isEmpty)) {
       complexContentExtension.setSequence(null);
+    } else {
+      final ExplicitGroup all = new ExplicitGroup();
+      all.setMinOccurs(ZERO);
+      all.setMaxOccurs(MAX_ONE);
+
+      builder.addOrderedParameterGroupsToSequence(groups, all);
+
+      complexContentExtension.setSequence(all);
     }
 
-    builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+    this.builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
 
     return complexContentExtension;
   }
 
-  private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs) {
+  private TopLevelElement generateNestedProcessorElement(DslElementSyntax paramDsl, ParameterModel parameterModel,
+                                                         String maxOccurs) {
     LocalComplexType collectionComplexType = new LocalComplexType();
     GroupRef group = generateNestedProcessorGroup(parameterModel, maxOccurs);
     collectionComplexType.setGroup(group);
     collectionComplexType.setAnnotation(builder.createDocAnnotation(parameterModel.getDescription()));
 
     TopLevelElement collectionElement = new TopLevelElement();
-    collectionElement.setName(hyphenize(parameterModel.getName()));
+    collectionElement.setName(paramDsl.getElementName());
     collectionElement.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
     collectionElement.setMaxOccurs(maxOccurs);
     collectionElement.setComplexType(collectionComplexType);
     collectionElement.setAnnotation(builder.createDocAnnotation(EMPTY));
-    all.getParticle().add(objectFactory.createElement(collectionElement));
+
+    return collectionElement;
   }
 
   private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs) {

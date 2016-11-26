@@ -7,14 +7,14 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ZERO;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.DISABLE_VALIDATION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -28,6 +28,9 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Lo
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Builder delegation class to generate a XSD schema that describes a {@link ConnectionProviderModel}
  *
@@ -39,11 +42,11 @@ final class ConnectionProviderSchemaDelegate {
   private final SchemaBuilder builder;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  public ConnectionProviderSchemaDelegate(SchemaBuilder builder) {
+  ConnectionProviderSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
   }
 
-  public void registerConnectionProviderElement(ConnectionProviderModel providerModel, DslElementSyntax elementSyntax) {
+  void registerConnectionProviderElement(ConnectionProviderModel providerModel, DslElementSyntax elementSyntax) {
     Element providerElement = new TopLevelElement();
     providerElement.setName(elementSyntax.getElementName());
     providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
@@ -60,25 +63,33 @@ final class ConnectionProviderSchemaDelegate {
 
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
 
-    final ExplicitGroup choice = new ExplicitGroup();
-    choice.setMinOccurs(ZERO);
-    choice.setMaxOccurs(UNBOUNDED);
 
-    builder.addRetryPolicy(choice);
+    final ExplicitGroup sequence = new ExplicitGroup();
+    sequence.setMinOccurs(ZERO);
+    sequence.setMaxOccurs(MAX_ONE);
+
+    builder.addRetryPolicy(sequence);
     ConnectionManagementType managementType = providerModel.getConnectionManagementType();
     if (managementType == POOLING || managementType == CACHED) {
       addValidationFlag(providerType);
     }
     if (managementType == POOLING) {
-      addConnectionProviderPoolingProfile(choice);
+      addConnectionProviderPoolingProfile(sequence);
     }
 
-    builder.registerParameters(providerType, choice, providerModel.getAllParameterModels());
+    Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
+    providerModel.getParameterGroupModels()
+        .forEach(g -> groups.put(g.getName(), builder.registerParameters(providerType, g.getParameterModels())));
+
+    builder.addOrderedParameterGroupsToSequence(groups, sequence);
+
+    providerType.setSequence(sequence);
+
   }
 
-  private void addConnectionProviderPoolingProfile(ExplicitGroup choice) {
+  private void addConnectionProviderPoolingProfile(ExplicitGroup sequence) {
     TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, false);
-    choice.getParticle().add(objectFactory.createElement(objectElement));
+    sequence.getParticle().add(objectFactory.createElement(objectElement));
   }
 
   private void addValidationFlag(ExtensionType providerType) {

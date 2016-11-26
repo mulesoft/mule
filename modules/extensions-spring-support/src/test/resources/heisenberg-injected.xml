@@ -18,14 +18,14 @@
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
         <heisenberg:ricin-packs>
             <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
-        </heisenberg:next-door>
     </heisenberg:config>
 
     <heisenberg:config name="dynamicAgeHeisenberg"
@@ -41,17 +41,17 @@
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
         <heisenberg:ricin-packs>
             <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
-        </heisenberg:next-door>
-        <heisenberg:monthly-incomes>
-            <heisenberg:monthly-income value="12000"/>
-            <heisenberg:monthly-income value="500"/>
-        </heisenberg:monthly-incomes>
     </heisenberg:config>
 </mule>

@@ -20,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class PersonalInfo {
 
@@ -55,6 +56,14 @@ public class PersonalInfo {
   @Expression(NOT_SUPPORTED)
   @Placement(order = 6)
   private Calendar dateOfGraduation;
+
+  @Parameter
+  @Placement(order = 7)
+  private List<String> knownAddresses;
+
+  public List<String> getKnownAddresses() {
+    return knownAddresses;
+  }
 
   public PersonalInfo() {}
 

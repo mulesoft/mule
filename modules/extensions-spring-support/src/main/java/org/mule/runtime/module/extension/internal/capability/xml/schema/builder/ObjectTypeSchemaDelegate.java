@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayou
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
@@ -26,9 +27,11 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ElementDslModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -56,9 +59,11 @@ final class ObjectTypeSchemaDelegate {
   private final Map<String, TopLevelElement> registeredGlobalElementTypes = new LinkedHashMap<>();
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final SchemaBuilder builder;
+  private final DslSyntaxResolver dsl;
 
   ObjectTypeSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
+    this.dsl = builder.getDslResolver();
   }
 
   /**
@@ -66,7 +71,6 @@ final class ObjectTypeSchemaDelegate {
    * will vary depending on the properties of the type itself along with the properties associated to the parameter.
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
-   *
    * @param type        the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
    * @param paramDsl    the {@link ElementDslModel} associated to the parameter, if any is present.
@@ -74,7 +78,7 @@ final class ObjectTypeSchemaDelegate {
    * @param all         the {@link ExplicitGroup group} the generated element should belong to
    */
   void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ElementDslModel paramDsl,
-                           String description, ExplicitGroup all) {
+                           String description, Map<String, TopLevelElement> all) {
 
     if (paramSyntax.supportsChildDeclaration()) {
       if (builder.isImported(type)) {
@@ -96,14 +100,17 @@ final class ObjectTypeSchemaDelegate {
     }
   }
 
-  private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description, ExplicitGroup all) {
+  private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description,
+                                 Map<String, TopLevelElement> all) {
     registerPojoComplexType(objectType, null, description);
     String typeName = getBaseTypeName(objectType);
     QName localQName = new QName(paramDsl.getNamespaceUri(), typeName, paramDsl.getNamespace());
-    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(), all);
+    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(), !paramDsl.supportsAttributeDeclaration(),
+                                 all);
   }
 
-  private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description, ExplicitGroup all) {
+  private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description,
+                                Map<String, TopLevelElement> all) {
     registerPojoSubtypes(objectType, builder.getSubTypesMapping().getSubTypes(objectType));
     addAbstractTypeRef(paramDsl, description, objectType, all);
   }
@@ -111,15 +118,17 @@ final class ObjectTypeSchemaDelegate {
   /**
    * Adds a new {@link TopLevelElement element} to the {@link ExplicitGroup group} {@code all}
    */
-  private void addChildElementTypeExtension(QName base, String description, String name, ExplicitGroup all) {
-    TopLevelElement objectElement = builder.createTopLevelElement(name, ZERO, "1");
+  private void addChildElementTypeExtension(QName base, String description, String name, boolean required,
+                                            Map<String, TopLevelElement> all) {
+    TopLevelElement objectElement = builder.createTopLevelElement(name, required ? ONE : ZERO, MAX_ONE);
     objectElement.setAnnotation(builder.createDocAnnotation(description));
     objectElement.setComplexType(createTypeExtension(base));
-    all.getParticle().add(objectFactory.createElement(objectElement));
+
+    all.put(name, objectElement);
   }
 
   private void addImportedTypeElement(DslElementSyntax paramDsl, String description, MetadataType metadataType,
-                                      ExplicitGroup all) {
+                                      Map<String, TopLevelElement> all) {
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(metadataType)
         .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] is not eligible for Import",
@@ -127,7 +136,7 @@ final class ObjectTypeSchemaDelegate {
 
     if (paramDsl.isWrapped()) {
 
-      TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(), ZERO, "1");
+      TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(), ZERO, MAX_ONE);
       objectElement.setComplexType(new LocalComplexType());
       objectElement.setAnnotation(builder.createDocAnnotation(description));
 
@@ -138,27 +147,31 @@ final class ObjectTypeSchemaDelegate {
       } else {
         ExplicitGroup sequence = new ExplicitGroup();
         sequence.setMinOccurs(ONE);
-        sequence.setMaxOccurs("1");
+        sequence.setMaxOccurs(MAX_ONE);
 
         QName refQName = new QName(paramDsl.getNamespaceUri(), getAbstractElementName(typeDsl), paramDsl.getNamespace());
         sequence.getParticle().add(objectFactory.createElement(builder.createRefElement(refQName, false)));
         objectElement.getComplexType().setSequence(sequence);
       }
 
-      all.getParticle().add(objectFactory.createElement(objectElement));
+      all.put(paramDsl.getElementName(), objectElement);
 
     } else {
       QName extensionBase = new QName(typeDsl.getNamespaceUri(), sanitizeName(getId(metadataType)), typeDsl.getNamespace());
-      addChildElementTypeExtension(extensionBase, description, paramDsl.getElementName(), all);
+      addChildElementTypeExtension(extensionBase, description, paramDsl.getElementName(),
+                                   !paramDsl.supportsAttributeDeclaration(), all);
     }
   }
 
-  private void addAbstractTypeRef(DslElementSyntax paramDsl, String description, MetadataType metadataType, ExplicitGroup all) {
-    TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(), ZERO, "1");
+  private void addAbstractTypeRef(DslElementSyntax paramDsl, String description, MetadataType metadataType,
+                                  Map<String, TopLevelElement> all) {
+    TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(),
+                                                                  paramDsl.supportsAttributeDeclaration() ? ZERO : ONE,
+                                                                  MAX_ONE);
     objectElement.setAnnotation(builder.createDocAnnotation(description));
     objectElement.setComplexType(createComplexTypeWithAbstractElementRef(metadataType));
 
-    all.getParticle().add(objectFactory.createElement(objectElement));
+    all.put(paramDsl.getElementName(), objectElement);
   }
 
 
@@ -170,11 +183,11 @@ final class ObjectTypeSchemaDelegate {
 
     LocalComplexType complexType = new LocalComplexType();
     if (typeDsl.isWrapped()) {
-      complexType.setChoice(builder.createTypeRefChoiceLocalOrGlobal(typeDsl, type, ONE, "1"));
+      complexType.setChoice(builder.createTypeRefChoiceLocalOrGlobal(typeDsl, type, ONE, MAX_ONE));
     } else {
       ExplicitGroup sequence = new ExplicitGroup();
       sequence.setMinOccurs(ONE);
-      sequence.setMaxOccurs("1");
+      sequence.setMaxOccurs(MAX_ONE);
 
       sequence.getParticle().add(objectFactory.createElement(createRefToLocalElement(typeDsl, type)));
       complexType.setSequence(sequence);
@@ -287,18 +300,26 @@ final class ObjectTypeSchemaDelegate {
 
     complexContent.setExtension(extension);
 
-    for (ObjectFieldType field : fields) {
-      final ExplicitGroup all = getOrCreateSequenceGroup(extension);
-
+    LinkedHashMap<String, TopLevelElement> childElements = new LinkedHashMap<>();
+    fields.forEach(field -> {
       if (isParameterGroupAtPojoLevel(field)) {
-        ((ObjectType) field.getValue()).getFields().forEach(subField -> declareObjectField(subField, extension, all));
-      } else {
-        declareObjectField(field, extension, all);
-      }
+        ((ObjectType) field.getValue()).getFields().forEach(
+                                                            subField -> declareObjectField(subField, extension, childElements));
 
-      if (all.getParticle().isEmpty()) {
-        extension.setSequence(null);
+      } else {
+        declareObjectField(field, extension, childElements);
       }
+    });
+
+    if (!childElements.isEmpty()) {
+      final ExplicitGroup all = new ExplicitGroup();
+      all.setMaxOccurs(MAX_ONE);
+
+      boolean requiredChilds = childElements.values().stream().anyMatch(builder::isRequired);
+      all.setMinOccurs(requiredChilds ? ONE : ZERO);
+
+      childElements.values().forEach(p -> all.getParticle().add(objectFactory.createElement(p)));
+      extension.setSequence(all);
     }
 
     return complexType;
@@ -308,8 +329,11 @@ final class ObjectTypeSchemaDelegate {
     return field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
   }
 
-  private void declareObjectField(ObjectFieldType field, ExtensionType extension, ExplicitGroup all) {
-    builder.declareAsParameter(field.getValue(), extension, all, asParameter(field));
+  private void declareObjectField(ObjectFieldType field, ExtensionType extension, Map<String, TopLevelElement> all) {
+    ParameterModel parameter = asParameter(field);
+    DslElementSyntax paramDsl = dsl.resolve(parameter);
+
+    builder.declareAsParameter(field.getValue(), extension, parameter, paramDsl, all);
   }
 
   private void registerPojoGlobalElements(DslElementSyntax typeDsl, ObjectType type, ObjectType baseType, String description) {
@@ -439,14 +463,6 @@ final class ObjectTypeSchemaDelegate {
                                        null, getLayoutModel(field).orElse(null), emptySet());
   }
 
-  private ExplicitGroup getOrCreateSequenceGroup(ExtensionType extension) {
-    ExplicitGroup all = extension.getSequence();
-    if (all == null) {
-      all = new ExplicitGroup();
-      extension.setSequence(all);
-    }
-    return all;
-  }
 
   void registerPojoSubtypes(SubTypesModel subTypesModel) {
     registerPojoSubtypes(subTypesModel.getBaseType(), subTypesModel.getSubTypes());

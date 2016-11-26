@@ -29,17 +29,15 @@
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
-        </heisenberg:next-door>
-        <heisenberg:ricin-packs>
-            <heisenberg:ricin microgramsPerKilo="22">
-                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin>
-        </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
-        </heisenberg:next-door>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:recipes>
+            <heisenberg:recipe key="methylamine" value="75"/>
+            <heisenberg:recipe key="pseudoephedrine" value="0"/>
+            <heisenberg:recipe key="P2P" value="25"/>
+        </heisenberg:recipes>
         <heisenberg:deaths-by-seasons>
             <heisenberg:deaths-by-season key="s01">
                 <heisenberg:deaths-by-season-item value="emilio"/>
@@ -48,22 +46,6 @@
             <heisenberg:deaths-by-season key="s02" value="#[['some', 'other']]"/>
             <heisenberg:deaths-by-season key="s02" value="#[['tuco', 'tortuga']]"/>
         </heisenberg:deaths-by-seasons>
-        <heisenberg:labeled-ricins>
-            <heisenberg:labeled-ricin key="pojo">
-                <heisenberg:ricin microgramsPerKilo="22">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-                </heisenberg:ricin>
-            </heisenberg:labeled-ricin>
-        </heisenberg:labeled-ricins>
-        <heisenberg:recipes>
-            <heisenberg:recipe key="methylamine" value="75"/>
-            <heisenberg:recipe key="pseudoephedrine" value="0"/>
-            <heisenberg:recipe key="P2P" value="25"/>
-        </heisenberg:recipes>
-        <heisenberg:monthly-incomes>
-            <heisenberg:monthly-income value="12000"/>
-            <heisenberg:monthly-income value="500"/>
-        </heisenberg:monthly-incomes>
         <heisenberg:weapon-value-maps>
             <heisenberg:weapon-value-map key="first">
                 <heisenberg:ricin microgramsPerKilo="22">
@@ -83,6 +65,21 @@
             <heisenberg:health-progression value="CANCER"/>
             <heisenberg:health-progression value="DEAD"/>
         </heisenberg:health-progressions>
+        <heisenberg:labeled-ricins>
+            <heisenberg:labeled-ricin key="pojo">
+                <heisenberg:ricin microgramsPerKilo="22">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:labeled-ricin>
+        </heisenberg:labeled-ricins>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin>
+        </heisenberg:ricin-packs>
     </heisenberg:config>
 
     <heisenberg:config name="heisenbergWithPlaceHolders"
@@ -104,19 +101,19 @@
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
         </heisenberg:enemies>
-        <heisenberg:ricin-packs>
-            <heisenberg:ricin microgramsPerKilo="${microgramsPerKilo}">
-                <heisenberg:destination victim="${lidia}" address="${steviaCoffeShop}"/>
-            </heisenberg:ricin>
-        </heisenberg:ricin-packs>
-        <heisenberg:next-door address="${pollosHermanos}" victim="${fring}">
-                <heisenberg:previous victim="${krazy8}" address="${jesseAddress}"/>
-        </heisenberg:next-door>
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>
         </heisenberg:monthly-incomes>
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
+        <heisenberg:next-door address="${pollosHermanos}" victim="${fring}">
+            <heisenberg:previous victim="${krazy8}" address="${jesseAddress}"/>
+        </heisenberg:next-door>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin microgramsPerKilo="${microgramsPerKilo}">
+                <heisenberg:destination victim="${lidia}" address="${steviaCoffeShop}"/>
+            </heisenberg:ricin>
+        </heisenberg:ricin-packs>
     </heisenberg:config>
 
     <heisenberg:config name="heisenbergByRef"
@@ -160,15 +157,15 @@
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>
         </heisenberg:enemies>
+        <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
+        <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
+            <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
+        </heisenberg:next-door>
         <heisenberg:ricin-packs>
             <heisenberg:ricin microgramsPerKilo="#[microgramsPerKilo]">
                 <heisenberg:destination victim="#[lidia]" address="#[steviaCoffeShop]"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
-            <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
-        </heisenberg:next-door>
-        <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenbergByRef"

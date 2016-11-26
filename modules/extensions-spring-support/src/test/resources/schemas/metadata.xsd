@@ -134,7 +134,7 @@
                     <xs:annotation>
                         <xs:documentation>Default configuration</xs:documentation>
                     </xs:annotation>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                      <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                     </xs:sequence>
@@ -149,7 +149,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                   <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     </xs:sequence>
                 </xs:extension>
@@ -234,7 +234,7 @@
     <xs:complexType name="ContentAndOutputMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -254,7 +254,7 @@
     <xs:complexType name="ContentMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+             <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -359,7 +359,7 @@
     <xs:complexType name="FailWithResolvingExceptionType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+                         <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -412,7 +412,7 @@
     <xs:complexType name="MetadataKeyWithDefaultValueType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -471,7 +471,7 @@
     <xs:complexType name="OutputMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -492,7 +492,7 @@
     <xs:complexType name="OutputMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -548,7 +548,7 @@
     <xs:complexType name="ShouldInheritExtensionResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -564,7 +564,7 @@
     <xs:complexType name="ShouldInheritOperationParentResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -580,7 +580,7 @@
     <xs:complexType name="ShouldInheritOperationResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
@@ -636,7 +636,7 @@
     <xs:complexType name="ContentParameterShouldNotGenerateListChildElementType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="contents">
                         <xs:complexType>
                             <xs:sequence>
@@ -657,7 +657,7 @@
     <xs:complexType name="ContentParameterShouldNotGenerateMapChildElementType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-content"></xs:element>
                 </xs:sequence>
             </xs:extension>
@@ -667,7 +667,7 @@
     <xs:complexType name="ContentParameterShouldNotGeneratePojoChildElementType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="animal-content">
                         <xs:complexType>
                             <xs:complexContent>
@@ -684,7 +684,7 @@
     <xs:complexType name="DoQueryType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">
@@ -749,7 +749,7 @@
     <xs:complexType name="PagedOperationMetadataType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="animal">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -799,7 +799,7 @@
     <xs:complexType name="TypeWithDeclaredSubtypesMetadataType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="plain-shape">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
