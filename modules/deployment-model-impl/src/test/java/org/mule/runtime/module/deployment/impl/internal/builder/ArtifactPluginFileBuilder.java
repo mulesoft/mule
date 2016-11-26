@@ -35,6 +35,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   private Properties properties = new Properties();
   private MulePluginModel mulePluginModel;
 
+
   /**
    * Creates a new builder
    *
@@ -107,6 +108,19 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
     resources.add(new ZipResource(resourceFile, "classes/" + alias));
+    return this;
+  }
+
+  /**
+   * Adds a resource file to the application {@link ArtifactPluginDescriptor#META_INF} folder.
+   *
+   * @param resourceFile resource file from a external file or test resource.
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder containingMetaInfResource(String resourceFile, String alias) {
+    checkImmutable();
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+    resources.add(new ZipResource(resourceFile, META_INF + "/" + alias));
     return this;
   }
 

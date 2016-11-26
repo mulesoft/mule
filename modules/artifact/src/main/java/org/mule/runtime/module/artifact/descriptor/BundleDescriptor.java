@@ -128,7 +128,7 @@ public class BundleDescriptor {
      * @return the builder
      */
     public BundleDescriptor.Builder setVersion(String version) {
-      validateIsNotEmpty(version, ARTIFACT_ID);
+      validateIsNotEmpty(version, VERSION);
       bundleDependency.version = version;
       return this;
     }
