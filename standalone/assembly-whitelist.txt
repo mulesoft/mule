@@ -175,6 +175,7 @@
 /mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}.zip
 
 #
 # /services
