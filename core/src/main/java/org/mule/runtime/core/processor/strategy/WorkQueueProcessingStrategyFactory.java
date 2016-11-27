@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.Scheduler;
@@ -78,8 +79,8 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
 
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-
+                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
+                                                                   MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
           .doOnNext(assertCanProcessAsync())
           .publishOn(fromExecutorService(scheduler))

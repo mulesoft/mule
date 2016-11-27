@@ -30,7 +30,7 @@ public interface ProcessingStrategy {
    */
   default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-    return publisher -> from(publisher).transform(pipelineFunction);
+    return onPipeline(flowConstruct, pipelineFunction, flowConstruct.getExceptionListener());
   }
 
   /**
@@ -44,7 +44,7 @@ public interface ProcessingStrategy {
   default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                   MessagingExceptionHandler messagingExceptionHandler) {
-    return onPipeline(flowConstruct, pipelineFunction);
+    return publisher -> from(publisher).transform(pipelineFunction);
   }
 
 
