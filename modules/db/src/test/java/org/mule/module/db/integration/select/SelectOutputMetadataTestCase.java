@@ -74,12 +74,14 @@ public class SelectOutputMetadataTestCase extends AbstractDbIntegrationTestCase
         assertEquals(implementationClass, listMetaDataModel.getImplementationClass());
         DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
 
-        assertThat(mapDataModel.getKeys().size(), equalTo(3));
+        assertThat(mapDataModel.getKeys().size(), equalTo(4));
         MetaDataModel id = mapDataModel.getValueMetaDataModel("ID");
         assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldOutputMetaDataType()));
         MetaDataModel type = mapDataModel.getValueMetaDataModel("POSITION");
         assertThat(type.getDataType(), equalTo(testDatabase.getPositionFieldOutputMetaDataType()));
         MetaDataModel data = mapDataModel.getValueMetaDataModel("NAME");
         assertThat(data.getDataType(), equalTo(DataType.STRING));
+        MetaDataModel description = mapDataModel.getValueMetaDataModel("DESCRIPTION");
+        assertThat(description.getDataType(), equalTo(testDatabase.getDescriptionFieldOutputMetaDataType()));
     }
 }

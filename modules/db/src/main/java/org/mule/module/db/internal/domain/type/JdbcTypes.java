@@ -44,7 +44,7 @@ public class JdbcTypes
     public static final DbType STRUCT_DB_TYPE = new ResolvedDbType(Types.STRUCT, "STRUCT");
     public static final DbType ARRAY_DB_TYPE = new ArrayResolvedDbType(Types.ARRAY, "ARRAY");
     public static final DbType BLOB_DB_TYPE = new ResolvedDbType(Types.BLOB, "BLOB");
-    public static final DbType CLOB_DB_TYPE = new ResolvedDbType(Types.CLOB, "CLOB");
+    public static final DbType CLOB_DB_TYPE = new ClobResolvedDataType(Types.CLOB, "CLOB");
     public static final DbType REF_DB_TYPE = new ResolvedDbType(Types.REF, "REF");
     public static final DbType DATALINK_DB_TYPE = new ResolvedDbType(Types.DATALINK, "DATALINK");
     public static final DbType BOOLEAN_DB_TYPE = new ResolvedDbType(Types.BOOLEAN, "BOOLEAN");
