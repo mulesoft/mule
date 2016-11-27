@@ -29,7 +29,7 @@ public class OracleTestDatabase extends AbstractTestDatabase {
   @Override
   public void createPlanetTable(Connection connection) throws SQLException {
     executeDdl(connection,
-               "CREATE TABLE PLANET(ID INTEGER NOT NULL PRIMARY KEY,POSITION SMALLINT, NAME VARCHAR(255), PICTURE BLOB)");
+               "CREATE TABLE PLANET(ID INTEGER NOT NULL PRIMARY KEY,POSITION SMALLINT, NAME VARCHAR(255), PICTURE BLOB, DESCRIPTION CLOB)");
 
     executeDdl(connection, "CREATE SEQUENCE PLANET_SEQ INCREMENT BY 1 START WITH 1");
 
@@ -65,6 +65,17 @@ public class OracleTestDatabase extends AbstractTestDatabase {
   public void createStoredProcedureUpdateTestType1(DataSource dataSource) throws SQLException {
     final String sql = "CREATE OR REPLACE PROCEDURE updateTestType1 (p_retVal OUT INTEGER)\n" + "AS\n" + "BEGIN\n"
         + "  UPDATE PLANET SET NAME='Mercury' WHERE POSITION=4;\n" + "   p_retVal := SQL%ROWCOUNT;\n" + "END;";
+
+    createStoredProcedure(dataSource, sql);
+  }
+
+  @Override
+  public void createStoredProcedureParameterizedUpdatePlanetDescription(DataSource dataSource) throws SQLException {
+    final String sql = "CREATE OR REPLACE PROCEDURE updatePlanetDescription (p_name IN VARCHAR2, p_description CLOB)\n" +
+        "AS\n" +
+        "BEGIN\n" +
+        "  UPDATE PLANET SET DESCRIPTION=p_description WHERE name=p_name;\n" +
+        "END;";
 
     createStoredProcedure(dataSource, sql);
   }

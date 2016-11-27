@@ -10,6 +10,7 @@ package org.mule.extension.db.integration.model.derbyutil;
 import org.mule.extension.db.integration.model.ContactDetails;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -51,6 +52,19 @@ public class DerbyTestStoredProcedure {
     try {
       Statement ps1 = conn.createStatement();
       ps1.executeUpdate("UPDATE PLANET SET NAME='" + name + "' WHERE POSITION=4");
+    } finally {
+      conn.close();
+    }
+  }
+
+  public static void updatePlanetDescription(String name, Clob description) throws SQLException {
+    Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+    try {
+      PreparedStatement ps1 = conn.prepareStatement("UPDATE PLANET SET DESCRIPTION=? WHERE NAME=?");
+      ps1.setClob(1, description);
+      ps1.setString(2, name);
+      ps1.execute();
     } finally {
       conn.close();
     }

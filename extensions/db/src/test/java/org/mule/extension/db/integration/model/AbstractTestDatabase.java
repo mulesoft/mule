@@ -315,6 +315,8 @@ public abstract class AbstractTestDatabase {
 
   public abstract void createStoredProcedureUpdateTestType1(DataSource dataSource) throws SQLException;
 
+  public abstract void createStoredProcedureParameterizedUpdatePlanetDescription(DataSource dataSource) throws SQLException;
+
   public abstract void createStoredProcedureParameterizedUpdateTestType1(DataSource dataSource) throws SQLException;
 
   public abstract void createStoredProcedureCountRecords(DataSource dataSource) throws SQLException;
@@ -359,6 +361,10 @@ public abstract class AbstractTestDatabase {
 
   public MetadataType getNameFieldMetaDataType() {
     return typeBuilder.stringType().build();
+  }
+
+  public Object getDescriptionFieldMetaDataType() {
+    return typeBuilder.objectType().build();
   }
 
   public Class getIdFieldJavaClass() {

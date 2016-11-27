@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 
 import java.sql.Blob;
+import java.sql.Clob;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -41,14 +42,16 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
   public void selectAll() throws Exception {
     ObjectType record = getSelectOutputMetadata("select * from PLANET");
 
-    assertThat(record.getFields().size(), equalTo(4));
+    assertThat(record.getFields().size(), equalTo(5));
     assertFieldOfType(record, "ID", testDatabase.getIdFieldMetaDataType());
     assertFieldOfType(record, "POSITION", testDatabase.getPositionFieldMetaDataType());
     assertFieldOfType(record, "NAME", typeBuilder.stringType().build());
     if (testDatabase.getDbType().equals(MYSQL)) {
       assertFieldOfType(record, "PICTURE", typeBuilder.binaryType().build());
+      assertFieldOfType(record, "DESCRIPTION", typeBuilder.anyType().build());
     } else {
       assertFieldOfType(record, "PICTURE", typeLoader.load(Blob.class));
+      assertFieldOfType(record, "DESCRIPTION", typeLoader.load(Clob.class));
     }
   }
 
