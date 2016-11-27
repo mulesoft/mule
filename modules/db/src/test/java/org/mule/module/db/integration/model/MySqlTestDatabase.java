@@ -7,6 +7,7 @@
 
 package org.mule.module.db.integration.model;
 
+import static org.mule.common.metadata.datatype.DataType.UNKNOWN;
 import org.mule.common.metadata.datatype.DataType;
 
 import java.sql.Connection;
@@ -40,7 +41,7 @@ public class MySqlTestDatabase extends AbstractTestDatabase
     @Override
     public void createPlanetTable(Connection connection) throws SQLException
     {
-        executeDdl(connection, "CREATE TABLE PLANET(ID INTEGER NOT NULL AUTO_INCREMENT,POSITION INTEGER,NAME VARCHAR(255), PRIMARY KEY (ID))");
+        executeDdl(connection, "CREATE TABLE PLANET(ID INTEGER NOT NULL AUTO_INCREMENT,POSITION INTEGER,NAME VARCHAR(255), DESCRIPTION LONGTEXT, PRIMARY KEY (ID))");
     }
 
     @Override
@@ -77,7 +78,19 @@ public class MySqlTestDatabase extends AbstractTestDatabase
         createStoredProcedure(dataSource, sql);
     }
 
-    @Override
+  @Override public void createStoredProcedureParameterizedUpdatePlanetDescription(DataSource dataSource) throws SQLException {
+    executeDdl(dataSource, "DROP PROCEDURE IF EXISTS updatePlanetDescription;\n");
+
+    final String sql =
+      "CREATE DEFINER=CURRENT_USER PROCEDURE updatePlanetDescription(IN pName VARCHAR(50), IN pDescription LONGTEXT)\n" +
+        "BEGIN\n" +
+        "update Planet SET DESCRIPTION=pDescription where NAME = pName;\n" +
+        "END";
+
+    createStoredProcedure(dataSource, sql);
+  }
+
+  @Override
     public void createStoredProcedureCountRecords(DataSource dataSource) throws SQLException
     {
         executeDdl(dataSource, "DROP PROCEDURE IF EXISTS countTestRecords;\n");
@@ -145,5 +158,11 @@ public class MySqlTestDatabase extends AbstractTestDatabase
     public DataType getIdFieldInputMetaDataType()
     {
         return DataType.STRING;
+    }
+
+    @Override
+    public Object getDescriptionFieldOutputMetaDataType()
+    {
+        return UNKNOWN;
     }
 }
