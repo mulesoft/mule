@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.api;
 
+import static java.util.Collections.emptyList;
 import static org.apache.maven.repository.internal.MavenRepositorySystemUtils.newSession;
 import static org.eclipse.aether.repository.RepositoryPolicy.CHECKSUM_POLICY_IGNORE;
 import static org.eclipse.aether.repository.RepositoryPolicy.UPDATE_POLICY_NEVER;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -25,6 +27,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RemoteRepository.Builder;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
@@ -47,6 +51,8 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
  */
 public class RepositorySystemFactory {
 
+  private static final String DEFAULT_REPOSITORY_TYPE = "default";
+
   /**
    * Creates an instance of the {@link RepositorySystemFactory} to collect Maven dependencies.
    *
@@ -61,7 +67,7 @@ public class RepositorySystemFactory {
     session.setOffline(true);
     session.setIgnoreArtifactDescriptorRepositories(true);
     RepositorySystem system = newRepositorySystem(classPath, workspaceLocationResolver, mavenLocalRepositoryLocation, session);
-    return new DependencyResolver(system, session);
+    return new DependencyResolver(system, session, emptyList());
   }
 
   /**
@@ -70,13 +76,26 @@ public class RepositorySystemFactory {
    * @param classPath {@link URL}'s from class path
    * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to resolve artifactId's {@link Path}s from workspace. Not
    *        {@code null}.
+   * @param mavenLocalRepositoryLocation file system location for the local Maven repository to resolve offline dependencies.
+   * @param remoteRepositories list of {@link String} with URL of remote repositories to resolve online dependencies not present in local Maven repository.
    */
   public static DependencyResolver newOnlineDependencyResolver(List<URL> classPath,
                                                                WorkspaceLocationResolver workspaceLocationResolver,
-                                                               File mavenLocalRepositoryLocation) {
+                                                               File mavenLocalRepositoryLocation,
+                                                               List<String> remoteRepositories) {
     DefaultRepositorySystemSession session = newDefaultRepositorySystemSession();
+    session.setIgnoreArtifactDescriptorRepositories(true);
     RepositorySystem system = newRepositorySystem(classPath, workspaceLocationResolver, mavenLocalRepositoryLocation, session);
-    return new DependencyResolver(system, session);
+    return new DependencyResolver(system, session, collectRemoteRepositories(remoteRepositories));
+  }
+
+  private static List<RemoteRepository> collectRemoteRepositories(List<String> remoteRepositories) {
+    List<RemoteRepository> collectedRemoteRepositories =
+        remoteRepositories.stream()
+            .filter(remoteRepository -> !remoteRepository.trim().equals(""))
+            .map(remoteRepository -> new Builder(remoteRepository, DEFAULT_REPOSITORY_TYPE, remoteRepository.trim()).build())
+            .collect(Collectors.toList());
+    return collectedRemoteRepositories;
   }
 
   private static DefaultRepositorySystemSession newDefaultRepositorySystemSession() {
@@ -99,6 +118,7 @@ public class RepositorySystemFactory {
     session.setWorkspaceReader(new DefaultWorkspaceReader(classPath, workspaceLocationResolver));
 
     session.setRepositoryListener(new LoggerRepositoryListener());
+
     return system;
   }
 
@@ -127,7 +147,5 @@ public class RepositorySystemFactory {
 
     return locator.getService(RepositorySystem.class);
   }
-
-
 
 }
