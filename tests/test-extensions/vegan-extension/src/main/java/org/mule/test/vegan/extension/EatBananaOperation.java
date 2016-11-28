@@ -22,4 +22,8 @@ public class EatBananaOperation {
                           @UseConfig BananaConfig config) {
     return eatBanana(attributeOnlyBanana, config);
   }
+
+  public BananaConfig getConfig(@UseConfig BananaConfig config) {
+    return config;
+  }
 }

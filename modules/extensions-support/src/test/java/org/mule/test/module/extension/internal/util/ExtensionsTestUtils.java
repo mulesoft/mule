@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.internal.util;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -107,7 +108,8 @@ public abstract class ExtensionsTestUtils {
 
   public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz) {
     BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
-    final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager();
+    final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory(currentThread().getContextClassLoader())
+        .createTypeHandlerManager();
     typeHandlerManager.handle(clazz, new ParsingContext(), typeBuilder);
 
     return typeBuilder;

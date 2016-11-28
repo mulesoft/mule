@@ -53,7 +53,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
@@ -66,7 +65,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDeleg
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
-import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.module.extension.internal.introspection.describer.FunctionParameterTypeModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.describer.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;

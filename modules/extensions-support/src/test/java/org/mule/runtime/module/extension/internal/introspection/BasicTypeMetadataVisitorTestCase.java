@@ -12,6 +12,7 @@ import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

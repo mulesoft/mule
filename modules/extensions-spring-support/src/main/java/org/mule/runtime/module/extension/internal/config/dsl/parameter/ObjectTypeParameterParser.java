@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
@@ -91,7 +92,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
 
   private Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
-    return Optional.ofNullable(infrastructureParameterMap.get(getId(fieldType)));
+    return ofNullable(infrastructureParameterMap.get(getId(fieldType)));
   }
 
   private void parseField(ObjectFieldType objectField) {

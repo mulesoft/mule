@@ -10,11 +10,14 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -30,13 +33,16 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
+import java.lang.reflect.Field;
+import java.util.Optional;
+
 /**
  * A {@link ValueResolver} wrapper which generates and returns default instances
  * if the {@link #delegate} returns {@code null}.
  * <p>
  * The values are generated according to the rules described in {@link NullSafe}.
  * <p>
- * Instances are to be obtained through the {@link #of(ValueResolver, ParameterizedModel, ParameterModel, MuleContext)}
+ * Instances are to be obtained through the {@link #of(ValueResolver, MetadataType, MuleContext)}
  * factory method
  *
  * @param <T> the generic type of the produced values.
@@ -80,15 +86,36 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
         }
 
         ResolverSet resolverSet = new ResolverSet();
-        getFields(clazz).forEach(field -> objectType.getFieldByName(getAlias(field))
-            .ifPresent(objectField -> getDefaultValue(objectField)
-                .ifPresent(defaultValue -> resolverSet.add(field.getName(),
-                                                           new TypeSafeExpressionValueResolver(defaultValue,
-                                                                                               field
-                                                                                                   .getType(),
-                                                                                               muleContext))
+        for (Field field : getFields(clazz)) {
+          ValueResolver<?> resolver = null;
+          ObjectFieldType objectField = objectType.getFieldByName(getAlias(field)).orElse(null);
+          if (objectField == null) {
+            continue;
+          }
 
-        )));
+          Optional<String> defaultValue = getDefaultValue(objectField);
+          if (defaultValue.isPresent()) {
+            resolver = new TypeSafeExpressionValueResolver(defaultValue.get(), field.getType(), muleContext);
+          } else {
+            NullSafe nullSafe = field.getAnnotation(NullSafe.class);
+            if (nullSafe != null) {
+              MetadataType nullSafeType;
+              if (Object.class.equals(nullSafe.defaultImplementingType())) {
+                nullSafeType = objectField.getValue();
+              } else {
+                nullSafeType = new BaseTypeBuilder(JAVA).objectType()
+                    .with(new TypeIdAnnotation(nullSafe.defaultImplementingType().getName()))
+                    .build();
+              }
+
+              resolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType, muleContext);
+            }
+          }
+
+          if (resolver != null) {
+            resolverSet.add(field.getName(), resolver);
+          }
+        }
 
         ObjectBuilder<T> objectBuilder =
             new DefaultResolverSetBasedObjectBuilder(clazz, resolverSet);

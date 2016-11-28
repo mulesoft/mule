@@ -46,19 +46,19 @@ public class HttpRequesterConfig implements Initialisable {
 
   @ParameterGroup(URL_CONFIGURATION)
   @NullSafe
-  private RequestUrlConfiguration urlConfiguration = new RequestUrlConfiguration();
+  private RequestUrlConfiguration urlConfiguration;
 
   @ParameterGroup(REQUEST_SETTINGS)
   @NullSafe
-  private RequestSettings requestSettings = new RequestSettings();
+  private RequestSettings requestSettings;
 
   @ParameterGroup(RESPONSE_SETTINGS)
   @NullSafe
-  private ResponseSettings responseSettings = new ResponseSettings();
+  private ResponseSettings responseSettings;
 
   @ParameterGroup(OTHER_SETTINGS)
   @NullSafe
-  private OtherRequestSettings otherSettings = new OtherRequestSettings();
+  private OtherRequestSettings otherSettings;
 
   /**
    * Specifies a RAML configuration file for the API that is being consumed.

@@ -28,7 +28,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.Destination;
@@ -119,8 +118,7 @@ public class MessageBuilder {
   @Parameter
   @Optional
   @NullSafe
-  // TODO MULE-10901: Nullsafe bug
-  private JmsxProperties jmsxProperties = new JmsxProperties();
+  private JmsxProperties jmsxProperties;
 
   /**
    * the custom user properties that should be set to this {@link Message}
@@ -129,8 +127,7 @@ public class MessageBuilder {
   @Optional
   @NullSafe
   @Content
-  // TODO MULE-10901: Nullsafe bug
-  private Map<String, Object> properties = new HashMap<>();
+  private Map<String, Object> properties;
 
   /**
    * Creates a {@link Message} based on the provided configurations
