@@ -18,6 +18,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import ru.yandex.qatools.allure.annotations.Description;
+
 public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public SynchronousProcessingStrategyTestCase(boolean reactive) {
@@ -30,60 +32,80 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
     assertSynchronous(2);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void multipleCpuLight() throws Exception {
     super.multipleCpuLight();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void multipleBlocking() throws Exception {
     super.multipleBlocking();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void multipleCpuIntensive() throws Exception {
     super.multipleCpuIntensive();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void mix() throws Exception {
     super.mix();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void mix2() throws Exception {
     super.mix2();
     assertSynchronous(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread.")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
     flow.initialise();

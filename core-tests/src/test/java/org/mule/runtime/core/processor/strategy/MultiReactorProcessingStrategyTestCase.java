@@ -20,6 +20,8 @@ import org.mule.runtime.core.processor.strategy.MultiReactorProcessingStrategyFa
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import ru.yandex.qatools.allure.annotations.Description;
+
 public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public MultiReactorProcessingStrategyTestCase(boolean reactive) {
@@ -33,12 +35,17 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("When MultiReactorProcessingStrategy is configured, two concurrent requests may be processed by two different "
+      + " cpu light threads.  This is why this strategy is called 'MultiReactor' and not 'Reactor`.  MULE-11062 is needed for "
+      + "true reactor behaviour.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
     assertThat(threads.size(), equalTo(2));
@@ -48,42 +55,56 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void multipleCpuLight() throws Exception {
     super.multipleCpuLight();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void multipleBlocking() throws Exception {
     super.multipleBlocking();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void multipleCpuIntensive() throws Exception {
     super.multipleCpuIntensive();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void mix() throws Exception {
     super.mix();
     assertEverythingOnEventLoop();
   }
 
   @Override
+  @Description("Regardless of processor type, when the MultiReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
   public void mix2() throws Exception {
     super.mix2();
     assertEverythingOnEventLoop();
@@ -97,6 +118,7 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
   }
 
   @Override
+  @Description("When the MultiReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
     flow.initialise();

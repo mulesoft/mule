@@ -24,6 +24,8 @@ import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactor
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import ru.yandex.qatools.allure.annotations.Description;
+
 public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ProactorProcessingStrategyTestCase(boolean reactive) {
@@ -37,6 +39,8 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, when all processor are CPU_LIGHT then they are all exectured in a single "
+      + " cpu light thread.")
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
     assertThat(threads.size(), equalTo(1));
@@ -46,12 +50,16 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("When ProactorProcessingStrategy is configured, two concurrent requests may be processed by two different "
+      + " cpu light threads. MULE-11062 is needed for true reactor behaviour.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
     assertThat(threads.size(), equalTo(2));
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, when all processor are CPU_LIGHT then they are all exectured in a single "
+      + " cpu light thread.")
   public void multipleCpuLight() throws Exception {
     super.multipleCpuLight();
     assertThat(threads.size(), equalTo(1));
@@ -61,6 +69,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, a BLOCKING message processor is scheduled on a IO thread.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
     assertThat(threads.size(), equalTo(1));
@@ -70,6 +79,8 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, each BLOCKING message processor is scheduled on a IO thread. These may, or "
+      + "may not, be the same thread.")
   public void multipleBlocking() throws Exception {
     super.multipleBlocking();
     assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(3)));
@@ -81,6 +92,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, a CPU_INTENSIVE message processor is scheduled on a CPU intensive thread.")
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertThat(threads.size(), equalTo(1));
@@ -90,6 +102,8 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, each CPU_INTENSIVE message processor is scheduled on a CPU Intensive thread."
+      + " These may, or may not, be the same thread.")
   public void multipleCpuIntensive() throws Exception {
     super.multipleCpuIntensive();
     assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(3)));
@@ -101,6 +115,8 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, when there is a mix of processor processing types, each processor is "
+      + "scheduled on the correct scheduler.")
   public void mix() throws Exception {
     super.mix();
     assertThat(threads.size(), equalTo(3));
@@ -111,6 +127,8 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("With the ProactorProcessingStrategy, when there is a mix of processor processing types, each processor is "
+      + "scheduled on the correct scheduler.")
   public void mix2() throws Exception {
     super.mix2();
     assertThat(threads.size(), allOf(greaterThanOrEqualTo(3), lessThanOrEqualTo(7)));
@@ -124,6 +142,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
+  @Description("When the ProactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
     flow.initialise();

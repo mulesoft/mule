@@ -20,6 +20,8 @@ import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFacto
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import ru.yandex.qatools.allure.annotations.Description;
+
 public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public WorkQueueProcessingStrategyTestCase(boolean reactive) {
@@ -33,67 +35,79 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
     assertSynchronousIOScheduler(2);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void multipleCpuLight() throws Exception {
     super.multipleCpuLight();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void multipleBlocking() throws Exception {
     super.multipleBlocking();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void multipleCpuIntensive() throws Exception {
     super.multipleCpuIntensive();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void mix() throws Exception {
     super.mix();
     assertSynchronousIOScheduler(1);
   }
 
   @Override
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single IO thead.")
   public void mix2() throws Exception {
     super.mix2();
     assertSynchronousIOScheduler(1);
   }
 
-  private void assertSynchronousIOScheduler(int concurrency) {
-    assertThat(threads.size(), equalTo(concurrency));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), equalTo((long) concurrency));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT.name())).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(), equalTo(0l));
-  }
-
   @Override
+  @Description("When the WorkQueueProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
     flow.initialise();
@@ -104,6 +118,13 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     expectedException.expect(DefaultMuleException.class);
     expectedException.expectMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE));
     process(flow, testEvent());
+  }
+
+  private void assertSynchronousIOScheduler(int concurrency) {
+    assertThat(threads.size(), equalTo(concurrency));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO.name())).count(), equalTo((long) concurrency));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT.name())).count(), equalTo(0l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE.name())).count(), equalTo(0l));
   }
 
 }

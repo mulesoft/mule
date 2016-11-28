@@ -20,6 +20,8 @@ import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFac
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import ru.yandex.qatools.allure.annotations.Description;
+
 public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrategyTestCase {
 
   public DefaultProcessingStrategyTestCase(boolean reactive) {
@@ -35,6 +37,8 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
   }
 
   @Override
+  @Description("Unlike with the MultiReactorProcessingStrategy, the DefaultFlowProcessingStrategy does not fail if a transaction "
+      + "is active, but rather executes these events synchonrously in the caller thread transparently.")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
     flow.initialise();
