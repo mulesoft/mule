@@ -21,7 +21,11 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Processing Strategies")
+@Stories("Work Queue Processing Strategy")
 public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public WorkQueueProcessingStrategyTestCase(boolean reactive) {

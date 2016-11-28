@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,7 +20,11 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Processing Strategies")
+@Stories("Default ProcessingStrategy used when no processing strategy is configured.")
 public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrategyTestCase {
 
   public DefaultProcessingStrategyTestCase(boolean reactive) {
