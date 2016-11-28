@@ -177,12 +177,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
         .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
     verify(notificationManager, times(1))
         .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
-    verify(notificationManager, times(5)).fireNotification(any(PipelineMessageNotification.class));
-    verify(notificationManager, times(1))
-        .fireNotification(
-                          argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, event)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, false, null)));
+    verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
   }
 
   private void verifyException() {
@@ -196,12 +191,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     verify(notificationManager, times(1))
         .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(ExceptionStrategyNotification.PROCESS_END,
                                                                                   false, null)));
-    verify(notificationManager, times(1))
-        .fireNotification(
-                          argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, event)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, true, null)));
-    verify(notificationManager, times(6)).fireNotification(any(PipelineMessageNotification.class));
+    verify(notificationManager, times(4)).fireNotification(any(PipelineMessageNotification.class));
   }
 
   private class TestPipeline extends Flow {

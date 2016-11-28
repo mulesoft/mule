@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 /**
- * This factory's strategies processes all message processors in the calling thread.
+ * This processing strategy processes all message processors in the calling thread.
  */
 public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 

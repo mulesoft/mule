@@ -9,6 +9,10 @@ package org.mule.runtime.core.util.rx;
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 
+import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.util.BooleanUtils;
+import org.mule.runtime.core.util.Predicate;
+
 import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.Collection;
@@ -19,15 +23,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 /**
  * Transaction aware {@link ExecutorService} decorator that does not scheduler tasks for async processing using the delagate
  * executor service if a transaction is active, instead a {@link MoreExecutors#newDirectExecutorService()} is used and the task is
  * run on the current thread.
  */
-public class TransactionAwareExecutorServiceDecorator implements ExecutorService {
+public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
-  private ExecutorService delegate;
+  private Scheduler delegate;
+  private Predicate<Scheduler> scheduleOverridePredicate;
   private ExecutorService directExecutor = newDirectExecutorService();
 
   /**
@@ -36,8 +42,9 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
    * 
    * @param executorService the delegate executor service to use when no transaction is actice.
    */
-  public TransactionAwareExecutorServiceDecorator(ExecutorService executorService) {
+  public ConditionalExecutorServiceDecorator(Scheduler executorService, Predicate<Scheduler> scheduleOverridePredicate) {
     this.delegate = executorService;
+    this.scheduleOverridePredicate = scheduleOverridePredicate;
   }
 
   @Override
@@ -69,7 +76,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
 
   @Override
   public <T> Future<T> submit(Callable<T> task) {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.submit(task);
     } else {
       return delegate.submit(task);
@@ -78,7 +85,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
 
   @Override
   public <T> Future<T> submit(Runnable task, T result) {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.submit(task, result);
     } else {
       return delegate.submit(task, result);
@@ -87,7 +94,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
 
   @Override
   public Future<?> submit(Runnable task) {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.submit(task);
     } else {
       return delegate.submit(task);
@@ -96,7 +103,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.invokeAll(tasks);
     } else {
       return delegate.invokeAll(tasks);
@@ -106,7 +113,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.invokeAll(tasks, timeout, unit);
     } else {
       return delegate.invokeAll(tasks, timeout, unit);
@@ -115,7 +122,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.invokeAny(tasks);
     } else {
       return delegate.invokeAny(tasks);
@@ -125,7 +132,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       return directExecutor.invokeAny(tasks, timeout, unit);
     } else {
       return delegate.invokeAny(tasks, timeout, unit);
@@ -134,7 +141,7 @@ public class TransactionAwareExecutorServiceDecorator implements ExecutorService
 
   @Override
   public void execute(Runnable command) {
-    if (isTransactionActive()) {
+    if (scheduleOverridePredicate.evaluate(delegate)) {
       directExecutor.execute(command);
     } else {
       delegate.execute(command);

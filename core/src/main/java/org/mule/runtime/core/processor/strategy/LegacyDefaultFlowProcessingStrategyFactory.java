@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.util.Predicate;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -48,19 +49,14 @@ public class LegacyDefaultFlowProcessingStrategyFactory extends LegacyAsynchrono
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      return publisher -> from(publisher).concatMap(request -> {
-        if (canProcessAsync(request)) {
-          return just(request).transform(super.onPipeline(flowConstruct, pipelineFunction));
-        } else {
-          return just(request).transform(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.onPipeline(flowConstruct, pipelineFunction));
-        }
-      });
+    protected Consumer<Event> assertCanProcess() {
+      return event -> {
+      };
     }
 
-    protected boolean canProcessAsync(Event event) {
-      return !(event.isSynchronous() || isTransactionActive());
+    @Override
+    protected Predicate<Scheduler> scheduleOverridePredicate() {
+      return scheduler -> isTransactionActive();
     }
   }
 }

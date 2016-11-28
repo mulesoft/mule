@@ -9,14 +9,14 @@
        http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd">
 
     <flow name="JMSService1SyncFixed">
-        <test:assert-intercepting responseSameTask="true"/>
+        <test:assert-intercepting responseSameTask="false"/>
         <set-property propertyName="JMSReplyTo" value="other"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
         <test:assert count="1"/>
     </flow>
  
     <flow name="JMSService1SyncTimeoutFixed">
-        <test:assert-intercepting responseSameTask="true"/>
+        <test:assert-intercepting responseSameTask="false"/>
         <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsTemporaryReplyToTestCase$SetReplyTo"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" responseTimeout="20"/>
         <test:assert expression="#[message.payload == null]"/>
@@ -37,14 +37,14 @@
     </flow>
 
     <flow name="JMSService1Sync">
-        <test:assert-intercepting responseSameTask="true"/>
+        <test:assert-intercepting responseSameTask="false"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response"
                            connector-ref="jmsConnector1"/>
         <test:assert count="1"/>
     </flow>
 
     <flow name="JMSService1SyncTimeout">
-        <test:assert-intercepting responseSameTask="true"/>
+        <test:assert-intercepting responseSameTask="false"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" responseTimeout="20"/>
         <test:assert expression="#[message.payload == null]"/>
     </flow>

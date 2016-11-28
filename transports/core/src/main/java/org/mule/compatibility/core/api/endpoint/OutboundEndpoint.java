@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.api.endpoint;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
@@ -34,6 +35,12 @@ public interface OutboundEndpoint
    * @return true if the destination is compute in every request, false if the destination is always the same.
    */
   boolean isDynamic();
+
+  @Override
+  default ProcessingType getProccesingType() {
+    return BLOCKING;
+  }
+
 }
 
 

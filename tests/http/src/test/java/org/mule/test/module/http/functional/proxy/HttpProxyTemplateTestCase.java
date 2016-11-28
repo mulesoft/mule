@@ -45,6 +45,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -52,7 +53,6 @@ import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
-@RunnerDelegateTo(Parameterized.class)
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
@@ -64,33 +64,11 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
-  private String configFile;
-  private String requestThreadNameSubString;
-  private String responeThreadNameSubString;
-  private boolean nonBlocking;
-
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "io", "worker", false}// ,
-        // {"http-proxy-template-config.xml", "worker", "proxyTemplate", true}
-    });
-  }
-
-  public HttpProxyTemplateTestCase(String configFile, String requestThreadNameSubString, String responeThreadNameSubString,
-                                   boolean nonBlocking) {
-    this.configFile = configFile;
-    this.requestThreadNameSubString = requestThreadNameSubString;
-    this.responeThreadNameSubString = responeThreadNameSubString;
-    this.nonBlocking = nonBlocking;
-    if (nonBlocking) {
-      systemProperty = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, NON_BLOCKING_PROCESSING_STRATEGY);
-    }
-  }
+  private static String CPU_LIGHT_THREAD_PREFIX = "SchedulerService_cpuLight";
 
   @Override
   protected String getConfigFile() {
-    return configFile;
+    return "http-proxy-template-config.xml";
   }
 
   @Test
@@ -270,19 +248,15 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   public void requestThread() throws Exception {
     Request.Get(getProxyUrl("")).connectTimeout(RECEIVE_TIMEOUT).execute();
     SensingNullRequestResponseMessageProcessor sensingMessageProcessor = getSensingNullRequestResponseMessageProcessor();
-    assertThat(sensingMessageProcessor.requestThread.getName(), containsString(requestThreadNameSubString));
+    assertThat(sensingMessageProcessor.requestThread.getName(), startsWith(CPU_LIGHT_THREAD_PREFIX));
   }
 
   @Test
   public void responseThread() throws Exception {
     assertRequestOk(getProxyUrl(""), null);
     SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
-    if (nonBlocking) {
-      assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
-      assertThat(requestResponseProcessor.responseThread.getName(), containsString(responeThreadNameSubString));
-    } else {
-      assertThat(requestResponseProcessor.requestThread, equalTo(requestResponseProcessor.responseThread));
-    }
+    assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
+    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(CPU_LIGHT_THREAD_PREFIX));
   }
 
   private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor() {

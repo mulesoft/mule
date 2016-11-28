@@ -22,11 +22,13 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.Predicate;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -35,49 +37,54 @@ import java.util.function.Supplier;
 import javax.resource.spi.work.WorkManager;
 
 import org.reactivestreams.Publisher;
+import reactor.core.scheduler.Schedulers;
 
 /**
- * This factory's strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors in a single
- * worker thread.
+ * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dipatches incoming messages to a work queue
+ * which is served by a pool of worker threads from the applications IO {@link Scheduler}. Processing of the flow is carried out
+ * synchronously on the worker thread until completion.
+ *
+ * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
+ *
+ * @since 4.0
  */
-public class AsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
+
+  // TODO MULE-11062 Need to be able to configure maxiumum number of workers
+  private int maxThreads;
+
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new AsynchronousProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
-                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                          MILLISECONDS),
-                                              muleContext);
+    return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+                                           maxThreads,
+                                           scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                                       MILLISECONDS),
+                                           muleContext);
   }
 
-  static class AsynchronousProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+  static class WorkQueueProcessingStrategy extends AbstractSchedulingProcessingStrategy {
 
     private Supplier<Scheduler> schedulerSupplier;
-    private Consumer<Scheduler> schedulerStopper;
     private Scheduler scheduler;
-    private MuleContext muleContext;
 
-    public AsynchronousProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
-                                          MuleContext muleContext) {
+    public WorkQueueProcessingStrategy(Supplier<Scheduler> schedulerSupplier, int maxThreads,
+                                       Consumer<Scheduler> schedulerStopper,
+                                       MuleContext muleContext) {
+      super(schedulerStopper, muleContext);
       this.schedulerSupplier = schedulerSupplier;
-      this.schedulerStopper = schedulerStopper;
-      this.muleContext = muleContext;
     }
 
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-
+                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
+                                                                   MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
           .doOnNext(assertCanProcessAsync())
-          .doOnNext(fireAsyncScheduledNotification(flowConstruct))
           .publishOn(fromExecutorService(scheduler))
-          .transform(pipelineFunction)
-          .doOnNext(request -> fireAsyncCompleteNotification(request, flowConstruct, null))
-          .doOnError(MessagingException.class,
-                     msgException -> fireAsyncCompleteNotification(msgException.getEvent(), flowConstruct, msgException));
+          .transform(pipelineFunction);
     }
 
     @Override
@@ -88,7 +95,7 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
     @Override
     public void stop() throws MuleException {
       if (scheduler != null) {
-        schedulerStopper.accept(scheduler);
+        getSchedulerStopper().accept(scheduler);
       }
     }
 
@@ -100,18 +107,9 @@ public class AsynchronousProcessingStrategyFactory implements ProcessingStrategy
       };
     }
 
-    protected Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
-      return event -> muleContext.getNotificationManager()
-          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_SCHEDULED));
-    }
-
-    protected void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
-      muleContext.getNotificationManager()
-          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_COMPLETE, exception));
-    }
-
-    protected Scheduler getScheduler() {
-      return this.scheduler;
+    @Override
+    protected Predicate<Scheduler> scheduleOverridePredicate() {
+      return scheduler -> false;
     }
   }
 }
