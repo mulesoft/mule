@@ -15,18 +15,6 @@
         <flow-ref name="obtainClobValue"/>
     </flow>
 
-    <flow name="usesStringOnExplicitParam">
-        <db:insert>
-            <db:parameterized-query>
-                INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)
-            </db:parameterized-query>
-
-            <db:in-param name="description" value="#[payload]" type="CLOB"/>
-        </db:insert>
-
-        <flow-ref name="obtainClobValue"/>
-    </flow>
-
     <sub-flow name="obtainClobValue">
         <transactional>
             <db:select>

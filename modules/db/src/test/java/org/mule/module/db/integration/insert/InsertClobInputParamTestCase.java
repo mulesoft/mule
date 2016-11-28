@@ -48,14 +48,6 @@ public class InsertClobInputParamTestCase extends AbstractDbIntegrationTestCase
         assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(TEST_MESSAGE));
     }
 
-    @Test
-    public void usesStringOnExplicitParam() throws Exception
-    {
-        MuleEvent response = runFlow("usesStringOnExplicitParam", TEST_MESSAGE);
-
-        assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(TEST_MESSAGE));
-    }
-
     @Before
     public void setupStoredProcedure() throws Exception
     {
