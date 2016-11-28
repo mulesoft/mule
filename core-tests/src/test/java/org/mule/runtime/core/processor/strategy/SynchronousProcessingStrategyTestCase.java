@@ -23,7 +23,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Processing Strategies")
-@Stories("Synchronous rocessingStrategy")
+@Stories("Synchronous Processing Strategy")
 public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public SynchronousProcessingStrategyTestCase(boolean reactive) {
