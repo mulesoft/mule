@@ -17,15 +17,19 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -103,6 +107,12 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
         valueResolver = getDefaultValue(field)
             .map(value -> new TypeSafeExpressionValueResolver<>(value, objectField.getType(), muleContext))
             .orElse(null);
+      }
+
+      Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
+      if (nullSafe.isPresent()) {
+        ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
+        valueResolver = NullSafeValueResolverWrapper.of(delegate, nullSafe.get().getType(), muleContext);
       }
 
       if (valueResolver != null) {

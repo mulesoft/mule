@@ -25,9 +25,27 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.HealthyFood.TasteProfile">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="tasty"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:complexType name="org.mule.test.vegan.extension.HealthyFood">
         <xs:complexContent>
-            <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.FarmedFood"></xs:extension>
+            <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.FarmedFood">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="taste-profile">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood.TasteProfile"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="tasteProfile"></xs:attribute>
+            </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.HealthyFood" substitutionGroup="vegan:abstract-farmed-food" abstract="true" name="abstract-healthy-food"></xs:element>
@@ -51,7 +69,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
@@ -73,7 +91,7 @@
     <xs:complexType name="org.mule.test.vegan.extension.VeganCookBook">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="recipes">
                         <xs:complexType>
                             <xs:sequence>
@@ -105,7 +123,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     </xs:sequence>
                 </xs:extension>
@@ -186,9 +204,18 @@
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
                     <xs:sequence minOccurs="0" maxOccurs="1">
-                      <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="healthy-food">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -232,6 +259,23 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetConfigType" substitutionGroup="mule:abstract-operator" name="get-config"></xs:element>
+    <xs:complexType name="GetConfigType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -296,7 +340,7 @@
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
                     <xs:sequence minOccurs="0" maxOccurs="1">
-                       <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                 </xs:extension>
@@ -307,7 +351,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                  <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     </xs:sequence>
                 </xs:extension>
@@ -336,7 +380,7 @@
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
                     <xs:sequence minOccurs="0" maxOccurs="1">
-                      <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                 </xs:extension>
@@ -347,7 +391,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                   <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     </xs:sequence>
                 </xs:extension>
@@ -381,7 +425,7 @@
     <xs:complexType name="ApplyPolicyType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                 <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="policy">
                         <xs:complexType>
                             <xs:complexContent>
@@ -446,7 +490,7 @@
     <xs:complexType name="GetAllApplesType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>

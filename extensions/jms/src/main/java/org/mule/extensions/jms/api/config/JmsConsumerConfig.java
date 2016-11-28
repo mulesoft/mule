@@ -45,8 +45,7 @@ public class JmsConsumerConfig {
   @Optional
   @Expression(NOT_SUPPORTED)
   @NullSafe(defaultImplementingType = QueueConsumer.class)
-  // TODO MULE-10901: Nullsafe bug
-  private ConsumerType consumerType = new QueueConsumer();
+  private ConsumerType consumerType;
 
   /**
    * Default selector to be used for filtering when consuming a {@link Message}

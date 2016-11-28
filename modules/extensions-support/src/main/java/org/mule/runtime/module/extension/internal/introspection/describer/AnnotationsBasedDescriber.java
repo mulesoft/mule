@@ -92,7 +92,7 @@ import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.FunctionParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.InfrastructureFieldContributor;
@@ -694,16 +694,16 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   private void parseNullSafe(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     if (extensionParameter.isAnnotatedWith(NullSafe.class)) {
-      if (extensionParameter.isRequired()) {
+      if (extensionParameter.isRequired() && !extensionParameter.isAnnotatedWith(ParameterGroup.class)) {
         throw new IllegalParameterModelDefinitionException(
                                                            format("Parameter '%s' is required but annotated with '@%s', which is redundant",
                                                                   extensionParameter.getName(), NullSafe.class.getSimpleName()));
       }
 
       Class<?> defaultType = extensionParameter.getAnnotation(NullSafe.class).get().defaultImplementingType();
-      final boolean hasDefaultOverride = !defaultType.isAssignableFrom(Object.class);
+      final boolean hasDefaultOverride = !defaultType.equals(Object.class);
 
-      MetadataType nullSafeType = !hasDefaultOverride ? parameter.getDeclaration().getType() : typeLoader.load(defaultType);
+      MetadataType nullSafeType = hasDefaultOverride ? typeLoader.load(defaultType) : parameter.getDeclaration().getType();
 
       parameter.getDeclaration().getType().accept(new BasicTypeMetadataVisitor() {
 
@@ -730,7 +730,7 @@ public final class AnnotationsBasedDescriber implements Describer {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (hasDefaultOverride && isInstantiable(parameter.getDeclaration().getType())) {
+          if (hasDefaultOverride && isInstantiable(objectType)) {
             throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
                 + " but a 'defaultImplementingType' was provided."
                 + " Type override is not allowed for concrete types",

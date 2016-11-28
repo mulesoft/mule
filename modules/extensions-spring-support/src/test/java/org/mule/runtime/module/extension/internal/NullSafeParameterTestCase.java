@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.test.vegan.extension.BananaConfig;
 import org.mule.test.vegan.extension.FarmedFood;
 import org.mule.test.vegan.extension.HealthyFood;
 import org.mule.test.vegan.extension.VeganExtension;
@@ -44,4 +45,24 @@ public class NullSafeParameterTestCase extends ExtensionFunctionalTestCase {
     assertThat(response, instanceOf(HealthyFood.class));
     assertThat(response.canBeEaten(), is(true));
   }
+
+  @Test
+  public void nestedNullSafe() throws Exception {
+    FarmedFood response = (FarmedFood) flowRunner("implementingType").run().getMessage().getPayload().getValue();
+    assertThat(response, is(instanceOf(HealthyFood.class)));
+    HealthyFood healthyFood = (HealthyFood) response;
+    assertHealthyFood(healthyFood);
+  }
+
+  private void assertHealthyFood(HealthyFood healthyFood) {
+    assertThat(healthyFood.getTasteProfile(), is(notNullValue()));
+    assertThat(healthyFood.getTasteProfile().isTasty(), is(false));
+  }
+
+  @Test
+  public void nestedNullSafeInConfig() throws Exception {
+    BananaConfig config = (BananaConfig) flowRunner("inConfig").run().getMessage().getPayload().getValue();
+    assertHealthyFood(config.getHealthyFood());
+  }
+
 }

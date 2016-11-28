@@ -16,4 +16,8 @@
         <vegan:get-production/>
     </flow>
 
+    <flow name="inConfig">
+        <vegan:get-config />
+    </flow>
+
 </mule>

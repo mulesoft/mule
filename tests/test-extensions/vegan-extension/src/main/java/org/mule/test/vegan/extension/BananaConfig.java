@@ -11,6 +11,9 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,6 +26,15 @@ public class BananaConfig {
   private final AtomicInteger bananasCount = new AtomicInteger(0);
   private final AtomicInteger nonBananasCount = new AtomicInteger(0);
   private final AtomicInteger exceptionCount = new AtomicInteger(0);
+
+  @Parameter
+  @Optional
+  @NullSafe
+  private HealthyFood healthyFood;
+
+  public HealthyFood getHealthyFood() {
+    return healthyFood;
+  }
 
   public int getBananasCount() {
     return bananasCount.get();

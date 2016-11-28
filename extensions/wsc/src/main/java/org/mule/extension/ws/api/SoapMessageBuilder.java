@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ws.api;
 
-import static java.util.Collections.emptyMap;
 import org.mule.extension.ws.internal.WebServiceConsumer;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -32,20 +31,18 @@ public class SoapMessageBuilder {
   /**
    * The XML headers to include in the SOAP message.
    */
-  // TODO remove empty map MULE-10901
   @Parameter
   @Optional
   @NullSafe
-  private Map<String, String> headers = emptyMap();
+  private Map<String, String> headers;
 
   /**
    * The attachments to include in the SOAP request.
    */
-  // TODO remove empty map MULE-10901
   @Parameter
   @Optional
   @NullSafe
-  private Map<String, SoapAttachment> attachments = emptyMap();
+  private Map<String, SoapAttachment> attachments;
 
 
   public String getBody() {
