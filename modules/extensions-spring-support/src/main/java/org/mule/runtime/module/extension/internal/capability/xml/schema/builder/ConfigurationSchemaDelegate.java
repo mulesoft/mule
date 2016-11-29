@@ -28,8 +28,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -58,11 +57,11 @@ final class ConfigurationSchemaDelegate {
     Optional<TopLevelElement> connectionElement = addConnectionProviderElement(configurationModel);
     Optional<TopLevelElement> policyElement = addDynamicConfigPolicyElement(configurationModel);
 
-    Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
-    configurationModel.getParameterGroupModels()
-        .forEach(g -> groups.put(g.getName(), builder.registerParameters(config, g.getParameterModels())));
+    //Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
+    //configurationModel.getParameterGroupModels()
+    //    .forEach(g -> groups.put(g.getName(), builder.registerParameters(config, g.getParameterModels())));
 
-    if (connectionElement.isPresent() || policyElement.isPresent() || !groups.isEmpty()) {
+    if (connectionElement.isPresent() || policyElement.isPresent() || !configurationModel.getParameterGroupModels().isEmpty()) {
       final ExplicitGroup sequence = new ExplicitGroup();
       sequence.setMinOccurs(ZERO);
       sequence.setMaxOccurs(MAX_ONE);
@@ -81,7 +80,10 @@ final class ConfigurationSchemaDelegate {
         }
       });
 
-      builder.addOrderedParameterGroupsToSequence(groups, sequence);
+      configurationModel.getParameterGroupModels().forEach(group -> {
+        List<TopLevelElement> parameters = builder.registerParameters(config, group.getParameterModels());
+        builder.addParameterGroupsToSequence(parameters, sequence);
+      });
 
       config.setSequence(sequence);
     }

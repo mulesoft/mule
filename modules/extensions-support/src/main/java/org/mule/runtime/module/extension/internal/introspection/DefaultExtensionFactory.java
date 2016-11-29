@@ -14,6 +14,7 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
@@ -74,6 +75,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -269,7 +271,23 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         return ImmutableList.of();
       }
 
-      return declarations.stream().map(this::toParameterGroup).collect(toList());
+      //List<ParameterGroupDeclaration> sortedGroups = new ArrayList<>(declarations.size());
+      //declarations.stream().filter(g -> DEFAULT_GROUP_NAME.equals(g.getName())).findFirst().ifPresent(sortedGroups::add);
+      //declarations.stream().filter(g -> !DEFAULT_GROUP_NAME.equals(g.getName())).forEach(sortedGroups::add);
+
+      //copy the list so that executing this doesn't affect the input data
+      declarations = new ArrayList<>(declarations);
+      declarations.sort((left, right) -> {
+        if (DEFAULT_GROUP_NAME.equals(left.getName())) {
+          return -1;
+        } else if (DEFAULT_GROUP_NAME.equals(right.getName())) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+      return declarations.stream().map(this::toParameterGroup).collect(new ImmutableListCollector<>());
     }
 
     private ParameterGroupModel toParameterGroup(ParameterGroupDeclaration declaration) {
@@ -293,7 +311,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         return ImmutableList.of();
       }
 
-      return declarations.stream().map(this::toParameter).collect(toList());
+      return declarations.stream().map(this::toParameter).collect(new ImmutableListCollector<>());
     }
 
     private ParameterModel toParameter(ParameterDeclaration parameter) {

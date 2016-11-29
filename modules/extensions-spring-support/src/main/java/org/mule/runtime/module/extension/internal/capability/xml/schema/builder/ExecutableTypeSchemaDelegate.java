@@ -47,6 +47,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -84,35 +86,31 @@ abstract class ExecutableTypeSchemaDelegate {
       complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
     }
 
-    Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
+    List<TopLevelElement> childElements = new LinkedList<>();
     parameterizedModel.getParameterGroupModels()
         .forEach(g -> {
-          LinkedHashMap<String, TopLevelElement> childElements = new LinkedHashMap<>();
           g.getParameterModels().forEach(parameter -> {
             DslElementSyntax paramDsl = dsl.resolve(parameter);
             MetadataType parameterType = parameter.getType();
 
             if (isOperation(parameterType)) {
               String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
-              childElements.put(paramDsl.getElementName(), generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
+              childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
             } else {
               this.builder.declareAsParameter(parameterType, complexContentExtension, parameter, paramDsl, childElements);
             }
           });
-
-          groups.put(g.getName(), childElements);
         });
 
 
-    if (groups.isEmpty() || groups.values().stream().allMatch(Map::isEmpty)) {
+    if (childElements.isEmpty()) {
       complexContentExtension.setSequence(null);
     } else {
       final ExplicitGroup all = new ExplicitGroup();
       all.setMinOccurs(ZERO);
       all.setMaxOccurs(MAX_ONE);
 
-      builder.addOrderedParameterGroupsToSequence(groups, all);
-
+      builder.addParameterGroupsToSequence(childElements, all);
       complexContentExtension.setSequence(all);
     }
 
