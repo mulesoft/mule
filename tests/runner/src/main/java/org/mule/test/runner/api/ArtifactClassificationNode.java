@@ -24,7 +24,7 @@ import org.eclipse.aether.artifact.Artifact;
  */
 public class ArtifactClassificationNode {
 
-  private final List<URL> urls;
+  private List<URL> urls;
   private final Artifact artifact;
   private final List<Class> exportClasses;
   private final List<ArtifactClassificationNode> artifactDependencies;
@@ -61,4 +61,7 @@ public class ArtifactClassificationNode {
     return artifactDependencies;
   }
 
+  public void setUrls(List<URL> urls) {
+    this.urls = urls;
+  }
 }

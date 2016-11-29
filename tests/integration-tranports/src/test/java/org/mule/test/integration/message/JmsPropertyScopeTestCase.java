@@ -10,12 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCaseRunnerConfig;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
+public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase implements
+    CompatibilityFunctionalTestCaseRunnerConfig {
 
   @Override
   protected String getConfigFile() {

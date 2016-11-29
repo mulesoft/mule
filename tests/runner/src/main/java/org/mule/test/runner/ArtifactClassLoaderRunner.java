@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
@@ -105,6 +106,8 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
+  private static RunnerConfiguration runnerConfiguration;
+
   private static Exception errorCreatingClassLoaderTestRunner;
   private static boolean staticFieldsInjected = false;
 
@@ -124,11 +127,14 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     if (artifactClassLoaderHolder == null) {
       try {
-        artifactClassLoaderHolder = createClassLoaderTestRunner(clazz);
+        runnerConfiguration = readConfiguration(clazz);
+        artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
       } catch (Exception e) {
         errorCreatingClassLoaderTestRunner = e;
         throw e;
       }
+    } else {
+      checkConfiguration(clazz);
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
@@ -150,14 +156,26 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   }
 
+  private void checkConfiguration(Class<?> klass) {
+    RunnerConfiguration testRunnerConfiguration = readConfiguration(klass);
+    if (!runnerConfiguration.equals(testRunnerConfiguration)) {
+      throw new IllegalArgumentException("Invalid configuration defined for test: " + klass
+          + " . Is not supported to have multiple configurations of" +
+          " the runner because class loaders are created only once for all the tests in the module. Current configuration loaded was: "
+          + runnerConfiguration + " but configuration obtained from test class was: " + testRunnerConfiguration);
+    }
+  }
+
   /**
    * Creates the {@link ArtifactClassLoaderHolder} with the isolated class loaders.
    *
    * @param klass the test class being executed
+   * @param runnerConfiguration {@link RunnerConfiguration} based on annotated test class.
    * @return creates a {@link ArtifactClassLoaderHolder} that would be used to run the test. This way the test will be isolated
    *         and it will behave similar as an application running in a Mule standalone container.
    */
-  private static synchronized ArtifactClassLoaderHolder createClassLoaderTestRunner(Class<?> klass) {
+  private static synchronized ArtifactClassLoaderHolder createClassLoaderTestRunner(Class<?> klass,
+                                                                                    RunnerConfiguration runnerConfiguration) {
     final File targetTestClassesFolder = new File(klass.getProtectionDomain().getCodeSource().getLocation().getPath());
 
     ArtifactIsolatedClassLoaderBuilder builder = new ArtifactIsolatedClassLoaderBuilder();
@@ -165,15 +183,15 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     builder.setRootArtifactClassesFolder(rootArtifactClassesFolder);
     builder.setPluginResourcesFolder(targetTestClassesFolder.getParentFile());
 
-    builder.setProvidedExclusions(readAttribute("providedExclusions", klass));
-    builder.setProvidedInclusions(readAttribute("providedInclusions", klass));
-    builder.setTestExclusions(readAttribute("testExclusions", klass));
-    builder.setTestInclusions(readAttribute("testInclusions", klass));
+    builder.setProvidedExclusions(runnerConfiguration.getProvidedExclusions());
+    builder.setProvidedInclusions(runnerConfiguration.getProvidedInclusions());
+    builder.setTestExclusions(runnerConfiguration.getTestExclusions());
+    builder.setTestInclusions(runnerConfiguration.getTestInclusions());
 
-    builder.setExportPluginClasses(readAttribute("exportPluginClasses", klass));
+    builder.setExportPluginClasses(runnerConfiguration.getExportPluginClasses());
 
-    builder.setPluginCoordinates(readAttribute("plugins", klass));
-    builder.setSharedPluginLibCoordinates(readAttribute("sharedRuntimeLibs", klass));
+    builder.setPluginCoordinates(runnerConfiguration.getPlugins());
+    builder.setSharedPluginLibCoordinates(runnerConfiguration.getSharedRuntimeLibs());
     builder.setExtensionMetadataGeneration(true);
 
     Properties excludedProperties;

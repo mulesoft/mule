@@ -12,8 +12,9 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.test.IntegrationTestCaseRunnerConfig;
 
-public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
+public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase implements IntegrationTestCaseRunnerConfig {
 
   @Override
   protected String getConfigFile() {

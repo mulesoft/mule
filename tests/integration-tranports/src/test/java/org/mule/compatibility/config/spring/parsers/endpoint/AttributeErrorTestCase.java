@@ -7,6 +7,7 @@
 package org.mule.compatibility.config.spring.parsers.endpoint;
 
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCaseRunnerConfig;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.test.config.spring.parsers.AbstractBadConfigTestCase;
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class AttributeErrorTestCase extends AbstractBadConfigTestCase {
+public class AttributeErrorTestCase extends AbstractBadConfigTestCase implements CompatibilityFunctionalTestCaseRunnerConfig {
 
   @Override
   protected String getConfigFile() {
