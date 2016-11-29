@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +31,7 @@ public final class JarUtils {
 
   private static final String MULE_MODULE_FILENAME = "lib" + File.separator + "module";
   private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
-  private static final String MULE_HOME = System.getProperty("mule.home");
+  private static final String MULE_HOME = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
 
   public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 

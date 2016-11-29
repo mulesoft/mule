@@ -6,6 +6,7 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Runtime.getRuntime;
 import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
@@ -86,18 +87,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param name the name of this scheduler
    * @param executor the actual executor that will run the dispatched tasks.
    * @param workers an estimate of how many threads will be, at maximum, in the underlying executor
-   * @param totalWorkers an estimate of how many threads will be, at maximum, in all the underlying executors
    * @param scheduledExecutor the executor that will handle the delayed/periodic tasks. This will not execute the actual tasks,
    *        but will dispatch it to the {@code executor} at the appropriate time.
    * @param quartzScheduler the quartz object that will handle tasks scheduled with cron expressions. This will not execute the
    *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
    * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
    */
-  DefaultScheduler(String name, ExecutorService executor, int workers, int totalWorkers,
-                   ScheduledExecutorService scheduledExecutor,
+  DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
                    org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
     this.name = name + "@" + Integer.toHexString(hashCode());
-    scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, totalWorkers);
+    scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
     cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;
     this.scheduledExecutor = scheduledExecutor;

@@ -17,9 +17,9 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
  * Provides access to the different schedulers and thread pools that exist in the Mule runtime, allowing an artifact to schedule
  * tasks on those.
  * <p>
- * This interface provides access to different schedulers, each with its own configured tuning options (TODO MULE-10585),
- * optimized for some specific kind of work. Artifacts that need to dispatch tasks need to carefully determine which scheduler
- * best fits the nature of the task in order to keep the resources usage and the impact on other artifacts at a minimum.
+ * This interface provides access to different schedulers, each with its own configured tuning options, optimized for some
+ * specific kind of work. Artifacts that need to dispatch tasks need to carefully determine which scheduler best fits the nature
+ * of the task in order to keep the resources usage and the impact on other artifacts at a minimum.
  * <p>
  * The {@link Scheduler}s returned by methods in the implementations must provide access the the thread pools in the Mule Runtime
  * that have the expected tuning configuration. Each {@link Scheduler} will have its own lifecycle, managed by its user and NOT

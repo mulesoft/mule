@@ -37,6 +37,7 @@
 #
 /mule-standalone-${productVersion}/conf/log4j2.xml
 /mule-standalone-${productVersion}/conf/wrapper.conf
+/mule-standalone-${productVersion}/conf/scheduler-pools.conf
 /mule-standalone-${productVersion}/conf/tls-default.conf
 /mule-standalone-${productVersion}/conf/tls-fips140-2.conf
 

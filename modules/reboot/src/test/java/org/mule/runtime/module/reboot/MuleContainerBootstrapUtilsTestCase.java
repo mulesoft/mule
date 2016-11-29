@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.reboot;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,16 +24,11 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MuleContainerBootstrapUtilsTestCase {
 
   @Before
   public void setUp() {
-    System.setProperty("mule.home", "foo");
+    System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, "foo");
   }
 
   /**
