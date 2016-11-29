@@ -7,9 +7,10 @@
 package org.mule.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.util.TemplateParser.createAntStyleParser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import static org.mule.util.TemplateParser.createAntStyleParser;
+
 import java.util.HashMap;
 import java.util.Map;
 
