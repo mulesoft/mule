@@ -23,7 +23,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Lo
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ArrayType}
@@ -40,7 +40,7 @@ class CollectionSchemaDelegate {
   }
 
   void generateCollectionElement(ArrayType metadataType, DslElementSyntax collectionDsl, String description, boolean required,
-                                 Map<String, TopLevelElement> all) {
+                                 List<TopLevelElement> all) {
     LocalComplexType collectionComplexType = generateCollectionComplexType(collectionDsl, metadataType);
 
     TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(),
@@ -49,7 +49,7 @@ class CollectionSchemaDelegate {
     collectionElement.setAnnotation(builder.createDocAnnotation(description));
     collectionElement.setComplexType(collectionComplexType);
 
-    all.put(collectionDsl.getElementName(), collectionElement);
+    all.add(collectionElement);
   }
 
   private LocalComplexType generateCollectionComplexType(DslElementSyntax collectionDsl, final ArrayType metadataType) {

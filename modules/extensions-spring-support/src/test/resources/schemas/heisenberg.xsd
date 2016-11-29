@@ -26,7 +26,7 @@
     <xs:complexType name="org.mule.test.heisenberg.extension.model.KnockeableDoor">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="previous">
                         <xs:complexType>
                             <xs:complexContent>
@@ -44,7 +44,7 @@
     <xs:complexType name="org.mule.test.heisenberg.extension.model.Ricin">
         <xs:complexContent>
             <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="destination">
                         <xs:complexType>
                             <xs:complexContent>
@@ -105,7 +105,7 @@
     <xs:complexType name="org.mule.test.heisenberg.extension.model.Investment">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-             <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="discarded-investments">
                         <xs:complexType>
                             <xs:sequence>
@@ -162,7 +162,7 @@
     <xs:complexType name="org.mule.test.heisenberg.extension.model.RecursivePojo">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="next">
                         <xs:complexType>
                             <xs:complexContent>
@@ -247,7 +247,7 @@
     <xs:complexType name="org.mule.test.heisenberg.extension.model.RecursiveChainB">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="chain-a">
                         <xs:complexType>
                             <xs:complexContent>
@@ -276,7 +276,7 @@
                     <xs:annotation>
                         <xs:documentation>Default configuration</xs:documentation>
                     </xs:annotation>
-                      <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="family-informations">
@@ -401,57 +401,47 @@
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
-                          <xs:complexType>
-                            <xs:sequence>
-                              <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
-                                <xs:complexType>
-                                  <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                </xs:complexType>
-                              </xs:element>
-                            </xs:sequence>
-                          </xs:complexType>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
-                          <xs:complexType>
-                            <xs:sequence>
-                              <xs:element minOccurs="0" maxOccurs="unbounded" name="labeled-ricin">
-                                <xs:complexType>
-                                  <xs:sequence maxOccurs="1">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
-                                  </xs:sequence>
-                                  <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                  <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                                </xs:complexType>
-                              </xs:element>
-                            </xs:sequence>
-                          </xs:complexType>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="labeled-ricin">
+                                        <xs:complexType>
+                                            <xs:sequence maxOccurs="1">
+                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="next-door">
-                          <xs:complexType>
-                            <xs:complexContent>
-                              <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
-                            </xs:complexContent>
-                          </xs:complexType>
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
-                          <xs:complexType>
-                            <xs:sequence>
-                              <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
-                            </xs:sequence>
-                          </xs:complexType>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
-                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
-                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
-                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
-                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="familyInformations"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
@@ -470,6 +460,16 @@
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="healthProgressions"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
+                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -478,17 +478,17 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:sequence minOccurs="0" maxOccurs="1">
-                  <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
-                    <xs:complexType>
-                      <xs:sequence>
-                        <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
-                          <xs:complexType>
-                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                          </xs:complexType>
-                        </xs:element>
-                      </xs:sequence>
-                    </xs:complexType>
-                  </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -694,19 +694,20 @@
     <xs:complexType name="AliasType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-                  <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
-                    <xs:complexType>
-                      <xs:sequence>
-                        <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
-                          <xs:complexType>
-                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                          </xs:complexType>
-                        </xs:element>
-                      </xs:sequence>
-                    </xs:complexType>
-                  </xs:element>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
                 <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
@@ -714,7 +715,6 @@
                 <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
                 <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -838,7 +838,7 @@
     <xs:complexType name="GetGramsInStorageType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="grams">
                         <xs:complexType>
                             <xs:sequence>
@@ -876,7 +876,7 @@
     <xs:complexType name="GetMedicalHistoryType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                 <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="health-by-years">
                         <xs:complexType>
                             <xs:sequence>
@@ -934,7 +934,7 @@
     <xs:complexType name="KillManyType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="1" maxOccurs="1">
+                <xs:sequence minOccurs="1" maxOccurs="1">
                     <xs:element minOccurs="1" maxOccurs="unbounded" name="kill-operations">
                         <xs:complexType>
                             <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="unbounded" ref="heisenberg-empire-group"></xs:group>
@@ -954,7 +954,7 @@
     <xs:complexType name="KillOneType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="1" maxOccurs="1">
+                <xs:sequence minOccurs="1" maxOccurs="1">
                     <xs:element minOccurs="1" maxOccurs="1" name="kill-operation">
                         <xs:complexType>
                             <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg-empire-group"></xs:group>
@@ -988,7 +988,7 @@
     <xs:complexType name="KillWithMultipleWildCardWeaponsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapons">
                         <xs:complexType>
                             <xs:sequence>
@@ -1013,7 +1013,7 @@
     <xs:complexType name="KillWithMultiplesWeaponsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                 <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="weapons">
                         <xs:complexType>
                             <xs:sequence>
@@ -1038,7 +1038,7 @@
     <xs:complexType name="KillWithRicinsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="ricins">
                         <xs:complexType>
                             <xs:sequence>
@@ -1067,7 +1067,7 @@
     <xs:complexType name="KillWithWeaponType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                 <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -1099,7 +1099,7 @@
     <xs:complexType name="KnockType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="knocked-door">
                         <xs:complexType>
                             <xs:complexContent>
@@ -1121,7 +1121,7 @@
     <xs:complexType name="KnockManyType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="doors">
                         <xs:complexType>
                             <xs:sequence>
@@ -1219,7 +1219,7 @@
     <xs:complexType name="ProcessWeaponType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -1242,7 +1242,7 @@
     <xs:complexType name="ProcessWeaponWithDefaultValueType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">

@@ -9,12 +9,10 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
@@ -88,10 +86,8 @@ import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -272,8 +268,8 @@ public final class SchemaBuilder {
     return this;
   }
 
-  Map<String, TopLevelElement> registerParameters(ExtensionType type, Collection<ParameterModel> parameterModels) {
-    LinkedHashMap<String, TopLevelElement> all = new LinkedHashMap<>();
+  List<TopLevelElement> registerParameters(ExtensionType type, Collection<ParameterModel> parameterModels) {
+    List<TopLevelElement> all = new ArrayList<>(parameterModels.size());
     for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels)) {
       DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
       declareAsParameter(parameterModel.getType(), type, parameterModel, paramDsl, all);
@@ -507,18 +503,17 @@ public final class SchemaBuilder {
   }
 
   void declareAsParameter(MetadataType type, ExtensionType extensionType, ParameterModel parameterModel,
-                          DslElementSyntax paramDsl, Map<String, TopLevelElement> childElements) {
+                          DslElementSyntax paramDsl, List<TopLevelElement> childElements) {
 
     if (ExtensionModelUtils.isContent(parameterModel) || TypeUtils.isContent(type)) {
-      childElements.put(paramDsl.getElementName(),
-                        generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired()));
+      childElements.add(generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired()));
     } else {
       type.accept(getParameterDeclarationVisitor(extensionType, childElements, parameterModel));
     }
   }
 
   private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
-                                                             final Map<String, TopLevelElement> childElements,
+                                                             final List<TopLevelElement> childElements,
                                                              final ParameterModel parameterModel) {
     final DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
     return getParameterDeclarationVisitor(extensionType, childElements,
@@ -529,7 +524,7 @@ public final class SchemaBuilder {
   }
 
   private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
-                                                             final Map<String, TopLevelElement> childElements,
+                                                             final List<TopLevelElement> childElements,
                                                              final String name, final String description,
                                                              ExpressionSupport expressionSupport, boolean required,
                                                              Object defaultValue, DslElementSyntax paramDsl,
@@ -573,8 +568,7 @@ public final class SchemaBuilder {
       @Override
       public void visitString(StringType stringType) {
         if (paramDsl.supportsChildDeclaration()) {
-          childElements.put(paramDsl.getElementName(),
-                            generateTextElement(paramDsl, description, isRequired(forceOptional, required)));
+          childElements.add(generateTextElement(paramDsl, description, isRequired(forceOptional, required)));
         } else {
           defaultVisit(stringType);
         }
@@ -607,7 +601,7 @@ public final class SchemaBuilder {
     return languageModel;
   }
 
-  private void addTlsSupport(ExtensionType extensionType, Map<String, TopLevelElement> childElements) {
+  private void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
     if (!requiresTls) {
       importTlsNamespace();
       requiresTls = true;
@@ -616,13 +610,13 @@ public final class SchemaBuilder {
     addAttributeAndElement(extensionType, childElements, TLS_ATTRIBUTE_NAME, TLS_CONTEXT_TYPE);
   }
 
-  private void addAttributeAndElement(ExtensionType extensionType, Map<String, TopLevelElement> childElements,
+  private void addAttributeAndElement(ExtensionType extensionType, List<TopLevelElement> childElements,
                                       String attributeName, QName elementRef) {
 
     extensionType.getAttributeOrAttributeGroup()
         .add(createAttribute(attributeName, load(String.class), false, ExpressionSupport.NOT_SUPPORTED));
 
-    childElements.put(elementRef.getLocalPart(), createRefElement(elementRef, false));
+    childElements.add(createRefElement(elementRef, false));
   }
 
   TopLevelElement createRefElement(QName elementRef, boolean isRequired) {
@@ -697,23 +691,12 @@ public final class SchemaBuilder {
     return element.getMinOccurs().equals(ONE);
   }
 
-  void addOrderedParameterGroupsToSequence(Map<String, Map<String, TopLevelElement>> groups, ExplicitGroup sequence) {
-    // General parameters first
-    groups.getOrDefault(DEFAULT_GROUP_NAME, emptyMap())
-        .forEach((name, parameter) -> {
-          sequence.getParticle().add(objectFactory.createElement(parameter));
-          if (isRequired(parameter)) {
-            sequence.setMinOccurs(ONE);
-          }
-        });
-
-    // Other groups later
-    groups.keySet().stream().filter(name -> !name.equals(DEFAULT_GROUP_NAME))
-        .forEach(group -> groups.get(group).forEach((name, parameter) -> {
-          sequence.getParticle().add(objectFactory.createElement(parameter));
-          if (isRequired(parameter)) {
-            sequence.setMinOccurs(ONE);
-          }
-        }));
+  void addParameterGroupsToSequence(List<TopLevelElement> parameters, ExplicitGroup sequence) {
+    parameters.forEach(parameter -> {
+      sequence.getParticle().add(objectFactory.createElement(parameter));
+      if (isRequired(parameter)) {
+        sequence.setMinOccurs(ONE);
+      }
+    });
   }
 }

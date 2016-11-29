@@ -28,9 +28,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Lo
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Builder delegation class to generate a XSD schema that describes a {@link ConnectionProviderModel}
  *
@@ -77,11 +74,11 @@ final class ConnectionProviderSchemaDelegate {
       addConnectionProviderPoolingProfile(sequence);
     }
 
-    Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
-    providerModel.getParameterGroupModels()
-        .forEach(g -> groups.put(g.getName(), builder.registerParameters(providerType, g.getParameterModels())));
-
-    builder.addOrderedParameterGroupsToSequence(groups, sequence);
+    providerModel.getParameterGroupModels().forEach(g -> builder.addParameterGroupsToSequence(
+                                                                                              builder
+                                                                                                  .registerParameters(providerType,
+                                                                                                                      g.getParameterModels()),
+                                                                                              sequence));
 
     providerType.setSequence(sequence);
 

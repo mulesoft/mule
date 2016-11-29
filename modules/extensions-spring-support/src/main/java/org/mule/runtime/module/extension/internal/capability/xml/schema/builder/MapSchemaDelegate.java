@@ -30,7 +30,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import java.math.BigInteger;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link DictionaryType}
@@ -47,7 +47,7 @@ final class MapSchemaDelegate {
   }
 
   void generateMapElement(DictionaryType metadataType, DslElementSyntax paramDsl, String description, boolean required,
-                          Map<String, TopLevelElement> all) {
+                          List<TopLevelElement> all) {
     BigInteger minOccurs = required ? ONE : ZERO;
     LocalComplexType mapComplexType = generateMapComplexType(paramDsl, metadataType);
 
@@ -55,7 +55,7 @@ final class MapSchemaDelegate {
     mapElement.setAnnotation(builder.createDocAnnotation(description));
     mapElement.setComplexType(mapComplexType);
 
-    all.put(paramDsl.getElementName(), mapElement);
+    all.add(mapElement);
   }
 
   private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final DictionaryType metadataType) {
