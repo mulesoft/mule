@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-9637")
 public class MessagePropertySessionScopesTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
@@ -35,7 +36,6 @@ public class MessagePropertySessionScopesTestCase extends CompatibilityFunctiona
     assertEquals("java.util.Date", payload);
   }
 
-  @Ignore
   @Test
   public void testInvocationProperty() throws Exception {
     InternalMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
