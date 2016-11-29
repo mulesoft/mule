@@ -6,11 +6,9 @@
  */
 package org.mule.service.scheduler.internal;
 
-import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
@@ -43,8 +41,6 @@ import ru.yandex.qatools.allure.annotations.Features;
 @RunWith(Parameterized.class)
 @Features("Scheduler Task Scheduling")
 public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCase {
-
-  private static final int DELTA_MILLIS = 30;
 
   private Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService> executorFactory;
 
@@ -396,14 +392,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(scheduled.isDone(), is(true));
   }
 
-  protected void assertTerminationIsNotDelayed(final ScheduledExecutorService executor) throws InterruptedException {
-    long startTime = nanoTime();
-    executor.shutdown();
-    executor.awaitTermination(1000, MILLISECONDS);
-
-    assertThat((double) NANOSECONDS.toMillis(nanoTime() - startTime), closeTo(0, DELTA_MILLIS));
-  }
-
   @Test
   @Description("Tests that shutdownNow after cancelling a running ScheduledFuture before being fired returns the cancelled task")
   public void shutdownNowAfterCancelCallableBeforeFire() {
@@ -530,6 +518,9 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   }
 
   protected ScheduledExecutorService useSharedScheduledExecutor() {
+    sharedScheduledExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
+    sharedScheduledExecutor.setRemoveOnCancelPolicy(false);
+
     return sharedScheduledExecutor;
   }
 
