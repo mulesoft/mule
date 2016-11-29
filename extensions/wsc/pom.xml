@@ -21,7 +21,6 @@
         <cxfVersion>2.7.15</cxfVersion>
         <metadataModelXmlVersion>1.0.0-SNAPSHOT</metadataModelXmlVersion>
         <xmlUnitVersion>1.6</xmlUnitVersion>
-        <muleXmlModuleVersion>4.0-SNAPSHOT</muleXmlModuleVersion>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -106,7 +105,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
-            <version>${muleXmlModuleVersion}</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
