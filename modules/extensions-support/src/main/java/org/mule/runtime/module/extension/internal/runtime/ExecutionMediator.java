@@ -10,6 +10,8 @@ import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 
+import reactor.core.publisher.Mono;
+
 /**
  * Executes operations while coordinating the several moving parts that are affected by the execution process, so that such pieces
  * can remain decoupled.
@@ -29,5 +31,5 @@ public interface ExecutionMediator {
    * @return the operation's result
    * @throws Exception if any exception is encountered
    */
-  Object execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable;
+  Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable;
 }

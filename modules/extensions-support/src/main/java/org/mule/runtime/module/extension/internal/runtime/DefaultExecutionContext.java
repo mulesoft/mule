@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isTransactional;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -72,8 +72,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     transactionConfigSupplier = () -> {
       synchronized (this) {
         if (transactionConfig == null) {
-          transactionConfig = isTransactional(componentModel) ? Optional.of(buildTransactionConfig()) : empty();
-
+          transactionConfig = componentModel.isTransactional() ? of(buildTransactionConfig()) : empty();
           transactionConfigSupplier = () -> transactionConfig;
         }
         return transactionConfig;

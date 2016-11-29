@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
@@ -33,7 +34,7 @@ final class VoidReturnDelegate implements ReturnDelegate {
    * @return {@link ExecutionContextAdapter#getEvent()}
    */
   @Override
-  public MuleEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return operationContext.getEvent();
   }
 }

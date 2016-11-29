@@ -108,13 +108,13 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
 
   private SourceCompletionHandlerFactory doCreateCompletionHandler(SourceCallbackModelProperty modelProperty) {
     final SourceCallbackExecutor onSuccessExecutor =
-        getMethodExecutor(modelProperty.getOnSuccessMethod(), successCallbackParameters);
-    final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod(), errorCallbackParameters);
+        getMethodExecutor(modelProperty.getOnSuccessMethod());
+    final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod());
 
     return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, context);
   }
 
-  private SourceCallbackExecutor getMethodExecutor(Optional<Method> method, ResolverSet parameters) {
+  private SourceCallbackExecutor getMethodExecutor(Optional<Method> method) {
     return method.map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
                                                                                          sourceModel, source, m,
                                                                                          muleContext))

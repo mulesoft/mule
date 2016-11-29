@@ -100,7 +100,7 @@ public interface Transformer extends Processor, Initialisable, Disposable, Namea
   DataType getReturnDataType();
 
   @Override
-  default ProcessingType getProccesingType() {
+  default ProcessingType getProcessingType() {
     return CPU_INTENSIVE;
   }
 

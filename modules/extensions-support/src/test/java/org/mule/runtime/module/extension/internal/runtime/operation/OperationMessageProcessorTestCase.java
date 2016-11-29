@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -18,7 +16,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -28,10 +25,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
+import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
-import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
@@ -46,6 +46,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -60,13 +61,10 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
-import org.mule.runtime.core.policy.OperationParametersProcessor;
-import org.mule.runtime.core.policy.OperationPolicy;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -84,7 +82,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -92,8 +89,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
 
   private static final String SOME_PARAM_NAME = "someParam";
-  private static final String EXTENSION_NAMESPACE = "extension_namespace";
-  private static final String OPERATION_NAME = "operation_name";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -378,6 +373,19 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(metadataKeys, hasItem(metadataKeyWithId(BOOLEAN.name())));
     assertThat(metadataKeys, hasItem(metadataKeyWithId(STRING.name())));
   }
+
+  @Test
+  public void getProcessingType() {
+    assertProcessingType(CPU_INTENSIVE, ProcessingType.CPU_INTENSIVE);
+    assertProcessingType(CPU_LITE, ProcessingType.CPU_LITE);
+    assertProcessingType(BLOCKING, ProcessingType.BLOCKING);
+  }
+
+  private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {
+    when(operationModel.getExecutionType()).thenReturn(executionType);
+    assertThat(messageProcessor.getProcessingType(), is(expectedProcessingType));
+  }
+
 
   private Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
     return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();

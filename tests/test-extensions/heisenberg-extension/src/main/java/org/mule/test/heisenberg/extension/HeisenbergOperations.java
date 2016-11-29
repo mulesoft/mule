@@ -8,9 +8,8 @@ package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -21,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -48,12 +48,13 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 public class HeisenbergOperations {
 
@@ -176,6 +177,7 @@ public class HeisenbergOperations {
     throw new HealthException(CURE_CANCER_MESSAGE);
   }
 
+  @Execution(CPU_INTENSIVE)
   public Investment approve(Investment investment,
                             @Optional RecursivePojo recursivePojo,
                             @Optional RecursiveChainB recursiveChainB,

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
@@ -23,6 +24,8 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapte
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
+
+import reactor.core.publisher.Mono;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which also implements {@link InterceptingMessageProcessor}.
@@ -42,10 +45,10 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, ExecutionContextAdapter operationContext)
+  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext)
       throws MuleException {
 
-    Event resultEvent = (Event) super.doProcess(event, operationContext);
+    Event resultEvent = super.doProcess(event, operationContext).block();
     PagingProvider<?, ?> pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
 
     if (pagingProvider == null) {
@@ -57,7 +60,6 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                    connectionManager);
     Consumer<?> consumer = new ListConsumer(producer);
 
-    return returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext);
+    return just(returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext));
   }
-
 }

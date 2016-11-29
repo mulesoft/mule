@@ -156,7 +156,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void interceptorsInvokedOnSuccess() throws Throwable {
-    Object result = mediator.execute(operationExecutor, operationContext);
+    Object result = mediator.execute(operationExecutor, operationContext).block();
 
     assertBefore();
     assertOnSuccess(times(1));

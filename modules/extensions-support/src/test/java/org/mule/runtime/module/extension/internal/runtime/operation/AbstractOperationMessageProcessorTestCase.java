@@ -16,6 +16,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -78,12 +79,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
+  protected static final String EXTENSION_NAMESPACE = "extension_namespace";
   protected static final String CONFIG_NAME = "config";
   protected static final String OPERATION_NAME = "operation";
   protected static final String TARGET_VAR = "myFlowVar";
@@ -175,8 +176,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
       return subject;
     });
 
-    when(extensionModel.getName()).thenReturn("testException");
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAMESPACE);
     when(operationModel.getName()).thenReturn(getClass().getName());
+    when(operationModel.isBlocking()).thenReturn(true);
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
     when(operationModel.getOutput())
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));
@@ -251,10 +253,12 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
     when(mockPolicyManager.createOperationPolicy(any(), any(), any(), any())).thenAnswer(invocationOnMock -> {
-      mockOperationPolicy = Mockito.mock(OperationPolicy.class);
-      when(mockOperationPolicy.process(any()))
-          .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
-              .execute((Map<String, Object>) invocationOnMock.getArguments()[2], (Event) invocationOnMock.getArguments()[1]));
+      if (mockOperationPolicy == null) {
+        mockOperationPolicy = mock(OperationPolicy.class);
+        when(mockOperationPolicy.process(any()))
+            .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
+                .execute((Map<String, Object>) invocationOnMock.getArguments()[2], (Event) invocationOnMock.getArguments()[1]));
+      }
       return mockOperationPolicy;
     });
 

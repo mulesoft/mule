@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -34,8 +36,6 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -43,6 +43,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 /**
  * Default implementation of {@link ExecutionMediator}.
@@ -88,7 +93,8 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
-  public Object execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable {
+  @Override
+  public Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable {
     final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
     final MutableConfigurationStats mutableStats = getMutableConfigurationStats(context);
     if (mutableStats != null) {
@@ -103,17 +109,15 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     }
   }
 
-  private Object executeWithRetryPolicy(OperationExecutor executor, ExecutionContextAdapter context,
-                                        List<Interceptor> interceptors)
+  private Mono<Object> executeWithRetryPolicy(OperationExecutor executor, ExecutionContextAdapter context,
+                                              List<Interceptor> interceptors)
       throws Throwable {
     RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate(context.getConfiguration());
-
-    ExecutionTemplate<RetryContext> executionTemplate = getExecutionTemplate(context);
 
     final OperationRetryCallBack connectionRetry = new OperationRetryCallBack(executor, context, interceptors);
     // TODO - MULE-9336 - Add support for non blocking retry policies
     // TODO - MULE-10579 - Reconnection should be centralized
-    executionTemplate.execute(() -> retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER));
+    retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER);
     Throwable exception = connectionRetry.getOperationExecutionResult().getException();
     if (exception != null) {
       throw exception;
@@ -146,7 +150,11 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
       after(context, result, interceptors);
     }
 
-    return new OperationExecutionResult(result, exception, Optional.ofNullable(retryRequestHolder.get()));
+    Mono<Object> reactiveResult = result instanceof Publisher
+        ? from((Publisher) result)
+        : justOrEmpty(result);
+
+    return new OperationExecutionResult(reactiveResult, exception, Optional.ofNullable(retryRequestHolder.get()));
   }
 
 

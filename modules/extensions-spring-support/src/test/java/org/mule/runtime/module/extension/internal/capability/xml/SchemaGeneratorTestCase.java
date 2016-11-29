@@ -38,6 +38,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Tes
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
@@ -96,6 +97,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
         put(HeisenbergExtension.class, "heisenberg.xsd");
         put(TransactionalExtension.class, "tx-ext.xsd");
         put(SubTypesMappingConnector.class, "subtypes.xsd");
+        put(MarvelExtension.class, "marvel.xsd");
       }
     };
 

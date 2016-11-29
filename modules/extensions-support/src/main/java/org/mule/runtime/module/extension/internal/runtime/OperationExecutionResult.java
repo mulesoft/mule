@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import java.util.Optional;
 
+import reactor.core.publisher.Mono;
+
 /**
  * POJO that holds the result of a Processor execution.
  *
@@ -15,11 +17,11 @@ import java.util.Optional;
  */
 final class OperationExecutionResult {
 
-  private final Object output;
+  private final Mono<Object> output;
   private final Throwable exception;
   private final Optional<InterceptorsRetryRequest> retryRequest;
 
-  public OperationExecutionResult(Object output, Throwable exception, Optional<InterceptorsRetryRequest> retryRequest) {
+  public OperationExecutionResult(Mono<Object> output, Throwable exception, Optional<InterceptorsRetryRequest> retryRequest) {
     this.output = output;
     this.exception = exception;
     this.retryRequest = retryRequest;
@@ -35,7 +37,7 @@ final class OperationExecutionResult {
   /**
    * @return the return of the operation
    */
-  public Object getOutput() {
+  public Mono<Object> getOutput() {
     return output;
   }
 

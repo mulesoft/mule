@@ -13,3 +13,5 @@ org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionTypes
 org.mule.runtime.module.extension.internal.introspection.enricher.ContentParameterModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ErrorsModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionErrorsModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.TransactionalModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ExecutionTypeModelEnricher

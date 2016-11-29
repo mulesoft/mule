@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
@@ -30,6 +31,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.NonBlockingCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
@@ -52,10 +54,12 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
   private static final ArgumentResolver<Message> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
-  private static final ArgumentResolver<SourceCallbackContext> SOURCE_CALLBACK_CONTEXT_RESOLVER =
+  private static final ArgumentResolver<SourceCallbackContext> SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER =
       new SourceCallbackContextArgumentResolver();
   private static final ArgumentResolver<Event> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
+  private static final ArgumentResolver<NonBlockingCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
+      new NonBlockingCallbackArgumentResolver();
 
 
   private final Method method;
@@ -104,11 +108,13 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (Error.class.isAssignableFrom(parameterType)) {
         argumentResolver = ERROR_ARGUMENT_RESOLVER;
       } else if (SourceCallbackContext.class.isAssignableFrom(parameterType)) {
-        argumentResolver = SOURCE_CALLBACK_CONTEXT_RESOLVER;
+        argumentResolver = SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
       } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
       } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
+      } else if (NonBlockingCallback.class.isAssignableFrom(parameterType)) {
+        argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

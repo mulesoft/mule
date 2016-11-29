@@ -47,6 +47,4 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
     return Event.builder(operationContext.getEvent())
         .message((InternalMessage) toMessage(value, operationContext)).build();
   }
-
-
 }

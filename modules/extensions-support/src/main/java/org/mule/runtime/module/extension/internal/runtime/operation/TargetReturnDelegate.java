@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
@@ -37,7 +37,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   }
 
   @Override
-  public MuleEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return org.mule.runtime.core.api.Event.builder(operationContext.getEvent())
         .addVariable(target, toMessage(value, operationContext)).build();
   }

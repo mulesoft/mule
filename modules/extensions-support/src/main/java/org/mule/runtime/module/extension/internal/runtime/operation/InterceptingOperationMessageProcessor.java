@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
@@ -32,6 +33,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which also implements {@link InterceptingMessageProcessor}.
@@ -56,9 +58,9 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
   }
 
   @Override
-  protected Event doProcess(org.mule.runtime.core.api.Event event, ExecutionContextAdapter operationContext)
+  protected Mono<Event> doProcess(org.mule.runtime.core.api.Event event, ExecutionContextAdapter operationContext)
       throws MuleException {
-    Event resultEvent = (Event) super.doProcess(event, operationContext);
+    Event resultEvent = super.doProcess(event, operationContext).block();
     InterceptingCallback<?> interceptingCallback = getInterceptorCallback(operationContext);
 
     try {
@@ -82,7 +84,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
       onComplete(interceptingCallback, event, operationContext);
     }
 
-    return resultEvent;
+    return just(resultEvent);
 
   }
 

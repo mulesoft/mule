@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -29,7 +30,7 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
    *
    * @return the processing type for this processor.
    */
-  default ProcessingType getProccesingType() {
+  default ProcessingType getProcessingType() {
     return CPU_LITE;
   }
 
@@ -42,16 +43,20 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
      * CPU intensive processing such as calculation or transformation.
      */
     CPU_INTENSIVE,
+
     /**
      * Processing which neither blocks nor is CPU intensive such as message passing, filtering, routing or non-blocking IO..
      */
     CPU_LITE,
+
     /**
-     * Blocking processing that use Thead.sleep or any other technique to block the current thread during processing.
+     * Blocking processing that use {@link Thread#sleep(long)}, {@link Lock#lock()} or any other technique to block
+     * the current thread during processing.
      */
     BLOCKING,
+
     /**
-     * Blocking IO read/write operations. This is treated seperatly to {@link #BLOCKING} to allow for potential optimizations when
+     * Blocking IO read/write operations. This is treated separately to {@link #BLOCKING} to allow for potential optimizations when
      * IO is fast and/or message sizes smalls.
      */
     IO_RW

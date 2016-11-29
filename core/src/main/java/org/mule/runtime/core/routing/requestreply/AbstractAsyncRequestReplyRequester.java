@@ -348,7 +348,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   }
 
   @Override
-  public ProcessingType getProccesingType() {
+  public ProcessingType getProcessingType() {
     return BLOCKING;
   }
 }

@@ -41,7 +41,7 @@ public interface Processor extends ReactiveProcessor {
    * <p>
    * The default implementation delegates to {@link #process(Event)} and will:
    * <ol>
-   * <li>propagte any exception thrown</li>
+   * <li>propagate any exception thrown</li>
    * <li>drop events if invocation of {@link #process(Event)} returns null.</li>
    * </ol>
    *

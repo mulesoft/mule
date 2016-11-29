@@ -93,9 +93,9 @@ public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStr
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
                                                                     Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-      if (messageProcessor.getProccesingType() == BLOCKING) {
+      if (messageProcessor.getProcessingType() == BLOCKING) {
         return proactor(processorFunction, blockingScheduler);
-      } else if (messageProcessor.getProccesingType() == CPU_INTENSIVE) {
+      } else if (messageProcessor.getProcessingType() == CPU_INTENSIVE) {
         return proactor(processorFunction, cpuIntensiveScheduler);
       } else {
         return publisher -> from(publisher).transform(processorFunction);

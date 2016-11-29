@@ -68,7 +68,7 @@ public interface MessageDispatcher extends Connectable, Processor, LifecycleStat
   InternalMessage createMuleMessage(Object transportMessage) throws MuleException;
 
   @Override
-  default ProcessingType getProccesingType() {
+  default ProcessingType getProcessingType() {
     return BLOCKING;
   }
 
