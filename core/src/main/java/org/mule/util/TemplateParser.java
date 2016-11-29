@@ -166,8 +166,8 @@ public final class TemplateParser
             {
                 String matchRegex = Pattern.quote(match);
                 String valueString = value.toString();
-                valueString = replaceBlackSlash(valueString);
-                valueString =replaceDollarSign(valueString);
+                valueString = replaceBackSlash(valueString);
+                valueString = replaceDollarSign(valueString);
 
                 result = result.replaceAll(matchRegex, valueString);
             }
@@ -175,19 +175,20 @@ public final class TemplateParser
         return result;
     }
 
-    private String replaceDollarSign (String valueString)
+    private String replaceDollarSign(String valueString)
     {
-        if (valueString.indexOf('$')!= -1)
+        if (valueString.indexOf('$') != -1)
         {
-            valueString = valueString.replace("$","\\$");
+            valueString = valueString.replace("$", "\\$");
         }
         return valueString;
     }
 
-    private String replaceBlackSlash(String valueString)
+    private String replaceBackSlash(String valueString)
     {
 
-        if(valueString.indexOf("\\")!=-1){
+        if (valueString.indexOf("\\") != -1)
+        {
             valueString = valueString.replace("\\", "\\\\");
         }
         return valueString;
