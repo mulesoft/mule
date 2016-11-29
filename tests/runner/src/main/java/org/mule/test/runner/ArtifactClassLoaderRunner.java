@@ -160,7 +160,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     RunnerConfiguration testRunnerConfiguration = readConfiguration(klass);
     if (!runnerConfiguration.equals(testRunnerConfiguration)) {
       throw new IllegalArgumentException("Invalid configuration defined for test: " + klass
-          + " it is not supported to have multiple configurations of" +
+          + " . Is not supported to have multiple configurations of" +
           " the runner because class loaders are created only once for all the tests in the module. Current configuration loaded was: "
           + runnerConfiguration + " but configuration obtained from test class was: " + testRunnerConfiguration);
     }
