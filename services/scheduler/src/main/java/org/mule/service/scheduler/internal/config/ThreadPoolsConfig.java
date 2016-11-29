@@ -131,7 +131,7 @@ public class ThreadPoolsConfig {
     }
   }
 
-  private int cores = getRuntime().availableProcessors();
+  private static int cores = getRuntime().availableProcessors();
 
   private int gracefulShutdownTimeout = 15000;
   private int cpuLightPoolSize = 2 * cores;
