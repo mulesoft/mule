@@ -8,14 +8,15 @@ package org.mule.util;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
+import org.mule.tck.size.SmallTest;
+import static org.mule.util.TemplateParser.createAntStyleParser;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
-
+@SmallTest
 public class TemplateParserSpecialCharactersTestCase extends AbstractMuleTestCase
 {
     private Map<String, Object> properties;
@@ -31,7 +32,7 @@ public class TemplateParserSpecialCharactersTestCase extends AbstractMuleTestCas
     @Test
     public void testValueWithADollarSign()
     {
-        TemplateParser templateParser = TemplateParser.createAntStyleParser();
+        TemplateParser templateParser = createAntStyleParser();
         String template = "${prop1}";
         String result = templateParser.parse(properties, template);
         assertEquals("12345@$6789", result);
