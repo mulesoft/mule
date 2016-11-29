@@ -9,7 +9,6 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
@@ -37,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -80,7 +80,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private ExecutorService ioExecutor;
   private ExecutorService computationExecutor;
   private Set<ExecutorService> customSchedulersExecutors = new HashSet<>();
-  private ScheduledExecutorService scheduledExecutor;
+  private ScheduledThreadPoolExecutor scheduledExecutor;
   private org.quartz.Scheduler quartzScheduler;
 
   @Override
@@ -199,7 +199,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
         new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize(), threadPoolsConfig.getCpuIntensivePoolSize(),
                                0, SECONDS, new LinkedBlockingQueue<>(),
                                new SchedulerThreadFactory(computationGroup));
-    scheduledExecutor = newScheduledThreadPool(1, new SchedulerThreadFactory(timerGroup, "%s"));
+    scheduledExecutor = new ScheduledThreadPoolExecutor(1, new SchedulerThreadFactory(timerGroup, "%s"));
+    scheduledExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+    scheduledExecutor.setRemoveOnCancelPolicy(true);
     StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     try {
       schedulerFactory.initialize(threadPoolsConfig.defaultQuartzProperties(getName()));
@@ -266,8 +268,13 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
                                    MILLISECONDS)) {
       final List<Runnable> cancelledJobs = executor.shutdownNow();
       logger.warn("'" + executorLabel + "' " + executor.toString() + " of " + this.toString()
-          + " did not shutdown gracefully after " + threadPoolsConfig.getGracefulShutdownTimeout() + " milliseconds. "
-          + cancelledJobs.size() + " jobs were cancelled.");
+          + " did not shutdown gracefully after " + threadPoolsConfig.getGracefulShutdownTimeout() + " milliseconds.");
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("The jobs " + cancelledJobs + " were cancelled.");
+      } else {
+        logger.info(cancelledJobs.size() + " jobs were cancelled.");
+      }
     }
   }
 

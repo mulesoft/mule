@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -184,6 +185,31 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     latch2.countDown();
     assertThat(pendingResult.get(EXECUTOR_TIMEOUT_SECS, SECONDS), is(true));
 
+    // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
+    // returns.
+    new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
+      assertThat(executor, terminatedMatcher);
+      return true;
+    }));
+  }
+
+  @Test
+  @Description("Tests that calling shutdown() on a Scheduler with a fixed-delay Callable in-between executions frees the timer executor")
+  public void terminatedAfterShutdownInBetweenFixedDelayTask() throws InterruptedException, ExecutionException, TimeoutException {
+    final ScheduledExecutorService executor = createExecutor();
+
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    final ScheduledFuture<?> result = executor.scheduleWithFixedDelay(() -> {
+      latch.countDown();
+    }, 0, 10, SECONDS);
+
+    latch.await();
+    result.cancel(false);
+
+    assertTerminationIsNotDelayed(sharedScheduledExecutor);
+
+    executor.shutdown();
     // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
     // returns.
     new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
