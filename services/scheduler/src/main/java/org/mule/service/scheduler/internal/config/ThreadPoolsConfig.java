@@ -45,8 +45,8 @@ public class ThreadPoolsConfig {
   public static final String PROP_PREFIX = "org.mule.runtime.scheduler.";
   public static final String THREAD_POOL = "threadPool";
   public static final String THREAD_POOL_SIZE = THREAD_POOL + ".size";
-  public static final String THREAD_POOL_SIZE_MAX = THREAD_POOL + ".sizeMax";
-  public static final String THREAD_POOL_SIZE_CORE = THREAD_POOL + ".sizeCore";
+  public static final String THREAD_POOL_SIZE_MAX = THREAD_POOL + ".maxSize";
+  public static final String THREAD_POOL_SIZE_CORE = THREAD_POOL + ".coreSize";
   public static final String THREAD_POOL_KEEP_ALIVE = THREAD_POOL + ".threadKeepAlive";
 
   private static final String NUMBER_OR_VAR_REGEXP = "([0-9]+(\\.[0-9]+)?)|cores";
