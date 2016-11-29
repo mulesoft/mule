@@ -271,10 +271,6 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         return ImmutableList.of();
       }
 
-      //List<ParameterGroupDeclaration> sortedGroups = new ArrayList<>(declarations.size());
-      //declarations.stream().filter(g -> DEFAULT_GROUP_NAME.equals(g.getName())).findFirst().ifPresent(sortedGroups::add);
-      //declarations.stream().filter(g -> !DEFAULT_GROUP_NAME.equals(g.getName())).forEach(sortedGroups::add);
-
       //copy the list so that executing this doesn't affect the input data
       declarations = new ArrayList<>(declarations);
       declarations.sort((left, right) -> {
