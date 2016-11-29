@@ -57,10 +57,6 @@ final class ConfigurationSchemaDelegate {
     Optional<TopLevelElement> connectionElement = addConnectionProviderElement(configurationModel);
     Optional<TopLevelElement> policyElement = addDynamicConfigPolicyElement(configurationModel);
 
-    //Map<String, Map<String, TopLevelElement>> groups = new LinkedHashMap<>();
-    //configurationModel.getParameterGroupModels()
-    //    .forEach(g -> groups.put(g.getName(), builder.registerParameters(config, g.getParameterModels())));
-
     if (connectionElement.isPresent() || policyElement.isPresent() || !configurationModel.getParameterGroupModels().isEmpty()) {
       final ExplicitGroup sequence = new ExplicitGroup();
       sequence.setMinOccurs(ZERO);
