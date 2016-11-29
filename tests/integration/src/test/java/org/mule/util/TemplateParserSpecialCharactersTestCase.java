@@ -20,10 +20,12 @@ import org.junit.Test;
 @SmallTest
 public class TemplateParserSpecialCharactersTestCase extends AbstractMuleTestCase
 {
+
     private Map<String, Object> properties;
 
     @Before
-    public void initializeMap(){
+    public void initializeMap()
+    {
         properties = new HashMap<>();
         properties.put("prop1", "12345@$6789");
         properties.put("prop2", "12345@$67$89$10$");
