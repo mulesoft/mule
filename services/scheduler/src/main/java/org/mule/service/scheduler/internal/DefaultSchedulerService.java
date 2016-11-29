@@ -193,7 +193,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     cpuLightExecutor = new ThreadPoolExecutor(threadPoolsConfig.getCpuLightPoolSize(), threadPoolsConfig.getCpuLightPoolSize(),
                                               0, SECONDS, new LinkedBlockingQueue<>(), new SchedulerThreadFactory(cpuLightGroup));
     ioExecutor = new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize(), threadPoolsConfig.getIoMaxPoolSize(),
-                                        30, SECONDS, new SynchronousQueue<>(), new SchedulerThreadFactory(ioGroup));
+                                        threadPoolsConfig.getIoKeepAlive(), MILLISECONDS, new SynchronousQueue<>(),
+                                        new SchedulerThreadFactory(ioGroup));
     computationExecutor =
         new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize(), threadPoolsConfig.getCpuIntensivePoolSize(),
                                0, SECONDS, new LinkedBlockingQueue<>(),

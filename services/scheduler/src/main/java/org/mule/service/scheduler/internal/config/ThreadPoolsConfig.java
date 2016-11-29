@@ -7,7 +7,7 @@
 package org.mule.service.scheduler.internal.config;
 
 import static java.io.File.separator;
-import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
@@ -39,10 +39,13 @@ import org.slf4j.Logger;
  */
 public class ThreadPoolsConfig {
 
+
   private static final Logger logger = getLogger(ThreadPoolsConfig.class);
 
   public static final String PROP_PREFIX = "org.mule.runtime.scheduler.";
   public static final String THREAD_POOL_SIZE = "threadPoolSize";
+  public static final String THREAD_POOL_SIZE_MAX = THREAD_POOL_SIZE + ".max";
+  public static final String THREAD_POOL_SIZE_CORE = THREAD_POOL_SIZE + ".core";
 
   private static final String NUMBER_OR_VAR_REGEXP = "([0-9]+(\\.[0-9]+)?)|cores";
   private static final Pattern POOLSIZE_PATTERN =
@@ -82,26 +85,27 @@ public class ThreadPoolsConfig {
 
     ScriptEngineManager manager = new ScriptEngineManager();
     ScriptEngine engine = manager.getEngineByName("js");
-    engine.put("cores", config.cores);
+    engine.put("cores", cores);
 
     config.setGracefulShutdownTimeout(resolveNumber(properties, PROP_PREFIX + "gracefulShutdownTimeout"));
-    config.setCpuLightPoolSize(resolveExpression(properties, PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, config,
-                                                 engine));
-    config.setIoCorePoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".core", config,
+    config.setCpuLightPoolSize(resolveExpression(properties, PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE,
+                                                 config, engine));
+    config.setIoCorePoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_CORE, config,
                                                engine));
-    config.setIoMaxPoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE + ".max", config,
-                                              engine));
+    config
+        .setIoMaxPoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, config, engine));
     config.setIoKeepAlive(resolveNumber(properties, PROP_PREFIX + IO.getName() + ".threadKeepAlive"));
-    config.setCpuIntensivePoolSize(resolveExpression(properties, PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE,
-                                                     config, engine));
+    config.setCpuIntensivePoolSize(resolveExpression(properties,
+                                                     PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE_CORE, config,
+                                                     engine));
 
     return config;
   }
 
-  private static int resolveNumber(Properties properties, String propName) throws DefaultMuleException {
+  private static long resolveNumber(Properties properties, String propName) throws DefaultMuleException {
     final String property = properties.getProperty(propName);
     try {
-      final int result = parseInt(property);
+      final long result = parseLong(property);
       if (result <= 0) {
         throw new DefaultMuleException(propName + ": Value has to be greater than 0");
       }
@@ -133,11 +137,11 @@ public class ThreadPoolsConfig {
 
   private static int cores = getRuntime().availableProcessors();
 
-  private int gracefulShutdownTimeout = 15000;
+  private long gracefulShutdownTimeout = 15000;
   private int cpuLightPoolSize = 2 * cores;
   private int ioCorePoolSize = cores;
   private int ioMaxPoolSize = cores * cores;
-  private int ioKeepAlive = 30;
+  private long ioKeepAlive = 30000;
   private int cpuIntensivePoolSize = 2 * cores;
 
   private ThreadPoolsConfig() {
@@ -148,11 +152,11 @@ public class ThreadPoolsConfig {
    * @return the maximum time (in milliseconds) to wait until all tasks in all the runtime thread pools have completed execution
    *         when stopping the scheduler service.
    */
-  public int getGracefulShutdownTimeout() {
+  public long getGracefulShutdownTimeout() {
     return gracefulShutdownTimeout;
   }
 
-  private void setGracefulShutdownTimeout(int gracefulShutdownTimeout) {
+  private void setGracefulShutdownTimeout(long gracefulShutdownTimeout) {
     this.gracefulShutdownTimeout = gracefulShutdownTimeout;
   }
 
@@ -191,13 +195,13 @@ public class ThreadPoolsConfig {
 
   /**
    * @return when the number of threads in the {@code I/O} pool is greater than {@link #getIoCorePoolSize()}, this is the maximum
-   *         time (in seconds) that excess idle threads will wait for new tasks before terminating.
+   *         time (in milliseconds) that excess idle threads will wait for new tasks before terminating.
    */
-  public int getIoKeepAlive() {
+  public long getIoKeepAlive() {
     return ioKeepAlive;
   }
 
-  private void setIoKeepAlive(int ioKeepAlive) {
+  private void setIoKeepAlive(long ioKeepAlive) {
     this.ioKeepAlive = ioKeepAlive;
   }
 
