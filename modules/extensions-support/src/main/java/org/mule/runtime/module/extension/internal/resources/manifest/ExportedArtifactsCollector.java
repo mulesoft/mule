@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.model.property.ExportModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -39,7 +41,8 @@ import java.util.Set;
 final class ExportedArtifactsCollector {
 
   private static final String META_INF_PREFIX = "/META-INF";
-  private final Set<String> filteredPackages = ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.").build();
+  private final Set<String> filteredPackages =
+      ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.", "com.mulesoft.mule.runtime").build();
 
   private final ExtensionModel extensionModel;
   private final Set<Class<?>> exportedClasses = new LinkedHashSet<>();
@@ -125,6 +128,7 @@ final class ExportedArtifactsCollector {
       @Override
       public void onOperation(HasOperationModels owner, OperationModel model) {
         collectReturnTypes(model);
+        collectExceptionTypes(model);
       }
 
       @Override
@@ -138,5 +142,11 @@ final class ExportedArtifactsCollector {
   private void collectReturnTypes(ComponentModel model) {
     exportedClasses.addAll(collectRelativeClasses(model.getOutput().getType(), extensionClassloader));
     exportedClasses.addAll(collectRelativeClasses(model.getOutputAttributes().getType(), extensionClassloader));
+  }
+
+  private void collectExceptionTypes(OperationModel operationModel) {
+    operationModel.getModelProperty(ImplementingMethodModelProperty.class)
+        .map(ImplementingMethodModelProperty::getMethod)
+        .ifPresent(method -> exportedClasses.addAll(asList(method.getExceptionTypes())));
   }
 }
