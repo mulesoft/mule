@@ -8,27 +8,28 @@ package org.mule.extension.http.policy;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier.Builder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build();
+      new Builder().withNamespace("http").withName("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
-  private final HttpRequestAttributes httpAttributes = Mockito.mock(HttpRequestAttributes.class);
-  private final Attributes attributes = Mockito.mock(Attributes.class);
+  private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
+  private final Attributes attributes = mock(Attributes.class);
 
   @Test
   public void supportsHttpListener() {
@@ -40,7 +41,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   @Test
   public void doesNotSupportHttpRequester() {
     assertThat(factory
-        .supportsSourceIdentifier(new ComponentIdentifier.Builder().withNamespace("http").withName("request").build()),
+        .supportsSourceIdentifier(new Builder().withNamespace("http").withName("request").build()),
                is(false));;
   }
 

@@ -13,12 +13,14 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import java.util.Map;
 
 /**
- * Http request operation policy pointcut parameters factory.
+ * HTTP request operation policy pointcut parameters factory.
  *
  * @since 4.0
  */
 public class HttpRequestPolicyPointcutParametersFactory implements OperationPolicyPointcutParametersFactory {
 
+  protected static final String PATH_PARAMETER_NAME = "path";
+  protected static final String METHOD_PARAMETER_NAME = "method";
   private final static ComponentIdentifier requestIdentifier =
       new ComponentIdentifier.Builder().withNamespace("http").withName("request").build();
 
@@ -30,8 +32,8 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   @Override
   public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier operationIdentifier,
                                                                  Map<String, Object> operationParameters) {
-    String pathParameter = (String) operationParameters.get("path");
-    String methodParameter = (String) operationParameters.get("method");
+    String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
+    String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
     return new HttpRequestPolicyPointcutParameters(operationIdentifier, pathParameter, methodParameter);
   }
 }

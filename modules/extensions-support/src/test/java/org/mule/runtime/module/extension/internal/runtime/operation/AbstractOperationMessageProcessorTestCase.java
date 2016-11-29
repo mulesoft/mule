@@ -243,8 +243,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(of(configurationProvider));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
-    when(mockPolicyManager.findSourcePolicyInstance(anyString(), any())).thenReturn(empty());
-    when(mockPolicyManager.findOperationPolicy(anyString(), any())).thenReturn(empty());
+    when(mockPolicyManager.createSourcePolicyInstance(anyString(), any(), nextOperation)).thenReturn(empty());
+    when(mockPolicyManager.createOperationPolicy(anyString(), any())).thenReturn(empty());
 
     messageProcessor = setUpOperationMessageProcessor();
   }

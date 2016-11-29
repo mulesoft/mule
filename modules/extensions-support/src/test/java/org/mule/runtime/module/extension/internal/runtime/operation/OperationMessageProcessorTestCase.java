@@ -66,7 +66,6 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -310,14 +309,14 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void executeWithPolicy() throws Exception {
     String eventContextId = event.getContext().getId();
-    when(mockPolicyManager.findOperationPolicy(same(eventContextId), any(PolicyPointcutParameters.class)))
+    when(mockPolicyManager.createOperationPolicy(same(eventContextId), any(PolicyPointcutParameters.class)))
         .thenReturn(of(mockPolicy));
     when(extensionModel.getName()).thenReturn(EXTENSION_NAMESPACE);
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
 
     messageProcessor.process(event);
 
-    verify(mockPolicyManager).findOperationPolicy(same(eventContextId), any(PolicyPointcutParameters.class));
+    verify(mockPolicyManager).createOperationPolicy(same(eventContextId), any(PolicyPointcutParameters.class));
     verify(mockPolicy.process(same(event), any(Processor.class), any(OperationParametersProcessor.class)));
   }
 

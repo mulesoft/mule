@@ -17,7 +17,7 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
  */
 public class PolicyPointcutParameters {
 
-  private ComponentIdentifier componentIdentifier;
+  private final ComponentIdentifier componentIdentifier;
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
@@ -33,7 +33,7 @@ public class PolicyPointcutParameters {
    * @return the component identifier. This is the namespace of the module were it is defined and the source / operation
    *         identifier.
    */
-  public ComponentIdentifier getComponentIdentifier() {
+  public final ComponentIdentifier getComponentIdentifier() {
     return componentIdentifier;
   }
 

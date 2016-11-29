@@ -10,6 +10,14 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
 
+/**
+ * Factory for instances of {@link PolicyPointcutParameters} for a particular operation.
+ *
+ * Instances of this factory must be registered in the {@link org.mule.runtime.core.api.MuleContext} and will be discovered by the
+ * {@link PolicyManager} and used to create the set of pointcut parameters for an operation before executing it.
+ * 
+ * @since 4.0
+ */
 public interface OperationPolicyPointcutParametersFactory {
 
   /**

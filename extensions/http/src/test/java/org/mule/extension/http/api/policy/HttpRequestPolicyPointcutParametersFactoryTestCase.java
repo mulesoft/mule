@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.policy;
+package org.mule.extension.http.api.policy;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
-import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
+import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -29,14 +28,14 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
   private final HttpRequestPolicyPointcutParametersFactory factory = new HttpRequestPolicyPointcutParametersFactory();
 
   @Test
-  public void supportsHttpListener() {
+  public void supportsHttpRequest() {
     assertThat(factory
         .supportsOperationIdentifier(HTTP_REQUEST_COMPONENT_IDENTIFIER),
                is(true));;
   }
 
   @Test
-  public void doesNotSupportHttpRequester() {
+  public void doesNotSupportHttpListener() {
     assertThat(factory
         .supportsOperationIdentifier(new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build()),
                is(false));;
@@ -45,7 +44,8 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
   @Test
   public void policyPointcutParameters() {
     Map<String, Object> parametersMap =
-        ImmutableMap.<String, Object>builder().put("method", TEST_METHOD).put("path", TEST_REQUEST_PATH).build();
+        ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
+            .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
     HttpRequestPolicyPointcutParameters policyPointcutParameters = (HttpRequestPolicyPointcutParameters) factory
         .createPolicyPointcutParameters(HTTP_REQUEST_COMPONENT_IDENTIFIER, parametersMap);
     assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_REQUEST_COMPONENT_IDENTIFIER));

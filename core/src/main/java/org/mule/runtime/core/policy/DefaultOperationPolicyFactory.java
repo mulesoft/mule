@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Optional;
 
@@ -25,7 +26,10 @@ public class DefaultOperationPolicyFactory implements OperationPolicyFactory {
 
   @Override
   public OperationPolicy createOperationPolicy(Policy policy,
-                                               Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer) {
-    return new DefaultOperationPolicy(policy, operationPolicyParametersTransformer, policyStateHandler);
+                                               Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
+                                               Processor nextProcessor,
+                                               OperationParametersProcessor operationParametersProcessor) {
+    return new DefaultOperationPolicy(policy, operationPolicyParametersTransformer, policyStateHandler, nextProcessor,
+                                      operationParametersProcessor);
   }
 }

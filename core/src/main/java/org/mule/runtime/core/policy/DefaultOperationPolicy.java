@@ -40,13 +40,19 @@ public class DefaultOperationPolicy implements OperationPolicy {
   private final Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
+  private final Processor nextProcessor;
+  private final OperationParametersProcessor operationParametersProcessor;
 
   public DefaultOperationPolicy(Policy policy,
                                 Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                PolicyStateHandler policyStateHandler) {
+                                PolicyStateHandler policyStateHandler,
+                                Processor nextProcessor,
+                                OperationParametersProcessor operationParametersProcessor) {
     this.policy = policy;
     this.operationPolicyParametersTransformer = operationPolicyParametersTransformer;
     this.policyStateHandler = policyStateHandler;
+    this.nextProcessor = nextProcessor;
+    this.operationParametersProcessor = operationParametersProcessor;
   }
 
   /**
@@ -54,14 +60,11 @@ public class DefaultOperationPolicy implements OperationPolicy {
    * next-operation of the chain.
    *
    * @param operationEvent the event with the data to execute the operation
-   * @param nextProcessor the next-operation processor implementation
-   * @param operationParametersProcessor a processor that converts an {@link Event} to the set of parameters to be sent by the
-   *        operation based on the user configuration.
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
   @Override
-  public Event process(Event operationEvent, Processor nextProcessor, OperationParametersProcessor operationParametersProcessor)
+  public Event process(Event operationEvent)
       throws Exception {
     PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
     Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);

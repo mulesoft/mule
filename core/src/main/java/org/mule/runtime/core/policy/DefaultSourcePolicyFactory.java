@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Optional;
 
@@ -30,7 +31,10 @@ public class DefaultSourcePolicyFactory implements SourcePolicyFactory {
 
   @Override
   public SourcePolicy createSourcePolicy(Policy policy,
-                                         Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer) {
-    return new DefaultSourcePolicy(policy, sourcePolicyParametersTransformer, policyStateHandler);
+                                         Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
+                                         Processor nextProcessor,
+                                         MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+    return new DefaultSourcePolicy(policy, sourcePolicyParametersTransformer, policyStateHandler, nextProcessor,
+                                   messageSourceResponseParametersProcessor);
   }
 }

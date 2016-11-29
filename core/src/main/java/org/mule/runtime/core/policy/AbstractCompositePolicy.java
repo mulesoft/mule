@@ -30,6 +30,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
 
   private List<Policy> parameterizedPolicies;
   private Optional<ParametersTransformer> parametersTransformer;
+  private ParametersProcessor parametersProcessor;
 
   /**
    * Creates a new composite policy.
@@ -38,10 +39,12 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * @param parametersTransformer transformer from the operation parameters to a message and vice versa.
    */
   public AbstractCompositePolicy(List<Policy> policies,
-                                 Optional<ParametersTransformer> parametersTransformer) {
+                                 Optional<ParametersTransformer> parametersTransformer,
+                                 ParametersProcessor parametersProcessor) {
     checkArgument(!policies.isEmpty(), "policies list cannot be empty");
     this.parameterizedPolicies = policies;
     this.parametersTransformer = parametersTransformer;
+    this.parametersProcessor = parametersProcessor;
   }
 
   /**
@@ -54,21 +57,36 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation
    * execution.
    */
-  public Event process(Event operationEvent, Processor nextProcessor, ParametersProcessor parametersProcessor)
+  public final Event processPolicies(Event operationEvent)
       throws Exception {
-    return new AbstractCompositePolicy.NextOperationCall(operationEvent, nextProcessor, parametersProcessor)
+    return new AbstractCompositePolicy.NextOperationCall(operationEvent)
         .process(operationEvent);
+  }
+
+  /**
+   * @return the parameters transformer that converts the message to function parameters and vice versa.
+   */
+  protected Optional<ParametersTransformer> getParametersTransformer()
+  {
+    return parametersTransformer;
+  }
+
+  /**
+   * @return the parameters processors that generates the parameters to be sent.
+   */
+  protected ParametersProcessor getParametersProcessor()
+  {
+    return parametersProcessor;
   }
 
   /**
    * Template method for executing the final processor of the chain.
    * 
-   * @param nextOperation the final processor of the chain.
    * @param event the event to use for executing the next operation.
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Event processNextOperation(Processor nextOperation, Event event) throws MuleException;
+  protected abstract Event processNextOperation(Event event) throws MuleException;
 
   /**
    * Template method for executing a policy.
@@ -95,21 +113,17 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
   public class NextOperationCall extends AbstractAnnotatedObject implements Processor {
 
     private final Event originalEvent;
-    private final ParametersProcessor parametersProcessor;
     private int index = 0;
-    private Processor nextProcessor;
 
-    public NextOperationCall(Event originalEvent, Processor nextProcessor, ParametersProcessor parametersProcessor) {
-      this.nextProcessor = nextProcessor;
+    public NextOperationCall(Event originalEvent) {
       this.originalEvent = originalEvent;
-      this.parametersProcessor = parametersProcessor;
     }
 
     @Override
     public Event process(Event event) throws MuleException {
       checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
       if (index == parameterizedPolicies.size()) {
-        return processNextOperation(nextProcessor, event);
+        return processNextOperation(event);
       }
       Policy policy = parameterizedPolicies.get(index);
       index++;
@@ -122,7 +136,5 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
       }
     }
   }
-
-
 
 }

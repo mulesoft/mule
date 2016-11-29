@@ -9,6 +9,7 @@ package org.mule.runtime.core.policy;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
@@ -25,26 +26,30 @@ import java.util.Optional;
 public interface PolicyManager {
 
   /**
-   * Creates a policy to be applied to a source. The creation must have into consideration the {@code executionIdentifier} to keep
-   * track of the state of the policy. A source policy state may be propagated to an operation policy instance. For the same
-   * message processing, the same {@code executionIdentifier} will be used.
+   * Creates a policy to be applied to a source. The creation must have into consideration the {@code sourceIdentifier} to find specific
+   * policies applied to that source and also the {@code sourceEvent} which will be used to extract data to match against the policies
+   * pointcuts.
    *
-   * @param executionIdentifier the unique identifier associated to the exection of a policy instance.
-   * @param policyPointcutParameters the parameters to use to match against the pointcut configured for each policy.
+   * @param sourceIdentifier the source identifier.
+   * @param sourceEvent the event generated from the source.
+   * @param flowExecutionProcessor the processor that executes the flow.
+   * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the source.
    * @return a {@link SourcePolicy} associated to that source.
    */
-  Optional<SourcePolicy> findSourcePolicyInstance(String executionIdentifier, PolicyPointcutParameters policyPointcutParameters);
+  SourcePolicy createSourcePolicyInstance(ComponentIdentifier sourceIdentifier, Event sourceEvent, Processor flowExecutionProcessor, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
   /**
-   * Creates a policy to be applied to an operation. The creation must have into consideration the {@code executionIdentifier} to
-   * keep track of the state of the policy and correlate any previous policy state for the same execution. For the same message
-   * processing, the same {@code executionIdentifier} will be used.
+   * Creates a policy to be applied to an operation. The creation must have into consideration the {@code operationIdentifier} to find specific
+   * policies applied to that operation and also the {@code operationParameters} which will be used to extract data to match against the policies
+   * pointcuts.
    *
-   * @param executionIdentifier the unique identifier associated to the exection of a policy instance.
-   * @param policyPointcutParameters the parameters to use to match against the pointcut configured for each policy.
+   * @param operationIdentifier component identifier of the operation.
+   * @param operationEvent the event used to execute the operation.
+   * @param operationParameters the set of parameters to use to execute the operation.
+   * @param operationExecutionFunction the function that executes the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */
-  Optional<OperationPolicy> findOperationPolicy(String executionIdentifier, PolicyPointcutParameters policyPointcutParameters);
+  OperationPolicy createOperationPolicy(ComponentIdentifier operationIdentifier, Event operationEvent, Map<String, Object> operationParameters, OperationExecutionFunction operationExecutionFunction);
 
   /**
    * A transformer to map source response function parameters to content in a {@link org.mule.runtime.api.message.Message} and
@@ -72,30 +77,4 @@ public interface PolicyManager {
    */
   void disposePoliciesResources(String executionIdentifier);
 
-  /**
-   * Creates a {@link PolicyPointcutParameters} for the given {@code sourceIdentifier}.
-   * 
-   * It will search for a particular implementation {@link SourcePolicyPointcutParametersFactory} to create a custom implementations of
-   * {@link PolicyPointcutParameters}. If there is no {@link SourcePolicyPointcutParametersFactory} then the common mechanism for all
-   * modules will be used which will only set the {@link ComponentIdentifier} in the parameters.
-   *
-   * @param sourceIdentifier component identifier of the message source.
-   * @param sourceEvent event generated from the message source.
-   * @return a {@link PolicyPointcutParameters} for the given source.
-   */
-  PolicyPointcutParameters createSourcePointcutParameters(ComponentIdentifier sourceIdentifier, Event sourceEvent);
-
-  /**
-   * Creates a {@link PolicyPointcutParameters} for the given {@code operationIdentifier}.
-   *
-   * It will search for a particular implementation {@link OperationPolicyPointcutParametersFactory} to create a custom implementations of
-   * {@link PolicyPointcutParameters}. If there is no {@link OperationPolicyPointcutParametersFactory} then the common mechanism for all
-   * modules will be used which will only set the {@link ComponentIdentifier} in the parameters.
-   *
-   * @param operationIdentifier component identifier of the operation.
-   * @param operationParameters the set of parameters to use to execute the operation.
-   * @return a {@link PolicyPointcutParameters} for the given source.
-   */
-  PolicyPointcutParameters createOperationPointcutParameters(ComponentIdentifier operationIdentifier,
-                                                             Map<String, Object> operationParameters);
 }

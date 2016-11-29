@@ -80,7 +80,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void singlePolicy() throws Exception {
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy),
-                                                      sourcePolicyParametersTransformer, sourcePolicyFactory);
+                                                      sourcePolicyParametersTransformer, sourcePolicyFactory, flowExecutionProcessor);
 
     Event result = compositeSourcePolicy.process(initialEvent, nextProcessor, sourceParametersTransformer);
     assertThat(result, is(firstPolicyResultEvent));
@@ -92,7 +92,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void compositePolicy() throws Exception {
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy, secondPolicy),
-                                                      sourcePolicyParametersTransformer, sourcePolicyFactory);
+                                                      sourcePolicyParametersTransformer, sourcePolicyFactory, flowExecutionProcessor);
 
     Event result = compositeSourcePolicy.process(initialEvent, nextProcessor, sourceParametersTransformer);
     assertThat(result, is(firstPolicyResultEvent));
@@ -106,7 +106,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalArgumentException.class)
   public void emptyPolicyList() throws Exception {
     compositeSourcePolicy = new CompositeSourcePolicy(emptyList(),
-                                                      sourcePolicyParametersTransformer, sourcePolicyFactory);
+                                                      sourcePolicyParametersTransformer, sourcePolicyFactory, flowExecutionProcessor);
   }
 
   @Test
@@ -115,7 +115,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     when(firstPolicySourcePolicy.process(any(Event.class), any(Processor.class),
                                          any(MessageSourceResponseParametersProcessor.class))).thenThrow(policyException);
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy, secondPolicy),
-                                                      sourcePolicyParametersTransformer, sourcePolicyFactory);
+                                                      sourcePolicyParametersTransformer, sourcePolicyFactory, flowExecutionProcessor);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     compositeSourcePolicy.process(initialEvent, nextProcessor, sourceParametersTransformer);
@@ -126,7 +126,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     RuntimeException policyException = new RuntimeException("policy failure");
     when(nextProcessor.process(any(Event.class))).thenThrow(policyException);
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy, secondPolicy),
-                                                      sourcePolicyParametersTransformer, sourcePolicyFactory);
+                                                      sourcePolicyParametersTransformer, sourcePolicyFactory, flowExecutionProcessor);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     compositeSourcePolicy.process(initialEvent, nextProcessor, sourceParametersTransformer);

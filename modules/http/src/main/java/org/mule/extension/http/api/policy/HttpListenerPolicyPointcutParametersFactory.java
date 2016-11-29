@@ -14,7 +14,7 @@ import org.mule.runtime.core.policy.SourcePolicyPointcutParametersFactory;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 /**
- * Http request operation policy pointcut parameters factory.
+ * HTTP request operation policy pointcut parameters factory.
  * 
  * @since 4.0
  */

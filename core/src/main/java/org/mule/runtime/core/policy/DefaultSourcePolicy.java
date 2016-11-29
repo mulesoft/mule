@@ -40,21 +40,30 @@ public class DefaultSourcePolicy implements SourcePolicy {
   private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
+  private final Processor nextProcessor;
+  private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
 
   /**
    * Creates a new {@code DefaultSourcePolicy}.
-   *
+   * 
    * @param policy the policy to execute before and after the source.
    * @param sourcePolicyParametersTransformer transformer from the response and failure response parameters to a message and vice
    *        versa.
    * @param policyStateHandler the state handler for the policy.
+   * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
+   * @param messageSourceResponseParametersProcessor a processor to convert an {@link Event} to the set of parameters used to
+   *        execute the successful or failure response function of the source.
+   * @param nextProcessor
    */
   public DefaultSourcePolicy(Policy policy,
                              Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                             PolicyStateHandler policyStateHandler) {
+                             PolicyStateHandler policyStateHandler, Processor nextProcessor,
+                             MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     this.policy = policy;
     this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
     this.policyStateHandler = policyStateHandler;
+    this.nextProcessor = nextProcessor;
+    this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
   }
 
   /**
@@ -63,30 +72,26 @@ public class DefaultSourcePolicy implements SourcePolicy {
    *
    *
    * @param sourceEvent the event with the data created from the source message that must be used to execute the source policy.
-   * @param nextOperation the next-operation processor implementation, it may be another policy or the flow execution.
-   * @param messageSourceResponseParametersProcessor a processor to convert an {@link Event} to the set of parameters used to
-   *        execute the successful or failure response function of the source.
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
   @Override
-  public Event process(Event sourceEvent, Processor nextOperation,
-                       MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor)
+  public SourcePolicyResult process(Event sourceEvent)
       throws Exception {
     Processor sourceNextOperation =
-        buildFlowExecutionWithPolicyFunction(nextOperation, sourceEvent, messageSourceResponseParametersProcessor);
+        buildFlowExecutionWithPolicyFunction(nextProcessor, sourceEvent, messageSourceResponseParametersProcessor);
     policyStateHandler.updateNextOperation(sourceEvent.getContext().getId(), sourceNextOperation);
     Event result = policy.getPolicyChain()
         .process(policyEventConverter.createEvent(sourceEvent.getMessage(), Event.builder(sourceEvent.getContext()).build()));
-    return Event.builder(result.getContext()).message(result.getMessage()).build();
+    return new DefaultSourcePolicyResult(Event.builder(result.getContext()).message(result.getMessage()).build(), messageSourceResponseParametersProcessor);
   }
 
   /**
    * Creates the actual behaviour to be executed by {@link PolicyNextActionMessageProcessor}.
    *
-   * It delegates the execution to the {@code nextOperation} which may be another policy/flow chain
-   * and based on the output of the policy/flow it generates a {@link Message} using {@code messageSourceResponseParametersProcessor}
-   * which is used as response of the {@link PolicyNextActionMessageProcessor} to continue the execution of the policy.
+   * It delegates the execution to the {@code nextOperation} which may be another policy/flow chain and based on the output of the
+   * policy/flow it generates a {@link Message} using {@code messageSourceResponseParametersProcessor} which is used as response
+   * of the {@link PolicyNextActionMessageProcessor} to continue the execution of the policy.
    *
    * @param nextOperation a processor which may be another policy or the flow.
    * @param sourceEvent the event generated from the source.

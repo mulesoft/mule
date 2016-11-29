@@ -24,8 +24,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.SourcePolicy;
+import org.mule.runtime.core.policy.SourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
@@ -79,20 +79,16 @@ public class ModuleFlowProcessingPhase
               Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
                   .message((InternalMessage) template.getMessage()).build();
 
-          PolicyPointcutParameters policyPointcutParameters =
-              policyManager.createSourcePointcutParameters(sourceIdentifier, templateEvent);
-          Optional<SourcePolicy> policy =
-              policyManager.findSourcePolicyInstance(templateEvent.getContext().getId(), policyPointcutParameters);
-
           Event flowExecutionResponse = null;
+          SourcePolicyResult sourcePolicyResult = null;
           try {
             final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
             Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler);
-            if (policy.isPresent()) {
-              flowExecutionResponse = policy.get().process(templateEvent, nextOperation, template);
-            } else {
-              flowExecutionResponse = nextOperation.process(templateEvent);
-            }
+            SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceIdentifier, templateEvent, nextOperation, template);
+
+            sourcePolicyResult = policy.process(templateEvent);
+            flowExecutionResponse = sourcePolicyResult.getExecutionResult();
+
             fireNotification(messageSource, flowExecutionResponse, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
             ResponseCompletionCallback responseCompletationCallback =
                 createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
@@ -103,14 +99,10 @@ public class ModuleFlowProcessingPhase
                   Event.builder(templateEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();
             }
 
-            Map<String, Object> responseParameters =
-                generateSuccessfulResponseParameters(sourceIdentifier, policy, flowExecutionResponse, template);
+            Map<String, Object> responseParameters = sourcePolicyResult.getResponseParameters();
 
-            Optional<SourcePolicyParametersTransformer> policySourceParametersTransformer =
-                policyManager.lookupSourceParametersTransformer(sourceIdentifier);
-            Function<Event, Map<String, Object>> errorResponseParametersFunction =
-                generateErrorResponseParametersFunction(policy, policySourceParametersTransformer,
-                                                        template);
+            SourcePolicyResult finalSourcePolicyResult = sourcePolicyResult;
+            Function<Event, Map<String, Object>> errorResponseParametersFunction = failureEvent -> finalSourcePolicyResult.getErrorResponseParameters(failureEvent);
 
             template.sendResponseToClient(flowExecutionResponse, responseParameters, errorResponseParametersFunction,
                                           responseCompletationCallback);
@@ -128,11 +120,7 @@ public class ModuleFlowProcessingPhase
 
             fireNotification(messageSource, me.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
 
-            template.sendFailureResponseToClient(me,
-                                                 generateErrorResponseParametersFunction(policy, policyManager
-                                                     .lookupSourceParametersTransformer(sourceIdentifier), template)
-                                                         .apply(me.getEvent()),
-                                                 createSendFailureResponseCompletationCallback(phaseResultNotifier));
+            template.sendFailureResponseToClient(me, sourcePolicyResult.getErrorResponseParameters(me.getEvent()), createSendFailureResponseCompletationCallback(phaseResultNotifier));
           } finally {
             policyManager.disposePoliciesResources(templateEvent.getContext().getId());
           }
@@ -174,37 +162,6 @@ public class ModuleFlowProcessingPhase
     } else {
       flowExecutionWork.run();
     }
-  }
-
-  private Function<Event, Map<String, Object>> generateErrorResponseParametersFunction(Optional<SourcePolicy> policy,
-                                                                                       Optional<SourcePolicyParametersTransformer> policySourceParametersTransformer,
-                                                                                       ModuleFlowProcessingPhaseTemplate template) {
-    return (failureResponseEvent) -> {
-      Map<String, Object> failureResponseParameters;
-      if (policy.isPresent() && policySourceParametersTransformer.isPresent()) {
-        failureResponseParameters =
-            policySourceParametersTransformer.get().fromMessageToErrorResponseParameters(failureResponseEvent.getMessage());
-
-      } else {
-        failureResponseParameters = template.getFailedExecutionResponseParametersFunction().apply(failureResponseEvent);
-      }
-      return failureResponseParameters;
-    };
-  }
-
-  private Map<String, Object> generateSuccessfulResponseParameters(ComponentIdentifier sourceIdentifier,
-                                                                   Optional<SourcePolicy> policy, Event flowExecutionResponse,
-                                                                   ModuleFlowProcessingPhaseTemplate template)
-      throws MuleException {
-    Map<String, Object> responseParameters;
-    if (policy.isPresent()) {
-      responseParameters = policyManager.lookupSourceParametersTransformer(sourceIdentifier).get()
-          .fromMessageToSuccessResponseParameters(flowExecutionResponse.getMessage());
-    } else {
-      responseParameters = template.getSuccessfulExecutionResponseParametersFunction()
-          .apply(flowExecutionResponse);
-    }
-    return responseParameters;
   }
 
   private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier) {
