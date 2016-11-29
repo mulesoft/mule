@@ -8,14 +8,14 @@ package org.mule.compatibility.module.client;
 
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.scheduler.ThreadType;
 
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;

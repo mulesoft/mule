@@ -6,10 +6,10 @@
  */
 package org.mule.tck;
 
-import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.ThreadType;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 
 import java.util.TimeZone;
 import java.util.concurrent.Callable;

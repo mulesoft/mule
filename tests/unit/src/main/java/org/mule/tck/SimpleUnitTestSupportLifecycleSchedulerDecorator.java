@@ -6,8 +6,8 @@
  */
 package org.mule.tck;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.ThreadType;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 
 import java.util.Collection;
 import java.util.List;

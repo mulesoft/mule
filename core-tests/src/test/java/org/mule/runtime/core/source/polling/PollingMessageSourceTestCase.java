@@ -14,10 +14,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;

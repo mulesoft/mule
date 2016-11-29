@@ -21,8 +21,8 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.scheduler.ThreadType;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,13 +12,13 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.scheduler.ThreadType;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.util.ArrayList;

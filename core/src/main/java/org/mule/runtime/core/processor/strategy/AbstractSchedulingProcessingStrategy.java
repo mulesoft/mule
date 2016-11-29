@@ -9,9 +9,9 @@ package org.mule.runtime.core.processor.strategy;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.util.Predicate;
 import org.mule.runtime.core.util.rx.ConditionalExecutorServiceDecorator;
 

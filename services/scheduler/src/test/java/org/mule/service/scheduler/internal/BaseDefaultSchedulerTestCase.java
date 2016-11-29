@@ -13,7 +13,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;

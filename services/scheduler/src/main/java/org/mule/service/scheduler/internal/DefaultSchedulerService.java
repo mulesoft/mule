@@ -11,11 +11,11 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
-import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
-import static org.mule.runtime.core.api.scheduler.ThreadType.UNKNOWN;
+import static org.mule.runtime.api.scheduler.ThreadType.CPU_INTENSIVE;
+import static org.mule.runtime.api.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.runtime.api.scheduler.ThreadType.IO;
+import static org.mule.runtime.api.scheduler.ThreadType.UNKNOWN;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.loadThreadPoolsConfig;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -23,9 +23,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.scheduler.ThreadType;
 import org.mule.service.scheduler.internal.config.ThreadPoolsConfig;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 

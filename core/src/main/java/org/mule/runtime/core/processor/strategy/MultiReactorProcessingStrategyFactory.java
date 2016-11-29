@@ -12,6 +12,7 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.util.Predicate;
 
 import java.util.function.Consumer;

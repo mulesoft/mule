@@ -11,11 +11,12 @@ import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStra
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.util.Predicate;
 
 import java.util.function.Consumer;

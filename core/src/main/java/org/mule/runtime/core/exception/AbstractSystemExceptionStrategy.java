@@ -10,13 +10,13 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transaction.TransactionCoordination;

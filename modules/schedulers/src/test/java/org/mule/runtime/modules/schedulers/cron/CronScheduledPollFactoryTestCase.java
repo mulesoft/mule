@@ -14,8 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

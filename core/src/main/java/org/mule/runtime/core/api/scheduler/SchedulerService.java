@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.ThreadType;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 

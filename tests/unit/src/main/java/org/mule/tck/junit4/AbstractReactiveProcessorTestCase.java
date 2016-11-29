@@ -11,9 +11,9 @@ import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 
