@@ -57,13 +57,14 @@ class ErrorsModelFactory {
     final DirectedGraph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph = toGraph(errorTypesEnum);
 
     errorModelMap = new HashMap<>();
+    initErrorModelMap(errorModelMap);
+
     new TopologicalOrderIterator<>(graph).forEachRemaining(errorType -> {
       ErrorModel errorModel = toErrorModel(errorType, errorModelMap);
       errorModelMap.put(errorModel.toString(), errorModel);
     });
     addConnectivityErrors(errorModelMap);
   }
-
 
   /**
    * @return A {@link Set} of converted {@link ErrorModel}s generated from the given {@link ErrorTypeDefinition} array
@@ -100,9 +101,7 @@ class ErrorsModelFactory {
       return errorModelMap.get(toIdentifier(errorTypeDefinition));
     } else {
       ErrorModelBuilder builder = newError(errorTypeDefinition.getType(), getErrorNamespace(errorTypeDefinition));
-      if (errorTypeDefinition.getParent().isPresent()) {
-        builder.withParent(toErrorModel(errorTypeDefinition.getParent().get(), errorModelMap));
-      }
+      builder.withParent(toErrorModel(errorTypeDefinition.getParent().orElse(ANY), errorModelMap));
       ErrorModel errorModel = builder.build();
       errorModelMap.put(toIdentifier(errorTypeDefinition), errorModel);
       return errorModel;
@@ -145,5 +144,9 @@ class ErrorsModelFactory {
     if (!errorModelMap.containsKey(retry)) {
       errorModelMap.put(retry, retryExhaustedError);
     }
+  }
+
+  private void initErrorModelMap(Map<String, ErrorModel> errorModelMap) {
+    errorModelMap.put(toIdentifier(MuleErrors.ANY), ErrorModelBuilder.newError(ANY.getType(), MULE).build());
   }
 }
