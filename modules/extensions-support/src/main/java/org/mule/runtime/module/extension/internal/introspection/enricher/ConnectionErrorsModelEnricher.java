@@ -20,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
@@ -31,7 +32,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * {@link ModelEnricher} implementation which enriches {@link OperationModel operationModels} adding the {}
+ * {@link ModelEnricher} implementation which enriches {@link OperationModel operationModels} adding connectivity
+ * related {@link MuleErrors} if the operations are considered as a connected ones.
  *
  * @since 4.0
  */

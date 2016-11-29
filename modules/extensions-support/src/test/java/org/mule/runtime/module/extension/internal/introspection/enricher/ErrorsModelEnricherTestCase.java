@@ -22,13 +22,13 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -95,6 +95,24 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
         .isInstanceOf(IllegalModelDefinitionException.class);
   }
 
+  @Test
+  public void orphanErrorsUsesAnyAsParent() {
+    describe(HeisenbergWithOrphanErrors.class);
+    ErrorModel errorModel =
+        extensionModel.getErrorModels().stream().filter(error -> error.getType().equals("HEALTH")).findFirst().get();
+    assertThat(errorModel.getNamespace(), is(HEISENBERG));
+
+    Optional<ErrorModel> anyExtensionError = errorModel.getParent();
+    assertThat(anyExtensionError.isPresent(), is(true));
+    assertThat(anyExtensionError.get().getType(), is(ModuleErrors.ANY.getType()));
+    assertThat(anyExtensionError.get().getNamespace(), is(HEISENBERG));
+
+    Optional<ErrorModel> muleAnyError = anyExtensionError.get().getParent();
+    assertThat(muleAnyError.isPresent(), is(true));
+    assertThat(muleAnyError.get().getType(), is(MuleErrors.ANY.getType()));
+    assertThat(muleAnyError.get().getNamespace(), is(MULE_NAMESPACE));
+  }
+
   private void describe(Class aClass) {
     final DefaultDescribingContext describingContext = new DefaultDescribingContext(getClass().getClassLoader());
     ExtensionDeclarer declarer =
@@ -115,6 +133,12 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
   @Operations(InvalidErrorOperations.class)
   @ErrorTypes(HeisenbergErrors.class)
   public static class HeisenbergWithNotMappedErrorType extends HeisenbergExtension {
+
+  }
+
+  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @ErrorTypes(OrphanErrorTypes.class)
+  public static class HeisenbergWithOrphanErrors extends HeisenbergExtension {
 
   }
 
@@ -156,5 +180,9 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
         return Optional.of(TYPE_A);
       }
     }
+  }
+
+  public enum OrphanErrorTypes implements ErrorTypeDefinition<OrphanErrorTypes> {
+    HEALTH, CONNECTIVITY, OAUTH2
   }
 }
