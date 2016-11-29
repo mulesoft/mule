@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.io.File.separator;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -66,7 +67,7 @@ public class RepositorySystemFactoryTestCase extends AbstractMuleTestCase {
     assertThat(artifactResult, not(nullValue()));
     assertThat(artifactResult.getArtifact().getFile().getParentFile(),
                equalTo(new File(mavenLocalRepositoryLocation,
-                                "commons-collections" + File.separator + "commons-collections" + File.separator + "3.2")));
+                                "commons-collections" + separator + "commons-collections" + separator + "3.2")));
   }
 
   @Test
