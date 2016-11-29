@@ -19,6 +19,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
 
@@ -36,6 +37,7 @@ import org.junit.rules.TemporaryFolder;
 public class RepositorySystemFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String MAVEN_CENTRAL = "http://central.maven.org/maven2/";
+  private static final String ONLINE_REPOSITORY_TEST_METHOD_NAME = "onlineRepository";
 
   @Rule
   public TemporaryFolder root = new TemporaryFolder();
@@ -44,17 +46,38 @@ public class RepositorySystemFactoryTestCase extends AbstractMuleTestCase {
 
   private Artifact commonsCollectionsArtifact = new DefaultArtifact("commons-collections:commons-collections:jar:3.2");
 
+  @Override
+  protected boolean isDisabledInThisEnvironment(String testMethodName) {
+    if (testMethodName.equals(ONLINE_REPOSITORY_TEST_METHOD_NAME)) {
+      try {
+        HttpURLConnection connection = (HttpURLConnection) new URL(MAVEN_CENTRAL).openConnection();
+        connection.setRequestMethod("HEAD");
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+          return true;
+        }
+      } catch (Exception e) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Test
   public void onlineRepository() throws Exception {
     WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
     File mavenLocalRepositoryLocation = root.newFolder("repository");
     DependencyResolver dependencyResolver = RepositorySystemFactory.newOnlineDependencyResolver(
-        Collections.<URL>emptyList(), workspaceLocationResolver, mavenLocalRepositoryLocation, newArrayList(MAVEN_CENTRAL));
+                                                                                                Collections.<URL>emptyList(),
+                                                                                                workspaceLocationResolver,
+                                                                                                mavenLocalRepositoryLocation,
+                                                                                                newArrayList(MAVEN_CENTRAL));
 
     final ArtifactResult artifactResult = dependencyResolver.resolveArtifact(commonsCollectionsArtifact);
     assertThat(artifactResult, not(nullValue()));
     assertThat(artifactResult.getArtifact().getFile().getParentFile(),
-               equalTo(new File(mavenLocalRepositoryLocation, "commons-collections" + File.separator + "commons-collections" + File.separator + "3.2")));
+               equalTo(new File(mavenLocalRepositoryLocation,
+                                "commons-collections" + File.separator + "commons-collections" + File.separator + "3.2")));
   }
 
   @Test
@@ -62,7 +85,10 @@ public class RepositorySystemFactoryTestCase extends AbstractMuleTestCase {
     WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
     File mavenLocalRepositoryLocation = root.newFolder("repository");
     DependencyResolver dependencyResolver = RepositorySystemFactory.newOnlineDependencyResolver(
-        Collections.<URL>emptyList(), workspaceLocationResolver, mavenLocalRepositoryLocation, Collections.<String>emptyList());
+                                                                                                Collections.<URL>emptyList(),
+                                                                                                workspaceLocationResolver,
+                                                                                                mavenLocalRepositoryLocation,
+                                                                                                Collections.<String>emptyList());
 
     expectedException.expect(ArtifactResolutionException.class);
     expectedException.expectCause(instanceOf(ArtifactNotFoundException.class));
