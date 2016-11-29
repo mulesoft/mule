@@ -17,6 +17,8 @@ import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.scheduler.ThreadType.CPU_LIGHT;
 import static org.mule.runtime.core.api.scheduler.ThreadType.IO;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.PROP_PREFIX;
+import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_KEEP_ALIVE;
+import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE_CORE;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE_MAX;
 import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.loadThreadPoolsConfig;
@@ -65,11 +67,11 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   protected Properties buildDefaultConfigProps() {
     final Properties props = new Properties();
     props.setProperty(PROP_PREFIX + "gracefulShutdownTimeout", "15000");
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "2*cores");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "2*cores");
     props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_CORE, "cores");
     props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, "cores*cores");
-    props.setProperty(PROP_PREFIX + IO.getName() + ".threadKeepAlive", "30000");
-    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE_CORE, "2*cores");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE, "30000");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "2*cores");
     return props;
   }
 
@@ -135,7 +137,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void withDecimalsConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "0.5 *cores");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "0.5 *cores");
     props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, "cores / 0.25");
     props.store(new FileOutputStream(schedulerConfigFile), "withDecimalsConfig");
 
@@ -148,9 +150,9 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void withPlusAndMinusConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "cores + cores");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "cores + cores");
     props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, "2 + cores");
-    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE_CORE, "cores - 1");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "cores - 1");
     props.store(new FileOutputStream(schedulerConfigFile), "withPlusAndMinusConfig");
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
@@ -163,9 +165,9 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void expressionConfigFixed() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "2");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "2");
     props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, "8");
-    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE_CORE, "4");
+    props.setProperty(PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE, "4");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigFixed");
 
     final ThreadPoolsConfig config = loadThreadPoolsConfig();
@@ -178,34 +180,34 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void expressionConfigNegative() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "cores - " + (cores + 1));
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "cores - " + (cores + 1));
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigNegative");
 
     expected.expect(DefaultMuleException.class);
     expected
-        .expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE + ": Value has to be greater than 0"));
+        .expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE + ": Value has to be greater than 0"));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void invalidExpressionConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "invalid");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "invalid");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigNegative");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE + ": Expression not valid"));
+    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE + ": Expression not valid"));
     loadThreadPoolsConfig();
   }
 
   @Test
   public void nastyExpressionConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE, "; print('aha!')");
+    props.setProperty(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, "; print('aha!')");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigNegative");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE + ": Expression not valid"));
+    expected.expectMessage(is(PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE + ": Expression not valid"));
     loadThreadPoolsConfig();
   }
 
@@ -224,12 +226,13 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void invalidIoKeepAliveConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + IO.getName() + ".threadKeepAlive", "notANumber");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE, "notANumber");
     props.store(new FileOutputStream(schedulerConfigFile), "invalidIoKeepAliveConfig");
 
     expected.expect(DefaultMuleException.class);
     expected.expectCause(instanceOf(NumberFormatException.class));
-    expected.expectMessage(is(PROP_PREFIX + IO.getName() + ".threadKeepAlive: For input string: \"notANumber\""));
+    expected
+        .expectMessage(is(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE + ": For input string: \"notANumber\""));
     loadThreadPoolsConfig();
   }
 
@@ -247,11 +250,12 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void negativeIoKeepAliveConfig() throws IOException, MuleException {
     final Properties props = buildDefaultConfigProps();
-    props.setProperty(PROP_PREFIX + IO.getName() + ".threadKeepAlive", "-2");
+    props.setProperty(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE, "-2");
     props.store(new FileOutputStream(schedulerConfigFile), "negativeIoKeepAliveConfig");
 
     expected.expect(DefaultMuleException.class);
-    expected.expectMessage(is(PROP_PREFIX + IO.getName() + ".threadKeepAlive: Value has to be greater than 0"));
+    expected
+        .expectMessage(is(PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE + ": Value has to be greater than 0"));
     loadThreadPoolsConfig();
   }
 }

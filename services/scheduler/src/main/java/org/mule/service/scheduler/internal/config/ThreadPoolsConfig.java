@@ -43,9 +43,11 @@ public class ThreadPoolsConfig {
   private static final Logger logger = getLogger(ThreadPoolsConfig.class);
 
   public static final String PROP_PREFIX = "org.mule.runtime.scheduler.";
-  public static final String THREAD_POOL_SIZE = "threadPoolSize";
-  public static final String THREAD_POOL_SIZE_MAX = THREAD_POOL_SIZE + ".max";
-  public static final String THREAD_POOL_SIZE_CORE = THREAD_POOL_SIZE + ".core";
+  public static final String THREAD_POOL = "threadPool";
+  public static final String THREAD_POOL_SIZE = THREAD_POOL + ".size";
+  public static final String THREAD_POOL_SIZE_MAX = THREAD_POOL + ".sizeMax";
+  public static final String THREAD_POOL_SIZE_CORE = THREAD_POOL + ".sizeCore";
+  public static final String THREAD_POOL_KEEP_ALIVE = THREAD_POOL + ".threadKeepAlive";
 
   private static final String NUMBER_OR_VAR_REGEXP = "([0-9]+(\\.[0-9]+)?)|cores";
   private static final Pattern POOLSIZE_PATTERN =
@@ -88,16 +90,15 @@ public class ThreadPoolsConfig {
     engine.put("cores", cores);
 
     config.setGracefulShutdownTimeout(resolveNumber(properties, PROP_PREFIX + "gracefulShutdownTimeout"));
-    config.setCpuLightPoolSize(resolveExpression(properties, PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE_CORE,
-                                                 config, engine));
+    config.setCpuLightPoolSize(resolveExpression(properties, PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, config,
+                                                 engine));
     config.setIoCorePoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_CORE, config,
                                                engine));
     config
         .setIoMaxPoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, config, engine));
-    config.setIoKeepAlive(resolveNumber(properties, PROP_PREFIX + IO.getName() + ".threadKeepAlive"));
-    config.setCpuIntensivePoolSize(resolveExpression(properties,
-                                                     PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE_CORE, config,
-                                                     engine));
+    config.setIoKeepAlive(resolveNumber(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE));
+    config.setCpuIntensivePoolSize(resolveExpression(properties, PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE,
+                                                     config, engine));
 
     return config;
   }
