@@ -48,6 +48,6 @@ public class ClobResolvedDataType extends ResolvedDbType {
   }
 
   protected static String createUnsupportedTypeErrorMessage(Object value) {
-    return format("Cannot create a Clob from a value of type ", value.getClass());
+    return format("Cannot create a Clob from a value of type '%s'", value.getClass());
   }
 }
