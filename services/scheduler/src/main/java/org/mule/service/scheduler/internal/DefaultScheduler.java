@@ -6,6 +6,7 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Integer.toHexString;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
@@ -95,7 +96,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
                    org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
-    this.name = name + "@" + Integer.toHexString(hashCode());
+    this.name = name + "@" + toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
     cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;

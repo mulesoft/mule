@@ -75,9 +75,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private final ThreadGroup timerGroup = new ThreadGroup(schedulerGroup, TIMER_THREADS_NAME);
   private final ThreadGroup customGroup = new ThreadGroup(schedulerGroup, CUSTOM_THREADS_NAME);
 
-  private ExecutorService cpuLightExecutor;
-  private ExecutorService ioExecutor;
-  private ExecutorService computationExecutor;
+  private ThreadPoolExecutor cpuLightExecutor;
+  private ThreadPoolExecutor ioExecutor;
+  private ThreadPoolExecutor computationExecutor;
   private Set<ExecutorService> customSchedulersExecutors = new HashSet<>();
   private ScheduledThreadPoolExecutor scheduledExecutor;
   private org.quartz.Scheduler quartzScheduler;
@@ -175,17 +175,21 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     threadPoolsConfig = loadThreadPoolsConfig();
 
     cpuLightExecutor = new ThreadPoolExecutor(threadPoolsConfig.getCpuLightPoolSize(), threadPoolsConfig.getCpuLightPoolSize(),
-                                              0, SECONDS, new LinkedBlockingQueue<>(), new SchedulerThreadFactory(cpuLightGroup));
+                                              0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuLightQueueSize()),
+                                              new SchedulerThreadFactory(cpuLightGroup));
     ioExecutor = new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize(), threadPoolsConfig.getIoMaxPoolSize(),
-                                        threadPoolsConfig.getIoKeepAlive(), MILLISECONDS, new SynchronousQueue<>(),
+                                        threadPoolsConfig.getIoKeepAlive(), MILLISECONDS,
+                                        new LinkedBlockingQueue<>(threadPoolsConfig.getIoQueueSize()),
                                         new SchedulerThreadFactory(ioGroup));
     computationExecutor =
         new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize(), threadPoolsConfig.getCpuIntensivePoolSize(),
-                               0, SECONDS, new LinkedBlockingQueue<>(),
+                               0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuIntensiveQueueSize()),
                                new SchedulerThreadFactory(computationGroup));
+
     scheduledExecutor = new ScheduledThreadPoolExecutor(1, new SchedulerThreadFactory(timerGroup, "%s"));
     scheduledExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
     scheduledExecutor.setRemoveOnCancelPolicy(true);
+
     StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     try {
       schedulerFactory.initialize(threadPoolsConfig.defaultQuartzProperties(getName()));
@@ -195,10 +199,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       throw new LifecycleException(e, this);
     }
 
-    ((ThreadPoolExecutor) cpuLightExecutor).prestartAllCoreThreads();
-    ((ThreadPoolExecutor) ioExecutor).prestartAllCoreThreads();
-    ((ThreadPoolExecutor) computationExecutor).prestartAllCoreThreads();
-    ((ThreadPoolExecutor) scheduledExecutor).prestartAllCoreThreads();
+    cpuLightExecutor.prestartAllCoreThreads();
+    ioExecutor.prestartAllCoreThreads();
+    computationExecutor.prestartAllCoreThreads();
+    scheduledExecutor.prestartAllCoreThreads();
 
     logger.info("Started " + this.toString());
   }
