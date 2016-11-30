@@ -12,13 +12,10 @@ import static java.util.Collections.singletonList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.ThreadType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -44,6 +41,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiveProcessorTestCase {
+
+  protected static final String CPU_LIGHT = "cpuLight";
+  protected static final String IO = "I/O";
+  protected static final String CPU_INTENSIVE = "cpuIntensive";
 
   protected Flow flow;
   protected volatile Set<String> threads = new HashSet<>();
@@ -83,9 +84,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Before
   public void before() throws RegistrationException {
-    cpuLight = new TestScheduler(3, ThreadType.CPU_LIGHT);
-    blocking = new TestScheduler(3, ThreadType.IO);
-    cpuIntensive = new TestScheduler(3, ThreadType.CPU_INTENSIVE);
+    cpuLight = new TestScheduler(3, CPU_LIGHT);
+    blocking = new TestScheduler(3, IO);
+    cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
     asyncExecutor = newSingleThreadExecutor();
 
     flow = new Flow("test", muleContext);
@@ -235,11 +236,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   static class TestScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
-    private ThreadType threadType;
-
-    public TestScheduler(int threads, ThreadType threadType) {
-      super(threads, new NamedThreadFactory(threadType.name()));
-      this.threadType = threadType;
+    public TestScheduler(int threads, String threadNamePrefix) {
+      super(threads, new NamedThreadFactory(threadNamePrefix));
     }
 
     @Override
@@ -265,10 +263,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     }
 
     @Override
-    public ThreadType getThreadType() {
-      return threadType;
-    }
-
     public String getName() {
       return TestScheduler.class.getSimpleName();
     }

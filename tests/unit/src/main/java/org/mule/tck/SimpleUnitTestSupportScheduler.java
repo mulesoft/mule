@@ -6,10 +6,7 @@
  */
 package org.mule.tck;
 
-import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
-
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.ThreadType;
 
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -68,11 +65,6 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
 
   int getScheduledTasks() {
     return scheduledTasks.get();
-  }
-
-  @Override
-  public ThreadType getThreadType() {
-    return CUSTOM;
   }
 
   @Override

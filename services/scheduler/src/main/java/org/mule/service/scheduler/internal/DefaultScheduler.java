@@ -22,7 +22,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.ThreadType;
+import org.mule.service.scheduler.ThreadType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -355,7 +355,6 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     }
   }
 
-  @Override
   public ThreadType getThreadType() {
     return threadType;
   }

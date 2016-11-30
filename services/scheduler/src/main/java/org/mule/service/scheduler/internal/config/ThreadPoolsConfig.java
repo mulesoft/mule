@@ -11,10 +11,10 @@ import static java.lang.Long.parseLong;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
-import static org.mule.runtime.api.scheduler.ThreadType.CPU_INTENSIVE;
-import static org.mule.runtime.api.scheduler.ThreadType.CPU_LIGHT;
-import static org.mule.runtime.api.scheduler.ThreadType.IO;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.service.scheduler.ThreadType.CPU_INTENSIVE;
+import static org.mule.service.scheduler.ThreadType.CPU_LIGHT;
+import static org.mule.service.scheduler.ThreadType.IO;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;

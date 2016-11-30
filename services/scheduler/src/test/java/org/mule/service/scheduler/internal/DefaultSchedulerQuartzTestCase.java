@@ -17,7 +17,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;

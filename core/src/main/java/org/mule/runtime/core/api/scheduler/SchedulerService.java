@@ -7,9 +7,7 @@
 package org.mule.runtime.core.api.scheduler;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.ThreadType;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
@@ -35,10 +33,9 @@ public interface SchedulerService extends Service {
    * Builds a fresh {@link Scheduler} for light CPU tasks. The returned {@link Scheduler} is backed by the Mule runtime cpu-light
    * executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
-   * A task is considered {@link ProcessingType#CPU_LITE cpu-light} if it doesn't block at any time and its duration is less than
-   * 10 milliseconds.
+   * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
    * 
-   * @return a scheduler that manages {@link ThreadType#OTHER} threads.
+   * @return a scheduler that runs {@code cpu-light} tasks.
    */
   Scheduler cpuLightScheduler();
 
@@ -46,10 +43,9 @@ public interface SchedulerService extends Service {
    * Builds a fresh {@link Scheduler} for blocking I/O tasks. The returned {@link Scheduler} is backed by the Mule runtime
    * blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
-   * A task is considered {@link ProcessingType#BLOCKING I/O} if it spends most of it's clock duration blocked due to I/O
-   * operations.
+   * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
    * 
-   * @return a scheduler that manages {@link ThreadType#IO I/O} threads.
+   * @return a scheduler that runs {@code blocking I/O} tasks.
    */
   Scheduler ioScheduler();
 
@@ -57,10 +53,10 @@ public interface SchedulerService extends Service {
    * Builds a fresh {@link Scheduler} for heavy computation or CPU intensive tasks. The returned {@link Scheduler} is backed by
    * the Mule runtime computation executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
-   * A task is considered a {@link ProcessingType#CPU computation} if its duration is more than 10 milliseconds and less than 20%
-   * of its clock time is due to blocking.
+   * A task is considered a {@code CPU intensive} if its duration is more than 10 milliseconds and less than 20% of its clock time
+   * is due to blocking.
    * 
-   * @return a scheduler that manages {@link ThreadType#CPU_INTENSIVE computation} threads.
+   * @return a scheduler that runs {@code CPU intensive} tasks.
    */
   Scheduler cpuIntensiveScheduler();
 
@@ -69,7 +65,7 @@ public interface SchedulerService extends Service {
    * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads, a {@link SynchronousQueue}
    * and an {@link AbortPolicy abort} rejection policy.
    * 
-   * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
+   * @return a scheduler whose threads manage {@code custom} tasks.
    */
   Scheduler customScheduler(String name, int corePoolSize);
 
@@ -78,12 +74,8 @@ public interface SchedulerService extends Service {
    * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads a {@link LinkedBlockingQueue}
    * with the given {@code queueSize} and an {@link AbortPolicy abort} rejection policy.
    * 
-   * @return a scheduler whose threads manage {@link ThreadType#CUSTOM custom} tasks.
+   * @return a scheduler whose threads manage {@code custom} tasks.
    */
   Scheduler customScheduler(String name, int corePoolSize, int queueSize);
 
-  /**
-   * @return The {@link ThreadType} that matches with the {@link Scheduler} that manages the current {@link Thread}.
-   */
-  ThreadType currentThreadType();
 }

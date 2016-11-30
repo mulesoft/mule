@@ -6,11 +6,8 @@
  */
 package org.mule.service.scheduler;
 
-import static org.mule.runtime.api.scheduler.ThreadType.CUSTOM;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.api.scheduler.ThreadType;
 
 public class MockSchedulerService implements SchedulerService {
 
@@ -42,10 +39,5 @@ public class MockSchedulerService implements SchedulerService {
   @Override
   public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
     return new MockScheduler();
-  }
-  
-  @Override
-  public ThreadType currentThreadType() {
-    return CUSTOM;
   }
 }
