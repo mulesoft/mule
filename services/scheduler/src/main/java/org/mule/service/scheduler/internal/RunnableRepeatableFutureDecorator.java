@@ -42,13 +42,16 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   /**
    * Decorates the given {@code task}
    * 
-   * @param task the task to be decorated
+   * @param taskSupplier the supplier for tasks to be decorated
+   * @param wrapUpCallback the callback to execute after the task is done
    * @param scheduler the owner {@link Executor} of this task
    * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
+   * @param id a unique it for this task.
    */
   RunnableRepeatableFutureDecorator(Supplier<RunnableFuture<V>> taskSupplier,
                                     Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback,
-                                    DefaultScheduler scheduler, String taskAsString) {
+                                    DefaultScheduler scheduler, String taskAsString, Integer id) {
+    super(id);
     this.taskSupplier = taskSupplier;
     this.wrapUpCallback = wrapUpCallback;
     this.scheduler = scheduler;

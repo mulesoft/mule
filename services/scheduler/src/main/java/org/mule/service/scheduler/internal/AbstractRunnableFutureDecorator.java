@@ -13,7 +13,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 
@@ -24,8 +23,6 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
-
-  private static AtomicInteger counter = new AtomicInteger(0);
 
   private static final Logger logger = getLogger(AbstractRunnableFutureDecorator.class);
 
@@ -48,12 +45,15 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     }
   }
 
-  private final int hash;
+  private final Integer id;
 
   private volatile boolean started = false;
 
-  protected AbstractRunnableFutureDecorator() {
-    hash = counter.getAndIncrement();
+  /**
+   * @param id a unique it for this task.
+   */
+  protected AbstractRunnableFutureDecorator(Integer id) {
+    this.id = id;
   }
 
   protected long beforeRun() {
@@ -80,6 +80,6 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
 
   @Override
   public int hashCode() {
-    return hash;
+    return id.hashCode();
   }
 }
