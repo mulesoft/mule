@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.construct.processor;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -14,7 +15,8 @@ import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class FlowConstructStatisticsMessageProcessor implements Processor, FlowConstructAware, InternalMessageProcessor {
+public class FlowConstructStatisticsMessageProcessor extends AbstractAnnotatedObject
+    implements Processor, FlowConstructAware, InternalMessageProcessor {
 
   protected FlowConstruct flowConstruct;
 

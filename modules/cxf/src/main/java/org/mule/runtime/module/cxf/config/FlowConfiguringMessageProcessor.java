@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.cxf.config;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,7 +26,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 /**
  * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can be injected with the {@link FlowConstruct}.
  */
-public class FlowConfiguringMessageProcessor
+public class FlowConfiguringMessageProcessor extends AbstractAnnotatedObject
     implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer {
 
   private MessageProcessorBuilder builder;

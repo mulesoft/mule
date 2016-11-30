@@ -9,7 +9,7 @@ package org.mule.runtime.core.policy;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -92,7 +92,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
   /**
    * Inner class that implements the actually chaining of policies.
    */
-  public class NextOperationCall implements Processor {
+  public class NextOperationCall extends AbstractAnnotatedObject implements Processor {
 
     private final Event originalEvent;
     private final ParametersProcessor parametersProcessor;

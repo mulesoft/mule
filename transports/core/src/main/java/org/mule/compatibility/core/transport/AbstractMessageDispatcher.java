@@ -9,13 +9,11 @@ package org.mule.compatibility.core.transport;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.compatibility.core.message.CompatibilityMessage;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -24,17 +22,23 @@ import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 /**
  * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors send messages over over a specific
  * transport. Different implementations may support different Message Exchange Patterns.
  */
 public abstract class AbstractMessageDispatcher extends AbstractTransportMessageHandler
-    implements MessageDispatcher {
+    implements MessageDispatcher, AnnotatedObject {
 
   protected List<Transformer> defaultOutboundTransformers;
   protected List<Transformer> defaultResponseTransformers;
+  private final Map<QName, Object> annotations = new ConcurrentHashMap<>();
 
   public AbstractMessageDispatcher(OutboundEndpoint endpoint) {
     super(endpoint);
@@ -168,6 +172,22 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
       }
       return encoding;
     });
+  }
+
+  @Override
+  public final Object getAnnotation(QName qName) {
+    return annotations.get(qName);
+  }
+
+  @Override
+  public final Map<QName, Object> getAnnotations() {
+    return Collections.unmodifiableMap(annotations);
+  }
+
+  @Override
+  public synchronized void setAnnotations(Map<QName, Object> newAnnotations) {
+    annotations.clear();
+    annotations.putAll(newAnnotations);
   }
 
 }

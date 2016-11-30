@@ -9,6 +9,7 @@ package org.mule.runtime.core.policy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -24,7 +25,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class PolicyNextActionMessageProcessor implements Processor {
+public class PolicyNextActionMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   @Inject
   private PolicyStateHandler policyStateHandler;

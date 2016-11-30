@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -24,7 +25,7 @@ import java.io.Serializable;
  * Sets the outbound endpoint uri on as a property of the message using the following key:
  * {@link MuleProperties#MULE_ENDPOINT_PROPERTY}.
  */
-public class OutboundEndpointPropertyMessageProcessor implements Processor {
+public class OutboundEndpointPropertyMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   private String[] ignoredPropertyOverrides = new String[] {MuleProperties.MULE_METHOD_PROPERTY, "Content-Type"};
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.json.validation;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -22,7 +23,8 @@ import java.util.Map;
  *
  * @since 3.6.0
  */
-public class ValidateJsonSchemaMessageProcessor implements Processor, Initialisable, MuleContextAware {
+public class ValidateJsonSchemaMessageProcessor extends AbstractAnnotatedObject
+    implements Processor, Initialisable, MuleContextAware {
 
   private String schemaLocation;
   private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;

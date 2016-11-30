@@ -2124,7 +2124,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
   }
 
-  class DispatcherMessageProcessor implements Processor, Disposable {
+  class DispatcherMessageProcessor extends AbstractAnnotatedObject implements Processor, Disposable {
 
     private OutboundNotificationMessageProcessor notificationMessageProcessor;
     private OutboundEndpoint endpoint;

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -27,7 +28,7 @@ import java.util.List;
  * When {@link #transform(Object)} is called each converter in the same order they are included in the composition. The output of
  * a given converter is the input of the next composed converter.
  */
-public class CompositeConverter implements Converter, MuleContextAware {
+public class CompositeConverter extends AbstractAnnotatedObject implements Converter, MuleContextAware {
 
   private String name;
 

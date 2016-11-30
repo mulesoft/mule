@@ -8,6 +8,7 @@ package org.mule.compatibility.core.endpoint.outbound;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -19,7 +20,7 @@ import org.mule.runtime.core.util.ObjectUtils;
 /**
  * Verify that the outbound mime type is acceptable by this endpoint.
  */
-public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Processor {
+public class OutboundEndpointMimeTypeCheckingMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   private OutboundEndpoint endpoint;
 

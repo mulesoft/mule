@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.endpoint.inbound;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -17,7 +18,7 @@ import org.mule.runtime.core.util.StringMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InboundLoggingMessageProcessor implements Processor {
+public class InboundLoggingMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
   protected InboundEndpoint endpoint;

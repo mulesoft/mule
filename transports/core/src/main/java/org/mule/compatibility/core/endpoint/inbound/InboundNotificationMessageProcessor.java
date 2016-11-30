@@ -9,6 +9,7 @@ package org.mule.compatibility.core.endpoint.inbound;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.transport.AbstractConnector;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -17,7 +18,7 @@ import org.mule.runtime.core.util.ObjectUtils;
 /**
  * Publishes a {@link EndpointMessageNotification}'s when a message is received.
  */
-public class InboundNotificationMessageProcessor implements Processor {
+public class InboundNotificationMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   protected InboundEndpoint endpoint;
 
