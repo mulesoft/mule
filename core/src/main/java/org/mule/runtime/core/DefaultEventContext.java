@@ -132,12 +132,12 @@ public final class DefaultEventContext implements CoreEventContext, Serializable
   }
 
   @Override
-  public void complete() {
+  public void success() {
     monoProcessor.onComplete();
   }
 
   @Override
-  public void complete(Event event) {
+  public void success(Event event) {
     monoProcessor.onNext(event);
   }
 

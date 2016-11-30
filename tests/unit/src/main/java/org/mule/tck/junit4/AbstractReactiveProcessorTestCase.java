@@ -18,6 +18,7 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or
@@ -105,7 +107,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
           throw (Exception) unwrap(exception);
         }
       case FLUX:
-        Flux.just(event).transform(flow).doOnNext(response -> response.getContext().complete(response))
+        Flux.just(event).transform(flow).doOnNext(response -> response.getContext().success(response))
             .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me)).subscribe();
         try {
           return from(event.getContext()).block();
@@ -118,6 +120,18 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   }
 
   public enum Mode {
-    BLOCKING, MONO, FLUX
+    /**
+     * Test using {@link Processor#process(Event)} blocking API.
+     */
+    BLOCKING,
+    /**
+     * Test using new reactive API by creating a {@link Mono} and blocking and waiting for completion (value, empty or error)
+     */
+    MONO,
+    /**
+     * Test using new reactive API by creating a {@link Flux}, emitting the event and then blocking for completion of the
+     * {@link EventContext}
+     */
+    FLUX
   }
 }

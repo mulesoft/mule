@@ -31,11 +31,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.util.Predicate;
-import org.mule.runtime.core.util.rx.Exceptions;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.resource.spi.work.WorkManager;

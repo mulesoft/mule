@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.rx.Exceptions;
 
 import java.util.function.Function;
 
@@ -149,7 +148,7 @@ public final class MuleTestUtils {
     return just(event)
         .transform(processor)
         .otherwise(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> empty())
-        .doOnSuccess(response -> event.getContext().complete(response))
+        .doOnSuccess(response -> event.getContext().success(response))
         .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me))
         .subscribe();
   }

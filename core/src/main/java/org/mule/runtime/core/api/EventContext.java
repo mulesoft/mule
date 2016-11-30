@@ -63,10 +63,23 @@ public interface EventContext extends Publisher<Event> {
    */
   String getOriginatingConnectorName();
 
-  void complete();
+  /**
+   * Complete this {@link EventContext} successfully with no result {@link Event}.
+   */
+  void success();
 
-  void complete(Event event);
+  /**
+   * Complete this {@link EventContext} successfully with a resut {@link Event}.
+   *
+   * @param event the result event.
+   */
+  void success(Event event);
 
+  /**
+   * Complete this {@link EventContext} unsuccessfully with an error
+   *
+   * @param messagingException the messaging exception .
+   */
   void error(MessagingException messagingException);
 
 }
