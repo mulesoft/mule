@@ -181,7 +181,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setExecutorServiceSupplier(() -> schedulerService.cpuLightScheduler()).build();
+        .setSchedulerSupplier(() -> schedulerService.cpuLightScheduler()).build();
 
     try {
       server = httpService.getServerFactory().create(serverConfiguration);

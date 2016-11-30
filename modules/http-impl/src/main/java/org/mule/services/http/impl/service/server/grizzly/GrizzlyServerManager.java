@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.module.http.internal.HttpMessageLogger;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
@@ -30,7 +31,6 @@ import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
@@ -157,7 +157,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     return false;
   }
 
-  public HttpServer createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<ExecutorService> executorSource,
+  public HttpServer createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<Scheduler> schedulerSupplier,
                                        final ServerAddress serverAddress, boolean usePersistentConnections,
                                        int connectionIdleTimeout)
       throws IOException {
@@ -174,13 +174,13 @@ public class GrizzlyServerManager implements HttpServerManager {
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
     final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
-                                                                         executorSource);
+                                                                         schedulerSupplier);
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
   }
 
-  public HttpServer createServerFor(ServerAddress serverAddress, Supplier<ExecutorService> executorSupplier,
+  public HttpServer createServerFor(ServerAddress serverAddress, Supplier<Scheduler> schedulerSupplier,
                                     boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException {
     if (logger.isDebugEnabled()) {
@@ -195,7 +195,7 @@ public class GrizzlyServerManager implements HttpServerManager {
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
     final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
-                                                                         executorSupplier);
+                                                                         schedulerSupplier);
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
@@ -265,8 +265,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     //TODO - MULE-11117: Cleanup GrizzlyServerManager server specific data
 
     public GrizzlyHttpServerWrapper(ServerAddress serverAddress, TCPNIOTransport transport,
-                                    HttpListenerRegistry listenerRegistry, Supplier<ExecutorService> schedulerSource) {
-      super(serverAddress, transport, listenerRegistry, schedulerSource);
+                                    HttpListenerRegistry listenerRegistry, Supplier<Scheduler> schedulerSupplier) {
+      super(serverAddress, transport, listenerRegistry, schedulerSupplier);
     }
 
     @Override

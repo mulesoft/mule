@@ -12,6 +12,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
@@ -27,7 +28,6 @@ import org.mule.services.http.impl.service.server.grizzly.GrizzlyServerManager;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -84,10 +84,10 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     TlsContextFactory tlsContextFactory = configuration.getTlsContextFactory();
     HttpServer httpServer;
     if (tlsContextFactory == null) {
-      httpServer = createServer(serverAddress, configuration.getExecutorServiceSupplier(),
+      httpServer = createServer(serverAddress, configuration.getSchedulerSupplier(),
                                 configuration.isUsePersistentConnections(), configuration.getConnectionIdleTimeout());
     } else {
-      httpServer = createSslServer(serverAddress, tlsContextFactory, configuration.getExecutorServiceSupplier(),
+      httpServer = createSslServer(serverAddress, tlsContextFactory, configuration.getSchedulerSupplier(),
                                    configuration.isUsePersistentConnections(),
                                    configuration.getConnectionIdleTimeout());
     }
@@ -96,11 +96,11 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   }
 
   public HttpServer createServer(ServerAddress serverAddress,
-                                 Supplier<ExecutorService> executorServiceSupplier, boolean usePersistentConnections,
+                                 Supplier<Scheduler> schedulerSupplier, boolean usePersistentConnections,
                                  int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {
-        return httpServerManager.createServerFor(serverAddress, executorServiceSupplier, usePersistentConnections,
+        return httpServerManager.createServerFor(serverAddress, schedulerSupplier, usePersistentConnections,
                                                  connectionIdleTimeout);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
@@ -116,11 +116,11 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   }
 
   public HttpServer createSslServer(ServerAddress serverAddress, TlsContextFactory tlsContext,
-                                    Supplier<ExecutorService> executorServiceSupplier, boolean usePersistentConnections,
+                                    Supplier<Scheduler> schedulerSupplier, boolean usePersistentConnections,
                                     int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {
-        return httpServerManager.createSslServerFor(tlsContext, executorServiceSupplier, serverAddress, usePersistentConnections,
+        return httpServerManager.createSslServerFor(tlsContext, schedulerSupplier, serverAddress, usePersistentConnections,
                                                     connectionIdleTimeout);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);

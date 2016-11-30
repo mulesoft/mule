@@ -6,9 +6,9 @@
  */
 package org.mule.service.http.api.server;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
-import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
 /**
@@ -23,17 +23,17 @@ public class HttpServerConfiguration {
   private final TlsContextFactory tlsContextFactory;
   private final boolean usePersistentConnections;
   private final int connectionIdleTimeout;
-  private final Supplier<ExecutorService> executorServiceSupplier;
+  private final Supplier<Scheduler> schedulerSupplier;
   private final String ownerName;
 
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
-                          int connectionIdleTimeout, String ownerName, Supplier<ExecutorService> executorServiceSupplier) {
+                          int connectionIdleTimeout, String ownerName, Supplier<Scheduler> schedulerSupplier) {
     this.host = host;
     this.port = port;
     this.tlsContextFactory = tlsContextFactory;
     this.usePersistentConnections = usePersistentConnections;
     this.connectionIdleTimeout = connectionIdleTimeout;
-    this.executorServiceSupplier = executorServiceSupplier;
+    this.schedulerSupplier = schedulerSupplier;
     this.ownerName = ownerName;
   }
 
@@ -57,8 +57,8 @@ public class HttpServerConfiguration {
     return connectionIdleTimeout;
   }
 
-  public Supplier<ExecutorService> getExecutorServiceSupplier() {
-    return executorServiceSupplier;
+  public Supplier<Scheduler> getSchedulerSupplier() {
+    return schedulerSupplier;
   }
 
   public static class Builder {
@@ -69,7 +69,7 @@ public class HttpServerConfiguration {
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
     private String ownerName;
-    private Supplier<ExecutorService> executorServiceSupplier;
+    private Supplier<Scheduler> schedulerSupplier;
 
     public Builder setHost(String host) {
       this.host = host;
@@ -96,8 +96,8 @@ public class HttpServerConfiguration {
       return this;
     }
 
-    public Builder setExecutorServiceSupplier(Supplier<ExecutorService> executorServiceSupplier) {
-      this.executorServiceSupplier = executorServiceSupplier;
+    public Builder setSchedulerSupplier(Supplier<Scheduler> schedulerSupplier) {
+      this.schedulerSupplier = schedulerSupplier;
       return this;
     }
 
@@ -108,7 +108,7 @@ public class HttpServerConfiguration {
 
     public HttpServerConfiguration build() {
       return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout,
-                                         ownerName, executorServiceSupplier);
+                                         ownerName, schedulerSupplier);
     }
   }
 }

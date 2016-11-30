@@ -7,9 +7,9 @@
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
@@ -33,18 +33,18 @@ public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier
   private final ServerAddress serverAddress;
   private final HttpListenerRegistry listenerRegistry;
   private TCPNIOServerConnection serverConnection;
-  private ExecutorService executor;
+  private Scheduler scheduler;
   private boolean stopped = true;
   private boolean stopping;
   private MuleContext muleContext;
   private String ownerName;
 
   public GrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry,
-                           Supplier<ExecutorService> executorSource) {
+                           Supplier<Scheduler> schedulerSource) {
     this.serverAddress = serverAddress;
     this.transport = transport;
     this.listenerRegistry = listenerRegistry;
-    this.executor = executorSource.get();
+    this.scheduler = schedulerSource.get();
   }
 
   @Override
@@ -66,14 +66,10 @@ public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier
   @Override
   public void dispose() {
     try {
-      //TODO: Remove once Scheduler is available through mule api
-      if (executor instanceof Scheduler) {
-        ((Scheduler) executor).stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-      } else {
-        executor.shutdown();
-      }
+      //TODO - MULE-11115: Get rid of muleContext once we have a stop() method
+      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     } finally {
-      executor = null;
+      scheduler = null;
     }
   }
 
@@ -104,6 +100,6 @@ public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier
 
   @Override
   public ExecutorService get() {
-    return executor;
+    return scheduler;
   }
 }
