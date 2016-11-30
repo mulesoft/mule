@@ -222,7 +222,7 @@ public class FileConnector extends AbstractConnector
             {
                 try
                 {
-                    setFileAge(Long.parseLong(tempFileAge));
+                    endpoint.getProperties().put("fileAge",Long.parseLong(tempFileAge));
                 }
                 catch (Exception ex1)
                 {
