@@ -6,8 +6,6 @@
  */
 package org.mule.service.scheduler;
 
-import static org.mule.service.scheduler.ThreadType.CUSTOM;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.TimeZone;
