@@ -36,8 +36,8 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   @Rule
   public ExpectedException thrown = none();
 
-  public MessageEnricherTestCase(boolean nonBlocking) {
-    super(nonBlocking);
+  public MessageEnricherTestCase(Mode mode) {
+    super(mode);
   }
 
   @Test

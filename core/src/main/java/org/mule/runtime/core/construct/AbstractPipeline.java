@@ -16,8 +16,10 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
+import static org.mule.runtime.core.util.rx.Exceptions.MESSAGE_DROPPED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -235,7 +237,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return pipeline.process(event);
           } else {
             try {
-              return Mono.just(event).transform(this).block();
+              return Mono.just(event)
+                  .transform(this)
+                  .otherwise(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> empty())
+                  .block();
             } catch (Exception e) {
               throw rxExceptionToMuleException(e);
             }

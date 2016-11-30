@@ -211,7 +211,7 @@
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <!-- TODO MULE-10771 -->
-        <projectReactorVersion>3.0.3.BUILD-SNAPSHOT</projectReactorVersion>
+        <projectReactorVersion>3.0.4.BUILD-SNAPSHOT</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.3</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>

@@ -51,8 +51,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Rule
   public ExpectedException expected;
 
-  public AsyncDelegateMessageProcessorTestCase(boolean nonBlocking) {
-    super(nonBlocking);
+  public AsyncDelegateMessageProcessorTestCase(Mode mode) {
+    super(mode);
     setStartContext(true);
   }
 

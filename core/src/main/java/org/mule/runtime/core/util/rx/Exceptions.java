@@ -11,7 +11,7 @@ import static reactor.core.Exceptions.unwrap;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.Event;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -24,6 +24,9 @@ import java.util.function.Predicate;
  * Utilities for working with checked exceptions with project reactor.
  */
 public class Exceptions {
+
+  public static Predicate<Throwable> MESSAGE_DROPPED_EXCEPTION_PREDICATE =
+      throwable -> throwable instanceof MessageDroppedException;
 
   /**
    * Adapt a {@link CheckedConsumer} to a {@link Consumer} propagating any exceptions thrown by the {@link CheckedConsumer} using
@@ -217,8 +220,8 @@ public class Exceptions {
   }
 
   /**
-   * Unwrap reactive exception and rethrow instances {@link MuleException} or {@link RuntimeException}.  Other exception types
-   * are wrapped in a instance of {@link DefaultMuleException}.
+   * Unwrap reactive exception and rethrow instances {@link MuleException} or {@link RuntimeException}. Other exception types are
+   * wrapped in a instance of {@link DefaultMuleException}.
    *
    * @param throwable
    * @return
@@ -233,6 +236,32 @@ public class Exceptions {
       throw (RuntimeException) throwable;
     } else {
       throw new DefaultMuleException(throwable);
+    }
+  }
+
+  /**
+   * Returns an exception used to signal a dropped message ina reactive stream. This exception does not extend
+   * {@link MuleException} or even call {@link Exception#Exception()} to avoid overhead of filling in the stack.
+   *
+   * This exception should only be thrown as part of reactive stream processing and neesd to be explcitly handled using for
+   * example {@link reactor.core.publisher.Flux#onErrorResumeWith(Predicate, Function)} depending on the behaviuor required in
+   * the specific context.  For example in a scatter-gather a dropped message means one less item in the aggregated collection of
+   * message, while a dropped message in a flow means the source should recieve an empty response.
+   */
+  public static MessageDroppedException newMessageDroppedException(Event event) {
+    return new MessageDroppedException(event);
+  }
+
+  private static final class MessageDroppedException extends Exception {
+
+    private Event dropped;
+
+    public MessageDroppedException(Event dropped) {
+      this.dropped = dropped;
+    }
+
+    public Event getDropped() {
+      return this.dropped;
     }
   }
 

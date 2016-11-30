@@ -47,8 +47,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
   public ExpectedException expectedException = ExpectedException.none();
 
 
-  public AsyncInterceptingMessageProcessorTestCase(boolean reactive) {
-    super(reactive);
+  public AsyncInterceptingMessageProcessorTestCase(Mode mode) {
+    super(mode);
     setStartContext(true);
   }
 

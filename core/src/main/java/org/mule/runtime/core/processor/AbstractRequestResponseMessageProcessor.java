@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.util.rx.internal.Operators.nullSafeMap;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
@@ -20,7 +20,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**

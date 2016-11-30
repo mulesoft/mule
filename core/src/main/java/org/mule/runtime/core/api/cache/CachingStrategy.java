@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.cache;
 
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.util.rx.internal.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;

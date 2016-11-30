@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.util.rx.Exceptions.newMessageDroppedException;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.empty;
+import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -19,6 +21,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.rx.Exceptions;
 
 import java.util.function.Function;
 
@@ -91,7 +94,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
         throw propagate(filterUnacceptedException(event));
       };
     } else {
-      return publisher -> empty();
+      return event -> error(newMessageDroppedException(event));
     }
   }
 

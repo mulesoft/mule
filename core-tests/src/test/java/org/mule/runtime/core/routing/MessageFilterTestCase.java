@@ -22,8 +22,8 @@ import org.junit.Test;
 
 public class MessageFilterTestCase extends AbstractReactiveProcessorTestCase {
 
-  public MessageFilterTestCase(boolean nonBlocking) {
-    super(nonBlocking);
+  public MessageFilterTestCase(Mode mode) {
+    super(mode);
   }
 
   @Test

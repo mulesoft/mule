@@ -12,10 +12,10 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.util.Predicate;
-import org.mule.runtime.core.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.util.rx.internal.ConditionalExecutorServiceDecorator;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 

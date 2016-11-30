@@ -76,8 +76,8 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Rule
   public ExpectedException thrown = none();
 
-  public PipelineMessageNotificationTestCase(boolean reactive) {
-    super(reactive);
+  public PipelineMessageNotificationTestCase(Mode mode) {
+    super(mode);
   }
 
   @Before

@@ -8,16 +8,15 @@ package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.tck.MuleTestUtils.processAsStream;
-import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
+import static org.mule.tck.MuleTestUtils.processWithMono;
+import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
+
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -171,7 +170,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   private ExecutionCallback getFlowRunCallback(final Flow flow) {
     return () -> {
       if (nonBlocking) {
-        return processAsStreamAndBlock(getOrBuildEvent(), flow);
+        return processWithMonoAndBlock(getOrBuildEvent(), flow);
       } else {
         return flow.process(getOrBuildEvent());
       }
@@ -181,7 +180,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   private ExecutionCallback getFlowDispatchCallback(final Flow flow) {
     return () -> {
       if (nonBlocking) {
-        processAsStream(getOrBuildEvent(), flow);
+        processWithMono(getOrBuildEvent(), flow);
       } else {
         flow.process(getOrBuildEvent());
       }
