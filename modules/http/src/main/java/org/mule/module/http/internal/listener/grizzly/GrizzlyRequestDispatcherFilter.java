@@ -8,14 +8,13 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
-import static org.glassfish.grizzly.http.util.HttpStatus.INTERNAL_SERVER_ERROR_500;
+import static org.glassfish.grizzly.http.util.HttpStatus.SERVICE_UNAVAILABLE_503;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.UNAVAILABLE_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
-
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.ClientConnection;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
@@ -64,7 +63,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         if (ctx.getConnection().getAttributes().getAttribute(UNAVAILABLE_ATTRIBUTE) != null)
         {
             final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(request);
-            responsePacketBuilder.status(INTERNAL_SERVER_ERROR_500.getStatusCode());
+            responsePacketBuilder.status(SERVICE_UNAVAILABLE_503.getStatusCode());
             HttpResponsePacket packet = responsePacketBuilder.build();
 
             // this is necessary to avoid chunk-encoding
