@@ -19,12 +19,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;

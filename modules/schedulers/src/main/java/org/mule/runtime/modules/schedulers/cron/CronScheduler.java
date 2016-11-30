@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 
 import java.util.TimeZone;

@@ -10,7 +10,7 @@ package org.mule.runtime.core.source.polling.schedule;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 
 import java.util.concurrent.ScheduledFuture;

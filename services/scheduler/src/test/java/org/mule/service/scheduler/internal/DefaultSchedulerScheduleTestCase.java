@@ -18,7 +18,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.scheduler.ThreadType.CUSTOM;
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import java.util.ArrayList;
 import java.util.Collection;

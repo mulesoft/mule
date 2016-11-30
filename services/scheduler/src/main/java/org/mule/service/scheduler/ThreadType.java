@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.scheduler;
+package org.mule.service.scheduler;
+
+import org.mule.runtime.api.scheduler.Scheduler;
 
 /**
  * Represents the type of work that a {@link Thread} owned by a {@link Scheduler} is configured to perform.
  *
- * @since 4.0
+ * @since 1.0
  */
 public enum ThreadType {
 

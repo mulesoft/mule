@@ -22,6 +22,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
@@ -49,8 +49,8 @@ import org.slf4j.LoggerFactory;
  * Polling {@link org.mule.runtime.core.api.source.MessageSource}.
  * </p>
  * <p>
- * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.core.api.schedule.Scheduler} at the
- * initialization phase. This {@link org.mule.runtime.core.api.schedule.Scheduler} can be stopped/started and executed by using
+ * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.api.scheduler.schedule.Scheduler} at the
+ * initialization phase. This {@link org.mule.runtime.api.scheduler.schedule.Scheduler} can be stopped/started and executed by using
  * the {@link org.mule.runtime.core.api.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule
  * server.
  * </p>

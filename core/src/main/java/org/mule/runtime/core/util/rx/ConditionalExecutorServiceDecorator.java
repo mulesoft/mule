@@ -9,7 +9,7 @@ package org.mule.runtime.core.util.rx;
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.util.BooleanUtils;
 import org.mule.runtime.core.util.Predicate;
 

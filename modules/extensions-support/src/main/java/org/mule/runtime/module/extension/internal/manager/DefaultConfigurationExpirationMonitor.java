@@ -10,8 +10,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import com.google.common.collect.Multimap;
