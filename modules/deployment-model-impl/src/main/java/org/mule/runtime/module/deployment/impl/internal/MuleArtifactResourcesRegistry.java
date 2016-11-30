@@ -16,6 +16,8 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
@@ -83,10 +85,12 @@ public class MuleArtifactResourcesRegistry {
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()));
     DefaultDependenciesProvider dependenciesProvider = new DefaultDependenciesProvider();
+    PluginDependenciesResolver pluginDependenciesResolver =
+        new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory, dependenciesProvider);
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, artifactPluginRepository,
-                                                 this.artifactPluginClassLoaderFactory, artifactPluginDescriptorFactory,
-                                                 dependenciesProvider);
+                                                 this.artifactPluginClassLoaderFactory,
+                                                 pluginDependenciesResolver);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
         new MuleServiceManager(new DefaultServiceDiscoverer(
@@ -106,9 +110,9 @@ public class MuleArtifactResourcesRegistry {
                                                                   artifactClassLoaderManager);
 
     temporaryArtifactClassLoaderBuilderFactory =
-        new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginRepository, artifactPluginClassLoaderFactory,
+        new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginClassLoaderFactory,
                                                        artifactPluginDescriptorFactory,
-                                                       dependenciesProvider);
+                                                       dependenciesProvider, pluginDependenciesResolver);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {

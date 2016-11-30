@@ -15,10 +15,9 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -26,7 +25,6 @@ import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFi
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
@@ -47,7 +45,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
-  private final BundlePluginDependenciesResolver pluginDependenciesResolver;
+  private final PluginDependenciesResolver pluginDependenciesResolver;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
   private ArtifactDescriptor artifactDescriptor;
@@ -56,27 +54,25 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
   /**
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
-   *  @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
+   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
    *        null.
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
-   * @param dependenciesProvider resolver for missing dependencies.
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                             ArtifactPluginRepository artifactPluginRepository,
                                             ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                            ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                            DependenciesProvider dependenciesProvider) {
+                                            PluginDependenciesResolver pluginDependenciesResolver) {
     checkArgument(artifactClassLoaderFactory != null, "artifact class loader factory cannot be null");
     checkArgument(artifactPluginRepository != null, "artifact plugin repository cannot be null");
     checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
-    checkArgument(artifactDescriptorFactory != null, "artifactPluginClassLoaderFactory cannot be null");
-    checkArgument(dependenciesProvider != null, "dependenciesProvider cannot be null");
+    checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
+
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactDescriptorFactory, dependenciesProvider);
+    this.pluginDependenciesResolver = pluginDependenciesResolver;
   }
 
   /**

@@ -9,20 +9,18 @@ package org.mule.runtime.deployment.model.internal.tooling;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.UUID.getUUID;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -50,17 +48,17 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
    * {@inheritDoc}
    *
    * @param artifactPluginDescriptor desired plugin to generate an {@link ArtifactClassLoader} for.
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    * @see #build()
    */
   public ToolingPluginClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                          ArtifactPluginRepository artifactPluginRepository,
                                          ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                         ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                         DependenciesProvider dependenciesProvider,
-                                         ArtifactPluginDescriptor artifactPluginDescriptor) {
+                                         ArtifactPluginDescriptor artifactPluginDescriptor,
+                                         PluginDependenciesResolver pluginDependenciesResolver) {
     super(artifactClassLoaderFactory, artifactPluginRepository,
-          artifactPluginClassLoaderFactory, artifactDescriptorFactory,
-          dependenciesProvider);
+          artifactPluginClassLoaderFactory,
+          pluginDependenciesResolver);
     this.artifactPluginDescriptor = artifactPluginDescriptor;
   }
 

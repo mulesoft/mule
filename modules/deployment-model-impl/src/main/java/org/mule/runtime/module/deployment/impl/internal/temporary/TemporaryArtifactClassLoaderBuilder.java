@@ -7,15 +7,14 @@
 package org.mule.runtime.module.deployment.impl.internal.temporary;
 
 import static com.google.common.collect.Lists.newArrayList;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarExplorer;
@@ -45,15 +44,13 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    * 
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory for creating class loaders for artifact plugins. Must be not null.
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve.
-   * @param dependenciesProvider resolver for missing dependencies.
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
                                              ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                             ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                             DependenciesProvider dependenciesProvider) {
+                                             PluginDependenciesResolver pluginDependenciesResolver) {
     super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository,
-          artifactPluginClassLoaderFactory, artifactDescriptorFactory, dependenciesProvider);
+          artifactPluginClassLoaderFactory, pluginDependenciesResolver);
   }
 
   /**

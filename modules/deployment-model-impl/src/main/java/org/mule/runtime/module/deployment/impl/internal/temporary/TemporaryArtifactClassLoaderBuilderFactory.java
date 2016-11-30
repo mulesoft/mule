@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
@@ -26,23 +27,25 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
   private final DependenciesProvider dependenciesProvider;
+  private PluginDependenciesResolver pluginDependenciesResolver;
 
   /**
    * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
    * 
-   * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
    * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
    * @param dependenciesProvider resolver for missing dependencies
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
-  public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
-                                                    ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+  public TemporaryArtifactClassLoaderBuilderFactory(ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                                     ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                                    DependenciesProvider dependenciesProvider) {
+                                                    DependenciesProvider dependenciesProvider,
+                                                    PluginDependenciesResolver pluginDependenciesResolver) {
     this.applicationPluginRepository = new EmptyArtifactPluginRepository();
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
     this.artifactDescriptorFactory = artifactDescriptorFactory;
     this.dependenciesProvider = dependenciesProvider;
+    this.pluginDependenciesResolver = pluginDependenciesResolver;
   }
 
   /**
@@ -52,7 +55,7 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    */
   public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
     return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory,
-                                                   artifactDescriptorFactory, dependenciesProvider);
+                                                   pluginDependenciesResolver);
   }
 
   /**
