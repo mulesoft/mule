@@ -6,6 +6,8 @@
  */
 package org.mule.service.http.api.domain;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
 import java.io.Serializable;
@@ -13,7 +15,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -83,8 +84,8 @@ public class ParameterMap implements Map<String, String>, Serializable {
     return null;
   }
 
-  public List<String> getAll(Object key) {
-    return paramsMap.containsKey(key) ? Collections.unmodifiableList(paramsMap.get(key)) : Collections.<String>emptyList();
+  public List<String> getAll(String key) {
+    return paramsMap.containsKey(key) ? unmodifiableList(paramsMap.get(key)) : emptyList();
   }
 
   @Override

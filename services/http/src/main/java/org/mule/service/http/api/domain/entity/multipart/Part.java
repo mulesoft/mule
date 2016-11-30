@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.util.Collection;
 
 /**
+ * Represent a part of a multipart body.
  *
+ * @since 4.0
  */
 public interface Part {
 
@@ -50,35 +52,29 @@ public interface Part {
    * specified name, this method returns <code>null</code>. If there are multiple headers with the same name, this method returns
    * the first header in the part. The header name is case insensitive. You can use this method with any request header.
    *
-   * @param name a <code>String</code> specifying the header name
-   *
-   * @return a <code>String</code> containing the value of the requested header, or <code>null</code> if the part does not have a
+   * @param name a {@code String} specifying the header name
+   * @return a {@code String} containing the value of the requested header, or {@code null} if the part does not have a
    *         header of that name
    */
   String getHeader(String name);
 
   /**
    * Gets the values of the Part header with the given name.
-   *
    * <p>
    * Any changes to the returned <code>Collection</code> must not affect this <code>Part</code>.
-   *
    * <p>
    * Part header names are case insensitive.
    *
    * @param name the header name whose values to return
-   *
    * @return a (possibly empty) <code>Collection</code> of the values of the header with the given name
    */
   Collection<String> getHeaders(String name);
 
   /**
    * Gets the header names of this Part.
-   *
    * <p>
    * Some servlet containers do not allow servlets to access headers using this method, in which case this method returns
    * <code>null</code>
-   *
    * <p>
    * Any changes to the returned <code>Collection</code> must not affect this <code>Part</code>.
    *

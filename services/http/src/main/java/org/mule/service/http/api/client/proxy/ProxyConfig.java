@@ -7,29 +7,29 @@
 package org.mule.service.http.api.client.proxy;
 
 /**
- * HTTP proxy configuration for making http requests.
+ * HTTP proxy configuration for making HTTP requests.
  *
  * @since 4.0
  */
 public interface ProxyConfig {
 
   /**
-   * @return the http proxy host
+   * @return the HTTP proxy host
    */
   String getHost();
 
   /**
-   * @return the http proxy port
+   * @return the HTTP proxy port
    */
   int getPort();
 
   /**
-   * @return the http proxy authentication username
+   * @return the HTTP proxy authentication username
    */
   String getUsername();
 
   /**
-   * @return the http proxy authentication password
+   * @return the HTTP proxy authentication password
    */
   String getPassword();
 

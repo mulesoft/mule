@@ -13,6 +13,9 @@ import java.util.concurrent.ExecutorService;
 
 import org.glassfish.grizzly.utils.DelayedExecutor;
 
+/**
+ * Object containing all idle check executors, making it easy to dispose them once a server goes down.
+ */
 public class IdleExecutor {
 
   private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
@@ -21,6 +24,7 @@ public class IdleExecutor {
   private DelayedExecutor idleTimeoutDelayedExecutor;
 
   public IdleExecutor(String prefix) {
+    //TODO - MULE-10545: Change http selectors to use a connector pool from the service
     this.idleTimeoutExecutorService = newCachedThreadPool(new NamedThreadFactory(prefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
     this.idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
   }

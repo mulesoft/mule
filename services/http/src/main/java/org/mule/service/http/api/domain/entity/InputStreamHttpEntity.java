@@ -8,6 +8,11 @@ package org.mule.service.http.api.domain.entity;
 
 import java.io.InputStream;
 
+/**
+ * Representation of an stream HTTP body.
+ *
+ * @since 4.0
+ */
 public class InputStreamHttpEntity implements HttpEntity {
 
   private Integer contentLength;

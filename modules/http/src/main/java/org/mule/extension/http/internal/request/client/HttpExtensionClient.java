@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
+ * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection
+ * default values for them.
  *
+ * @since 4.0
  */
 public class HttpExtensionClient implements Startable, Stoppable {
 

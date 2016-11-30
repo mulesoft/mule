@@ -9,11 +9,16 @@ package org.mule.service.http.api.server;
 import org.mule.runtime.api.connection.ConnectionException;
 
 /**
- * Factory object for {@link HttpServer}
+ * Factory object for {@link HttpServer}.
  *
  * @since 4.0
  */
 public interface HttpServerFactory {
 
-  HttpServer create(HttpServerConfiguration serverConfiguration) throws ConnectionException;
+  /**
+   * @param configuration a {@link HttpServerConfiguration} specifying the desired server.
+   * @return a newly built {@link HttpServer} based on the {@code configuration}.
+   * @throws ConnectionException if the server cannot be created based on the configuration.
+   */
+  HttpServer create(HttpServerConfiguration configuration) throws ConnectionException;
 }

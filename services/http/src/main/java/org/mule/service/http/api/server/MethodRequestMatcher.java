@@ -6,15 +6,26 @@
  */
 package org.mule.service.http.api.server;
 
+import org.mule.service.http.api.domain.request.HttpRequest;
+
 import java.util.List;
 
 /**
+ * {@link RequestMatcher} that specifically matches against an {@link HttpRequest} method.
  *
+ * @since 4.0
  */
 public interface MethodRequestMatcher extends RequestMatcher {
 
-  boolean intersectsWith(MethodRequestMatcher methodRequestMatcher);
+  /**
+   * @param otherMatcher another {@link MethodRequestMatcher}.
+   * @return true if this and {@code otherMatcher} have matching methods in common, false otherwise.
+   */
+  boolean intersectsWith(MethodRequestMatcher otherMatcher);
 
+  /**
+   * @return the list of methods to match.
+   */
   List<String> getMethods();
 
 }

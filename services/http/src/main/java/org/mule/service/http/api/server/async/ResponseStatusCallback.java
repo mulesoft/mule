@@ -6,17 +6,22 @@
  */
 package org.mule.service.http.api.server.async;
 
+/**
+ * Callback to notify of success or failure sending a response.
+ *
+ * @since 4.0
+ */
 public interface ResponseStatusCallback {
 
   /**
-   * method to process a failure while sending the response to the client
+   * Method to process a failure while sending the response to the client
    *
    * @param throwable exception thrown while sending the response
    */
   void responseSendFailure(Throwable throwable);
 
   /**
-   * notifies that the response was successfully send.
+   * Notifies that the response was successfully send.
    */
   void responseSendSuccessfully();
 

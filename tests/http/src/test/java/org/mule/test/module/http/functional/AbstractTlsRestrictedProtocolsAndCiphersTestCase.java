@@ -30,6 +30,7 @@ import java.util.List;
  */
 public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
 
+  //TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
   private HttpService httpService = new HttpServiceImplementation();
 
   @Override

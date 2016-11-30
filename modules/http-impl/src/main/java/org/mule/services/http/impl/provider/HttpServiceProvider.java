@@ -6,22 +6,21 @@
  */
 package org.mule.services.http.impl.provider;
 
+import static java.util.Collections.singletonList;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
 
-import com.google.common.collect.Lists;
-
 import java.util.List;
 
 public class HttpServiceProvider implements ServiceProvider {
 
-  HttpServiceImplementation service = new HttpServiceImplementation();
+  private HttpServiceImplementation service = new HttpServiceImplementation();
   private ServiceDefinition serviceDefinition = new ServiceDefinition(HttpService.class, service);
 
   @Override
   public List<ServiceDefinition> providedServices() {
-    return Lists.newArrayList(serviceDefinition);
+    return singletonList(serviceDefinition);
   }
 }

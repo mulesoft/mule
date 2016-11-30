@@ -6,7 +6,11 @@
  */
 package org.mule.service.http.api.client;
 
+/**
+ * Representation of a request's authentication scheme.
+ */
 public class HttpRequestAuthentication {
+  //TODO - MULE-11113: Review HTTP request authentication API and provide a better way of using it (remove setters)
 
   private final HttpAuthenticationType type;
 
@@ -63,6 +67,5 @@ public class HttpRequestAuthentication {
   public void setPreemptive(boolean preemptive) {
     this.preemptive = preemptive;
   }
-
 
 }

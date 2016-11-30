@@ -10,14 +10,16 @@ import org.mule.service.http.api.domain.request.HttpRequestContext;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 
 /**
- * Handler for an incoming http request that allows to send the http response asynchronously.
+ * Handler for an incoming HTTP request that allows to send the HTTP response asynchronously.
+ *
+ * @since 4.0
  */
 public interface RequestHandler {
 
   /**
-   * Called to handle an incoming http request
+   * Called to handle an incoming HTTP request
    *
-   * @param requestContext http request content
+   * @param requestContext HTTP request content
    * @param responseCallback callback to call when the response content is ready.
    */
   void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback);

@@ -12,7 +12,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientFactory;
+import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerFactory;
 import org.mule.services.http.impl.service.client.GrizzlyHttpClient;
 import org.mule.services.http.impl.service.server.HttpListenerConnectionManager;
@@ -20,6 +22,10 @@ import org.mule.services.http.impl.service.server.HttpListenerConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of {@link HttpService} that uses Grizzly to create {@link HttpServer}s and its Async HTTP Client provider to
+ * create {@link HttpClient}s.
+ */
 public class HttpServiceImplementation implements HttpService, Startable, Stoppable {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpServiceImplementation.class);

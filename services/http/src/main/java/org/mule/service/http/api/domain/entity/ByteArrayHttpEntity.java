@@ -7,7 +7,9 @@
 package org.mule.service.http.api.domain.entity;
 
 /**
- * Represents a byte array entity message.
+ * Represents a byte array HTTP body.
+ *
+ * @since 4.0
  */
 public class ByteArrayHttpEntity implements HttpEntity {
 

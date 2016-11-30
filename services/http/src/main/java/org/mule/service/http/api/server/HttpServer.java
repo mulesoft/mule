@@ -9,7 +9,9 @@ package org.mule.service.http.api.server;
 import java.io.IOException;
 
 /**
- * Represents a ServerSocket connection
+ * Represents a ServerSocket connection.
+ *
+ * @since 4.0
  */
 public interface HttpServer {
 
@@ -31,7 +33,7 @@ public interface HttpServer {
   void dispose();
 
   /**
-   * @return the server address this server is listening
+   * @return the server address this server is listening on
    */
   ServerAddress getServerAddress();
 

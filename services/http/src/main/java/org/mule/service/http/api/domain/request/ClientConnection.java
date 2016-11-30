@@ -6,11 +6,15 @@
  */
 package org.mule.service.http.api.domain.request;
 
+import org.mule.service.http.api.server.HttpServer;
+
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
 
 /**
+ * Representation of all client related data concerning an {@link HttpServer}.
  *
+ * @since 4.0
  */
 public interface ClientConnection {
 

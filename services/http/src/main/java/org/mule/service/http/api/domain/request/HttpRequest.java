@@ -11,6 +11,11 @@ import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 
+/**
+ * Representation of an HTTP request message.
+ *
+ * @since 4.0
+ */
 public interface HttpRequest extends HttpMessage {
 
   /**
@@ -19,24 +24,27 @@ public interface HttpRequest extends HttpMessage {
   HttpProtocol getProtocol();
 
   /**
-   * @return the request path extracted from the uri
+   * @return the request path extracted from the URI
    */
   String getPath();
 
   /**
-   * @return the request http method
+   * @return the request HTTP method
    */
   String getMethod();
 
   /**
-   * @return the request uri
+   * @return the request URI
    */
   String getUri();
 
+  /**
+   * @return the query parameters
+   */
   ParameterMap getQueryParams();
 
   /**
-   * @return the raw input stream from the body. if there's not body then returns null. After calling this method #getEntity
+   * @return the raw input stream from the body. If there's no body then returns null. After calling this method {@link #getEntity()}
    *         should not be used.
    */
   InputStreamHttpEntity getInputStreamEntity();

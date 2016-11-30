@@ -44,13 +44,13 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
   /**
    * Determines if there's an intersection between the allowed methods by two request matcher
    *
-   * @param methodRequestMatcher request matcher to test against
+   * @param otherMatcher request matcher to test against
    * @return true at least there's one http method that both request matcher accepts, false otherwise.
    */
-  public boolean intersectsWith(final MethodRequestMatcher methodRequestMatcher) {
-    Preconditions.checkArgument(methodRequestMatcher != null, "methodRequestMatcher cannot be null");
+  public boolean intersectsWith(final MethodRequestMatcher otherMatcher) {
+    Preconditions.checkArgument(otherMatcher != null, "methodRequestMatcher cannot be null");
     for (String method : methods) {
-      if (methodRequestMatcher.getMethods().contains(method)) {
+      if (otherMatcher.getMethods().contains(method)) {
         return true;
       }
     }

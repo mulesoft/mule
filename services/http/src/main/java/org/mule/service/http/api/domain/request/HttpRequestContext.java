@@ -6,18 +6,22 @@
  */
 package org.mule.service.http.api.domain.request;
 
+import org.mule.service.http.api.server.HttpServer;
+
 /**
+ * Representation of all HTTP request data concerning an {@link HttpServer}.
  *
+ * @since 4.0
  */
 public interface HttpRequestContext {
 
   /**
-   * @return the http request content
+   * @return the HTTP request message
    */
   HttpRequest getRequest();
 
   /**
-   * @return client connection descriptor
+   * @return the client connection descriptor
    */
   ClientConnection getClientConnection();
 

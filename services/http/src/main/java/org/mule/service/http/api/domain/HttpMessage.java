@@ -12,7 +12,9 @@ import org.mule.service.http.api.domain.entity.HttpEntity;
 import java.util.Collection;
 
 /**
- * Represents common parts of an http message
+ * Represents common parts of an HTTP message.
+ *
+ * @since 4.0
  */
 public interface HttpMessage {
 

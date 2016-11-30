@@ -7,7 +7,9 @@
 package org.mule.service.http.api.domain.entity;
 
 /**
- * Marker interface for a http message entity.
+ * Marker interface for a HTTP message entity.
+ *
+ * @since 4.0
  */
 public interface HttpEntity {
 

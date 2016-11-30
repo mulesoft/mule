@@ -7,13 +7,15 @@
 package org.mule.service.http.api.client;
 
 /**
- * Factory object for {@link HttpClient} mule-to-httpLibrary adapters.
+ * Factory object for {@link HttpClient}.
+ *
+ * @since 4.0
  */
 public interface HttpClientFactory {
 
   /**
-   * @param configuration the configuration to use for the underlying http library.
-   * @return a newly built {@link HttpClient}
+   * @param configuration the {@link HttpClientConfiguration} specifying the desired client.
+   * @return a newly built {@link HttpClient} based on the {@code configuration}.
    */
   HttpClient create(HttpClientConfiguration configuration);
 

@@ -9,15 +9,17 @@ package org.mule.service.http.api.server.async;
 import org.mule.service.http.api.domain.response.HttpResponse;
 
 /**
- * Handler for sending an http response asynchronously
+ * Handler for sending an HTTP response asynchronously
+ *
+ * @since 4.0
  */
 public interface HttpResponseReadyCallback {
 
   /**
-   * method to send response to the client
+   * Method to send response to the client.
    *
-   * @param response http response content
-   * @param responseStatusCallback callback to be called if there's a failure while sending the response
+   * @param response HTTP response content.
+   * @param responseStatusCallback callback to be called if there's a failure while sending the response or when it is successfully sent.
    */
   void responseReady(HttpResponse response, ResponseStatusCallback responseStatusCallback);
 

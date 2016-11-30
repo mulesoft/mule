@@ -7,13 +7,26 @@
 package org.mule.service.http.api;
 
 import org.mule.runtime.api.service.Service;
+import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientFactory;
+import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerFactory;
 
+/**
+ * Provides HTTP server and client factories.
+ *
+ * @since 4.0
+ */
 public interface HttpService extends Service {
 
+  /**
+   * @return an {@link HttpServerFactory} capable of creating {@link HttpServer}s.
+   */
   HttpServerFactory getServerFactory();
 
+  /**
+   * @return an {@link HttpClientFactory} capable of creating {@link HttpClient}s.
+   */
   HttpClientFactory getClientFactory();
 
 }

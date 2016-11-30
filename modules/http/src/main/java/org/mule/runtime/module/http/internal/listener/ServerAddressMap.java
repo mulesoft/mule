@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.runtime.module.http.api.HttpConstants;
+import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import org.mule.service.http.api.server.ServerAddress;
 
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class ServerAddressMap<T> {
     T value = internalMap.get(key);
     if (value == null) {
       // if there's no entry for the specific address, we need to check if there's one for all interfaces address.
-      value = internalMap.get(new DefaultServerAddress(HttpConstants.ALL_INTERFACES_IP, ((ServerAddress) key).getPort()));
+      value = internalMap.get(new DefaultServerAddress(ALL_INTERFACES_IP, ((ServerAddress) key).getPort()));
     }
     return value;
   }

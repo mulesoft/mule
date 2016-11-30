@@ -8,6 +8,7 @@ package org.mule.services.http.impl.service.server.grizzly;
 
 import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
@@ -172,8 +173,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     httpServerFilterDelegate.addFilterForAddress(serverAddress,
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
-    final GrizzlyHttpServer grizzlyServer = new ProxyGrizzlyHttpServer(serverAddress, transport, httpListenerRegistry,
-                                                                       executorSource);
+    final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
+                                                                         executorSource);
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
@@ -193,8 +194,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     httpServerFilterDelegate.addFilterForAddress(serverAddress,
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
-    final GrizzlyHttpServer grizzlyServer = new ProxyGrizzlyHttpServer(serverAddress, transport, httpListenerRegistry,
-                                                                       executorSupplier);
+    final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
+                                                                         executorSupplier);
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
@@ -234,7 +235,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     if (usePersistentConnections) {
       ka = new KeepAlive();
       ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
-      ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
+      ka.setIdleTimeoutInSeconds((int) MILLISECONDS.toSeconds(connectionIdleTimeout));
     }
     IdleExecutor idleExecutor = new IdleExecutor(threadNamePrefix);
     idleExecutorPerServerAddressMap.put(serverAddress, idleExecutor);
@@ -256,15 +257,15 @@ public class GrizzlyServerManager implements HttpServerManager {
     }
   }
 
-  private int convertToSeconds(int milliseconds) {
-    return (int) Math.ceil((double) milliseconds / 1000.0);
+  /**
+   * Wrapper that adds startup and disposal of manager specific data.
+   */
+  private class GrizzlyHttpServerWrapper extends GrizzlyHttpServer {
 
-  }
+    //TODO - MULE-11117: Cleanup GrizzlyServerManager server specific data
 
-  private class ProxyGrizzlyHttpServer extends GrizzlyHttpServer {
-
-    public ProxyGrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport,
-                                  HttpListenerRegistry listenerRegistry, Supplier<ExecutorService> schedulerSource) {
+    public GrizzlyHttpServerWrapper(ServerAddress serverAddress, TCPNIOTransport transport,
+                                    HttpListenerRegistry listenerRegistry, Supplier<ExecutorService> schedulerSource) {
       super(serverAddress, transport, listenerRegistry, schedulerSource);
     }
 

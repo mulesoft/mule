@@ -6,12 +6,22 @@
  */
 package org.mule.service.http.api.server;
 
+import org.mule.service.http.api.domain.request.HttpRequest;
+
 /**
+ * {@link RequestMatcher} that matches against an {@link HttpRequest} method (via a {@link MethodRequestMatcher}) and it's path.
  *
+ * @since 4.0
  */
 public interface PathAndMethodRequestMatcher extends RequestMatcher {
 
+  /**
+   * @return the path to match
+   */
   String getPath();
 
+  /**
+   * @return the {@link MethodRequestMatcher} to use
+   */
   MethodRequestMatcher getMethodRequestMatcher();
 }

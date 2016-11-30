@@ -6,8 +6,6 @@
  */
 package org.mule.extension.http.internal.listener;
 
-
-
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 
 /**

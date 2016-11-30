@@ -7,13 +7,25 @@
 package org.mule.service.http.api.server;
 
 /**
+ * Representation of a server's address.
  *
+ * @since 4.0
  */
 public interface ServerAddress {
 
+  /**
+   * @return the port this server is bind to.
+   */
   int getPort();
 
+  /**
+   * @return the IP for this server.
+   */
   String getIp();
 
+  /**
+   * @param serverAddress another {@link ServerAddress}.
+   * @return true if this and {@code serverAddress} have conflicting addresses, false otherwise.
+   */
   boolean overlaps(ServerAddress serverAddress);
 }

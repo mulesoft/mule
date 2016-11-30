@@ -40,6 +40,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
 
   public static final String SERVER_ALREADY_EXISTS_FORMAT =
       "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
+  //TODO - MULE-11018: Allow to give names to the Schedulers retrieved from SchedulerService
   private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
   private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
@@ -53,7 +54,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
       return;
     }
 
-    //TODO: Analyze how to allow users to configure this
+    //TODO - MULE-11116: Analyze how to allow users to configure this
     TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 
     String threadNamePrefix = LISTENER_THREAD_NAME_PREFIX;
@@ -71,24 +72,24 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   }
 
   @Override
-  public HttpServer create(HttpServerConfiguration serverConfiguration) throws ConnectionException {
+  public HttpServer create(HttpServerConfiguration configuration) throws ConnectionException {
     ServerAddress serverAddress;
-    String host = serverConfiguration.getHost();
+    String host = configuration.getHost();
     try {
-      serverAddress = createServerAddress(host, serverConfiguration.getPort());
+      serverAddress = createServerAddress(host, configuration.getPort());
     } catch (UnknownHostException e) {
       throw new ConnectionException(String.format("Cannot resolve host %s", host), e);
     }
 
-    TlsContextFactory tlsContextFactory = serverConfiguration.getTlsContextFactory();
+    TlsContextFactory tlsContextFactory = configuration.getTlsContextFactory();
     HttpServer httpServer;
     if (tlsContextFactory == null) {
-      httpServer = createServer(serverAddress, serverConfiguration.getExecutorServiceSupplier(),
-                                serverConfiguration.isUsePersistentConnections(), serverConfiguration.getConnectionIdleTimeout());
+      httpServer = createServer(serverAddress, configuration.getExecutorServiceSupplier(),
+                                configuration.isUsePersistentConnections(), configuration.getConnectionIdleTimeout());
     } else {
-      httpServer = createSslServer(serverAddress, tlsContextFactory, serverConfiguration.getExecutorServiceSupplier(),
-                                   serverConfiguration.isUsePersistentConnections(),
-                                   serverConfiguration.getConnectionIdleTimeout());
+      httpServer = createSslServer(serverAddress, tlsContextFactory, configuration.getExecutorServiceSupplier(),
+                                   configuration.isUsePersistentConnections(),
+                                   configuration.getConnectionIdleTimeout());
     }
 
     return httpServer;

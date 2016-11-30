@@ -7,7 +7,9 @@
 package org.mule.service.http.api.domain.entity;
 
 /**
- * Represents a http empty body
+ * Represents an HTTP empty body.
+ *
+ * @since 4.0
  */
 public class EmptyHttpEntity implements HttpEntity {
 

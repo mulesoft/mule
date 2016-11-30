@@ -10,6 +10,11 @@ import org.mule.service.http.api.domain.entity.HttpEntity;
 
 import java.util.Collection;
 
+/**
+ * Represents a multipart HTTP body.
+ *
+ * @since 4.0
+ */
 public class MultipartHttpEntity implements HttpEntity {
 
   private final Collection<HttpPart> parts;

@@ -24,6 +24,9 @@ import java.util.function.Supplier;
 import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
+/**
+ * Grizzly based implementation of an {@link HttpServer}.
+ */
 public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier<ExecutorService> {
 
   private final TCPNIOTransport transport;

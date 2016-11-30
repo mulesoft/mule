@@ -6,18 +6,17 @@
  */
 package org.mule.service.http.api.server;
 
-
-
 import org.mule.service.http.api.domain.request.HttpRequest;
 
 /**
- * A request matcher represents a condition that is fulfilled or not by an http request
+ * A request matcher represents a condition that is fulfilled or not by an HTTP request.
+ *
+ * @since 4.0
  */
 public interface RequestMatcher {
 
   /**
    * @param httpRequest request to evaluate against
-   *
    * @return true if the request matches the expected condition, false otherwise.
    */
   boolean matches(HttpRequest httpRequest);

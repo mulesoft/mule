@@ -7,14 +7,14 @@
 package org.mule.service.http.api.client.proxy;
 
 /**
- * HTTP proxy configuration for making http requests through an NTLM authenticated proxy.
+ * HTTP proxy configuration for making HTTP requests through an NTLM authenticated proxy.
  *
  * @since 4.0
  */
 public interface NtlmProxyConfig extends ProxyConfig {
 
   /**
-   * @return the http proxy user domain
+   * @return the HTTP proxy user domain
    */
   String getNtlmDomain();
 

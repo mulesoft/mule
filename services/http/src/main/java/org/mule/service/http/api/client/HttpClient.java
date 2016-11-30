@@ -19,12 +19,18 @@ import java.util.concurrent.TimeoutException;
  */
 public interface HttpClient {
 
+  /**
+   * Fully configures the client, leaving it ready to use.
+   */
   void start();
 
+  /**
+   * Disables the client.
+   */
   void stop();
 
   /**
-   * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
+   * Sends a HttpRequest blocking the current thread until a response is available or the request times out.
    */
   HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication)
       throws IOException, TimeoutException;
