@@ -73,7 +73,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(CPU_LIGHT_PREFIX + "." + THREAD_POOL_SIZE, "2*cores");
     props.setProperty(CPU_LIGHT_PREFIX + "." + WORK_QUEUE_SIZE, "mem / (2*3*32)");
     props.setProperty(IO_PREFIX + "." + THREAD_POOL_SIZE_CORE, "cores");
-    props.setProperty(IO_PREFIX + "." + THREAD_POOL_SIZE_MAX, "mem / (2*3*64)");
+    props.setProperty(IO_PREFIX + "." + THREAD_POOL_SIZE_MAX, "mem / (2*30*64)");
     props.setProperty(IO_PREFIX + "." + WORK_QUEUE_SIZE, "mem / (2*3*32)");
     props.setProperty(IO_PREFIX + "." + THREAD_POOL_KEEP_ALIVE, "30000");
     props.setProperty(CPU_INTENSIVE_PREFIX + "." + THREAD_POOL_SIZE, "2*cores");
@@ -91,7 +91,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getCpuLightQueueSize(), is((int) (mem / (2 * 3 * 32))));
     assertThat(config.getIoCorePoolSize(), is(cores));
-    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 3 * 64))));
+    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 30 * 64))));
     assertThat(config.getIoQueueSize(), is((int) (mem / (2 * 3 * 32))));
     assertThat(config.getIoKeepAlive(), is(30000l));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
@@ -106,7 +106,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getCpuLightQueueSize(), is((int) (mem / (2 * 3 * 32))));
     assertThat(config.getIoCorePoolSize(), is(cores));
-    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 3 * 64))));
+    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 30 * 64))));
     assertThat(config.getIoQueueSize(), is((int) (mem / (2 * 3 * 32))));
     assertThat(config.getIoKeepAlive(), is(30000l));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
@@ -124,7 +124,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getCpuLightQueueSize(), is((int) (mem / (2 * 3 * 32))));
     assertThat(config.getIoCorePoolSize(), is(cores));
-    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 3 * 64))));
+    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 30 * 64))));
     assertThat(config.getIoQueueSize(), is((int) (mem / (2 * 3 * 32))));
     assertThat(config.getIoKeepAlive(), is(30000l));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));

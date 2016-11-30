@@ -152,7 +152,7 @@ public class ThreadPoolsConfig {
   private int cpuLightPoolSize = 2 * cores;
   private int ioQueueSize = (int) (mem / (2 * 3 * 32));
   private int ioCorePoolSize = cores;
-  private int ioMaxPoolSize = (int) (mem / (2 * 3 * 64));
+  private int ioMaxPoolSize = (int) (mem / (2 * 30 * 64));
   private long ioKeepAlive = 30000;
   private int cpuIntensiveQueueSize = (int) (mem / (2 * 3 * 32));
   private int cpuIntensivePoolSize = 2 * cores;
