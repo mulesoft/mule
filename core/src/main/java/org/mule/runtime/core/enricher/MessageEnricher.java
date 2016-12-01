@@ -10,12 +10,10 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.util.rx.Exceptions.MESSAGE_DROPPED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -26,6 +24,7 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +98,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
         .map(event1 -> Event.builder(event.getContext()).message(event.getMessage())
             .session(new DefaultMuleSession(event.getSession())).build())
         .transform(enrichmentProcessor).map(checkedFunction(response -> enrich(response, event)))
-        .otherwise(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> Mono.just(event)));
+        .otherwise(EventDroppedException.class, mde -> Mono.just(event)));
   }
 
   protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {

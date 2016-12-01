@@ -9,7 +9,7 @@ package org.mule.runtime.core.construct;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.rx.Exceptions.MESSAGE_DROPPED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -35,6 +35,7 @@ import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.Optional;
 
@@ -79,7 +80,7 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
       try {
         return Mono.just(event)
             .transform(this)
-            .otherwise(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> empty())
+            .otherwise(EventDroppedException.class, mde -> empty())
             .block();
       } catch (Exception e) {
         throw rxExceptionToMuleException(e);
@@ -97,10 +98,8 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
           .map(request -> createMuleEventForCurrentFlow(request, request.getReplyToDestination(), request.getReplyToHandler()))
           .transform(pipeline)
           .onErrorResumeWith(MessagingException.class, getExceptionListener())
-          .doOnError(exception -> {
-            if (!(exception instanceof MessagingException))
-              LOGGER.error("Unhandled exception in async processing " + exception);
-          })
+          .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                     throwable -> LOGGER.error("Unhandled exception in async processing " + throwable))
           .map(response -> createReturnEventForParentFlowConstruct(response, event)));
     }
   }

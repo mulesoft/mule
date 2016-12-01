@@ -16,7 +16,6 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-import static org.mule.runtime.core.util.rx.Exceptions.MESSAGE_DROPPED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
@@ -62,6 +61,7 @@ import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFac
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.Collections;
 import java.util.List;
@@ -239,7 +239,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             try {
               return Mono.just(event)
                   .transform(this)
-                  .otherwise(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> empty())
+                  .otherwise(EventDroppedException.class, mde -> empty())
                   .block();
             } catch (Exception e) {
               throw rxExceptionToMuleException(e);

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.rx.internal;
 
-import static org.mule.runtime.core.util.rx.Exceptions.newMessageDroppedException;
+import static org.mule.runtime.core.util.rx.Exceptions.newEventDroppedException;
 import org.mule.runtime.core.api.Event;
 
 import java.util.function.BiConsumer;
@@ -34,7 +34,7 @@ public final class Operators {
         if (r != null) {
           sink.next(r);
         } else {
-          sink.error(newMessageDroppedException(t));
+          sink.error(newEventDroppedException(t));
         }
       }
     };

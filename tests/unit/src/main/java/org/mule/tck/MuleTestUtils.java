@@ -9,7 +9,6 @@ package org.mule.tck;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.rx.Exceptions.MESSAGE_DROPPED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -23,6 +22,7 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Function;
 
@@ -147,7 +147,7 @@ public final class MuleTestUtils {
   private static Mono<Event> processMonoInternal(Event event, Function<Publisher<Event>, Publisher<Event>> processor) {
     return just(event)
         .transform(processor)
-        .otherwise(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> empty())
+        .otherwise(EventDroppedException.class, mde -> empty())
         .doOnSuccess(response -> event.getContext().success(response))
         .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me))
         .subscribe();

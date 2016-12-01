@@ -11,7 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.rx.Exceptions.MESSAGE_DROPPED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -92,11 +93,9 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
               .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
               .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
               .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
-              .onErrorResumeWith(MESSAGE_DROPPED_EXCEPTION_PREDICATE, mde -> empty())
-              .doOnError(exception -> {
-                if (!(exception instanceof MessagingException))
-                  LOGGER.error("Unhandled exception in async processing.", exception);
-              })
+              .onErrorResumeWith(EventDroppedException.class, mde -> empty())
+              .doOnError(UNEXPECTED_EXCEPTION_PREDICATE, exception -> LOGGER.error("Unhandled exception in async processing.",
+                                                                                   exception))
               .subscribe());
     }
 
