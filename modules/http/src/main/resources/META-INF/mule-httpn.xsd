@@ -688,7 +688,7 @@
         <xsd:attribute name="requestStreamingMode">
             <xsd:annotation>
                 <xsd:documentation>
-                    Defines if the request should be sent using streaming or not. If this attribute is not present or is AUTP,
+                    Defines if the request should be sent using streaming or not. If this attribute is not present or is AUTO,
                     the behavior will depend on the type of the payload (it will stream only for InputStream). If set
                     to ALWAYS, it will always stream. If set to NEVER, it will never stream. As streaming is done the request
                     will be sent user Transfer-Encoding: chunked.
