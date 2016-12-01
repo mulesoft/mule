@@ -9,9 +9,18 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+    <http:request-config name="requestConfigMode" host="localhost" port="${httpPort}" requestStreamingMode="NEVER"/>
 
     <flow name="streamingAuto">
         <http:request config-ref="requestConfig"  method="POST" path="path" />
+    </flow>
+
+    <flow name="streamingAutoConfigMode">
+        <http:request config-ref="requestConfigMode"  method="POST" path="path" />
+    </flow>
+
+    <flow name="streamingAlwaysConfigMode">
+        <http:request config-ref="requestConfigMode"  method="POST" path="path" requestStreamingMode="ALWAYS" />
     </flow>
 
     <flow name="streamingAutoHeader">

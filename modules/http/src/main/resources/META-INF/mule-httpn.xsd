@@ -77,9 +77,9 @@
                 <xsd:attribute name="responseStreamingMode" default="AUTO">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines if the response should be sent using streaming or not. If this attribute is not present,
+                            Defines if the response should be sent using streaming or not. If this attribute is not present or is AUTO,
                             the behavior will depend on the type of the payload (it will stream only for InputStream). If set
-                            to true, it will always stream. If set to false, it will never stream. As streaming is done the response
+                            to ALWAYS, it will always stream. If set to NEVER, it will never stream. As streaming is done the response
                             will be sent user Transfer-Encoding: chunked.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -685,12 +685,12 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="requestStreamingMode" default="AUTO">
+        <xsd:attribute name="requestStreamingMode">
             <xsd:annotation>
                 <xsd:documentation>
-                    Defines if the request should be sent using streaming or not. If this attribute is not present,
+                    Defines if the request should be sent using streaming or not. If this attribute is not present or is AUTO,
                     the behavior will depend on the type of the payload (it will stream only for InputStream). If set
-                    to true, it will always stream. If set to false, it will never stream. As streaming is done the request
+                    to ALWAYS, it will always stream. If set to NEVER, it will never stream. As streaming is done the request
                     will be sent user Transfer-Encoding: chunked.
                 </xsd:documentation>
             </xsd:annotation>
@@ -702,10 +702,10 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="sendBodyMode" default="AUTO">
+        <xsd:attribute name="sendBodyMode">
             <xsd:annotation>
                 <xsd:documentation>
-                    Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET,
+                    Defines if the request should contain a body or not. If AUTO or empty, it will depend on the method (GET,
                     HEAD and OPTIONS will not send a body).
                 </xsd:documentation>
             </xsd:annotation>
