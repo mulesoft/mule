@@ -7,15 +7,22 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.reactivestreams.Publisher;
 
 /**
  * This factory's processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes
