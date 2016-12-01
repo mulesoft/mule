@@ -27,7 +27,7 @@ public class AcceptsAllMethodsRequestMatcher extends DefaultMethodRequestMatcher
   }
 
   @Override
-  public boolean intersectsWith(MethodRequestMatcher otherMatcher) {
-    return otherMatcher instanceof AcceptsAllMethodsRequestMatcher;
+  public boolean intersectsWith(MethodRequestMatcher matcher) {
+    return matcher instanceof AcceptsAllMethodsRequestMatcher;
   }
 }

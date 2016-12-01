@@ -18,10 +18,10 @@ import java.util.List;
 public interface MethodRequestMatcher extends RequestMatcher {
 
   /**
-   * @param otherMatcher another {@link MethodRequestMatcher}.
-   * @return true if this and {@code otherMatcher} have matching methods in common, false otherwise.
+   * @param matcher another {@link MethodRequestMatcher}.
+   * @return true if this and {@code matcher} have matching methods in common, false otherwise.
    */
-  boolean intersectsWith(MethodRequestMatcher otherMatcher);
+  boolean intersectsWith(MethodRequestMatcher matcher);
 
   /**
    * @return the list of methods to match.

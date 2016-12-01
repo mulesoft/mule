@@ -131,7 +131,7 @@
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!--Services-->
-                <include>org.mule:mule-service-http-api</include>
+                <include>org.mule.modules:mule-service-http-api</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
@@ -208,7 +208,7 @@
                 <exclude>org.mule.extensions:mule-extensions-api-xml-dsl</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-dsql</exclude>
                 <!--Services-->
-                <exclude>org.mule:mule-service-http-api</exclude>
+                <exclude>org.mule.modules:mule-service-http-api</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>

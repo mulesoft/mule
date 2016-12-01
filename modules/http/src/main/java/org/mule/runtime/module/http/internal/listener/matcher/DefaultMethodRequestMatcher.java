@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener.matcher;
 
-import org.mule.runtime.api.util.Preconditions;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.service.http.api.domain.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 
@@ -31,7 +31,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
    * @param methods http request method allowed.
    */
   public DefaultMethodRequestMatcher(final String... methods) {
-    Preconditions.checkArgument(methods != null, "methods attribute should not be null");
+    checkArgument(methods != null, "methods attribute should not be null");
     this.methods = (List<String>) CollectionUtils.collect(Arrays.asList(methods), new Transformer() {
 
       @Override
@@ -44,13 +44,13 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
   /**
    * Determines if there's an intersection between the allowed methods by two request matcher
    *
-   * @param otherMatcher request matcher to test against
+   * @param matcher request matcher to test against
    * @return true at least there's one http method that both request matcher accepts, false otherwise.
    */
-  public boolean intersectsWith(final MethodRequestMatcher otherMatcher) {
-    Preconditions.checkArgument(otherMatcher != null, "methodRequestMatcher cannot be null");
+  public boolean intersectsWith(final MethodRequestMatcher matcher) {
+    checkArgument(matcher != null, "matcher cannot be null");
     for (String method : methods) {
-      if (otherMatcher.getMethods().contains(method)) {
+      if (matcher.getMethods().contains(method)) {
         return true;
       }
     }
