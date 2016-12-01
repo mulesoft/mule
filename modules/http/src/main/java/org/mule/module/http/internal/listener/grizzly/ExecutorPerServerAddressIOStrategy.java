@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Logger;
 
 import org.glassfish.grizzly.Connection;
@@ -29,6 +30,7 @@ import org.glassfish.grizzly.strategies.AbstractIOStrategy;
  */
 public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
 {
+    protected final static String EXECUTOR_REJECTED_ATTRIBUTE = "__executor_rejected__";
 
     private final static EnumSet<IOEvent> WORKER_THREAD_EVENT_SET =
             EnumSet.of(IOEvent.READ, IOEvent.CLOSED);
@@ -67,8 +69,23 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
         final Executor threadPool = getThreadPoolFor(connection, ioEvent);
         if (threadPool != null)
         {
-            threadPool.execute(
-                    new WorkerThreadRunnable(connection, ioEvent, listener));
+            try
+            {
+                threadPool.execute(
+                        new WorkerThreadRunnable(connection, ioEvent, listener));
+            }
+            catch (RejectedExecutionException e)
+            {
+                try
+                {
+                    connection.getAttributes().setAttribute(EXECUTOR_REJECTED_ATTRIBUTE, true);
+                    run0(connection, ioEvent, listener);
+                }
+                finally
+                {
+                    connection.getAttributes().removeAttribute(EXECUTOR_REJECTED_ATTRIBUTE);
+                }
+            }
         }
         else
         {

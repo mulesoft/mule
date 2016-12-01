@@ -12,6 +12,7 @@ MULE-10100: Processing after a synchronous until successful resulting in a VoidM
 MULE-10306: XML entity expansion in XML transformers is now disabled by default because it allows DoS attacks. To restore previous behaviour use the expandInternalEntities="true" attribute.
 MULE-10686: XML entity expansion in Jersey is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
 MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
+MULE-11118: The HTTP listener now replies with status code 503 when the thread pool is exhausted (and poolExhaustedAction="ABORT") instead of closing the socket.
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
