@@ -28,9 +28,6 @@
             </httpn:response-builder>
         </httpn:listener>
         <echo-component/>
-        <!--<set-property propertyName="Content-Type" value="text/x-json"/>-->
-        <!--<set-property propertyName="Content-Type" value="text/javascript"/>-->
-        <!--<set-property propertyName="content-type" value="application/xml"/>-->
     </flow>
 
     <flow name="statusResponseBuilderFlow">
