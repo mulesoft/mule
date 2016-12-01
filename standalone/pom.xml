@@ -33,6 +33,7 @@
                             <includeGroupIds>
                                 org.mule.modules
                             </includeGroupIds>
+                            <excludeArtifactIds>mule-service-http</excludeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -177,6 +178,13 @@
             <artifactId>mule-services-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
         </dependency>
 
         <!-- Include all Mule Extensions -->
