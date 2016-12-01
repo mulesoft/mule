@@ -13,7 +13,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -23,8 +22,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,8 +29,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.FLUX;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.MONO;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -48,7 +49,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -80,11 +80,8 @@ import org.mule.tck.size.SmallTest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -112,26 +109,33 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-        {new SynchronousProcessingStrategyFactory(), false},
-        {new DefaultFlowProcessingStrategyFactory(), false},
-        {new ProactorProcessingStrategyFactory(), false},
-        {new WorkQueueProcessingStrategyFactory(), false},
-        {new LegacyDefaultFlowProcessingStrategyFactory(), false},
-        {new LegacyNonBlockingProcessingStrategyFactory(), false},
-        {new LegacyAsynchronousProcessingStrategyFactory(), false},
-        {new SynchronousProcessingStrategyFactory(), true},
-        {new DefaultFlowProcessingStrategyFactory(), true},
-        {new ProactorProcessingStrategyFactory(), true},
-        {new WorkQueueProcessingStrategyFactory(), true},
-        {new LegacyDefaultFlowProcessingStrategyFactory(), true},
-        {new LegacyNonBlockingProcessingStrategyFactory(), true},
-        {new LegacyAsynchronousProcessingStrategyFactory(), true}});
+        {new SynchronousProcessingStrategyFactory(), BLOCKING},
+        {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
+        {new ProactorProcessingStrategyFactory(), BLOCKING},
+        {new WorkQueueProcessingStrategyFactory(), BLOCKING},
+        {new LegacyDefaultFlowProcessingStrategyFactory(), BLOCKING},
+        {new LegacyNonBlockingProcessingStrategyFactory(), BLOCKING},
+        {new LegacyAsynchronousProcessingStrategyFactory(), BLOCKING},
+        {new SynchronousProcessingStrategyFactory(), MONO},
+        {new DefaultFlowProcessingStrategyFactory(), MONO},
+        {new ProactorProcessingStrategyFactory(), MONO},
+        {new WorkQueueProcessingStrategyFactory(), MONO},
+        {new LegacyDefaultFlowProcessingStrategyFactory(), MONO},
+        {new LegacyNonBlockingProcessingStrategyFactory(), MONO},
+        {new LegacyAsynchronousProcessingStrategyFactory(), MONO},
+        {new SynchronousProcessingStrategyFactory(), FLUX},
+        {new DefaultFlowProcessingStrategyFactory(), FLUX},
+        {new ProactorProcessingStrategyFactory(), FLUX},
+        {new WorkQueueProcessingStrategyFactory(), FLUX},
+        {new LegacyDefaultFlowProcessingStrategyFactory(), FLUX},
+        {new LegacyNonBlockingProcessingStrategyFactory(), FLUX},
+        {new LegacyAsynchronousProcessingStrategyFactory(), FLUX}});
   }
 
   private Flow flow;
 
-  public DefaultMessageProcessorChainTestCase(ProcessingStrategyFactory processingStrategyFactory, boolean reactive) {
-    super(reactive);
+  public DefaultMessageProcessorChainTestCase(ProcessingStrategyFactory processingStrategyFactory, Mode mode) {
+    super(mode);
     this.processingStrategyFactory = processingStrategyFactory;
   }
 
@@ -771,7 +775,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     } finally {
       final SimpleUnitTestSupportSchedulerService schedulerService =
           (SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService());
-      if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && isReactive()) {
+      if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && (mode == MONO || mode == FLUX)) {
         new PollingProber().check(new JUnitLambdaProbe(() -> {
           verify(schedulerService.getCreatedSchedulers().get(1), atLeast(nonBlockingProcessorsExecuted.get()))
               .submit(any(Runnable.class));

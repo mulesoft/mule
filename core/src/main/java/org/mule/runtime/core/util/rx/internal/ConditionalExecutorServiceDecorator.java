@@ -4,14 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.rx;
+package org.mule.runtime.core.util.rx.internal;
 
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.util.BooleanUtils;
-import org.mule.runtime.core.util.Predicate;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -23,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 /**
  * Transaction aware {@link ExecutorService} decorator that does not scheduler tasks for async processing using the delagate
@@ -76,7 +72,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public <T> Future<T> submit(Callable<T> task) {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.submit(task);
     } else {
       return delegate.submit(task);
@@ -85,7 +81,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public <T> Future<T> submit(Runnable task, T result) {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.submit(task, result);
     } else {
       return delegate.submit(task, result);
@@ -94,7 +90,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public Future<?> submit(Runnable task) {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.submit(task);
     } else {
       return delegate.submit(task);
@@ -103,7 +99,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.invokeAll(tasks);
     } else {
       return delegate.invokeAll(tasks);
@@ -113,7 +109,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.invokeAll(tasks, timeout, unit);
     } else {
       return delegate.invokeAll(tasks, timeout, unit);
@@ -122,7 +118,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.invokeAny(tasks);
     } else {
       return delegate.invokeAny(tasks);
@@ -132,7 +128,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       return directExecutor.invokeAny(tasks, timeout, unit);
     } else {
       return delegate.invokeAny(tasks, timeout, unit);
@@ -141,7 +137,7 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public void execute(Runnable command) {
-    if (scheduleOverridePredicate.evaluate(delegate)) {
+    if (scheduleOverridePredicate.test(delegate)) {
       directExecutor.execute(command);
     } else {
       delegate.execute(command);

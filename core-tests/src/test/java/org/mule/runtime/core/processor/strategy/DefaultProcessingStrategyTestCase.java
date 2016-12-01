@@ -24,8 +24,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("Default Processing Strategy (used when no processing strategy is configured)")
 public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrategyTestCase {
 
-  public DefaultProcessingStrategyTestCase(boolean reactive) {
-    super(reactive);
+  public DefaultProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Override

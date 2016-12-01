@@ -26,8 +26,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("Work Queue Processing Strategy")
 public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public WorkQueueProcessingStrategyTestCase(boolean reactive) {
-    super(reactive);
+  public WorkQueueProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Override

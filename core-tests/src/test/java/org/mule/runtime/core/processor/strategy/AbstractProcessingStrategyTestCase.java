@@ -78,8 +78,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  public AbstractProcessingStrategyTestCase(boolean reactive) {
-    super(reactive);
+  public AbstractProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Before

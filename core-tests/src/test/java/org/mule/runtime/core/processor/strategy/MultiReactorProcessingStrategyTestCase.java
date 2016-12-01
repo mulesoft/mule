@@ -26,8 +26,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("MultiReactor Processing Strategy")
 public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public MultiReactorProcessingStrategyTestCase(boolean reactive) {
-    super(reactive);
+  public MultiReactorProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Override

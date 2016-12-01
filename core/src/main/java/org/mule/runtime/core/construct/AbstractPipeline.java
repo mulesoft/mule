@@ -18,6 +18,7 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFac
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.Collections;
 import java.util.List;
@@ -235,7 +237,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return pipeline.process(event);
           } else {
             try {
-              return Mono.just(event).transform(this).block();
+              return Mono.just(event)
+                  .transform(this)
+                  .otherwise(EventDroppedException.class, mde -> empty())
+                  .block();
             } catch (Exception e) {
               throw rxExceptionToMuleException(e);
             }

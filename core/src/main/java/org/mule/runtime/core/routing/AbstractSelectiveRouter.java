@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.util.NotificationUtils;
 
@@ -184,7 +185,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
         return fromIterable(getProcessorsToRoute(event)).concatMap(mp -> just(event).transform(mp)).collectList()
             .map(list -> resultsHandler.aggregateResults(list, event));
       } catch (RoutePathNotFoundException e) {
-        return error(e);
+        return error(new MessagingException(event, e, this));
       }
     });
   }

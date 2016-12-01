@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.core.exception.MessagingException;
+
 import java.time.OffsetTime;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
@@ -18,7 +23,7 @@ import java.time.OffsetTime;
  * @see Event
  * @since 4.0
  */
-public interface EventContext {
+public interface EventContext extends Publisher<Event> {
 
 
   /**
@@ -57,5 +62,24 @@ public interface EventContext {
    * @return the name of the connector that generated the message for the first event of this context.
    */
   String getOriginatingConnectorName();
+
+  /**
+   * Complete this {@link EventContext} successfully with no result {@link Event}.
+   */
+  void success();
+
+  /**
+   * Complete this {@link EventContext} successfully with a resut {@link Event}.
+   *
+   * @param event the result event.
+   */
+  void success(Event event);
+
+  /**
+   * Complete this {@link EventContext} unsuccessfully with an error
+   *
+   * @param messagingException the messaging exception .
+   */
+  void error(MessagingException messagingException);
 
 }

@@ -24,6 +24,7 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,8 +96,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).flatMap(event -> Mono.just(event)
         .map(event1 -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
-        .transform(enrichmentProcessor).map(checkedFunction(response -> enrich(response, event)))
-        .otherwiseIfEmpty(Mono.just(event)));
+        .transform(enrichmentProcessor)
+        .map(checkedFunction(response -> enrich(response, event)))
+        .otherwise(EventDroppedException.class, mde -> Mono.just(event)));
   }
 
   protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {

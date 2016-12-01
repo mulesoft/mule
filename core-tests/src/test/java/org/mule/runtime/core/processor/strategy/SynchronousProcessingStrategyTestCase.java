@@ -24,8 +24,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("Synchronous Processing Strategy")
 public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public SynchronousProcessingStrategyTestCase(boolean reactive) {
-    super(reactive);
+  public SynchronousProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Override

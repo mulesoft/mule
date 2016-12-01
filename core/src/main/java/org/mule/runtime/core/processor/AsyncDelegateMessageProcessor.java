@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
@@ -126,10 +127,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             .map(event1 -> updateEventForAsync(event1))
             .transform(processingStrategy.onPipeline(flowConstruct, delegate, messagingExceptionHandler))
             .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
-            .doOnError(exception -> {
-              if (!(exception instanceof MessagingException))
-                logger.error("Unhandled exception in async processing.", exception);
-            })
+            .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                       exception -> logger.error("Unhandled exception in async processing.", exception))
             .subscribe());
   }
 
