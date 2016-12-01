@@ -13,7 +13,6 @@ import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -56,11 +55,6 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
   @Override
   public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
     return empty();
-  }
-
-  @Override
-  public void initializeTlsContextFactory(TlsContextFactory tlsContextFactory) {
-    // no initialization required
   }
 
   @Override

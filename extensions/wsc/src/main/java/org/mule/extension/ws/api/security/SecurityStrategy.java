@@ -8,8 +8,6 @@ package org.mule.extension.ws.api.security;
 
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.util.Map;
 import java.util.Optional;
@@ -23,14 +21,6 @@ import java.util.Optional;
  * @since 4.0
  */
 public interface SecurityStrategy {
-
-  /**
-   * Initializes the tlsContext for the security strategies that require one.
-   *
-   * @param tlsContextFactory the connection configured connection factory.
-   * @throws ConnectionException if a null TLS context factory is passed to initialize the {@link SecurityStrategy}
-   */
-  void initializeTlsContextFactory(TlsContextFactory tlsContextFactory) throws ConnectionException;
 
   /**
    * Returns the security action name that is going to be executed in the request phase (OUT interceptors).

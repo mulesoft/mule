@@ -11,18 +11,15 @@ import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.DEC_PROP_REF_ID;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
-import org.mule.extension.ws.internal.security.EncryptionHelper;
+import org.mule.extension.ws.api.security.config.WssKeyStoreConfiguration;
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 
 /**
  * Decrypts an encrypted SOAP response, using the private key of the key-store in the provided TLS context.
@@ -32,17 +29,12 @@ import java.util.Properties;
 public class WssDecryptSecurityStrategy implements SecurityStrategy {
 
   private static final String WS_DECRYPT_PROPERTIES_KEY = "decryptProperties";
-  private static final EncryptionHelper encryptionHelper = new EncryptionHelper();
 
-  private TlsContextFactory tlsContextFactory;
-
-  @Override
-  public void initializeTlsContextFactory(TlsContextFactory tlsContextFactory) throws ConnectionException {
-    if (tlsContextFactory == null) {
-      throw new ConnectionException("Decrypt security strategy required a TLS context and no one was provided");
-    }
-    this.tlsContextFactory = tlsContextFactory;
-  }
+  /**
+   * The keystore to use when decrypting the message.
+   */
+  @Parameter
+  private WssKeyStoreConfiguration keyStoreConfiguration;
 
   @Override
   public SecurityStrategyType securityType() {
@@ -56,26 +48,14 @@ public class WssDecryptSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    validateTls();
-    TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
-    return of(new WSPasswordCallbackHandler(DECRYPT, cb -> cb.setPassword(keyStoreConfig.getKeyPassword())));
+    return of(new WSPasswordCallbackHandler(DECRYPT, cb -> cb.setPassword(keyStoreConfiguration.getKeyPassword())));
   }
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
-    validateTls();
-    TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
-    Properties decryptionProperties = encryptionHelper.createKeyStoreProperties(keyStoreConfig);
-
     return ImmutableMap.<String, Object>builder()
         .put(DEC_PROP_REF_ID, WS_DECRYPT_PROPERTIES_KEY)
-        .put(WS_DECRYPT_PROPERTIES_KEY, decryptionProperties)
+        .put(WS_DECRYPT_PROPERTIES_KEY, keyStoreConfiguration.getConfigurationProperties())
         .build();
-  }
-
-  private void validateTls() {
-    if (tlsContextFactory == null) {
-      throw new IllegalStateException("Tls Context Factory was not initialized, cannot apply Decrypt security");
-    }
   }
 }
