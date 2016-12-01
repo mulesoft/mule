@@ -27,6 +27,7 @@
         <module>extensions-xml-support</module>
         <module>file-extension-common</module>
         <module>launcher</module>
+        <module>http-api</module>
         <module>http</module>
         <module>jaas</module>
         <module>jboss-transactions</module>

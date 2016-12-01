@@ -6,8 +6,8 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import static org.mule.runtime.module.http.internal.request.HttpAuthenticationType.DIGEST;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import static org.mule.service.http.api.client.HttpAuthenticationType.DIGEST;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
 
 /**
  * Configures digest authentication for the requests.

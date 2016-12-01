@@ -18,7 +18,7 @@ import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.api.tls.TlsContextFactory;

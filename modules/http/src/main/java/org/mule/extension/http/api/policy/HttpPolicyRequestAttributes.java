@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import java.util.Map;
 

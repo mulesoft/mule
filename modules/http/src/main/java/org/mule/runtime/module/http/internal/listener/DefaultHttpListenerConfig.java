@@ -9,9 +9,9 @@ package org.mule.runtime.module.http.internal.listener;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -32,8 +32,11 @@ import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -65,7 +68,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
   private ThreadingProfile workerThreadingProfile;
   private boolean started = false;
-  private Server server;
+  private HttpServer server;
   private Scheduler workManager;
   private boolean initialised;
 
@@ -179,7 +182,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
    * Creates the server address object with the IP and port that this config should bind to.
    */
   private ServerAddress createServerAddress() throws UnknownHostException {
-    return new ServerAddress(NetworkUtils.getLocalHostIp(host), port);
+    return new DefaultServerAddress(NetworkUtils.getLocalHostIp(host), port);
   }
 
   @Override

@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
 import org.mule.runtime.module.http.internal.request.DefaultHttpAuthentication;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

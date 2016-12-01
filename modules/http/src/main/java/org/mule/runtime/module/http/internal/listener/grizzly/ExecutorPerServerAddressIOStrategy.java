@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
+import org.mule.runtime.module.http.internal.listener.DefaultServerAddress;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,7 +23,7 @@ import org.glassfish.grizzly.strategies.AbstractIOStrategy;
 
 /**
  * Grizzly IO Strategy that will handle each work to an specific {@link java.util.concurrent.Executor} based on the
- * {@link org.mule.runtime.module.http.internal.listener.ServerAddress} of a {@link org.glassfish.grizzly.Connection}.
+ * {@link ServerAddress} of a {@link org.glassfish.grizzly.Connection}.
  * <p/>
  * There's logic from {@link org.glassfish.grizzly.strategies.WorkerThreadIOStrategy} that need to be reused but unfortunately
  * that class cannot be override.
@@ -70,7 +71,7 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy {
     if (WORKER_THREAD_EVENT_SET.contains(ioEvent)) {
       final String ip = ((InetSocketAddress) connection.getLocalAddress()).getAddress().getHostAddress();
       final int port = ((InetSocketAddress) connection.getLocalAddress()).getPort();
-      return executorProvider.getExecutor(new ServerAddress(ip, port));
+      return executorProvider.getExecutor(new DefaultServerAddress(ip, port));
     } else {
       // Run other types of IOEvent in selector thread.
       return null;

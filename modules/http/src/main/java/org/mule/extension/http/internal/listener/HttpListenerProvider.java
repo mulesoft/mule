@@ -7,7 +7,6 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
@@ -18,21 +17,16 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADV
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import org.mule.extension.http.internal.listener.server.HttpListenerConnectionManager;
-import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -43,22 +37,22 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.http.internal.listener.Server;
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.HttpServerConfiguration;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
 /**
- * Connection provider for a {@link HttpListener}, handles the creation of {@link Server} instances.
+ * Connection provider for a {@link HttpListener}, handles the creation of {@link HttpServer} instances.
  *
  * @since 4.0
  */
 @Alias("listener")
-public class HttpListenerProvider implements CachedConnectionProvider<Server>, Initialisable, Startable, Stoppable {
+public class HttpListenerProvider implements CachedConnectionProvider<HttpServer>, Lifecycle {
 
   public static final class ConnectionParams {
 
@@ -128,6 +122,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
     public Integer getConnectionIdleTimeout() {
       return connectionIdleTimeout;
     }
+
   }
 
   @ConfigName
@@ -147,20 +142,17 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   private TlsContextFactory tlsContext;
 
   @Inject
-  private HttpListenerConnectionManager connectionManager;
-
-  @Inject
-  private MuleContext muleContext;
+  private HttpService httpService;
 
   @Inject
   private SchedulerService schedulerService;
+  @Inject
+  private MuleContext muleContext;
 
-  private Scheduler workManager;
-  private Server server;
+  private HttpServer server;
 
   @Override
   public void initialise() throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(connectionManager);
 
     if (connectionParams.port == null) {
       connectionParams.port = connectionParams.protocol.getDefaultPort();
@@ -184,15 +176,15 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
 
     verifyConnectionsParameters();
 
-
     HttpServerConfiguration serverConfiguration = new HttpServerConfiguration.Builder()
         .setHost(connectionParams.getHost())
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout()).setWorkManagerSource(() -> workManager).build();
+        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setSchedulerSupplier(() -> schedulerService.cpuLightScheduler()).build();
 
     try {
-      server = connectionManager.create(serverConfiguration);
+      server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ConnectionException e) {
       throw new InitialisationException(createStaticMessage("Could not create HTTP server"), this);
     }
@@ -200,7 +192,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
 
   @Override
   public void start() throws MuleException {
-    workManager = schedulerService.cpuLightScheduler();
     try {
       server.start();
     } catch (IOException e) {
@@ -210,29 +201,26 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
 
   @Override
   public void stop() throws MuleException {
-    try {
-      server.stop();
-    } finally {
-      try {
-        workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-      } finally {
-        workManager = null;
-      }
-    }
+    server.stop();
   }
 
   @Override
-  public Server connect() throws ConnectionException {
+  public void dispose() {
+    server.dispose();
+  }
+
+  @Override
+  public HttpServer connect() throws ConnectionException {
     return server;
   }
 
   @Override
-  public void disconnect(Server server) {
+  public void disconnect(HttpServer server) {
     // server could be shared with other listeners, do nothing
   }
 
   @Override
-  public ConnectionValidationResult validate(Server server) {
+  public ConnectionValidationResult validate(HttpServer server) {
     if (server.isStopped() || server.isStopping()) {
       ServerAddress serverAddress = server.getServerAddress();
       return failure(format("Server on host %s and port %s is stopped.", serverAddress.getIp(), serverAddress.getPort()), UNKNOWN,
@@ -252,7 +240,4 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
     }
   }
 
-  private Supplier<Executor> createWorkManagerSource() {
-    return () -> workManager;
-  }
 }

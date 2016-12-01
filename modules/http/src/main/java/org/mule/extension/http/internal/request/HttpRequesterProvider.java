@@ -18,12 +18,10 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
-import org.mule.extension.http.api.request.client.HttpClient;
-import org.mule.extension.http.api.request.proxy.ProxyConfig;
+import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
-import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
-import org.mule.extension.http.internal.request.client.HttpClientFactory;
-import org.mule.extension.http.internal.request.grizzly.GrizzlyHttpClient;
+import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -44,21 +42,24 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
 /**
- * Connection provider for a HTTP request, handles the creation of {@link HttpClient} instances.
+ * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
  *
  * @since 4.0
  */
 @Alias("request")
-public class HttpRequesterProvider implements CachedConnectionProvider<HttpClient>, Initialisable {
+public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable {
 
   private static final int UNLIMITED_CONNECTIONS = -1;
-  private static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
   private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
 
   @Inject
@@ -102,10 +103,11 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
-  private HttpClientFactory httpClientFactory;
+  @Inject
+  private HttpService httpService;
 
   @Override
-  public ConnectionValidationResult validate(HttpClient httpClient) {
+  public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
     return ConnectionValidationResult.success();
   }
 
@@ -136,8 +138,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
     }
 
     verifyConnectionsParameters();
-
-    httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
@@ -153,16 +153,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   }
 
   @Override
-  public HttpClient connect() throws ConnectionException {
+  public HttpExtensionClient connect() throws ConnectionException {
     String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
 
     HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-        .setUriParameters(new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
-                                                   connectionParams.getPort()))
-        .setAuthentication(authentication)
         .setTlsContextFactory(tlsContext)
         .setProxyConfig(proxyConfig)
-        .setClientSocketProperties(connectionParams.getClientSocketProperties())
+        .setClientSocketProperties(new TcpClientSocketPropertiesAdapter(connectionParams.getClientSocketProperties()))
         .setMaxConnections(connectionParams.getMaxConnections())
         .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
@@ -170,18 +167,14 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
         .setOwnerName(configName)
         .build();
 
-    HttpClient httpClient;
-    if (httpClientFactory == null) {
-      httpClient = new GrizzlyHttpClient(configuration);
-    } else {
-      httpClient = httpClientFactory.create(configuration);
-    }
-
-    return httpClient;
+    HttpClient httpClient = httpService.getClientFactory().create(configuration);
+    UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
+                                                           connectionParams.getPort());
+    return new HttpExtensionClient(httpClient, uriParameters, authentication);
   }
 
   @Override
-  public void disconnect(HttpClient httpClient) {}
+  public void disconnect(HttpExtensionClient httpClient) {}
 
   public Function<Event, Integer> getPort() {
     return connectionParams.getPort();
@@ -198,4 +191,50 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   public HttpAuthentication getAuthentication() {
     return authentication;
   }
+
+
+  private class TcpClientSocketPropertiesAdapter implements org.mule.service.http.api.tcp.TcpClientSocketProperties {
+
+    TcpClientSocketProperties tcpClientSocketProperties;
+
+    public TcpClientSocketPropertiesAdapter(TcpClientSocketProperties tcpClientSocketProperties) {
+      this.tcpClientSocketProperties = tcpClientSocketProperties;
+    }
+
+    @Override
+    public Integer getSendBufferSize() {
+      return tcpClientSocketProperties.getSendBufferSize();
+    }
+
+    @Override
+    public Integer getReceiveBufferSize() {
+      return tcpClientSocketProperties.getReceiveBufferSize();
+    }
+
+    @Override
+    public Boolean getSendTcpNoDelay() {
+      return tcpClientSocketProperties.getSendTcpNoDelay();
+    }
+
+    @Override
+    public Integer getConnectionTimeout() {
+      return tcpClientSocketProperties.getConnectionTimeout();
+    }
+
+    @Override
+    public Integer getLinger() {
+      return tcpClientSocketProperties.getLinger();
+    }
+
+    @Override
+    public Boolean getKeepAlive() {
+      return tcpClientSocketProperties.getKeepAlive();
+    }
+
+    @Override
+    public Integer getClientTimeout() {
+      return tcpClientSocketProperties.getClientTimeout();
+    }
+  }
+
 }

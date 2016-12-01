@@ -6,9 +6,19 @@
  */
 package org.mule.test.module.http.functional;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
+import org.mule.service.http.api.HttpService;
+import org.mule.services.http.impl.service.HttpServiceImplementation;
+
+import java.util.List;
 
 /**
  * Needs to access resources for validating different TLS scenarios and it cannot be done with
@@ -19,6 +29,26 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
  * isolated class loader.
  */
 public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
+
+  //TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
+  private HttpService httpService = new HttpServiceImplementation();
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    try {
+      startIfNeeded(httpService);
+    } catch (MuleException e) {
+      //do nothing
+    }
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        muleContext.getRegistry().registerObject(httpService.getName(), httpService);
+      }
+    });
+  }
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -36,4 +66,9 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
     return this.getClass().getClassLoader();
   }
 
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    stopIfNeeded(httpService);
+  }
 }

@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
+
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.util.concurrent.Executor;
 
 public interface ExecutorProvider {
 
   /**
-   * Provides an {@link java.util.concurrent.Executor} for a {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
+   * Provides an {@link java.util.concurrent.Executor} for a {@link ServerAddress}
    *
    * @param serverAddress an HTTP server address
    * @return the executor to use for process HTTP request for the server address

@@ -7,13 +7,17 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+import static org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher.getMethodsListRepresentation;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
 
 import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
@@ -37,11 +41,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
   private static final String SLASH = "/";
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final ServerAddressMap<Server> serverAddressToServerMap = new ServerAddressMap<>();
-  private final Map<Server, ServerAddressRequestHandlerRegistry> requestHandlerPerServerAddress = new HashMap<>();
+  private final ServerAddressMap<HttpServer> serverAddressToServerMap = new ServerAddressMap<>();
+  private final Map<HttpServer, ServerAddressRequestHandlerRegistry> requestHandlerPerServerAddress = new HashMap<>();
 
-  public synchronized RequestHandlerManager addRequestHandler(final Server server, final RequestHandler requestHandler,
-                                                              final ListenerRequestMatcher requestMatcher) {
+  public synchronized RequestHandlerManager addRequestHandler(final HttpServer server, final RequestHandler requestHandler,
+                                                              final PathAndMethodRequestMatcher requestMatcher) {
     ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = this.requestHandlerPerServerAddress.get(server);
     if (serverAddressRequestHandlerRegistry == null) {
       serverAddressRequestHandlerRegistry = new ServerAddressRequestHandlerRegistry();
@@ -51,12 +55,17 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
     return serverAddressRequestHandlerRegistry.addRequestHandler(requestMatcher, requestHandler);
   }
 
+  public synchronized void removeHandlersFor(HttpServer server) {
+    requestHandlerPerServerAddress.remove(server);
+    serverAddressToServerMap.remove(server.getServerAddress());
+  }
+
   @Override
   public RequestHandler getRequestHandler(String ip, int port, final HttpRequest request) {
     if (logger.isDebugEnabled()) {
       logger.debug("Looking RequestHandler for request: " + request.getPath());
     }
-    final Server server = serverAddressToServerMap.get(new ServerAddress(ip, port));
+    final HttpServer server = serverAddressToServerMap.get(new DefaultServerAddress(ip, port));
     if (server != null && !server.isStopping() && !server.isStopped()) {
       final ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = requestHandlerPerServerAddress.get(server);
       if (serverAddressRequestHandlerRegistry != null) {
@@ -83,14 +92,15 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
           }
         });
 
-    public synchronized RequestHandlerManager addRequestHandler(final ListenerRequestMatcher requestMatcher,
+    public synchronized RequestHandlerManager addRequestHandler(final PathAndMethodRequestMatcher requestMatcher,
                                                                 final RequestHandler requestHandler) {
       pathMapSearchCache.invalidateAll();
       String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
       Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER),
                                   "path parameter must start with /");
       validateCollision(requestMatcher);
-      paths.add(getMethodAndPath(requestMatcher.getMethodRequestMatcher().getMethodsList(), requestMatcherPath));
+      List<String> matcherMethods = requestMatcher.getMethodRequestMatcher().getMethods();
+      paths.add(getMethodAndPath(getMethodsListRepresentation(matcherMethods), requestMatcherPath));
       PathMap currentPathMap = rootPathMap;
       final RequestHandlerMatcherPair addedRequestHandlerMatcherPair;
       final PathMap requestHandlerOwner;
@@ -144,13 +154,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       return new DefaultRequestHandlerManager(requestHandlerOwner, addedRequestHandlerMatcherPair);
     }
 
-    private void validateCollision(ListenerRequestMatcher newListenerRequestMatcher) {
+    private void validateCollision(PathAndMethodRequestMatcher newListenerRequestMatcher) {
       final String newListenerRequestMatcherPath = newListenerRequestMatcher.getPath();
       final Stack<PathMap> possibleRequestHandlers = findPossibleRequestHandlersFromCache(newListenerRequestMatcherPath);
       for (PathMap possibleRequestHandler : possibleRequestHandlers) {
         final List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = possibleRequestHandler.getRequestHandlerMatcherPairs();
         for (RequestHandlerMatcherPair requestHandlerMatcherPair : requestHandlerMatcherPairs) {
-          final ListenerRequestMatcher requestMatcher = requestHandlerMatcherPair.getRequestMatcher();
+          final PathAndMethodRequestMatcher requestMatcher = requestHandlerMatcherPair.getRequestMatcher();
           final String possibleCollisionRequestMatcherPath = requestMatcher.getPath();
           if (isSameDepth(possibleCollisionRequestMatcherPath, newListenerRequestMatcherPath)) {
             if (newListenerRequestMatcher.getMethodRequestMatcher().intersectsWith(requestMatcher.getMethodRequestMatcher())) {
@@ -407,16 +417,16 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
 
   public class RequestHandlerMatcherPair {
 
-    private ListenerRequestMatcher requestMatcher;
+    private PathAndMethodRequestMatcher requestMatcher;
     private RequestHandler requestHandler;
     private boolean running = true;
 
-    private RequestHandlerMatcherPair(ListenerRequestMatcher requestMatcher, RequestHandler requestHandler) {
+    private RequestHandlerMatcherPair(PathAndMethodRequestMatcher requestMatcher, RequestHandler requestHandler) {
       this.requestMatcher = requestMatcher;
       this.requestHandler = requestHandler;
     }
 
-    public ListenerRequestMatcher getRequestMatcher() {
+    public PathAndMethodRequestMatcher getRequestMatcher() {
       return requestMatcher;
     }
 

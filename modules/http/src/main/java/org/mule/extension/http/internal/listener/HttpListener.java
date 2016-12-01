@@ -56,21 +56,23 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.runtime.module.http.internal.domain.HttpProtocol;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
-import org.mule.runtime.module.http.internal.listener.RequestHandlerManager;
-import org.mule.runtime.module.http.internal.listener.Server;
-import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.MethodRequestMatcher;
+import org.slf4j.Logger;
+import org.mule.service.http.api.domain.HttpProtocol;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.request.HttpRequestContext;
+import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.MethodRequestMatcher;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import com.google.common.collect.Lists;
 
@@ -78,8 +80,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -104,7 +104,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private HttpListenerConfig config;
 
   @Connection
-  private Server server;
+  private HttpServer server;
 
   /**
    * Relative path from the path set in the HTTP Listener configuration
@@ -206,7 +206,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   public void onStart(SourceCallback<Object, HttpRequestAttributes> sourceCallback) throws MuleException {
     if (allowedMethods != null) {
       parsedAllowedMethods = extractAllowedMethods();
-      methodRequestMatcher = new MethodRequestMatcher(parsedAllowedMethods);
+      methodRequestMatcher = new DefaultMethodRequestMatcher(parsedAllowedMethods);
     }
 
     path = HttpParser.sanitizePathWithStartSlash(path);
@@ -254,7 +254,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
       @Override
       public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
-        // TODO: MULE-9698 Analyse adding security here to reject the HttpRequestContext and avoid creating a Message
+        // TODO: MULE-9698 Analyse adding security here to reject the DefaultHttpRequestContext and avoid creating a Message
         try {
           HttpResponseContext responseContext = new HttpResponseContext();
           final String httpVersion = requestContext.getRequest().getProtocol().asString();

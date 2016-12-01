@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -87,6 +88,7 @@ public final class RequestConnectionParams {
 
   @Parameter
   @Optional
+  @NullSafe
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 4)
   private TcpClientSocketProperties clientSocketProperties;

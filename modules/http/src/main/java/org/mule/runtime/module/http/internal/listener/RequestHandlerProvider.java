@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.server.RequestHandler;
 
 /**
- * Provider of {@link org.mule.runtime.module.http.internal.listener.async.RequestHandler} for a certain incoming http request.
+ * Provider of {@link RequestHandler} for a certain incoming http request.
  */
 public interface RequestHandlerProvider {
 

@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.http.internal.listener.matcher;
 
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import static java.lang.String.format;
+import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.server.MethodRequestMatcher;
+import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
+import org.mule.service.http.api.server.RequestMatcher;
 
 /**
- * Request matcher for an http listener that accepts request based on a path and a group of allowed methods.
+ * {@link RequestMatcher} for an HTTP listener that accepts request based on a path and a group of allowed methods.
  */
-public class ListenerRequestMatcher implements RequestMatcher {
+public class ListenerRequestMatcher implements PathAndMethodRequestMatcher {
 
   private String path;
   private final MethodRequestMatcher methodRequestMatcher;
@@ -42,6 +46,6 @@ public class ListenerRequestMatcher implements RequestMatcher {
 
   @Override
   public String toString() {
-    return "ListenerRequestMatcher{" + "path='" + path + '\'' + ", methodRequestMatcher=" + methodRequestMatcher + '}';
+    return format("%s{path='%s', methodRequestMatcher='%s'}", this.getClass().getSimpleName(), path, methodRequestMatcher);
   }
 }

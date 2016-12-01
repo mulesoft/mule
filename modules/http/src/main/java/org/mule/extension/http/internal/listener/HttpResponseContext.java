@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 
 /**
  * Holds temporary state necessary to emit an http response

@@ -23,7 +23,7 @@ import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
 import org.mule.runtime.module.http.internal.request.DefaultProxyConfig;
 import org.mule.runtime.module.http.internal.request.FailureStatusCodeValidator;
-import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
+import org.mule.service.http.api.client.HttpAuthenticationType;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
 import org.mule.runtime.module.http.internal.request.RamlApiConfiguration;
 import org.mule.runtime.module.http.internal.request.SuccessStatusCodeValidator;

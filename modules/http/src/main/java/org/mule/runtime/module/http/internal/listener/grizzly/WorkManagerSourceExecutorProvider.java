@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
 /**
@@ -19,18 +20,22 @@ import java.util.function.Supplier;
  */
 public class WorkManagerSourceExecutorProvider implements ExecutorProvider {
 
-  private ServerAddressMap<Supplier<Executor>> executorPerServerAddress =
-      new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, Supplier<Executor>>());
+  private ServerAddressMap<Supplier<ExecutorService>> executorPerServerAddress =
+      new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, Supplier<ExecutorService>>());
 
   /**
    * Adds an {@link java.util.concurrent.Executor} to be used when a request is made to a
-   * {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
+   * {@link ServerAddress}
    *
    * @param serverAddress address to which the executor should be applied to
    * @param workManagerSource the executor to use when a request is done to the server address
    */
-  public void addExecutor(final ServerAddress serverAddress, final Supplier<Executor> workManagerSource) {
+  public void addExecutor(final ServerAddress serverAddress, final Supplier<ExecutorService> workManagerSource) {
     executorPerServerAddress.put(serverAddress, workManagerSource);
+  }
+
+  public void removeExecutor(ServerAddress serverAddress) {
+    executorPerServerAddress.remove(serverAddress);
   }
 
   @Override

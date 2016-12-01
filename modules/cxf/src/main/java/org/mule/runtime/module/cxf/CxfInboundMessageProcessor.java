@@ -35,11 +35,11 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
 import org.mule.runtime.module.xml.stax.StaxSource;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

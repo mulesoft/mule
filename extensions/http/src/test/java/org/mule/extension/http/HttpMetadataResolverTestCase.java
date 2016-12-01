@@ -34,12 +34,12 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.model.ParameterMap;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.junit4.rule.DynamicPort;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import java.io.InputStream;
 import java.util.Set;

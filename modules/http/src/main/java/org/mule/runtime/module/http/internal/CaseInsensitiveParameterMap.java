@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.internal;
 
 import static java.util.stream.Collectors.toCollection;
 
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 
 import java.util.LinkedHashMap;
