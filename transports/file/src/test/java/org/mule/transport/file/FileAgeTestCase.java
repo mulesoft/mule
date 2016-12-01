@@ -18,11 +18,15 @@ import org.junit.Test;
 
 public class FileAgeTestCase extends FunctionalTestCase
 {
-    @Rule
-    public SystemProperty fileAgeConnectorSystemProperty = new SystemProperty("fileAgeConnector","60000");
+
+    private static final String CONNECTOR_FILE_AGE= "60000";
+    private static final String ENDPOINT_FILE_AGE = "120000";
 
     @Rule
-    public SystemProperty fileAgeEndpointSystemProperty = new SystemProperty("fileAgeEndpoint","120000");
+    public SystemProperty fileAgeConnectorSystemProperty = new SystemProperty("fileAgeConnector", CONNECTOR_FILE_AGE);
+
+    @Rule
+    public SystemProperty fileAgeEndpointSystemProperty = new SystemProperty("fileAgeEndpoint", ENDPOINT_FILE_AGE);
 
     @Override
     protected String getConfigFile()
@@ -34,8 +38,7 @@ public class FileAgeTestCase extends FunctionalTestCase
     public void testFileAgeConnectorValue()
     {
         FileConnector fileConnector = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector");
-        assertThat(fileConnector.getFileAge(),is(parseLong(fileAgeConnectorSystemProperty.getValue())));
-
+        assertThat(fileConnector.getFileAge(), is(parseLong(CONNECTOR_FILE_AGE)));
     }
 
 }

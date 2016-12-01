@@ -6,6 +6,7 @@
  */
 package org.mule.transport.file;
 
+import static java.lang.Long.parseLong;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -50,6 +51,7 @@ public class FileConnector extends AbstractConnector
     private static Log logger = LogFactory.getLog(FileConnector.class);
 
     public static final String FILE = "file";
+    private static final String FILE_AGE= "fileAge";
     private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:inbound:originalFilename]";
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
@@ -205,7 +207,7 @@ public class FileConnector extends AbstractConnector
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
-                polling = Long.parseLong(tempPolling);
+                polling = parseLong(tempPolling);
             }
 
             if (polling <= 0)
@@ -222,7 +224,7 @@ public class FileConnector extends AbstractConnector
             {
                 try
                 {
-                    endpoint.getProperties().put("fileAge",Long.parseLong(tempFileAge));
+                    endpoint.getProperties().put(FILE_AGE, parseLong(tempFileAge));
                 }
                 catch (Exception ex1)
                 {

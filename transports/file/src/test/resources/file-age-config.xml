@@ -5,13 +5,13 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
-    <file:connector name="fileConnector" autoDelete="true" streaming="true" validateConnections="true" pollingFrequency="60000" fileAge="${fileAgeConnector}"/>
+    <file:connector name="fileConnector" fileAge="${fileAgeConnector}"/>
     <flow name="testageFlow">
-        <file:inbound-endpoint name="fileEndpoint1" path="src/main/resources/Dir1" responseTimeout="10000" connector-ref="fileConnector"/>
-        <file:outbound-endpoint path="src/main/resources/Archive" outputPattern="#[message.inboundProperties.originalFilename]" connector-ref="fileConnector" responseTimeout="10000"/>
+        <file:inbound-endpoint path="src/main/resources/Dir1" connector-ref="fileConnector"/>
+        <echo-component></echo-component>
     </flow>
     <flow name="testageFlow1">
-        <file:inbound-endpoint name="fileEndpoint2" path="src/main/resources/Dir2" responseTimeout="10000" pollingFrequency="10000" fileAge="${fileAgeEndpoint}"/>
-        <file:outbound-endpoint path="src/main/resources/Archive" responseTimeout="10000"/>
+        <file:inbound-endpoint path="src/main/resources/Dir2"  fileAge="${fileAgeEndpoint}"/>
+        <echo-component></echo-component>
     </flow>
 </mule>
