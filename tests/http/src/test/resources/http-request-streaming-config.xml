@@ -9,6 +9,18 @@
         <httpn:request-connection host="localhost" port="${httpPort}"/>
     </httpn:request-config>
 
+    <httpn:request-config name="requestConfigMode" requestStreamingMode="NEVER">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <flow name="streamingAutoConfigMode">
+        <httpn:request config-ref="requestConfigMode" method="POST" path="path" />
+    </flow>
+
+    <flow name="streamingAlwaysConfigMode">
+        <httpn:request config-ref="requestConfigMode" method="POST" path="path" requestStreamingMode="ALWAYS" />
+    </flow>
+
     <flow name="streamingAuto">
         <httpn:request config-ref="requestConfig"  method="POST" path="path">
             <httpn:request-builder>

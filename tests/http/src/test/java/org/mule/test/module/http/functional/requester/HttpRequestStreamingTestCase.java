@@ -43,6 +43,16 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
     return "http-request-streaming-config.xml";
   }
 
+  @Test
+  public void defaultsToConfigStreamingModeWhenEmpty() throws Exception {
+    assertNoStreaming(runFlowWithPayload("streamingAutoConfigMode", new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+  }
+
+  @Test
+  public void overridesConfigStreamingModeWhenSet() throws Exception {
+    assertStreaming(runFlowWithPayload("streamingAlwaysConfigMode", new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+  }
+
   // AUTO
 
   @Test

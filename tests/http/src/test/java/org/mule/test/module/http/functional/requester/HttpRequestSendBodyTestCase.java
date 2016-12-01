@@ -21,6 +21,11 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
+  public void defaultsToConfigSendBodyModeIfEmpty() throws Exception {
+    assertEmptyBody("sendBodyConfig", TEST_MESSAGE, "POST");
+  }
+
+  @Test
   public void sendBodyAutoSendsPayloadPost() throws Exception {
     assertNotEmptyBody("sendBodyAuto", TEST_MESSAGE, "POST");
   }

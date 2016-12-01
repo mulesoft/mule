@@ -10,16 +10,20 @@
         <httpn:request-connection host="localhost" port="${httpPort}"/>
     </httpn:request-config>
 
+    <flow name="sendBodyConfig">
+        <httpn:request config-ref="config" path="requestPath" method="#[dw:method]" />
+    </flow>
+
     <flow name="sendBodyAuto">
-        <httpn:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="AUTO"/>
+        <httpn:request config-ref="config" path="requestPath" method="#[dw:method]" sendBodyMode="AUTO"/>
     </flow>
 
     <flow name="sendBodyAlways">
-        <httpn:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="ALWAYS"/>
+        <httpn:request config-ref="config" path="requestPath" method="#[dw:method]" sendBodyMode="ALWAYS"/>
     </flow>
 
     <flow name="sendBodyNever">
-        <httpn:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="NEVER"/>
+        <httpn:request config-ref="config" path="requestPath" method="#[dw:method]" sendBodyMode="NEVER"/>
     </flow>
 
 
