@@ -13,7 +13,7 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
-import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.UNAVAILABLE_ATTRIBUTE;
+import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_REJECTED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.ClientConnection;
@@ -60,7 +60,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         final HttpRequestPacket request = (HttpRequestPacket) httpContent.getHttpHeader();
 
         // handle the case when the worker pool is busy
-        if (ctx.getConnection().getAttributes().getAttribute(UNAVAILABLE_ATTRIBUTE) != null)
+        if (ctx.getConnection().getAttributes().getAttribute(EXECUTOR_REJECTED_ATTRIBUTE) != null)
         {
             final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(request);
             responsePacketBuilder.status(SERVICE_UNAVAILABLE_503.getStatusCode());

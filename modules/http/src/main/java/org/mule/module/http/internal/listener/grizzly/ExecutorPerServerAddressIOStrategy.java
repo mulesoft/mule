@@ -30,7 +30,7 @@ import org.glassfish.grizzly.strategies.AbstractIOStrategy;
  */
 public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
 {
-    protected final static String UNAVAILABLE_ATTRIBUTE = "__reject_request__";
+    protected final static String EXECUTOR_REJECTED_ATTRIBUTE = "__executor_rejected__";
 
     private final static EnumSet<IOEvent> WORKER_THREAD_EVENT_SET =
             EnumSet.of(IOEvent.READ, IOEvent.CLOSED);
@@ -78,12 +78,12 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
             {
                 try
                 {
-                    connection.getAttributes().setAttribute(UNAVAILABLE_ATTRIBUTE, true);
+                    connection.getAttributes().setAttribute(EXECUTOR_REJECTED_ATTRIBUTE, true);
                     run0(connection, ioEvent, listener);
                 }
                 finally
                 {
-                    connection.getAttributes().removeAttribute(UNAVAILABLE_ATTRIBUTE);
+                    connection.getAttributes().removeAttribute(EXECUTOR_REJECTED_ATTRIBUTE);
                 }
             }
         }
