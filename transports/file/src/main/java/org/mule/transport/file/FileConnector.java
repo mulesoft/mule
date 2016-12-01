@@ -6,6 +6,7 @@
  */
 package org.mule.transport.file;
 
+import static java.lang.Long.parseLong;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -205,7 +206,7 @@ public class FileConnector extends AbstractConnector
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
-                polling = Long.parseLong(tempPolling);
+                polling = parseLong(tempPolling);
             }
 
             if (polling <= 0)
@@ -222,7 +223,7 @@ public class FileConnector extends AbstractConnector
             {
                 try
                 {
-                    setFileAge(Long.parseLong(tempFileAge));
+                    endpoint.getProperties().put(PROPERTY_FILE_AGE, parseLong(tempFileAge));
                 }
                 catch (Exception ex1)
                 {
