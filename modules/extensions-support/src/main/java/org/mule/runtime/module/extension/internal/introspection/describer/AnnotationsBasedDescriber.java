@@ -25,8 +25,6 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
-import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
@@ -34,11 +32,13 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
@@ -92,7 +92,6 @@ import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.FunctionParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.InfrastructureFieldContributor;
@@ -117,8 +116,6 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.introspection.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
-import org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase;
 import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
@@ -150,6 +147,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
@@ -292,7 +290,13 @@ public final class AnnotationsBasedDescriber implements Describer {
                                     SourceElement sourceType,
                                     boolean supportsConfig) {
     //TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
-    // any lifecycle interface
+
+    if (isLifecycle(sourceType.getDeclaringClass())) {
+      throw new IllegalSourceModelDefinitionException(
+                                                      format("Source class '%s' implements a lifecycle interface. Sources are not allowed to",
+                                                             sourceType.getDeclaringClass().getName()));
+    }
+
     final Optional<ExtensionParameter> configParameter = getConfigParameter(sourceType);
     final Optional<ExtensionParameter> connectionParameter = getConnectionParameter(sourceType);
 
@@ -353,20 +357,19 @@ public final class AnnotationsBasedDescriber implements Describer {
     final Optional<MethodElement> onErrorMethod = sourceType.getOnErrorMethod();
 
     //TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
-    declareSourceCallbackParameters(source, onResponseMethod, ON_SUCCESS);
-    declareSourceCallbackParameters(source, onErrorMethod, ON_ERROR);
+    declareSourceCallbackParameters(source, onResponseMethod, source::onSuccess);
+    declareSourceCallbackParameters(source, onErrorMethod, source::onError);
 
     source.withModelProperty(new SourceCallbackModelProperty(getMethod(onResponseMethod), getMethod(onErrorMethod)));
   }
 
   private void declareSourceCallbackParameters(SourceDeclarer source, Optional<MethodElement> sourceCallback,
-                                               CallbackPhase callbackPhase) {
+                                               Supplier<ParameterizedDeclarer> callback) {
     sourceCallback.ifPresent(method -> declareMethodBasedParameters(
-                                                                    source, method.getParameters(),
+                                                                    callback.get(),
+                                                                    method.getParameters(),
                                                                     new ParameterDeclarationContext(SOURCE,
-                                                                                                    source.getDeclaration()))
-                                                                                                        .forEach(p -> p
-                                                                                                            .withModelProperty(new CallbackParameterModelProperty(callbackPhase))));
+                                                                                                    source.getDeclaration())));
   }
 
   private Optional<Method> getMethod(Optional<MethodElement> method) {
@@ -611,7 +614,7 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                 groupParameter.getName()));
     }
 
-    ParameterGroupDeclarer declarer = component.withParameterGroup(groupName);
+    ParameterGroupDeclarer declarer = component.onParameterGroup(groupName);
     if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
                                                                 groupName,
@@ -731,25 +734,28 @@ public final class AnnotationsBasedDescriber implements Describer {
         @Override
         public void visitObject(ObjectType objectType) {
           if (hasDefaultOverride && isInstantiable(objectType)) {
-            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
-                + " but a 'defaultImplementingType' was provided."
-                + " Type override is not allowed for concrete types",
+            throw new IllegalParameterModelDefinitionException(
+                                                               format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
+                                                                   + " but a 'defaultImplementingType' was provided."
+                                                                   + " Type override is not allowed for concrete types",
                                                                       extensionParameter.getName(),
                                                                       NullSafe.class.getSimpleName(),
                                                                       extensionParameter.getType().getName()));
           }
 
           if (!isInstantiable(nullSafeType)) {
-            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                + "used with complex instantiable types (Pojos, Lists, Maps)",
+            throw new IllegalParameterModelDefinitionException(
+                                                               format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                   + "used with complex instantiable types (Pojos, Lists, Maps)",
                                                                       extensionParameter.getName(),
                                                                       NullSafe.class.getSimpleName(),
                                                                       extensionParameter.getType().getName()));
           }
 
           if (!getType(parameter.getDeclaration().getType()).isAssignableFrom(getType(nullSafeType))) {
-            throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
-                + " is not a subtype of the parameter's type",
+            throw new IllegalParameterModelDefinitionException(
+                                                               format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
+                                                                   + " is not a subtype of the parameter's type",
                                                                       extensionParameter.getName(),
                                                                       NullSafe.class.getSimpleName(),
                                                                       extensionParameter.getType().getName(),

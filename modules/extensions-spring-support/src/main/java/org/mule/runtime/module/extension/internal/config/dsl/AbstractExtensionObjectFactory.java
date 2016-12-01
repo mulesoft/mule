@@ -25,7 +25,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.core.util.func.CompositePredicate;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
@@ -45,7 +44,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create extension components.
@@ -82,37 +80,40 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
    * @return a {@link ResolverSet}
    * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
    */
-  protected ResolverSet getParametersAsResolverSet(ParameterizedModel model, Predicate<ParameterModel>... predicates)
+  protected ResolverSet getParametersAsResolverSet(ParameterizedModel model)
+      throws ConfigurationException {
+    return getParametersAsResolverSet(model, model.getAllParameterModels());
+  }
+
+  protected ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels)
       throws ConfigurationException {
 
     ResolverSet resolverSet = new ResolverSet();
     Map<String, Object> parameters = getParameters();
-    model.getAllParameterModels().stream()
-        .filter(CompositePredicate.of(predicates))
-        .forEach(p -> {
-          String parameterName = getMemberName(p, p.getName());
-          ValueResolver<?> resolver = null;
-          if (parameters.containsKey(parameterName)) {
-            resolver = toValueResolver(parameters.get(parameterName));
-          } else {
-            Object defaultValue = p.getDefaultValue();
-            if (defaultValue instanceof String) {
-              resolver = new TypeSafeExpressionValueResolver((String) defaultValue, getType(p.getType()), muleContext);
-            } else if (defaultValue != null) {
-              resolver = new StaticValueResolver<>(defaultValue);
-            }
-          }
+    parameterModels.forEach(p -> {
+      String parameterName = getMemberName(p, p.getName());
+      ValueResolver<?> resolver = null;
+      if (parameters.containsKey(parameterName)) {
+        resolver = toValueResolver(parameters.get(parameterName));
+      } else {
+        Object defaultValue = p.getDefaultValue();
+        if (defaultValue instanceof String) {
+          resolver = new TypeSafeExpressionValueResolver((String) defaultValue, getType(p.getType()), muleContext);
+        } else if (defaultValue != null) {
+          resolver = new StaticValueResolver<>(defaultValue);
+        }
+      }
 
-          if (isNullSafe(p)) {
-            MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-            ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
-            resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
-          }
+      if (isNullSafe(p)) {
+        MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+        ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
+        resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
+      }
 
-          if (resolver != null) {
-            resolverSet.add(parameterName, resolver);
-          }
-        });
+      if (resolver != null) {
+        resolverSet.add(parameterName, resolver);
+      }
+    });
 
     checkParameterGroupExclusiveness(model, getParameters().keySet());
 

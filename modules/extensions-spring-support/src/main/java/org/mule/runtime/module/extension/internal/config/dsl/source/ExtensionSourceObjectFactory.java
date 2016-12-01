@@ -7,15 +7,13 @@
 package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_ERROR;
-import static org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase.ON_SUCCESS;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -25,8 +23,6 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.CallbackParameterModelProperty.CallbackPhase;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapter;
@@ -37,6 +33,7 @@ import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import com.google.common.base.Joiner;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -71,8 +68,8 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
       throw dynamicParameterException(nonCallbackParameters, sourceModel);
     }
 
-    ResolverSet responseCallbackParameters = getCallbackParameters(ON_SUCCESS);
-    ResolverSet errorCallbackParameters = getCallbackParameters(ON_ERROR);
+    ResolverSet responseCallbackParameters = getCallbackParameters(sourceModel.getSuccessCallback());
+    ResolverSet errorCallbackParameters = getCallbackParameters(sourceModel.getErrorCallback());
 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel,
@@ -92,17 +89,14 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   private ResolverSet getNonCallbackParameters() throws ConfigurationException {
-    return getParametersAsResolverSet(sourceModel, p -> !p.getModelProperty(CallbackParameterModelProperty.class).isPresent());
+    return getParametersAsResolverSet(sourceModel, sourceModel.getParameterGroupModels().stream()
+        .flatMap(g -> g.getParameterModels().stream())
+        .collect(toList()));
   }
 
-  private ResolverSet getCallbackParameters(CallbackPhase callbackPhase) throws ConfigurationException {
-    return getParametersAsResolverSet(sourceModel, p -> isOfCallbackPhase(p, callbackPhase));
-  }
-
-  private boolean isOfCallbackPhase(ParameterModel parameter, CallbackPhase callbackPhase) {
-    return parameter.getModelProperty(CallbackParameterModelProperty.class)
-        .map(property -> property.getCallbackPhase() == callbackPhase)
-        .orElse(false);
+  private ResolverSet getCallbackParameters(Optional<SourceCallbackModel> callbackModel) throws ConfigurationException {
+    return getParametersAsResolverSet(sourceModel,
+                                      callbackModel.map(callback -> callback.getAllParameterModels()).orElse(emptyList()));
   }
 
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,
@@ -139,8 +133,10 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     List<String> dynamicParams = resolverSet.getResolvers().entrySet().stream().filter(entry -> entry.getValue().isDynamic())
         .map(entry -> entry.getKey()).collect(toList());
 
-    return new ConfigurationException(createStaticMessage(format("The '%s' message source is using expressions, which are not allowed on message sources. "
-        + "Offending parameters are: [%s]", model.getName(), Joiner.on(',').join(dynamicParams))));
+    return new ConfigurationException(
+                                      createStaticMessage(format("The '%s' message source is using expressions, which are not allowed on message sources. "
+                                          + "Offending parameters are: [%s]", model.getName(),
+                                                                 Joiner.on(',').join(dynamicParams))));
   }
 
   public void setConfigurationProvider(ConfigurationProvider configurationProvider) {

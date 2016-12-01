@@ -263,7 +263,6 @@ public final class SchemaBuilder {
   }
 
   public SchemaBuilder registerMessageSource(SourceModel sourceModel) {
-
     sourceSchemaDelegate.registerMessageSource(sourceModel, dslResolver.resolve(sourceModel));
     return this;
   }
