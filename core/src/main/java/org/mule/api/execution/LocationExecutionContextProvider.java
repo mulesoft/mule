@@ -36,7 +36,7 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     public static final String PASSWORD_ATTRIBUTE_MASK = "password=\"%s\"";
 
     /**
-     * Populates the passed beanAnnotations with the oSOURCE_ELEMENT_ANNOTATION_KEY passed parameters.
+     * Populates the passed beanAnnotations with the {@link #SOURCE_ELEMENT_ANNOTATION_KEY} passed parameters.
      *
      * @param beanAnnotations the map with annotations to populate
      * @param fileName        the name of the file where the element definition was read from.
