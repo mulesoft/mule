@@ -19,6 +19,20 @@
         <echo-component/>
     </flow>
 
+    <flow name="twoHeadersResponseBuilderFlow">
+        <httpn:listener config-ref="listenerConfig" path="${twoHeadersResponseBuilderPath}">
+            <httpn:response-builder>
+                <httpn:headers>
+                    #[['content-type' : 'text/x-javascript', 'Content-Type' : 'application/json']]
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <echo-component/>
+        <!--<set-property propertyName="Content-Type" value="text/x-json"/>-->
+        <!--<set-property propertyName="Content-Type" value="text/javascript"/>-->
+        <!--<set-property propertyName="content-type" value="application/xml"/>-->
+    </flow>
+
     <flow name="statusResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${statusResponseBuilderPath}">
             <httpn:response-builder statusCode="201" reasonPhrase="everything works!"/>
