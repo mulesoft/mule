@@ -29,7 +29,7 @@
 
         <http:request config-ref="requesterConfig" path="requestServer" method="GET">
             <http:request-builder>
-                <http:header headerName="content-Type" value="text/x-json"/>
+                <http:header headerName="COnTeNt-tyPE" value="text/x-json"/>
             </http:request-builder>
         </http:request>
     </flow>
