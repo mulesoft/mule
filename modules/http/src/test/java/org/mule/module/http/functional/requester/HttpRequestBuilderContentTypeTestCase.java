@@ -50,6 +50,15 @@ public class HttpRequestBuilderContentTypeTestCase extends AbstractHttpRequestTe
         assertThat((String) response.getInboundProperty(CONTENT_TYPE_PROPERTY), equalTo("text/x-json"));
     }
 
+    @Test
+    public void contentTypeCaseInsensitiveInRequestBuilderSentAsHeader() throws Exception
+    {
+        MuleMessage response = runFlow("requesterContentTypeCaseInsensitiveClient").getMessage();
+
+        assertThat(response.getInboundPropertyNames(), hasItem(equalToIgnoringCase(CONTENT_TYPE_PROPERTY)));
+        assertThat((String) response.getInboundProperty(CONTENT_TYPE_PROPERTY), equalTo("text/x-json"));
+    }
+
     @Override
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
     {
