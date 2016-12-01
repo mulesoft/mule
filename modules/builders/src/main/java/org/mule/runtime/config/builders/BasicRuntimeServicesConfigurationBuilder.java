@@ -25,6 +25,7 @@ public class BasicRuntimeServicesConfigurationBuilder extends AbstractConfigurat
   protected void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
     final DefaultSchedulerService schedulerService = new DefaultSchedulerService();
+    schedulerService.start();
     registry.registerObject(schedulerService.getName(), schedulerService);
   }
 }
