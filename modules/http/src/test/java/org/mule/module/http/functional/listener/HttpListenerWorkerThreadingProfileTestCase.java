@@ -92,9 +92,7 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
         maxActiveNumberOfRequestExecutedLatch = new CountDownLatch(maxThreadsActive);
 
         sendRequestUntilNoMoreWorkers(flowName, url, maxThreadsActive);
-        // Due to differences in buffer sizes, the exception that is caused client side may be one of two different
-        // exceptions.
-        //expectedException.expect(anyOf(instanceOf(NoHttpResponseException.class), instanceOf(SocketException.class)));
+
         try
         {
             Response response = httpClientExecutor.execute(Request.Get(url));
