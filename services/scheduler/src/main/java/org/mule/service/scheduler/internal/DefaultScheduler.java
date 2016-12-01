@@ -6,6 +6,7 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Integer.toHexString;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.lineSeparator;
 import static java.lang.System.nanoTime;
@@ -40,6 +41,7 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -61,6 +63,8 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   private static final long FORCEFUL_SHUTDOWN_TIMEOUT_SECS = 5;
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultScheduler.class);
+
+  private final AtomicInteger idGenerator = new AtomicInteger(0);
 
   private final String name;
 
@@ -95,7 +99,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
                    org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
-    this.name = name + "@" + Integer.toHexString(hashCode());
+    this.name = name + "@" + toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
     cancelledBeforeFireTasks = newKeySet();
     this.executor = executor;
@@ -141,7 +145,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    }, this, command.getClass().getName());
+    }, this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     final ScheduledFuture<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
@@ -162,7 +166,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       } else {
         taskFinished(t);
       }
-    }, this, command.getClass().getName());
+    }, this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
@@ -185,7 +189,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    }, this, command.getClass().getName());
+    }, this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     JobDataMap jobDataMap = new JobDataMap();
     jobDataMap.put(JOB_TASK_KEY, schedulableTask(task));
@@ -307,12 +311,14 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-    return new RunnableFutureDecorator<>(super.newTaskFor(callable), this, callable.getClass().getName());
+    return new RunnableFutureDecorator<>(super.newTaskFor(callable), this, callable.getClass().getName(),
+                                         idGenerator.getAndIncrement());
   }
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-    return new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this, runnable.getClass().getName());
+    return new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this, runnable.getClass().getName(),
+                                         idGenerator.getAndIncrement());
   }
 
   @Override

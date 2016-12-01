@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
@@ -20,7 +19,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
@@ -45,6 +43,7 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -131,6 +130,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -1069,7 +1069,7 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public String getId() {
     MuleConfiguration conf = getConfiguration();
-    return format("%s.%s.%s", conf.getDomainId(), getClusterId(), conf.getId());
+    return conf.getDomainId() + "." + getClusterId() + "." + conf.getId();
   }
 
   public void setErrorTypeLocator(ErrorTypeLocator errorTypeLocator) {

@@ -45,7 +45,16 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     }
   }
 
+  private final Integer id;
+
   private volatile boolean started = false;
+
+  /**
+   * @param id a unique it for this task.
+   */
+  protected AbstractRunnableFutureDecorator(Integer id) {
+    this.id = id;
+  }
 
   protected long beforeRun() {
     long startTime = 0;
@@ -69,4 +78,8 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     return started;
   }
 
+  @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
 }

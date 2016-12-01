@@ -49,6 +49,8 @@ import ru.yandex.qatools.allure.annotations.Features;
 @Features("Scheduler Service")
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
+  private static long mem = getRuntime().maxMemory() / 1024;
+
   @Override
   protected String getConfigFile() {
     return "org/mule/test/service/scheduler/scheduler-service.xml";
@@ -70,9 +72,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Test
   @Description("Tests that the exception that happens when a thread pool is full is properly handled.")
   public void overloadErrorHandling() throws Exception {
-    int cores = getRuntime().availableProcessors();
-    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize().
-    for (int i = 0; i < cores * cores; ++i) {
+    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize() + ThreadPoolsConfig#getIoQueueSize().
+    for (int i = 0; i < 256 + 1024; ++i) {
       flowRunner("delaySchedule").run();
     }
 
@@ -95,9 +96,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     FlowConstruct delayScheduleFlow = getFlowConstruct("delaySchedule");
     MessageSource messageSource = ((Flow) delayScheduleFlow).getMessageSource();
 
-    int cores = getRuntime().availableProcessors();
-    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize().
-    for (int i = 0; i < cores * cores; ++i) {
+    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize() + ThreadPoolsConfig#getIoQueueSize().
+    for (int i = 0; i < 256 + 1024; ++i) {
       ((SkeletonSource) messageSource).getListener()
           .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).build());
     }

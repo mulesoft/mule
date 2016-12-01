@@ -43,15 +43,20 @@ public class ThreadPoolsConfig {
   private static final Logger logger = getLogger(ThreadPoolsConfig.class);
 
   public static final String PROP_PREFIX = "org.mule.runtime.scheduler.";
+  public static final String CPU_LIGHT_PREFIX = PROP_PREFIX + CPU_LIGHT.getName();
+  public static final String IO_PREFIX = PROP_PREFIX + IO.getName();
+  public static final String CPU_INTENSIVE_PREFIX = PROP_PREFIX + CPU_INTENSIVE.getName();
   public static final String THREAD_POOL = "threadPool";
   public static final String THREAD_POOL_SIZE = THREAD_POOL + ".size";
   public static final String THREAD_POOL_SIZE_MAX = THREAD_POOL + ".maxSize";
   public static final String THREAD_POOL_SIZE_CORE = THREAD_POOL + ".coreSize";
   public static final String THREAD_POOL_KEEP_ALIVE = THREAD_POOL + ".threadKeepAlive";
+  public static final String WORK_QUEUE = "workQueue";
+  public static final String WORK_QUEUE_SIZE = WORK_QUEUE + ".size";
 
-  private static final String NUMBER_OR_VAR_REGEXP = "([0-9]+(\\.[0-9]+)?)|cores";
+  private static final String NUMBER_OR_VAR_REGEXP = "([0-9]+(\\.[0-9]+)?)|cores|mem";
   private static final Pattern POOLSIZE_PATTERN =
-      compile("(" + NUMBER_OR_VAR_REGEXP + ")?(\\s*[-+\\/*]\\s*(" + NUMBER_OR_VAR_REGEXP + ")?)*");
+      compile("(" + NUMBER_OR_VAR_REGEXP + ")?(\\s*[-+\\/*\\(\\)]\\s*(" + NUMBER_OR_VAR_REGEXP + ")?)*");
 
   /**
    * Loads the configuration from the {@code &#123;mule.home&#125;/conf/scheduler-pools.conf} file.
@@ -88,17 +93,20 @@ public class ThreadPoolsConfig {
     ScriptEngineManager manager = new ScriptEngineManager();
     ScriptEngine engine = manager.getEngineByName("js");
     engine.put("cores", cores);
+    engine.put("mem", mem);
 
     config.setGracefulShutdownTimeout(resolveNumber(properties, PROP_PREFIX + "gracefulShutdownTimeout"));
-    config.setCpuLightPoolSize(resolveExpression(properties, PROP_PREFIX + CPU_LIGHT.getName() + "." + THREAD_POOL_SIZE, config,
-                                                 engine));
-    config.setIoCorePoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_CORE, config,
-                                               engine));
-    config
-        .setIoMaxPoolSize(resolveExpression(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_SIZE_MAX, config, engine));
-    config.setIoKeepAlive(resolveNumber(properties, PROP_PREFIX + IO.getName() + "." + THREAD_POOL_KEEP_ALIVE));
-    config.setCpuIntensivePoolSize(resolveExpression(properties, PROP_PREFIX + CPU_INTENSIVE.getName() + "." + THREAD_POOL_SIZE,
-                                                     config, engine));
+
+    config.setCpuLightPoolSize(resolveExpression(properties, CPU_LIGHT_PREFIX + "." + THREAD_POOL_SIZE, config, engine));
+    config.setCpuLightQueueSize(resolveExpression(properties, CPU_LIGHT_PREFIX + "." + WORK_QUEUE_SIZE, config, engine));
+
+    config.setIoCorePoolSize(resolveExpression(properties, IO_PREFIX + "." + THREAD_POOL_SIZE_CORE, config, engine));
+    config.setIoMaxPoolSize(resolveExpression(properties, IO_PREFIX + "." + THREAD_POOL_SIZE_MAX, config, engine));
+    config.setIoQueueSize(resolveExpression(properties, IO_PREFIX + "." + WORK_QUEUE_SIZE, config, engine));
+    config.setIoKeepAlive(resolveNumber(properties, IO_PREFIX + "." + THREAD_POOL_KEEP_ALIVE));
+
+    config.setCpuIntensivePoolSize(resolveExpression(properties, CPU_INTENSIVE_PREFIX + "." + THREAD_POOL_SIZE, config, engine));
+    config.setCpuIntensiveQueueSize(resolveExpression(properties, CPU_INTENSIVE_PREFIX + "." + WORK_QUEUE_SIZE, config, engine));
 
     return config;
   }
@@ -137,12 +145,16 @@ public class ThreadPoolsConfig {
   }
 
   private static int cores = getRuntime().availableProcessors();
+  private static long mem = getRuntime().maxMemory() / 1024;
 
   private long gracefulShutdownTimeout = 15000;
+  private int cpuLightQueueSize = 1024;
   private int cpuLightPoolSize = 2 * cores;
+  private int ioQueueSize = 1024;
   private int ioCorePoolSize = cores;
-  private int ioMaxPoolSize = cores * cores;
+  private int ioMaxPoolSize = 256;
   private long ioKeepAlive = 30000;
+  private int cpuIntensiveQueueSize = 1024;
   private int cpuIntensivePoolSize = 2 * cores;
 
   private ThreadPoolsConfig() {
@@ -173,6 +185,17 @@ public class ThreadPoolsConfig {
   }
 
   /**
+   * @return the size of the queue to use for holding {@code cpu_lite} tasks before they are executed.
+   */
+  public int getCpuLightQueueSize() {
+    return cpuLightQueueSize;
+  }
+
+  private void setCpuLightQueueSize(int cpuLightQueueSize) {
+    this.cpuLightQueueSize = cpuLightQueueSize;
+  }
+
+  /**
    * @return the number of threads to keep in the {@code I/O} pool.
    */
   public int getIoCorePoolSize() {
@@ -192,6 +215,17 @@ public class ThreadPoolsConfig {
 
   private void setIoMaxPoolSize(int ioMaxPoolSize) {
     this.ioMaxPoolSize = ioMaxPoolSize;
+  }
+
+  /**
+   * @return the size of the queue to use for holding {@code I/O} tasks before they are executed.
+   */
+  public int getIoQueueSize() {
+    return ioQueueSize;
+  }
+
+  private void setIoQueueSize(int ioQueueSize) {
+    this.ioQueueSize = ioQueueSize;
   }
 
   /**
@@ -215,6 +249,17 @@ public class ThreadPoolsConfig {
 
   private void setCpuIntensivePoolSize(int cpuIntensivePoolSize) {
     this.cpuIntensivePoolSize = cpuIntensivePoolSize;
+  }
+
+  /**
+   * @return the size of the queue to use for holding {@code cpu_intensive} tasks before they are executed.
+   */
+  public int getCpuIntensiveQueueSize() {
+    return cpuIntensiveQueueSize;
+  }
+
+  private void setCpuIntensiveQueueSize(int cpuIntensiveQueueSize) {
+    this.cpuIntensiveQueueSize = cpuIntensiveQueueSize;
   }
 
   public Properties defaultQuartzProperties(String name) {
