@@ -47,13 +47,12 @@ public interface Part {
   long getSize();
 
   /**
-   *
-   * Returns the value of the specified mime header as a {@code String}. If the Part did not include a header of the
+   * Returns the value of the specified mime header as a {@link String}. If the Part did not include a header of the
    * specified name, this method returns {@code null}. If there are multiple headers with the same name, this method returns
    * the first header in the part. The header name is case insensitive. You can use this method with any request header.
    *
-   * @param name a {@code String} specifying the header name
-   * @return a {@code String} containing the value of the requested header, or {@code null} if the part does not have a
+   * @param name a {@link String} specifying the header name
+   * @return a {@link String} containing the value of the requested header, or {@code null} if the part does not have a
    *         header of that name
    */
   String getHeader(String name);
@@ -61,12 +60,12 @@ public interface Part {
   /**
    * Gets the values of the Part header with the given name.
    * <p>
-   * Any changes to the returned {@code Collection} must not affect this {@code Part}.
+   * Any changes to the returned {@link Collection} must not affect this {@code Part}.
    * <p>
    * Part header names are case insensitive.
    *
    * @param name the header name whose values to return
-   * @return a (possibly empty) {@code Collection} of the values of the header with the given name
+   * @return a (possibly empty) {@link Collection} of the values of the header with the given name
    */
   Collection<String> getHeaders(String name);
 
@@ -76,9 +75,9 @@ public interface Part {
    * Some servlet containers do not allow servlets to access headers using this method, in which case this method returns
    * {@code null}
    * <p>
-   * Any changes to the returned {@code Collection} must not affect this {@code Part}.
+   * Any changes to the returned {@link Collection} must not affect this {@code Part}.
    *
-   * @return a (possibly empty) {@code Collection} of the header names of this Part
+   * @return a (possibly empty) {@link Collection} of the header names of this Part
    */
   Collection<String> getHeaderNames();
 
