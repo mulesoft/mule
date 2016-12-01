@@ -79,6 +79,14 @@
             <directory>${project.build.directory}/plugins</directory>
             <outputDirectory>plugins</outputDirectory>
         </fileSet>
+
+        <fileSet>
+            <directory>target/dependency/</directory>
+            <includes>
+                <include>mule-plugin-weave-*-dist.zip</include>
+            </includes>
+            <outputDirectory>plugins</outputDirectory>
+        </fileSet>
     </fileSets>
 
     <!--

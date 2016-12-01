@@ -177,6 +177,7 @@
 /mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-plugin-weave-${productVersion}-dist.zip
 
 #
 # /services
