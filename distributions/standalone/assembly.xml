@@ -79,7 +79,6 @@
             <directory>${project.build.directory}/plugins</directory>
             <outputDirectory>plugins</outputDirectory>
         </fileSet>
-
     </fileSets>
 
     <!--

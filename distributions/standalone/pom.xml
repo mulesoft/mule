@@ -180,8 +180,8 @@
             <artifactId>mule-plugin-weave</artifactId>
             <version>${weaveVersion}</version>
             <classifier>dist</classifier>
-            <scope>provided</scope>
             <type>zip</type>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Include all Mule Services -->
