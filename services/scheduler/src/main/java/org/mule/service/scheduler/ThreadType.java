@@ -7,11 +7,12 @@
 package org.mule.service.scheduler;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 /**
  * Represents the type of work that a {@link Thread} owned by a {@link Scheduler} is configured to perform.
  *
- * @since 1.0
+ * @since 4.0
  */
 public enum ThreadType {
 

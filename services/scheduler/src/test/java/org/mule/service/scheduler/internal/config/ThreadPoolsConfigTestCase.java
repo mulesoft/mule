@@ -89,13 +89,13 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
     assertThat(config.getGracefulShutdownTimeout(), is(15000l));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
-    assertThat(config.getCpuLightQueueSize(), is((int) (mem / (2 * 3 * 32))));
+    assertThat(config.getCpuLightQueueSize(), is(1024));
     assertThat(config.getIoCorePoolSize(), is(cores));
-    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 30 * 64))));
-    assertThat(config.getIoQueueSize(), is((int) (mem / (2 * 3 * 32))));
+    assertThat(config.getIoMaxPoolSize(), is(256));
+    assertThat(config.getIoQueueSize(), is(1024));
     assertThat(config.getIoKeepAlive(), is(30000l));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
-    assertThat(config.getCpuIntensiveQueueSize(), is((int) (mem / (2 * 3 * 32))));
+    assertThat(config.getCpuIntensiveQueueSize(), is(1024));
   }
 
   @Test
@@ -104,13 +104,13 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
     assertThat(config.getGracefulShutdownTimeout(), is(15000l));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
-    assertThat(config.getCpuLightQueueSize(), is((int) (mem / (2 * 3 * 32))));
+    assertThat(config.getCpuLightQueueSize(), is(1024));
     assertThat(config.getIoCorePoolSize(), is(cores));
-    assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 30 * 64))));
-    assertThat(config.getIoQueueSize(), is((int) (mem / (2 * 3 * 32))));
+    assertThat(config.getIoMaxPoolSize(), is(256));
+    assertThat(config.getIoQueueSize(), is(1024));
     assertThat(config.getIoKeepAlive(), is(30000l));
     assertThat(config.getCpuIntensivePoolSize(), is(2 * cores));
-    assertThat(config.getCpuIntensiveQueueSize(), is((int) (mem / (2 * 3 * 32))));
+    assertThat(config.getCpuIntensiveQueueSize(), is(1024));
   }
 
   @Test

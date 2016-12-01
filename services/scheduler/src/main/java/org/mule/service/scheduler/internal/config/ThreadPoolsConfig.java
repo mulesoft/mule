@@ -148,13 +148,13 @@ public class ThreadPoolsConfig {
   private static long mem = getRuntime().maxMemory() / 1024;
 
   private long gracefulShutdownTimeout = 15000;
-  private int cpuLightQueueSize = (int) (mem / (2 * 3 * 32));
+  private int cpuLightQueueSize = 1024;
   private int cpuLightPoolSize = 2 * cores;
-  private int ioQueueSize = (int) (mem / (2 * 3 * 32));
+  private int ioQueueSize = 1024;
   private int ioCorePoolSize = cores;
-  private int ioMaxPoolSize = (int) (mem / (2 * 30 * 64));
+  private int ioMaxPoolSize = 256;
   private long ioKeepAlive = 30000;
-  private int cpuIntensiveQueueSize = (int) (mem / (2 * 3 * 32));
+  private int cpuIntensiveQueueSize = 1024;
   private int cpuIntensivePoolSize = 2 * cores;
 
   private ThreadPoolsConfig() {
