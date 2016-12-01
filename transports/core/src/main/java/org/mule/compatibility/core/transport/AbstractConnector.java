@@ -11,6 +11,7 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.compatibility.core.config.i18n.TransportCoreMessages.connectorCausedError;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -1654,8 +1655,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   }
 
   protected Scheduler createScheduler() {
-    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),this.getName() + ".scheduler"
-    return muleContext.getSchedulerService().ioScheduler();
+    return muleContext.getSchedulerService().ioScheduler(config().withName(getName() + ".scheduler"));
   }
 
   /**

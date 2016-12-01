@@ -90,10 +90,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     asyncExecutor = newSingleThreadExecutor();
 
     flow = new Flow("test", muleContext);
-    flow.setProcessingStrategyFactory(muleContext -> createProcessingStrategy(muleContext));
+    flow.setProcessingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix));
   }
 
-  protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext);
+  protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
 
   @After
   public void after() {

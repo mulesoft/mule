@@ -19,6 +19,7 @@ import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -200,7 +201,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private WatchService watcher;
   private Predicate<FileAttributes> matcher;
   private Set<FileEventType> enabledEventTypes = new HashSet<>();
-  private Scheduler scheduler;
   private Scheduler listenerExecutor;
   private PrimaryNodeLifecycleNotificationListener clusterListener;
 
@@ -223,16 +223,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     createWatcherService();
 
     matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
-    // TODO MULE-11018 format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())
-    scheduler = schedulerService.ioScheduler();
-
-    started = true;
-    stopRequested.set(false);
 
     listenerExecutor =
         schedulerService.customScheduler(format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName()), 1);
 
     submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
+
+    started = true;
+    stopRequested.set(false);
   }
 
   private synchronized void initialiseClusterListener(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
@@ -362,9 +360,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private void shutdownScheduler() {
     if (listenerExecutor != null) {
       listenerExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-    }
-    if (scheduler != null) {
-      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     }
   }
 

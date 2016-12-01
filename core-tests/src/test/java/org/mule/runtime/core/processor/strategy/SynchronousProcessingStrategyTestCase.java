@@ -29,7 +29,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext) {
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 

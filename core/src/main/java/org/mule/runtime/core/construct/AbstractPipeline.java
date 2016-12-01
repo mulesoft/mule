@@ -16,6 +16,7 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
@@ -68,6 +69,7 @@ import java.util.List;
 
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -153,13 +155,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
       }
 
-      processingStrategy = processingStrategyFactory.create(muleContext);
+      processingStrategy = processingStrategyFactory.create(muleContext, getPrefix(muleContext) + getName());
     }
 
     boolean userConfiguredProcessingStrategy = !(getProcessingStrategyFactory() instanceof DefaultFlowProcessingStrategyFactory);
     boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
     if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
-      processingStrategy = new SynchronousProcessingStrategyFactory().create(muleContext);
+      processingStrategy = new SynchronousProcessingStrategyFactory().create(muleContext, getPrefix(muleContext) + getName());
       if (LOGGER.isWarnEnabled()) {
         LOGGER
             .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");

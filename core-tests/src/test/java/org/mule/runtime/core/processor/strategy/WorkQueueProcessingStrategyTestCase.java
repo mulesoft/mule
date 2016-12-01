@@ -31,7 +31,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   }
 
   @Override
-  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext) {
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> blocking, scheduler -> {
     }, muleContext);
   }

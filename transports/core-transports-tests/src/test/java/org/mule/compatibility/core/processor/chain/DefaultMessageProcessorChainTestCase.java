@@ -113,8 +113,11 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getError()).thenReturn(empty());
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
-        .thenReturn(nonBlocking ? new LegacyNonBlockingProcessingStrategyFactory().create(muleContext)
-            : new DefaultFlowProcessingStrategyFactory().create(muleContext));
+        .thenReturn(nonBlocking
+            ? new LegacyNonBlockingProcessingStrategyFactory().create(muleContext,
+                                                                      DefaultMessageProcessorChainTestCase.class.getSimpleName())
+            : new DefaultFlowProcessingStrategyFactory().create(muleContext,
+                                                                DefaultMessageProcessorChainTestCase.class.getSimpleName()));
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
@@ -32,8 +33,9 @@ import org.reactivestreams.Publisher;
 public class LegacyDefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new LegacyDefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new LegacyDefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
+        .ioScheduler(config().withName(schedulersNamePrefix)),
                                                    scheduler -> scheduler
                                                        .stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                              MILLISECONDS),

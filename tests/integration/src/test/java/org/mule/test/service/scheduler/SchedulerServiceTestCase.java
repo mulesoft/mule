@@ -15,6 +15,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
 import org.mule.functional.functional.SkeletonSource;
 import org.mule.runtime.api.exception.MuleException;
@@ -63,10 +64,17 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
-  public void schedulerName() {
+  public void schedulerDefaultName() {
     SchedulerService schedulerService = muleContext.getSchedulerService();
     assertThat(schedulerService.ioScheduler().getName(),
-               startsWith("SchedulerService_io@" + SchedulerServiceTestCase.class.getName() + ".schedulerName:"));
+               startsWith("SchedulerService_io@" + SchedulerServiceTestCase.class.getName() + ".schedulerDefaultName:"));
+  }
+
+  @Test
+  public void schedulerCustomName() {
+    SchedulerService schedulerService = muleContext.getSchedulerService();
+    assertThat(schedulerService.ioScheduler(config().withName("myPreciousScheduler")).getName(),
+               startsWith("myPreciousScheduler"));
   }
 
   @Test

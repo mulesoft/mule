@@ -23,6 +23,7 @@ public class SchedulerConfig {
   }
 
   private Integer maxConcurrentTasks;
+  private String schedulerName;
 
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
@@ -45,4 +46,21 @@ public class SchedulerConfig {
     return maxConcurrentTasks;
   }
 
+  /**
+   * Sets the name for the target {@link Scheduler}, which will override the default one.
+   * 
+   * @param schedulerName the name for the target {@link Scheduler}.
+   * @return the updated configuration.
+   */
+  public SchedulerConfig withName(String schedulerName) {
+    this.schedulerName = schedulerName;
+    return this;
+  }
+
+  /**
+   * @return the name for the target {@link Scheduler}.
+   */
+  public String getSchedulerName() {
+    return schedulerName;
+  }
 }

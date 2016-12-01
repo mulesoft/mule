@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -69,9 +72,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   @Override
   public void start() {
-    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),
-    // getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful"
-    pool = muleContext.getSchedulerService().ioScheduler();
+    pool = muleContext.getSchedulerService().ioScheduler(config()
+        .withName(format("%s%s.%s", getPrefix(getUntilSuccessfulConfiguration().getMuleContext()),
+                         getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful")));
 
     scheduleAllPendingEventsForProcessing();
   }
@@ -121,21 +124,21 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     if (firstTime) {
       submitForProcessing(eventStoreKey);
     } else {
-      this.pool.schedule(() -> {
-        submitForProcessing(eventStoreKey);
-        return null;
-      }, getUntilSuccessfulConfiguration().getMillisBetweenRetries(), MILLISECONDS);
+      this.pool.schedule(() -> doProcess(eventStoreKey), getUntilSuccessfulConfiguration().getMillisBetweenRetries(),
+                         MILLISECONDS);
     }
   }
 
   protected void submitForProcessing(final Serializable eventStoreKey) {
-    this.pool.execute(() -> {
-      try {
-        retrieveAndProcessEvent(eventStoreKey);
-      } catch (Exception e) {
-        incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
-      }
-    });
+    this.pool.execute(() -> doProcess(eventStoreKey));
+  }
+
+  protected void doProcess(final Serializable eventStoreKey) {
+    try {
+      retrieveAndProcessEvent(eventStoreKey);
+    } catch (Exception e) {
+      incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
+    }
   }
 
   private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey,

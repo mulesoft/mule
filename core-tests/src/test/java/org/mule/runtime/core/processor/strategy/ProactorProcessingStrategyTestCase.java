@@ -34,7 +34,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   }
 
   @Override
-  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext) {
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new ProactorProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive, scheduler -> {
     }, muleContext);
   }
