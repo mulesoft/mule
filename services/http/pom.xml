@@ -3,26 +3,59 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>org.mule.services</groupId>
         <artifactId>mule-services</artifactId>
+        <groupId>org.mule.services</groupId>
         <version>4.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Mule HTTP Service</name>
-    <description>Mule service that allows to create HTTP servers and clients</description>
+    <name>HTTP Service Implementation</name>
+    <description>Grizzly based implementation of the HTTP Service</description>
 
     <artifactId>mule-service-http</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-service</packaging>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>mule-service</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>mule-service</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.mule.plugins</groupId>
+                <artifactId>mule-app-plugins-maven-plugin</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-api</artifactId>
+            <artifactId>mule-service-http-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

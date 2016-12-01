@@ -104,6 +104,7 @@
         <module>extensions</module>
         <module>transports</module>
         <module>services</module>
+        <module>http</module>
     </modules>
 
     <properties>
