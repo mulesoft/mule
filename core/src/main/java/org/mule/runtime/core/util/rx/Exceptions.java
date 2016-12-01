@@ -244,7 +244,7 @@ public class Exceptions {
    * Returns an exception used to signal a dropped {@link Event} in a reactive stream. This exception does not extend
    * {@link MuleException} or even call {@link Exception#Exception()} to avoid the overhead of filling-in the stack.
    *
-   * This exception should only be thrown as part of reactive stream processing and needs to be explcitly handled using for
+   * This exception should only be thrown as part of reactive stream processing and needs to be explicitly handled using for
    * example {@link reactor.core.publisher.Flux#onErrorResumeWith(Predicate, Function)} depending on the behaviuor required in the
    * specific context. For example, in a {@link org.mule.runtime.core.routing.ScatterGatherRouter} a dropped message means one
    * less item in the aggregated collection of messages, while a dropped message in a {@link org.mule.runtime.core.construct.Flow}
