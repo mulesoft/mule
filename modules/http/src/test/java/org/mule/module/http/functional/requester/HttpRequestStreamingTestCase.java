@@ -41,6 +41,20 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
         return "http-request-streaming-config.xml";
     }
 
+    @Test
+    public void defaultsToConfigStreamingModeWhenEmpty() throws Exception
+    {
+        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
+        assertNoStreaming("streamingAutoConfigMode", event);
+    }
+
+    @Test
+    public void overridesConfigStreamingModeWhenSet() throws Exception
+    {
+        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
+        assertStreaming("streamingAlwaysConfigMode", event);
+    }
+
     //AUTO
 
     @Test
