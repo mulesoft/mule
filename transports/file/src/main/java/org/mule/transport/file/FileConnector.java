@@ -51,7 +51,6 @@ public class FileConnector extends AbstractConnector
     private static Log logger = LogFactory.getLog(FileConnector.class);
 
     public static final String FILE = "file";
-    private static final String FILE_AGE= "fileAge";
     private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:inbound:originalFilename]";
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
@@ -224,7 +223,7 @@ public class FileConnector extends AbstractConnector
             {
                 try
                 {
-                    endpoint.getProperties().put(FILE_AGE, parseLong(tempFileAge));
+                    endpoint.getProperties().put(PROPERTY_FILE_AGE, parseLong(tempFileAge));
                 }
                 catch (Exception ex1)
                 {

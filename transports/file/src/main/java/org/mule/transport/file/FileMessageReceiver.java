@@ -6,6 +6,7 @@
  */
 package org.mule.transport.file;
 
+import static org.mule.transport.file.FileConnector.PROPERTY_FILE_AGE;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -62,8 +63,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
     public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
-    private static final String FILE_AGE = "fileAge";
-
     private static final List<File> NO_FILES = new ArrayList<File>();
 
     private FileConnector fileConnector = null;
@@ -273,9 +272,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
         //the current And/Or filters to extend {@link FilenameFilter}
         Long fileAge;
-        if (this.endpoint.getProperties().containsKey(FILE_AGE))
+        if (this.endpoint.getProperties().containsKey(PROPERTY_FILE_AGE))
         {
-            fileAge = (Long) endpoint.getProperties().get(FILE_AGE);
+            fileAge = (Long) endpoint.getProperties().get(PROPERTY_FILE_AGE);
         }
         else
         {

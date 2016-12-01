@@ -37,7 +37,7 @@ public class FileAgeTestCase extends FunctionalTestCase
     @Test
     public void testFileAgeConnectorValue()
     {
-        FileConnector fileConnector = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector");
+        FileConnector fileConnector = muleContext.getRegistry().lookupObject("fileConnector");
         assertThat(fileConnector.getFileAge(), is(parseLong(CONNECTOR_FILE_AGE)));
     }
 
