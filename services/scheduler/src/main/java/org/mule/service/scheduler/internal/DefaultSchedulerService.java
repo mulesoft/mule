@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.scheduler.ThreadType;
 import org.mule.service.scheduler.internal.config.ThreadPoolsConfig;
@@ -82,6 +83,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private ScheduledThreadPoolExecutor scheduledExecutor;
   private org.quartz.Scheduler quartzScheduler;
 
+  private volatile boolean started = false;
+
   @Override
   public String getName() {
     return "SchedulerService";
@@ -89,24 +92,64 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
+    checkStarted();
     return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
                                 scheduledExecutor, quartzScheduler, CPU_LIGHT);
   }
 
   @Override
   public Scheduler ioScheduler() {
+    checkStarted();
     return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
                                 scheduledExecutor, quartzScheduler, IO);
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
+    checkStarted();
     return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
                                 scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
   }
 
   @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config) {
+    checkStarted();
+    if (config.getMaxConcurrentTasks() != null) {
+      return new ThrottledScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
+                                    scheduledExecutor, quartzScheduler, CPU_LIGHT, config.getMaxConcurrentTasks());
+    } else {
+      return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
+                                  scheduledExecutor, quartzScheduler, CPU_LIGHT);
+    }
+  }
+
+  @Override
+  public Scheduler ioScheduler(SchedulerConfig config) {
+    checkStarted();
+    if (config.getMaxConcurrentTasks() != null) {
+      return new ThrottledScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
+                                    scheduledExecutor, quartzScheduler, IO, config.getMaxConcurrentTasks());
+    } else {
+      return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
+                                  scheduledExecutor, quartzScheduler, IO);
+    }
+  }
+
+  @Override
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
+    checkStarted();
+    if (config.getMaxConcurrentTasks() != null) {
+      return new ThrottledScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
+                                    scheduledExecutor, quartzScheduler, CPU_INTENSIVE, config.getMaxConcurrentTasks());
+    } else {
+      return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
+                                  scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
+    }
+  }
+
+  @Override
   public Scheduler customScheduler(String name, int corePoolSize) {
+    checkStarted();
     final ExecutorService executor =
         new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new SynchronousQueue<Runnable>(),
                                new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
@@ -117,6 +160,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+    checkStarted();
     final ExecutorService executor =
         new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new LinkedBlockingQueue<Runnable>(queueSize),
                                new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
@@ -124,6 +168,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
                                                                  scheduledExecutor, quartzScheduler, CUSTOM);
     customSchedulersExecutors.add(customScheduler);
     return customScheduler;
+  }
+
+  private void checkStarted() {
+    if (!started) {
+      throw new IllegalStateException("Service " + getName() + " is not started.");
+    }
   }
 
   private class CustomScheduler extends DefaultScheduler {
@@ -205,10 +255,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     scheduledExecutor.prestartAllCoreThreads();
 
     logger.info("Started " + this.toString());
+    started = true;
   }
 
   @Override
   public void stop() throws MuleException {
+    started = false;
     logger.info("Stopping " + this.toString() + "...");
 
     cpuLightExecutor.shutdown();

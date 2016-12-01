@@ -7,6 +7,7 @@
 package org.mule.service.scheduler;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 public class MockSchedulerService implements SchedulerService {
@@ -28,6 +29,21 @@ public class MockSchedulerService implements SchedulerService {
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config) {
+    return new MockScheduler();
+  }
+
+  @Override
+  public Scheduler ioScheduler(SchedulerConfig config) {
+    return new MockScheduler();
+  }
+
+  @Override
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     return new MockScheduler();
   }
   

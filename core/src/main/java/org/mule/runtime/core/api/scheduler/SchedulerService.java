@@ -30,8 +30,8 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 public interface SchedulerService extends Service {
 
   /**
-   * Builds a fresh {@link Scheduler} for light CPU tasks. The returned {@link Scheduler} is backed by the Mule runtime cpu-light
-   * executor, which is shared by all {@link Scheduler}s returned by this method.
+   * Builds a fresh {@link Scheduler} with a default configuration for light CPU tasks. The returned {@link Scheduler} is backed
+   * by the Mule runtime cpu-light executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
    * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
    * 
@@ -40,8 +40,8 @@ public interface SchedulerService extends Service {
   Scheduler cpuLightScheduler();
 
   /**
-   * Builds a fresh {@link Scheduler} for blocking I/O tasks. The returned {@link Scheduler} is backed by the Mule runtime
-   * blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
+   * Builds a fresh {@link Scheduler} with a default configuration for blocking I/O tasks. The returned {@link Scheduler} is
+   * backed by the Mule runtime blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
    * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
    * 
@@ -50,8 +50,9 @@ public interface SchedulerService extends Service {
   Scheduler ioScheduler();
 
   /**
-   * Builds a fresh {@link Scheduler} for heavy computation or CPU intensive tasks. The returned {@link Scheduler} is backed by
-   * the Mule runtime computation executor, which is shared by all {@link Scheduler}s returned by this method.
+   * Builds a fresh {@link Scheduler} with a default configuration for heavy computation or CPU intensive tasks. The returned
+   * {@link Scheduler} is backed by the Mule runtime computation executor, which is shared by all {@link Scheduler}s returned by
+   * this method.
    * <p>
    * A task is considered a {@code CPU intensive} if its duration is more than 10 milliseconds and less than 20% of its clock time
    * is due to blocking.
@@ -59,6 +60,43 @@ public interface SchedulerService extends Service {
    * @return a scheduler that runs {@code CPU intensive} tasks.
    */
   Scheduler cpuIntensiveScheduler();
+
+  /**
+   * Builds a fresh {@link Scheduler} for light CPU tasks. The returned {@link Scheduler} is backed by the Mule runtime cpu-light
+   * executor, which is shared by all {@link Scheduler}s returned by this method.
+   * <p>
+   * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
+   * 
+   * @param config allows customization of the returned scheduler.
+   * 
+   * @return a scheduler that runs {@code cpu-light} tasks.
+   */
+  Scheduler cpuLightScheduler(SchedulerConfig config);
+
+  /**
+   * Builds a fresh {@link Scheduler} for blocking I/O tasks. The returned {@link Scheduler} is backed by the Mule runtime
+   * blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
+   * <p>
+   * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
+   * 
+   * @param config allows customization of the returned scheduler.
+   * 
+   * @return a scheduler that runs {@code blocking I/O} tasks.
+   */
+  Scheduler ioScheduler(SchedulerConfig config);
+
+  /**
+   * Builds a fresh {@link Scheduler} for heavy computation or CPU intensive tasks. The returned {@link Scheduler} is backed by
+   * the Mule runtime computation executor, which is shared by all {@link Scheduler}s returned by this method.
+   * <p>
+   * A task is considered a {@code CPU intensive} if its duration is more than 10 milliseconds and less than 20% of its clock time
+   * is due to blocking.
+   * 
+   * @param config allows customization of the returned scheduler.
+   * 
+   * @return a scheduler that runs {@code CPU intensive} tasks.
+   */
+  Scheduler cpuIntensiveScheduler(SchedulerConfig config);
 
   /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
