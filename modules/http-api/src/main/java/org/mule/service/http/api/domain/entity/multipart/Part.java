@@ -18,10 +18,10 @@ import java.util.Collection;
 public interface Part {
 
   /**
-   * Gets the content of this part as an <tt>InputStream</tt>
+   * Gets the content of this part as an {@link InputStream}
    *
-   * @return The content of this part as an <tt>InputStream</tt>
-   * @throws IOException If an error occurs in retrieving the content as an <tt>InputStream</tt>
+   * @return The content of this part as an {@link InputStream}
+   * @throws IOException If an error occurs in retrieving the content as an {@link InputStream}
    */
   InputStream getInputStream() throws IOException;
 
@@ -35,21 +35,21 @@ public interface Part {
   /**
    * Gets the name of this part
    *
-   * @return The name of this part as a <tt>String</tt>
+   * @return The name of this part as a {@link String}
    */
   String getName();
 
   /**
    * Returns the size of this file.
    *
-   * @return a <code>long</code> specifying the size of this part, in bytes.
+   * @return a {@code long} specifying the size of this part, in bytes.
    */
   long getSize();
 
   /**
    *
-   * Returns the value of the specified mime header as a <code>String</code>. If the Part did not include a header of the
-   * specified name, this method returns <code>null</code>. If there are multiple headers with the same name, this method returns
+   * Returns the value of the specified mime header as a {@code String}. If the Part did not include a header of the
+   * specified name, this method returns {@code null}. If there are multiple headers with the same name, this method returns
    * the first header in the part. The header name is case insensitive. You can use this method with any request header.
    *
    * @param name a {@code String} specifying the header name
@@ -61,12 +61,12 @@ public interface Part {
   /**
    * Gets the values of the Part header with the given name.
    * <p>
-   * Any changes to the returned <code>Collection</code> must not affect this <code>Part</code>.
+   * Any changes to the returned {@code Collection} must not affect this {@code Part}.
    * <p>
    * Part header names are case insensitive.
    *
    * @param name the header name whose values to return
-   * @return a (possibly empty) <code>Collection</code> of the values of the header with the given name
+   * @return a (possibly empty) {@code Collection} of the values of the header with the given name
    */
   Collection<String> getHeaders(String name);
 
@@ -74,11 +74,11 @@ public interface Part {
    * Gets the header names of this Part.
    * <p>
    * Some servlet containers do not allow servlets to access headers using this method, in which case this method returns
-   * <code>null</code>
+   * {@code null}
    * <p>
-   * Any changes to the returned <code>Collection</code> must not affect this <code>Part</code>.
+   * Any changes to the returned {@code Collection} must not affect this {@code Part}.
    *
-   * @return a (possibly empty) <code>Collection</code> of the header names of this Part
+   * @return a (possibly empty) {@code Collection} of the header names of this Part
    */
   Collection<String> getHeaderNames();
 

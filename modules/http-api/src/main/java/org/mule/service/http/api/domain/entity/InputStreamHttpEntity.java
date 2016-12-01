@@ -9,7 +9,7 @@ package org.mule.service.http.api.domain.entity;
 import java.io.InputStream;
 
 /**
- * Representation of an stream HTTP body.
+ * Representation of a stream HTTP body.
  *
  * @since 4.0
  */

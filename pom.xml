@@ -99,11 +99,11 @@
         <module>buildtools</module>
         <module>core</module>
         <module>core-tests</module>
+        <module>services</module>
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
         <module>transports</module>
-        <module>services</module>
     </modules>
 
     <properties>

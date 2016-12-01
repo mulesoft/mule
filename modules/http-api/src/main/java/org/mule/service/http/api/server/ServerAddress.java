@@ -14,7 +14,7 @@ package org.mule.service.http.api.server;
 public interface ServerAddress {
 
   /**
-   * @return the port this server is bind to.
+   * @return the port this server is bound to.
    */
   int getPort();
 
