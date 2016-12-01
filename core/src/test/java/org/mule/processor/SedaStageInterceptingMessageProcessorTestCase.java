@@ -204,13 +204,14 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
 
         queueProfile.setMaxOutstandingMessages(1);
 
+        final Latch latch = new Latch();
         MessageProcessor mockListener = mock(MessageProcessor.class);
         when(mockListener.process((MuleEvent)any())).thenAnswer(new Answer<MuleEvent>()
         {
             public MuleEvent answer(InvocationOnMock invocation) throws Throwable
             {
-                // Use 220 as it's over the default 200ms.
-                Thread.sleep(220);
+                // Await on latch so that only thread available is busy and otehr events have be be queued.
+                latch.await();
                 return (MuleEvent)invocation.getArguments()[0];
             }
         });
@@ -228,15 +229,23 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         when(flow.getProcessingStrategy()).thenReturn(new AsynchronousProcessingStrategy());
         final MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
 
-        for (int i = 0; i < 3; i++)
+        int NUMBER_OF_EVENTS = 3;
+
+        for (int i = 0; i < NUMBER_OF_EVENTS; i++)
         {
             sedaStageInterceptingMessageProcessor.process(event);
         }
 
+        // Release latch only after 400ms which is double the default queue timeout.  If the new custom queueTimeout wasn't being
+        // used then event 3 would be rejected, as there is no room for it in the queue while event 1 processing is waiting on
+        // the latch.
+        Thread.sleep(400);
+        latch.countDown();
+
         ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
 
         // Three events are processed
-        verify(mockListener, timeout(RECEIVE_TIMEOUT).times(3)).process(argThat(notSameEvent));
+        verify(mockListener, timeout(RECEIVE_TIMEOUT).times(NUMBER_OF_EVENTS)).process(argThat(notSameEvent));
     }
 
     @Test
