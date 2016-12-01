@@ -95,9 +95,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).flatMap(event -> Mono.just(event)
-        .map(event1 -> Event.builder(event.getContext()).message(event.getMessage())
-            .session(new DefaultMuleSession(event.getSession())).build())
-        .transform(enrichmentProcessor).map(checkedFunction(response -> enrich(response, event)))
+        .map(event1 -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
+        .transform(enrichmentProcessor)
+        .map(checkedFunction(response -> enrich(response, event)))
         .otherwise(EventDroppedException.class, mde -> Mono.just(event)));
   }
 
