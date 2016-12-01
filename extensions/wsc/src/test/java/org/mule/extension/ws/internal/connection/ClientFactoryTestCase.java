@@ -8,11 +8,11 @@ package org.mule.extension.ws.internal.connection;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.apache.cxf.message.Message.MTOM_ENABLED;
 import static org.apache.ws.security.handler.WSHandlerConstants.ACTION;
 import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;
-import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE_USER;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -23,9 +23,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.ws.api.SoapVersion.SOAP11;
 import static org.mule.extension.ws.api.SoapVersion.SOAP12;
+import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
+import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
 import org.mule.extension.ws.WscUnitTestCase;
-import org.mule.extension.ws.api.security.SecurityStrategy;
-import org.mule.extension.ws.api.security.WssDecryptSecurityStrategy;
 import org.mule.extension.ws.api.security.WssSignSecurityStrategy;
 import org.mule.extension.ws.api.security.WssVerifySignatureSecurityStrategy;
 import org.mule.extension.ws.internal.interceptor.NamespaceRestorerStaxInterceptor;
@@ -34,13 +34,12 @@ import org.mule.extension.ws.internal.interceptor.OutputMtomSoapAttachmentsInter
 import org.mule.extension.ws.internal.interceptor.OutputSoapHeadersInterceptor;
 import org.mule.extension.ws.internal.interceptor.SoapActionInterceptor;
 import org.mule.extension.ws.internal.interceptor.StreamClosingInterceptor;
+import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
-import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.endpoint.Client;
@@ -49,13 +48,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Step;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Web Service Consumer")
 @Stories("Client Factory")
+@RunWith(MockitoJUnitRunner.class)
 public class ClientFactoryTestCase extends WscUnitTestCase {
 
   private static final String NAMESPACE_RESTORER = NamespaceRestorerStaxInterceptor.class.getSimpleName();
@@ -70,6 +71,8 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   private static final String WSS_OUT = WSS4JOutInterceptor.class.getSimpleName();
 
   private static final ClientFactory factory = ClientFactory.getInstance();
+
+
 
   @Test
   @Description("Checks the creation of a basic client without security")
@@ -99,15 +102,20 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks the creation of a secured client")
   public void securedClient() throws ConnectionException {
-    SecurityStrategy sign = new WssSignSecurityStrategy();
-    SecurityStrategy decrypt = new WssDecryptSecurityStrategy();
-    SecurityStrategy verify = new WssVerifySignatureSecurityStrategy();
-    TlsContextFactory tlsContext = getTestTlsContext();
-    sign.initializeTlsContextFactory(tlsContext);
-    decrypt.initializeTlsContextFactory(tlsContext);
-    verify.initializeTlsContextFactory(tlsContext);
 
-    Client client = factory.create(service.get11Address(), null, SOAP11, asList(sign, decrypt, verify), false);
+    WssVerifySignatureSecurityStrategy verify = mock(WssVerifySignatureSecurityStrategy.class);
+    WssSignSecurityStrategy sign = mock(WssSignSecurityStrategy.class);
+    when(sign.buildSecurityProperties()).thenReturn(emptyMap());
+    when(verify.buildSecurityProperties()).thenReturn(emptyMap());
+    when(sign.securityAction()).thenReturn(WssSignSecurityStrategy.class.getName());
+    when(verify.securityAction()).thenReturn(WssVerifySignatureSecurityStrategy.class.getName());
+    when(sign.securityType()).thenReturn(OUTGOING);
+    when(verify.securityType()).thenReturn(INCOMING);
+    when(sign.buildPasswordCallbackHandler()).thenReturn(Optional.of(new WSPasswordCallbackHandler(1, ws -> {
+    })));
+    when(verify.buildPasswordCallbackHandler()).thenReturn(Optional.empty());
+
+    Client client = factory.create(service.get11Address(), null, SOAP11, asList(sign, verify), false);
 
     assertThat(inInterceptorNames(client),
                hasItems(NAMESPACE_RESTORER, NAMESPACE_SAVER, STREAM_CLOSING, CHECK_FAULT, OUT_SOAP_HEADERS, SOAP_ACTION, WSS_IN));
@@ -116,13 +124,11 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
 
     WSS4JInInterceptor wssIn = (WSS4JInInterceptor) getInterceptorByName(client.getInInterceptors(), WSS_IN);
     Map<String, Object> inProps = wssIn.getProperties();
-    assertThat(inProps.get(ACTION), is(decrypt.securityAction() + " " + verify.securityAction()));
-    assertThat(inProps.get(PW_CALLBACK_REF), notNullValue());
+    assertThat(inProps.get(ACTION), is(verify.securityAction()));
 
     WSS4JOutInterceptor wssOut = (WSS4JOutInterceptor) getInterceptorByName(client.getOutInterceptors(), WSS_OUT);
     Map<String, Object> outProps = wssOut.getProperties();
     assertThat(outProps.get(ACTION), is(sign.securityAction()));
-    assertThat(outProps.get(SIGNATURE_USER), is("alias"));
     assertThat(outProps.get(PW_CALLBACK_REF), notNullValue());
   }
 
@@ -136,30 +142,5 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
 
   private Interceptor getInterceptorByName(List<Interceptor<? extends Message>> interceptors, String name) {
     return interceptors.stream().filter(i -> i.getClass().getSimpleName().contains(name)).findAny().get();
-  }
-
-  @Step("Creates a Tls Context test instance")
-  private TlsContextFactory getTestTlsContext() {
-    TlsContextFactory tls = mock(TlsContextFactory.class);
-    TlsContextTrustStoreConfiguration tsc = mock(TlsContextTrustStoreConfiguration.class);
-    when(tsc.isInsecure()).thenReturn(false);
-    when(tsc.getPassword()).thenReturn("trustPass");
-    when(tsc.getType()).thenReturn("type");
-    when(tsc.getAlgorithm()).thenReturn("algorithm");
-    when(tsc.getPath()).thenReturn("some/path");
-
-    TlsContextKeyStoreConfiguration ksc = mock(TlsContextKeyStoreConfiguration.class);
-    when(ksc.getAlias()).thenReturn("alias");
-    when(ksc.getType()).thenReturn("type");
-    when(ksc.getAlgorithm()).thenReturn("algorithm");
-    when(ksc.getPassword()).thenReturn("pass");
-    when(ksc.getPath()).thenReturn("some/path");
-    when(ksc.getKeyPassword()).thenReturn("keyPass");
-
-    when(tls.getKeyStoreConfiguration()).thenReturn(ksc);
-    when(tls.getTrustStoreConfiguration()).thenReturn(tsc);
-    when(tls.getEnabledProtocols()).thenReturn(new String[] {"TLS1.1"});
-    when(tls.getEnabledCipherSuites()).thenReturn(new String[] {"SOMETHING"});
-    return tls;
   }
 }

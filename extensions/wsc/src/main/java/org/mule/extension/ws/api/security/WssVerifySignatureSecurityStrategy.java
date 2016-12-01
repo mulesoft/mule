@@ -7,7 +7,6 @@
 package org.mule.extension.ws.api.security;
 
 
-import static java.util.Optional.empty;
 import static org.apache.ws.security.components.crypto.Merlin.LOAD_CA_CERTS;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
@@ -16,12 +15,12 @@ import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOM
 import org.mule.extension.ws.api.security.config.WssTrustStoreConfiguration;
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.ws.security.components.crypto.Merlin;
@@ -40,6 +39,7 @@ public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
    * The truststore to use to verify the signature.
    */
   @Parameter
+  @Optional
   private WssTrustStoreConfiguration trustStoreConfiguration;
 
   @Override
@@ -48,8 +48,8 @@ public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
   }
 
   @Override
-  public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return empty();
+  public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
+    return java.util.Optional.empty();
   }
 
   @Override
