@@ -6,12 +6,11 @@
  */
 package org.mule.module.http.functional.listener;
 
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
 import org.mule.api.MuleEventContext;
 import org.mule.tck.functional.EventCallback;
@@ -21,14 +20,12 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -37,7 +34,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCase
 {
@@ -53,8 +49,6 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
     public DynamicPort listenPort3 = new DynamicPort("port3");
     @Rule
     public SystemProperty maxThreadsActive = new SystemProperty("max.threads.active", String.valueOf(CUSTOM_MAX_THREADS_ACTIVE));
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private CountDownLatch maxActiveNumberOfRequestExecutedLatch;
     private Latch waitingLatch = new Latch();
@@ -98,13 +92,12 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
         maxActiveNumberOfRequestExecutedLatch = new CountDownLatch(maxThreadsActive);
 
         sendRequestUntilNoMoreWorkers(flowName, url, maxThreadsActive);
-        // Due to differences in buffer sizes, the exception that is caused client side may be one of two different
-        // exceptions.
-        expectedException.expect(anyOf(instanceOf(NoHttpResponseException.class), instanceOf(SocketException
-                                                                                                     .class)));
+
         try
         {
-            httpClientExecutor.execute(Request.Get(url));
+            Response response = httpClientExecutor.execute(Request.Get(url));
+            int statusCode = response.returnResponse().getStatusLine().getStatusCode();
+            assertThat(statusCode, is(SERVICE_UNAVAILABLE.getStatusCode()));
         }
         finally
         {

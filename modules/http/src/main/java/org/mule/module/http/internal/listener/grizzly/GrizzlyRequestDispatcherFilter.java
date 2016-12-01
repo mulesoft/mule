@@ -8,10 +8,12 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
+import static org.glassfish.grizzly.http.util.HttpStatus.SERVICE_UNAVAILABLE_503;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_REJECTED_ATTRIBUTE;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -29,6 +31,7 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
+import org.glassfish.grizzly.http.HttpServerFilter;
 
 /**
  * Grizzly filter that dispatches the request to the right request handler
@@ -51,6 +54,21 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();
         final HttpRequestPacket request = (HttpRequestPacket) httpContent.getHttpHeader();
+
+        // handle the case when the worker pool is busy
+        if (ctx.getConnection().getAttributes().getAttribute(EXECUTOR_REJECTED_ATTRIBUTE) != null)
+        {
+            final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(request);
+            responsePacketBuilder.status(SERVICE_UNAVAILABLE_503.getStatusCode());
+            HttpResponsePacket packet = responsePacketBuilder.build();
+
+            // this is necessary to avoid chunk-encoding
+            packet.setContentLength(0);
+
+            ctx.write(packet);
+            ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
+            return ctx.getStopAction();
+        }
 
         // Handle Expect Continue
         if (request.requiresAcknowledgement())
