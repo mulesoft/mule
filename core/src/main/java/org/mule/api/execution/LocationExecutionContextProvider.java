@@ -6,15 +6,19 @@
  */
 package org.mule.api.execution;
 
+import static java.lang.String.format;
+import static java.util.regex.Pattern.compile;
 import org.mule.api.AnnotatedObject;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
 /**
  * Provides a standard way to generate a log entry or message that references an element in a flow.
- * 
+ *
  * @since 3.8.0
  */
 public abstract class LocationExecutionContextProvider implements ExceptionContextProvider
@@ -23,15 +27,21 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     private static final QName NAME_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
     private static final QName SOURCE_FILE_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName");
     private static final QName SOURCE_FILE_LINE_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
-    private static final QName SOURCE_ELEMENT_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceElement");
+    static final QName SOURCE_ELEMENT_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceElement");
+
+    private static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
+    private static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
+    private static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"]*)\"");
+    private static final String PASSWORD_MASK = "<<credentials>>";
+    public static final String PASSWORD_ATTRIBUTE_MASK = "password=\"%s\"";
 
     /**
-     * Populates the passed beanAnnotations with the other passed parameters.
-     * 
+     * Populates the passed beanAnnotations with the oSOURCE_ELEMENT_ANNOTATION_KEY passed parameters.
+     *
      * @param beanAnnotations the map with annotations to populate
-     * @param fileName the name of the file where the element definition was read from.
-     * @param lineNumber the line number where the definition of the element starts in the file.
-     * @param xmlContent the xml representation of the element definition.
+     * @param fileName        the name of the file where the element definition was read from.
+     * @param lineNumber      the line number where the definition of the element starts in the file.
+     * @param xmlContent      the xml representation of the element definition.
      */
     public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String fileName, int lineNumber, String xmlContent)
     {
@@ -42,7 +52,7 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
 
     /**
      * Generates a representation of a flow element to be logged in a standard way.
-     * 
+     *
      * @param appId
      * @param processorPath
      * @param element
@@ -53,17 +63,17 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
         String docName = getDocName(element);
         if (docName != null)
         {
-            return String.format("%s @ %s:%s:%d (%s)", processorPath, appId, getSourceFile((AnnotatedObject) element), getSourceFileLine((AnnotatedObject) element), docName);
+            return format("%s @ %s:%s:%d (%s)", processorPath, appId, getSourceFile((AnnotatedObject) element), getSourceFileLine((AnnotatedObject) element), docName);
         }
         else
         {
             if (element instanceof AnnotatedObject)
             {
-                return String.format("%s @ %s:%s:%d", processorPath, appId, getSourceFile((AnnotatedObject) element), getSourceFileLine((AnnotatedObject) element));
+                return format("%s @ %s:%s:%d", processorPath, appId, getSourceFile((AnnotatedObject) element), getSourceFileLine((AnnotatedObject) element));
             }
             else
             {
-                return String.format("%s @ %s", processorPath, appId);
+                return format("%s @ %s", processorPath, appId);
             }
         }
     }
@@ -98,7 +108,37 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     protected static String getSourceXML(AnnotatedObject element)
     {
         Object sourceXml = element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY);
-        return sourceXml != null ? sourceXml.toString() : null;
+        return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
+    }
+
+    protected static String maskPasswords(String xml)
+    {
+        xml = maskUrlPassword(xml, URL_PATTERN);
+        xml = maskUrlPassword(xml, ADDRESS_PATTERN);
+
+        Matcher matcher = PASSWORD_PATTERN.matcher(xml);
+        if (matcher.find() && matcher.groupCount() > 0)
+        {
+            xml = xml.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
+        }
+        xml = maskUrlPassword(xml, PASSWORD_PATTERN);
+
+        return xml;
+    }
+
+    private static String maskUrlPassword(String xml, Pattern pattern)
+    {
+        Matcher matcher = pattern.matcher(xml);
+        if (matcher.find() && matcher.groupCount() > 0)
+        {
+            xml = xml.replaceAll(matcher.group(1), PASSWORD_MASK);
+        }
+        return xml;
+    }
+
+    private static String maskPasswordAttribute(String password)
+    {
+        return format(PASSWORD_ATTRIBUTE_MASK, password);
     }
 
 }
