@@ -19,18 +19,19 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
-import org.mule.runtime.core.policy.SourcePolicyResult;
+import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.resource.spi.work.Work;
@@ -79,48 +80,60 @@ public class ModuleFlowProcessingPhase
               Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
                   .message((InternalMessage) template.getMessage()).build();
 
-          Event flowExecutionResponse = null;
-          SourcePolicyResult sourcePolicyResult = null;
+          final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
+          Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler);
+          SourcePolicy policy =
+              policyManager.createSourcePolicyInstance(sourceIdentifier, templateEvent, nextOperation, template);
+
           try {
-            final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
-            Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler);
-            SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceIdentifier, templateEvent, nextOperation, template);
+            Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> sourcePolicyResult = policy.process(templateEvent);
 
-            sourcePolicyResult = policy.process(templateEvent);
-            flowExecutionResponse = sourcePolicyResult.getExecutionResult();
+            Consumer<MessagingException> onExceptionFunction = messagingException -> {
+              messagingException
+                  .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
+                                                      messageProcessContext.getErrorTypeLocator()));
+              fireNotification(messageSource, messagingException.getEvent(), messageProcessContext.getFlowConstruct(),
+                               MESSAGE_ERROR_RESPONSE);
+              try {
+                template.sendFailureResponseToClient(messagingException,
+                                                     sourcePolicyResult.getRight()
+                                                         .createErrorResponseParameters(messagingException.getEvent()),
+                                                     createSendFailureResponseCompletationCallback(phaseResultNotifier));
+              } catch (MuleException e) {
+                throw new MuleRuntimeException(e);
+              }
+            };
 
-            fireNotification(messageSource, flowExecutionResponse, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
-            ResponseCompletionCallback responseCompletationCallback =
-                createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
+            Consumer<SuccessSourcePolicyResult> onSuccessFunction = successSourcePolicyResult -> {
+              Event flowExecutionResponse = successSourcePolicyResult.getFlowExecutionResult();
+              fireNotification(messageSource, flowExecutionResponse, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
+              ResponseCompletionCallback responseCompletationCallback =
+                  createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
 
-            // This is the case of a filtered flow. This will eventually go away.
-            if (flowExecutionResponse == null) {
-              flowExecutionResponse =
-                  Event.builder(templateEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();
-            }
+              // This is the case of a filtered flow. This will eventually go away.
+              if (flowExecutionResponse == null) {
+                flowExecutionResponse =
+                    Event.builder(templateEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();
+              }
 
-            Map<String, Object> responseParameters = sourcePolicyResult.getResponseParameters();
+              Map<String, Object> responseParameters = sourcePolicyResult.getRight().getResponseParameters();
 
-            SourcePolicyResult finalSourcePolicyResult = sourcePolicyResult;
-            Function<Event, Map<String, Object>> errorResponseParametersFunction = failureEvent -> finalSourcePolicyResult.getErrorResponseParameters(failureEvent);
+              Function<Event, Map<String, Object>> errorResponseParametersFunction =
+                  failureEvent -> sourcePolicyResult.getRight().createErrorResponseParameters(failureEvent);
 
-            template.sendResponseToClient(flowExecutionResponse, responseParameters, errorResponseParametersFunction,
-                                          responseCompletationCallback);
+              try {
+                template.sendResponseToClient(flowExecutionResponse, responseParameters, errorResponseParametersFunction,
+                                              responseCompletationCallback);
+              } catch (MessagingException e) {
+                onExceptionFunction.accept(e);
+              } catch (MuleException e) {
+                onExceptionFunction.accept(new MessagingException(flowExecutionResponse, e));
+              }
+            };
 
-          } catch (final Exception e) {
-            MessagingException me;
-            if (e instanceof MessagingException) {
-              me = (MessagingException) e;
-            } else if (flowExecutionResponse != null) {
-              me = new MessagingException(flowExecutionResponse, e);
-            } else {
-              throw e;
-            }
-            me.setProcessedEvent(createErrorEvent(me.getEvent(), messageSource, me, messageProcessContext.getErrorTypeLocator()));
-
-            fireNotification(messageSource, me.getEvent(), messageProcessContext.getFlowConstruct(), MESSAGE_ERROR_RESPONSE);
-
-            template.sendFailureResponseToClient(me, sourcePolicyResult.getErrorResponseParameters(me.getEvent()), createSendFailureResponseCompletationCallback(phaseResultNotifier));
+            sourcePolicyResult
+                .apply(failureSourcePolicyResult -> onExceptionFunction.accept(failureSourcePolicyResult.getMessagingException()),
+                       onSuccessFunction);
           } finally {
             policyManager.disposePoliciesResources(templateEvent.getContext().getId());
           }

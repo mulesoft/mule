@@ -7,6 +7,8 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.functional.Either;
 
 import java.util.Map;
 
@@ -21,10 +23,7 @@ import java.util.Map;
 public interface SourcePolicyResult
 {
 
-    /**
-     * @return result of the execution of the flow.
-     */
-    Event getExecutionResult();
+    Either<MessagingException, Event> getResult();
 
     /**
      * @return the response parameters to be sent by the source.

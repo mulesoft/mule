@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.functional.Either.right;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
@@ -15,6 +16,8 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Collection;
@@ -42,19 +45,37 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   private Collection<SourcePolicyPointcutParametersFactory> sourcePointcutFactories = emptyList();
   private Collection<OperationPolicyPointcutParametersFactory> operationPointcutFactories = emptyList();
   private PolicyProvider policyProvider;
-  private OperationPolicyFactory operationPolicyFactory;
-  private SourcePolicyFactory sourcePolicyFactory;
+  private OperationPolicyProcessorFactory operationPolicyProcessorFactory;
+  private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
 
   @Override
-  public SourcePolicy createSourcePolicyInstance(ComponentIdentifier sourceIdentifier, Event sourceEvent, Processor flowExecutionProcessor, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+  public SourcePolicy createSourcePolicyInstance(ComponentIdentifier sourceIdentifier, Event sourceEvent,
+                                                 Processor flowExecutionProcessor,
+                                                 MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(sourceIdentifier, sourceEvent);
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
-      return event -> new DefaultSourcePolicyResult(flowExecutionProcessor.process(sourceEvent), messageSourceResponseParametersProcessor);
+      return event -> {
+        try {
+          Event flowExecutionResult = flowExecutionProcessor.process(sourceEvent);
+          return right(new SuccessSourcePolicyResult(flowExecutionResult,
+                                                     messageSourceResponseParametersProcessor
+                                                         .getSuccessfulExecutionResponseParametersFunction()
+                                                         .apply(flowExecutionResult),
+                                                     messageSourceResponseParametersProcessor));
+        } catch (Exception e) {
+          MessagingException messagingException =
+              e instanceof MessagingException ? (MessagingException) e : new MessagingException(event, e, flowExecutionProcessor);
+          return Either.left(new FailureSourcePolicyResult(messagingException, messageSourceResponseParametersProcessor
+              .getFailedExecutionResponseParametersFunction()
+              .apply(messagingException.getEvent()), messageSourceResponseParametersProcessor));
+        }
+      };
     }
     return new CompositeSourcePolicy(parameterizedPolicies,
                                      lookupSourceParametersTransformer(sourceIdentifier),
-                                     sourcePolicyFactory, flowExecutionProcessor, messageSourceResponseParametersProcessor);
+                                     sourcePolicyProcessorFactory, flowExecutionProcessor,
+                                     messageSourceResponseParametersProcessor);
   }
 
   @Override
@@ -69,7 +90,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       return (operationEvent) -> operationExecutionFunction.execute(operationParameters, operationEvent);
     }
     return new CompositeOperationPolicy(parameterizedPolicies, lookupOperationParametersTransformer(operationIdentifier),
-                                           operationPolicyFactory, () -> operationParameters, operationExecutionFunction);
+                                        operationPolicyProcessorFactory, () -> operationParameters, operationExecutionFunction);
   }
 
   @Override
@@ -90,8 +111,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   @Override
   public void initialise() throws InitialisationException {
     try {
-      operationPolicyFactory = new DefaultOperationPolicyFactory(policyStateHandler);
-      sourcePolicyFactory = new DefaultSourcePolicyFactory(policyStateHandler);
+      operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory(policyStateHandler);
+      sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler);
       policyProvider = muleContext.getRegistry().lookupObject(PolicyProvider.class);
       if (policyProvider == null) {
         policyProvider = new NullPolicyProvider();

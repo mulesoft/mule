@@ -8,6 +8,7 @@ package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.functional.Either;
 
 /**
  * Interceptor of a {@link Processor} that executes logic before and after it. It allows to modify the content of the response (if
@@ -27,6 +28,6 @@ public interface SourcePolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  SourcePolicyResult process(Event sourceEvent) throws Exception;
+  Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> process(Event sourceEvent) throws Exception;
 
 }

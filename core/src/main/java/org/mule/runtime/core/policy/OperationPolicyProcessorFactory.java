@@ -16,22 +16,22 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public interface OperationPolicyFactory {
+public interface OperationPolicyProcessorFactory {
 
   /**
-   * Creates an {@link OperationPolicy}.
+   * Creates a {@link Processor} to execute the {@code policy}.
    *
    * @param policy the policy from which the {@link OperationPolicy} gets created.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
    * @param nextProcessor the next-operation processor implementation
-   * @param operationParametersProcessor a processor that converts an event to the set of parameters to be sent by the
-   *        operation based on the user configuration.
-
+   * @param operationParametersProcessor a processor that converts an event to the set of parameters to be sent by the operation
+   *        based on the user configuration.
+   * 
    * @return an {@link OperationPolicy} that performs the common logic related to policies.
    */
-  OperationPolicy createOperationPolicy(Policy policy,
-                                        Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                        Processor nextProcessor,
-                                        OperationParametersProcessor operationParametersProcessor);
+  Processor createOperationPolicy(Policy policy,
+                                  Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
+                                  Processor nextProcessor,
+                                  OperationParametersProcessor operationParametersProcessor);
 
 }

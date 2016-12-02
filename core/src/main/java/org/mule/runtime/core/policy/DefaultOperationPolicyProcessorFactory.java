@@ -12,24 +12,25 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.Optional;
 
 /**
- * Default implementation for {@link OperationPolicyFactory}.
+ * Default implementation for {@link OperationPolicyProcessorFactory}.
  *
  * @since 4.0
  */
-public class DefaultOperationPolicyFactory implements OperationPolicyFactory {
+public class DefaultOperationPolicyProcessorFactory implements OperationPolicyProcessorFactory
+{
 
   private final PolicyStateHandler policyStateHandler;
 
-  public DefaultOperationPolicyFactory(PolicyStateHandler policyStateHandler) {
+  public DefaultOperationPolicyProcessorFactory(PolicyStateHandler policyStateHandler) {
     this.policyStateHandler = policyStateHandler;
   }
 
   @Override
-  public OperationPolicy createOperationPolicy(Policy policy,
+  public Processor createOperationPolicy(Policy policy,
                                                Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                                Processor nextProcessor,
                                                OperationParametersProcessor operationParametersProcessor) {
-    return new DefaultOperationPolicy(policy, operationPolicyParametersTransformer, policyStateHandler, nextProcessor,
-                                      operationParametersProcessor);
+    return new OperationPolicyProcessor(policy, operationPolicyParametersTransformer, policyStateHandler, nextProcessor,
+                                        operationParametersProcessor);
   }
 }

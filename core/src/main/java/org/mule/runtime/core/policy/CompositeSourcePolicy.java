@@ -6,17 +6,20 @@
  */
 package org.mule.runtime.core.policy;
 
+import static org.mule.runtime.core.functional.Either.left;
+import static org.mule.runtime.core.functional.Either.right;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.functional.Either;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * {@link SourcePolicy} created from a list of {@link Policy}.
@@ -29,25 +32,53 @@ public class CompositeSourcePolicy extends
     AbstractCompositePolicy<SourcePolicyParametersTransformer, MessageSourceResponseParametersProcessor> implements SourcePolicy {
 
   private final Processor flowExecutionProcessor;
-  private SourcePolicyFactory sourcePolicyFactory;
+  private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private Event flowExecutionResponse;
+  private Map<String, Object> originalResponseParameters;
+  private Map<String, Object> originalFailureResponseParameters;
 
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                               SourcePolicyFactory sourcePolicyFactory, Processor flowExecutionProcessor,
+                               SourcePolicyProcessorFactory sourcePolicyProcessorFactory, Processor flowExecutionProcessor,
                                MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     super(parameterizedPolicies, sourcePolicyParametersTransformer, messageSourceResponseParametersProcessor);
-    this.sourcePolicyFactory = sourcePolicyFactory;
+    this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
     this.flowExecutionProcessor = flowExecutionProcessor;
   }
 
   /**
-   * Executes the flow and returns it's value since it's going to be used by the policy wrapping the flow.
+   * Executes the flow.
+   * 
+   * If there's a {@link SourcePolicyParametersTransformer} provided then it will use it to convert the source response or source
+   * failure response from the parameters back to a {@link Message} that can be route through the policy chain which later will be
+   * convert back to response or failure response parameters thus allowing the policy chain to modify the response.. That message
+   * will be the result of the next-operation of the policy.
+   * 
+   * If no {@link SourcePolicyParametersTransformer} is provided, then the same response from the flow is going to be route as
+   * response of the next-operation of the policy chain. In this case, the same response from the flow is going to be used to
+   * generate the response or failure response for the source so the policy chain is not going to be able to modify the response
+   * sent by the source.
    */
   @Override
   protected Event processNextOperation(Event event) throws MuleException {
-    flowExecutionResponse = flowExecutionProcessor.process(event);
-    return flowExecutionResponse;
+    try {
+      flowExecutionResponse = flowExecutionProcessor.process(event);
+      originalResponseParameters =
+          getParametersProcessor().getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
+      Message message = getParametersTransformer()
+          .map(parametersTransformer -> parametersTransformer.fromSuccessResponseParametersToMessage(originalResponseParameters))
+          .orElseGet(flowExecutionResponse::getMessage);
+      return Event.builder(event).message((InternalMessage) message).build();
+    } catch (MessagingException messagingException) {
+      originalFailureResponseParameters =
+          getParametersProcessor().getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
+      Message message = getParametersTransformer()
+          .map(parametersTransformer -> parametersTransformer
+              .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
+          .orElse(messagingException.getEvent().getMessage());
+      throw new MessagingException(Event.builder(event).message((InternalMessage) message).build(), messagingException.getCause(),
+                                   messagingException.getFailingMessageProcessor());
+    }
   }
 
   /**
@@ -60,35 +91,37 @@ public class CompositeSourcePolicy extends
                                 MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
                                 Event event)
       throws Exception {
-    SourcePolicy defaultSourcePolicy =
-        sourcePolicyFactory.createSourcePolicy(policy, sourcePolicyParametersTransformer, nextProcessor, messageSourceResponseParametersProcessor);
-    return defaultSourcePolicy.process(event).getExecutionResult();
+    Processor defaultSourcePolicy =
+        sourcePolicyProcessorFactory.createSourcePolicy(policy, sourcePolicyParametersTransformer, nextProcessor,
+                                                        messageSourceResponseParametersProcessor);
+    return defaultSourcePolicy.process(event);
   }
 
+  /**
+   * Process the set of policies.
+   * 
+   * When there's a {@link SourcePolicyParametersTransformer} then the final set of parameters to be sent by the response function
+   * and the error response function will be calculated based on the output of the policy chain. If there's no
+   * {@link SourcePolicyParametersTransformer} then those parameters will be exactly the one defined by the message source.
+   * 
+   * @param sourceEvent the event generated from the source.
+   * @return a {@link SuccessSourcePolicyResult} which contains the response parameters and the result event of the execution or a
+   *         {@link FailureSourcePolicyResult} which contains the failure response parameters and the {@link MessagingException}
+   *         thrown by the policy chain execution.
+   * @throws Exception if there was an unexpected failure thrown by executing the chain.
+   */
   @Override
-  public SourcePolicyResult process(Event sourceEvent) throws Exception {
-    Event event = processPolicies(sourceEvent);
-    return new SourcePolicyResult() {
-
-      @Override
-      public Event getExecutionResult() {
-        return event;
-      }
-
-      @Override
-      public Map<String, Object> getResponseParameters() {
-        return getParametersTransformer()
-            .map(parametersTransformer -> parametersTransformer.fromMessageToSuccessResponseParameters(event.getMessage()))
-            .orElseGet(() -> getParametersProcessor().getSuccessfulExecutionResponseParametersFunction().apply(event));
-      }
-
-      @Override
-      public Map<String, Object> getErrorResponseParameters(Event failureEvent) {
-        return getParametersTransformer()
-            .map(parametersTransformer -> parametersTransformer.fromMessageToErrorResponseParameters(event.getMessage()))
-            .orElseGet(() -> getParametersProcessor().getFailedExecutionResponseParametersFunction().apply(event));
-      }
-    };
+  public Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> process(Event sourceEvent) throws Exception {
+    try {
+      Event policiesResultEvent = processPolicies(sourceEvent);
+      Map<String, Object> responseParameters = getParametersTransformer().map(parametersTransformer -> parametersTransformer
+          .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())).orElse(originalResponseParameters);
+      return right(new SuccessSourcePolicyResult(policiesResultEvent, responseParameters, getParametersProcessor()));
+    } catch (MessagingException e) {
+      Map<String, Object> responseParameters = getParametersTransformer().map(parametersTransformer -> parametersTransformer
+          .fromMessageToSuccessResponseParameters(e.getEvent().getMessage())).orElse(originalFailureResponseParameters);
+      return left(new FailureSourcePolicyResult(e, responseParameters, getParametersProcessor()));
+    }
   }
 
 }

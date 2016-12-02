@@ -29,7 +29,7 @@ public class CompositeOperationPolicy extends
 
 
   private final Processor nextOperation;
-  private OperationPolicyFactory operationPolicyFactory;
+  private OperationPolicyProcessorFactory operationPolicyProcessorFactory;
   private Event nextOperationResponse;
 
   /**
@@ -37,12 +37,12 @@ public class CompositeOperationPolicy extends
    * 
    * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param operationPolicyFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
+   * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
    * @param operationExecutionFunction the function that executes the operation.
    */
   public CompositeOperationPolicy(List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                  OperationPolicyFactory operationPolicyFactory,
+                                  OperationPolicyProcessorFactory operationPolicyProcessorFactory,
                                   OperationParametersProcessor operationParametersProcessor,
                                   OperationExecutionFunction operationExecutionFunction) {
     super(parameterizedPolicies, operationPolicyParametersTransformer, operationParametersProcessor);
@@ -61,7 +61,7 @@ public class CompositeOperationPolicy extends
         throw new DefaultMuleException(e);
       }
     };
-    this.operationPolicyFactory = operationPolicyFactory;
+    this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
   }
 
   /**
@@ -84,8 +84,8 @@ public class CompositeOperationPolicy extends
                                 OperationParametersProcessor operationParametersProcessor,
                                 Event event)
       throws Exception {
-    OperationPolicy defaultOperationPolicy =
-        operationPolicyFactory.createOperationPolicy(policy, operationPolicyParametersTransformer, nextProcessor, operationParametersProcessor);
+    Processor defaultOperationPolicy =
+        operationPolicyProcessorFactory.createOperationPolicy(policy, operationPolicyParametersTransformer, nextProcessor, operationParametersProcessor);
     defaultOperationPolicy.process(event);
     return nextOperationResponse;
   }

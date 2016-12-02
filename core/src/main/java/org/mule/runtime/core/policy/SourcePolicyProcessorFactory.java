@@ -12,11 +12,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.Optional;
 
 /**
- * Factory for {@link SourcePolicy} instances.
+ * Factory for {@link Processor} instances created from a {@link Policy}
  *
  * @since 4.0
  */
-public interface SourcePolicyFactory {
+public interface SourcePolicyProcessorFactory {
 
   /**
    * Creates an {@link SourcePolicy}.
@@ -27,9 +27,9 @@ public interface SourcePolicyFactory {
    * @param messageSourceResponseParametersProcessor processor that generate the response and error response parameters.
    * @return an {@link SourcePolicy} that performs the common logic related to policies.
    */
-  SourcePolicy createSourcePolicy(Policy policy,
-                                  Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                                  Processor nextProcessor,
-                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
+  Processor createSourcePolicy(Policy policy,
+                               Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
+                               Processor nextProcessor,
+                               MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
 }

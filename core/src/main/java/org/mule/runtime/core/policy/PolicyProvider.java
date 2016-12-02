@@ -21,7 +21,7 @@ public interface PolicyProvider {
    * The provided collection must be in the correct order in which the policies must be applied.
    *
    * @param policyPointcutParameters the parameters to use to match against the pointcut configured for each policy.
-   * @return a {@link DefaultOperationPolicy} associated to that source.
+   * @return a {@link OperationPolicyProcessor} associated to that source.
    */
   List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
@@ -31,7 +31,7 @@ public interface PolicyProvider {
    * The provided collection must be in the correct order in which the policies must be applied.
    *
    * @param policyPointcutParameters the parameters to use to match against the pointcut configured for each policy.
-   * @return a {@link DefaultOperationPolicy} associated to that source.
+   * @return a {@link OperationPolicyProcessor} associated to that source.
    */
   List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
