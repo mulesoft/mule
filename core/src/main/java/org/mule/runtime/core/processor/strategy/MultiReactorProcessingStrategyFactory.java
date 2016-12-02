@@ -25,7 +25,7 @@ public class MultiReactorProcessingStrategyFactory extends ReactorProcessingStra
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop")),
+        .cpuLightScheduler(config().withName(schedulersNamePrefix + ".event-loop")),
                                          scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                      MILLISECONDS),
                                          muleContext);

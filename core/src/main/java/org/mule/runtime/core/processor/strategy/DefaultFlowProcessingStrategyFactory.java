@@ -35,7 +35,7 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
                                              () -> muleContext.getSchedulerService()
                                                  .ioScheduler(config().withName(schedulersNamePrefix + "." + IO_RW.name())),
                                              () -> muleContext.getSchedulerService().cpuIntensiveScheduler(config()
-                                                 .withName(schedulersNamePrefix + "." + CPU_INTENSIVE)),
+                                                 .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                          MILLISECONDS),
                                              muleContext);
