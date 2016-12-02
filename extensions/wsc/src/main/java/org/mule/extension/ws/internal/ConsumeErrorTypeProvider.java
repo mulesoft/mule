@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ws.internal;
 
-import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.ws.api.exception.WscErrors.BAD_REQUEST;
 import static org.mule.extension.ws.api.exception.WscErrors.BAD_RESPONSE;
 import static org.mule.extension.ws.api.exception.WscErrors.ENCODING;
@@ -15,8 +14,9 @@ import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * {@link ErrorTypeProvider} implementation for the {@link ConsumeOperation}.
@@ -30,6 +30,6 @@ public class ConsumeErrorTypeProvider implements ErrorTypeProvider {
    */
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    return Stream.of(BAD_REQUEST, BAD_RESPONSE, ENCODING, INVALID_WSDL, SOAP_FAULT).collect(toSet());
+    return ImmutableSet.<ErrorTypeDefinition>builder().add(BAD_REQUEST, BAD_RESPONSE, ENCODING, INVALID_WSDL, SOAP_FAULT).build();
   }
 }
