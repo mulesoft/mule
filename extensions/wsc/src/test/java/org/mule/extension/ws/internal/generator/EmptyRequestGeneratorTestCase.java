@@ -16,7 +16,8 @@ import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import org.mule.extension.ws.WscUnitTestCase;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.BadRequestException;
+import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 
 import javax.wsdl.BindingInput;
@@ -47,7 +48,7 @@ public class EmptyRequestGeneratorTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks that the generation of a body request for an operation that require parameters fails")
   public void withParams() throws Exception {
-    exception.expect(WscException.class);
+    exception.expect(BadRequestException.class);
     exception.expectMessage("Cannot build default body request for operation [echo], the operation requires input parameters");
     generator.generateRequest(introspecter, loader, ECHO);
   }
@@ -55,7 +56,7 @@ public class EmptyRequestGeneratorTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks that the generation of a body request for an operation without a body part fails")
   public void noBodyPart() throws Exception {
-    exception.expect(WscException.class);
+    exception.expect(InvalidWsdlException.class);
     exception.expectMessage("No SOAP body defined in the WSDL for the specified operation");
 
     // Makes that the introspecter returns an Binding Operation without input SOAP body.

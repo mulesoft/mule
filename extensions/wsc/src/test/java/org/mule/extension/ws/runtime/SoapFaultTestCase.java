@@ -13,7 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
+import org.mule.extension.ws.api.exception.SoapFault;
 import org.mule.extension.ws.api.exception.SoapFaultException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Test;
@@ -36,12 +38,18 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
   @Description("Consumes an operation that throws a SOAP Fault and expects a Soap Fault Exception")
   public void failOperation() throws Exception {
     MessagingException me = flowRunner(FAIL_FLOW).withPayload(getRequestResource(FAIL)).runExpectingException();
-    Exception causeException = me.getCauseException();
+    Error error = me.getEvent().getError().get();
+
+    assertThat(error.getErrorType().getIdentifier(), is("Soap Fault"));
+
+    Throwable causeException = error.getCause();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
 
+    SoapFault fault = (SoapFault) sf.getErrorMessage().getPayload().getValue();
+
     // Receiver is for SOAP12. Server is for SOAP11
-    assertThat(sf.getFaultCode().getLocalPart(), isOneOf("Server", "Receiver"));
+    assertThat(fault.getFaultCode().getLocalPart(), isOneOf("Server", "Receiver"));
     assertThat(sf.getMessage(), is("Fail Message"));
   }
 
@@ -49,13 +57,19 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
   @Description("Consumes an operation that does not exist and throws a SOAP Fault because of it and asserts the thrown exception")
   public void noExistentOperation() throws Exception {
     String badRequest = "<con:noOperation xmlns:con=\"http://consumer.ws.extension.mule.org/\"/>";
-    MessagingException e = flowRunner(FAIL_FLOW).withPayload(badRequest).runExpectingException();
-    Exception causeException = e.getCauseException();
+    MessagingException me = flowRunner(FAIL_FLOW).withPayload(badRequest).runExpectingException();
+
+    Error error = me.getEvent().getError().get();
+
+    assertThat(error.getErrorType().getIdentifier(), is("Soap Fault"));
+
+    Throwable causeException = error.getCause();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
+    SoapFault fault = (SoapFault) sf.getErrorMessage().getPayload().getValue();
 
     // Sender is for SOAP12. Client is for SOAP11
-    assertThat(sf.getFaultCode().getLocalPart(), isOneOf("Client", "Sender"));
+    assertThat(fault.getFaultCode().getLocalPart(), isOneOf("Client", "Sender"));
     assertThat(sf.getMessage(), is("Cannot find dispatch method for {http://consumer.ws.extension.mule.org/}noOperation"));
   }
 }

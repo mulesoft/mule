@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ws.internal;
 
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.WscErrors;
 import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.extension.ws.api.security.WssDecryptSecurityStrategy;
 import org.mule.extension.ws.api.security.WssEncryptSecurityStrategy;
@@ -18,12 +18,12 @@ import org.mule.extension.ws.internal.connection.WscConnectionProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -34,8 +34,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-// TODO: Remove when MULE-10839 it's fixed
-@Export(classes = WscException.class)
+@ErrorTypes(WscErrors.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
 @SubTypeMapping(baseType = SecurityStrategy.class,

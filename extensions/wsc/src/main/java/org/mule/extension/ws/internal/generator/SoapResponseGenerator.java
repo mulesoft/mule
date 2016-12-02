@@ -13,7 +13,7 @@ import static org.mule.extension.ws.internal.util.TransformationUtils.xmlStreamR
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.extension.ws.api.WscMultipartPayload;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.BadResponseException;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
@@ -90,16 +90,16 @@ public final class SoapResponseGenerator {
    */
   private Document unwrapResponse(Object[] response) {
     if (response.length == 0) {
-      throw new WscException("no elements were received in the SOAP response.");
+      throw new BadResponseException("no elements were received in the SOAP response.");
     }
     if (response.length != 1) {
-      throw new WscException("the obtained response contains more than one element, only one was expected");
+      throw new BadResponseException("the obtained response contains more than one element, only one was expected");
     }
     XMLStreamReader reader = (XMLStreamReader) response[0];
     try {
       return xmlStreamReaderToDocument(reader);
     } catch (WscTransformationException e) {
-      throw new WscException("Error transforming the web service response to be processed", e);
+      throw new BadResponseException("Error transforming the XML web service response to be processed", e);
     }
   }
 

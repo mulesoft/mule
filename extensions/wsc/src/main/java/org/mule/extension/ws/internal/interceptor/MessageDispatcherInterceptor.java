@@ -14,7 +14,7 @@ import static org.apache.cxf.message.Message.ENCODING;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
 import static org.mule.extension.ws.internal.ConsumeOperation.MULE_WSC_ENCODING;
 import static org.mule.runtime.api.metadata.MediaType.MULTIPART_RELATED;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.BadResponseException;
 import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.extension.ws.internal.transport.HttpDispatcher;
 import org.mule.runtime.api.metadata.MediaType;
@@ -70,7 +70,7 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
     try {
       body = IOUtils.toString(response.body().byteStream());
     } catch (IOException e) {
-      throw new WscException("Error while getting body response content");
+      throw new BadResponseException("Error while getting body response content", e);
     }
 
     Exchange exchange = message.getExchange();
@@ -87,19 +87,13 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
       inMessage.put(ENCODING, encoding);
 
       String contentType = response.header(CONTENT_TYPE);
-
-      // TODO: MULE-10783 This is needed when the HTTP message is returned a multipart with only one part.
-      if (body.contains("uid") && !contentType.contains(MULTIPART_RELATED.toString())) {
-        contentType = MediaType.MULTIPART_RELATED.toString();
-      }
-
       inMessage.put(CONTENT_TYPE, contentType);
       inMessage.setContent(InputStream.class, is);
       inMessage.setExchange(exchange);
       messageObserver.onMessage(inMessage);
     } else {
       exchange.put(ClientImpl.FINISHED, TRUE);
-      throw new WscException("Web Service Response is blank");
+      throw new BadResponseException("Web Service Response is blank");
     }
   }
 }
