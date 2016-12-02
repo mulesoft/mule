@@ -114,8 +114,7 @@ public final class IntrospectionUtils {
   private static final String CONNECTION_PROVIDER = "connection provider";
   private static final String SOURCE = "source";
 
-  private IntrospectionUtils() {
-  }
+  private IntrospectionUtils() {}
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
@@ -388,8 +387,8 @@ public final class IntrospectionUtils {
     Class<?> searchClass = type;
 
     checkArgument(searchClass.getSuperclass().equals(superClass), format(
-        "Class '%s' does not extend the '%s' class",
-        type.getName(), superClass.getName()));
+                                                                         "Class '%s' does not extend the '%s' class",
+                                                                         type.getName(), superClass.getName()));
 
     while (!Object.class.equals(searchClass)) {
       if (searchClass.getSuperclass().equals(superClass)) {

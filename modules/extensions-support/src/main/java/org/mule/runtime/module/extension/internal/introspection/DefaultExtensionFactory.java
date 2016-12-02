@@ -239,9 +239,9 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
     private Optional<SourceCallbackModel> toSourceCallback(Optional<SourceCallbackDeclaration> callbackDeclaration) {
       return callbackDeclaration.map(callback -> new ImmutableSourceCallbackModel(callback.getName(),
                                                                                   callback.getDescription(),
-                                                                                  callback.getDisplayModel(),
                                                                                   toParameterGroups(callback
                                                                                       .getParameterGroups()),
+                                                                                  callback.getDisplayModel(),
                                                                                   callback.getModelProperties()));
     }
 
