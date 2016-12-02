@@ -18,21 +18,23 @@ import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
  */
 public class SoapFaultException extends MuleRuntimeException implements ErrorMessageAwareException {
 
-  private final SoapFault soapFault;
+  private final Message message;
 
   public SoapFaultException(org.apache.cxf.binding.soap.SoapFault cause) {
     super(createStaticMessage(cause.getMessage()));
-    this.soapFault = new SoapFault(cause.getFaultCode(),
+    SoapFault soapFault = new SoapFault(cause.getFaultCode(),
                                    cause.getSubCode(),
                                    cause.getOrCreateDetail(),
                                    cause.getReason(),
                                    cause.getNode(),
                                    cause.getRole());
+
+    this.message = Message.builder().payload(soapFault).build();
   }
 
   @Override
   public Message getErrorMessage() {
-    return Message.builder().payload(soapFault).build();
+    return message;
   }
 
   @Override
