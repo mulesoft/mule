@@ -33,12 +33,14 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -54,6 +56,7 @@ import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
+import org.mule.runtime.extension.api.model.source.ImmutableSourceCallbackModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
@@ -77,6 +80,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
@@ -226,8 +230,19 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                       toParameterGroups(declaration.getParameterGroups()),
                                                       toOutputModel(declaration.getOutput()),
                                                       toOutputModel(declaration.getOutputAttributes()),
+                                                      toSourceCallback(declaration.getSuccessCallback()),
+                                                      toSourceCallback(declaration.getErrorCallback()),
                                                       declaration.getDisplayModel(),
                                                       declaration.getModelProperties()));
+    }
+
+    private Optional<SourceCallbackModel> toSourceCallback(Optional<SourceCallbackDeclaration> callbackDeclaration) {
+      return callbackDeclaration.map(callback -> new ImmutableSourceCallbackModel(callback.getName(),
+                                                                                  callback.getDescription(),
+                                                                                  toParameterGroups(callback
+                                                                                      .getParameterGroups()),
+                                                                                  callback.getDisplayModel(),
+                                                                                  callback.getModelProperties()));
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations) {
