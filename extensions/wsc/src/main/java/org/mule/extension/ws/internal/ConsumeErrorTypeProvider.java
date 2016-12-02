@@ -9,6 +9,7 @@ package org.mule.extension.ws.internal;
 import static org.mule.extension.ws.api.exception.WscErrors.BAD_REQUEST;
 import static org.mule.extension.ws.api.exception.WscErrors.BAD_RESPONSE;
 import static org.mule.extension.ws.api.exception.WscErrors.ENCODING;
+import static org.mule.extension.ws.api.exception.WscErrors.WSC_GENERIC;
 import static org.mule.extension.ws.api.exception.WscErrors.INVALID_WSDL;
 import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
@@ -30,6 +31,8 @@ public class ConsumeErrorTypeProvider implements ErrorTypeProvider {
    */
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    return ImmutableSet.<ErrorTypeDefinition>builder().add(BAD_REQUEST, BAD_RESPONSE, ENCODING, INVALID_WSDL, SOAP_FAULT).build();
+    return ImmutableSet.<ErrorTypeDefinition>builder()
+        .add(WSC_GENERIC, BAD_REQUEST, BAD_RESPONSE, ENCODING, INVALID_WSDL, SOAP_FAULT)
+        .build();
   }
 }
