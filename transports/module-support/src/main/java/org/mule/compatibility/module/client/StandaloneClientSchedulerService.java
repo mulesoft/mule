@@ -13,6 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.TimeZone;
@@ -56,6 +57,21 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
+    return scheduler;
+  }
+
+  @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config) {
+    return scheduler;
+  }
+
+  @Override
+  public Scheduler ioScheduler(SchedulerConfig config) {
+    return scheduler;
+  }
+
+  @Override
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     return scheduler;
   }
 

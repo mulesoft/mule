@@ -52,7 +52,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
 
   @Override
   @Description("When ProactorProcessingStrategy is configured, two concurrent requests may be processed by two different "
-      + " cpu light threads. MULE-11062 is needed for true reactor behaviour.")
+      + " cpu light threads. MULE-11132 is needed for true reactor behaviour.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
     assertThat(threads.size(), equalTo(2));

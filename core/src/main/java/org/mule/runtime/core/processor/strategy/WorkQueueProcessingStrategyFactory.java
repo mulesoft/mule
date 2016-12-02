@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -43,14 +44,12 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
 
   public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
-
-  // TODO MULE-11062 Need to be able to configure maxiumum number of workers
   private int maxThreads;
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
-                                           maxThreads,
+    return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
+        .ioScheduler(config().withMaxConcurrentTasks(maxThreads)),
                                            scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                        MILLISECONDS),
                                            muleContext);
@@ -61,8 +60,7 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
     private Supplier<Scheduler> schedulerSupplier;
     private Scheduler scheduler;
 
-    public WorkQueueProcessingStrategy(Supplier<Scheduler> schedulerSupplier, int maxThreads,
-                                       Consumer<Scheduler> schedulerStopper,
+    public WorkQueueProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
                                        MuleContext muleContext) {
       super(schedulerStopper, muleContext);
       this.schedulerSupplier = schedulerSupplier;

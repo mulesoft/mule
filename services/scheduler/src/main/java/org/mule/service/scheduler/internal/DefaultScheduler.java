@@ -118,7 +118,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
 
-    scheduledTasks.put(task, scheduled);
+    putTask(task, scheduled);
     return scheduled;
   }
 
@@ -132,7 +132,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     final ScheduledFuture<V> scheduled =
         new ScheduledFutureDecorator(scheduledExecutor.schedule(schedulableTask(task), delay, unit), task);
 
-    scheduledTasks.put(task, scheduled);
+    putTask(task, scheduled);
     return scheduled;
   }
 
@@ -151,7 +151,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
                                        task);
 
-    scheduledTasks.put(task, scheduled);
+    putTask(task, scheduled);
     return scheduled;
   }
 
@@ -171,7 +171,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
 
-    scheduledTasks.put(task, scheduled);
+    putTask(task, scheduled);
     return scheduled;
   }
 
@@ -205,7 +205,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
     QuartzScheduledFututre<Object> scheduled = new QuartzScheduledFututre<>(quartzScheduler, trigger, task);
 
-    scheduledTasks.put(task, scheduled);
+    putTask(task, scheduled);
     return scheduled;
   }
 
@@ -332,11 +332,11 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       runnableFutureCommand = newTaskFor(command, null);
     }
 
-    scheduledTasks.put(runnableFutureCommand, NULL_SCHEDULED_FUTURE);
+    putTask(runnableFutureCommand, NULL_SCHEDULED_FUTURE);
     try {
       executor.execute(runnableFutureCommand);
     } catch (Exception e) {
-      scheduledTasks.remove(runnableFutureCommand);
+      removeTask(runnableFutureCommand);
       throw e;
     }
   }
@@ -348,11 +348,19 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   protected void taskFinished(RunnableFuture<?> task) {
-    scheduledTasks.remove(task);
+    removeTask(task);
     if (task instanceof AbstractRunnableFutureDecorator && !((AbstractRunnableFutureDecorator) task).isStarted()) {
       cancelledBeforeFireTasks.add(task);
     }
     tryTerminate();
+  }
+
+  protected void putTask(RunnableFuture<?> task, final ScheduledFuture<?> scheduledFuture) {
+    scheduledTasks.put(task, scheduledFuture);
+  }
+
+  protected void removeTask(RunnableFuture<?> task) {
+    scheduledTasks.remove(task);
   }
 
   private void tryTerminate() {

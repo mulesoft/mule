@@ -46,7 +46,7 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
 
   @Override
   @Description("When MultiReactorProcessingStrategy is configured, two concurrent requests may be processed by two different "
-      + " cpu light threads.  This is why this strategy is called 'MultiReactor' and not 'Reactor`.  MULE-11062 is needed for "
+      + " cpu light threads.  This is why this strategy is called 'MultiReactor' and not 'Reactor`.  MULE-11132 is needed for "
       + "true reactor behaviour.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();

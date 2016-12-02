@@ -16,6 +16,7 @@ import static org.mockito.Mockito.spy;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
@@ -58,6 +59,27 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler ioScheduler(SchedulerConfig config) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
