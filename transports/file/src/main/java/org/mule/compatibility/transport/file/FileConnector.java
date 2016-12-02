@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static java.lang.Long.parseLong;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
@@ -184,7 +185,7 @@ public class FileConnector extends AbstractConnector {
 
       String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
       if (tempPolling != null) {
-        polling = Long.parseLong(tempPolling);
+        polling = parseLong(tempPolling);
       }
 
       if (polling <= 0) {
@@ -197,7 +198,7 @@ public class FileConnector extends AbstractConnector {
       String tempFileAge = (String) props.get(PROPERTY_FILE_AGE);
       if (tempFileAge != null) {
         try {
-          setFileAge(Long.parseLong(tempFileAge));
+          endpoint.getProperties().put(PROPERTY_FILE_AGE, parseLong(tempFileAge));
         } catch (Exception ex1) {
           logger.error("Failed to set fileAge", ex1);
         }

@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.file;
 
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILE_AGE;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
@@ -230,7 +231,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     // TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
     // combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
     // the current And/Or filters to extend {@link FilenameFilter}
-    if (fileConnector.getCheckFileAge() && !isAgedFile(file, fileConnector.getFileAge())) {
+    Long fileAge;
+    if (this.endpoint.getProperties().containsKey(PROPERTY_FILE_AGE)) {
+      fileAge = (Long) endpoint.getProperties().get(PROPERTY_FILE_AGE);
+    } else {
+      fileAge = fileConnector.getFileAge();
+    }
+
+    if (fileConnector.getCheckFileAge() && !isAgedFile(file, fileAge)) {
       removeProcessingMark(file.getAbsolutePath());
 
       return;
