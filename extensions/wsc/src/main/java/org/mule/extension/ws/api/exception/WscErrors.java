@@ -22,12 +22,12 @@ public enum WscErrors implements ErrorTypeDefinition<WscErrors> {
   /**
    * Error thrown when an invalid WSDL is found or inconsistent WSDL state occurred.
    */
-  INVALID_WSDL("Invalid Wsdl"),
+  INVALID_WSDL("Invalid WSDL"),
 
   /**
    * Error thrown when an encoding related problem occurs when parsing the request or response XML.
    */
-  ENCODING("Xml Encoding"),
+  ENCODING("XML Encoding"),
 
   /**
    * Error thrown when the generated request is invalid, mostly because inconsistent provided parameters.
