@@ -23,11 +23,11 @@ public class SoapFaultException extends MuleRuntimeException implements ErrorMes
   public SoapFaultException(org.apache.cxf.binding.soap.SoapFault cause) {
     super(createStaticMessage(cause.getMessage()));
     SoapFault soapFault = new SoapFault(cause.getFaultCode(),
-                                   cause.getSubCode(),
-                                   cause.getOrCreateDetail(),
-                                   cause.getReason(),
-                                   cause.getNode(),
-                                   cause.getRole());
+                                        cause.getSubCode(),
+                                        cause.getOrCreateDetail(),
+                                        cause.getReason(),
+                                        cause.getNode(),
+                                        cause.getRole());
 
     this.message = Message.builder().payload(soapFault).build();
   }
