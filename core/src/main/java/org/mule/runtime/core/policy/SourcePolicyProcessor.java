@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.core.policy;
 
+import static org.mule.runtime.core.api.Event.builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-
-import java.util.Optional;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
@@ -34,39 +32,28 @@ import java.util.Optional;
 public class SourcePolicyProcessor implements Processor {
 
   private final Policy policy;
-  private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
   private final Processor nextProcessor;
-  private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
 
   /**
    * Creates a new {@code DefaultSourcePolicy}.
    * 
    * @param policy the policy to execute before and after the source.
-   * @param sourcePolicyParametersTransformer transformer from the response and failure response parameters to a message and vice
-   *        versa.
    * @param policyStateHandler the state handler for the policy.
    * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
-   * @param messageSourceResponseParametersProcessor a processor to convert an {@link Event} to the set of parameters used to
-   *        execute the successful or failure response function of the source.
    * @param nextProcessor
    */
   public SourcePolicyProcessor(Policy policy,
-                               Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                               PolicyStateHandler policyStateHandler, Processor nextProcessor,
-                               MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+                               PolicyStateHandler policyStateHandler, Processor nextProcessor) {
     this.policy = policy;
-    this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
-    this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
   }
 
   /**
    * Process the source policy chain of processors. The provided {@code nextOperation} function has the behaviour to be executed
    * by the next-operation of the chain which may be the next policy in the chain or the flow execution.
-   *
    *
    * @param sourceEvent the event with the data created from the source message that must be used to execute the source policy.
    * @return the result of processing the {@code event} through the policy chain.
@@ -74,10 +61,16 @@ public class SourcePolicyProcessor implements Processor {
    */
   @Override
   public Event process(Event sourceEvent) throws MuleException {
-    policyStateHandler.updateNextOperation(sourceEvent.getContext().getId(), nextProcessor);
-    Event result = policy.getPolicyChain()
-            .process(policyEventConverter.createEvent(sourceEvent.getMessage(), Event.builder(sourceEvent.getContext()).build()));
-    return Event.builder(result.getContext()).message(result.getMessage()).build();
+    String executionIdentifier = sourceEvent.getContext().getId();
+    policyStateHandler.updateNextOperation(executionIdentifier, nextProcessorEvent -> {
+      policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()), nextProcessorEvent);
+      Event nextProcessorResult = nextProcessor
+          .process(policyEventConverter.createEvent(nextProcessorEvent.getMessage(), sourceEvent));
+      return policyEventConverter.createEvent(nextProcessorResult.getMessage(), nextProcessorEvent);
+    });
+    Event sourcePolicyResult = policy.getPolicyChain()
+        .process(policyEventConverter.createEvent(sourceEvent.getMessage(), builder(sourceEvent.getContext()).build()));
+    return policyEventConverter.createEvent(sourcePolicyResult.getMessage(), sourceEvent);
   }
 
 }

@@ -17,14 +17,13 @@ import java.util.Map;
  * @since 4.0
  */
 @FunctionalInterface
-public interface OperationExecutionFunction
-{
+public interface OperationExecutionFunction {
 
-    /**
-     * @param parameters the set of parameters required to execute the function.
-     * @param operationEvent the event to use for executing the operation.
-     * @return an {@link Event} as result of the operation execution.
-     */
-    Event execute(Map<String,Object> parameters, Event operationEvent) throws MuleException;
+  /**
+   * @param parameters the set of parameters required to execute the function.
+   * @param operationEvent the event to use for executing the operation.
+   * @return an {@link Event} as result of the operation execution.
+   */
+  Event execute(Map<String, Object> parameters, Event operationEvent) throws MuleException;
 
 }

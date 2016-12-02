@@ -139,7 +139,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
         return (Event) muleEvent;
       };
 
-      OperationPolicy policy = policyManager.createOperationPolicy(operationIdentifier, event, operationParameters, operationExecutionFunction);
+      OperationPolicy policy =
+          policyManager.createOperationPolicy(operationIdentifier, event, operationParameters, operationExecutionFunction);
       return policy.process(event);
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);

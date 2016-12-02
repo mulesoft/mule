@@ -35,8 +35,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
   public Message fromParametersToMessage(Map<String, Object> parameters) {
     HttpRequesterRequestBuilder requestBuilder = (HttpRequesterRequestBuilder) parameters.get("requestBuilder");
     String path = (String) parameters.get("path");
-    // TODO support body once MULE-10711 gets done
-    return Message.builder().payload("empty body")
+    return Message.builder().payload(requestBuilder.getBody())
         .attributes(new HttpPolicyRequestAttributes(new ParameterMap(requestBuilder.getHeaders()),
                                                     new ParameterMap(requestBuilder.getQueryParams()),
                                                     new ParameterMap(requestBuilder.getQueryParams()), path))
@@ -51,6 +50,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
       httpRequesterRequestBuilder.setHeaders(requestAttributes.getHeaders());
       httpRequesterRequestBuilder.setQueryParams(requestAttributes.getQueryParams());
       httpRequesterRequestBuilder.setUriParams(requestAttributes.getUriParams());
+      httpRequesterRequestBuilder.setBody(message.getPayload().getValue());
       return ImmutableMap.<String, Object>builder().put("requestBuilder", httpRequesterRequestBuilder).build();
     } else {
       return emptyMap();

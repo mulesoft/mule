@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Abstract implementation that performs the chaining of a set of policies and the
- * {@link Processor} being intercepted.
+ * Abstract implementation that performs the chaining of a set of policies and the {@link Processor} being intercepted.
  *
  * @param <ParametersTransformer> the type of the function parameters transformer.
  * @param <ParametersProcessor> the type of the parameters processor that provides access to the initial value of the parameters.
@@ -57,8 +56,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation
    * execution.
    */
-  public final Event processPolicies(Event operationEvent)
-      throws Exception {
+  public final Event processPolicies(Event operationEvent) throws Exception {
     return new AbstractCompositePolicy.NextOperationCall(operationEvent)
         .process(operationEvent);
   }
@@ -66,16 +64,14 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
   /**
    * @return the parameters transformer that converts the message to function parameters and vice versa.
    */
-  protected Optional<ParametersTransformer> getParametersTransformer()
-  {
+  protected Optional<ParametersTransformer> getParametersTransformer() {
     return parametersTransformer;
   }
 
   /**
    * @return the parameters processors that generates the parameters to be sent.
    */
-  protected ParametersProcessor getParametersProcessor()
-  {
+  protected ParametersProcessor getParametersProcessor() {
     return parametersProcessor;
   }
 
@@ -94,17 +90,11 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * @param policy the policy to execute
    * @param nextProcessor the next processor to use as the {@link PolicyNextActionMessageProcessor}. It will invoke the next
    *        policy in the chain.
-   * @param parametersTransformer parameters transformer for the source response function or the operation function.
-   * @param parametersProcessor the parameters processor that allows to get the initial values of the source response function
-   *        parameters or the operation function parameters.
    * @param event the event to use for processing the policy.
    * @return the result to use for the next policy in the chain.
    * @throws Exception if the execution of the policy fails.
    */
-  protected abstract Event processPolicy(Policy policy, Processor nextProcessor,
-                                         Optional<ParametersTransformer> parametersTransformer,
-                                         ParametersProcessor parametersProcessor,
-                                         Event event)
+  protected abstract Event processPolicy(Policy policy, Processor nextProcessor, Event event)
       throws Exception;
 
   /**
@@ -128,7 +118,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
       Policy policy = parameterizedPolicies.get(index);
       index++;
       try {
-        return processPolicy(policy, this, parametersTransformer, parametersProcessor, originalEvent);
+        return processPolicy(policy, this, originalEvent);
       } catch (MuleException e) {
         throw e;
       } catch (Exception e) {

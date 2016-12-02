@@ -49,6 +49,8 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.policy.OperationExecutionFunction;
+import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -70,10 +72,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -243,9 +248,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(of(configurationProvider));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
-    //TODO fix
-    //when(mockPolicyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(event >);
-    //when(mockPolicyManager.createOperationPolicy(anyString(), any())).thenReturn(empty());
+    when(mockPolicyManager.createOperationPolicy(any(), any(), any(), any())).thenAnswer(invocationOnMock -> {
+      OperationPolicy operationPolicy = Mockito.mock(OperationPolicy.class);
+      when(operationPolicy.process(any()))
+          .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
+              .execute((Map<String, Object>) invocationOnMock.getArguments()[2], (Event) invocationOnMock.getArguments()[1]));
+      return operationPolicy;
+    });
 
     messageProcessor = setUpOperationMessageProcessor();
   }

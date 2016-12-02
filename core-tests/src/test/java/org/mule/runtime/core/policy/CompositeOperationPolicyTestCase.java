@@ -19,7 +19,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -40,95 +44,112 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
   private CompositeOperationPolicy compositeOperationPolicy;
 
   private Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
-      of(mock(OperationPolicyParametersTransformer.class));
+      of(mock(OperationPolicyParametersTransformer.class, RETURNS_DEEP_STUBS));
   private OperationParametersProcessor operationParametersProcessor = mock(OperationParametersProcessor.class);
   private Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
   private Policy secondPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
-  private Event initialEvent = mock(Event.class);
-  private Event firstPolicyResultEvent = mock(Event.class);
-  private Event secondPolicyResultEvent = mock(Event.class);
-  private Processor nextProcessor = mock(Processor.class);
-  private Event nextProcessResultEvent = mock(Event.class);
-  private OperationPolicyProcessorFactory operationPolicyProcessorFactory = mock(OperationPolicyProcessorFactory.class, RETURNS_DEEP_STUBS);
-  private OperationPolicy firstPolicyOperationPolicy = mock(OperationPolicy.class);
-  private OperationPolicy secondPolicyOperationPolicy = mock(OperationPolicy.class);
+  private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
+  private Event initialEvent;
+  private Event firstPolicyProcessorResultEvent;
+  private Event secondPolicyResultProcessorEvent;
+  private OperationExecutionFunction operationExecutionFunction = mock(OperationExecutionFunction.class);
+  private Event nextProcessResultEvent;
+
+  private OperationPolicyProcessorFactory operationPolicyProcessorFactory = mock(OperationPolicyProcessorFactory.class);
+  private Processor firstPolicyOperationPolicyProcessor = mock(Processor.class);
+  private Processor secondPolicyOperationPolicyProcessor = mock(Processor.class);
 
   @Before
   public void setUp() throws Exception {
-    when(nextProcessor.process(any())).thenReturn(nextProcessResultEvent);
-    when(firstPolicy.getPolicyChain().process(any())).thenReturn(firstPolicyResultEvent);
-    when(secondPolicy.getPolicyChain().process(any())).thenReturn(secondPolicyResultEvent);
-    when(operationPolicyProcessorFactory.createOperationPolicy(firstPolicy, operationPolicyParametersTransformer))
-        .thenReturn(firstPolicyOperationPolicy);
-    when(operationPolicyProcessorFactory.createOperationPolicy(secondPolicy, operationPolicyParametersTransformer))
-        .thenReturn(secondPolicyOperationPolicy);
-    when(firstPolicyOperationPolicy.process(any(Event.class), any(Processor.class), same(operationParametersProcessor)))
-        .then(invocationOnMock -> {
-          ((Processor) invocationOnMock.getArguments()[1])
-              .process((Event) invocationOnMock.getArguments()[0]);
-          return firstPolicyResultEvent;
-        });
-    when(secondPolicyOperationPolicy.process(any(Event.class), any(Processor.class), same(operationParametersProcessor)))
-        .then(invocationOnMock -> {
-          ((Processor) invocationOnMock.getArguments()[1])
-              .process((Event) invocationOnMock.getArguments()[0]);
-          return secondPolicyResultEvent;
-        });
+    initialEvent = createTestEvent();
+    firstPolicyProcessorResultEvent = createTestEvent();
+    secondPolicyResultProcessorEvent = createTestEvent();
+    nextProcessResultEvent = createTestEvent();
+    when(operationPolicyParametersTransformer.get().fromParametersToMessage(any()))
+        .thenReturn(Message.builder().nullPayload().build());
+    when(operationExecutionFunction.execute(any(), any())).thenReturn(nextProcessResultEvent);
+    when(firstPolicy.getPolicyChain().process(any())).thenReturn(firstPolicyProcessorResultEvent);
+    when(secondPolicy.getPolicyChain().process(any())).thenReturn(secondPolicyResultProcessorEvent);
+    when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any()))
+        .thenReturn(secondPolicyOperationPolicyProcessor);
+    when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
+      when(firstPolicyOperationPolicyProcessor.process(any())).thenAnswer(policyProcessorInvocation -> {
+        ((Processor) policyFactoryInvocation.getArguments()[1]).process(initialEvent);
+        return firstPolicyProcessorResultEvent;
+      });
+      return firstPolicyOperationPolicyProcessor;
+    });
+    when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
+      when(secondPolicyOperationPolicyProcessor.process(any())).thenAnswer(policyProcessorInvocation -> {
+        ((Processor) policyFactoryInvocation.getArguments()[1]).process(initialEvent);
+        return secondPolicyResultProcessorEvent;
+      });
+      return secondPolicyOperationPolicyProcessor;
+    });
   }
 
   @Test
   public void singlePolicy() throws Exception {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy),
-                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory, operationExecutionFunction);
+                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory,
+                                                            operationParametersProcessor, operationExecutionFunction);
 
-    Event result = compositeOperationPolicy.process(initialEvent, nextProcessor, operationParametersProcessor);
+    Event result = compositeOperationPolicy.process(initialEvent);
     assertThat(result, is(nextProcessResultEvent));
-    verify(nextProcessor).process(initialEvent);
-    verify(operationPolicyProcessorFactory).createOperationPolicy(firstPolicy, operationPolicyParametersTransformer);
-    verify(firstPolicyOperationPolicy).process(same(initialEvent), any(), same(operationParametersProcessor));
+    verify(operationExecutionFunction).execute(any(), same(initialEvent));
+    verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
+    verify(firstPolicyOperationPolicyProcessor).process(any());
   }
 
   @Test
   public void compositePolicy() throws Exception {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
-                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory, operationExecutionFunction);
+                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory,
+                                                            operationParametersProcessor, operationExecutionFunction);
 
-    Event result = compositeOperationPolicy.process(initialEvent, nextProcessor, operationParametersProcessor);
+    Event result = compositeOperationPolicy.process(initialEvent);
     assertThat(result, is(nextProcessResultEvent));
-    verify(nextProcessor).process(initialEvent);
-    verify(operationPolicyProcessorFactory).createOperationPolicy(firstPolicy, operationPolicyParametersTransformer);
-    verify(operationPolicyProcessorFactory).createOperationPolicy(secondPolicy, operationPolicyParametersTransformer);
-    verify(firstPolicyOperationPolicy).process(same(initialEvent), any(), same(operationParametersProcessor));
-    verify(firstPolicyOperationPolicy).process(same(initialEvent), any(), same(operationParametersProcessor));
+    verify(operationExecutionFunction).execute(any(), same(initialEvent));
+    verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
+    verify(operationPolicyProcessorFactory).createOperationPolicy(same(secondPolicy), any());
+    verify(firstPolicyOperationPolicyProcessor).process(any());
+    verify(firstPolicyOperationPolicyProcessor).process(any());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void emptyPolicyList() throws Exception {
     compositeOperationPolicy = new CompositeOperationPolicy(emptyList(),
-                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory, operationExecutionFunction);
+                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory,
+                                                            operationParametersProcessor, operationExecutionFunction);
   }
 
   @Test
   public void policyExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
-    when(firstPolicyOperationPolicy.process(any(Event.class), any(Processor.class), any(OperationParametersProcessor.class)))
-        .thenThrow(policyException);
+    when(firstPolicyOperationPolicyProcessor.process(any(Event.class))).thenThrow(policyException);
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
-                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory, operationExecutionFunction);
+                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory,
+                                                            operationParametersProcessor, operationExecutionFunction);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
-    compositeOperationPolicy.process(initialEvent, nextProcessor, operationParametersProcessor);
+    compositeOperationPolicy.process(initialEvent);
   }
 
   @Test
   public void nextProcessorExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
-    when(nextProcessor.process(any(Event.class))).thenThrow(policyException);
+    when(operationExecutionFunction.execute(any(), any())).thenThrow(policyException);
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
-                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory, operationExecutionFunction);
+                                                            operationPolicyParametersTransformer, operationPolicyProcessorFactory,
+                                                            operationParametersProcessor, operationExecutionFunction);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
-    compositeOperationPolicy.process(initialEvent, nextProcessor, operationParametersProcessor);
+    compositeOperationPolicy.process(initialEvent);
+  }
+
+  private Event createTestEvent() {
+    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http"))
+        .message((InternalMessage) Message.builder().nullPayload().build()).build();
   }
 
 }

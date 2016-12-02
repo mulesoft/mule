@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.functional.Either;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,14 +87,10 @@ public class CompositeSourcePolicy extends
    * wrapped policy / flow.
    */
   @Override
-  protected Event processPolicy(Policy policy, Processor nextProcessor,
-                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
-                                MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
-                                Event event)
+  protected Event processPolicy(Policy policy, Processor nextProcessor, Event event)
       throws Exception {
     Processor defaultSourcePolicy =
-        sourcePolicyProcessorFactory.createSourcePolicy(policy, sourcePolicyParametersTransformer, nextProcessor,
-                                                        messageSourceResponseParametersProcessor);
+        sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor);
     return defaultSourcePolicy.process(event);
   }
 
@@ -114,14 +111,28 @@ public class CompositeSourcePolicy extends
   public Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> process(Event sourceEvent) throws Exception {
     try {
       Event policiesResultEvent = processPolicies(sourceEvent);
-      Map<String, Object> responseParameters = getParametersTransformer().map(parametersTransformer -> parametersTransformer
-          .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())).orElse(originalResponseParameters);
+      Map<String, Object> responseParameters =
+          getParametersTransformer().map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
+              .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage()))).orElse(originalResponseParameters);
       return right(new SuccessSourcePolicyResult(policiesResultEvent, responseParameters, getParametersProcessor()));
     } catch (MessagingException e) {
-      Map<String, Object> responseParameters = getParametersTransformer().map(parametersTransformer -> parametersTransformer
-          .fromMessageToSuccessResponseParameters(e.getEvent().getMessage())).orElse(originalFailureResponseParameters);
+      Map<String, Object> responseParameters =
+          getParametersTransformer()
+              .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
+                  .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
+              .orElse(originalFailureResponseParameters);
       return left(new FailureSourcePolicyResult(e, responseParameters, getParametersProcessor()));
     }
+  }
+
+  private Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,
+                                         Map<String, Object> policyResponseParameters) {
+    Map<String, Object> concatMap = new HashMap<>();
+    if (originalResponseParameters != null) {
+      concatMap.putAll(originalResponseParameters);
+    }
+    concatMap.putAll(policyResponseParameters);
+    return concatMap;
   }
 
 }

@@ -10,27 +10,24 @@ import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Map;
 
-public class FailureSourcePolicyResult
-{
+public class FailureSourcePolicyResult {
 
-    private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
-    private final MessagingException messagingException;
-    private final Map<String, Object> errorResponseParameters;
+  private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
+  private final MessagingException messagingException;
+  private final Map<String, Object> errorResponseParameters;
 
-    public FailureSourcePolicyResult(MessagingException messagingException, Map<String, Object> errorResponseParameters, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor)
-    {
-        this.messagingException = messagingException;
-        this.errorResponseParameters = errorResponseParameters;
-        this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
-    }
+  public FailureSourcePolicyResult(MessagingException messagingException, Map<String, Object> errorResponseParameters,
+                                   MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+    this.messagingException = messagingException;
+    this.errorResponseParameters = errorResponseParameters;
+    this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
+  }
 
-    public MessagingException getMessagingException()
-    {
-        return messagingException;
-    }
+  public MessagingException getMessagingException() {
+    return messagingException;
+  }
 
-    public Map<String, Object> getErrorResponseParameters()
-    {
-        return errorResponseParameters;
-    }
+  public Map<String, Object> getErrorResponseParameters() {
+    return errorResponseParameters;
+  }
 }

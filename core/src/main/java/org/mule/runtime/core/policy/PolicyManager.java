@@ -36,7 +36,9 @@ public interface PolicyManager {
    * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the source.
    * @return a {@link SourcePolicy} associated to that source.
    */
-  SourcePolicy createSourcePolicyInstance(ComponentIdentifier sourceIdentifier, Event sourceEvent, Processor flowExecutionProcessor, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
+  SourcePolicy createSourcePolicyInstance(ComponentIdentifier sourceIdentifier, Event sourceEvent,
+                                          Processor flowExecutionProcessor,
+                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
   /**
    * Creates a policy to be applied to an operation. The creation must have into consideration the {@code operationIdentifier} to find specific
@@ -49,7 +51,9 @@ public interface PolicyManager {
    * @param operationExecutionFunction the function that executes the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */
-  OperationPolicy createOperationPolicy(ComponentIdentifier operationIdentifier, Event operationEvent, Map<String, Object> operationParameters, OperationExecutionFunction operationExecutionFunction);
+  OperationPolicy createOperationPolicy(ComponentIdentifier operationIdentifier, Event operationEvent,
+                                        Map<String, Object> operationParameters,
+                                        OperationExecutionFunction operationExecutionFunction);
 
   /**
    * A transformer to map source response function parameters to content in a {@link org.mule.runtime.api.message.Message} and

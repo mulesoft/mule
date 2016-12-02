@@ -96,8 +96,7 @@ public class ModuleFlowProcessingPhase
                                MESSAGE_ERROR_RESPONSE);
               try {
                 template.sendFailureResponseToClient(messagingException,
-                                                     sourcePolicyResult.getRight()
-                                                         .createErrorResponseParameters(messagingException.getEvent()),
+                                                     sourcePolicyResult.getLeft().getErrorResponseParameters(),
                                                      createSendFailureResponseCompletationCallback(phaseResultNotifier));
               } catch (MuleException e) {
                 throw new MuleRuntimeException(e);

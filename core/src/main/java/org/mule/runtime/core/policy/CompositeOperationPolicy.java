@@ -7,8 +7,10 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -34,6 +36,12 @@ public class CompositeOperationPolicy extends
 
   /**
    * Creates a new composite policy.
+   *
+   * If a non-empty {@code operationPolicyParametersTransformer} is passed to this class, then it will be used to convert the
+   * flow execution response parameters to a message with the content of such parameters in order to allow the pipeline after
+   * the next-operation to modify the response. If an empty {@code operationPolicyParametersTransformer} is provided then
+   * the policy won't be able to change the response parameters of the source and the original response parameters generated
+   * from the source will be usd.
    * 
    * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
@@ -79,20 +87,19 @@ public class CompositeOperationPolicy extends
    * with the actual operation result and not a modified version from another policy.
    */
   @Override
-  protected Event processPolicy(Policy policy, Processor nextProcessor,
-                                Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                OperationParametersProcessor operationParametersProcessor,
-                                Event event)
+  protected Event processPolicy(Policy policy, Processor nextProcessor, Event event)
       throws Exception {
     Processor defaultOperationPolicy =
-        operationPolicyProcessorFactory.createOperationPolicy(policy, operationPolicyParametersTransformer, nextProcessor, operationParametersProcessor);
+        operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
     defaultOperationPolicy.process(event);
     return nextOperationResponse;
   }
 
   @Override
-  public Event process(Event operationEvent) throws Exception
-  {
-    return processPolicies(operationEvent);
+  public Event process(Event operationEvent) throws Exception {
+    Message message = getParametersTransformer().isPresent()
+        ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
+        : operationEvent.getMessage();
+    return processPolicies(Event.builder(operationEvent).message((InternalMessage) message).build());
   }
 }

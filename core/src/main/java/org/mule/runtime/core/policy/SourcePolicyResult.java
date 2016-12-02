@@ -20,20 +20,19 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public interface SourcePolicyResult
-{
+public interface SourcePolicyResult {
 
-    Either<MessagingException, Event> getResult();
+  Either<MessagingException, Event> getResult();
 
-    /**
-     * @return the response parameters to be sent by the source.
-     */
-    Map<String, Object> getResponseParameters();
+  /**
+   * @return the response parameters to be sent by the source.
+   */
+  Map<String, Object> getResponseParameters();
 
-    /**
-     * @param failureEvent the failure event used to generate the error response parameters.
-     * @return the response parameters to be sent by the source in case of a failure.
-     */
-    Map<String, Object> getErrorResponseParameters(Event failureEvent);
+  /**
+   * @param failureEvent the failure event used to generate the error response parameters.
+   * @return the response parameters to be sent by the source in case of a failure.
+   */
+  Map<String, Object> getErrorResponseParameters(Event failureEvent);
 
 }
