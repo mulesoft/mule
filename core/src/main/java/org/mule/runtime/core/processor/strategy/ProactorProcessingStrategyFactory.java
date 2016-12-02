@@ -9,6 +9,8 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -41,10 +43,14 @@ import org.reactivestreams.Publisher;
 public class ProactorProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new ProactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
-                                          () -> muleContext.getSchedulerService().ioScheduler(),
-                                          () -> muleContext.getSchedulerService().cpuIntensiveScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new ProactorProcessingStrategy(() -> muleContext.getSchedulerService()
+        .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+                                          () -> muleContext.getSchedulerService()
+                                              .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                          () -> muleContext.getSchedulerService()
+                                              .cpuIntensiveScheduler(config()
+                                                  .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                           scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                       MILLISECONDS),
                                           muleContext);

@@ -66,6 +66,9 @@ public interface SchedulerService extends Service {
    * executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
    * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
+   * <p>
+   * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
+   * task is finished.
    * 
    * @param config allows customization of the returned scheduler.
    * 
@@ -78,6 +81,9 @@ public interface SchedulerService extends Service {
    * blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
    * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
+   * <p>
+   * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
+   * task is finished.
    * 
    * @param config allows customization of the returned scheduler.
    * 
@@ -91,6 +97,9 @@ public interface SchedulerService extends Service {
    * <p>
    * A task is considered a {@code CPU intensive} if its duration is more than 10 milliseconds and less than 20% of its clock time
    * is due to blocking.
+   * <p>
+   * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
+   * task is finished.
    * 
    * @param config allows customization of the returned scheduler.
    * 
@@ -105,7 +114,7 @@ public interface SchedulerService extends Service {
    * 
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
-  Scheduler customScheduler(String name, int corePoolSize);
+  Scheduler customScheduler(SchedulerConfig config);
 
   /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
@@ -114,6 +123,6 @@ public interface SchedulerService extends Service {
    * 
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
-  Scheduler customScheduler(String name, int corePoolSize, int queueSize);
+  Scheduler customScheduler(SchedulerConfig config, int queueSize);
 
 }

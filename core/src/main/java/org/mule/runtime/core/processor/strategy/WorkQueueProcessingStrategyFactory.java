@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 
 /**
- * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dipatches incoming messages to a work queue
+ * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dispatches incoming messages to a work queue
  * which is served by a pool of worker threads from the applications IO {@link Scheduler}. Processing of the flow is carried out
  * synchronously on the worker thread until completion.
  *
@@ -47,9 +47,9 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
   private int maxThreads;
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(config().withMaxConcurrentTasks(maxThreads)),
+        .ioScheduler(config().withMaxConcurrentTasks(maxThreads).withName(schedulersNamePrefix)),
                                            scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                        MILLISECONDS),
                                            muleContext);

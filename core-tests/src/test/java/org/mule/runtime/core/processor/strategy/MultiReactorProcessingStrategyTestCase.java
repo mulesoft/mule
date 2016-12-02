@@ -31,7 +31,7 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
   }
 
   @Override
-  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext) {
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorProcessingStrategy(() -> cpuLight, scheduler -> {
     }, muleContext);
   }

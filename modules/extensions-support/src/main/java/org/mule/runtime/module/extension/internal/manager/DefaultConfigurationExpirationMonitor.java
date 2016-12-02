@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -122,9 +124,9 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
    */
   @Override
   public void beginMonitoring() {
-    // TODO MULE-11018 Give a name to the scheduler: ThreadNameHelper.getPrefix(muleContext),"extension.expiration.manager"
     // TODO: Change the executor type when MULE-8870 is implemented
-    executor = muleContext.getSchedulerService().ioScheduler();
+    executor =
+        muleContext.getSchedulerService().ioScheduler(config().withName(getPrefix(muleContext) + "extension.expiration.manager"));
     scheduledMonitoring = executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
   }
 

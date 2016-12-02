@@ -114,58 +114,79 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config) {
     checkStarted();
+    final String schedulerName = resolveSchedulerName(config, CPU_LIGHT_THREADS_NAME);
     if (config.getMaxConcurrentTasks() != null) {
-      return new ThrottledScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
-                                    scheduledExecutor, quartzScheduler, CPU_LIGHT, config.getMaxConcurrentTasks());
+      return new ThrottledScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT,
+                                    config.getMaxConcurrentTasks());
     } else {
-      return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
-                                  scheduledExecutor, quartzScheduler, CPU_LIGHT);
+      return new DefaultScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT);
     }
   }
 
   @Override
   public Scheduler ioScheduler(SchedulerConfig config) {
     checkStarted();
+    final String schedulerName = resolveSchedulerName(config, IO_THREADS_NAME);
     if (config.getMaxConcurrentTasks() != null) {
-      return new ThrottledScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
-                                    scheduledExecutor, quartzScheduler, IO, config.getMaxConcurrentTasks());
+      return new ThrottledScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO,
+                                    config.getMaxConcurrentTasks());
     } else {
-      return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
-                                  scheduledExecutor, quartzScheduler, IO);
+      return new DefaultScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO);
     }
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     checkStarted();
+    final String schedulerName = resolveSchedulerName(config, COMPUTATION_THREADS_NAME);
     if (config.getMaxConcurrentTasks() != null) {
-      return new ThrottledScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                                    scheduledExecutor, quartzScheduler, CPU_INTENSIVE, config.getMaxConcurrentTasks());
+      return new ThrottledScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
+                                    CPU_INTENSIVE, config.getMaxConcurrentTasks());
     } else {
-      return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                                  scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
+      return new DefaultScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
+                                  CPU_INTENSIVE);
+    }
+  }
+
+  private String resolveSchedulerName(SchedulerConfig config, String prefix) {
+    if (config.getSchedulerName() == null) {
+      return resolveSchedulerCreationLocation(prefix);
+    } else {
+      return config.getSchedulerName();
     }
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize) {
+  public Scheduler customScheduler(SchedulerConfig config) {
     checkStarted();
+    if (config.getMaxConcurrentTasks() == null) {
+      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
+    }
     final ExecutorService executor =
-        new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new SynchronousQueue<Runnable>(),
-                               new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores,
-                                                                 scheduledExecutor, quartzScheduler, CUSTOM);
+        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
+                               new SynchronousQueue<Runnable>(),
+                               new SchedulerThreadFactory(customGroup,
+                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+    final DefaultScheduler customScheduler =
+        new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
+                            scheduledExecutor, quartzScheduler, CUSTOM);
     return customScheduler;
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
     checkStarted();
+    if (config.getMaxConcurrentTasks() == null) {
+      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
+    }
     final ExecutorService executor =
-        new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new LinkedBlockingQueue<Runnable>(queueSize),
-                               new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores,
-                                                                 scheduledExecutor, quartzScheduler, CUSTOM);
+        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
+                               new LinkedBlockingQueue<Runnable>(queueSize),
+                               new SchedulerThreadFactory(customGroup,
+                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+    final DefaultScheduler customScheduler =
+        new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
+                            scheduledExecutor, quartzScheduler, CUSTOM);
     customSchedulersExecutors.add(customScheduler);
     return customScheduler;
   }

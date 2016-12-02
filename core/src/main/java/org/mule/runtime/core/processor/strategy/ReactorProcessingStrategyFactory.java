@@ -8,10 +8,11 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.using;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -22,14 +23,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * Creates {@link ReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages to
@@ -42,9 +41,10 @@ import reactor.core.scheduler.Schedulers;
 public class ReactorProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().customScheduler("event-loop", 1),
+    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
+        .cpuLightScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop")),
                                          scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                      MILLISECONDS),
                                          muleContext);

@@ -40,7 +40,6 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
 
   public static final String SERVER_ALREADY_EXISTS_FORMAT =
       "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
-  //TODO - MULE-11018: Allow to give names to the Schedulers retrieved from SchedulerService
   private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
   private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
@@ -57,9 +56,8 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     //TODO - MULE-11116: Analyze how to allow users to configure this
     TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 
-    String threadNamePrefix = LISTENER_THREAD_NAME_PREFIX;
     try {
-      httpServerManager = new GrizzlyServerManager(threadNamePrefix, httpListenerRegistry, tcpServerSocketProperties);
+      httpServerManager = new GrizzlyServerManager(LISTENER_THREAD_NAME_PREFIX, httpListenerRegistry, tcpServerSocketProperties);
     } catch (IOException e) {
       throw new InitialisationException(e, this);
     }

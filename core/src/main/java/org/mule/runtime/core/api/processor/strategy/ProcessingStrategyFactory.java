@@ -18,5 +18,5 @@ public interface ProcessingStrategyFactory {
   /**
    * @return a new {@link ProcessingStrategy}.
    */
-  ProcessingStrategy create(MuleContext muleContext);
+  ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix);
 }

@@ -7,9 +7,13 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import org.mule.runtime.api.scheduler.Scheduler;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -25,10 +29,13 @@ import java.util.function.Supplier;
 public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
-                                             () -> muleContext.getSchedulerService().ioScheduler(),
-                                             () -> muleContext.getSchedulerService().cpuIntensiveScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
+        .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+                                             () -> muleContext.getSchedulerService()
+                                                 .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                             () -> muleContext.getSchedulerService().cpuIntensiveScheduler(config()
+                                                 .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                          MILLISECONDS),
                                              muleContext);
@@ -42,6 +49,7 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
       super(eventLoop, io, cpu, schedulerStopper, muleContext);
     }
 
+    @Override
     protected Consumer<Event> assertCanProcess() {
       // Do nothing given event should still be processed when transaction is active
       return event -> {

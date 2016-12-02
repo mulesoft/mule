@@ -12,6 +12,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -59,7 +60,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
     service.start();
 
-    final Scheduler custom = service.customScheduler("custom", 1);
+    final Scheduler custom = service.customScheduler(config().withMaxConcurrentTasks(1));
 
     custom.execute(() -> {
       try {

@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
@@ -55,8 +56,9 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
   public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new LegacyAsynchronousProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new LegacyAsynchronousProcessingStrategy(() -> muleContext.getSchedulerService()
+        .ioScheduler(config().withName(schedulersNamePrefix)),
                                                     scheduler -> scheduler
                                                         .stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
                                                     muleContext);

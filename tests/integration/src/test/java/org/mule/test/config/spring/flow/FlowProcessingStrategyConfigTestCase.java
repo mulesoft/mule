@@ -9,12 +9,13 @@ package org.mule.test.config.spring.flow;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -82,7 +83,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     }
 
     @Override
-    public ProcessingStrategy create(MuleContext muleContext) {
+    public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
       return this;
     }
   }

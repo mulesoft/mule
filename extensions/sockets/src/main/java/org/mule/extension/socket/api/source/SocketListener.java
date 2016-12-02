@@ -10,15 +10,17 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.scheduler.Scheduler;
+
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.config.ListenerConfig;
 import org.mule.extension.socket.api.connection.ListenerConnection;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -81,13 +83,13 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
    */
   @Override
   public void onStart(SourceCallback<InputStream, SocketAttributes> sourceCallback) throws MuleException {
-    // TODO MULE-11018 format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName())
-    workManager = schedulerService.ioScheduler();
+    workManager = schedulerService
+        .ioScheduler(config().withName(format("%s%s.socket.worker", getPrefix(muleContext), flowConstruct.getName())));
 
     stopRequested.set(false);
 
-    listenerExecutor =
-        schedulerService.customScheduler(format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName()), 1);
+    listenerExecutor = schedulerService.customScheduler(config().withMaxConcurrentTasks(1)
+        .withName(format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName())));
     submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
   }
 

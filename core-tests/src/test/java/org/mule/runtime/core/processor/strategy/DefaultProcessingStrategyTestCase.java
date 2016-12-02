@@ -29,7 +29,7 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
   }
 
   @Override
-  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext) {
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new DefaultFlowProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive,
                                              scheduler -> {
                                              },

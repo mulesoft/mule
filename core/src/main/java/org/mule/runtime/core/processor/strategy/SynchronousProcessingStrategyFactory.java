@@ -24,7 +24,7 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
   };
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 
