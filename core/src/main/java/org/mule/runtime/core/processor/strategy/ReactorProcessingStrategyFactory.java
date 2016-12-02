@@ -79,7 +79,7 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
           .doOnNext(assertCanProcess())
-          .publishOn(Schedulers.fromExecutorService(Executors.newSingleThreadExecutor()))
+          .publishOn(createReactorScheduler(cpuLightScheduler))
           .transform(pipelineFunction);
     }
 
