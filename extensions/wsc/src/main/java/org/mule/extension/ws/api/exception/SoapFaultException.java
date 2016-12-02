@@ -6,53 +6,39 @@
  */
 package org.mule.extension.ws.api.exception;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-
-import java.util.Optional;
-
-import javax.xml.namespace.QName;
-
-import org.w3c.dom.Element;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 
 /**
  * Exception thrown by the Web Service Consumer when processing a SOAP fault. The exception contains the details about the fault.
  *
  * @since 4.0
  */
-public class SoapFaultException extends MuleRuntimeException {
+public class SoapFaultException extends MuleRuntimeException implements ErrorMessageAwareException {
 
-  private final QName faultCode;
-  private final QName subCode;
-  private final Element detail;
+  private final Message message;
 
-  public SoapFaultException(QName faultCode,
-                            QName subCode,
-                            String message,
-                            Element detail) {
-    super(createStaticMessage(message));
-    this.faultCode = faultCode;
-    this.subCode = subCode;
-    this.detail = detail;
+  public SoapFaultException(org.apache.cxf.binding.soap.SoapFault cause) {
+    super(createStaticMessage(cause.getMessage()));
+    SoapFault soapFault = new SoapFault(cause.getFaultCode(),
+                                        cause.getSubCode(),
+                                        cause.getOrCreateDetail(),
+                                        cause.getReason(),
+                                        cause.getNode(),
+                                        cause.getRole());
+
+    this.message = Message.builder().payload(soapFault).build();
   }
 
-  public SoapFaultException(QName faultCode, String message, Element detail) {
-    super(createStaticMessage(message));
-    this.faultCode = faultCode;
-    this.subCode = null;
-    this.detail = detail;
+  @Override
+  public Message getErrorMessage() {
+    return message;
   }
 
-  public QName getFaultCode() {
-    return faultCode;
-  }
-
-  public Optional<QName> getSubCode() {
-    return ofNullable(subCode);
-  }
-
-  public Element getDetail() {
-    return detail;
+  @Override
+  public Throwable getRootCause() {
+    return this;
   }
 }

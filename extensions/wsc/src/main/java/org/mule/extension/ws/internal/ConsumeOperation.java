@@ -14,7 +14,8 @@ import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.api.WscAttributes;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.BadRequestException;
+import org.mule.extension.ws.api.exception.SoapFaultException;
 import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.extension.ws.internal.generator.SoapRequestGenerator;
 import org.mule.extension.ws.internal.generator.SoapResponseGenerator;
@@ -25,6 +26,7 @@ import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
 import org.mule.extension.ws.internal.util.WscTransformationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.OnException;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
@@ -76,11 +78,13 @@ public class ConsumeOperation {
    * @param message    the constructed SOAP message to perform the request.
    */
   @OnException(WscExceptionEnricher.class)
+  @Throws(ConsumeErrorTypeProvider.class)
   @OutputResolver(output = ConsumeOutputResolver.class, attributes = WscAttributesResolver.class)
   public Result<Object, WscAttributes> consume(@UseConfig WebServiceConsumer config,
                                                @Connection WscConnection connection,
                                                @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                               @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message) {
+                                               @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
+      throws SoapFaultException {
     Map<String, SoapAttachment> attachments = message.getAttachments();
     Map<String, String> headers = message.getHeaders();
     Map<String, Object> ctx = getInvocationContext(config, connection, headers, attachments, operation);
@@ -124,7 +128,7 @@ public class ConsumeOperation {
           try {
             return new SoapHeader(new QName(null, h.getKey()), stringToDomElement(h.getValue()));
           } catch (WscTransformationException e) {
-            throw new WscException(format("Error while preparing request header [%s] to be sent", h.getKey()), e);
+            throw new BadRequestException(format("Error while preparing request header [%s] to be sent", h.getKey()), e);
           }
         })
         .collect(new ImmutableListCollector<>());
@@ -138,7 +142,7 @@ public class ConsumeOperation {
       try {
         return new AttachmentImpl(a.getId(), toDataHandler(a.getId(), a.getContent(), a.getContentType()));
       } catch (IOException e) {
-        throw new WscException(format("Error while preparing attachment [%s] for upload", a.getId()), e);
+        throw new BadRequestException(format("Error while preparing attachment [%s] for upload", a.getId()), e);
       }
     }).collect(new ImmutableListCollector<>());
   }

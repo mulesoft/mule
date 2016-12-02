@@ -9,7 +9,9 @@ package org.mule.extension.ws.internal.connection;
 import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.ws.api.SoapVersion;
+import org.mule.extension.ws.api.exception.SoapFaultException;
 import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentRequestEnricher;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentResponseEnricher;
 import org.mule.extension.ws.internal.generator.attachment.MtomRequestEnricher;
@@ -17,7 +19,6 @@ import org.mule.extension.ws.internal.generator.attachment.MtomResponseEnricher;
 import org.mule.extension.ws.internal.generator.attachment.SoapAttachmentRequestEnricher;
 import org.mule.extension.ws.internal.generator.attachment.SoapAttachmentResponseEnricher;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
-import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -83,7 +84,7 @@ public class WscConnection {
     try {
       return client.invoke(getInvocationOperation(), new Object[] {payload}, ctx, exchange);
     } catch (SoapFault sf) {
-      throw sf;
+      throw new SoapFaultException(sf);
     } catch (Exception e) {
       throw new WscException(format("An unexpected error occur while consuming the [%s] web service operation", operation), e);
     }

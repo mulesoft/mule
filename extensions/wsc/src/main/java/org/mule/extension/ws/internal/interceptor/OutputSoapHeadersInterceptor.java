@@ -12,7 +12,7 @@ import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
 import static org.mule.extension.ws.internal.ConsumeOperation.MULE_HEADERS_KEY;
 import static org.mule.extension.ws.internal.util.TransformationUtils.nodeToString;
 import org.mule.extension.ws.api.WscAttributes;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.BadResponseException;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.extension.ws.internal.util.WscTransformationException;
 
@@ -48,7 +48,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
           try {
             return nodeToString((Node) h.getObject());
           } catch (WscTransformationException e) {
-            throw new WscException(format("Error while processing response header [%s]", h.getName()), e);
+            throw new BadResponseException(format("Error while processing response header [%s]", h.getName()), e);
           }
         }));
     message.getExchange().put(MULE_HEADERS_KEY, result);

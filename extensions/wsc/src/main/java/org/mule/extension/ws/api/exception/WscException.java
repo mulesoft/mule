@@ -13,15 +13,7 @@ package org.mule.extension.ws.api.exception;
  */
 public class WscException extends RuntimeException {
 
-  public WscException(String message) {
-    super(message);
-  }
-
   public WscException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public WscException(Throwable cause) {
-    super(cause);
   }
 }
