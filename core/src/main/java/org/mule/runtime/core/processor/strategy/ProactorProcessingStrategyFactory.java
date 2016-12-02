@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 
@@ -48,7 +47,7 @@ public class ProactorProcessingStrategyFactory implements ProcessingStrategyFact
     return new ProactorProcessingStrategy(() -> muleContext.getSchedulerService()
         .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                           () -> muleContext.getSchedulerService()
-                                              .ioScheduler(config().withName(schedulersNamePrefix + "." + IO_RW.name())),
+                                              .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                           () -> muleContext.getSchedulerService()
                                               .cpuIntensiveScheduler(config()
                                                   .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
