@@ -16,6 +16,7 @@ import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.Connectable;
@@ -40,7 +41,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
  */
-public abstract class AbstractTransportMessageHandler<O> implements Connectable, LifecycleStateEnabled {
+public abstract class AbstractTransportMessageHandler<O> extends AbstractAnnotatedObject
+    implements Connectable, LifecycleStateEnabled {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
