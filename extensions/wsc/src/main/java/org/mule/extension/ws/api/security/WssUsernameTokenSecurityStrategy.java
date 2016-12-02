@@ -20,6 +20,7 @@ import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import com.google.common.collect.ImmutableMap;
@@ -47,6 +48,7 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
    * The password for the provided username required to authenticate with the service.
    */
   @Parameter
+  @Password
   private String password;
 
   /**

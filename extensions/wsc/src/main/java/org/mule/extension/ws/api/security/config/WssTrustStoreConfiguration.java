@@ -11,6 +11,7 @@ import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_PASSWOR
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_TYPE;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.Properties;
@@ -30,6 +31,7 @@ public class WssTrustStoreConfiguration implements WssStoreConfiguration {
 
   @Parameter
   @Summary("The password to access the store.")
+  @Password
   private String password;
 
   @Parameter

@@ -13,6 +13,7 @@ import static org.apache.ws.security.components.crypto.Merlin.KEYSTORE_PRIVATE_P
 import static org.apache.ws.security.components.crypto.Merlin.KEYSTORE_TYPE;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.Properties;
@@ -32,6 +33,7 @@ public class WssKeyStoreConfiguration implements WssStoreConfiguration {
 
   @Parameter
   @Summary("The password used to access the private key.")
+  @Password
   private String keyPassword;
 
   @Parameter
@@ -40,6 +42,7 @@ public class WssKeyStoreConfiguration implements WssStoreConfiguration {
 
   @Parameter
   @Summary("The password to access the store.")
+  @Password
   private String password;
 
   @Parameter
