@@ -12,6 +12,8 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
+import org.mule.compatibility.core.message.CompatibilityMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
@@ -20,6 +22,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -83,7 +86,16 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                                                                                                resultMessage,
                                                                                                endpoint.getMuleContext());
       requestEvent.getSession().merge(storedSession);
-      Event resultEvent = Event.builder(requestEvent).message(resultMessage).build();
+
+      InternalMessage.Builder messageBuilder = InternalMessage.builder(resultMessage);
+      for (String propertyName : ((OutboundEndpoint) endpoint).getResponseProperties()) {
+        Serializable propertyValue = requestEvent.getMessage().getOutboundProperty(propertyName);
+        if (propertyValue != null) {
+          messageBuilder.addOutboundProperty(propertyName, propertyValue);
+        }
+      }
+      Event resultEvent = Event.builder(requestEvent).message(messageBuilder.build())
+          .groupCorrelation(requestEvent.getGroupCorrelation()).build();
       setCurrentEvent(resultEvent);
       return resultEvent;
     } else {

@@ -30,7 +30,7 @@ public class SensingNullRequestResponseMessageProcessor extends AbstractRequestR
   }
 
   @Override
-  protected Event processResponse(Event response, final Event request) throws MuleException {
+  protected Event processResponse(Event response) throws MuleException {
     responseThread = Thread.currentThread();
     return super.processRequest(response);
   }

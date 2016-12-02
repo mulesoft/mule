@@ -14,10 +14,15 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.junit.Test;
 
-public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContextTestCase {
+public class ResponseMessageProcessorAdapterTestCase extends AbstractReactiveProcessorTestCase {
+
+  public ResponseMessageProcessorAdapterTestCase(Mode mode) {
+    super(mode);
+  }
 
   @Test
   public void testResponseAdaptorSingleMP() throws MuleException, Exception {

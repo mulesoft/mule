@@ -47,7 +47,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).publishOn(fromExecutorService(scheduler.get())).transform(s -> applyNext(s));
+    return from(publisher).publishOn(fromExecutorService(scheduler.get())).transform(applyNext());
   }
 
   @Override

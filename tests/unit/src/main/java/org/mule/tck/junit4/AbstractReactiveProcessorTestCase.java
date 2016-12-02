@@ -7,6 +7,7 @@
 package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.tck.MuleTestUtils.processWithMonoAndBlockOnEventContextCompletion;
 import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
@@ -19,6 +20,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
@@ -68,6 +70,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   @Override
   protected Event process(Processor processor, Event event) throws Exception {
+    setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {
         case BLOCKING:

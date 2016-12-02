@@ -18,7 +18,6 @@ import org.mule.compatibility.core.endpoint.inbound.InboundNotificationMessagePr
 import org.mule.compatibility.core.endpoint.outbound.OutboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundLoggingMessageProcessor;
-import org.mule.compatibility.core.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundRootMessageIdPropertyMessageProcessor;
 import org.mule.compatibility.core.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.runtime.api.exception.MuleException;
@@ -76,7 +75,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler(), endpoint.getMuleContext()));
     list.add(new OutboundEndpointPropertyMessageProcessor(endpoint));
     list.add(new OutboundRootMessageIdPropertyMessageProcessor());
-    list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
     list.add(new OutboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
 
     return list;

@@ -18,6 +18,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,11 +89,11 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
     return event != null;
   }
 
-  protected Publisher<Event> applyNext(Publisher<Event> publisher) {
+  protected Function<Publisher<Event>, Publisher<Event>> applyNext() {
     if (next == null) {
-      return publisher;
+      return publisher -> publisher;
     }
-    return from(publisher).doOnNext(event -> logNextMessageProcessorInvocation()).transform(next);
+    return publisher -> from(publisher).doOnNext(event -> logNextMessageProcessorInvocation()).transform(next);
   }
 
   private void logNextMessageProcessorInvocation() {
