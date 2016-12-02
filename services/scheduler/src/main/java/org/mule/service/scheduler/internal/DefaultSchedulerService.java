@@ -157,24 +157,36 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize) {
+  public Scheduler customScheduler(SchedulerConfig config) {
     checkStarted();
+    if (config.getMaxConcurrentTasks() == null) {
+      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
+    }
     final ExecutorService executor =
-        new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new SynchronousQueue<Runnable>(),
-                               new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores,
-                                                                 scheduledExecutor, quartzScheduler, CUSTOM);
+        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
+                               new SynchronousQueue<Runnable>(),
+                               new SchedulerThreadFactory(customGroup,
+                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+    final DefaultScheduler customScheduler =
+        new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
+                            scheduledExecutor, quartzScheduler, CUSTOM);
     return customScheduler;
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
     checkStarted();
+    if (config.getMaxConcurrentTasks() == null) {
+      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
+    }
     final ExecutorService executor =
-        new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, MILLISECONDS, new LinkedBlockingQueue<Runnable>(queueSize),
-                               new SchedulerThreadFactory(customGroup, "%s." + name + ".%02d"));
-    final DefaultScheduler customScheduler = new CustomScheduler(resolveSchedulerCreationLocation(name), executor, cores,
-                                                                 scheduledExecutor, quartzScheduler, CUSTOM);
+        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
+                               new LinkedBlockingQueue<Runnable>(queueSize),
+                               new SchedulerThreadFactory(customGroup,
+                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+    final DefaultScheduler customScheduler =
+        new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
+                            scheduledExecutor, quartzScheduler, CUSTOM);
     customSchedulersExecutors.add(customScheduler);
     return customScheduler;
   }

@@ -48,12 +48,12 @@ public class MockSchedulerService implements SchedulerService {
   }
   
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize) {
+  public Scheduler customScheduler(SchedulerConfig config) {
     return new MockScheduler();
   }
   
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
     return new MockScheduler();
   }
 }

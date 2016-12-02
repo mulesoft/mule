@@ -76,13 +76,19 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize) {
-    return new StandaloneClientThreadScheduler(corePoolSize);
+  public Scheduler customScheduler(SchedulerConfig config) {
+    if (config.getMaxConcurrentTasks() == null) {
+      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
+    }
+    return new StandaloneClientThreadScheduler(config.getMaxConcurrentTasks());
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
-    return new StandaloneClientThreadScheduler(corePoolSize);
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
+    if (config.getMaxConcurrentTasks() == null) {
+      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
+    }
+    return new StandaloneClientThreadScheduler(config.getMaxConcurrentTasks());
   }
 
   private static class StandaloneClientThreadScheduler extends ScheduledThreadPoolExecutor implements Scheduler {

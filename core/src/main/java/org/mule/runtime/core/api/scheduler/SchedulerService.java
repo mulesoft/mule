@@ -105,7 +105,7 @@ public interface SchedulerService extends Service {
    * 
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
-  Scheduler customScheduler(String name, int corePoolSize);
+  Scheduler customScheduler(SchedulerConfig config);
 
   /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
@@ -114,6 +114,6 @@ public interface SchedulerService extends Service {
    * 
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
-  Scheduler customScheduler(String name, int corePoolSize, int queueSize);
+  Scheduler customScheduler(SchedulerConfig config, int queueSize);
 
 }

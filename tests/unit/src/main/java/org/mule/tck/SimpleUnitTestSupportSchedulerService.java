@@ -86,17 +86,21 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize) {
+  public Scheduler customScheduler(SchedulerConfig config) {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        decorateScheduler(new SimpleUnitTestSupportScheduler(corePoolSize, new NamedThreadFactory(name), new AbortPolicy()));
+        decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
+                                                             new NamedThreadFactory(config.getSchedulerName()),
+                                                             new AbortPolicy()));
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
-  public Scheduler customScheduler(String name, int corePoolSize, int queueSize) {
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        decorateScheduler(new SimpleUnitTestSupportScheduler(corePoolSize, new NamedThreadFactory(name), new AbortPolicy()));
+        decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
+                                                             new NamedThreadFactory(config.getSchedulerName()),
+                                                             new AbortPolicy()));
     decorators.add(decorator);
     return decorator;
   }

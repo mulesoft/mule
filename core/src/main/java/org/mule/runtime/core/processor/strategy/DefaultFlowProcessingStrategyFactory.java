@@ -7,6 +7,9 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 
@@ -28,11 +31,11 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(config().withName(schedulersNamePrefix + ".cpuLite")),
+        .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                              () -> muleContext.getSchedulerService()
-                                                 .ioScheduler(config().withName(schedulersNamePrefix + ".io")),
+                                                 .ioScheduler(config().withName(schedulersNamePrefix + "." + IO_RW.name())),
                                              () -> muleContext.getSchedulerService().cpuIntensiveScheduler(config()
-                                                 .withName(schedulersNamePrefix + ".cpuIntensive")),
+                                                 .withName(schedulersNamePrefix + "." + CPU_INTENSIVE)),
                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                          MILLISECONDS),
                                              muleContext);
