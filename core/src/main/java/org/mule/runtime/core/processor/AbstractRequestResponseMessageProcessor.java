@@ -21,6 +21,7 @@ import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -29,7 +30,7 @@ import reactor.core.publisher.Mono;
  * <p>
  * In order to define the process during the request phase you should override the
  * {@link #processRequest(org.mule.runtime.core.api.Event)} method. Symmetrically, if you need to define a process to be executed
- * during the response phase, then you should override the {@link #processResponse(Event, Event)} method.
+ * during the response phase, then you should override the {@link #processResponse(Event)} method.
  * <p>
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
  * override the {@link #processFinally(org.mule.runtime.core.api.Event, MessagingException)} method.
@@ -44,7 +45,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     MessagingException exception = null;
     Event response = null;
     try {
-      response = processResponse(processNext(processRequest(event)), event);
+      response = processResponse(processNext(processRequest(event)));
       return response;
     } catch (MessagingException e) {
       exception = e;
@@ -60,24 +61,22 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).concatMap(request -> {
-      Mono<Event> stream = Mono.just(request).transform(processRequest());
-      if (next != null) {
-        stream = stream.transform(s -> applyNext(s));
-      }
-      return stream.transform(processResponse(request))
-          .doOnSuccess(result -> processFinally(result != null ? result : request, null))
-          .doOnError(EventDroppedException.class, dme -> processFinally(dme.getEvent(), null))
-          .otherwise(MessagingException.class, exception -> {
-            try {
-              return Mono.just(processCatch(exception.getEvent(), exception));
-            } catch (MessagingException me) {
-              return Mono.error(me);
-            } finally {
-              processFinally(exception.getEvent(), exception);
-            }
-          });
-    });
+    Flux<Event> flux = from(publisher).transform(processRequest());
+    if (next != null) {
+      flux = flux.transform(applyNext());
+    }
+    return flux.transform(processResponse())
+        .doOnNext(result -> processFinally(result, null))
+        .doOnError(EventDroppedException.class, dme -> processFinally(dme.getEvent(), null))
+        .onErrorResumeWith(MessagingException.class, exception -> {
+          try {
+            return Mono.just(processCatch(exception.getEvent(), exception));
+          } catch (MessagingException me) {
+            return Mono.error(me);
+          } finally {
+            processFinally(exception.getEvent(), exception);
+          }
+        });
   }
 
   /**
@@ -110,11 +109,10 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * Processes the response phase after the next message processor and it's response phase have been invoked
    *
    * @param response response event to be processed.
-   * @param request the request event
    * @return result of response processing.
    * @throws MuleException exception thrown by implementations of this method whiile performing response processing
    */
-  protected Event processResponse(Event response, final Event request) throws MuleException {
+  protected Event processResponse(Event response) throws MuleException {
     return response;
   }
 
@@ -123,8 +121,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    *
    * @return function that performs request processing
    */
-  protected Function<Publisher<Event>, Publisher<Event>> processResponse(Event request) {
-    return stream -> from(stream).handle(nullSafeMap(checkedFunction(response -> processResponse(response, request))));
+  protected Function<Publisher<Event>, Publisher<Event>> processResponse() {
+    return stream -> from(stream).handle(nullSafeMap(checkedFunction(response -> processResponse(response))));
   }
 
   /**

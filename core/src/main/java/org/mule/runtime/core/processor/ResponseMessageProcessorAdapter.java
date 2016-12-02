@@ -25,13 +25,16 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.util.rx.Exceptions;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
-public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMessageProcessor
+public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
     implements Lifecycle, FlowConstructAware {
 
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
@@ -51,21 +54,14 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
     this.responseProcessor = processor;
   }
 
+
   @Override
-  protected Event processResponse(final Event response, final Event request) throws MuleException {
+  public Event process(Event event) throws MuleException {
+    Event response = processNext(event);
     if (responseProcessor == null || !isEventValid(response)) {
       return response;
     } else {
       return resolveReturnEvent(responseProcessor.process(response), response);
-    }
-  }
-
-  @Override
-  protected Function<Publisher<Event>, Publisher<Event>> processResponse(Event request) {
-    if (responseProcessor == null) {
-      return stream -> stream;
-    } else {
-      return stream -> from(stream).transform(responseProcessor).map(result -> resolveReturnEvent(result, request));
     }
   }
 
@@ -78,6 +74,19 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
       return original;
     } else {
       return result;
+    }
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    if (responseProcessor == null) {
+      return publisher;
+    } else {
+      return from(publisher)
+          .transform(applyNext())
+          .concatMap(event -> just(event)
+              .transform(responseProcessor)
+              .onErrorResumeWith(EventDroppedException.class, ede -> just(event)));
     }
   }
 

@@ -20,10 +20,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import reactor.core.Exceptions;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
@@ -61,15 +63,40 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).concatMap(event -> {
-      Builder builder = Event.builder(event);
-      boolean accepted = accept(event, builder);
-      if (accepted) {
-        return applyNext(just(builder.build()));
-      } else {
-        return handleUnaccepted().apply(event);
-      }
-    });
+    // Optimize to only use concatMap is unaccepted processor is configured.
+    if (unacceptedMessageProcessor == null) {
+      return from(publisher).<Event>handle((event, sink) -> {
+        Builder builder = Event.builder(event);
+        boolean accepted;
+        try {
+          accepted = accept(event, builder);
+        } catch (Exception ex) {
+          throw propagate(filterFailureException(builder.build(), ex));
+        }
+        if (accepted) {
+          sink.next(builder.build());
+        } else {
+          if (isThrowOnUnaccepted()) {
+            throw propagate(filterUnacceptedException(event));
+          } else {
+            sink.error(newEventDroppedException(event));
+          }
+        }
+      }).transform(applyNext());
+    } else {
+      return from(publisher).concatMap(event -> {
+        Builder builder = Event.builder(event);
+        try {
+          if (accept(event, builder)) {
+            return just(event).transform(applyNext());
+          } else {
+            return just(event).transform(unacceptedMessageProcessor);
+          }
+        } catch (Exception ex) {
+          return error(filterFailureException(builder.build(), ex));
+        }
+      });
+    }
   }
 
   protected abstract boolean accept(Event event, Event.Builder builder);
@@ -81,18 +108,6 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
       throw filterUnacceptedException(event);
     } else {
       return null;
-    }
-  }
-
-  private Function<Event, Publisher<Event>> handleUnaccepted() {
-    if (unacceptedMessageProcessor != null) {
-      return event -> just(event).transform(unacceptedMessageProcessor);
-    } else if (isThrowOnUnaccepted()) {
-      return event -> {
-        throw propagate(filterUnacceptedException(event));
-      };
-    } else {
-      return event -> error(newEventDroppedException(event));
     }
   }
 

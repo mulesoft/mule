@@ -71,7 +71,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
 
     @Override
-    protected Event processResponse(Event response, Event request) throws MuleException {
+    protected Event processResponse(Event response) throws MuleException {
       processOutboundRouterStatistics();
       response = afterRouting(exception, response);
       if (response != null) {

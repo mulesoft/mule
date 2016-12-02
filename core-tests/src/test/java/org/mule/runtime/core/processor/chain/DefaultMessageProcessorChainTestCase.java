@@ -937,7 +937,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       if (stopProcessing) {
         return publisher;
       } else {
-        return from(publisher).map(before -> appendBefore(before)).transform(eventFlux -> applyNext(eventFlux))
+        return from(publisher).map(before -> appendBefore(before)).transform(applyNext())
             .map(after -> {
               if (after != null) {
                 return appendAfter(after);

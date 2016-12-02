@@ -60,7 +60,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     if (filter == null) {
-      return from(publisher).transform(stream -> applyNext(stream));
+      return from(publisher).transform(applyNext());
     } else {
       return from(publisher).doOnNext(event -> {
         try {
@@ -68,7 +68,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         } catch (Exception e) {
           throw propagate(e);
         }
-      }).transform(stream -> applyNext(stream));
+      }).transform(applyNext());
     }
   }
 

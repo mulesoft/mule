@@ -7,6 +7,7 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -28,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * Experimental implementation that supports a single dynamic pipeline due to restrictions imposed by intercepting message
@@ -55,7 +57,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return applyNext(publisher);
+    return from(publisher).transform(applyNext());
   }
 
   @Override

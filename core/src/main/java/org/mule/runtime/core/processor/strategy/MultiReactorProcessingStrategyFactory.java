@@ -27,71 +27,25 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.TopicProcessor;
+import reactor.core.scheduler.Schedulers;
 
 /**
- * Creates {@link MultiReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages to
- * single-threaded event-loop.
+ * Creates {@link ReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages using the
+ * cpu-light scheduler.
  *
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0
  */
-public class MultiReactorProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class MultiReactorProcessingStrategyFactory extends ReactorProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
-    return new MultiReactorProcessingStrategy(() -> muleContext.getSchedulerService().customScheduler("event-loop", 1),
-                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                          MILLISECONDS),
-                                              muleContext);
-  }
-
-  static class MultiReactorProcessingStrategy extends AbstractSchedulingProcessingStrategy {
-
-    private Supplier<Scheduler> cpuLightSchedulerSupplier;
-    protected Scheduler cpuLightScheduler;
-
-    public MultiReactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                          Consumer<Scheduler> schedulerStopper,
-                                          MuleContext muleContext) {
-      super(schedulerStopper, muleContext);
-      this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
-    }
-
-    @Override
-    public void start() throws MuleException {
-      this.cpuLightScheduler = cpuLightSchedulerSupplier.get();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (cpuLightScheduler != null) {
-        getSchedulerStopper().accept(cpuLightScheduler);
-      }
-    }
-
-    @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
-                                                                   MessagingExceptionHandler messagingExceptionHandler) {
-      return publisher -> from(publisher)
-          .doOnNext(assertCanProcess())
-          .publishOn(createReactorScheduler(cpuLightScheduler))
-          .transform(pipelineFunction);
-    }
-
-    protected Consumer<Event> assertCanProcess() {
-      return event -> {
-        if (isTransactionActive()) {
-          throw propagate(new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
-        }
-      };
-    }
-
-    @Override
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> false;
-    }
+    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
+                                         scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                                     MILLISECONDS),
+                                         muleContext);
   }
 
 }
