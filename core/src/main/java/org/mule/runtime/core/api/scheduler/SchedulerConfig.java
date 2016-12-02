@@ -28,8 +28,8 @@ public class SchedulerConfig {
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
    * <p>
-   * This is useful to apply throttling on the target {@link Scheduler}. Exceeding tasks will block the caller, until a running
-   * task is finished.
+   * This is useful to apply throttling on the target {@link Scheduler}. The way exceeding tasks will be handled is determined by
+   * the target {@link Scheduler}.
    * 
    * @param maxConcurrentTasks how many tasks can be running at the same time for the target {@link Scheduler}.
    * @return the updated configuration.
