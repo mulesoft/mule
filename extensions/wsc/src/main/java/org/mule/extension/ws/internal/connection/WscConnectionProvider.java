@@ -6,20 +6,15 @@
  */
 package org.mule.extension.ws.internal.connection;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.extension.ws.api.SoapVersion;
 import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.List;
 
@@ -28,7 +23,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class WscConnectionProvider implements PoolingConnectionProvider<WscConnection>, Initialisable {
+public class WscConnectionProvider implements PoolingConnectionProvider<WscConnection> {
 
   /**
    * The WSDL file URL remote or local.
@@ -56,15 +51,6 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   private String address;
 
   /**
-   * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. Allows to create a TLS secured
-   * connections.
-   */
-  @Parameter
-  @Optional
-  @Summary("TLS Configuration for the secure connection of the IMAPS protocol")
-  private TlsContextFactory tlsContextFactory;
-
-  /**
    * The security strategies configured to protect the SOAP messages.
    */
   @Parameter
@@ -88,22 +74,9 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
 
   /**
    * {@inheritDoc}
-   * <p>
-   * Initialises the {@code tlsContextFactory}.
-   */
-  @Override
-  public void initialise() throws InitialisationException {
-    initialiseIfNeeded(tlsContextFactory);
-  }
-
-  /**
-   * {@inheritDoc}
    */
   @Override
   public WscConnection connect() throws ConnectionException {
-    for (SecurityStrategy securityStrategy : securityStrategies) {
-      securityStrategy.initializeTlsContextFactory(tlsContextFactory);
-    }
     return new WscConnection(wsdlLocation, address, service, port, soapVersion, securityStrategies, mtomEnabled);
   }
 

@@ -15,13 +15,12 @@ import static org.apache.ws.security.handler.WSHandlerConstants.ADD_UT_ELEMENTS;
 import static org.apache.ws.security.handler.WSHandlerConstants.PASSWORD_TYPE;
 import static org.apache.ws.security.handler.WSHandlerConstants.USER;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
-
 import org.mule.extension.ws.api.PasswordType;
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import com.google.common.collect.ImmutableMap;
@@ -49,6 +48,7 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
    * The password for the provided username required to authenticate with the service.
    */
   @Parameter
+  @Password
   private String password;
 
   /**
@@ -111,10 +111,5 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
     }
 
     return builder.build();
-  }
-
-  @Override
-  public void initializeTlsContextFactory(TlsContextFactory tlsContextFactory) {
-    // no initialization required
   }
 }

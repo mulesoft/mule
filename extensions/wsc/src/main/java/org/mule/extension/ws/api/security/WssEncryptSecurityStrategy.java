@@ -6,23 +6,18 @@
  */
 package org.mule.extension.ws.api.security;
 
-import static java.util.Optional.empty;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPTION_USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENC_PROP_REF_ID;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
-import org.mule.extension.ws.internal.security.EncryptionHelper;
+import org.mule.extension.ws.api.security.config.WssKeyStoreConfiguration;
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
 
 /**
  * Verifies the signature of a SOAP response, using certificates of the trust-store in the provided TLS context.
@@ -32,20 +27,12 @@ import java.util.Properties;
 public class WssEncryptSecurityStrategy implements SecurityStrategy {
 
   private static final String WS_ENCRYPT_PROPERTIES_KEY = "encryptProperties";
-  private static final EncryptionHelper encryptionHelper = new EncryptionHelper();
 
+  /**
+   * The keystore to use when encrypting the message.
+   */
   @Parameter
-  private String alias;
-
-  private TlsContextFactory tlsContextFactory;
-
-  @Override
-  public void initializeTlsContextFactory(TlsContextFactory tlsContextFactory) throws ConnectionException {
-    if (tlsContextFactory == null) {
-      throw new ConnectionException("Encrypt security strategy required a TLS context and no one was provided");
-    }
-    this.tlsContextFactory = tlsContextFactory;
-  }
+  private WssKeyStoreConfiguration keyStoreConfiguration;
 
   @Override
   public SecurityStrategyType securityType() {
@@ -58,18 +45,15 @@ public class WssEncryptSecurityStrategy implements SecurityStrategy {
   }
 
   @Override
-  public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return empty();
+  public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
+    return java.util.Optional.empty();
   }
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
-    Properties encryptionProperties = tlsContextFactory == null ? encryptionHelper.createDefaultTrustStoreProperties()
-        : encryptionHelper.createTrustStoreProperties(tlsContextFactory.getTrustStoreConfiguration());
-
     return ImmutableMap.<String, Object>builder().put(ENC_PROP_REF_ID, WS_ENCRYPT_PROPERTIES_KEY)
-        .put(WS_ENCRYPT_PROPERTIES_KEY, encryptionProperties)
-        .put(ENCRYPTION_USER, alias)
+        .put(WS_ENCRYPT_PROPERTIES_KEY, keyStoreConfiguration.getConfigurationProperties())
+        .put(ENCRYPTION_USER, keyStoreConfiguration.getAlias())
         .build();
   }
 }

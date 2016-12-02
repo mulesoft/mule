@@ -7,21 +7,23 @@
 package org.mule.extension.ws.api.security;
 
 
-import static java.util.Optional.*;
+import static org.apache.ws.security.components.crypto.Merlin.LOAD_CA_CERTS;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
+import static org.mule.extension.ws.api.security.config.WssStoreConfiguration.WS_CRYPTO_PROVIDER_KEY;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
-import org.mule.extension.ws.internal.security.EncryptionHelper;
+import org.mule.extension.ws.api.security.config.WssTrustStoreConfiguration;
 import org.mule.extension.ws.internal.security.SecurityStrategyType;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
+
+import org.apache.ws.security.components.crypto.Merlin;
 
 
 /**
@@ -32,17 +34,13 @@ import java.util.Properties;
 public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
 
   private static final String WS_VERIFY_SIGNATURE_PROPERTIES_KEY = "verifySignatureProperties";
-  private static final EncryptionHelper encryptionHelper = new EncryptionHelper();
 
-  private TlsContextFactory tlsContextFactory;
-
-  @Override
-  public void initializeTlsContextFactory(TlsContextFactory tlsContextFactory) throws ConnectionException {
-    if (tlsContextFactory == null) {
-      throw new ConnectionException("Verify Signature security strategy required a TLS context and no one was provided");
-    }
-    this.tlsContextFactory = tlsContextFactory;
-  }
+  /**
+   * The truststore to use to verify the signature.
+   */
+  @Parameter
+  @Optional
+  private WssTrustStoreConfiguration trustStoreConfiguration;
 
   @Override
   public SecurityStrategyType securityType() {
@@ -50,8 +48,8 @@ public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
   }
 
   @Override
-  public Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return empty();
+  public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
+    return java.util.Optional.empty();
   }
 
   @Override
@@ -61,12 +59,19 @@ public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
-    Properties signature = tlsContextFactory == null ? encryptionHelper.createDefaultTrustStoreProperties()
-        : encryptionHelper.createTrustStoreProperties(tlsContextFactory.getTrustStoreConfiguration());
+    Properties signatureProps = trustStoreConfiguration != null ? trustStoreConfiguration.getConfigurationProperties()
+        : getDefaultTrustStoreConfigurationProperties();
 
     return ImmutableMap.<String, Object>builder()
         .put(SIG_PROP_REF_ID, WS_VERIFY_SIGNATURE_PROPERTIES_KEY)
-        .put(WS_VERIFY_SIGNATURE_PROPERTIES_KEY, signature)
+        .put(WS_VERIFY_SIGNATURE_PROPERTIES_KEY, signatureProps)
         .build();
+  }
+
+  private Properties getDefaultTrustStoreConfigurationProperties() {
+    Properties properties = new Properties();
+    properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
+    properties.setProperty(LOAD_CA_CERTS, String.valueOf(true));
+    return properties;
   }
 }
