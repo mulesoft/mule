@@ -43,6 +43,7 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext) {
+    // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
     return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().customScheduler("event-loop", 1),
                                          scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                      MILLISECONDS),
