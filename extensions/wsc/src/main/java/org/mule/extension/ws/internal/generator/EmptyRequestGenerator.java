@@ -55,8 +55,8 @@ final class EmptyRequestGenerator {
     Optional<List<String>> soapBodyParts = getSoapBodyParts(bindingOperation);
 
     if (!soapBodyParts.isPresent()) {
-      throw new InvalidWsdlException("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation"
-          + " requires input parameters. Cannot build a default body request for the specified operation [" + operation + "]");
+      throw new InvalidWsdlException(format("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation"
+          + " requires input parameters. Cannot build a default body request for the specified operation [%s]", operation));
     }
 
     Message message = bindingOperation.getOperation().getInput().getMessage();
