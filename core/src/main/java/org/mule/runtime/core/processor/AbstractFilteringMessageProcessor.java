@@ -70,26 +70,24 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
         boolean accepted;
         try {
           accepted = accept(event, builder);
-          if (accepted) {
-            sink.next(builder.build());
-          } else {
-            if (isThrowOnUnaccepted()) {
-              sink.error(filterUnacceptedException(event));
-            } else {
-              sink.error(newEventDroppedException(event));
-            }
-          }
         } catch (Exception ex) {
-          sink.error(filterFailureException(builder.build(), ex));
+          throw propagate(filterFailureException(builder.build(), ex));
+        }
+        if (accepted) {
+          sink.next(builder.build());
+        } else {
+          if (isThrowOnUnaccepted()) {
+            throw propagate(filterUnacceptedException(event));
+          } else {
+            sink.error(newEventDroppedException(event));
+          }
         }
       }).transform(applyNext());
     } else {
       return from(publisher).concatMap(event -> {
         Builder builder = Event.builder(event);
-        boolean accepted;
         try {
-          accepted = accept(event, builder);
-          if (accepted) {
+          if (accept(event, builder)) {
             return just(event).transform(applyNext());
           } else {
             return just(event).transform(unacceptedMessageProcessor);
