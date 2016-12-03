@@ -52,11 +52,23 @@ public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
     }
 
     @Test
-    public void returnObject() throws Exception
+    public void updatesWithStruct() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://updatesObject", TEST_MESSAGE, null);
+        MuleMessage response = client.send("vm://updateWithStruct", TEST_MESSAGE, null);
+
+        assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
+    }
+
+    @Test
+    public void updatesWithArray() throws Exception
+    {
+        Object[] payload = SOUTHWEST_MANAGER.getContactDetails().asObjectArray();
+
+        LocalMuleClient client = muleContext.getClient();
+
+        MuleMessage response = client.send("vm://updateWithObject", payload, null);
 
         assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
     }
