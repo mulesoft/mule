@@ -48,7 +48,7 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
 
   private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax) {
     final ExtensionType extensionType =
-        registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
+        registerExecutableType(name, sourceModel.getAllParameterModels(), MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
     ExplicitGroup sequence = extensionType.getSequence();
 
     if (sequence == null) {
