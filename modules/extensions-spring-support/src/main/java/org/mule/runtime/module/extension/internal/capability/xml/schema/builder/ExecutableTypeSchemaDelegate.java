@@ -72,6 +72,11 @@ abstract class ExecutableTypeSchemaDelegate {
 
   protected ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
                                                  DslElementSyntax dslSyntax) {
+    return registerExecutableType(name, parameterizedModel.getAllParameterModels(), base, dslSyntax);
+  }
+
+  protected ExtensionType registerExecutableType(String name, List<ParameterModel> parameterModels, QName base,
+                                                 DslElementSyntax dslSyntax) {
     TopLevelComplexType complexType = new TopLevelComplexType();
     complexType.setName(name);
 
@@ -87,20 +92,17 @@ abstract class ExecutableTypeSchemaDelegate {
     }
 
     List<TopLevelElement> childElements = new LinkedList<>();
-    parameterizedModel.getParameterGroupModels()
-        .forEach(g -> {
-          g.getParameterModels().forEach(parameter -> {
-            DslElementSyntax paramDsl = dsl.resolve(parameter);
-            MetadataType parameterType = parameter.getType();
+    parameterModels.forEach(parameter -> {
+      DslElementSyntax paramDsl = dsl.resolve(parameter);
+      MetadataType parameterType = parameter.getType();
 
-            if (isOperation(parameterType)) {
-              String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
-              childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
-            } else {
-              this.builder.declareAsParameter(parameterType, complexContentExtension, parameter, paramDsl, childElements);
-            }
-          });
-        });
+      if (isOperation(parameterType)) {
+        String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
+        childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
+      } else {
+        this.builder.declareAsParameter(parameterType, complexContentExtension, parameter, paramDsl, childElements);
+      }
+    });
 
 
     if (childElements.isEmpty()) {
