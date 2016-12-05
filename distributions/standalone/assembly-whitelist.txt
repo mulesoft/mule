@@ -245,7 +245,6 @@
 /mule-standalone-${productVersion}/lib/opt/cxf-tools-common-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/dom4j-1.6.1.jar
-/mule-standalone-${productVersion}/lib/opt/FastInfoset-1.2.12.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
@@ -272,8 +271,8 @@
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.transaction-api-1.2.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.17.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.17.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.13.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.13.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
