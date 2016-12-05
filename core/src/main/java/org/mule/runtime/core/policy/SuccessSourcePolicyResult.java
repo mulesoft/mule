@@ -53,6 +53,12 @@ public class SuccessSourcePolicyResult {
   }
 
   /**
+   * This method generates the set of error parameters from an {@link Event} to use on the error response function.
+   * 
+   * Even though this class represents a successful execution it may be that when evaluating the response parameters there's a
+   * failure which most likely can be an expression execution error. In such scenarios the error handler must be executed and an
+   * error response must be send. This method must be used to generate the error response parameters
+   * 
    * @param event the event to use as source for generating the error response parameters.
    * @return the set of parameters to execute the function that sends the failure response.
    */

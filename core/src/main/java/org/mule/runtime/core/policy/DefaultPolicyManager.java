@@ -12,8 +12,10 @@ import static org.mule.runtime.core.functional.Either.right;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
@@ -63,6 +65,13 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       return event -> {
         try {
           Event flowExecutionResult = flowExecutionProcessor.process(sourceEvent);
+
+          // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
+          if (flowExecutionResult == null) {
+            flowExecutionResult =
+                Event.builder(sourceEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();
+          }
+
           return right(new SuccessSourcePolicyResult(flowExecutionResult,
                                                      messageSourceResponseParametersProcessor
                                                          .getSuccessfulExecutionResponseParametersFunction()
