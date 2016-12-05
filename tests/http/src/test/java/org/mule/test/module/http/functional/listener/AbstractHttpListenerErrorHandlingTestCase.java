@@ -8,6 +8,7 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -63,7 +64,7 @@ public abstract class AbstractHttpListenerErrorHandlingTestCase extends Abstract
 
   protected void assertExceptionStrategyNotExecuted(final HttpResponse httpResponse) throws IOException {
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_INTERNAL_SERVER_ERROR));
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(""));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(""));
     assertThat(TrackPassageMessageProcessor.passed, is(false));
   }
 

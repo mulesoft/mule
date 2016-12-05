@@ -40,6 +40,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
@@ -129,27 +130,18 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       ComponentIdentifier operationIdentifier =
           new ComponentIdentifier.Builder().withName(operationModel.getName())
               .withNamespace(extensionModel.getName().toLowerCase()).build();
-      Optional<OperationPolicy> policy = policyManager.findOperationPolicy(event.getContext().getId(), operationIdentifier);
+
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
-      OperationParametersProcessor operationParametersProcessor = () -> operationParameters;
-      Processor nextOperation = operationCallEvent -> {
-        Map<String, Object> parametersMap = new HashMap<>();
-        parametersMap.putAll(operationParameters);
-        Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
-            policyManager.lookupOperationParametersTransformer(operationIdentifier);
-        if (policy.isPresent() && operationPolicyParametersTransformer.isPresent()) {
-          parametersMap
-              .putAll(operationPolicyParametersTransformer.get().fromMessageToParameters(operationCallEvent.getMessage()));
-        }
-        ExecutionContextAdapter operationContext = createExecutionContext(configuration, parametersMap, event);
-        MuleEvent muleEvent = doProcess(operationCallEvent, operationContext);
+
+      OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent) -> {
+        ExecutionContextAdapter operationContext = createExecutionContext(configuration, parameters, operationEvent);
+        MuleEvent muleEvent = doProcess(event, operationContext);
         return (Event) muleEvent;
       };
-      if (policy.isPresent()) {
-        return policy.get().process(event, nextOperation, operationParametersProcessor);
-      } else {
-        return nextOperation.process(event);
-      }
+
+      OperationPolicy policy =
+          policyManager.createOperationPolicy(operationIdentifier, event, operationParameters, operationExecutionFunction);
+      return policy.process(event);
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     });

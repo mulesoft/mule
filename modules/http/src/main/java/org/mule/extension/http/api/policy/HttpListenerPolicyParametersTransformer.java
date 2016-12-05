@@ -37,10 +37,10 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   @Override
   public Message fromSuccessResponseParametersToMessage(Map<String, Object> parameters) {
     HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("responseBuilder");
-    return responseParametersToMessage(responseBuilder);
+    return responseParametersToMessage(responseBuilder, 200);
   }
 
-  private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder) {
+  private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
     ParameterMap headers = new ParameterMap(responseBuilder.getHeaders());
     Message.Builder messageBuilder;
     Message.PayloadBuilder builder = Message.builder();
@@ -49,15 +49,16 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     } else {
       messageBuilder = builder.payload(responseBuilder.getBody());
     }
+    int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
     return messageBuilder
-        .attributes(new HttpResponseAttributes(responseBuilder.getStatusCode(), responseBuilder.getReasonPhrase(), headers))
+        .attributes(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
         .build();
   }
 
   @Override
   public Message fromFailureResponseParametersToMessage(Map<String, Object> parameters) {
     HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("errorResponseBuilder");
-    return responseParametersToMessage(responseBuilder);
+    return responseParametersToMessage(responseBuilder, 500);
   }
 
   @Override

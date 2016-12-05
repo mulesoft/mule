@@ -7,7 +7,6 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.List;
 
@@ -19,12 +18,12 @@ import java.util.List;
 public class NullPolicyProvider implements PolicyProvider {
 
   @Override
-  public List<Policy> findSourceParameterizedPolicies(ComponentIdentifier sourceIdentifier) {
+  public List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
     return emptyList();
   }
 
   @Override
-  public List<Policy> findOperationParameterizedPolicies(ComponentIdentifier operationIdentifier) {
+  public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
     return emptyList();
   }
 }

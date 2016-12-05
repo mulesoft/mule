@@ -16,19 +16,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.policy.DefaultPolicyManager;
-import org.mule.runtime.core.policy.NullPolicyProvider;
-import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.policy.OperationExecutionFunction;
+import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest

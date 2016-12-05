@@ -9,6 +9,7 @@ package org.mule.runtime.core.policy;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
@@ -30,23 +31,20 @@ import java.util.Optional;
  * from the policy to the next operation {@link Event} or from the next operation result to the {@link Event} that must continue
  * the execution of the policy.
  * <p>
- * If a non-empty {@code operationPolicyParametersTransformer} is passed to this class, then it will be used to convert the
- * message that arrives to the next-operation component of the policy chain to a new {@link Event} containing the data to be used
- * to execute the provided {@link Processor}.
  */
-public class DefaultOperationPolicy implements OperationPolicy {
+public class OperationPolicyProcessor implements Processor {
 
   private final Policy policy;
-  private final Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
+  private final Processor nextProcessor;
 
-  public DefaultOperationPolicy(Policy policy,
-                                Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                PolicyStateHandler policyStateHandler) {
+  public OperationPolicyProcessor(Policy policy,
+                                  PolicyStateHandler policyStateHandler,
+                                  Processor nextProcessor) {
     this.policy = policy;
-    this.operationPolicyParametersTransformer = operationPolicyParametersTransformer;
     this.policyStateHandler = policyStateHandler;
+    this.nextProcessor = nextProcessor;
   }
 
   /**
@@ -54,38 +52,42 @@ public class DefaultOperationPolicy implements OperationPolicy {
    * next-operation of the chain.
    *
    * @param operationEvent the event with the data to execute the operation
-   * @param nextProcessor the next-operation processor implementation
-   * @param operationParametersProcessor a processor that converts an {@link Event} to the set of parameters to be sent by the
-   *        operation based on the user configuration.
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
   @Override
-  public Event process(Event operationEvent, Processor nextProcessor, OperationParametersProcessor operationParametersProcessor)
-      throws Exception {
-    PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
-    Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
-    Event variablesProviderEvent = latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).build());
-    policyStateHandler.updateState(policyStateId, variablesProviderEvent);
-    Map<String, Object> originalParametersMap = operationParametersProcessor.getOperationParameters();
-    Message message = operationEvent.getMessage();
-    message = operationPolicyParametersTransformer
-        .map(parametersTransformer -> parametersTransformer.fromParametersToMessage(originalParametersMap)).orElse(message);
-    Event policyEvent = policyEventConverter.createEvent(message, variablesProviderEvent);
-    Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor);
-    policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
+  public Event process(Event operationEvent)
+      throws MuleException {
+    try {
+      PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
+      Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
+      Event variablesProviderEvent = latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).build());
+      policyStateHandler.updateState(policyStateId, variablesProviderEvent);
+      Event policyEvent = policyEventConverter.createEvent(operationEvent.getMessage(), variablesProviderEvent);
+      Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
+      policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
+      return executePolicyChain(operationEvent, policyStateId, policyEvent);
+    } catch (MuleException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
+    }
+  }
+
+  private Event executePolicyChain(Event operationEvent, PolicyStateId policyStateId, Event policyEvent) throws MuleException {
     Event policyChainResult = policy.getPolicyChain().process(policyEvent);
     policyStateHandler.updateState(policyStateId, policyChainResult);
     return policyEventConverter.createEvent(policyChainResult.getMessage(), operationEvent);
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation)
+  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, Event operationEvent)
       throws Exception {
     return policyExecuteNextEvent -> {
       try {
         PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
         policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
-        Event operationResult = nextOperation.process(policyExecuteNextEvent);
+        Event operationResult =
+            nextOperation.process(policyEventConverter.createEvent(policyExecuteNextEvent.getMessage(), operationEvent));
         return policyEventConverter.createEvent(operationResult.getMessage(), policyExecuteNextEvent);
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);

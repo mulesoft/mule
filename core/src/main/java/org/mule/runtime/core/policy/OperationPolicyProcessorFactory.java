@@ -6,25 +6,23 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
-
-import java.util.Optional;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * Factory for {@link OperationPolicy} instances.
  *
  * @since 4.0
  */
-public interface OperationPolicyFactory {
+public interface OperationPolicyProcessorFactory {
 
   /**
-   * Creates an {@link OperationPolicy}.
+   * Creates a {@link Processor} to execute the {@code policy}.
    *
    * @param policy the policy from which the {@link OperationPolicy} gets created.
-   * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
+   * @param nextProcessor the next-operation processor implementation
+   * 
    * @return an {@link OperationPolicy} that performs the common logic related to policies.
    */
-  OperationPolicy createOperationPolicy(Policy policy,
-                                        Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer);
+  Processor createOperationPolicy(Policy policy, Processor nextProcessor);
 
 }

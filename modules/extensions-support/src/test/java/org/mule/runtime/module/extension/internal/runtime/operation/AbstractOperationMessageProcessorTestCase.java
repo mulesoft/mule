@@ -49,6 +49,8 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.policy.OperationExecutionFunction;
+import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -70,10 +72,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -159,6 +164,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   protected DefaultConnectionManager connectionManager;
 
+  protected OperationPolicy mockOperationPolicy;
+
   @Before
   public void before() throws Exception {
     event = configureEvent();
@@ -243,8 +250,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(of(configurationProvider));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
-    when(mockPolicyManager.findSourcePolicyInstance(anyString(), any())).thenReturn(empty());
-    when(mockPolicyManager.findOperationPolicy(anyString(), any())).thenReturn(empty());
+    when(mockPolicyManager.createOperationPolicy(any(), any(), any(), any())).thenAnswer(invocationOnMock -> {
+      mockOperationPolicy = Mockito.mock(OperationPolicy.class);
+      when(mockOperationPolicy.process(any()))
+          .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
+              .execute((Map<String, Object>) invocationOnMock.getArguments()[2], (Event) invocationOnMock.getArguments()[1]));
+      return mockOperationPolicy;
+    });
 
     messageProcessor = setUpOperationMessageProcessor();
   }

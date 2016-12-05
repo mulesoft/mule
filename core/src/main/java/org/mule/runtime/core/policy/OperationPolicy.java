@@ -7,7 +7,6 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
 
 public interface OperationPolicy {
 
@@ -16,13 +15,9 @@ public interface OperationPolicy {
    * next-operation of the chain.
    *
    * @param operationEvent the event with the data to execute the operation
-   * @param nextProcessor the next-operation processor implementation
-   * @param operationParametersProcessor a processor that converts an {@link Event} to the set of parameters to be sent by the
-   *        operation based on the user configuration.
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  Event process(Event operationEvent, Processor nextProcessor, OperationParametersProcessor operationParametersProcessor)
-      throws Exception;
+  Event process(Event operationEvent) throws Exception;
 
 }

@@ -6,25 +6,22 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-
-import java.util.Optional;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Factory for {@link SourcePolicy} instances.
+ * Factory for {@link Processor} instances created from a {@link Policy}
  *
  * @since 4.0
  */
-public interface SourcePolicyFactory {
+public interface SourcePolicyProcessorFactory {
 
   /**
    * Creates an {@link SourcePolicy}.
    *
    * @param policy the policy from which the {@link SourcePolicy} gets created.
-   * @param sourcePolicyParametersTransformer transformer from the source response parameters to a message and vice versa.
+   * @param nextProcessor the next processor in the chain.
    * @return an {@link SourcePolicy} that performs the common logic related to policies.
    */
-  SourcePolicy createSourcePolicy(Policy policy,
-                                  Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer);
+  Processor createSourcePolicy(Policy policy, Processor nextProcessor);
 
 }
