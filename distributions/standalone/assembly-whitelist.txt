@@ -261,7 +261,6 @@
 /mule-standalone-${productVersion}/lib/opt/drools-core-5.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.45.jar
-/mule-standalone-${productVersion}/lib/opt/FastInfoset-1.2.12.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.1.jar
@@ -298,8 +297,9 @@
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.17.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.17.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.13.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.13.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
@@ -348,7 +348,6 @@
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.45.jar
-/mule-standalone-${productVersion}/lib/opt/jsr173_api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.45.jar
 /mule-standalone-${productVersion}/lib/opt/juniversalchardet-1.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar

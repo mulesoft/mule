@@ -185,7 +185,7 @@
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
-        <javaXmlBindVersion>2.1.17</javaXmlBindVersion>
+        <javaXmlBindVersion>2.1.13</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.15.0.Final</jbossTsVersion>
