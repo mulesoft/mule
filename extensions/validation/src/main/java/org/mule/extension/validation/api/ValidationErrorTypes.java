@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
  * @since 4.0
  */
 public enum ValidationErrorTypes implements ErrorTypeDefinition<ValidationErrorTypes> {
+
   /**
    * Indicates that a validation failure occurred
    */

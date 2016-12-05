@@ -65,11 +65,6 @@ public class ModuleExceptionHandler {
    * @param throwable to process
    */
   public Throwable processException(Throwable throwable) {
-    HashMap<byte[], byte[]> objectObjectHashMap = new HashMap<>();
-    objectObjectHashMap.put("Hola".getBytes(), "value".getBytes());
-    objectObjectHashMap.values().iterator().next();
-
-
     if (throwable instanceof ModuleException) {
       ErrorTypeDefinition errorDefinition = ((ModuleException) throwable).getType();
       return handleTypedException(throwable, errorDefinition);
@@ -77,30 +72,24 @@ public class ModuleExceptionHandler {
     return throwable;
   }
 
-  private Throwable handleTypedException(Throwable exception, ErrorTypeDefinition errorDefinition) {
-    if (isAllowedError(errorDefinition)) {
-      Optional<ErrorType> errorType = typeRepository.lookupErrorType(new ComponentIdentifier.Builder()
-          .withNamespace(extensionNamespace)
-          .withName(errorDefinition.getType())
-          .build());
-
-      if (errorType.isPresent()) {
-        exception = new TypedException(exception.getCause(), errorType.get());
-      } else {
-        throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
-            +
-            "in the Error Repository", componentModel.getName(), extensionModel.getName(),
-                                                           extensionNamespace + ":" + errorDefinition),
-                                       exception.getCause());
-      }
-    } else {
+  private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition errorDefinition) {
+    if (!isAllowedError(errorDefinition)) {
       throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
-          +
-          " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
+          + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
                                                          extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
                                      exception.getCause());
     }
-    return exception;
+
+    ErrorType errorType = typeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+        .withNamespace(extensionNamespace)
+        .withName(errorDefinition.getType())
+        .build())
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
+            + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
+                                                                        extensionNamespace + ":" + errorDefinition),
+                                                    exception.getCause()));
+
+    return new TypedException(exception.getCause(), errorType);
   }
 
 
