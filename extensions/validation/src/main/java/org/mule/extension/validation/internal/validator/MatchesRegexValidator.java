@@ -7,12 +7,10 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.i18n.I18nMessage;
+import org.apache.commons.validator.routines.RegexValidator;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-
-import org.apache.commons.validator.routines.RegexValidator;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * An {@link AbstractValidator} which tests that a {@link #value} matches a given {@link #regex}
@@ -45,7 +43,7 @@ public class MatchesRegexValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     RegexValidator validator = new RegexValidator(new String[] {regex}, caseSensitive);
     return validator.isValid(value) ? ok() : fail();
   }

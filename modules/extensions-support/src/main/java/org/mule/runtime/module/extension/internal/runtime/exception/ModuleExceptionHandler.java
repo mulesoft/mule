@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.extension.internal.runtime.exception;
+
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.TypedException;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.extension.api.exception.ModuleException;
+
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is
+ * {@link ModuleException}, and if is converts it to an {@link TypedException}.
+ *
+ * @since 4.0
+ */
+public class ModuleExceptionHandler {
+
+  private final ComponentModel componentModel;
+  private ExtensionModel extensionModel;
+  private final ErrorTypeRepository typeRepository;
+  private final Set<ErrorModel> allowedErrorTypes;
+  private final String extensionNamespace;
+
+  public ModuleExceptionHandler(ComponentModel componentModel, ExtensionModel extensionModel,
+                                ErrorTypeRepository typeRepository) {
+
+    this.componentModel = componentModel;
+    this.extensionModel = extensionModel;
+    this.typeRepository = typeRepository;
+
+    allowedErrorTypes = componentModel.getErrorModels();
+    extensionNamespace = getExtensionsErrorNamespace(extensionModel);
+  }
+
+  /**
+   * Process a given {@link Throwable}, if this one is a {@link ModuleException}, a {@link TypedException} will be built
+   * and returned.
+   * <ul>
+   * <li>
+   * The cause of the {@link TypedException} will be taken from the given {@code throwable} cause
+   * </li>
+   * <li>
+   * The {@link ErrorType} will be taken from the {@link ErrorTypeRepository} using the
+   * {@link ErrorTypeDefinition} from the {@link ModuleException}
+   * </li>
+   * </ul>
+   *
+   * @param throwable to process
+   */
+  public Throwable processException(Throwable throwable) {
+    HashMap<byte[], byte[]> objectObjectHashMap = new HashMap<>();
+    objectObjectHashMap.put("Hola".getBytes(), "value".getBytes());
+    objectObjectHashMap.values().iterator().next();
+
+
+    if (throwable instanceof ModuleException) {
+      ErrorTypeDefinition errorDefinition = ((ModuleException) throwable).getType();
+      return handleTypedException(throwable, errorDefinition);
+    }
+    return throwable;
+  }
+
+  private Throwable handleTypedException(Throwable exception, ErrorTypeDefinition errorDefinition) {
+    if (isAllowedError(errorDefinition)) {
+      Optional<ErrorType> errorType = typeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+          .withNamespace(extensionNamespace)
+          .withName(errorDefinition.getType())
+          .build());
+
+      if (errorType.isPresent()) {
+        exception = new TypedException(exception.getCause(), errorType.get());
+      } else {
+        throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
+            +
+            "in the Error Repository", componentModel.getName(), extensionModel.getName(),
+                                                           extensionNamespace + ":" + errorDefinition),
+                                       exception.getCause());
+      }
+    } else {
+      throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
+          +
+          " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
+                                                         extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
+                                     exception.getCause());
+    }
+    return exception;
+  }
+
+
+  private boolean isAllowedError(ErrorTypeDefinition errorTypeDefinition) {
+    return allowedErrorTypes
+        .stream()
+        .anyMatch(errorModel -> errorModel.getType().equals(errorTypeDefinition.getType())
+            && errorModel.getNamespace().equals(extensionNamespace));
+  }
+}

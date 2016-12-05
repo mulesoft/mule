@@ -8,7 +8,7 @@ package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
@@ -39,7 +39,7 @@ public class SizeValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     int inputLength = getSize(value);
     if (inputLength < minSize) {
       errorMessage = getMessages().lowerThanMinSize(value, minSize, inputLength);

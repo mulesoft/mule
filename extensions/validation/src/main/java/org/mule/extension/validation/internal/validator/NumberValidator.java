@@ -9,7 +9,6 @@ package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import org.mule.extension.validation.api.NumberType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
@@ -65,7 +64,7 @@ public class NumberValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     Comparable<Number> newValue = (Comparable<Number>) numberType.toNumber(value, pattern, locale);
 
 

@@ -7,16 +7,14 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
+import org.apache.commons.lang.StringUtils;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.Collection;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * A {@link AbstractValidator} which verifies that a given {@link #value} is empty. The definition of empty depends on the type of
@@ -37,7 +35,7 @@ public class EmptyValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     if (value == null) {
       return ok();
     } else if (value instanceof String) {

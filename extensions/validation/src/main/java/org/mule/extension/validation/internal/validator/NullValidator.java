@@ -9,7 +9,6 @@ package org.mule.extension.validation.internal.validator;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
@@ -27,7 +26,7 @@ public class NullValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     return value == null ? ok() : fail();
   }
 

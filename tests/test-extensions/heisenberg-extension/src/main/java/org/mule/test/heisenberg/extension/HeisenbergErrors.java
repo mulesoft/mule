@@ -6,31 +6,27 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 
 import java.util.Optional;
 
 public enum HeisenbergErrors implements ErrorTypeDefinition<HeisenbergErrors> {
-  HEALTH {
 
-    @Override
-    public Optional<ErrorTypeDefinition<?>> getParent() {
-      return Optional.of(CONNECTIVITY);
-    }
-  },
-  CONNECTIVITY {
+  CONNECTIVITY(MuleErrors.CONNECTIVITY), OAUTH2(HeisenbergErrors.CONNECTIVITY), HEALTH(HeisenbergErrors.CONNECTIVITY);
 
-    @Override
-    public Optional<ErrorTypeDefinition<?>> getParent() {
-      return Optional.of(MuleErrors.CONNECTIVITY);
-    }
-  },
-  OAUTH2 {
+  private ErrorTypeDefinition<?> parentErrortype;
 
-    @Override
-    public Optional<ErrorTypeDefinition<?>> getParent() {
-      return Optional.of(HeisenbergErrors.CONNECTIVITY);
-    }
+  HeisenbergErrors(ErrorTypeDefinition parentErrorType) {
+    this.parentErrortype = parentErrorType;
+  }
+
+  HeisenbergErrors() {}
+
+  @Override
+  public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
+    return ofNullable(parentErrortype);
   }
 }

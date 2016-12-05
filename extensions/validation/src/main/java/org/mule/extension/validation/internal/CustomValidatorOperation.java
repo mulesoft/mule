@@ -6,18 +6,20 @@
  */
 package org.mule.extension.validation.internal;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.mule.extension.validation.api.ObjectSource;
+import org.mule.extension.validation.api.ValidationErrorTypeProvider;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * Defines a stateful operation of {@link ValidationExtension} which is capable of executing custom validators provided by a third
@@ -45,9 +47,11 @@ public final class CustomValidatorOperation extends ValidationSupport {
         }
       });
 
-  public void customValidator(@ParameterGroup("Validator") ObjectSource<Validator> source,
-                              @ParameterGroup(ERROR_GROUP) ValidationOptions options,
-                              Event event, @UseConfig ValidationExtension config)
+  @Throws(ValidationErrorTypeProvider.class)
+  public void customValidator(@Placement(order = 0) @ParameterGroup("Validator") ObjectSource<Validator> source,
+                              @Placement(order = 1) @ParameterGroup(ERROR_GROUP) ValidationOptions options,
+                              Event event,
+                              @UseConfig ValidationExtension config)
       throws Exception {
     ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
     Validator validator = validatorSource.getObject(muleContext);

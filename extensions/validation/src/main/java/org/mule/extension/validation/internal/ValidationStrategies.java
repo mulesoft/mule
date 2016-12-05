@@ -6,16 +6,21 @@
  */
 package org.mule.extension.validation.internal;
 
+import static org.mule.extension.validation.api.ValidationErrorTypes.VALIDATION;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-import org.mule.extension.validation.api.ValidationExtension;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.extension.api.annotation.RestrictedTo;
+
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
+import org.mule.extension.validation.api.ValidationErrorTypeProvider;
+import org.mule.extension.validation.api.ValidationErrorTypes;
 import org.mule.extension.validation.api.ValidationException;
+import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationResult;
+import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.extension.api.annotation.RestrictedTo;
+import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +35,19 @@ public final class ValidationStrategies {
   /**
    * Perform a list of nested validation operations and informs only one {@link MultipleValidationResult} which summarizes all of
    * the found errors (if any).
-   * <p/>
+   * <p>
    * If {@code throwsException} is {@code true}, then the {@link ValidationResult} is communicated by throwing a
    * {@link ValidationException}. On the other hand, if {@code throwsException} is {@code false}, then the
    * {@link ValidationResult} is set as the message payload.
-   * <p/>
+   * <p>
    * When configured through XML, all the {@code validations} must include the All the child processors must contain the
    * {@code validator-message-processor} substitution group.
    *
    * @param validations the nested validation operations
-   * @param muleEvent the current {@link Event}
-   * @return the same {@code muleEvent} that was passed as argument
    * @throws MultipleValidationException if at least one validator fails and {@code throwsException} is {@code true}
    */
-  public void all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations, Event muleEvent)
+  @Throws(ValidationErrorTypeProvider.class)
+  public void all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations)
       throws MultipleValidationException {
     List<ValidationResult> results = new ArrayList<>(validations.size());
     for (NestedProcessor validation : validations) {

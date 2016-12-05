@@ -10,10 +10,11 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -23,16 +24,18 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.work.SerialWorkManager;
-import org.mule.runtime.extension.api.runtime.Interceptable;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -40,9 +43,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ExecutionMediator}.
@@ -71,11 +71,13 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private final ExceptionEnricherManager exceptionEnricherManager;
   private final ConnectionManagerAdapter connectionManager;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
+  private final ModuleExceptionHandler moduleExceptionHandler;
 
   public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel,
                                   ConnectionManagerAdapter connectionManager, ErrorTypeRepository typeRepository) {
     this.connectionManager = connectionManager;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel, typeRepository);
+    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel);
+    this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
   }
 
   /**
@@ -138,6 +140,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
       }
     } catch (Throwable e) {
       exception = exceptionEnricherManager.processException(e);
+      exception = moduleExceptionHandler.processException(exception);
       exception = onError(context, retryRequestHolder, exception, interceptors);
     } finally {
       after(context, result, interceptors);

@@ -6,9 +6,11 @@
  */
 package org.mule.extension.validation.internal;
 
+import org.mule.extension.validation.api.ValidationErrorTypeProvider;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -24,6 +26,7 @@ import org.mule.extension.validation.internal.validator.NullValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.util.Collection;
 import java.util.Map;
@@ -47,6 +50,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws Exception if the value is not {@code true}
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isTrue(boolean expression, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                      @UseConfig ValidationExtension config)
       throws Exception {
@@ -63,6 +67,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws Exception if the value is not {@code true}
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isFalse(boolean expression, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                       @UseConfig ValidationExtension config)
       throws Exception {
@@ -78,6 +83,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isEmail(String email, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                       @UseConfig ValidationExtension config)
       throws Exception {
@@ -93,6 +99,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
+  @DisplayName("Is IP")
   public void isIp(String ip, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                    @UseConfig ValidationExtension config)
       throws Exception {
@@ -111,6 +119,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void validateSize(Object value, @Optional(defaultValue = "0") int min, @Optional Integer max,
                            @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                            @UseConfig ValidationExtension config)
@@ -130,6 +139,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isNotEmpty(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                          @UseConfig ValidationExtension config)
       throws Exception {
@@ -148,6 +158,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param config the current {@link ValidationExtension} that serves as config
    * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isEmpty(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                       @UseConfig ValidationExtension config)
       throws Exception {
@@ -163,6 +174,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isNotNull(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                         @UseConfig ValidationExtension config)
       throws Exception {
@@ -178,6 +190,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isNull(Object value, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                      @UseConfig ValidationExtension config)
       throws Exception {
@@ -196,6 +209,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void isTime(String time, @Optional String locale, @Optional String pattern,
                      @ParameterGroup(ERROR_GROUP) ValidationOptions options,
                      Event event, @UseConfig ValidationExtension config)
@@ -212,7 +226,9 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isUrl(String url, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
+  @Throws(ValidationErrorTypeProvider.class)
+  @DisplayName("Is URL")
+  public void isUrl(@DisplayName("URL") String url, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                     @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
@@ -229,6 +245,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @Throws(ValidationErrorTypeProvider.class)
   public void matchesRegex(String value, String regex, @Optional(defaultValue = "true") boolean caseSensitive,
                            @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                            @UseConfig ValidationExtension config)
