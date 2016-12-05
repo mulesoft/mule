@@ -37,14 +37,13 @@ import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.runtime.module.http.internal.domain.request.DefaultClientConnection;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequestContext;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -14,7 +14,7 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.service.http.api.domain.request.ClientConnection;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
 
 import java.security.cert.Certificate;

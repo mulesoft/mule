@@ -36,10 +36,10 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.client.HttpRequestAuthentication;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 import com.google.common.collect.Lists;
 

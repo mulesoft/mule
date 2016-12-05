@@ -10,8 +10,8 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
@@ -35,7 +35,7 @@ public class HttpListenerResponseSender {
 
   protected HttpResponse buildResponse(HttpListenerSuccessResponseBuilder listenerResponseBuilder, boolean supportStreaming)
       throws Exception {
-    HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+    HttpResponseBuilder responseBuilder = HttpResponse.builder();
 
     return doBuildResponse(responseBuilder, listenerResponseBuilder, supportStreaming);
   }
@@ -65,7 +65,7 @@ public class HttpListenerResponseSender {
   }
 
   protected HttpResponse buildErrorResponse() {
-    final HttpResponseBuilder errorResponseBuilder = new HttpResponseBuilder();
+    final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
     final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
         .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
         .build();

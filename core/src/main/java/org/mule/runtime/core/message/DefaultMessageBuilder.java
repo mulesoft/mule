@@ -24,14 +24,14 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
-
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.CollectionBuilder;
@@ -40,7 +40,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
-import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
@@ -71,8 +70,8 @@ public class DefaultMessageBuilder
 
   private ExceptionPayload exceptionPayload;
 
-  private Map<String, DefaultTypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
-  private Map<String, DefaultTypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
+  private Map<String, DefaultTypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
+  private Map<String, DefaultTypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
   private Map<String, DataHandler> inboundAttachments = new HashMap<>();
   private Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
@@ -324,8 +323,8 @@ public class DefaultMessageBuilder
     //TODO: MULE-10774 - Make attributes a TypedValue
     private Attributes attributes;
 
-    private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
-    private Map<String, DefaultTypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
+    private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
+    private Map<String, DefaultTypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
 
     private MessageImplementation(DefaultTypedValue typedValue, Attributes attributes,
                                   Map<String, DefaultTypedValue<Serializable>> inboundProperties,

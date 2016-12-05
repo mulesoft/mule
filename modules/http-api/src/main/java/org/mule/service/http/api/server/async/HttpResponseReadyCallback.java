@@ -6,7 +6,7 @@
  */
 package org.mule.service.http.api.server.async;
 
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 /**
  * Handler for sending an HTTP response asynchronously

@@ -4,19 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal.domain.request;
+package org.mule.service.http.api.domain.message.request;
 
-import org.mule.service.http.api.domain.ParameterMap;
-import org.mule.runtime.module.http.internal.domain.BaseHttpMessage;
-import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.HttpProtocol;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.BaseHttpMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
+/**
+ * Basic implementation of {@link HttpRequest}. Instances can only be obtained through an {@link HttpRequestBuilder}.
+ */
+class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
 
   private final String uri;
   private final String path;

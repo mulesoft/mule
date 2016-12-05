@@ -46,7 +46,7 @@ import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
@@ -87,7 +87,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     reasonPhraseEvaluator = new AttributeEvaluator(reasonPhrase).initialize(muleContext.getExpressionManager());
   }
 
-  public HttpResponse build(org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder,
+  public HttpResponse build(org.mule.service.http.api.domain.message.response.HttpResponseBuilder httpResponseBuilder,
                             Event event)
       throws MessagingException {
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();

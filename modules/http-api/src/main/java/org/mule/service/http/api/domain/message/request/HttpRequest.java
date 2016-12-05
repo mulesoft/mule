@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.service.http.api.domain.request;
+package org.mule.service.http.api.domain.message.request;
 
-import org.mule.service.http.api.domain.HttpMessage;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.HttpMessage;
 
 /**
  * Representation of an HTTP request message.
@@ -17,6 +17,13 @@ import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
  * @since 4.0
  */
 public interface HttpRequest extends HttpMessage {
+
+  /**
+   * @return an {@link HttpRequestBuilder}
+   */
+  static HttpRequestBuilder builder() {
+    return new HttpRequestBuilder();
+  }
 
   /**
    * @return the protocol version

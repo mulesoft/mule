@@ -6,6 +6,7 @@
  */
 package org.mule.service.http.api.domain.request;
 
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.HttpServer;
 
 /**

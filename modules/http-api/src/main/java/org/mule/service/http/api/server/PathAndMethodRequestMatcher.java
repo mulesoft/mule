@@ -6,7 +6,7 @@
  */
 package org.mule.service.http.api.server;
 
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 
 /**
  * {@link RequestMatcher} that matches against an {@link HttpRequest} method (via a {@link MethodRequestMatcher}) and it's path.

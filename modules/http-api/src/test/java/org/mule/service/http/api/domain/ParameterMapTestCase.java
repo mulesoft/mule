@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal;
+package org.mule.service.http.api.domain;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -15,17 +15,12 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.service.http.api.domain.ParameterMap;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-
 import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.Test;
 
-@SmallTest
-public class ParameterMapTestCase extends AbstractMuleTestCase {
+public class ParameterMapTestCase {
 
   public static final String KEY_1 = "key1";
   public static final String KEY_2 = "key2";

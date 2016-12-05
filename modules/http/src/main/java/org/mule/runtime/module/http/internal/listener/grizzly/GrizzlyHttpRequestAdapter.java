@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.internal.listener.grizzly;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.mule.runtime.module.http.internal.domain.BaseHttpMessage;
+import org.mule.service.http.api.domain.message.BaseHttpMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.util.StringUtils;
@@ -20,7 +20,7 @@ import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
 import java.util.Collection;

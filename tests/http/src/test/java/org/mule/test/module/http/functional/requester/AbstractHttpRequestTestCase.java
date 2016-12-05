@@ -6,11 +6,11 @@
  */
 package org.mule.test.module.http.functional.requester;
 
-import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -49,7 +49,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
   protected String method;
   protected String uri;
   protected Multimap<String, String> headers =
-      Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), Sets::newHashSet);
+      Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(new HashMap()), Sets::newHashSet);
 
   protected String body;
 

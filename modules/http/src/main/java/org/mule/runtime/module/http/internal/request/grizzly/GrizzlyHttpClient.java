@@ -21,8 +21,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequest;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.runtime.module.http.internal.request.HttpClient;
 import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
@@ -33,8 +31,9 @@ import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
-import org.mule.service.http.api.domain.request.HttpRequest;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -268,7 +267,7 @@ public class GrizzlyHttpClient implements HttpClient {
   }
 
   private HttpResponse createMuleResponse(Response response) throws IOException {
-    HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+    HttpResponseBuilder responseBuilder = HttpResponse.builder();
     responseBuilder.setStatusCode(response.getStatusCode());
     responseBuilder.setReasonPhrase(response.getStatusText());
     responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
@@ -292,10 +291,8 @@ public class GrizzlyHttpClient implements HttpClient {
 
       populateHeaders(request, builder);
 
-      DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
-
-      for (String queryParamName : defaultHttpRequest.getQueryParams().keySet()) {
-        for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName)) {
+      for (String queryParamName : request.getQueryParams().keySet()) {
+        for (String queryParamValue : request.getQueryParams().getAll(queryParamName)) {
           builder.addQueryParam(queryParamName, queryParamValue);
         }
       }

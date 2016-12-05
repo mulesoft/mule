@@ -15,8 +15,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpRequestAuthentication;
-import org.mule.service.http.api.domain.request.HttpRequest;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

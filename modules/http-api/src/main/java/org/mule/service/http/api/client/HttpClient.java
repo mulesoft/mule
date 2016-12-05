@@ -6,8 +6,8 @@
  */
 package org.mule.service.http.api.client;
 
-import org.mule.service.http.api.domain.request.HttpRequest;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

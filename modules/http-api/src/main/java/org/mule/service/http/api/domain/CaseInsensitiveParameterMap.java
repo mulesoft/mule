@@ -5,12 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.http.internal;
+package org.mule.service.http.api.domain;
 
 import static java.util.stream.Collectors.toCollection;
-
-import org.mule.service.http.api.domain.ParameterMap;
-import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -22,8 +20,12 @@ import java.util.LinkedList;
  */
 public class CaseInsensitiveParameterMap extends ParameterMap {
 
+  public CaseInsensitiveParameterMap() {
+    this(new ParameterMap());
+  }
+
   public CaseInsensitiveParameterMap(ParameterMap paramsMap) {
-    this.paramsMap = new CaseInsensitiveMapWrapper<>(LinkedHashMap.class);
+    this.paramsMap = new CaseInsensitiveMapWrapper<>(new LinkedHashMap());
     for (String key : paramsMap.keySet()) {
       this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));
     }
