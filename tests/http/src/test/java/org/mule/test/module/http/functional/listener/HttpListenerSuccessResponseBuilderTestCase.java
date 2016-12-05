@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Description;
@@ -76,6 +77,10 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath =
       new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath",
                          "responseBuilderAndErrorResponseBuilderNotTheSamePath");
+  @Rule
+  public SystemProperty twoHeadersResponseBuilderPath =
+      new SystemProperty("twoHeadersResponseBuilderPath",
+                         "twoHeadersResponseBuilderFlow");
 
   @Override
   protected String getConfigFile() {
@@ -105,6 +110,16 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   public void headersResponseBuilder() throws Exception {
     final String url = getUrl(headersResponseBuilderPath);
     simpleHeaderTest(url);
+  }
+
+  @Test
+  public void twoHeadersResponseBuilder() throws Exception {
+    final String url = getUrl(twoHeadersResponseBuilderPath);
+    final Response response = Request.Get(url).connectTimeout(1000).execute();
+    final StatusLine statusLine = response.returnResponse().getStatusLine();
+
+    assertThat(statusLine.getStatusCode(), is(500));
+    assertThat(statusLine.getReasonPhrase(), is("Header Content-Type does not support multiple values"));
   }
 
   @Test
