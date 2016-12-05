@@ -16,6 +16,7 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * substitutes the URI, but other config elements such as the transformers, filters, etc do not change. You cannot change an
  * endpoint scheme dynamically so you can't switch between HTTP and JMS for example using the same dynamic endpoint.
  */
-public class DynamicOutboundEndpoint implements OutboundEndpoint {
+public class DynamicOutboundEndpoint extends AbstractAnnotatedObject implements OutboundEndpoint {
 
   protected transient final Logger logger = LoggerFactory.getLogger(DynamicOutboundEndpoint.class);
 

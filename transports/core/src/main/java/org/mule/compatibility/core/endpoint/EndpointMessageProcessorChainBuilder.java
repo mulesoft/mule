@@ -7,15 +7,16 @@
 package org.mule.compatibility.core.endpoint;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -48,7 +49,8 @@ public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcesso
     return super.initializeMessageProcessor(processor);
   }
 
-  private class EndpointAwareMessageProcessorChain implements MessageProcessorChain, EndpointAware {
+  private class EndpointAwareMessageProcessorChain extends AbstractAnnotatedObject
+      implements MessageProcessorChain, EndpointAware {
 
     private MessageProcessorChain chain;
 

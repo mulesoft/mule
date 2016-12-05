@@ -9,17 +9,18 @@ package org.mule.compatibility.core.endpoint.inbound;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
  * Verify that the inbound mime type is acceptable by this endpoint.
  */
-public class InboundEndpointMimeTypeCheckingMessageProcessor implements Processor {
+public class InboundEndpointMimeTypeCheckingMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   private InboundEndpoint endpoint;
 

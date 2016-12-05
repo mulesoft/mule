@@ -11,11 +11,12 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * Allows EndpointURI to be set and changed dynamically by wrapping up an immutable endpoint instance.
  */
-public class DynamicURIOutboundEndpoint implements OutboundEndpoint {
+public class DynamicURIOutboundEndpoint extends AbstractAnnotatedObject implements OutboundEndpoint {
 
   private static final long serialVersionUID = -2814979100270307813L;
 

@@ -8,6 +8,7 @@ package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -16,14 +17,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
 
-;
-
-
 /**
  * Sets the inbound endpoint uri on as a property of the message using the following key:
  * {@link MuleProperties#MULE_ORIGINATING_ENDPOINT_PROPERTY}.
  */
-public class InboundEndpointPropertyMessageProcessor implements Processor {
+public class InboundEndpointPropertyMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   private InboundEndpoint endpoint;
 

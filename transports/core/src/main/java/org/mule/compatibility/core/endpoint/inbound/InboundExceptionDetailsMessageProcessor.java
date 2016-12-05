@@ -10,6 +10,7 @@ import static org.mule.runtime.core.config.ExceptionHelper.getErrorCodePropertyN
 import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * property that should be set. The name of the property is defined by the error.code.property property in the same properties
  * file.
  */
-public class InboundExceptionDetailsMessageProcessor implements Processor, MuleContextAware {
+public class InboundExceptionDetailsMessageProcessor extends AbstractAnnotatedObject implements Processor, MuleContextAware {
 
   private static final Logger logger = LoggerFactory.getLogger(InboundExceptionDetailsMessageProcessor.class);
 

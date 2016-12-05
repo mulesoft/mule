@@ -9,13 +9,10 @@ package org.mule.compatibility.core.transport;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.compatibility.core.message.CompatibilityMessage;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;

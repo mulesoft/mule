@@ -15,14 +15,14 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
-
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -40,7 +40,7 @@ import javax.activation.MimetypesFileTypeMap;
  * allows the user to specify a resourceBase which refers to the local directory from where files will be served from.
  * Additionally, a default file can be specificed for URLs where no file is set
  */
-public class StaticResourceMessageProcessor implements Processor, Initialisable {
+public class StaticResourceMessageProcessor extends AbstractAnnotatedObject implements Processor, Initialisable {
 
   public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
   public static final String ANY_PATH = "/*";

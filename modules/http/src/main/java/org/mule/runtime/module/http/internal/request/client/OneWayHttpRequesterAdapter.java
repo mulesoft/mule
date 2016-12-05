@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.http.internal.request.client;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,7 @@ import org.apache.commons.io.IOUtils;
 /**
  * Adapts an HTTP operation to be one-way.
  */
-public class OneWayHttpRequesterAdapter implements Processor, FlowConstructAware {
+public class OneWayHttpRequesterAdapter extends AbstractAnnotatedObject implements Processor, FlowConstructAware {
 
   private Processor httpRequester;
 

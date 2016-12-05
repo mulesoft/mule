@@ -23,6 +23,7 @@ import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
@@ -415,7 +416,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doDispose();
   }
 
-  private class ProcessEndProcessor implements Processor, InternalMessageProcessor {
+  private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalMessageProcessor {
 
     @Override
     public Event process(Event event) throws MuleException {

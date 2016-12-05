@@ -13,11 +13,11 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -26,16 +26,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Policy chain for handling the message processor associated to a policy.
  *
  * @since 4.0
  */
-public class PolicyChain implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
-
+public class PolicyChain extends AbstractAnnotatedObject
+    implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
 
   @Inject
   private MuleContext muleContext;

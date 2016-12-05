@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -14,7 +15,7 @@ import org.mule.runtime.core.util.ObjectUtils;
 /**
  * Implementation of {@link Processor} that dynamically chooses and uses another {@link Processor}
  */
-public abstract class AbstractDynamicMessageProcessor implements Processor {
+public abstract class AbstractDynamicMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   public Event process(Event event) throws MuleException {
     return resolveMessageProcessor(event).process(event);

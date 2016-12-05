@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -18,7 +19,7 @@ import org.mule.runtime.core.util.ObjectUtils;
  *
  * @see SessionHandler
  */
-public class OutboundSessionHandlerMessageProcessor implements Processor {
+public class OutboundSessionHandlerMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   private SessionHandler sessionHandler;
   private MuleContext muleContext;

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal.tokenmanager;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -21,7 +22,8 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 /**
  * Clears the oauth context for a token manager and a resource owner id.
  */
-public class InvalidateOauthContextMessageProcessor implements Processor, Initialisable, MuleContextAware {
+public class InvalidateOauthContextMessageProcessor extends AbstractAnnotatedObject
+    implements Processor, Initialisable, MuleContextAware {
 
   private TokenManagerConfig config;
   private AttributeEvaluator resourceOwnerIdEvaluator;

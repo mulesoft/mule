@@ -12,6 +12,7 @@ import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -29,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExceptionHandlerAware, Initialisable {
+public class DefaultInterfaceBinding extends AbstractAnnotatedObject
+    implements InterfaceBinding, MessagingExceptionHandlerAware, Initialisable {
 
   protected static final Logger logger = LoggerFactory.getLogger(DefaultInterfaceBinding.class);
 

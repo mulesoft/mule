@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -14,7 +15,7 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OutboundLoggingMessageProcessor implements Processor {
+public class OutboundLoggingMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
