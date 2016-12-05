@@ -20,6 +20,8 @@ import java.util.Map;
 public interface OperationExecutionFunction {
 
   /**
+   * Executes the operation being intercepted by a policy.
+   *
    * @param parameters the set of parameters required to execute the function.
    * @param operationEvent the event to use for executing the operation.
    * @return an {@link Event} as result of the operation execution.

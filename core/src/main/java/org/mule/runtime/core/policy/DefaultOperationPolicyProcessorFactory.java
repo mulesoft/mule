@@ -17,6 +17,11 @@ public class DefaultOperationPolicyProcessorFactory implements OperationPolicyPr
 
   private final PolicyStateHandler policyStateHandler;
 
+  /**
+   * Creates a new {@link Processor} from an operation {@link Policy}.
+   *
+   * @param policyStateHandler the state handler to use for keeping track of the policy chain event modifications.
+   */
   public DefaultOperationPolicyProcessorFactory(PolicyStateHandler policyStateHandler) {
     this.policyStateHandler = policyStateHandler;
   }

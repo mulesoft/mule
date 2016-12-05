@@ -9,9 +9,10 @@ package org.mule.runtime.core.policy;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 /**
- * This class defines a set of parameters related to the {@link org.mule.runtime.core.api.source.MessageSource} and the message
- * received by the {@link org.mule.runtime.core.api.source.MessageSource}. These parameters will later by used during policy
- * lookup in {@link PolicyProvider} to match it against a configured pointcut.
+ * This class defines a set of parameters related to the execution of a component. In particular to the execution of a source or
+ * an operation.
+ * 
+ * These parameters will later by used during policy lookup in {@link PolicyProvider} to match it against a configured pointcut.
  * 
  * @since 4.0
  */

@@ -63,9 +63,11 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationParametersProcessor;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -95,9 +97,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Rule
   public ExpectedException expectedException = none();
-
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  private OperationPolicy mockPolicy;
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
@@ -308,17 +307,16 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void executeWithPolicy() throws Exception {
-    //TODO fix
-    //String eventContextId = event.getContext().getId();
-    //when(mockPolicyManager.createOperationPolicy(same(eventContextId), any(PolicyPointcutParameters.class)))
-    //    .thenReturn(of(mockPolicy));
-    //when(extensionModel.getName()).thenReturn(EXTENSION_NAMESPACE);
-    //when(operationModel.getName()).thenReturn(OPERATION_NAME);
-    //
-    //messageProcessor.process(event);
-    //
-    //verify(mockPolicyManager).createOperationPolicy(same(eventContextId), any(PolicyPointcutParameters.class));
-    //verify(mockPolicy.process(same(event), any(Processor.class), any(OperationParametersProcessor.class)));
+    ComponentIdentifier componentIdentifier =
+        new ComponentIdentifier.Builder().withNamespace(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
+    when(extensionModel.getName()).thenReturn(componentIdentifier.getNamespace());
+    when(operationModel.getName()).thenReturn(componentIdentifier.getName());
+
+    messageProcessor.process(event);
+
+    verify(mockPolicyManager).createOperationPolicy(eq(componentIdentifier), same(event), any(Map.class),
+                                                    any(OperationExecutionFunction.class));
+    verify(mockOperationPolicy).process(same(event));
   }
 
   @Test

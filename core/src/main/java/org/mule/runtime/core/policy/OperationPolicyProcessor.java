@@ -63,18 +63,21 @@ public class OperationPolicyProcessor implements Processor {
       Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
       Event variablesProviderEvent = latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).build());
       policyStateHandler.updateState(policyStateId, variablesProviderEvent);
-      Message message = operationEvent.getMessage();
-      Event policyEvent = policyEventConverter.createEvent(message, variablesProviderEvent);
+      Event policyEvent = policyEventConverter.createEvent(operationEvent.getMessage(), variablesProviderEvent);
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
       policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
-      Event policyChainResult = policy.getPolicyChain().process(policyEvent);
-      policyStateHandler.updateState(policyStateId, policyChainResult);
-      return policyEventConverter.createEvent(policyChainResult.getMessage(), operationEvent);
+      return executePolicyChain(operationEvent, policyStateId, policyEvent);
     } catch (MuleException e) {
       throw e;
     } catch (Exception e) {
       throw new DefaultMuleException(e);
     }
+  }
+
+  private Event executePolicyChain(Event operationEvent, PolicyStateId policyStateId, Event policyEvent) throws MuleException {
+    Event policyChainResult = policy.getPolicyChain().process(policyEvent);
+    policyStateHandler.updateState(policyStateId, policyChainResult);
+    return policyEventConverter.createEvent(policyChainResult.getMessage(), operationEvent);
   }
 
   private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, Event operationEvent)

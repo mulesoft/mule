@@ -10,23 +10,38 @@ import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Map;
 
+/**
+ * Result for an execution of a policy {@link org.mule.runtime.core.api.processor.Processor} which failed the executing
+ * by throwing a {@link MessagingException}.
+ *
+ * @since 4.0
+ */
 public class FailureSourcePolicyResult {
 
-  private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
   private final MessagingException messagingException;
   private final Map<String, Object> errorResponseParameters;
 
-  public FailureSourcePolicyResult(MessagingException messagingException, Map<String, Object> errorResponseParameters,
-                                   MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+  /**
+   * Creates a new failed policy result.
+   *
+   * @param messagingException the exception thrown by the policy chain
+   * @param errorResponseParameters the error response parameters to be used by the source to send the response
+   */
+  public FailureSourcePolicyResult(MessagingException messagingException, Map<String, Object> errorResponseParameters) {
     this.messagingException = messagingException;
     this.errorResponseParameters = errorResponseParameters;
-    this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
   }
 
+  /**
+   * @return the messaging exception result of the execution of the policy chain
+   */
   public MessagingException getMessagingException() {
     return messagingException;
   }
 
+  /**
+   * @return the set of response parameters to be send by the message source
+   */
   public Map<String, Object> getErrorResponseParameters() {
     return errorResponseParameters;
   }

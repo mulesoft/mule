@@ -109,7 +109,7 @@ public class ModuleFlowProcessingPhase
               ResponseCompletionCallback responseCompletationCallback =
                   createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
 
-              // This is the case of a filtered flow. This will eventually go away.
+              //TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
               if (flowExecutionResponse == null) {
                 flowExecutionResponse =
                     Event.builder(templateEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();

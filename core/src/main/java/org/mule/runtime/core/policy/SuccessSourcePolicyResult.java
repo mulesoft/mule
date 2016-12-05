@@ -29,6 +29,7 @@ public class SuccessSourcePolicyResult {
    *
    * @param flowExecutionResult the result of the flow execution.
    * @param responseParameters the response parameters to be sent by the source.
+   * @param messageSourceResponseParametersProcessor a processor to create response parameters from an {@link Event}
    */
   public SuccessSourcePolicyResult(Event flowExecutionResult, Map<String, Object> responseParameters,
                                    MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {

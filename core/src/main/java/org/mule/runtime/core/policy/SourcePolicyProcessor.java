@@ -42,7 +42,6 @@ public class SourcePolicyProcessor implements Processor {
    * @param policy the policy to execute before and after the source.
    * @param policyStateHandler the state handler for the policy.
    * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
-   * @param nextProcessor
    */
   public SourcePolicyProcessor(Policy policy,
                                PolicyStateHandler policyStateHandler, Processor nextProcessor) {

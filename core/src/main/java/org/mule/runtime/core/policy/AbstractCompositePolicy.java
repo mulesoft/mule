@@ -27,9 +27,9 @@ import java.util.Optional;
  */
 public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersProcessor> {
 
-  private List<Policy> parameterizedPolicies;
-  private Optional<ParametersTransformer> parametersTransformer;
-  private ParametersProcessor parametersProcessor;
+  private final List<Policy> parameterizedPolicies;
+  private final Optional<ParametersTransformer> parametersTransformer;
+  private final ParametersProcessor parametersProcessor;
 
   /**
    * Creates a new composite policy.

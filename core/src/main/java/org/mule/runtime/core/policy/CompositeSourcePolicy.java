@@ -33,11 +33,20 @@ public class CompositeSourcePolicy extends
     AbstractCompositePolicy<SourcePolicyParametersTransformer, MessageSourceResponseParametersProcessor> implements SourcePolicy {
 
   private final Processor flowExecutionProcessor;
-  private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
-  private Event flowExecutionResponse;
+  private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private Map<String, Object> originalResponseParameters;
   private Map<String, Object> originalFailureResponseParameters;
+  private Event flowExecutionResponse;
 
+  /**
+   * Creates a new source policies composed by several {@link Policy} that will be chain together.
+   *
+   * @param parameterizedPolicies the list of policies to use in this composite policy.
+   * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
+   * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
+   * @param flowExecutionProcessor the operation that executes the flow
+   * @param messageSourceResponseParametersProcessor processor that gives access to the set of parameters to be sent originally by the source
+   */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                                SourcePolicyProcessorFactory sourcePolicyProcessorFactory, Processor flowExecutionProcessor,
@@ -51,11 +60,11 @@ public class CompositeSourcePolicy extends
    * Executes the flow.
    * 
    * If there's a {@link SourcePolicyParametersTransformer} provided then it will use it to convert the source response or source
-   * failure response from the parameters back to a {@link Message} that can be route through the policy chain which later will be
+   * failure response from the parameters back to a {@link Message} that can be routed through the policy chain which later will be
    * convert back to response or failure response parameters thus allowing the policy chain to modify the response.. That message
    * will be the result of the next-operation of the policy.
    * 
-   * If no {@link SourcePolicyParametersTransformer} is provided, then the same response from the flow is going to be route as
+   * If no {@link SourcePolicyParametersTransformer} is provided, then the same response from the flow is going to be routed as
    * response of the next-operation of the policy chain. In this case, the same response from the flow is going to be used to
    * generate the response or failure response for the source so the policy chain is not going to be able to modify the response
    * sent by the source.
@@ -121,7 +130,7 @@ public class CompositeSourcePolicy extends
               .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
                   .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
               .orElse(originalFailureResponseParameters);
-      return left(new FailureSourcePolicyResult(e, responseParameters, getParametersProcessor()));
+      return left(new FailureSourcePolicyResult(e, responseParameters));
     }
   }
 

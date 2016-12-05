@@ -164,6 +164,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   protected DefaultConnectionManager connectionManager;
 
+  protected OperationPolicy mockOperationPolicy;
+
   @Before
   public void before() throws Exception {
     event = configureEvent();
@@ -249,11 +251,11 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
     when(mockPolicyManager.createOperationPolicy(any(), any(), any(), any())).thenAnswer(invocationOnMock -> {
-      OperationPolicy operationPolicy = Mockito.mock(OperationPolicy.class);
-      when(operationPolicy.process(any()))
+      mockOperationPolicy = Mockito.mock(OperationPolicy.class);
+      when(mockOperationPolicy.process(any()))
           .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
               .execute((Map<String, Object>) invocationOnMock.getArguments()[2], (Event) invocationOnMock.getArguments()[1]));
-      return operationPolicy;
+      return mockOperationPolicy;
     });
 
     messageProcessor = setUpOperationMessageProcessor();

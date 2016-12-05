@@ -31,7 +31,7 @@ public class CompositeOperationPolicy extends
 
 
   private final Processor nextOperation;
-  private OperationPolicyProcessorFactory operationPolicyProcessorFactory;
+  private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
   private Event nextOperationResponse;
 
   /**
@@ -75,6 +75,8 @@ public class CompositeOperationPolicy extends
   /**
    * Stores the operation result so all the chains after the operation execution are executed with the actual operation result and
    * not a modified version from another policy.
+   *
+   * @param event the event to execute the operation.
    */
   @Override
   protected Event processNextOperation(Event event) throws MuleException {
@@ -85,6 +87,10 @@ public class CompositeOperationPolicy extends
   /**
    * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
    * with the actual operation result and not a modified version from another policy.
+   *
+   * @param policy the policy to execute.
+   * @param nextProcessor the processor to execute when the policy next-processor gets executed
+   * @param event the event to use to execute the policy chain.
    */
   @Override
   protected Event processPolicy(Policy policy, Processor nextProcessor, Event event)

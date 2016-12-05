@@ -7,7 +7,9 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.functional.Either.right;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
@@ -24,6 +26,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -68,7 +73,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
               e instanceof MessagingException ? (MessagingException) e : new MessagingException(event, e, flowExecutionProcessor);
           return Either.left(new FailureSourcePolicyResult(messagingException, messageSourceResponseParametersProcessor
               .getFailedExecutionResponseParametersFunction()
-              .apply(messagingException.getEvent()), messageSourceResponseParametersProcessor));
+              .apply(messagingException.getEvent())));
         }
       };
     }
@@ -93,15 +98,13 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                         operationPolicyProcessorFactory, () -> operationParameters, operationExecutionFunction);
   }
 
-  @Override
-  public Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
+  private Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
     return operationPolicyParametersTransformerCollection.stream()
         .filter(policyOperationParametersTransformer -> policyOperationParametersTransformer.supports(componentIdentifier))
         .findAny();
   }
 
-  @Override
-  public Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer(ComponentIdentifier componentIdentifier) {
+  private Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer(ComponentIdentifier componentIdentifier) {
     return sourcePolicyParametersTransformerCollection.stream()
         .filter(policyOperationParametersTransformer -> policyOperationParametersTransformer.supports(componentIdentifier))
         .findAny();
@@ -129,24 +132,40 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   }
 
   private PolicyPointcutParameters createSourcePointcutParameters(ComponentIdentifier sourceIdentifier, Event sourceEvent) {
-    return sourcePointcutFactories.stream()
-        .filter(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
-            .supportsSourceIdentifier(sourceIdentifier))
-        .findAny()
-        .map(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
-            .createPolicyPointcutParameters(sourceIdentifier, sourceEvent.getMessage().getAttributes()))
-        .orElse(new PolicyPointcutParameters(sourceIdentifier));
+    return createPointcutParameters(sourceIdentifier, SourcePolicyPointcutParametersFactory.class, sourcePointcutFactories,
+                                    factory -> factory.supportsSourceIdentifier(sourceIdentifier),
+                                    factory -> factory.createPolicyPointcutParameters(sourceIdentifier,
+                                                                                      sourceEvent.getMessage().getAttributes()));
   }
 
   private PolicyPointcutParameters createOperationPointcutParameters(ComponentIdentifier operationIdentifier,
                                                                      Map<String, Object> operationParameters) {
-    return operationPointcutFactories.stream()
-        .filter(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
-            .supportsOperationIdentifier(operationIdentifier))
-        .findAny()
-        .map(sourcePolicyPointcutParametersFactory -> sourcePolicyPointcutParametersFactory
-            .createPolicyPointcutParameters(operationIdentifier, operationParameters))
-        .orElse(new PolicyPointcutParameters(operationIdentifier));
+    return createPointcutParameters(operationIdentifier, OperationPolicyPointcutParametersFactory.class,
+                                    operationPointcutFactories,
+                                    factory -> factory.supportsOperationIdentifier(operationIdentifier),
+                                    factory -> factory.createPolicyPointcutParameters(operationIdentifier, operationParameters));
+  }
+
+  private <T> PolicyPointcutParameters createPointcutParameters(ComponentIdentifier componentIdentifier, Class<T> factoryType,
+                                                                Collection<T> factories, Predicate<T> factoryFilter,
+                                                                Function<T, PolicyPointcutParameters> policyPointcutParametersCreationFunction) {
+    List<T> policyPointcutParametersFactories = factories.stream()
+        .filter(factoryFilter)
+        .collect(Collectors.toList());
+    if (policyPointcutParametersFactories.size() > 1) {
+      return throwMoreThanOneFactoryFoundException(componentIdentifier, factoryType);
+    }
+    if (policyPointcutParametersFactories.isEmpty()) {
+      return new PolicyPointcutParameters(componentIdentifier);
+    }
+    return policyPointcutParametersCreationFunction.apply(policyPointcutParametersFactories.get(0));
+  }
+
+  private PolicyPointcutParameters throwMoreThanOneFactoryFoundException(ComponentIdentifier sourceIdentifier,
+                                                                         Class factoryClass) {
+    throw new MuleRuntimeException(createStaticMessage(String.format(
+                                                                     "More than one %s for component %s was found. There should be only one.",
+                                                                     factoryClass.getName(), sourceIdentifier)));
   }
 
   @Override
