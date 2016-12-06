@@ -17,14 +17,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public final class ValidationOptions {
 
   /**
-   * Specifies the classname of the {@link Exception} to be thrown if the validation fail. If it's not provided, then the platform
-   * will choose a default type
-   */
-  @Parameter
-  @Optional
-  private String exceptionClass;
-
-  /**
    * Specifies the message that is to be notified to the user if the validation fails. It's marked as not dynamic to allow eager
    * evaluation of the expression in case that the validation is successful and the message is not needed. Components consuming
    * this value are to manually check if this is an expression and evaluate it in case that the validation failed
@@ -32,10 +24,6 @@ public final class ValidationOptions {
   @Parameter
   @Optional
   private String message = null;
-
-  public String getExceptionClass() {
-    return exceptionClass;
-  }
 
   public String getMessage() {
     return message;

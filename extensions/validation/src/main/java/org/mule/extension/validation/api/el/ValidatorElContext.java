@@ -222,6 +222,6 @@ public final class ValidatorElContext {
   }
 
   private boolean validate(Validator validator) {
-    return !validator.validate(event).isError();
+    return !validator.validate().isError();
   }
 }

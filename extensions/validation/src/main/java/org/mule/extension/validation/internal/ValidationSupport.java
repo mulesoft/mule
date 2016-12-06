@@ -6,6 +6,8 @@
  */
 package org.mule.extension.validation.internal;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.extension.validation.api.ValidationErrorTypes.VALIDATION;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 
 import org.mule.extension.validation.api.ValidationException;
@@ -22,6 +24,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,15 +42,10 @@ abstract class ValidationSupport {
   protected MuleContext muleContext;
 
   protected void validateWith(Validator validator, ValidationContext validationContext, Event event) throws Exception {
-    ValidationResult result = validator.validate(event);
+    ValidationResult result = validator.validate();
     if (result.isError()) {
       result = evaluateCustomMessage(result, validationContext);
-      String customExceptionClass = validationContext.getOptions().getExceptionClass();
-      if (StringUtils.isEmpty(customExceptionClass)) {
-        throw validationContext.getConfig().getExceptionFactory().createException(result, ValidationException.class, event);
-      } else {
-        throw validationContext.getConfig().getExceptionFactory().createException(result, customExceptionClass, event);
-      }
+      throw new ValidationException(result);
     } else {
       logSuccessfulValidation(validator, event);
     }
@@ -55,7 +53,7 @@ abstract class ValidationSupport {
 
   private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext) {
     String customMessage = validationContext.getOptions().getMessage();
-    return StringUtils.isBlank(customMessage)
+    return isBlank(customMessage)
         ? result
         : error(customMessage);
   }
@@ -65,7 +63,7 @@ abstract class ValidationSupport {
   }
 
   protected Locale parseLocale(String locale) {
-    locale = StringUtils.isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
+    locale = isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
     return new Locale(locale);
   }
 

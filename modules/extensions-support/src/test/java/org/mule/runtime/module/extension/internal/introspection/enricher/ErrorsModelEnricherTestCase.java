@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
+import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,9 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getNamedObject;
+import static org.mule.runtime.module.extension.internal.introspection.enricher.LevelErrorTypes.EXTENSION;
+import static org.mule.runtime.module.extension.internal.introspection.enricher.LevelErrorTypes.OPERATION;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-
 import org.junit.Test;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -38,7 +40,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -113,6 +114,24 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
     assertThat(muleAnyError.get().getNamespace(), is(MULE_NAMESPACE));
   }
 
+  @Test
+  public void operationThrowsOverridesExtensionThrows() {
+    describe(HeisenbergWithOperationThrows.class);
+    OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
+    Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
+        .filter(errorModel -> errorModel.getType().equals(OPERATION.getType())).findFirst();
+    assertThat(operationError.isPresent(), is(true));
+  }
+
+  @Test
+  public void operationInheritsExtensionErrorThrows() {
+    describe(HeisenbergWithExtensionThrows.class);
+    OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
+    Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
+        .filter(errorModel -> errorModel.getType().equals(EXTENSION.getType())).findFirst();
+    assertThat(operationError.isPresent(), is(true));
+  }
+
   private void describe(Class aClass) {
     final DefaultDescribingContext describingContext = new DefaultDescribingContext(getClass().getClassLoader());
     ExtensionDeclarer declarer =
@@ -142,6 +161,21 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
 
   }
 
+  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @ErrorTypes(LevelErrorTypes.class)
+  @Throws(ExtensionLevelErrorTypeProvider.class)
+  @Operations(OperationWithThrows.class)
+  public static class HeisenbergWithOperationThrows extends HeisenbergExtension {
+
+  }
+  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @ErrorTypes(LevelErrorTypes.class)
+  @Throws(ExtensionLevelErrorTypeProvider.class)
+  @Operations(OperationWithOutThrows.class)
+  public static class HeisenbergWithExtensionThrows extends HeisenbergExtension {
+
+  }
+
   private static class InvalidErrorOperations {
 
     @Throws(ErrorTypeProviderWithInvalidErrors.class)
@@ -153,7 +187,7 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
 
       @Override
       public Set<ErrorTypeDefinition> getErrorTypes() {
-        return Collections.singleton(MuleErrors.CONNECTIVITY);
+        return singleton(MuleErrors.CONNECTIVITY);
       }
     }
   }
@@ -179,6 +213,36 @@ public class ErrorsModelEnricherTestCase extends AbstractMuleTestCase {
       public Optional<ErrorTypeDefinition<?>> getParent() {
         return Optional.of(TYPE_A);
       }
+    }
+  }
+
+  private static class OperationWithThrows {
+
+    @Throws(OperationLevelErrorTypeProvider.class)
+    public void someOperation() {
+
+    }
+  }
+  private static class OperationWithOutThrows {
+
+    public void someOperation() {
+
+    }
+  }
+
+  public static class OperationLevelErrorTypeProvider implements ErrorTypeProvider {
+
+    @Override
+    public Set<ErrorTypeDefinition> getErrorTypes() {
+      return singleton(OPERATION);
+    }
+  }
+
+  public static class ExtensionLevelErrorTypeProvider implements ErrorTypeProvider {
+
+    @Override
+    public Set<ErrorTypeDefinition> getErrorTypes() {
+      return singleton(EXTENSION);
     }
   }
 

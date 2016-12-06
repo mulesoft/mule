@@ -12,9 +12,12 @@ import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.extension.ws.api.exception.SoapFault;
 import org.mule.extension.ws.api.exception.SoapFaultException;
+import org.mule.extension.ws.api.exception.WscErrors;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -40,7 +43,7 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
     MessagingException me = flowRunner(FAIL_FLOW).withPayload(getRequestResource(FAIL)).runExpectingException();
     Error error = me.getEvent().getError().get();
 
-    assertThat(error.getErrorType().getIdentifier(), is("Soap Fault"));
+    assertThat(error.getErrorType(), is(errorType("WSC", SOAP_FAULT.getType())));
 
     Throwable causeException = error.getCause();
     assertThat(causeException, instanceOf(SoapFaultException.class));
@@ -61,7 +64,7 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
     Error error = me.getEvent().getError().get();
 
-    assertThat(error.getErrorType().getIdentifier(), is("Soap Fault"));
+    assertThat(error.getErrorType(), is(errorType("WSC", SOAP_FAULT.getType())));
 
     Throwable causeException = error.getCause();
     assertThat(causeException, instanceOf(SoapFaultException.class));

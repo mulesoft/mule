@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 /**
  * The exception to be thrown by default when a validation fails. It's a pretty simple {@link MuleException} with the added
  * ability to provide the {@link ValidationResult} which failed.
- * <p/>
+ * <p>
  * The exception message is set to match the one in {@link ValidationResult#getMessage()}
  *
  * @since 3.7.0

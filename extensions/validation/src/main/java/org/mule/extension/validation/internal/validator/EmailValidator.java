@@ -7,10 +7,9 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * An {@link AbstractValidator} which verifies that a {@link #email} address is valid
@@ -27,7 +26,7 @@ public class EmailValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     if (!email.trim().equals(email)) {
       return fail();
     }

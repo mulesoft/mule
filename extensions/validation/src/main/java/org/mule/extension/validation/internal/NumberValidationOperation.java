@@ -6,15 +6,15 @@
  */
 package org.mule.extension.validation.internal;
 
+import org.mule.extension.validation.api.NumberType;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
-import org.mule.extension.validation.api.NumberType;
 import org.mule.extension.validation.internal.validator.NumberValidator;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.util.Locale;
@@ -39,7 +39,8 @@ public class NumberValidationOperation extends ValidationSupport {
    * @param options the {@link ValidationOptions}
    * @param event the current {@link Event}
    */
-  public void isNumber(String value, @Optional String locale, @Optional String pattern, @Optional String minValue,
+  public void isNumber(String value, @Optional String locale, @Optional String pattern,
+                       @Optional String minValue,
                        @Optional String maxValue, NumberType numberType, @ParameterGroup(ERROR_GROUP) ValidationOptions options,
                        Event event, @UseConfig ValidationExtension config)
       throws Exception {
@@ -54,5 +55,4 @@ public class NumberValidationOperation extends ValidationSupport {
   private Number parseNumber(String value, NumberType numberType) {
     return StringUtils.isBlank(value) ? null : numberType.toNumber(value, null, parseLocale(null));
   }
-
 }

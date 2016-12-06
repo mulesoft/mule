@@ -87,7 +87,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel, errorTypeRepository);
+    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
   }
 
   private synchronized void createSource() throws Exception {

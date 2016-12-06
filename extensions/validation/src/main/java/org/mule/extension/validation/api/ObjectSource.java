@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -22,21 +23,23 @@ import java.lang.reflect.Constructor;
 /**
  * A factory object for providing instances by either referencing their classname (through the {@link #type} attribute, or a
  * {@link MuleRegistry} reference (through the {@link #ref} one.
- * <p/>
+ * <p>
  * When the {@link #type} attribute is used to reference a type, then a new instance is returned each time that
  * {@link #getObject(MuleContext)} is invoked. That type is also expected to have a public default {@link Constructor}.
- * <p/>
+ * <p>
  * When a {@link #ref} is provided, then that value is searched by using the {@link MuleRegistry#get(String)}. Notice however that
  * the reference will be re fetched each time that {@link #getObject(MuleContext)} is invoked
- * <p/>
+ * <p>
  * The {@link #type} and {@link #ref} attributes are mutually exclusive. A {@link IllegalArgumentException} is thrown if both are
  * set by the time {@link #getObject(MuleContext)} is invoked. The same exception is also thrown if none of them are.
- * <p/>
+ * <p>
  * Instances of this class are to be considered thread-safe and reusable.
  *
  * @param <T> the type of the object to be returned
  * @since 3.7.0
  */
+//TODO MULE-11144 : Add '(isOneRequired = true)' when the bug is fixed
+@ExclusiveOptionals
 public class ObjectSource<T> {
 
   @Parameter

@@ -8,10 +8,6 @@ package org.mule.extension.validation.internal;
 
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.BooleanValidator;
 import org.mule.extension.validation.internal.validator.EmailValidator;
@@ -24,6 +20,11 @@ import org.mule.extension.validation.internal.validator.NullValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.util.Collection;
 import java.util.Map;
@@ -93,6 +94,7 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event
    * @param config the current {@link ValidationExtension} that serves as config
    */
+  @DisplayName("Is IP")
   public void isIp(String ip, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                    @UseConfig ValidationExtension config)
       throws Exception {
@@ -212,7 +214,8 @@ public final class CommonValidationOperations extends ValidationSupport {
    * @param event the current {@link Event}
    * @param config the current {@link ValidationExtension} that serves as config
    */
-  public void isUrl(String url, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
+  @DisplayName("Is URL")
+  public void isUrl(@DisplayName("URL") String url, @ParameterGroup(ERROR_GROUP) ValidationOptions options, Event event,
                     @UseConfig ValidationExtension config)
       throws Exception {
     ValidationContext context = createContext(options, event, config);
