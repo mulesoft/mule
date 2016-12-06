@@ -116,6 +116,8 @@ import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.util.rx.Exceptions;
+import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.Serializable;
@@ -248,7 +250,7 @@ public class DefaultMuleContext implements MuleContext {
     // Ensure reactor operatorError hook is always registered.
     Hooks.onOperatorError((throwable, signal) -> {
       // Only apply hook for Event signals.
-      if (signal instanceof Event) {
+      if (signal instanceof Event && !(throwable instanceof EventDroppedException)) {
         throwable = unwrap(throwable);
         return throwable instanceof MessagingException ? throwable
             : new MessagingException((Event) signal, getRootCauseException(throwable));
