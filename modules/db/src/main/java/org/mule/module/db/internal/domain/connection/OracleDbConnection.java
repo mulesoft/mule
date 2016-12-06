@@ -21,6 +21,9 @@ import java.sql.SQLException;
 public class OracleDbConnection extends DefaultDbConnection
 {
 
+    private Method createArrayMethod;
+    private boolean initialized;
+
     /**
      * {@inheritDoc}
      */
@@ -32,25 +35,46 @@ public class OracleDbConnection extends DefaultDbConnection
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException
     {
-        Method createArrayMethod;
-        try
+        if (getCreateArrayOfMethod(delegate) == null)
         {
-            createArrayMethod = delegate.getClass().getMethod("createARRAY", String.class, Object.class);
-            createArrayMethod.setAccessible(true);
-        }
-        catch (NoSuchMethodException e)
-        {
-            // Attempts to create the array using the standard JDBC method
             return super.createArrayOf(typeName, elements);
         }
+        else
+        {
+            try
+            {
+                return (Array) getCreateArrayOfMethod(delegate).invoke(delegate, typeName, elements);
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Error creating ARRAY", e);
+            }
+        }
+    }
 
-        try
+    private Method getCreateArrayOfMethod(Connection delegate)
+    {
+        if (createArrayMethod == null && !initialized)
         {
-            return (Array) createArrayMethod.invoke(delegate, typeName, elements);
+            synchronized (this)
+            {
+                if (createArrayMethod == null && !initialized)
+                {
+                    try
+                    {
+                        createArrayMethod = delegate.getClass().getMethod("createARRAY", String.class, Object.class);
+                        createArrayMethod.setAccessible(true);
+                    }
+                    catch (NoSuchMethodException e)
+                    {
+                        // Ignore, will use the standard method
+                    }
+
+                    initialized = true;
+                }
+            }
         }
-        catch (Exception e)
-        {
-            throw new SQLException("Error creating ARRAY", e);
-        }
+
+        return createArrayMethod;
     }
 }

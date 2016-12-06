@@ -11,8 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.module.db.integration.TestDbConfig.getOracleResource;
 import static org.mule.module.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.api.MuleEvent;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.OracleTestDatabase;
@@ -54,11 +53,9 @@ public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesWithStruct() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleEvent response = runFlow("updateWithStruct", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://updateWithStruct", TEST_MESSAGE, null);
-
-        assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
+        assertThat(((Struct) response.getMessage().getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
     }
 
     @Test
@@ -66,10 +63,8 @@ public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
     {
         Object[] payload = SOUTHWEST_MANAGER.getContactDetails().asObjectArray();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleEvent response = runFlow("updateWithObject", payload);
 
-        MuleMessage response = client.send("vm://updateWithObject", payload, null);
-
-        assertThat(((Struct) response.getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
+        assertThat(((Struct) response.getMessage().getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
     }
 }

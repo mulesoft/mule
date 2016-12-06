@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updateWithStruct">
-        <inbound-endpoint address="vm://updateWithStruct" exchange-pattern="request-response"/>
-
         <transactional>
             <db:select>
                 <db:parameterized-query>
@@ -36,8 +34,6 @@
     </flow>
 
     <flow name="updateWithObject">
-        <inbound-endpoint address="vm://updateWithObject" exchange-pattern="request-response"/>
-
         <transactional>
             <db:update>
                 <db:parameterized-query>update REGION_MANAGERS set DETAILS = :details where

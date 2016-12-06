@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="createsDefaultTypeArray">
-        <inbound-endpoint address="vm://createsDefaultTypeArray" exchange-pattern="request-response"/>
-
         <transactional>
             <db:stored-procedure>
                 <db:parameterized-query>{ CALL updateZipCodes('Southwest', :array) }
@@ -29,8 +27,6 @@
     </flow>
 
     <flow name="createsCustomTypeArray">
-        <inbound-endpoint address="vm://createsCustomTypeArray" exchange-pattern="request-response"/>
-
         <transactional>
             <db:stored-procedure>
                 <db:parameterized-query>{ CALL updateContactDetails('Contact1', :array) }

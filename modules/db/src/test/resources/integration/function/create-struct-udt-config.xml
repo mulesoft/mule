@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="createsStruct">
-        <inbound-endpoint address="vm://createsStruct" exchange-pattern="request-response"/>
-
         <transactional>
             <db:update>
                 <db:parameterized-query>update REGION_MANAGERS set DETAILS = :details where
