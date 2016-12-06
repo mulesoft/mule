@@ -10,8 +10,7 @@ package org.mule.module.db.integration.update;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.module.db.integration.TestDbConfig.getDerbyResource;
 import static org.mule.module.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.api.MuleEvent;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
@@ -42,12 +41,18 @@ public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase
     }
 
     @Test
-    public void updatesObject() throws Exception
+    public void updatesWithStruct() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleEvent response = runFlow("updateWithStruct", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://updatesObject", TEST_MESSAGE, null);
+        assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
+    }
 
-        assertThat(response.getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
+    @Test
+    public void updatesWithObject() throws Exception
+    {
+        MuleEvent response = runFlow("updateWithStruct", SOUTHWEST_MANAGER.getContactDetails());
+
+        assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
     }
 }

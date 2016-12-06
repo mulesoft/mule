@@ -8,13 +8,12 @@
 package org.mule.module.db.internal.domain.type;
 
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Defines a data type that was resolved for a database instance
+ * Base class for structured DB types.
  */
-public class ResolvedDbType extends AbstractDbType
+public abstract class AbstractStructuredDbType extends ResolvedDbType
 {
 
     /**
@@ -23,27 +22,14 @@ public class ResolvedDbType extends AbstractDbType
      * @param id type identifier from {#link java.sql.Types} or any custom value.
      * @param name name of the structured type. Non empty.
      */
-    public ResolvedDbType(int id, String name)
+    public AbstractStructuredDbType(int id, String name)
     {
         super(id, name);
     }
 
     @Override
-    public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
+    public void registerOutParameter(CallableStatement statement, int index) throws SQLException
     {
-        if (value == null)
-        {
-            statement.setNull(index, id);
-        }
-        else
-        {
-            statement.setObject(index, value, id);
-        }
-    }
-
-    @Override
-    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
-    {
-        return statement.getObject(index);
+        statement.registerOutParameter(index, id, name);
     }
 }

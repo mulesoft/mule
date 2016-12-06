@@ -5,14 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.update;
+package org.mule.module.db.integration.function;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.module.db.integration.TestDbConfig.getOracleResource;
 import static org.mule.module.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
 import org.mule.api.MuleEvent;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.OracleTestDatabase;
 
@@ -23,10 +22,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
+public class DbCreateStructTestCase extends AbstractDbFunctionTestCase
 {
 
-    public UpdateStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public DbCreateStructTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -35,7 +34,6 @@ public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
     public static List<Object[]> parameters()
     {
         List<Object[]> params = new LinkedList<>();
-
         if (!getOracleResource().isEmpty())
         {
             params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
@@ -47,23 +45,15 @@ public class UpdateStructUdtTestCase extends AbstractDbIntegrationTestCase
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/update/update-udt-config.xml"};
+        return new String[] {"integration/function/create-struct-udt-config.xml"};
     }
 
     @Test
-    public void updatesWithStruct() throws Exception
-    {
-        MuleEvent response = runFlow("updateWithStruct", TEST_MESSAGE);
-
-        assertThat(((Struct) response.getMessage().getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
-    }
-
-    @Test
-    public void updatesWithArray() throws Exception
+    public void createsStruct() throws Exception
     {
         Object[] payload = SOUTHWEST_MANAGER.getContactDetails().asObjectArray();
 
-        MuleEvent response = runFlow("updateWithObject", payload);
+        MuleEvent response = runFlow("createsStruct", payload);
 
         assertThat(((Struct) response.getMessage().getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
     }

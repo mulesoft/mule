@@ -7,12 +7,19 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import org.mule.module.db.internal.domain.connection.ConnectionFactory;
+import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.module.db.internal.domain.connection.OracleTransactionalDbConnectionFactory;
+import org.mule.module.db.internal.domain.transaction.TransactionCoordinationDbTransactionManager;
 import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
 import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 /**
  * Creates {@link DbConfig} instances for Oracle databases
@@ -31,5 +38,11 @@ public class OracleDbConfigFactory extends GenericDbConfigFactory
         dbTypes.add(new OracleXmlType());
 
         return dbTypes;
+    }
+
+    @Override
+    protected DbConnectionFactory createDbConnectionFactory(DataSource dataSource, ConnectionFactory connectionFactory, DbTypeManager dbTypeManager)
+    {
+        return new OracleTransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, dataSource);
     }
 }
