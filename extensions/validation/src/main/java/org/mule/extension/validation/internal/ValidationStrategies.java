@@ -6,21 +6,15 @@
  */
 package org.mule.extension.validation.internal;
 
-import static org.mule.extension.validation.api.ValidationErrorTypes.VALIDATION;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
-import org.mule.extension.validation.api.ValidationErrorTypeProvider;
-import org.mule.extension.validation.api.ValidationErrorTypes;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
-import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +40,6 @@ public final class ValidationStrategies {
    * @param validations the nested validation operations
    * @throws MultipleValidationException if at least one validator fails and {@code throwsException} is {@code true}
    */
-  @Throws(ValidationErrorTypeProvider.class)
   public void all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations)
       throws MultipleValidationException {
     List<ValidationResult> results = new ArrayList<>(validations.size());

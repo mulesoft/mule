@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -48,6 +49,7 @@ import java.util.Locale;
     resources = {"/META-INF/services/org/mule/runtime/core/i18n/validation-messages.properties"})
 @ErrorTypes(ValidationErrorTypes.class)
 @OnException(ValidationExceptionEnricher.class)
+@Throws(ValidationErrorTypeProvider.class)
 public class ValidationExtension implements Config, NamedObject, Initialisable {
 
   public static final String DEFAULT_LOCALE = Locale.getDefault().getLanguage();

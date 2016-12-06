@@ -7,9 +7,13 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -27,6 +31,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
@@ -43,6 +48,15 @@ import java.util.stream.Stream;
 public class ErrorsModelEnricher implements ModelEnricher {
 
   private ErrorsModelFactory errorModelDescriber;
+  private ExtensionElement extensionElement;
+  private final LoadingCache<Class<?>, TypeWrapper> typeWrapperCache =
+      CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, TypeWrapper>() {
+
+        @Override
+        public TypeWrapper load(Class<?> clazz) throws Exception {
+          return new TypeWrapper(clazz);
+        }
+      });
 
   @Override
   public void enrich(DescribingContext describingContext) {
@@ -51,8 +65,7 @@ public class ErrorsModelEnricher implements ModelEnricher {
 
     if (implementingType.isPresent()) {
 
-      ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
-
+      extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
       extensionElement.getAnnotation(ErrorTypes.class).ifPresent(errorTypesAnnotation -> {
 
         String extensionNamespace = getExtensionsErrorNamespace(declaration);
@@ -83,7 +96,7 @@ public class ErrorsModelEnricher implements ModelEnricher {
   private void registerOperationErrorTypes(MethodElement operationMethod, OperationDeclaration operation,
                                            ErrorsModelFactory errorModelDescriber,
                                            ErrorTypeDefinition<?>[] extensionErrorTypes) {
-    operationMethod.getAnnotation(Throws.class)
+    getOperationThrowsDeclaration(operationMethod, extensionElement)
         .ifPresent(throwsAnnotation -> {
           Class<? extends ErrorTypeProvider>[] providers = throwsAnnotation.value();
           Stream.of(providers).forEach(provider -> {
@@ -103,6 +116,14 @@ public class ErrorsModelEnricher implements ModelEnricher {
         });
   }
 
+  private Optional<Throws> getOperationThrowsDeclaration(MethodElement operationMethod, ExtensionElement extensionElement) {
+    TypeWrapper operationContainer = typeWrapperCache.getUnchecked(operationMethod.getDeclaringClass());
+    return ofNullable(operationMethod.getAnnotation(Throws.class)
+        .orElseGet(() -> operationContainer.getAnnotation(Throws.class)
+            .orElseGet(() -> extensionElement.getAnnotation(Throws.class)
+                .orElse(null))));
+  }
+
   private ErrorTypeDefinition validateOperationThrows(ErrorTypeDefinition<?>[] errorTypes, ErrorTypeDefinition error) {
     Class<?> extensionErrorType = errorTypes.getClass().getComponentType();
 
@@ -113,6 +134,4 @@ public class ErrorsModelEnricher implements ModelEnricher {
       return error;
     }
   }
-
-
 }
