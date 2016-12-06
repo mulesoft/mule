@@ -224,7 +224,10 @@ public class HttpResponseFactory {
       logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
       httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
     }
-    httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
+    String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
+    if (!CHUNKED.equals(existingTransferEncoding)) {
+      httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
+    }
   }
 
   private String createMultipartFormDataContentType() {
