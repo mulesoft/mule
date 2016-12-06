@@ -52,6 +52,7 @@ public final class CustomValidatorOperation extends ValidationSupport {
       throws Exception {
     ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
     Validator validator = validatorSource.getObject(muleContext);
+    event.getMuleContext().getRegistry().applyProcessors(validator);
 
     validateWith(validator, createContext(options, event, config), event);
   }
