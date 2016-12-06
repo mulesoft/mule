@@ -33,7 +33,7 @@ public class DbConfigFactoryBeanTestCase extends AbstractMuleTestCase
         DbConfigFactoryBean dbConfigFactoryBean = new DbConfigFactoryBean()
         {
             @Override
-            protected GenericDbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager)
+            protected GenericDbConfig doCreateDbConfig(String name, DataSource datasource, DbTypeManager dbTypeManager)
             {
                 return dbConfig;
             }

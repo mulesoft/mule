@@ -19,6 +19,7 @@ import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
 import org.mule.module.db.internal.domain.connection.ConnectionFactory;
+import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.module.db.internal.domain.connection.RetryConnectionFactory;
 import org.mule.module.db.internal.domain.connection.SimpleConnectionFactory;
@@ -54,7 +55,7 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
 
     private DataSource dataSource;
     private final String name;
-    private TransactionalDbConnectionFactory dbConnectionFactory;
+    private DbConnectionFactory dbConnectionFactory;
     private final DbTypeManager dbTypeManager;
 
     private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
@@ -89,7 +90,7 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
     }
 
     @Override
-    public TransactionalDbConnectionFactory getConnectionFactory()
+    public DbConnectionFactory getConnectionFactory()
     {
         return dbConnectionFactory;
     }
@@ -177,7 +178,20 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
             connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, new SimpleConnectionFactory());
         }
 
-        dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, this.getDataSource());
+        dbConnectionFactory = createDbConnectionFactory(this.getDataSource(), connectionFactory, dbTypeManager);
+    }
+
+    /**
+     * Creates the {@link DbConnectionFactory} to use on the created {@link DbConfig}
+     *
+     * @param dataSource datasource used on the DB config.
+     * @param connectionFactory creates the connections delegates for the created factory.
+     * @param dbTypeManager manages types provided on the created connections.
+     * @return a non null instance.
+     */
+    protected DbConnectionFactory createDbConnectionFactory(DataSource dataSource, ConnectionFactory connectionFactory, DbTypeManager dbTypeManager)
+    {
+        return new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, dataSource);
     }
 
     @Override

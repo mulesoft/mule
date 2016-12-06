@@ -14,7 +14,7 @@ import org.mule.module.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.module.db.internal.domain.type.ClobResolvedDataType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
-import org.mule.module.db.internal.domain.type.StructuredDbType;
+import org.mule.module.db.internal.domain.type.StructDbType;
 
 import java.sql.Connection;
 import java.sql.Types;
@@ -102,7 +102,7 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
                 }
                 else if (id == Types.STRUCT)
                 {
-                    customDbTypes.add(new StructuredDbType(id, name));
+                    customDbTypes.add(new StructDbType(id, name));
                 }
                 else if (id == Types.CLOB)
                 {

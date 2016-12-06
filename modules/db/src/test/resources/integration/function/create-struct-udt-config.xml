@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="createsStruct">
+        <transactional>
+            <db:update>
+                <db:parameterized-query>update REGION_MANAGERS set DETAILS = :details where
+                    REGION_NAME = 'Northwest'
+                </db:parameterized-query>
+                <db:in-param name="details" value="#[dbCreateStruct('dbConfig', 'CONTACT_DETAILS', payload)]" type="CONTACT_DETAILS"/>
+            </db:update>
+
+            <db:select>
+                <db:parameterized-query>
+                    select DETAILS from REGION_MANAGERS where REGION_NAME = 'Northwest'
+                </db:parameterized-query>
+            </db:select>
+
+            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+        </transactional>
+    </flow>
+</mule>

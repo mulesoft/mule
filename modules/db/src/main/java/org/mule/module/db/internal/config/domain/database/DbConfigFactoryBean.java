@@ -64,7 +64,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
         validate();
 
         DbTypeManager dbTypeManager = doCreateTypeManager();
-        dbConfig = doCreateDbConfig(dataSource, dbTypeManager);
+        dbConfig = doCreateDbConfig(name, dataSource, dbTypeManager);
         dbConfig.setPoolingProfile(poolingProfile);
         dbConfig.setUseXaTransactions(useXaTransactions);
         dbConfig.setUrl(getEffectiveUrl());
@@ -106,7 +106,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
         return Collections.EMPTY_LIST;
     }
 
-    protected GenericDbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager)
+    protected GenericDbConfig doCreateDbConfig(String name, DataSource datasource, DbTypeManager dbTypeManager)
     {
         return new GenericDbConfig(datasource, name, dbTypeManager);
     }

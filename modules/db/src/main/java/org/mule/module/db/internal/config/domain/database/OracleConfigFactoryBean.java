@@ -7,12 +7,17 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
+import org.mule.module.db.internal.domain.database.GenericDbConfig;
+import org.mule.module.db.internal.domain.database.OracleDbConfig;
 import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
 import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
 {
@@ -39,4 +44,9 @@ public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
         return dbTypes;
     }
 
+    @Override
+    protected GenericDbConfig doCreateDbConfig(String name, DataSource datasource, DbTypeManager dbTypeManager)
+    {
+        return new OracleDbConfig(datasource, name, dbTypeManager);
+    }
 }
