@@ -8,10 +8,10 @@ package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -174,7 +174,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
             try {
               return just(event).transform(resolveReferencedProcessor(event));
             } catch (MuleException e) {
-              throw propagate(e);
+              return error(e);
             }
           });
         }
