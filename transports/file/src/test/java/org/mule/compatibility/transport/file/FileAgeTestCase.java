@@ -9,16 +9,14 @@ package org.mule.compatibility.transport.file;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static java.lang.Long.parseLong;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 
-public class FileAgeTestCase extends MuleArtifactFunctionalTestCase {
+public class FileAgeTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String CONNECTOR_FILE_AGE = "60000";
   private static final String ENDPOINT_FILE_AGE = "120000";
