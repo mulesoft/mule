@@ -119,7 +119,7 @@ public class ContactDetails implements SQLData, Externalizable
                '}';
     }
 
-    public Object asObjectArray()
+    public Object[] asObjectArray()
     {
         return new Object[] {description, phoneNumber, email};
     }

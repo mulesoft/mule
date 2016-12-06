@@ -85,9 +85,22 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
 
         DbTypeManager dbTypeManager = doCreateTypeManager();
 
-        DbConnectionFactory dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, dataSource);
+        DbConnectionFactory dbConnectionFactory = createDbConnectionFactory(dataSource, connectionFactory, dbTypeManager);
 
         return doCreateDbConfig(dataSource, dbTypeManager, dbConnectionFactory, name);
+    }
+
+    /**
+     * Creates the {@link DbConnectionFactory} to use on the created {@link DbConfig}
+     *
+     * @param dataSource datasource used on the DB config.
+     * @param connectionFactory creates the connections delegates for the created factory.
+     * @param dbTypeManager manages types provided on the created connections.
+     * @return a non null instance.
+     */
+    protected DbConnectionFactory createDbConnectionFactory(DataSource dataSource, ConnectionFactory connectionFactory, DbTypeManager dbTypeManager)
+    {
+        return new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, dataSource);
     }
 
     protected DbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager, DbConnectionFactory dbConnectionFactory, String name)
