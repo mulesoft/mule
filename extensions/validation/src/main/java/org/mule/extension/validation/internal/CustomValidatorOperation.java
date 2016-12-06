@@ -59,6 +59,7 @@ public final class CustomValidatorOperation extends ValidationSupport
     {
         ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
         Validator validator = validatorSource.getObject(event.getMuleContext());
+        event.getMuleContext().getRegistry().applyProcessors(validator);
 
         validateWith(validator, createContext(options, event, config), event);
     }
