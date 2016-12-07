@@ -23,7 +23,7 @@ import org.mule.util.FileUtils;
  * the payload of the message should be a byte array
  * and the file-to-string transformer should be able to
  * process such incoming message.
- * see Jira ticket SE3200
+ * see Jira ticket MULE-11159
  */
 public class FileNoStreamingTestCase extends FunctionalTestCase
 {
