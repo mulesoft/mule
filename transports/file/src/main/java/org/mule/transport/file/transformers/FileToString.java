@@ -19,6 +19,7 @@ public class FileToString extends FileToByteArray
 
     public FileToString()
     {
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
         setReturnDataType(DataTypeFactory.STRING);
     }
 
@@ -35,7 +36,14 @@ public class FileToString extends FileToByteArray
     {
         byte[] bytes;
 
-        bytes = (byte[]) super.doTransform(src, encoding);
+        if (src instanceof byte[])
+        {
+            bytes = (byte[]) src;
+        }
+        else
+        {
+            bytes = (byte[]) super.doTransform(src, encoding);
+        }
 
         try
         {
