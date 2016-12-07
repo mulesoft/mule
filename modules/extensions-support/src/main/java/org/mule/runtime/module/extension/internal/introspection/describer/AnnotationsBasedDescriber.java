@@ -752,7 +752,7 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                       extensionParameter.getType().getName()));
           }
 
-          if (!getType(parameter.getDeclaration().getType()).isAssignableFrom(getType(nullSafeType))) {
+          if (hasDefaultOverride && !getType(parameter.getDeclaration().getType()).isAssignableFrom(getType(nullSafeType))) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
                                                                    + " is not a subtype of the parameter's type",

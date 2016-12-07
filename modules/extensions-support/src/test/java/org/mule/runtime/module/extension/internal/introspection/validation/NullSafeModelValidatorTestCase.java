@@ -82,6 +82,20 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     validator.validate(extensionModel);
   }
 
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void abstractFieldType() {
+    when(parameterModel.getType())
+        .thenReturn(toMetadataType(AbstractNullSafeTypeWithoutOverride.class));
+    validator.validate(extensionModel);
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void abstractImplementingType() {
+    when(parameterModel.getType())
+        .thenReturn(toMetadataType(AbstractNullSafeTypeWithAbstractOverride.class));
+    validator.validate(extensionModel);
+  }
+
   @Test
   public void validModel() {
     when(parameterModel.getType())
@@ -121,6 +135,22 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private ParentPojo pojo;
   }
 
+  private static class AbstractNullSafeTypeWithoutOverride {
+
+    @Parameter
+    @NullSafe
+    @Optional
+    private ParentPojo pojo;
+  }
+
+  private static class AbstractNullSafeTypeWithAbstractOverride {
+
+    @Parameter
+    @NullSafe(defaultImplementingType = AbstractChildPojo.class)
+    @Optional
+    private ParentPojo pojo;
+  }
+
   private static class ValidModel {
 
     @Parameter
@@ -129,7 +159,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private ParentPojo pojo;
 
     @Parameter
-    @NullSafe(defaultImplementingType = ChildPojo.class)
+    @NullSafe
     @Optional
     private ChildPojo childPojo;
 
@@ -144,7 +174,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     private List<String> listOfStrings;
   }
 
-  private static class ParentPojo {
+  private abstract static class ParentPojo {
 
   }
 
@@ -152,7 +182,15 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
 
   }
 
+
   private static class ChildPojo extends ParentPojo {
+
+    public ChildPojo() {
+
+    }
+  }
+
+  private abstract static class AbstractChildPojo extends ParentPojo {
 
   }
 }

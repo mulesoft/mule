@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -97,26 +98,26 @@ public final class NullSafeModelValidator implements ModelValidator {
 
               @Override
               public void visitObject(ObjectType objectType) {
-                // TODO: Reenable these checks when MULE-10679 brings introspectionUtils to a visible scope
-                // if (hasDefaultOverride && isInstantiable(parameter.getDeclaration().getType())) {
-                // throw new IllegalParameterModelDefinitionException(
-                // format("Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
-                // + " but a 'defaultImplementingType' was provided."
-                // + " Type override is not allowed for concrete types",
-                // field.getName(),
-                // declaringClass.getName(),
-                // NullSafe.class.getSimpleName(),
-                // field.getType().getName()));
-                // }
-                //
-                // if (!isInstantiable(nullSafeType)) {
-                // throw new IllegalParameterModelDefinitionException(
-                // format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                // + "used with complex instantiable types (Pojos, Lists, Maps)",
-                // extensionParameter.getName(),
-                // NullSafe.class.getSimpleName(),
-                // extensionParameter.getType().getName()));
-                // }
+                if (hasDefaultOverride && isInstantiable(fieldType)) {
+                  throw new IllegalParameterModelDefinitionException(
+                                                                     format("Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
+                                                                         + " but a 'defaultImplementingType' was provided."
+                                                                         + " Type override is not allowed for concrete types",
+                                                                            fieldName,
+                                                                            declaringClass.getName(),
+                                                                            NullSafe.class.getSimpleName(),
+                                                                            fieldType.getName()));
+                }
+
+                if (!isInstantiable(nullSafeType)) {
+                  throw new IllegalParameterModelDefinitionException(
+                                                                     format("Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                         + "used with complex instantiable types (Pojos, Lists, Maps)",
+                                                                            fieldName,
+                                                                            declaringClass.getName(),
+                                                                            NullSafe.class.getSimpleName(),
+                                                                            nullSafeType.getName()));
+                }
 
                 if (hasDefaultOverride && !fieldType.isAssignableFrom((Class) nullSafeType)) {
                   throw new IllegalParameterModelDefinitionException(
@@ -126,7 +127,7 @@ public final class NullSafeModelValidator implements ModelValidator {
                                                                             declaringClass.getName(),
                                                                             NullSafe.class.getSimpleName(),
                                                                             fieldType.getName(),
-                                                                            nullSafeType.getTypeName()));
+                                                                            nullSafeType.getName()));
                 }
               }
 
