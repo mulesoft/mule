@@ -8,10 +8,9 @@
     <flow name="createsStruct">
         <transactional>
             <db:update>
-                <db:parameterized-query>update REGION_MANAGERS set DETAILS = :details where
+                <db:parameterized-query>update REGION_MANAGERS set DETAILS = #[dbCreateStruct('dbConfig', 'CONTACT_DETAILS', payload)] where
                     REGION_NAME = 'Northwest'
                 </db:parameterized-query>
-                <db:in-param name="details" value="#[dbCreateStruct('dbConfig', 'CONTACT_DETAILS', payload)]" type="CONTACT_DETAILS"/>
             </db:update>
 
             <db:select>

@@ -18,7 +18,6 @@ import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.sql.SQLException;
@@ -107,15 +106,13 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
     {
         MuleEvent event = mock(MuleEvent.class);
         MuleRegistry muleRegistry = mock(MuleRegistry.class);
-        DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
         DbConfig dbConfig = mock(DbConfig.class);
         DbConnection dbConnection = mock(DbConnection.class);
         DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
 
         when(context.getVariable(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE)).thenReturn(event);
         when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        when(muleRegistry.get(DB_CONFIG_NAME)).thenReturn(dbConfigResolver);
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+        when(muleRegistry.get(DB_CONFIG_NAME)).thenReturn(dbConfig);
         when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
         if (withTransaction)

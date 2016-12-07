@@ -9,17 +9,12 @@ package org.mule.module.db.internal.el;
 
 import static java.lang.String.format;
 import static org.mule.util.Preconditions.checkArgument;
-import static org.mule.util.Preconditions.checkState;
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.el.mvel.MVELExpressionLanguageContext;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -53,9 +48,7 @@ public abstract class AbstractDbFunction  implements ExpressionLanguageFunction
         validateParams(params);
         DbConnection connection = null;
 
-        DbConfigResolver dbConfigResolver = muleContext.getRegistry().get((String) params[0]);
-        final MuleEvent muleEvent = getMuleEvent(context);
-        DbConfig dbConfig = dbConfigResolver.resolve(muleEvent);
+        DbConfig dbConfig = muleContext.getRegistry().get((String) params[0]);
 
         try
         {
@@ -91,18 +84,6 @@ public abstract class AbstractDbFunction  implements ExpressionLanguageFunction
      * @return the name of the function as it appears on MEL expressions
      */
     protected abstract String getFunctionName();
-
-    private MuleEvent getMuleEvent(ExpressionLanguageContext context)
-    {
-        MuleEvent event = context.getVariable(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE);
-        if (event == null)
-        {
-            event = RequestContext.getEvent();
-        }
-
-        checkState(event != null, "Could not obtain MuleEvent");
-        return event;
-    }
 
     private void validateParams(Object[] params)
     {

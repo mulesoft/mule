@@ -47,12 +47,4 @@ public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase
 
         assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
     }
-
-    @Test
-    public void updatesWithObject() throws Exception
-    {
-        MuleEvent response = runFlow("updateWithStruct", SOUTHWEST_MANAGER.getContactDetails());
-
-        assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
-    }
 }

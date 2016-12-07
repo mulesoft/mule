@@ -32,23 +32,4 @@
             <set-payload value="#[payload.get(0)['DETAILS']]"/>
         </transactional>
     </flow>
-
-    <flow name="updateWithObject">
-        <transactional>
-            <db:update>
-                <db:parameterized-query>update REGION_MANAGERS set DETAILS = :details where
-                    REGION_NAME = 'Northwest'
-                </db:parameterized-query>
-                <db:in-param name="details" value="#[payload]" type="CONTACT_DETAILS"/>
-            </db:update>
-
-            <db:select>
-                <db:parameterized-query>
-                    select DETAILS from REGION_MANAGERS where REGION_NAME = 'Northwest'
-                </db:parameterized-query>
-            </db:select>
-
-            <set-payload value="#[payload.get(0)['DETAILS']]"/>
-        </transactional>
-    </flow>
 </mule>
