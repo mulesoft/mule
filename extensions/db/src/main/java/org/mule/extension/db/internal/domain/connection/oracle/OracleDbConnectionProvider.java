@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CON
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
+import org.mule.extension.db.internal.domain.connection.JdbcConnectionFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -31,6 +32,11 @@ public class OracleDbConnectionProvider extends DbConnectionProvider {
 
   @ParameterGroup(CONNECTION)
   private OracleConnectionParameters oracleConnectionParameters;
+
+  @Override
+  protected JdbcConnectionFactory createJdbcConnectionFactory() {
+    return new OracleJdbcConnectionFactory();
+  }
 
   @Override
   protected DbConnection createDbConnection(Connection connection) throws Exception {

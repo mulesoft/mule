@@ -23,7 +23,7 @@ import org.mule.extension.db.internal.domain.type.ClobResolvedDataType;
 import org.mule.extension.db.internal.domain.type.DbType;
 import org.mule.extension.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.extension.db.internal.domain.type.ResolvedDbType;
-import org.mule.extension.db.internal.domain.type.StructuredDbType;
+import org.mule.extension.db.internal.domain.type.StructDbType;
 import org.mule.extension.db.internal.domain.xa.XADbConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -87,7 +87,17 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   private DataSourceFactory dataSourceFactory;
   private List<DbType> resolvedCustomTypes = emptyList();
-  private JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory();
+  private JdbcConnectionFactory jdbcConnectionFactory = createJdbcConnectionFactory();
+
+  /**
+   * Creates the {@link JdbcConnectionFactory} to use on this provider
+   *
+   * @return a non null provider.
+   */
+  protected JdbcConnectionFactory createJdbcConnectionFactory() {
+    return new JdbcConnectionFactory();
+  }
+
   private DataSource dataSource;
 
   @Override
@@ -210,7 +220,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
           }
           return new MappedStructResolvedDbType<>(id, name, mappedClass);
         } else {
-          return new StructuredDbType(id, name);
+          return new StructDbType(id, name);
         }
       } else if (id == Types.CLOB) {
         return new ClobResolvedDataType(id, name);

@@ -343,6 +343,14 @@ public abstract class AbstractTestDatabase {
     throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
   }
 
+  public void createStoredProcedureUpdateZipCodes(DataSource dataSource) throws SQLException {
+    throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+  }
+
+  public void createStoredProcedureUpdateContactDetails(DataSource dataSource) throws SQLException {
+    throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+  }
+
   public void createStoredProcedureGetContactDetails(DataSource dataSource) throws SQLException {
     throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
   }

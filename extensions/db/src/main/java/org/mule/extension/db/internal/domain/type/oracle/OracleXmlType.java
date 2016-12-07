@@ -6,7 +6,7 @@
  */
 package org.mule.extension.db.internal.domain.type.oracle;
 
-import org.mule.extension.db.internal.domain.type.StructuredDbType;
+import org.mule.extension.db.internal.domain.type.AbstractStructuredDbType;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.InputStream;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
 /**
  * Defines a structured data type for the {@link #ORACLE_XMLTYPE_CLASS} class
  */
-public class OracleXmlType extends StructuredDbType {
+public class OracleXmlType extends AbstractStructuredDbType {
 
   private static final int OPAQUE_TYPE_ID = 2007;
   private static final String XML_TYPE_INTERNAL_NAME = "SYS.XMLTYPE";
