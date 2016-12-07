@@ -48,11 +48,13 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.HealthyFood" substitutionGroup="vegan:abstract-farmed-food" abstract="true" name="abstract-healthy-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:global-abstract-farmed-food" abstract="true" name="abstract-healthy-food"></xs:element>
     <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-healthy-food" name="healthy-food">
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
@@ -494,6 +496,28 @@
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetHealthyFoodType" substitutionGroup="mule:abstract-operator" name="get-healthy-food"></xs:element>
+    <xs:complexType name="GetHealthyFoodType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

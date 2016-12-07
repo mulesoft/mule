@@ -7,6 +7,7 @@
 package org.mule.extension.email.sender;
 
 import static java.nio.charset.Charset.availableCharsets;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -26,6 +27,7 @@ public class SendTestCase extends SMTPTestCase {
   private static final String SEND_EMAIL_CUSTOM_HEADERS = "sendEmailHeaders";
   private static final String SEND_EMAIL_WITH_ATTACHMENT = "sendEmailWithAttachment";
   private static final String SEND_ENCODED_MESSAGE = "sendEncodedMessage";
+  private static final String SEND_EMAIL_WITHOUT_BODY = "sendEmailWithoutBody";
 
   @Test
   public void sendEmail() throws Exception {
@@ -82,5 +84,14 @@ public class SendTestCase extends SMTPTestCase {
     Message[] messages = getReceivedMessagesAndAssertCount(1);
     Object content = ((String) messages[0].getContent()).trim();
     assertThat(content, is(new String(WEIRD_CHAR_MESSAGE.getBytes(customEncoding), customEncoding)));
+  }
+
+  @Test
+  public void sendEmailWithoutBody() throws Exception {
+    flowRunner(SEND_EMAIL_WITHOUT_BODY).run();
+    Message[] messages = getReceivedMessagesAndAssertCount(1);
+    Message sentMessage = messages[0];
+    assertSubject(sentMessage.getSubject());
+    assertThat(sentMessage.getContent().toString().trim(), isEmptyString());
   }
 }

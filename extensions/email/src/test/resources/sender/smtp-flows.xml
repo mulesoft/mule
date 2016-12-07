@@ -53,4 +53,13 @@
         </email:send>
     </flow>
 
+    <flow name="sendEmailWithoutBody">
+        <email:send config-ref="config">
+            <email:email-builder subject="Email Subject">
+                <email:to-addresses>
+                    <email:to-address value="juan.desimoni@mulesoft.com"/>
+                </email:to-addresses>
+            </email:email-builder>
+        </email:send>
+    </flow>
 </mule>

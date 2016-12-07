@@ -24,6 +24,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.internal.utils.MetadataTypeUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -76,7 +77,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
         Class<?> clazz = getType(objectType);
 
         String requiredFields = objectType.getFields().stream()
-            .filter(ObjectFieldType::isRequired).map(f -> f.getKey().getName().getLocalPart())
+            .filter(ObjectFieldType::isRequired).map(MetadataTypeUtils::getLocalPart)
             .collect(joining(", "));
         if (!isBlank(requiredFields)) {
           throw new IllegalParameterModelDefinitionException(

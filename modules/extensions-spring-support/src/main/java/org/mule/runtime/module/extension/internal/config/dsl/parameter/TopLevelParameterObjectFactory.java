@@ -8,14 +8,17 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static java.lang.String.format;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -60,7 +63,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   @Override
   public Object doGetObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
-      //TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
+      // TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
       // be generalized
 
       resolveParameters(objectType, builder);
@@ -83,7 +86,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
           }
 
           final ObjectType groupType = (ObjectType) groupField.getValue();
-          final Field objectField = getField(objectClass, getFieldKey(groupField));
+          final Field objectField = getField(objectClass, getLocalPart(groupField));
           DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(groupField.getValue()));
           builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
 
@@ -97,7 +100,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     final boolean isParameterGroup = objectType.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
     final Map<String, Object> parameters = getParameters();
     objectType.getFields().forEach(field -> {
-      final String key = getFieldKey(field);
+      final String key = getLocalPart(field);
 
       ValueResolver<?> valueResolver = null;
       Field objectField = getField(objectClass, key);
@@ -112,7 +115,9 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
       if (nullSafe.isPresent()) {
         ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
-        valueResolver = NullSafeValueResolverWrapper.of(delegate, nullSafe.get().getType(), muleContext);
+        MetadataType type =
+            getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader));
+        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
       }
 
       if (valueResolver != null) {
@@ -126,9 +131,5 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
         .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
                                                                       objectClass.getName(),
                                                                       key)));
-  }
-
-  private String getFieldKey(ObjectFieldType field) {
-    return field.getKey().getName().getLocalPart();
   }
 }
