@@ -9,6 +9,7 @@
         <db:data-types>
             <db:data-type name="CONTACT_DETAILS" id="2002"/>
             <db:data-type name="CONTACT_DETAILS_ARRAY" id="2003"/>
+            <db:data-type name="ZIPARRAY" id="2003"/>
         </db:data-types>
     </db:oracle-config>
 
