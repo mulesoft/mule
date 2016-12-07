@@ -6,9 +6,12 @@
  */
 package org.mule.extension.ws.runtime;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
@@ -17,12 +20,16 @@ import static org.mule.extension.ws.WscTestUtils.HEADER_OUT;
 import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.extension.ws.api.WscAttributes;
+import org.mule.extension.ws.api.exception.WscException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -35,6 +42,9 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
   private static final String ECHO_FLOW = "echoOperation";
   private static final String ECHO_HEADERS_FLOW = "echoWithHeadersOperation";
   private static final String ECHO_ACCOUNT_FLOW = "echoAccountOperation";
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Override
   protected String getConfigFile() {
@@ -72,5 +82,14 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
     assertSoapResponse(ECHO_ACCOUNT, out);
     WscAttributes attributes = (WscAttributes) message.getAttributes();
     assertThat(attributes.getSoapHeaders().isEmpty(), is(true));
+  }
+
+  @Test
+  @Description("Consumes an operation with a body that is not a valid XML")
+  public void echoBodyIsNotValidXml() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(WscException.class));
+    expectedException.expectMessage(containsString("request body is not a valid XML"));
+    flowRunner(ECHO_FLOW).withPayload("not a valid XML file").run().getMessage();
   }
 }

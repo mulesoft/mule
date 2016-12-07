@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -85,6 +86,8 @@ public class WscConnection {
       return client.invoke(getInvocationOperation(), new Object[] {payload}, ctx, exchange);
     } catch (SoapFault sf) {
       throw new SoapFaultException(sf);
+    } catch (Fault f) {
+      throw new WscException(format("Error consuming [%s] web service operation, request body is not a valid XML", operation), f);
     } catch (Exception e) {
       throw new WscException(format("An unexpected error occur while consuming the [%s] web service operation", operation), e);
     }
