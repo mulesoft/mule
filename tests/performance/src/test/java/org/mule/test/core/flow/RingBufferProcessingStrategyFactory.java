@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.processor.strategy;
+package org.mule.test.core.flow;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.util.concurrent.QueueSupplier.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -23,47 +23,46 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
+import org.mule.runtime.core.processor.strategy.AbstractSchedulingProcessingStrategy;
 
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.TopicProcessor;
+import reactor.util.concurrent.QueueSupplier;
 
 /**
- * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dispatches incoming messages to a work queue
- * which is served by a pool of worker threads from the applications IO {@link Scheduler}. Processing of the flow is carried out
- * synchronously on the worker thread until completion.
+ * Creates {@link RingBufferProcessingStrategy} instances. This processing strategy demultiplexes incoming messages to
+ * single-threaded event-loop.
  *
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0
  */
-public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFactory {
-
-  public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
-
-  private int maxThreads;
+public class RingBufferProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(config().withMaxConcurrentTasks(maxThreads).withName(schedulersNamePrefix)),
-                                           scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                       MILLISECONDS),
-                                           muleContext);
+  public ProcessingStrategy create(MuleContext muleContext, String name) {
+    return new RingBufferProcessingStrategy(() -> muleContext.getSchedulerService()
+        .customScheduler(config().withMaxConcurrentTasks(2), SMALL_BUFFER_SIZE),
+                                            scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                                        MILLISECONDS),
+                                            muleContext);
   }
 
-  static class WorkQueueProcessingStrategy extends AbstractSchedulingProcessingStrategy {
+  static class RingBufferProcessingStrategy extends AbstractSchedulingProcessingStrategy {
 
-    private Supplier<Scheduler> schedulerSupplier;
-    private Scheduler scheduler;
+    private Supplier<Scheduler> cpuLightSchedulerSupplier;
+    protected Scheduler eventLoop;
 
-    public WorkQueueProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
-                                       MuleContext muleContext) {
+    public RingBufferProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                        Consumer<Scheduler> schedulerStopper, MuleContext muleContext) {
       super(schedulerStopper, muleContext);
-      this.schedulerSupplier = schedulerSupplier;
+      this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
     }
 
     @Override
@@ -71,24 +70,13 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
-          .doOnNext(assertCanProcessAsync())
-          .publishOn(fromExecutorService(scheduler))
+          // TODO Work out why this fails with our scheduler
+          .subscribeWith(TopicProcessor.create())
+          .doOnNext(assertCanProcess())
           .transform(pipelineFunction);
     }
 
-    @Override
-    public void start() throws MuleException {
-      this.scheduler = schedulerSupplier.get();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (scheduler != null) {
-        getSchedulerStopper().accept(scheduler);
-      }
-    }
-
-    private Consumer<Event> assertCanProcessAsync() {
+    protected Consumer<Event> assertCanProcess() {
       return event -> {
         if (isTransactionActive()) {
           throw propagate(new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
@@ -96,5 +84,16 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
       };
     }
 
+    @Override
+    public void start() throws MuleException {
+      eventLoop = cpuLightSchedulerSupplier.get();
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      getSchedulerStopper().accept(eventLoop);
+    }
+
   }
+
 }
