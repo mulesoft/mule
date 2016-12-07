@@ -20,29 +20,34 @@ import java.util.Optional;
 public enum WscErrors implements ErrorTypeDefinition<WscErrors> {
 
   /**
+   * The generic error type for all {@link WebServiceConsumer} errors.
+   */
+  WSC_GENERIC("Generic WSC Error"),
+
+  /**
    * Error thrown when an invalid WSDL is found or inconsistent WSDL state occurred.
    */
-  INVALID_WSDL("Invalid WSDL"),
+  INVALID_WSDL("Invalid WSDL", WSC_GENERIC),
 
   /**
    * Error thrown when an encoding related problem occurs when parsing the request or response XML.
    */
-  ENCODING("XML Encoding"),
+  ENCODING("XML Encoding", WSC_GENERIC),
 
   /**
    * Error thrown when the generated request is invalid, mostly because inconsistent provided parameters.
    */
-  BAD_REQUEST("Bad Request"),
+  BAD_REQUEST("Bad Request", WSC_GENERIC),
 
   /**
    * Error thrown when the resulting response is invalid.
    */
-  BAD_RESPONSE("Bad Response"),
+  BAD_RESPONSE("Bad Response", WSC_GENERIC),
 
   /**
    * Error thrown when a SOAP Fault occurred.
    */
-  SOAP_FAULT("Soap Fault");
+  SOAP_FAULT("Soap Fault", WSC_GENERIC);
 
   private final String type;
   private final ErrorTypeDefinition parent;
