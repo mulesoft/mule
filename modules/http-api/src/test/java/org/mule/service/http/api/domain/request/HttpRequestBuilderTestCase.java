@@ -21,8 +21,14 @@ import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-public class HttpRequestBuilderTestCase {
+
+@Features("HTTP Service")
+@Stories("Request Builder")
+public class HttpRequestBuilderTestCase extends AbstractMuleTestCase {
 
   public static final String URI_VALUE = "someUri";
 

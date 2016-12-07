@@ -35,6 +35,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
+import static com.google.common.collect.Multimaps.newMultimap;
+
 public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   @Rule
@@ -48,8 +50,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   protected String method;
   protected String uri;
-  protected Multimap<String, String> headers =
-      Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(new HashMap()), Sets::newHashSet);
+  protected Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
 
   protected String body;
 

@@ -21,8 +21,14 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-public class HttpResponseBuilderTestCase {
+@Features("HTTP Service")
+@Stories("Response Builder")
+public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
   private HttpResponseBuilder builder = HttpResponse.builder();
   private String header = "HEADER";

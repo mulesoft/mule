@@ -19,8 +19,13 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-public class ParameterMapTestCase {
+@Features("HTTP Service")
+@Stories("Multi Map")
+public class ParameterMapTestCase extends AbstractMuleTestCase {
 
   public static final String KEY_1 = "key1";
   public static final String KEY_2 = "key2";

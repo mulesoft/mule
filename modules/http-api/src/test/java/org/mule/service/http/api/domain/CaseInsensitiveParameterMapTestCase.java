@@ -13,7 +13,11 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("HTTP Service")
+@Stories("Multi Map")
 public class CaseInsensitiveParameterMapTestCase extends ParameterMapTestCase {
 
   @Override

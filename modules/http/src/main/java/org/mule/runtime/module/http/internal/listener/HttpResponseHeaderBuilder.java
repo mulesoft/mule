@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static com.google.common.collect.Multimaps.newMultimap;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -26,8 +27,7 @@ public class HttpResponseHeaderBuilder {
   private List<String> uniqueHeadersNames =
       asList(TRANSFER_ENCODING.toLowerCase(), CONTENT_LENGTH.toLowerCase(), CONTENT_TYPE.toLowerCase());
 
-  Multimap<String, String> headers =
-      Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
+  Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
 
   public void addHeader(String headerName, Object headerValue) {
     if (headerValue instanceof Iterable) {
