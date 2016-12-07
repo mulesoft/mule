@@ -12,13 +12,11 @@ import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderCon
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
-import org.mule.extension.http.internal.request.DefaultHttpRequest;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.runtime.module.http.internal.request.grizzly.CompositeTransportCustomizer;
 import org.mule.runtime.module.http.internal.request.grizzly.CustomTimeoutThrottleRequestFilter;
 import org.mule.runtime.module.http.internal.request.grizzly.IOStrategyTransportCustomizer;
@@ -33,8 +31,9 @@ import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
-import org.mule.service.http.api.domain.request.HttpRequest;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.tcp.TcpClientSocketProperties;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -230,7 +229,7 @@ public class GrizzlyHttpClient implements HttpClient {
   }
 
   private HttpResponse createMuleResponse(Response response, InputStream inputStream) throws IOException {
-    HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+    HttpResponseBuilder responseBuilder = HttpResponse.builder();
     responseBuilder.setStatusCode(response.getStatusCode());
     responseBuilder.setReasonPhrase(response.getStatusText());
     responseBuilder.setEntity(new InputStreamHttpEntity(inputStream));
@@ -254,10 +253,8 @@ public class GrizzlyHttpClient implements HttpClient {
 
       populateHeaders(request, builder);
 
-      DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
-
-      for (String queryParamName : defaultHttpRequest.getQueryParams().keySet()) {
-        builder.addQueryParam(queryParamName, defaultHttpRequest.getQueryParams().get(queryParamName));
+      for (String queryParamName : request.getQueryParams().keySet()) {
+        builder.addQueryParam(queryParamName, request.getQueryParams().get(queryParamName));
       }
 
       if (authentication != null) {

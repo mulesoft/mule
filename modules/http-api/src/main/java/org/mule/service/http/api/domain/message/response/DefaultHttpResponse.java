@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal.domain.response;
+package org.mule.service.http.api.domain.message.response;
 
-import org.mule.runtime.module.http.internal.domain.BaseHttpMessage;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.HttpEntity;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.BaseHttpMessage;
 
 import java.util.Collection;
 
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.map.MultiValueMap;
-
-public class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
+/**
+ * Basic implementation of {@link HttpResponse}. Instances can only be obtained through an {@link HttpResponseBuilder}.
+ */
+class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
 
   private final HttpEntity body;
   private ResponseStatus responseStatus = new ResponseStatus();
-  private MultiMap headers = new MultiValueMap();
+  private ParameterMap headers = new ParameterMap();
 
-  public DefaultHttpResponse(ResponseStatus responseStatus, MultiMap headers, HttpEntity body) {
+  DefaultHttpResponse(ResponseStatus responseStatus, ParameterMap headers, HttpEntity body) {
     this.responseStatus = responseStatus;
     this.headers = headers;
     this.body = body;
@@ -39,16 +39,12 @@ public class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse
 
   @Override
   public String getHeaderValue(String headerName) {
-    final Object value = headers.get(headerName);
-    if (value == null) {
-      return null;
-    }
-    return (String) ((Collection) value).iterator().next();
+    return headers.get(headerName);
   }
 
   @Override
   public Collection<String> getHeaderValues(String headerName) {
-    return (Collection<String>) headers.get(headerName);
+    return headers.getAll(headerName);
   }
 
   @Override
@@ -57,18 +53,8 @@ public class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse
   }
 
   @Override
-  public void setStatusCode(int statusCode) {
-    this.responseStatus.setStatusCode(statusCode);
-  }
-
-  @Override
   public String getReasonPhrase() {
     return this.responseStatus.getReasonPhrase();
-  }
-
-  @Override
-  public void setReasonPhrase(String reasonPhrase) {
-    this.responseStatus.setReasonPhrase(reasonPhrase);
   }
 
 }

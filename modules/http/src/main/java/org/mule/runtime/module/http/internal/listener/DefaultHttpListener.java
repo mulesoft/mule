@@ -41,7 +41,8 @@ import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsR
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
@@ -147,7 +148,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
       }
 
       private void sendErrorResponse(final HttpStatus status, String message, HttpResponseReadyCallback responseCallback) {
-        responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+        responseCallback.responseReady(HttpResponse.builder()
             .setStatusCode(status.getStatusCode())
             .setReasonPhrase(status.getReasonPhrase())
             .setEntity(new ByteArrayHttpEntity(message.getBytes()))

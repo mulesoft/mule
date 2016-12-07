@@ -4,21 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal.domain.response;
+package org.mule.service.http.api.domain.message.response;
 
-public class ResponseStatus {
+class ResponseStatus {
 
   private int statusCode;
   private String reasonPhrase;
 
-  public ResponseStatus() {
+  ResponseStatus() {
     this.statusCode = 200;
     this.reasonPhrase = "";
-  }
-
-  public ResponseStatus(final int statusCode, final String reasonPhrase) {
-    this.statusCode = statusCode;
-    this.reasonPhrase = reasonPhrase;
   }
 
   public int getStatusCode() {

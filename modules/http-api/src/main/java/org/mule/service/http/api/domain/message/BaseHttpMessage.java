@@ -4,15 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal.domain;
-
-import org.mule.service.http.api.domain.HttpMessage;
+package org.mule.service.http.api.domain.message;
 
 import java.util.Collection;
 
 /**
- * Base implementation for {@HttpMessage} that handles ignore case header operations. The lower case version is attempted first
- * since it's the Grizzly default.
+ * Base implementation for {@HttpMessage} that handles ignore case header operations. The lower case version is attempted first.
  *
  * @since 3.9
  */

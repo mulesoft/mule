@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.listener.matcher;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 
 import com.google.common.collect.ImmutableList;

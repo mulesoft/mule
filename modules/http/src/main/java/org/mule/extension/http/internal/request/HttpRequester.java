@@ -31,8 +31,8 @@ import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.client.HttpRequestAuthentication;
-import org.mule.service.http.api.domain.request.HttpRequest;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 import java.io.InputStream;
 

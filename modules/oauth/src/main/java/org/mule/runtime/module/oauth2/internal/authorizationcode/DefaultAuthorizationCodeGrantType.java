@@ -20,7 +20,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.runtime.module.oauth2.api.RequestAuthenticationException;
 import org.mule.runtime.module.oauth2.internal.AbstractGrantType;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;

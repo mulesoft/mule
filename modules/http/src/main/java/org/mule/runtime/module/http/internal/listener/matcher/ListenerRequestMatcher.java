@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.listener.matcher;
 
 import static java.lang.String.format;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestMatcher;

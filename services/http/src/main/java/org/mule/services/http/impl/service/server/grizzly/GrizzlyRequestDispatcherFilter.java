@@ -16,7 +16,7 @@ import static org.mule.runtime.module.http.internal.listener.grizzly.MuleSslFilt
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.DefaultClientConnection;
 import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequestContext;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.module.http.internal.listener.RequestHandlerProvider;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.RequestHandler;

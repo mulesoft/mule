@@ -10,7 +10,7 @@ import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVEN
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.service.http.api.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import com.google.common.base.Preconditions;

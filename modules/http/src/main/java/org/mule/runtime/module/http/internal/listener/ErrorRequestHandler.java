@@ -7,6 +7,7 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
@@ -34,7 +35,7 @@ public class ErrorRequestHandler implements RequestHandler {
   @Override
   public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
     String resolvedEntity = String.format(entityFormat, requestContext.getRequest().getUri());
-    responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+    responseCallback.responseReady(HttpResponse.builder()
         .setStatusCode(statusCode).setReasonPhrase(reasonPhrase)
         .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(resolvedEntity.getBytes()))).build(),
                                    new ResponseStatusCallback() {

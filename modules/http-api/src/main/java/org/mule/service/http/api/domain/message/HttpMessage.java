@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.service.http.api.domain;
+package org.mule.service.http.api.domain.message;
 
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
@@ -49,8 +49,7 @@ public interface HttpMessage {
   Collection<String> getHeaderValuesIgnoreCase(String headerName);
 
   /**
-   * @return the entity of the message. If there's no entity an
-   *         {@link EmptyHttpEntity} is returned
+   * @return the entity of the message. If there's no entity an {@link EmptyHttpEntity} is returned
    */
   HttpEntity getEntity();
 

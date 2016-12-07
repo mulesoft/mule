@@ -6,9 +6,9 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import org.mule.extension.http.internal.request.HttpRequestBuilder;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
  * An object that authenticates an HTTP request.

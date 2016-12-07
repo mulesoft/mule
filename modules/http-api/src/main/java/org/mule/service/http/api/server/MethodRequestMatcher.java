@@ -6,7 +6,7 @@
  */
 package org.mule.service.http.api.server;
 
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 
 import java.util.List;
 

@@ -37,7 +37,8 @@ import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
-import org.mule.service.http.api.domain.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import com.google.common.collect.Lists;
@@ -49,6 +50,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +98,7 @@ public class MuleEventToHttpRequest {
   public HttpRequest create(Event event, HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
                             MuleContext muleContext)
       throws MuleException {
-    HttpRequestBuilder builder = new HttpRequestBuilder();
+    HttpRequestBuilder builder = HttpRequest.builder();
 
     builder.setUri(this.uri);
     builder.setMethod(this.method);
@@ -104,7 +106,7 @@ public class MuleEventToHttpRequest {
     builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
 
     MediaType mediaType = requestBuilder.getMediaType();
-    if (!builder.getHeaders().containsKey(CONTENT_TYPE)) {
+    if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
       if (!MediaType.ANY.matches(mediaType)) {
         builder.addHeader(CONTENT_TYPE, mediaType.toRfcString());
       }
@@ -198,10 +200,10 @@ public class MuleEventToHttpRequest {
       }
 
     } else {
-      String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
+      Optional<String> contentType = requestBuilder.getHeaderValue(CONTENT_TYPE);
 
-      if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
-          || contentType.startsWith(APPLICATION_JAVA)) {
+      if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
+          || contentType.get().startsWith(APPLICATION_JAVA)) {
         if (payload instanceof Map) {
           String body = HttpParser.encodeString(mediaType.getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
@@ -227,12 +229,12 @@ public class MuleEventToHttpRequest {
   }
 
   private boolean doStreaming(HttpRequestBuilder requestBuilder, Object payload) throws MessagingException {
-    String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
-    String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
+    Optional<String> transferEncodingHeader = requestBuilder.getHeaderValue(TRANSFER_ENCODING);
+    Optional<String> contentLengthHeader = requestBuilder.getHeaderValue(CONTENT_LENGTH);
 
     if (streamingMode == HttpStreamingType.AUTO) {
-      if (contentLengthHeader != null) {
-        if (transferEncodingHeader != null) {
+      if (contentLengthHeader.isPresent()) {
+        if (transferEncodingHeader.isPresent()) {
           requestBuilder.removeHeader(TRANSFER_ENCODING);
 
           if (logger.isDebugEnabled()) {
@@ -242,7 +244,7 @@ public class MuleEventToHttpRequest {
         return false;
       }
 
-      if (transferEncodingHeader == null || !transferEncodingHeader.equalsIgnoreCase(CHUNKED)) {
+      if (!transferEncodingHeader.isPresent() || !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
         return payload instanceof InputStream;
       } else {
         return true;
@@ -256,7 +258,7 @@ public class MuleEventToHttpRequest {
         }
       }
 
-      if (transferEncodingHeader != null && !transferEncodingHeader.equalsIgnoreCase(CHUNKED)) {
+      if (transferEncodingHeader.isPresent() && !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
         requestBuilder.removeHeader(TRANSFER_ENCODING);
 
         if (logger.isDebugEnabled()) {
