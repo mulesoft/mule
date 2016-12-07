@@ -9,8 +9,6 @@ package org.mule.extension.db.internal.domain.type;
 
 import static java.lang.String.format;
 
-import java.sql.Array;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -18,39 +16,34 @@ import java.sql.Struct;
 import java.util.List;
 
 /**
- * Defines a structured data type for {@link Array}
+ * Defines a structured data type
  */
-public class ArrayResolvedDbType extends AbstractStructuredDbType {
+public class StructDbType extends AbstractStructuredDbType {
 
   /**
-   * Creates a new instance
+   * Creates a new DB type
    *
-   * @param id identifier for the type
-   * @param name type name. Non Empty.
+   * @param id type identifier from {#link java.sql.Types} or any custom value.
+   * @param name name of the structured type. Non empty.
    */
-  public ArrayResolvedDbType(int id, String name) {
+  public StructDbType(int id, String name) {
     super(id, name);
   }
 
   @Override
   public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
-    if (!(value instanceof Array)) {
+    if (value != null && !(value instanceof Struct)) {
       Connection connection = statement.getConnection();
       if (value instanceof Object[]) {
-        value = connection.createArrayOf(name, (Object[]) value);
+        value = connection.createStruct(name, (Object[]) value);
       } else if (value instanceof List) {
-        value = connection.createArrayOf(name, ((List) value).toArray());
+        value = connection.createStruct(name, ((List) value).toArray());
       } else {
         throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
       }
     }
 
-    statement.setArray(index, (Array) value);
-  }
-
-  @Override
-  public Object getParameterValue(CallableStatement statement, int index) throws SQLException {
-    return statement.getArray(index);
+    super.setParameterValue(statement, index, value);
   }
 
   /**
@@ -60,6 +53,6 @@ public class ArrayResolvedDbType extends AbstractStructuredDbType {
    * @return the error message for the provided value's class
    */
   protected static String createUnsupportedTypeErrorMessage(Object value) {
-    return format("Cannot create a %s from a value of type %s", Struct.class.getName(), value.getClass());
+    return format("Cannot create a %s from a value of type '%s'", Struct.class.getName(), value.getClass());
   }
 }

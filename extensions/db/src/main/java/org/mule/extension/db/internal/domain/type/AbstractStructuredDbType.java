@@ -13,11 +13,11 @@ import java.sql.SQLException;
 /**
  * Defines a structured data type
  */
-public class StructuredDbType extends ResolvedDbType {
+public class AbstractStructuredDbType extends ResolvedDbType {
 
   private final int id;
 
-  public StructuredDbType(int id, String name) {
+  public AbstractStructuredDbType(int id, String name) {
     super(id, name);
     this.id = id;
   }

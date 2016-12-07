@@ -24,7 +24,7 @@ import javax.sql.DataSource;
  *
  * @since 4.0
  */
-class JdbcConnectionFactory {
+public class JdbcConnectionFactory {
 
   /**
    * Creates a new JDBC {@link Connection}
