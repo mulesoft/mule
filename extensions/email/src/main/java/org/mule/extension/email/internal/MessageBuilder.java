@@ -20,6 +20,7 @@ import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -219,13 +220,13 @@ public final class MessageBuilder {
   /**
    * Adds the text content the {@link Message} that is being built.
    *
-   * @param content the text content of the email.
+   * @param content the text content of the email. If {@code null} is received, {@link StringUtils#EMPTY} will be used instead.
    * @param contentType the contentType of the {@code content} of the email. One of "text/plain" or "text/html" expected.
    * @return this {@link MessageBuilder}
    * @throws MessagingException
    */
   public MessageBuilder withBody(String content, MediaType contentType, String charset) throws MessagingException {
-    this.content = content;
+    this.content = content == null ? StringUtils.EMPTY : content;
     this.contentType = contentType;
     this.charset = charset;
     return this;
@@ -234,12 +235,12 @@ public final class MessageBuilder {
   /**
    * Adds the text content the {@link Message} that is being built. The contentType of this content will default to "text/plain".
    *
-   * @param content the text content of the email.
+   * @param content the text content of the email. If {@code null} is received, {@link StringUtils#EMPTY} will be used instead.
    * @return this {@link MessageBuilder}
    * @throws MessagingException
    */
   public MessageBuilder withBody(String content) throws MessagingException {
-    this.content = content;
+    this.content = content == null ? StringUtils.EMPTY : content;
     this.contentType = TEXT;
     return this;
   }

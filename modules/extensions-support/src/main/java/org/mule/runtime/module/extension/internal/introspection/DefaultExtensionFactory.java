@@ -68,6 +68,7 @@ import org.mule.runtime.module.extension.internal.introspection.validation.Expor
 import org.mule.runtime.module.extension.internal.introspection.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.NameClashModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.NullSafeModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.OperationParametersModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ParameterModelValidator;
@@ -106,7 +107,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
    * Creates a new instance and uses the given {@code serviceRegistry} to locate instances of {@link ModelEnricher}
    *
    * @param serviceRegistry a {@link ServiceRegistry}
-   * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
+   * @param classLoader the {@link ClassLoader} on which the {@code serviceRegistry} will search into
    */
   public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader) {
     modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
@@ -123,6 +124,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         .add(new ExclusiveParameterModelValidator())
         .add(new ConnectionProviderNameModelValidator())
         .add(new ContentParameterModelValidator())
+        .add(new NullSafeModelValidator())
         .build();
   }
 

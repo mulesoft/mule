@@ -48,10 +48,19 @@ public class NullSafeParameterTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void nestedNullSafe() throws Exception {
-    FarmedFood response = (FarmedFood) flowRunner("implementingType").run().getMessage().getPayload().getValue();
+    assertNestedNullSafe("implementingType");
+  }
+
+  private void assertNestedNullSafe(String flowName) throws Exception {
+    FarmedFood response = (FarmedFood) flowRunner(flowName).run().getMessage().getPayload().getValue();
     assertThat(response, is(instanceOf(HealthyFood.class)));
     HealthyFood healthyFood = (HealthyFood) response;
     assertHealthyFood(healthyFood);
+  }
+
+  @Test
+  public void topLevelNestedNullSafe() throws Exception {
+    assertNestedNullSafe("topLevelNullSafe");
   }
 
   private void assertHealthyFood(HealthyFood healthyFood) {

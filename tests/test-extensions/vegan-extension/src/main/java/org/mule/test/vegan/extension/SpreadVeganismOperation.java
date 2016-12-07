@@ -30,6 +30,10 @@ public class SpreadVeganismOperation {
     return food;
   }
 
+  public FarmedFood getHealthyFood(HealthyFood food) {
+    return food;
+  }
+
   public void convinceAnimalKiller(@ParameterGroup("arguments") @Placement(tab = ARGUMENTS_TAB) VeganArguments arguments) {
 
   }
