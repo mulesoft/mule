@@ -6,6 +6,8 @@
  */
 package org.mule.module.pgp;
 
+import static org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags.AES_256;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,15 +17,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
-import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
-import org.bouncycastle.openpgp.PGPEncryptedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
 import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 
 public class EncryptStreamTransformer implements StreamTransformer
 {
@@ -57,7 +58,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     public void initialize(OutputStream out) throws Exception
     {
         armoredOut = new ArmoredOutputStream(out);
-        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
+        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(AES_256);
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
 
         BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
