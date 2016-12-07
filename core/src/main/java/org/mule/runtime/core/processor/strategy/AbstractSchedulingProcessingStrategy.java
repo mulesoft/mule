@@ -17,7 +17,7 @@ import org.mule.runtime.core.util.rx.internal.ConditionalExecutorServiceDecorato
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+public abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
   public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
@@ -41,6 +41,13 @@ abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrateg
     return fromExecutorService(new ConditionalExecutorServiceDecorator(scheduler, scheduleOverridePredicate()));
   }
 
-  protected abstract Predicate<Scheduler> scheduleOverridePredicate();
+  /**
+   * Provides a way override the scheduling of tasks based on a predicate.
+   * 
+   * @return preficate that determines if task should be scheduled or processed in the current thread.
+   */
+  protected Predicate<Scheduler> scheduleOverridePredicate() {
+    return scheduler -> false;
+  }
 
 }

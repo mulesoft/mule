@@ -110,11 +110,6 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
     }
 
     @Override
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> false;
-    }
-
-    @Override
     public void start() throws MuleException {
       this.scheduler = schedulerSupplier.get();
     }

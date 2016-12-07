@@ -40,7 +40,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class ProactorProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {

@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+import static reactor.util.concurrent.QueueSupplier.*;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -29,6 +30,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import reactor.util.concurrent.QueueSupplier;
 
 /**
  * Creates {@link ReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages to
@@ -44,7 +46,7 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
     return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop")),
+        .customScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop"), SMALL_BUFFER_SIZE),
                                          scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                      MILLISECONDS),
                                          muleContext);
@@ -92,10 +94,6 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
       };
     }
 
-    @Override
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> false;
-    }
   }
 
 }
