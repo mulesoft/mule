@@ -6,7 +6,6 @@
            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-	<!-- NOTE: bug occurs only when polling frequency is less than fileAge --> 
 	<file:connector name="fileConnector" streaming="false">
 	</file:connector>
 

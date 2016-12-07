@@ -7,10 +7,12 @@
 
 package org.mule.transport.file;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
@@ -23,7 +25,7 @@ import org.mule.util.FileUtils;
  * the payload of the message should be a byte array
  * and the file-to-string transformer should be able to
  * process such incoming message.
- * see Jira ticket SE3200
+ * see Jira ticket MULE-11159
  */
 public class FileNoStreamingTestCase extends FunctionalTestCase
 {
@@ -43,15 +45,13 @@ public class FileNoStreamingTestCase extends FunctionalTestCase
     public void fileToStringNoStreamingFileConnector() throws Exception
     {
         File tmpDir = FileUtils.openDirectory(getFileInsideWorkingDirectory("in").getAbsolutePath());
-        createDataFile(tmpDir, TEST_MESSAGE, "UTF-8");
+        createDataFile(tmpDir, TEST_MESSAGE, StandardCharsets.UTF_8.name());
 
         muleContext.start();
 
         MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT);
 
-        assertEquals(TEST_MESSAGE, response.getPayload());
-
+        assertThat(TEST_MESSAGE, equalTo(response.getPayload()));
     }
-
 
 }
