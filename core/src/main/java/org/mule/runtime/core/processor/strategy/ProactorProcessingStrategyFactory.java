@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -19,8 +20,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,7 +39,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class ProactorProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
@@ -106,9 +105,9 @@ public class ProactorProcessingStrategyFactory implements ProcessingStrategyFact
     private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
                                                                   Scheduler scheduler) {
       return publisher -> from(publisher)
-          .publishOn(createReactorScheduler(scheduler))
+          .publishOn(fromExecutorService(getExecutorService(scheduler)))
           .transform(processorFunction)
-          .publishOn(createReactorScheduler(cpuLightScheduler));
+          .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)));
     }
 
   }

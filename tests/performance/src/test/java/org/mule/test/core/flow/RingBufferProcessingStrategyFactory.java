@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.processor.strategy;
+package org.mule.test.core.flow;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.util.concurrent.QueueSupplier.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -23,57 +23,38 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.AbstractSchedulingProcessingStrategy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.TopicProcessor;
 
 /**
- * Creates {@link ReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages to
- * single-threaded event-loop.
- *
- * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
- *
- * @since 4.0
+ * EXPERIMENTAL
  */
-public class ReactorProcessingStrategyFactory implements ProcessingStrategyFactory {
-
-  private static int DEFAULT_QUEUE_SIZE = 256;
+public class RingBufferProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop"), DEFAULT_QUEUE_SIZE),
-                                         scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                     MILLISECONDS),
-                                         muleContext);
+  public ProcessingStrategy create(MuleContext muleContext, String name) {
+    return new RingBufferProcessingStrategy(() -> muleContext.getSchedulerService()
+        .customScheduler(config().withMaxConcurrentTasks(2), SMALL_BUFFER_SIZE),
+                                            scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
+                                                                        MILLISECONDS),
+                                            muleContext);
   }
 
-  static class ReactorProcessingStrategy extends AbstractSchedulingProcessingStrategy {
+  static class RingBufferProcessingStrategy extends AbstractSchedulingProcessingStrategy {
 
     private Supplier<Scheduler> cpuLightSchedulerSupplier;
-    protected Scheduler cpuLightScheduler;
+    protected Scheduler eventLoop;
 
-    public ReactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                     Consumer<Scheduler> schedulerStopper,
-                                     MuleContext muleContext) {
+    public RingBufferProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                        Consumer<Scheduler> schedulerStopper, MuleContext muleContext) {
       super(schedulerStopper, muleContext);
       this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
-    }
-
-    @Override
-    public void start() throws MuleException {
-      this.cpuLightScheduler = cpuLightSchedulerSupplier.get();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (cpuLightScheduler != null) {
-        getSchedulerStopper().accept(cpuLightScheduler);
-      }
     }
 
     @Override
@@ -81,8 +62,9 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
+          // TODO Work out why this fails with our scheduler
+          .subscribeWith(TopicProcessor.create())
           .doOnNext(assertCanProcess())
-          .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
           .transform(pipelineFunction);
     }
 
@@ -92,6 +74,16 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
           throw propagate(new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
         }
       };
+    }
+
+    @Override
+    public void start() throws MuleException {
+      eventLoop = cpuLightSchedulerSupplier.get();
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      getSchedulerStopper().accept(eventLoop);
     }
 
   }

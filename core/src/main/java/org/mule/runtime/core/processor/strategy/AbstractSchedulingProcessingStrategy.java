@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -14,10 +13,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.util.rx.internal.ConditionalExecutorServiceDecorator;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+public abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
 
   public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
@@ -37,10 +37,17 @@ abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrateg
     return this.muleContext;
   }
 
-  protected reactor.core.scheduler.Scheduler createReactorScheduler(Scheduler scheduler) {
-    return fromExecutorService(new ConditionalExecutorServiceDecorator(scheduler, scheduleOverridePredicate()));
+  protected ExecutorService getExecutorService(Scheduler scheduler) {
+    return new ConditionalExecutorServiceDecorator(scheduler, scheduleOverridePredicate());
   }
 
-  protected abstract Predicate<Scheduler> scheduleOverridePredicate();
+  /**
+   * Provides a way override the scheduling of tasks based on a predicate.
+   * 
+   * @return preficate that determines if task should be scheduled or processed in the current thread.
+   */
+  protected Predicate<Scheduler> scheduleOverridePredicate() {
+    return scheduler -> false;
+  }
 
 }
