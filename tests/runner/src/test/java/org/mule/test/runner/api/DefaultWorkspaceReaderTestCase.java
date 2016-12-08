@@ -13,9 +13,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.test.runner.classification.DefaultWorkspaceReader.findClassPathURL;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.runner.classification.DefaultWorkspaceReader;
 
 import java.io.File;
 import java.net.URL;
@@ -65,6 +68,17 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
     targetClasses = new File(new File(bar, TARGET), CLASSES);
     assertThat(targetClasses.mkdirs(), is(true));
     urls.add(targetClasses.toURI().toURL());
+  }
+
+  @Test
+  public void resolveAlsoReleaseVersions() throws Exception {
+    WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
+    when(workspaceLocationResolver.resolvePath(artifact.getArtifactId())).thenReturn(bar);
+    DefaultWorkspaceReader reader = new DefaultWorkspaceReader(urls, workspaceLocationResolver);
+
+    File result = reader.findArtifact(artifact);
+    assertThat(result, not(nullValue()));
+    assertThat(result, equalTo(targetClasses));
   }
 
   @Test
