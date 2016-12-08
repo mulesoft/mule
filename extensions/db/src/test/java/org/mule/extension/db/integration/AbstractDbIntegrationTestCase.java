@@ -60,7 +60,7 @@ import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class},
-    sharedRuntimeLibs = {"org.apache.derby:derby", "mysql:mysql-connector-java", "com.oracle:ojdbc7"})
+    sharedRuntimeLibs = {"org.apache.derby:derby"})
 public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
   @Parameterized.Parameter(0)
