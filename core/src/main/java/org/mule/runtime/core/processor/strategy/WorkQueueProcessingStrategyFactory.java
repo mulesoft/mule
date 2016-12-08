@@ -96,9 +96,5 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
       };
     }
 
-    @Override
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> false;
-    }
   }
 }

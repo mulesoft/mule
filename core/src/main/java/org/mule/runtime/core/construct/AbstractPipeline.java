@@ -171,6 +171,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+    builder.chain(new ProcessingStrategyInterceptingMessageProcessor());
     builder.chain(new ProcessorStartCompleteProcessor());
   }
 
@@ -236,7 +237,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Event process(final Event event) throws MuleException {
-          if (isTransactionActive()) {
+          if (isTransactionActive() || processingStrategy.isSynchronous()) {
             return pipeline.process(event);
           } else {
             try {
@@ -268,7 +269,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    builder.chain(new ProcessingStrategyInterceptingMessageProcessor());
     for (Object processor : getMessageProcessors()) {
       if (processor instanceof Processor) {
         builder.chain((Processor) processor);

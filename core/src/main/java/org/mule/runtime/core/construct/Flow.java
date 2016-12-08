@@ -61,7 +61,7 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   public Event process(final Event event) throws MuleException {
-    if (isTransactionActive()) {
+    if (isTransactionActive() || processingStrategy.isSynchronous()) {
       // TODO MULE-11023	Migrate transaction execution template mechanism to use non-blocking API
       final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
       try {
