@@ -21,6 +21,7 @@ import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
@@ -35,6 +36,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private CredentialsAccessor credentialsAccessor;
     private boolean checkKeyExpirity = false;
     private Provider provider;
+    private Integer encryptionAlgorithm;
 
     public void initialise() throws InitialisationException
     {
@@ -43,6 +45,11 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             java.security.Security.addProvider(new BouncyCastleProvider());
         }
         provider = SecurityUtils.getDefaultSecurityProvider();
+
+        if (encryptionAlgorithm == null)
+        {
+            encryptionAlgorithm = SymmetricKeyAlgorithmTags.CAST5;
+        }
     }
 
     public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
@@ -51,7 +58,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider);
+            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithm);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -67,7 +74,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
             StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
+                                                                         this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -136,5 +143,10 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     public void setCheckKeyExpirity(boolean checkKeyExpirity)
     {
         this.checkKeyExpirity = checkKeyExpirity;
+    }
+
+    public void setEncryptionAlgorithm(Integer encryptionAlgorithm)
+    {
+        this.encryptionAlgorithm = encryptionAlgorithm;
     }
 }

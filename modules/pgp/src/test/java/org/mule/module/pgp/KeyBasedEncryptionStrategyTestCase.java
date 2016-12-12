@@ -13,6 +13,7 @@ import org.mule.util.IOUtils;
 import java.io.FileInputStream;
 import java.net.URL;
 
+import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.junit.Test;
 
 public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
@@ -53,14 +54,25 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     }
 
     @Test
-    public void testEncrypt() throws Exception
+    public void testEncryptWithCustomAlgorithm() throws Exception
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
             "Mule client <mule_client@mule.com>"), true);
 
+        kbStrategy.setEncryptionAlgorithm(SymmetricKeyAlgorithmTags.AES_256);
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
         assertNotNull(result);
     }
 
+    @Test
+    public void testEncryptWithDefaultAlgorithm() throws Exception
+    {
+        String msg = "Test Message";
+        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
+                "Mule client <mule_client@mule.com>"), true);
+
+        String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
+        assertNotNull(result);
+    }
 }

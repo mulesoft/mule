@@ -6,8 +6,6 @@
  */
 package org.mule.module.pgp;
 
-import static org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags.AES_256;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,6 +31,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     private InputStream toBeEncrypted;
     private PGPPublicKey publicKey;
     private Provider provider;
+    private final int algorithm;
 
     private OutputStream pgpOutputStream;
     private OutputStream compressedEncryptedOutputStream;
@@ -40,7 +39,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     private OutputStream armoredOut;
     private long bytesWrote;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider) throws IOException
+    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm) throws IOException
     {
         Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
@@ -49,6 +48,7 @@ public class EncryptStreamTransformer implements StreamTransformer
         this.publicKey = publicKey;
         this.bytesWrote = 0;
         this.provider = provider;
+        this.algorithm = algorithm;
     }
 
     /**
@@ -58,7 +58,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     public void initialize(OutputStream out) throws Exception
     {
         armoredOut = new ArmoredOutputStream(out);
-        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(AES_256);
+        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(algorithm);
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
 
         BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
