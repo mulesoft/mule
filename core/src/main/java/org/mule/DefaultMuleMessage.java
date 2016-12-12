@@ -80,6 +80,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     protected static final String NOT_SET = "<not set>";
+    private static final int UTF_INVALID_CHARACTER= 65533;
 
     private static final long serialVersionUID = 1541720810851984845L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
@@ -760,7 +761,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         String result = getPayload(DataType.STRING_DATA_TYPE, encoding);
         if (muleContext.getConfiguration().isCacheMessageAsBytes())
         {
-            cache = result.getBytes(encoding);
+            if (isValidUT8Character(result))
+            {
+                cache = result.getBytes(encoding);
+            }
         }
         return result;
     }
@@ -1424,7 +1428,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         properties.clearProperties(scope);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1470,6 +1474,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         if (payload == null)
         {
             this.payload = NullPayload.getInstance();
+        }
+        else if (payload instanceof String)
+        {
+            if (isValidUT8Character((String) payload))
+            {
+                this.payload = payload;
+            }
         }
         else
         {
@@ -1825,7 +1836,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * @deprecated since 3.8.0. Use {@link ClassUtils#isConsumable(Class)} instead.
-     * 
+     *
      * Determines if the payload of this message is consumable i.e. it can't be read
      * more than once.
      */
@@ -2195,7 +2206,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         newMessage.setReplyTo(getReplyTo());
         newMessage.setEncoding(getEncoding());
     }
-    
+
     void setSessionProperties(Map<String, TypedValue> sessionProperties)
     {
         properties.sessionMap = sessionProperties;
@@ -2221,9 +2232,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         return id.hashCode();
     }
-    
+
     protected Map<String, TypedValue> getOrphanFlowVariables()
     {
         return properties.getOrphanFlowVariables();
+    }
+
+    private boolean isValidUT8Character(String result)
+    {
+        if (result.length() == 0)
+        {
+            return true;
+        }
+        return result.length() >= 1 && result.charAt(0) != UTF_INVALID_CHARACTER;
     }
 }
