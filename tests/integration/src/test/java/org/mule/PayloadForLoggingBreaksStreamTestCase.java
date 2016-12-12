@@ -6,11 +6,14 @@
  */
 package org.mule;
 
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
@@ -21,7 +24,7 @@ public class PayloadForLoggingBreaksStreamTestCase extends FunctionalTestCase
     @Test
     public void testCallGetPayloadForLogging() throws Exception
     {
-        assertEquals("Set file encoding to UTF-8 for this test", "UTF-8", System.getProperty("file.encoding"));
+        assertEquals("Set file encoding to UTF-8 for this test", StandardCharsets.UTF_8.name(), System.getProperty("file.encoding"));
         byte[] tempSourceBytes = new byte[] {invalidUTFValue};
         ByteArrayInputStream tempStream = new ByteArrayInputStream(tempSourceBytes);
         DefaultMuleMessage tempMessage = new DefaultMuleMessage(tempStream, muleContext);
@@ -34,7 +37,7 @@ public class PayloadForLoggingBreaksStreamTestCase extends FunctionalTestCase
     @Test
     public void testCallPayloadAsBytesTwice() throws Exception
     {
-        assertEquals("Set file encoding to UTF-8 for this test", "UTF-8", System.getProperty("file.encoding"));
+        assertEquals("Set file encoding to UTF-8 for this test", StandardCharsets.UTF_8.name(), System.getProperty("file.encoding"));
         byte[] tempSourceBytes = new byte[] {invalidUTFValue};
         ByteArrayInputStream tempStream = new ByteArrayInputStream(tempSourceBytes);
         DefaultMuleMessage tempMessage = new DefaultMuleMessage(tempStream, muleContext);
@@ -46,7 +49,7 @@ public class PayloadForLoggingBreaksStreamTestCase extends FunctionalTestCase
     @Test
     public void testCallPayloadAsBytesBeforeGetPayloadForLogging() throws Exception
     {
-        assertEquals("Set file encoding to UTF-8 for this test", "UTF-8", System.getProperty("file.encoding"));
+        assertEquals("Set file encoding to UTF-8 for this test", StandardCharsets.UTF_8.name(), System.getProperty("file.encoding"));
         byte[] tempSourceBytes = new byte[] {invalidUTFValue};
         ByteArrayInputStream tempStream = new ByteArrayInputStream(tempSourceBytes);
         DefaultMuleMessage tempMessage = new DefaultMuleMessage(tempStream, muleContext);
