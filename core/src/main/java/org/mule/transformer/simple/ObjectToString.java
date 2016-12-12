@@ -85,7 +85,6 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
             try
             {
                 input.close();
-                input.reset();
             }
             catch (IOException e)
             {
