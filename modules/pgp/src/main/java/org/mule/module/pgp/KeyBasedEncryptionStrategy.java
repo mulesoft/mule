@@ -6,6 +6,7 @@
  */
 package org.mule.module.pgp;
 
+import static org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags.CAST5;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
@@ -21,7 +22,6 @@ import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
@@ -48,7 +48,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
         if (encryptionAlgorithm == null)
         {
-            encryptionAlgorithm = SymmetricKeyAlgorithmTags.CAST5;
+            encryptionAlgorithm = CAST5;
         }
     }
 
