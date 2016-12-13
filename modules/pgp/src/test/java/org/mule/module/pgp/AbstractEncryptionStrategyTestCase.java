@@ -34,7 +34,6 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleCon
         kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
         kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
-        kbStrategy.initialise();
 
         keyManager = keyM;
     }

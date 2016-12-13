@@ -6,7 +6,6 @@
  */
 package org.mule.module.pgp;
 
-import static org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags.CAST5;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
@@ -36,7 +35,8 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private CredentialsAccessor credentialsAccessor;
     private boolean checkKeyExpirity = false;
     private Provider provider;
-    private Integer encryptionAlgorithm;
+    private String encryptionAlgorithm;
+    private int encryptionAlgorithmId;
 
     public void initialise() throws InitialisationException
     {
@@ -48,7 +48,16 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
         if (encryptionAlgorithm == null)
         {
-            encryptionAlgorithm = CAST5;
+            encryptionAlgorithm = EncryptionAlgorithm.CAST5.toString();
+        }
+
+        try
+        {
+            encryptionAlgorithmId = EncryptionAlgorithm.valueOf(encryptionAlgorithm).getNumericId();
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new RuntimeException("Could not initialise encryption strategy: invalid algorithm " + encryptionAlgorithm, e);
         }
     }
 
@@ -58,7 +67,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithm);
+            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -145,7 +154,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         this.checkKeyExpirity = checkKeyExpirity;
     }
 
-    public void setEncryptionAlgorithm(Integer encryptionAlgorithm)
+    public void setEncryptionAlgorithm(String encryptionAlgorithm)
     {
         this.encryptionAlgorithm = encryptionAlgorithm;
     }

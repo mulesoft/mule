@@ -13,7 +13,6 @@ import org.mule.util.IOUtils;
 import java.io.FileInputStream;
 import java.net.URL;
 
-import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.junit.Test;
 
 public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
@@ -49,6 +48,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
                 "Mule client <mule_client@mule.com>"), true);
 
+        kbStrategy.initialise();
         String result = new String(kbStrategy.decrypt(msg, cryptInfo));
         assertEquals("This is a test message.\r\nThis is another line.\r\n", result);
     }
@@ -60,7 +60,8 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
             "Mule client <mule_client@mule.com>"), true);
 
-        kbStrategy.setEncryptionAlgorithm(SymmetricKeyAlgorithmTags.AES_256);
+        kbStrategy.setEncryptionAlgorithm(EncryptionAlgorithm.AES_256.toString());
+        kbStrategy.initialise();
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
         assertNotNull(result);
     }
@@ -72,7 +73,20 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
                 "Mule client <mule_client@mule.com>"), true);
 
+        kbStrategy.initialise();
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
         assertNotNull(result);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testEncryptWithInvalidAlgorithm() throws Exception
+    {
+        String msg = "Test Message";
+        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
+                "Mule client <mule_client@mule.com>"), true);
+
+        kbStrategy.setEncryptionAlgorithm("invalid algorithm");
+        kbStrategy.initialise();
+        String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
     }
 }
