@@ -9,6 +9,11 @@ package org.mule.transport.sftp;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.After;
 import org.junit.Test;
 
 import org.mule.api.MuleMessage;
@@ -18,6 +23,7 @@ public class SftpEndpointWithRelativePathTestCase extends AbstractSftpFunctional
 {
 
     private static final String FILE_CONTENT = "File content";
+    private static final String FILE_NAME = "file.txt";
 
     @Override
     protected String getConfigFile()
@@ -25,14 +31,24 @@ public class SftpEndpointWithRelativePathTestCase extends AbstractSftpFunctional
         return "mule-sftp-endpoint-with-relative-path-config.xml";
     }
 
-
     @Test
     public void writeFileWithRelativePath() throws Exception
     {
         MuleClient client = muleContext.getClient();
         client.send("vm://in", FILE_CONTENT, null);
-        MuleMessage message = client.request("file://testdir/file.txt", RECEIVE_TIMEOUT);
+        MuleMessage message = client.request("file://" + TESTDIR + "/" + FILE_NAME, RECEIVE_TIMEOUT);
         assertThat(message.getPayloadAsString(), is(FILE_CONTENT));
 
+    }
+
+    @After
+    public void doForceDeleteTestFile() throws Exception
+    {
+        Path path = Paths.get(TESTDIR + "/" + FILE_NAME);
+
+        if (Files.exists(path))
+        {
+            Files.delete(path);
+        }
     }
 }
