@@ -1,0 +1,22 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+
+	<spring:beans>
+		<spring:import resource="sftp-properties.xml" />
+	</spring:beans>
+
+	<flow name="test">
+		<vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+
+		<logger level="INFO" message="### MESSAGE RECEIVED" />
+
+		<sftp:outbound-endpoint path="~"
+			user="${USER1_NAME}" password="${USER1_PASSWORD}" port="${SFTP_PORT}" host="${SFTP_HOST}" />
+	</flow>
+</mule>
