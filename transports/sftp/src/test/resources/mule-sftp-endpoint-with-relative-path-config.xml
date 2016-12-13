@@ -11,12 +11,11 @@
 		<spring:import resource="sftp-properties.xml" />
 	</spring:beans>
 
+	<sftp:connector name="sftpConnector" tempDirInbound="archive" useTempFileTimestampSuffix="true" />
+	
 	<flow name="test">
 		<vm:inbound-endpoint path="in" exchange-pattern="request-response" />
-
-		<logger level="INFO" message="### MESSAGE RECEIVED" />
-
-		<sftp:outbound-endpoint path="~"
-			user="${USER1_NAME}" password="${USER1_PASSWORD}" port="${SFTP_PORT}" host="${SFTP_HOST}" />
+		<sftp:outbound-endpoint path="~/testdir"
+			user="${USER1_NAME}" password="${USER1_PASSWORD}" port="${SFTP_PORT}" host="${SFTP_HOST}" outputPattern="file.txt" connector-ref="sftpConnector"/>
 	</flow>
 </mule>

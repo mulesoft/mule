@@ -6,18 +6,18 @@
  */
 package org.mule.transport.sftp;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.transport.NullPayload;
 
 public class SftpEndpointWithRelativePathTestCase extends AbstractSftpFunctionalTestCase
 {
+
+    private static final String FILE_CONTENT = "File content";
 
     @Override
     protected String getConfigFile()
@@ -30,10 +30,9 @@ public class SftpEndpointWithRelativePathTestCase extends AbstractSftpFunctional
     public void writeFileWithRelativePath() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://in", "some data", null);
+        client.send("vm://in", FILE_CONTENT, null);
+        MuleMessage message = client.request("file://testdir/file.txt", RECEIVE_TIMEOUT);
+        assertThat(message.getPayloadAsString(), is(FILE_CONTENT));
 
-        assertNotNull(result);
-        assertNull(result.getExceptionPayload());
-        assertFalse(result.getPayload() instanceof NullPayload);
     }
 }
