@@ -135,7 +135,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   @Override
   public Event process(Event event) throws MuleException {
     try {
-      return just(event).transform(this).subscribe().block();
+      return just(event).transform(this).block();
     } catch (Exception e) {
       throw rxExceptionToMuleException(e);
     }
@@ -143,9 +143,26 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
+    if (operationModel.isBlocking()) {
+      return from(publisher).map(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
+        Optional<ConfigurationInstance> configuration = getConfiguration(event);
+        Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
+        ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
+
+        OperationExecutionFunction operationExecutionFunction =
+            (parameters, operationEvent) -> doProcess(operationEvent, operationContext).block();
+        OperationPolicy policy =
+            policyManager.createOperationPolicy(operationIdentifier, event,
+                                                operationParameters,
+                                                operationExecutionFunction);
+        return policy.process(event);
+      }, MuleException.class, e -> {
+        throw new DefaultMuleException(e);
+      })));
+    }
+
     return from(publisher).concatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration = getConfiguration(event);
-
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
       ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
 
@@ -169,7 +186,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       throws MuleException {
     return executeOperation(operationContext, event)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
-        .otherwiseIfEmpty(justOrEmpty(returnDelegate.asReturnValue(null, operationContext)));
+        .defaultIfEmpty(returnDelegate.asReturnValue(null, operationContext));
   }
 
   private Mono<Object> executeOperation(ExecutionContextAdapter operationContext, Event event) throws MuleException {
