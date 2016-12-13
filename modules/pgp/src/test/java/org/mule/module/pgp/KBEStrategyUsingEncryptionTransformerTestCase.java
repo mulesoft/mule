@@ -6,6 +6,8 @@
  */
 package org.mule.module.pgp;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -16,9 +18,6 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
@@ -31,6 +30,7 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
         event = RequestContext.setEvent(event);
 
         EncryptionTransformer etrans = new EncryptionTransformer();
+        kbStrategy.initialise();
         etrans.setStrategy(kbStrategy);
         Object result = etrans.doTransform(msg.getBytes(), "UTF-8");
 
