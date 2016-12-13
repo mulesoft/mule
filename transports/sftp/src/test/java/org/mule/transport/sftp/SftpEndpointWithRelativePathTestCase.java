@@ -9,9 +9,7 @@ package org.mule.transport.sftp;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 
 import org.junit.After;
 import org.junit.Test;
@@ -44,11 +42,10 @@ public class SftpEndpointWithRelativePathTestCase extends AbstractSftpFunctional
     @After
     public void doForceDeleteTestFile() throws Exception
     {
-        Path path = Paths.get(TESTDIR + "/" + FILE_NAME);
-
-        if (Files.exists(path))
+        File f = new File(TESTDIR + "/" + FILE_NAME);
+        if (f.exists() && !f.isDirectory())
         {
-            Files.delete(path);
+            f.delete();
         }
     }
 }
