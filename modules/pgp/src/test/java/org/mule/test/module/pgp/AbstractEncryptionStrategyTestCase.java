@@ -12,9 +12,6 @@ import org.mule.runtime.module.pgp.PGPKeyRingImpl;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.Cipher;
 
 public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleContextTestCase {
 
@@ -39,7 +36,6 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleCon
     kbStrategy = new KeyBasedEncryptionStrategy();
     kbStrategy.setKeyManager(keyM);
     kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
-    kbStrategy.initialise();
 
     keyManager = keyM;
   }

@@ -9,6 +9,7 @@ package org.mule.test.module.pgp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.pgp.EncryptionAlgorithm;
 import org.mule.runtime.module.pgp.PGPCryptInfo;
 
 import java.io.FileInputStream;
@@ -44,18 +45,46 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     PGPCryptInfo cryptInfo =
         new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey("Mule client <mule_client@mule.com>"), true);
 
+    kbStrategy.initialise();
     String result = new String(kbStrategy.decrypt(msg, cryptInfo));
     assertEquals("This is a test message.\r\nThis is another line.\r\n", result);
   }
 
   @Test
-  public void testEncrypt() throws Exception {
+  public void testEncryptWithCustomAlgorithm() throws Exception {
     String msg = "Test Message";
-    PGPCryptInfo cryptInfo =
-        new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey("Mule client <mule_client@mule.com>"), true);
+    PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
+                                                                                      "Mule client <mule_client@mule.com>"),
+                                              true);
 
+    kbStrategy.initialise();
+    kbStrategy.setEncryptionAlgorithm(EncryptionAlgorithm.AES_256.toString());
     String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
     assertNotNull(result);
+  }
+
+  @Test
+  public void testEncryptWithDefaultAlgorithm() throws Exception {
+    String msg = "Test Message";
+    PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
+                                                                                      "Mule client <mule_client@mule.com>"),
+                                              true);
+
+    kbStrategy.initialise();
+    String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
+    assertNotNull(result);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testEncryptWithInvalidAlgorithm() throws Exception {
+    String msg = "Test Message";
+    PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
+                                                                                      "Mule client <mule_client@mule.com>"),
+                                              true);
+
+    kbStrategy.setEncryptionAlgorithm("invalid algorithm");
+    kbStrategy.initialise();
+    String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
   }
 
 }

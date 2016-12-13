@@ -26,6 +26,7 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
     setCurrentEvent(testEvent());
 
     EncryptionTransformer etrans = new EncryptionTransformer();
+    kbStrategy.initialise();
     etrans.setStrategy(kbStrategy);
     Object result = etrans.doTransform(TEST_PAYLOAD.getBytes(), UTF_8);
 
