@@ -197,4 +197,5 @@ public class MuleProperties
     public static final String MULE_FORCE_CONSOLE_LOG = SYSTEM_PROPERTY_PREFIX + "forceConsoleLog";
 
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
+    public static final String MULE_PGP_ENCRYPTION_ALGORITHM = SYSTEM_PROPERTY_PREFIX + "pgp.encryption.algorithm";
 }
