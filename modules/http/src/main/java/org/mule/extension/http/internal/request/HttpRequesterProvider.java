@@ -174,8 +174,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return new HttpExtensionClient(httpClient, uriParameters, authentication);
   }
 
-  private org.mule.service.http.api.tcp.TcpClientSocketProperties buildTcpProperties(
-                                                                                     TcpClientSocketProperties socketProperties) {
+  private org.mule.service.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
     return org.mule.service.http.api.tcp.TcpClientSocketProperties.builder()
         .setSendBufferSize(socketProperties.getSendBufferSize())
         .setSendBufferSize(socketProperties.getSendBufferSize())
