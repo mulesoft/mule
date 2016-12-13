@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
 
@@ -122,7 +123,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     {
         if (requestConfig == null)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("The config-ref attribute is required in the HTTP request element"), this);
+            throw new InitialisationException(createStaticMessage("The config-ref attribute is required in the HTTP request element"), this);
         }
         if (requestBuilder == null)
         {
@@ -193,17 +194,17 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         {
             if (host.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("No host defined. Set the host attribute " +
-                                                                                   "either in the request or request-config elements"), this);
+                throw new InitialisationException(createStaticMessage("No host defined. Set the host attribute " +
+                                                                      "either in the request or request-config elements"), this);
             }
             if (port.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("No port defined. Set the host attribute " +
-                                                                                   "either in the request or request-config elements"), this);
+                throw new InitialisationException(createStaticMessage("No port defined. Set the host attribute " +
+                                                                      "either in the request or request-config elements"), this);
             }
             if (path.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("The path attribute is required in the HTTP request element"), this);
+                throw new InitialisationException(createStaticMessage("The path attribute is required in the HTTP request element"), this);
             }
         }
     }
@@ -257,11 +258,13 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             @Override
             public void onFailure(Exception exception)
             {
-                MessagingException msgException = new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)),
+                MessagingException msgException = new MessagingException(createStaticMessage(getErrorMessage(httpRequest)),
                                                                          resetMuleEventForNewThread(muleEvent),
                                                                          exception,
                                                                          DefaultHttpRequester.this);
                 checkIfRemotelyClosed(exception);
+                // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
+                // a "IOException: Remotely Closed"
                 if(shouldRetryRemotelyClosed(exception, retryCount))
                 {
                     try
@@ -270,7 +273,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                     }
                     catch (MuleException e)
                     {
-                        originalCompletionHandler.onFailure(new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e));
+                        // Only exception caught here is from createHttpRequest, so it doesn't make sense to use error message
+                        // from http request but instead simply propagate exception as happens the first time around.
+                        originalCompletionHandler.onFailure(new MessagingException(muleEvent, e, DefaultHttpRequester.this));
                     }
                 }
                 else
@@ -372,13 +377,15 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         catch (Exception e)
         {
             checkIfRemotelyClosed(e);
+            // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
+            // a "IOException: Remotely Closed"
             if(shouldRetryRemotelyClosed(e, retryCount))
             {
                 return innerProcess(muleEvent, retryCount - 1);
             }
             else
             {
-                throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e);
+                throw new MessagingException(createStaticMessage(getErrorMessage(httpRequest)), muleEvent, e, this);
             }
         }
 
