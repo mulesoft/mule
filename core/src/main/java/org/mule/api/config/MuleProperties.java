@@ -181,4 +181,5 @@ public class MuleProperties
     public static final String MULE_STREAMING_BUFFER_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bufferSize";
 
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
+    public static final String MULE_PGP_ENCRYPTION_ALGORITHM = SYSTEM_PROPERTY_PREFIX + "pgp.encryption.algorithm";
 }
