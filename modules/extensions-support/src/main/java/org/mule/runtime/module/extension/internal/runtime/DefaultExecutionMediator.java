@@ -9,27 +9,26 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.justOrEmpty;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.retry.RetryCallback;
-import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.core.work.SerialWorkManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
-import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -44,7 +43,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -60,18 +58,15 @@ import reactor.core.publisher.Mono;
  * {@link MutableConfigurationStats#addInflightOperation()} and {@link MutableConfigurationStats#discountInflightOperation()} are
  * guaranteed to be called, whatever the operation's outcome.
  * <p>
- * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, RetryRequest, Throwable)} method
- * of all the available interceptors, even if any of them request for a retry. When a retry request is granted, the entire cycle
- * of interception (before, onSuccess/onError, after) will be fired again, but no interceptor which required a retry on the first
- * execution will be allowed to request it again. If an interceptor makes such a requirement after it already did on the first
- * attempt, an {@link IllegalStateException} will be thrown. This is to prevent badly written {@link Interceptor interceptors}
- * from generating and endless loop by requesting the same retry over and over again.
+ * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, Throwable)} method
+ * of all the available interceptors. If the operation fails with {@link ConnectionException}, then a retry might be attempted
+ * depending on the configured {@link RetryPolicyTemplate}. Notice that if a retry is attempted, the entire cycle of interception
+ * (before, onSuccess/onError, after) will be fired again.
  *
  * @since 4.0
  */
 public final class DefaultExecutionMediator implements ExecutionMediator {
 
-  public static final SerialWorkManager WORK_MANAGER = new SerialWorkManager();
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
   private final ExceptionEnricherManager exceptionEnricherManager;
   private final ConnectionManagerAdapter connectionManager;
@@ -89,74 +84,57 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link OperationExecutor}
-   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
   @Override
-  public Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable {
+  public Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException {
     final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
-    final MutableConfigurationStats mutableStats = getMutableConfigurationStats(context);
-    if (mutableStats != null) {
-      mutableStats.addInflightOperation();
-    }
+    final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
+    stats.ifPresent(s -> s.addInflightOperation());
+
     try {
-      return executeWithRetryPolicy(executor, context, interceptors);
-    } finally {
-      if (mutableStats != null) {
-        mutableStats.discountInflightOperation();
-      }
+      return (Mono<Object>) getExecutionTemplate(context).execute(() -> executeWithInterceptors(executor, context, interceptors, stats));
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
     }
   }
 
-  private Mono<Object> executeWithRetryPolicy(OperationExecutor executor, ExecutionContextAdapter context,
-                                              List<Interceptor> interceptors)
-      throws Throwable {
-    RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate(context.getConfiguration());
-
-    final OperationRetryCallBack connectionRetry = new OperationRetryCallBack(executor, context, interceptors);
-    // TODO - MULE-9336 - Add support for non blocking retry policies
-    // TODO - MULE-10579 - Reconnection should be centralized
-    retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER);
-    Throwable exception = connectionRetry.getOperationExecutionResult().getException();
-    if (exception != null) {
-      throw exception;
-    }
-    return connectionRetry.getOperationExecutionResult().getOutput();
-  }
-
-  private OperationExecutionResult executeWithInterceptors(OperationExecutor executor, ExecutionContextAdapter context,
-                                                           List<Interceptor> interceptors,
-                                                           ValueHolder<InterceptorsRetryRequest> retryRequestHolder) {
-    Object result = null;
-    Throwable exception = null;
-
+  private Mono<Object> executeWithInterceptors(OperationExecutor executor,
+                                               ExecutionContextAdapter context,
+                                               final List<Interceptor> interceptors,
+                                               Optional<MutableConfigurationStats> stats) {
+    Mono<Object> result;
+    ValueHolder<Throwable> exception = new ValueHolder<>(null);
+    List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
 
     InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
-
-    try {
-      if (beforeExecutionResult.isOk()) {
-        result = executor.execute(context);
-        onSuccess(context, result, interceptors);
-      } else {
-        interceptors = beforeExecutionResult.getExecutedInterceptors();
-        throw beforeExecutionResult.getThrowable();
-      }
-    } catch (Throwable e) {
-      exception = exceptionEnricherManager.processException(e);
-      exception = moduleExceptionHandler.processException(exception);
-      exception = onError(context, retryRequestHolder, exception, interceptors);
-    } finally {
-      after(context, result, interceptors);
+    if (beforeExecutionResult.isOk()) {
+      result = from(executor.execute(context));
+    } else {
+      result = error(beforeExecutionResult.getThrowable());
+      executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
     }
 
-    Mono<Object> reactiveResult = result instanceof Publisher
-        ? from((Publisher) result)
-        : justOrEmpty(result);
+    result.doOnSuccess(value -> {
+      onSuccess(context, value, interceptors);
+      executedInterceptors.addAll(interceptors);
+    }).doOnError(e -> {
+      e = exceptionEnricherManager.processException(e);
+      e = moduleExceptionHandler.processException(e);
+      e = onError(context, e, interceptors);
 
-    return new OperationExecutionResult(reactiveResult, exception, Optional.ofNullable(retryRequestHolder.get()));
+      exception.set(e);
+    }).doAfterTerminate((value, e) -> {
+      after(context, value, executedInterceptors);
+      stats.ifPresent(s -> s.discountInflightOperation());
+    });
+
+    getRetryPolicyTemplate(context.getConfiguration()).applyOn(result, e -> extractConnectionException(e).isPresent());
+
+    return result;
   }
-
 
   private InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
 
@@ -176,25 +154,22 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private void onSuccess(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     intercept(interceptors,
               interceptor -> interceptor.onSuccess(executionContext, result), interceptor -> format(
-                                                                                                    "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)"
-                                                                                                        + "will be executed and the operation's result will be returned",
-                                                                                                    interceptor));
+            "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)"
+                + "will be executed and the operation's result will be returned",
+            interceptor));
   }
 
-  private Throwable onError(ExecutionContext executionContext, ValueHolder<InterceptorsRetryRequest> retryRequestHolder,
-                            Throwable e, List<Interceptor> interceptors) {
+  private Throwable onError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
     ValueHolder<Throwable> exceptionHolder = new ValueHolder<>(e);
 
     intercept(interceptors, interceptor -> {
-      InterceptorsRetryRequest retryRequest = new InterceptorsRetryRequest(interceptor, retryRequestHolder.get());
-      retryRequestHolder.set(retryRequest);
-
-      Throwable decoratedException = interceptor.onError(executionContext, retryRequest, exceptionHolder.get());
+      Throwable decoratedException = interceptor.onError(executionContext, exceptionHolder.get());
       if (decoratedException != null) {
         exceptionHolder.set(decoratedException);
       }
-    }, interceptor -> format("Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)"
-        + "will be executed and the operation's exception will be returned", interceptor));
+    }, interceptor -> format(
+        "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)"
+            + "will be executed and the operation's exception will be returned", interceptor));
 
     return exceptionHolder.get();
   }
@@ -203,9 +178,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     {
       intercept(interceptors,
                 interceptor -> interceptor.after(executionContext, result), interceptor -> format(
-                                                                                                  "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)"
-                                                                                                      + "will be executed and the operation's result be returned",
-                                                                                                  interceptor));
+              "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)"
+                  + "will be executed and the operation's result be returned",
+              interceptor));
     }
   }
 
@@ -231,7 +206,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   //TODO: MULE-10580 - Operation reconnection should be decoupled from config reconnection
   private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configurationInstance) {
     Optional<ConnectionProvider> connectionProviderOptional = configurationInstance.map(
-                                                                                        ConfigurationInstance::getConnectionProvider)
+        ConfigurationInstance::getConnectionProvider)
         .orElse(empty());
 
     if (connectionProviderOptional.isPresent()) {
@@ -243,9 +218,11 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     return connectionManager.getDefaultRetryPolicyTemplate();
   }
 
-  private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<ComponentModel> context) {
-    ConfigurationStats stats = context.getConfiguration().map(ConfigurationInstance::getStatistics).orElse(null);
-    return stats instanceof MutableConfigurationStats ? (MutableConfigurationStats) stats : null;
+  private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<ComponentModel> context) {
+    return context.getConfiguration()
+        .map(ConfigurationInstance::getStatistics)
+        .filter(s -> s instanceof MutableConfigurationStats)
+        .map(s -> (MutableConfigurationStats) s);
   }
 
   private List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
@@ -260,58 +237,6 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private void collectInterceptors(List<Interceptor> accumulator, Object subject) {
     if (subject instanceof Interceptable) {
       accumulator.addAll(((Interceptable) subject).getInterceptors());
-    }
-  }
-
-  private class OperationRetryCallBack implements RetryCallback {
-
-    private final ExecutionContextAdapter<OperationModel> context;
-    private final List<Interceptor> interceptorList;
-    private OperationExecutor operationExecutor;
-    private OperationExecutionResult operationExecutionResult;
-
-    private OperationRetryCallBack(OperationExecutor operationExecutor, ExecutionContextAdapter context,
-                                   List<Interceptor> interceptorList) {
-      this.operationExecutor = operationExecutor;
-      this.context = context;
-      this.interceptorList = interceptorList;
-    }
-
-    @Override
-    public void doWork(RetryContext retryContext) throws Exception {
-      operationExecutionResult = (OperationExecutionResult) getExecutionTemplate(context)
-          .execute(() -> executeWithInterceptors(operationExecutor, context, interceptorList, new ValueHolder<>()));
-
-      if (!operationExecutionResult.isOk()) {
-        if (operationExecutionResult.getRetryRequest().isPresent()
-            && operationExecutionResult.getRetryRequest().get().isRetryRequested()) {
-          Throwable throwable = operationExecutionResult.getException();
-          if (throwable instanceof Exception) {
-            throw (Exception) throwable;
-          } else {
-            throw new MuleRuntimeException(throwable);
-          }
-        } else {
-          retryContext.setFailed(operationExecutionResult.getException());
-        }
-      }
-    }
-
-    @Override
-    public String getWorkDescription() {
-      StringBuilder description = new StringBuilder(format("Extension '%s'", context.getExtensionModel().getName()));
-      context.getConfiguration().ifPresent(conf -> description.append(format(" with configuration '%s'", conf.getName())));
-
-      return description.toString();
-    }
-
-    @Override
-    public Object getWorkOwner() {
-      return this;
-    }
-
-    public OperationExecutionResult getOperationExecutionResult() {
-      return operationExecutionResult;
     }
   }
 }

@@ -11,6 +11,10 @@ import org.mule.runtime.core.retry.PolicyStatus;
 import org.mule.runtime.core.retry.policies.AbstractPolicyTemplate;
 
 import java.util.List;
+import java.util.function.Predicate;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class TestRetryPolicyTemplate extends AbstractPolicyTemplate {
 
@@ -44,6 +48,16 @@ public class TestRetryPolicyTemplate extends AbstractPolicyTemplate {
 
     public PolicyStatus applyPolicy(Throwable cause) {
       return PolicyStatus.policyExhausted(cause);
+    }
+
+    @Override
+    public void applyOn(Mono<?> publisher, Predicate<Throwable> predicate) {
+      // no op
+    }
+
+    @Override
+    public void applyOn(Flux<?> publisher, Predicate<Throwable> predicate) {
+      // no op
     }
   }
 

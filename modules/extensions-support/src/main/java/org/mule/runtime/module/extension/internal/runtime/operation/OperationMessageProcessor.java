@@ -182,24 +182,14 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
     })));
   }
 
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext)
-      throws MuleException {
-    return executeOperation(operationContext, event)
+  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) throws MuleException {
+    return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
         .defaultIfEmpty(returnDelegate.asReturnValue(null, operationContext));
   }
 
-  private Mono<Object> executeOperation(ExecutionContextAdapter operationContext, Event event) throws MuleException {
-    try {
-      return executionMediator.execute(operationExecutor, operationContext);
-    } catch (MessagingException e) {
-      if (e.getEvent() == null) {
-        throw wrapInMessagingException(event, e);
-      }
-      throw e;
-    } catch (Throwable e) {
-      throw wrapInMessagingException(event, e);
-    }
+  private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) throws MuleException {
+    return executionMediator.execute(operationExecutor, operationContext);
   }
 
   private MessagingException wrapInMessagingException(Event event, Throwable e) {
@@ -208,8 +198,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                                          Map<String, Object> resolvedParameters,
-                                                                         Event event)
-      throws MuleException {
+                                                                         Event event) throws MuleException {
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
                                          muleContext);
   }

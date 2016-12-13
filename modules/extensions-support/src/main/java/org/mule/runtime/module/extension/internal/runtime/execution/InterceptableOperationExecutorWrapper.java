@@ -12,8 +12,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -21,6 +21,7 @@ import org.mule.runtime.module.extension.internal.introspection.AbstractIntercep
 
 import java.util.List;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
@@ -51,7 +52,7 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
    * Directly delegates into {@link #delegate} {@inheritDoc}
    */
   @Override
-  public Object execute(ExecutionContext<OperationModel> executionContext) throws Exception {
+  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
     return delegate.execute(executionContext);
   }
 

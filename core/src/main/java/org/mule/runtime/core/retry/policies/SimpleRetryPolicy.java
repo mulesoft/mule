@@ -10,9 +10,12 @@ import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.retry.PolicyStatus;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Allows to configure how many times a retry should be attempted and how long to wait between retries.
@@ -30,6 +33,16 @@ public class SimpleRetryPolicy implements RetryPolicy {
     this.frequency = frequency;
     this.count = retryCount;
     retryCounter = new RetryCounter();
+  }
+
+  @Override
+  public void applyOn(Mono<?> publisher, Predicate<Throwable> predicate) {
+    publisher.retry(count, e -> predicate.test(e) && applyPolicy(e).isOk());
+  }
+
+  @Override
+  public void applyOn(Flux<?> publisher, Predicate<Throwable> predicate) {
+    publisher.retry(count, e -> predicate.test(e) && applyPolicy(e).isOk());
   }
 
   public PolicyStatus applyPolicy(Throwable cause) {

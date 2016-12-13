@@ -56,6 +56,7 @@ public class NonBlockingOperationsTestCase extends ExtensionFunctionalTestCase {
   public void failingNonBlockingOperation() throws Exception {
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectMessage(MISSILE_PROOF);
+    expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 
     Villain villain = new MissileProofVillain();
     flowRunner("fireMissile").withPayload(villain).run();

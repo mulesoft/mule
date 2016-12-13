@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.runtime.extension.api.runtime.RetryRequest;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 
@@ -17,7 +17,9 @@ import reactor.core.publisher.Mono;
  * can remain decoupled.
  * <p/>
  * This mediator will coordinate {@link OperationExecutor operation executors}, {@link Interceptor interceptors},
- * {@link RetryRequest}, configuration expiration, statistics, etc.
+ * configuration expiration, statistics, etc.
+ * <p>
+ * This mediator supports reactive streams and hence returns the operation result in the form of a {@link Mono}.
  *
  * @since 4.0
  */
@@ -27,9 +29,9 @@ public interface ExecutionMediator {
    * Coordinates the execution of the {@code executor} using the given {@code context}
    *
    * @param executor an {@link OperationExecutor}
-   * @param context an {@link ExecutionContextAdapter}
-   * @return the operation's result
-   * @throws Exception if any exception is encountered
+   * @param context  an {@link ExecutionContextAdapter}
+   * @return a {@link Mono} with the operation's result
+   * @throws MuleException if the {@link Mono} could not be created
    */
-  Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable;
+  Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException;
 }

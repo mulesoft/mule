@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.core.api.retry;
 
+
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Predicate;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 /**
@@ -29,4 +34,14 @@ public interface RetryPolicyTemplate {
   void setNotifier(RetryNotifier retryNotifier);
 
   RetryContext execute(RetryCallback callback, Executor workManager) throws Exception;
+
+  //TODO: Send PR to Reactor so that the retry operators have a common abstraction
+  default void applyOn(Mono<?> publisher, Predicate<Throwable> predicate) {
+    createRetryInstance().applyOn(publisher, predicate);
+  }
+
+  //TODO: Send PR to Reactor so that the retry operators have a common abstraction
+  default void applyOn(Flux<?> publisher, Predicate<Throwable> predicate) {
+    createRetryInstance().applyOn(publisher, predicate);
+  }
 }

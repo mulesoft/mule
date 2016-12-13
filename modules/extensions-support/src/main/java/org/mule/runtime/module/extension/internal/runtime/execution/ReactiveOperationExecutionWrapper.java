@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
@@ -49,7 +50,7 @@ public final class ReactiveOperationExecutionWrapper implements OperationExecuto
   }
 
   @Override
-  public Object execute(ExecutionContext<OperationModel> executionContext) throws Exception {
+  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
     if (executionContext.getComponentModel().isBlocking()) {
       return delegate.execute(executionContext);
     }

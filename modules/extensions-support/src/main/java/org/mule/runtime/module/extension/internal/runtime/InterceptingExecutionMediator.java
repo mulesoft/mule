@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
@@ -42,7 +44,7 @@ public final class InterceptingExecutionMediator implements ExecutionMediator {
   }
 
   @Override
-  public Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable {
+  public Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException {
     Object resultValue = intercepted.execute(executor, context).block();
     if (!(resultValue instanceof InterceptingCallback)) {
       throw new IllegalStateException(format("%s '%s' was expected to return a '%s' but a '%s' was found instead",
@@ -53,8 +55,10 @@ public final class InterceptingExecutionMediator implements ExecutionMediator {
 
     context.setVariable(INTERCEPTING_CALLBACK_PARAM, resultValue);
 
-    return just(((InterceptingCallback) resultValue).getResult());
+    try {
+      return just(((InterceptingCallback) resultValue).getResult());
+    } catch (Exception e) {
+      return error(e);
+    }
   }
-
-
 }
