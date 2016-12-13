@@ -92,6 +92,16 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="encryptionAlgorithm" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encryption algorithm used for the symmetric cipher.
+                            Allowed values are: IDEA, TRIPLE_DES, CAST5, BLOWFISH, SAFER, DES, AES_128,
+                            AES_192, AES_256, TWOFISH, CAMELLIA_128, CAMELLIA_192 and CAMELLIA_256.
+                            Default value is CAST5.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

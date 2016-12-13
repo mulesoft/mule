@@ -35,6 +35,8 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private CredentialsAccessor credentialsAccessor;
     private boolean checkKeyExpirity = false;
     private Provider provider;
+    private String encryptionAlgorithm;
+    private int encryptionAlgorithmId;
 
     public void initialise() throws InitialisationException
     {
@@ -43,6 +45,20 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             java.security.Security.addProvider(new BouncyCastleProvider());
         }
         provider = SecurityUtils.getDefaultSecurityProvider();
+
+        if (encryptionAlgorithm == null)
+        {
+            encryptionAlgorithm = EncryptionAlgorithm.CAST5.toString();
+        }
+
+        try
+        {
+            encryptionAlgorithmId = EncryptionAlgorithm.valueOf(encryptionAlgorithm).getNumericId();
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new RuntimeException("Could not initialise encryption strategy: invalid algorithm " + encryptionAlgorithm, e);
+        }
     }
 
     public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
@@ -51,7 +67,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider);
+            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -67,7 +83,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
             StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
+                                                                         this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -136,5 +152,10 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     public void setCheckKeyExpirity(boolean checkKeyExpirity)
     {
         this.checkKeyExpirity = checkKeyExpirity;
+    }
+
+    public void setEncryptionAlgorithm(String encryptionAlgorithm)
+    {
+        this.encryptionAlgorithm = encryptionAlgorithm;
     }
 }
