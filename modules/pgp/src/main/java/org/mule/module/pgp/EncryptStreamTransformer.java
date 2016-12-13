@@ -15,15 +15,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
-import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
-import org.bouncycastle.openpgp.PGPEncryptedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
 import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 
 public class EncryptStreamTransformer implements StreamTransformer
 {
@@ -32,6 +31,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     private InputStream toBeEncrypted;
     private PGPPublicKey publicKey;
     private Provider provider;
+    private final int algorithm;
 
     private OutputStream pgpOutputStream;
     private OutputStream compressedEncryptedOutputStream;
@@ -39,7 +39,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     private OutputStream armoredOut;
     private long bytesWrote;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider) throws IOException
+    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm) throws IOException
     {
         Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
@@ -48,6 +48,7 @@ public class EncryptStreamTransformer implements StreamTransformer
         this.publicKey = publicKey;
         this.bytesWrote = 0;
         this.provider = provider;
+        this.algorithm = algorithm;
     }
 
     /**
@@ -57,7 +58,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     public void initialize(OutputStream out) throws Exception
     {
         armoredOut = new ArmoredOutputStream(out);
-        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
+        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(algorithm);
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
 
         BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
