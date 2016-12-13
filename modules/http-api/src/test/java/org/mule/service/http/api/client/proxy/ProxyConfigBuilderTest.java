@@ -4,33 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.api.requester.proxy;
+package org.mule.service.http.api.client.proxy;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.service.http.api.client.proxy.ProxyConfig;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-public class ProxyConfigBuilderTest extends AbstractMuleTestCase {
+@Features("HTTP Service")
+@Stories("Proxy Config Builder")
+public class ProxyConfigBuilderTest extends AbstractProxyConfigTestCase<ProxyConfigBuilder> {
 
-  public static final String HOST = "host";
-  public static final int PORT = 8080;
-  public static final String USERNAME = "username";
-  public static final String PASSWORD = "password";
+  private ProxyConfigBuilder proxyConfigBuilder = ProxyConfig.builder();
 
-  private ProxyConfigBuilder proxyConfigBuilder = new ProxyConfigBuilder();
-
-  @Test(expected = IllegalArgumentException.class)
-  public void onlyHost() {
-    proxyConfigBuilder.setHost(HOST).build();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void onlyPort() {
-    proxyConfigBuilder.setPort(PORT).build();
+  @Override
+  protected ProxyConfigBuilder getProxyConfigBuilder() {
+    return proxyConfigBuilder;
   }
 
   @Test
@@ -50,4 +42,5 @@ public class ProxyConfigBuilderTest extends AbstractMuleTestCase {
     assertThat(config.getPassword(), is(PASSWORD));
     assertThat(config.getUsername(), is(USERNAME));
   }
+
 }

@@ -14,6 +14,13 @@ package org.mule.service.http.api.client.proxy;
 public interface NtlmProxyConfig extends ProxyConfig {
 
   /**
+   * @return a {@link NtlmProxyConfigBuilder}.
+   */
+  static NtlmProxyConfigBuilder builder() {
+    return new NtlmProxyConfigBuilder();
+  }
+
+  /**
    * @return the HTTP proxy user domain
    */
   String getNtlmDomain();

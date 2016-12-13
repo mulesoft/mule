@@ -14,6 +14,13 @@ package org.mule.service.http.api.client.proxy;
 public interface ProxyConfig {
 
   /**
+   * @return a {@link ProxyConfigBuilder}.
+   */
+  static ProxyConfigBuilder builder() {
+    return new ProxyConfigBuilder();
+  }
+
+  /**
    * @return the HTTP proxy host
    */
   String getHost();
