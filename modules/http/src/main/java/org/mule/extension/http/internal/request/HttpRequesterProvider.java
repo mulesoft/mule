@@ -46,6 +46,7 @@ import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
+import org.mule.service.http.api.tcp.TcpClientSocketPropertiesBuilder;
 
 import java.util.function.Function;
 
@@ -159,7 +160,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
         .setTlsContextFactory(tlsContext)
         .setProxyConfig(proxyConfig)
-        .setClientSocketProperties(new TcpClientSocketPropertiesAdapter(connectionParams.getClientSocketProperties()))
+        .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
         .setMaxConnections(connectionParams.getMaxConnections())
         .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
@@ -171,6 +172,18 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
     return new HttpExtensionClient(httpClient, uriParameters, authentication);
+  }
+
+  private org.mule.service.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
+    return org.mule.service.http.api.tcp.TcpClientSocketProperties.builder()
+        .setSendBufferSize(socketProperties.getSendBufferSize())
+        .setSendBufferSize(socketProperties.getSendBufferSize())
+        .setClientTimeout(socketProperties.getClientTimeout())
+        .setSendTcpNoDelay(socketProperties.getSendTcpNoDelay())
+        .setLinger(socketProperties.getLinger())
+        .setKeepAlive(socketProperties.getKeepAlive())
+        .setConnectionTimeout(socketProperties.getConnectionTimeout())
+        .build();
   }
 
   @Override
@@ -190,51 +203,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   public HttpAuthentication getAuthentication() {
     return authentication;
-  }
-
-
-  private class TcpClientSocketPropertiesAdapter implements org.mule.service.http.api.tcp.TcpClientSocketProperties {
-
-    TcpClientSocketProperties tcpClientSocketProperties;
-
-    public TcpClientSocketPropertiesAdapter(TcpClientSocketProperties tcpClientSocketProperties) {
-      this.tcpClientSocketProperties = tcpClientSocketProperties;
-    }
-
-    @Override
-    public Integer getSendBufferSize() {
-      return tcpClientSocketProperties.getSendBufferSize();
-    }
-
-    @Override
-    public Integer getReceiveBufferSize() {
-      return tcpClientSocketProperties.getReceiveBufferSize();
-    }
-
-    @Override
-    public Boolean getSendTcpNoDelay() {
-      return tcpClientSocketProperties.getSendTcpNoDelay();
-    }
-
-    @Override
-    public Integer getConnectionTimeout() {
-      return tcpClientSocketProperties.getConnectionTimeout();
-    }
-
-    @Override
-    public Integer getLinger() {
-      return tcpClientSocketProperties.getLinger();
-    }
-
-    @Override
-    public Boolean getKeepAlive() {
-      return tcpClientSocketProperties.getKeepAlive();
-    }
-
-    @Override
-    public Integer getClientTimeout() {
-      return tcpClientSocketProperties.getClientTimeout();
-    }
   }
 
 }

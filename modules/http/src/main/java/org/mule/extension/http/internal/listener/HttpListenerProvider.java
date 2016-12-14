@@ -76,8 +76,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     private String host;
 
     /**
-     * Port where the requests will be received. If the protocol attribute is HTTP (default) then the default value is 80, if the
-     * protocol attribute is HTTPS then the default value is 443.
+     * Port where the requests will be received.
      */
     @Parameter
     @Expression(NOT_SUPPORTED)

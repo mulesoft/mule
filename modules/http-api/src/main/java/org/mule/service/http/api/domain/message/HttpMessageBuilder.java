@@ -16,6 +16,13 @@ import org.mule.service.http.api.domain.entity.HttpEntity;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * Base implementation of an {@link HttpMessage} builder. Implementations should extend it and indicate their type and the type of
+ * the message they build.
+ *
+ * @param <B> the type of the builder itself.
+ * @param <M> the type of {@link HttpMessage} that the builder creates.
+ */
 public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends HttpMessage> {
 
   protected ParameterMap headers = new CaseInsensitiveParameterMap();
