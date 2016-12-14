@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -42,7 +41,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
@@ -55,9 +53,7 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapte
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
@@ -68,6 +64,7 @@ import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 /**
@@ -185,20 +182,18 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) throws MuleException {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
-        .defaultIfEmpty(returnDelegate.asReturnValue(null, operationContext));
+        .defaultIfEmpty(returnDelegate.asReturnValue(null, operationContext))
+        .mapError(Exceptions::unwrap);
   }
 
   private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) throws MuleException {
-    return executionMediator.execute(operationExecutor, operationContext);
-  }
-
-  private MessagingException wrapInMessagingException(Event event, Throwable e) {
-    return new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
+    return Mono.from(executionMediator.execute(operationExecutor, operationContext));
   }
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                                          Map<String, Object> resolvedParameters,
-                                                                         Event event) throws MuleException {
+                                                                         Event event)
+      throws MuleException {
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
                                          muleContext);
   }

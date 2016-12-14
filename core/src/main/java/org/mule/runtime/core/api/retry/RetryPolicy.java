@@ -8,10 +8,10 @@ package org.mule.runtime.core.api.retry;
 
 import org.mule.runtime.core.retry.PolicyStatus;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.reactivestreams.Publisher;
 
 /**
  * A RetryPolicy takes some action each time an exception occurs and returns a {@link PolicyStatus} which indicates whether the
@@ -21,7 +21,10 @@ public interface RetryPolicy {
 
   PolicyStatus applyPolicy(Throwable cause);
 
-  void applyOn(Mono<?> publisher, Predicate<Throwable> predicate);
+  default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
+                                       Predicate<Throwable> shouldRetry,
+                                       Consumer<Publisher<T>> onExhausted) {
+    return publisher;
+  }
 
-  void applyOn(Flux<?> publisher, Predicate<Throwable> predicate);
 }

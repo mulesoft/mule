@@ -16,21 +16,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.Event;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.policy.OperationExecutionFunction;
-import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -48,7 +43,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
   public void before() throws Exception {
     super.before();
     when(interceptingCallback.shouldProcessNext()).thenReturn(true);
-    when(operationExecutor.execute(any())).thenReturn(interceptingCallback);
+    when(operationExecutor.execute(any())).thenReturn(just(interceptingCallback));
   }
 
   @Override

@@ -33,6 +33,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
@@ -40,6 +41,8 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.just;
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ObjectType;
@@ -68,7 +71,6 @@ import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -127,7 +129,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Attributes attributes = mock(Attributes.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
+        .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -147,7 +149,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Attributes attributes = mock(Attributes.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
+        .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
 
     InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
@@ -163,7 +165,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).mediaType(mediaType).build());
+        .thenReturn(just(builder().output(payload).mediaType(mediaType).build()));
 
     event =
         Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
@@ -180,7 +182,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception {
     Object payload = "hello world!";
 
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(Result.builder().output(payload).build());
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(builder().output(payload).build()));
     event =
         Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
 
@@ -198,7 +200,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Attributes attributes = mock(Attributes.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).attributes(attributes).build());
+        .thenReturn(just(builder().output(payload).attributes(attributes).build()));
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -211,7 +213,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationReturnsPayloadValue() throws Exception {
     Object value = new Object();
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(value);
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(value));
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -224,7 +226,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor = setUpOperationMessageProcessor();
 
     Object value = new Object();
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(value);
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(value));
 
     InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
@@ -277,7 +279,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(void.class), false, emptySet()));
     messageProcessor = setUpOperationMessageProcessor();
 
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(null);
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(empty());
     assertThat(messageProcessor.process(event), is(sameInstance(event)));
   }
 

@@ -9,10 +9,10 @@ package org.mule.runtime.core.api.retry;
 
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.reactivestreams.Publisher;
 
 
 /**
@@ -35,13 +35,10 @@ public interface RetryPolicyTemplate {
 
   RetryContext execute(RetryCallback callback, Executor workManager) throws Exception;
 
-  //TODO: Send PR to Reactor so that the retry operators have a common abstraction
-  default void applyOn(Mono<?> publisher, Predicate<Throwable> predicate) {
-    createRetryInstance().applyOn(publisher, predicate);
-  }
+  default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
+                                       Predicate<Throwable> shouldRetry,
+                                       Consumer<Publisher<T>> onExhausted) {
+    return createRetryInstance().applyPolicy(publisher, shouldRetry, onExhausted);
 
-  //TODO: Send PR to Reactor so that the retry operators have a common abstraction
-  default void applyOn(Flux<?> publisher, Predicate<Throwable> predicate) {
-    createRetryInstance().applyOn(publisher, predicate);
   }
 }

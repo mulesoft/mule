@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,5 +35,5 @@ public interface ExecutionMediator {
    * @return a {@link Mono} with the operation's result
    * @throws MuleException if the {@link Mono} could not be created
    */
-  Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException;
+  Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException;
 }

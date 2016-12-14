@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 

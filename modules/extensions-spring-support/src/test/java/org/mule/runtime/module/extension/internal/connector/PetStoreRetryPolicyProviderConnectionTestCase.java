@@ -14,7 +14,6 @@ import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -33,7 +32,6 @@ import org.junit.rules.ExpectedException;
 public class PetStoreRetryPolicyProviderConnectionTestCase extends ExtensionFunctionalTestCase {
 
   public static final String CONNECTION_FAIL = "Connection fail";
-  public static final String CONNECTION_FAIL_DOT = "Connection fail.";
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -53,8 +51,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends ExtensionFunc
   @Test
   public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperation() throws Exception {
     exception.expect(MessagingException.class);
-    exception.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
-    exception.expectMessage(is(CONNECTION_FAIL_DOT));
+    exception.expectCause(is(instanceOf(ConnectionException.class)));
     runFlow("fail-operation-with-connection-exception");
   }
 
@@ -62,7 +59,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends ExtensionFunc
   public void retryPolicyExhaustedDueToInvalidConnectionAtValidateTime() throws Exception {
     exception.expect(MessagingException.class);
     exception.expectCause(is(instanceOf(ConnectionException.class)));
-    exception.expectMessage(is(CONNECTION_FAIL_DOT));
+    //exception.expectMessage(is(CONNECTION_FAIL_DOT));
     runFlow("fail-connection-validation");
   }
 
@@ -70,7 +67,6 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends ExtensionFunc
   public void retryPolicyNotExecutedDueToNotConnectionExceptionWithException() throws Exception {
     exception.expect(MessagingException.class);
     exception.expectCause(is(instanceOf(Throwable.class)));
-    exception.expectMessage(is(CONNECTION_FAIL_DOT));
     runFlow("fail-operation-with-not-handled-exception");
   }
 

@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -25,6 +24,7 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -89,13 +91,14 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
   @Override
-  public Mono<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException {
+  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException {
     final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
     final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
     stats.ifPresent(s -> s.addInflightOperation());
 
     try {
-      return (Mono<Object>) getExecutionTemplate(context).execute(() -> executeWithInterceptors(executor, context, interceptors, stats));
+      return (Mono<Object>) getExecutionTemplate(context)
+          .execute(() -> executeWithInterceptors(executor, context, interceptors, stats));
     } catch (Exception e) {
       throw new DefaultMuleException(e);
     }
@@ -105,35 +108,46 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
                                                ExecutionContextAdapter context,
                                                final List<Interceptor> interceptors,
                                                Optional<MutableConfigurationStats> stats) {
-    Mono<Object> result;
-    ValueHolder<Throwable> exception = new ValueHolder<>(null);
+
     List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
+    Mono<Object> publisher = Mono.create(sink -> {
+      Mono<Object> result;
 
-    InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
-    if (beforeExecutionResult.isOk()) {
-      result = from(executor.execute(context));
-    } else {
-      result = error(beforeExecutionResult.getThrowable());
-      executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
-    }
+      InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
+      if (beforeExecutionResult.isOk()) {
+        result = from(executor.execute(context));
+        executedInterceptors.addAll(interceptors);
+      } else {
+        result = error(beforeExecutionResult.getThrowable());
+        executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
+      }
 
-    result.doOnSuccess(value -> {
-      onSuccess(context, value, interceptors);
-      executedInterceptors.addAll(interceptors);
-    }).doOnError(e -> {
-      e = exceptionEnricherManager.processException(e);
-      e = moduleExceptionHandler.processException(e);
-      e = onError(context, e, interceptors);
+      result.doOnSuccess(value -> {
+        onSuccess(context, value, interceptors);
+        stats.ifPresent(s -> s.discountInflightOperation());
+        sink.success(value);
+      })
+          .mapError(e -> {
+            e = exceptionEnricherManager.processException(e);
+            e = moduleExceptionHandler.processException(e);
+            e = onError(context, e, interceptors);
 
-      exception.set(e);
-    }).doAfterTerminate((value, e) -> {
-      after(context, value, executedInterceptors);
-      stats.ifPresent(s -> s.discountInflightOperation());
+            return e;
+          }).subscribe(value -> {
+          }, sink::error);
+    }).doOnTerminate((value, e) -> {
+      try {
+        after(context, value, executedInterceptors);
+      } finally {
+        executedInterceptors.clear();
+      }
     });
 
-    getRetryPolicyTemplate(context.getConfiguration()).applyOn(result, e -> extractConnectionException(e).isPresent());
-
-    return result;
+    return from(getRetryPolicyTemplate(context.getConfiguration()).applyPolicy(publisher,
+                                                                               e -> ExceptionUtils.extractConnectionException(e)
+                                                                                   .isPresent(),
+                                                                               e -> stats.ifPresent(s -> s
+                                                                                   .discountInflightOperation())));
   }
 
   private InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
@@ -154,9 +168,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private void onSuccess(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     intercept(interceptors,
               interceptor -> interceptor.onSuccess(executionContext, result), interceptor -> format(
-            "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)"
-                + "will be executed and the operation's result will be returned",
-            interceptor));
+                                                                                                    "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)"
+                                                                                                        + "will be executed and the operation's result will be returned",
+                                                                                                    interceptor));
   }
 
   private Throwable onError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
@@ -168,8 +182,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         exceptionHolder.set(decoratedException);
       }
     }, interceptor -> format(
-        "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)"
-            + "will be executed and the operation's exception will be returned", interceptor));
+                             "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)"
+                                 + "will be executed and the operation's exception will be returned",
+                             interceptor));
 
     return exceptionHolder.get();
   }
@@ -178,9 +193,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     {
       intercept(interceptors,
                 interceptor -> interceptor.after(executionContext, result), interceptor -> format(
-              "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)"
-                  + "will be executed and the operation's result be returned",
-              interceptor));
+                                                                                                  "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)"
+                                                                                                      + "will be executed and the operation's result be returned",
+                                                                                                  interceptor));
     }
   }
 
@@ -206,7 +221,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   //TODO: MULE-10580 - Operation reconnection should be decoupled from config reconnection
   private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configurationInstance) {
     Optional<ConnectionProvider> connectionProviderOptional = configurationInstance.map(
-        ConfigurationInstance::getConnectionProvider)
+                                                                                        ConfigurationInstance::getConnectionProvider)
         .orElse(empty());
 
     if (connectionProviderOptional.isPresent()) {

@@ -26,8 +26,6 @@ import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
-import org.mule.runtime.module.extension.internal.runtime.InterceptingExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
