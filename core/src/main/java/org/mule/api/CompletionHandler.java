@@ -6,8 +6,6 @@
  */
 package org.mule.api;
 
-import org.mule.api.MessagingException;
-
 /**
  * Handles the result of asynchronous processing.
  *
