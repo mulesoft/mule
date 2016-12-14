@@ -636,6 +636,8 @@ public class SftpClient
     public String duplicateHandling(String destDir, String filename, String duplicateHandling)
             throws IOException
     {
+    	destDir = getAbsolutePath(destDir);
+    	
         if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO))
         {
             filename = createUniqueName(destDir, filename);
