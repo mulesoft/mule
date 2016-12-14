@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
 
@@ -14,6 +15,11 @@ import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.CompletionHandler;
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -46,9 +52,11 @@ import org.mule.util.AttributeEvaluator;
 
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -78,7 +86,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
     static final String QUERY_PARAMS_DEBUG = "Query Params";
-    static final String REMOTELY_CLOSED = "Remotely closed";
+    private static final String REMOTELY_CLOSED = "Remotely closed";
+    private static final int DEFAULT_RETRY_ATTEMPTS = 3;
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -114,7 +123,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     {
         if (requestConfig == null)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("The config-ref attribute is required in the HTTP request element"), this);
+            throw new InitialisationException(createStaticMessage("The config-ref attribute is required in the HTTP request element"), this);
         }
         if (requestBuilder == null)
         {
@@ -185,17 +194,17 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         {
             if (host.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("No host defined. Set the host attribute " +
-                                                                                   "either in the request or request-config elements"), this);
+                throw new InitialisationException(createStaticMessage("No host defined. Set the host attribute " +
+                                                                      "either in the request or request-config elements"), this);
             }
             if (port.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("No port defined. Set the host attribute " +
-                                                                                   "either in the request or request-config elements"), this);
+                throw new InitialisationException(createStaticMessage("No port defined. Set the host attribute " +
+                                                                      "either in the request or request-config elements"), this);
             }
             if (path.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("The path attribute is required in the HTTP request element"), this);
+                throw new InitialisationException(createStaticMessage("The path attribute is required in the HTTP request element"), this);
             }
         }
     }
@@ -214,83 +223,124 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     @Override
     protected MuleEvent processBlocking(final MuleEvent muleEvent) throws MuleException
     {
-        return innerProcess(muleEvent, true);
+        return innerProcess(muleEvent, DEFAULT_RETRY_ATTEMPTS);
     }
 
     @Override
     protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws
                                                                                                             MuleException
     {
-        innerProcessNonBlocking(muleEvent, completionHandler, true);
+        innerProcessNonBlocking(muleEvent, completionHandler, DEFAULT_RETRY_ATTEMPTS);
     }
 
-    protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler,
-                                           final boolean checkRetry) throws MuleException
+    protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler originalCompletionHandler,
+                                           final int retryCount) throws MuleException
     {
         final HttpAuthentication authentication = requestConfig.getAuthentication();
         final HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
-        getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent),
-                             new CompletionHandler<HttpResponse, Exception>()
-                             {
-                                 @Override
-                                 public void onFailure(Exception exception)
-                                 {
-                                     MessagingException msgException = new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)),
-                                                                                              resetMuleEventForNewThread(muleEvent),
-                                                                                              exception,
-                                                                                              DefaultHttpRequester.this);
-                                     checkIfRemotelyClosed(exception);
-                                     completionHandler.onFailure(msgException);
-                                 }
+        getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent),
+                             followRedirects.resolveBooleanValue(muleEvent),
+                             resolveAuthentication(muleEvent),
+                             createNonBlockingCompletionHandler(muleEvent, originalCompletionHandler, retryCount, authentication, httpRequest),
+                             getWorkManager(muleEvent));
+    }
 
-                                 @Override
-                                 public void onCompletion(HttpResponse httpResponse)
-                                 {
-                                     try
-                                     {
+    private CompletionHandler<HttpResponse, Exception> createNonBlockingCompletionHandler(final MuleEvent muleEvent,
+                                                                                          final CompletionHandler originalCompletionHandler,
+                                                                                          final int retryCount,
+                                                                                          final HttpAuthentication authentication,
+                                                                                          final HttpRequest httpRequest)
+    {
+        return new CompletionHandler<HttpResponse, Exception>()
+        {
+            @Override
+            public void onFailure(Exception exception)
+            {
+                MessagingException msgException = new MessagingException(createStaticMessage(getErrorMessage(httpRequest)),
+                                                                         resetMuleEventForNewThread(muleEvent),
+                                                                         exception,
+                                                                         DefaultHttpRequester.this);
+                checkIfRemotelyClosed(exception);
+                // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
+                // a "IOException: Remotely Closed"
+                if(shouldRetryRemotelyClosed(exception, retryCount))
+                {
+                    try
+                    {
+                        innerProcessNonBlocking(muleEvent, originalCompletionHandler, retryCount - 1);
+                    }
+                    catch (MuleException e)
+                    {
+                        // Only exception caught here is from createHttpRequest, so it doesn't make sense to use error message
+                        // from http request but instead simply propagate exception as happens the first time around.
+                        originalCompletionHandler.onFailure(new MessagingException(muleEvent, e, DefaultHttpRequester.this));
+                    }
+                }
+                else
+                {
+                    originalCompletionHandler.onFailure(msgException);
+                }
+            }
 
-                                         httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
-                                         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(),
-                                                                             muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
-                                         resetMuleEventForNewThread(muleEvent);
+            @Override
+            public void onCompletion(HttpResponse httpResponse)
+            {
+                try
+                {
+
+                    httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
+                    notificationHelper.fireNotification(muleEvent, httpRequest.getUri(),
+                                                        muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+                    resetMuleEventForNewThread(muleEvent);
 
 
-                                         if (resendRequest(muleEvent, checkRetry, authentication))
-                                         {
-                                             consumePayload(muleEvent);
-                                             innerProcessNonBlocking(muleEvent, completionHandler, false);
-                                         }
-                                         else
-                                         {
-                                             validateResponse(muleEvent);
-                                             completionHandler.onCompletion(muleEvent);
-                                         }
-                                     }
-                                     catch (MessagingException messagingException)
-                                     {
-                                         completionHandler.onFailure(messagingException);
-                                     }
-                                     catch (MuleException muleException)
-                                     {
-                                         completionHandler.onFailure(new MessagingException(resetMuleEventForNewThread(muleEvent), muleException, DefaultHttpRequester.this));
-                                     }
-                                     finally
-                                     {
-                                         RequestContext.clear();
-                                     }
-                                 }
+                    if (resendRequest(muleEvent, retryCount, authentication))
+                    {
+                        consumePayload(muleEvent);
+                        innerProcessNonBlocking(muleEvent, originalCompletionHandler, 0);
+                    }
+                    else
+                    {
+                        validateResponse(muleEvent);
+                        originalCompletionHandler.onCompletion(muleEvent);
+                    }
+                }
+                catch (MessagingException messagingException)
+                {
+                    originalCompletionHandler.onFailure(messagingException);
+                }
+                catch (MuleException muleException)
+                {
+                    originalCompletionHandler.onFailure(new MessagingException(resetMuleEventForNewThread(muleEvent), muleException, DefaultHttpRequester.this));
+                }
+                finally
+                {
+                    RequestContext.clear();
+                }
+            }
 
-                                 private MuleEvent resetMuleEventForNewThread(MuleEvent event)
-                                 {
-                                     // Reset access control for new thread
-                                     ((DefaultMuleEvent)event).resetAccessControl();
-                                     // Set RequestContext ThreadLocal in new thread for backwards compatibility
-                                     OptimizedRequestContext.unsafeSetEvent(event);
-                                     return event;
-                                 }
-                             }, getWorkManager(muleEvent));
+            private MuleEvent resetMuleEventForNewThread(MuleEvent event)
+            {
+                // Reset access control for new thread
+                ((DefaultMuleEvent)event).resetAccessControl();
+                // Set RequestContext ThreadLocal in new thread for backwards compatibility
+                OptimizedRequestContext.unsafeSetEvent(event);
+                return event;
+            }
+        };
+    }
+
+    private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount)
+    {
+        boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
+        if(shouldRetry)
+        {
+            logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+                        + "`. Request will be retried " + retryCount + " time(s) before failing.");
+        }
+        return shouldRetry;
     }
 
     private void checkIfRemotelyClosed(Exception exception)
@@ -314,11 +364,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         }
     }
 
-    private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException
+    private MuleEvent innerProcess(MuleEvent muleEvent, int retryCount) throws MuleException
     {
         HttpAuthentication authentication = requestConfig.getAuthentication();
         HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
-
         HttpResponse response;
         try
         {
@@ -328,16 +377,25 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         catch (Exception e)
         {
             checkIfRemotelyClosed(e);
-            throw new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)), muleEvent, e, this);
+            // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
+            // a "IOException: Remotely Closed"
+            if(shouldRetryRemotelyClosed(e, retryCount))
+            {
+                return innerProcess(muleEvent, retryCount - 1);
+            }
+            else
+            {
+                throw new MessagingException(createStaticMessage(getErrorMessage(httpRequest)), muleEvent, e, this);
+            }
         }
 
         httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
-        if (resendRequest(muleEvent, checkRetry, authentication))
+        if (resendRequest(muleEvent, retryCount, authentication))
         {
             consumePayload(muleEvent);
-            muleEvent = innerProcess(muleEvent, false);
+            muleEvent = innerProcess(muleEvent, 0);
         }
         else
         {
@@ -361,9 +419,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         responseValidator.validate(muleEvent);
     }
 
-    private boolean resendRequest(MuleEvent muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException
+    private boolean resendRequest(MuleEvent muleEvent, int retryCount, HttpAuthentication authentication) throws MuleException
     {
-        return retry && authentication != null && authentication.shouldRetry(muleEvent);
+        return retryCount > 0 && authentication != null && authentication.shouldRetry(muleEvent);
     }
 
     private HttpRequest createHttpRequest(MuleEvent muleEvent, HttpAuthentication authentication) throws MuleException
