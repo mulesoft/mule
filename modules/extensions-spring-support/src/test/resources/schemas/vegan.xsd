@@ -421,6 +421,8 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

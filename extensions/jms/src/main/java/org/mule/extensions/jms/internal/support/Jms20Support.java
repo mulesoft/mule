@@ -230,17 +230,16 @@ public class Jms20Support implements JmsSupport {
    * {@inheritDoc}
    */
   @Override
-  public void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority,
+  public void send(MessageProducer producer, Message message, boolean persistent, int priority,
                    long ttl, boolean topic)
       throws JMSException {
     if (LOGGER.isDebugEnabled()) {
+      Destination dest = producer.getDestination();
       LOGGER.debug(format("Sending message to [%s], persistent:[%s], with priority:[%s] and ttl:[%s]",
                           dest instanceof Queue ? ((Queue) dest).getQueueName() : ((Topic) dest).getTopicName(),
                           persistent, priority, ttl));
     }
-    producer.send(dest, message,
-                  (persistent ? PERSISTENT : NON_PERSISTENT),
-                  priority, ttl);
+    producer.send(message, (persistent ? PERSISTENT : NON_PERSISTENT), priority, ttl);
   }
 
   private Function<String, Optional<Destination>> getJndiObjectSupplier() {

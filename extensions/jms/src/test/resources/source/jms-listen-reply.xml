@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <flow name="publisher">
+        <jmsn:publish config-ref="config" destination="#[dw:destination]" destinationType="TOPIC">
+            <jmsn:message-builder>
+                <jmsn:reply-to destination="#[dw:replyToDestination]" destinationType="#[dw:replyToDestinationType]"/>
+            </jmsn:message-builder>
+        </jmsn:publish>
+    </flow>
+
+    <flow name="consumer">
+        <jmsn:consume config-ref="config" destination="#[dw:destination]" consumerType="#[dw:consumerType]"/>
+    </flow>
+
+    <flow name="listener">
+        <jmsn:subscribe config-ref="config" destination="topicListenerDestination">
+            <jmsn:consumer-type>
+                <jmsn:topic-consumer/>
+            </jmsn:consumer-type>
+        </jmsn:subscribe>
+        <set-payload value="#[dw:'received_' ++ payload]"/>
+    </flow>
+
+</mule>

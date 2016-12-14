@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.test.topic;
+package org.mule.extensions.jms.test.topic.integration;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,7 +52,9 @@ public abstract class JmsAbstractTopicBridge extends JmsAbstractTestCase {
 
   @After
   public void cleanup() {
-    this.executor.shutdown();
+    if (this.executor != null) {
+      this.executor.shutdown();
+    }
   }
 
   @Test

@@ -6,33 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
-import static java.lang.String.format;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
-import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -76,60 +59,4 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     });
   }
 
-  private void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
-    Class<?> objectClass = getType(objectType);
-    objectType.getFields().stream()
-        .filter(f -> f.getAnnotation(FlattenedTypeAnnotation.class).isPresent())
-        .forEach(groupField -> {
-          if (!(groupField.getValue() instanceof ObjectType)) {
-            return;
-          }
-
-          final ObjectType groupType = (ObjectType) groupField.getValue();
-          final Field objectField = getField(objectClass, getLocalPart(groupField));
-          DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(groupField.getValue()));
-          builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
-
-          resolveParameters(groupType, groupBuilder);
-          resolveParameterGroups(groupType, groupBuilder);
-        });
-  }
-
-  private void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
-    final Class<?> objectClass = getType(objectType);
-    final boolean isParameterGroup = objectType.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
-    final Map<String, Object> parameters = getParameters();
-    objectType.getFields().forEach(field -> {
-      final String key = getLocalPart(field);
-
-      ValueResolver<?> valueResolver = null;
-      Field objectField = getField(objectClass, key);
-      if (parameters.containsKey(key)) {
-        valueResolver = toValueResolver(parameters.get(key));
-      } else if (!isParameterGroup) {
-        valueResolver = getDefaultValue(field)
-            .map(value -> new TypeSafeExpressionValueResolver<>(value, objectField.getType(), muleContext))
-            .orElse(null);
-      }
-
-      Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
-      if (nullSafe.isPresent()) {
-        ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
-        MetadataType type =
-            getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader));
-        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
-      }
-
-      if (valueResolver != null) {
-        builder.addPropertyResolver(objectField.getName(), valueResolver);
-      }
-    });
-  }
-
-  private Field getField(Class<?> objectClass, String key) {
-    return getFieldByNameOrAlias(objectClass, key)
-        .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
-                                                                      objectClass.getName(),
-                                                                      key)));
-  }
 }

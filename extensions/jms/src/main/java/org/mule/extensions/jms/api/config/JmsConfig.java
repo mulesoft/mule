@@ -6,19 +6,24 @@
  */
 package org.mule.extensions.jms.api.config;
 
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extensions.jms.JmsExtension;
 import org.mule.extensions.jms.api.operation.JmsAck;
 import org.mule.extensions.jms.api.operation.JmsConsume;
 import org.mule.extensions.jms.api.operation.JmsPublish;
 import org.mule.extensions.jms.api.operation.JmsPublishConsume;
+import org.mule.extensions.jms.api.source.JmsSubscribe;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import javax.inject.Inject;
 import javax.jms.Message;
@@ -32,6 +37,7 @@ import javax.jms.Topic;
  */
 @Configuration(name = "config")
 @Operations({JmsConsume.class, JmsPublish.class, JmsPublishConsume.class, JmsAck.class})
+@Sources({JmsSubscribe.class})
 public class JmsConfig implements Initialisable {
 
   @Inject
@@ -50,12 +56,14 @@ public class JmsConfig implements Initialisable {
    */
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   private String encoding;
 
   /**
    * the content type of the {@link Message} {@code body}
    */
   @Parameter
+  @Expression(NOT_SUPPORTED)
   @Optional(defaultValue = "*/*")
   private String contentType;
 
@@ -65,6 +73,8 @@ public class JmsConfig implements Initialisable {
   @Parameter
   @Optional
   @NullSafe
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = "Consumer")
   private JmsConsumerConfig consumerConfig;
 
   /**
@@ -73,6 +83,8 @@ public class JmsConfig implements Initialisable {
   @Parameter
   @Optional
   @NullSafe
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = "Producer")
   private JmsProducerConfig producerConfig;
 
 
@@ -91,4 +103,5 @@ public class JmsConfig implements Initialisable {
   public JmsProducerConfig getProducerConfig() {
     return producerConfig;
   }
+
 }

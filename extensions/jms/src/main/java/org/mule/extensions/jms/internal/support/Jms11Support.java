@@ -6,9 +6,6 @@
  */
 package org.mule.extensions.jms.internal.support;
 
-import static java.lang.String.format;
-import static javax.jms.DeliveryMode.NON_PERSISTENT;
-import static javax.jms.DeliveryMode.PERSISTENT;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_1_1;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
 import org.mule.extensions.jms.api.connection.LookupJndiDestination;
@@ -20,10 +17,7 @@ import java.util.function.Function;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
@@ -76,19 +70,5 @@ public class Jms11Support extends Jms20Support {
     return session.createConsumer(destination, messageSelector, topicConsumer.isNoLocal());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority,
-                   long ttl, boolean topic)
-      throws JMSException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Sending message to [%s], persistent:[%s], with priority:[%s] and ttl:[%s]",
-                          dest instanceof Queue ? ((Queue) dest).getQueueName() : ((Topic) dest).getTopicName(),
-                          persistent, priority, ttl));
-    }
-    producer.send(dest, message, persistent ? PERSISTENT : NON_PERSISTENT, priority, ttl);
-  }
 
 }

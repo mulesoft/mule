@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.test.topic;
+package org.mule.extensions.jms.test.queue.integration;
 
 import static java.util.Arrays.asList;
+import static org.junit.runners.Parameterized.*;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -18,16 +19,16 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @RunnerDelegateTo(Parameterized.class)
 @Features("JMS Extension")
-@Stories("Generic Connection Provider Topic Bridge")
-public class JmsGenericTopicBridgeTestCase extends JmsAbstractTopicBridge {
+@Stories("Generic Connection Provider Queue Bridge")
+public class GenericProviderQueueBridgeTestCase extends JmsAbstractQueueBridge {
 
-  @Parameterized.Parameter(0)
+  @Parameter(0)
   public String configName;
 
-  @Parameterized.Parameter(1)
+  @Parameter(1)
   public String configFileName;
 
-  @Parameterized.Parameters(name = "{0}")
+  @Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
         // TODO MULE-10962: migrate jndi-destinations-always.xml with custom JndiDestinationResolver

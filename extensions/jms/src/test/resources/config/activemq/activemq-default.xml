@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
-    <jms:config name="config">
-        <jms:active-mq-connection/>
-    </jms:config>
+    <jmsn:config name="config">
+        <jmsn:active-mq-connection/>
+    </jmsn:config>
 
 </mule>

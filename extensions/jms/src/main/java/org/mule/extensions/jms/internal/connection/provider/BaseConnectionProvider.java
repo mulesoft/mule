@@ -47,6 +47,7 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
+import javax.jms.Session;
 
 import org.slf4j.Logger;
 
@@ -62,6 +63,9 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   @ParameterGroup(CONNECTION)
   private GenericConnectionParameters connectionParameters;
 
+  /**
+   * the strategy to be used for caching of {@link Session}s and {@link Connection}s
+   */
   @Parameter
   @Optional
   @NullSafe(defaultImplementingType = DefaultCachingStrategy.class)
@@ -134,6 +138,28 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   }
 
   @Override
+  public ConnectionValidationResult validate(JmsConnection jmsConnection) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Validating connection");
+    }
+
+    try {
+      // According to javax.jms.Connection#start javadoc:
+      // 'a call to start on a connection that has already been started is ignored'
+      // and exception is thrown 'if the JMS provider fails to start'
+      // thus, if the connection is valid, we should be able to re-start it even if the 'connect'
+      // method did it already
+      jmsConnection.get().start();
+      return success();
+    } catch (Exception e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Validation failed: ", e);
+      }
+      return failure("Invalid connection provided: Connection could not be started.", DISCONNECTED, e);
+    }
+  }
+
+  @Override
   public void disconnect(JmsConnection jmsConnection) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Disconnection Started");
@@ -143,6 +169,11 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
     disconnecting.set(true);
     doStop(jmsConnection);
     doClose(jmsConnection);
+  }
+
+  @Override
+  public void onReturn(JmsConnection connection) {
+    connection.releaseResources();
   }
 
   protected void doStop(JmsConnection jmsConnection) {
@@ -172,28 +203,6 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
       LOGGER.debug(format("Disposing [%s]", getClass().getName()));
     }
     disposeIfNeeded(jmsConnectionFactory, LOGGER);
-  }
-
-  @Override
-  public ConnectionValidationResult validate(JmsConnection jmsConnection) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Validating connection");
-    }
-
-    try {
-      // According to javax.jms.Connection#start javadoc:
-      // 'a call to start on a connection that has already been started is ignored'
-      // and exception is thrown 'if the JMS provider fails to start'
-      // thus, if the connection is valid, we should be able to re-start it even if the 'connect'
-      // method did it already
-      jmsConnection.get().start();
-      return success();
-    } catch (Exception e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Validation failed: ", e);
-      }
-      return failure("Invalid connection provided: Connection could not be started.", DISCONNECTED, e);
-    }
   }
 
   private void initialiseConnectionFactory() throws Exception {
@@ -236,7 +245,6 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   /**
    * A jmsConnectionFactory method to create various JmsSupport class versions.
    *
-   * @return JmsSupport instance
    * @see JmsSupport
    */
   protected void createJmsSupport() {
@@ -256,7 +264,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
     }
   }
 
-  protected Connection createConnection() throws JMSException {
+  private Connection createConnection() throws JMSException {
 
     String username = getConnectionParameters().getUsername();
     String password = getConnectionParameters().getPassword();

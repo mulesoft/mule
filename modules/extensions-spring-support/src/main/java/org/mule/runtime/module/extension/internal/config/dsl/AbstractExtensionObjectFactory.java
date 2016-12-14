@@ -9,15 +9,20 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.intersection;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -27,22 +32,32 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectTypeParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import com.google.common.base.Joiner;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -53,7 +68,8 @@ import java.util.Set;
  * @param <T> the generic type of the instances to be built
  * @since 4.0
  */
-public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotatedObjectFactory<T> {
+public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotatedObjectFactory<T>
+    implements ObjectTypeParametersResolver {
 
   protected final MuleContext muleContext;
   private Map<String, Object> parameters = new HashMap<>();
@@ -107,7 +123,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
       if (isNullSafe(p)) {
         MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
         ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
-        resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext);
+        resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext, this);
       }
 
       if (resolver != null) {
@@ -150,6 +166,59 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
     }
     return resolver;
   }
+
+  @Override
+  public void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
+    Class<?> objectClass = getType(objectType);
+    objectType.getFields().stream()
+        .filter(ExtensionMetadataTypeUtils::isParameterGroup)
+        .forEach(groupField -> {
+          if (!(groupField.getValue() instanceof ObjectType)) {
+            return;
+          }
+
+          final ObjectType groupType = (ObjectType) groupField.getValue();
+          final Field objectField = getField(objectClass, getLocalPart(groupField));
+          DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(groupField.getValue()));
+          builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
+
+          resolveParameters(groupType, groupBuilder);
+          resolveParameterGroups(groupType, groupBuilder);
+        });
+  }
+
+  @Override
+  public void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
+    final Class<?> objectClass = getType(objectType);
+    final boolean isParameterGroup = objectType.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
+    final Map<String, Object> parameters = getParameters();
+    objectType.getFields().forEach(field -> {
+      final String key = getLocalPart(field);
+
+      ValueResolver<?> valueResolver = null;
+      Field objectField = getField(objectClass, key);
+      if (parameters.containsKey(key)) {
+        valueResolver = toValueResolver(parameters.get(key));
+      } else if (!isParameterGroup) {
+        valueResolver = getDefaultValue(field)
+            .map(value -> new TypeSafeExpressionValueResolver<>(value, objectField.getType(), muleContext))
+            .orElse(null);
+      }
+
+      Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
+      if (nullSafe.isPresent()) {
+        ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
+        MetadataType type =
+            getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
+        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext, this);
+      }
+
+      if (valueResolver != null) {
+        builder.addPropertyResolver(objectField.getName(), valueResolver);
+      }
+    });
+  }
+
 
   private Map<String, Object> normalize(Map<String, Object> parameters) {
     Map<String, Object> normalized = new HashMap<>();
@@ -204,5 +273,12 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
                                       createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
                                                                  getComponentModelTypeName(model), getModelName(model),
                                                                  Joiner.on(", ").join(definedExclusiveParameters))));
+  }
+
+  private Field getField(Class<?> objectClass, String key) {
+    return getFieldByNameOrAlias(objectClass, key)
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
+                                                                      objectClass.getName(),
+                                                                      key)));
   }
 }

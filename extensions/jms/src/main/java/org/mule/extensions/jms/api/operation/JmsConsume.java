@@ -6,10 +6,10 @@
  */
 package org.mule.extensions.jms.api.operation;
 
-import static org.mule.extensions.jms.api.operation.JmsOperationCommons.evaluateMessageAck;
-import static org.mule.extensions.jms.api.operation.JmsOperationCommons.resolveConsumeMessage;
-import static org.mule.extensions.jms.api.operation.JmsOperationCommons.resolveMessageContentType;
-import static org.mule.extensions.jms.api.operation.JmsOperationCommons.resolveOverride;
+import static java.lang.String.format;
+import static org.mule.extensions.jms.internal.common.JmsOperationCommons.evaluateMessageAck;
+import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveMessageContentType;
+import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
@@ -20,6 +20,7 @@ import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
+import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
 import org.mule.extensions.jms.internal.support.JmsSupport;
@@ -48,7 +49,7 @@ public final class JmsConsume {
 
   private static final Logger LOGGER = getLogger(JmsConsume.class);
 
-  private JmsResultFactory resultFactory = new JmsResultFactory();
+  private final JmsResultFactory resultFactory = new JmsResultFactory();
 
   /**
    * Operation that allows the user to consume a single {@link Message} from a given {@link Destination}.
@@ -62,8 +63,8 @@ public final class JmsConsume {
    * @param selector        a custom JMS selector for filtering the messages
    * @param contentType     the {@link Message}'s content content type
    * @param encoding        the {@link Message}'s content encoding
-   * @param maximumWaitTime maximum time to wait for a message before timing out
-   * @param waitTimeUnit  Time unit to be used in the maximumWaitTime configurations
+   * @param maximumWait maximum time to wait for a message before timing out
+   * @param maximumWaitUnit  Time unit to be used in the maximumWaitTime configurations
    * @return a {@link Result} with the {@link Message} content as {@link Result#getOutput} and its properties
    * and headers as {@link Result#getAttributes}
    * @throws JmsExtensionException if an error occurs
@@ -72,15 +73,15 @@ public final class JmsConsume {
   public Result<Object, JmsAttributes> consume(@Connection JmsConnection connection, @UseConfig JmsConfig config,
                                                @XmlHints(
                                                    allowReferences = false) @Summary("The name of the Destination from where the Message should be consumed") String destination,
-                                               @Optional ConsumerType consumerType,
+                                               @Optional @Summary("The Type of the Consumer that should be used for the provided destination") ConsumerType consumerType,
                                                @Optional @Summary("The Session ACK mode to use when consuming a message") AckMode ackMode,
                                                @Optional @Summary("JMS selector to be used for filtering incoming messages") String selector,
                                                @Optional @Summary("The content type of the message body") String contentType,
                                                @Optional @Summary("The encoding of the message body") String encoding,
                                                @Optional(
-                                                   defaultValue = "10000") @Summary("Maximum time to wait for a message to arrive before timeout") Long maximumWaitTime,
+                                                   defaultValue = "10000") @Summary("Maximum time to wait for a message to arrive before timeout") Long maximumWait,
                                                @Optional(
-                                                   defaultValue = "MILLISECONDS") @Summary("Time unit to be used in the maximumWaitTime configuration") TimeUnit waitTimeUnit)
+                                                   defaultValue = "MILLISECONDS") @Summary("Time unit to be used in the maximumWaitTime configuration") TimeUnit maximumWaitUnit)
       throws JmsExtensionException {
 
     JmsConsumerConfig consumerConfig = config.getConsumerConfig();
@@ -99,30 +100,32 @@ public final class JmsConsume {
       JmsSession session = connection.createSession(ackMode, consumerType.isTopic());
       Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
 
-      MessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
+      JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Consuming Message");
       }
 
-      Message received = resolveConsumeMessage(consumer, waitTimeUnit.toMillis(maximumWaitTime));
-      if (received != null) {
-        evaluateMessageAck(connection, ackMode, session, received, LOGGER);
-      }
+      Message received = consumer.consume(maximumWaitUnit.toMillis(maximumWait));
 
-      // If no explicit content type was provided to the operation, fallback to the
-      // one communicated in the message properties. Finally if no property was set,
-      // use the default one provided by the config
-      contentType = resolveOverride(resolveMessageContentType(received, config.getContentType(), LOGGER),
-                                    contentType);
+      if (received != null) {
+        evaluateMessageAck(connection, ackMode, session, received);
+
+        // If no explicit content type was provided to the operation, fallback to the
+        // one communicated in the message properties. Finally if no property was set,
+        // use the default one provided by the config
+        contentType = resolveOverride(resolveMessageContentType(received, config.getContentType()),
+                                      contentType);
+      }
 
       return resultFactory.createResult(received, jmsSupport.getSpecification(),
                                         contentType, encoding,
                                         session.getAckId());
     } catch (Exception e) {
-      LOGGER.error("An error occurred while consuming a message: ", e);
-
-      throw new JmsExtensionException(createStaticMessage("An error occurred while consuming a message: "), e);
+      String msg = format("An error occurred while consuming a message from destination [%s] of type [%s]: ",
+                          destination, consumerType.isTopic() ? "TOPIC" : "QUEUE");
+      LOGGER.error(msg, e);
+      throw new JmsExtensionException(createStaticMessage(msg), e);
     }
   }
 

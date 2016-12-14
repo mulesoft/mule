@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -25,12 +26,13 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase.TestConfig;
@@ -71,6 +73,9 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   private SourceModel sourceModel;
 
   @Mock
+  private SourceCallbackModel sourceCallbackModel;
+
+  @Mock
   private ComponentModel componentModel;
 
   @Mock
@@ -97,9 +102,11 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(operationModel.getModelProperty(ConnectivityModelProperty.class))
-        .thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
+        .thenReturn(of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
     when(sourceModel.getModelProperty(ConnectivityModelProperty.class))
-        .thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
+        .thenReturn(of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
+    when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
+    when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
 
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
     factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet);

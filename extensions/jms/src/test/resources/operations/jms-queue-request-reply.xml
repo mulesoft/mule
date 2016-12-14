@@ -5,20 +5,16 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
-    <flow name="publisher">
-        <jmsn:publish config-ref="config" destination="#[dw:replyToDestination]"/>
-    </flow>
-
-    <flow name="request-reply">
-        <jmsn:publish-consume config-ref="config" destination="#[dw:requestDestination]" maximumWaitTime="1000">
+    <flow name="request-reply-explicit-destination">
+        <jmsn:publish-consume config-ref="config" destination="#[dw:destination]">
             <jmsn:message-builder>
-                <jmsn:reply-to destination="#[dw:replyToDestination]"/>
+                <jmsn:reply-to destination="#[dw:replyToDestination]" destinationType="QUEUE"/>
             </jmsn:message-builder>
         </jmsn:publish-consume>
     </flow>
 
-    <flow name="request-listener">
-        <jmsn:consume config-ref="config" destination="#[dw:requestDestination]" maximumWaitTime="1000"/>
+    <flow name="request-reply-temp-destination">
+        <jmsn:publish-consume config-ref="config" destination="#[dw:destination]"/>
     </flow>
 
 </mule>

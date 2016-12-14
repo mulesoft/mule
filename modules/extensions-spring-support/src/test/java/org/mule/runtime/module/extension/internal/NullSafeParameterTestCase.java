@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.vegan.extension.BananaConfig;
@@ -36,6 +37,9 @@ public class NullSafeParameterTestCase extends ExtensionFunctionalTestCase {
     VeganPolicy policy = (VeganPolicy) flowRunner("policy").run().getMessage().getPayload().getValue();
     assertThat(policy, is(notNullValue()));
     assertThat(policy.getMeetAllowed(), is(false));
+    assertThat(policy.getIngredients(), is(notNullValue()));
+    assertThat(policy.getIngredients().getSaltMiligrams(), is(0));
+    assertThat(policy.getIngredients().getSaltReplacementName(), is(nullValue()));
   }
 
   @Test

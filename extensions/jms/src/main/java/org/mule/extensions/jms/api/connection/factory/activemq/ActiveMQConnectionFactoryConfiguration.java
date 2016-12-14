@@ -24,7 +24,7 @@ import org.apache.activemq.RedeliveryPolicy;
  */
 public final class ActiveMQConnectionFactoryConfiguration {
 
-  private static final String DEFAULT_BROKER_URL = "vm://localhost?broker.useJmx=false";
+  private static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
 
   /**
    * The address of the broker to connect

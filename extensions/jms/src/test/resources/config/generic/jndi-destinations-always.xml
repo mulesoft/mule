@@ -15,7 +15,12 @@
                                              lookupDestination="ALWAYS">
                     <jmsn:name-resolver-builder
                             jndiInitialContextFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                            jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+                            jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false">
+                        <jmsn:provider-properties>
+                            <jmsn:provider-property key="queue.jndi-queue-in" value="in.queue"/>
+                            <jmsn:provider-property key="topic.jndi-topic-in" value="in.topic"/>
+                        </jmsn:provider-properties>
+                    </jmsn:name-resolver-builder>
                 </jmsn:jndi-connection-factory>
             </jmsn:connection-factory>
         </jmsn:generic-connection>

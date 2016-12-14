@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayou
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
@@ -40,6 +41,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Lo
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -304,7 +306,7 @@ final class ObjectTypeSchemaDelegate {
 
     List<TopLevelElement> childElements = new LinkedList<>();
     fields.forEach(field -> {
-      if (isParameterGroupAtPojoLevel(field)) {
+      if (isParameterGroup(field)) {
         ((ObjectType) field.getValue()).getFields().forEach(
                                                             subField -> declareObjectField(subField, extension, childElements));
 
@@ -325,10 +327,6 @@ final class ObjectTypeSchemaDelegate {
     }
 
     return complexType;
-  }
-
-  private boolean isParameterGroupAtPojoLevel(ObjectFieldType field) {
-    return field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
   }
 
   private void declareObjectField(ObjectFieldType field, ExtensionType extension, List<TopLevelElement> all) {

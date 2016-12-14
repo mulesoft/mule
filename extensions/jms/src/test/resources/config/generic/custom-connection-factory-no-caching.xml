@@ -10,7 +10,9 @@
     <spring:bean name="customConnectionFactory" class="org.mule.extensions.jms.test.infra.JmsTestConnectionFactory"/>
 
     <jmsn:config name="config">
-        <jmsn:generic-connection connectionFactory="customConnectionFactory">
+        <jmsn:generic-connection connectionFactory="customConnectionFactory"
+                                 username="user" password="pass" clientId="myclient"
+                                 specification="JMS_1_1" disableValidation="false">
             <jmsn:caching-strategy>
                 <jmsn:no-caching/>
             </jmsn:caching-strategy>

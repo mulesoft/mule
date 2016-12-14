@@ -11,10 +11,12 @@ import static org.mule.metadata.internal.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeAliasAnnotation;
 
 import java.lang.reflect.Modifier;
@@ -87,5 +89,9 @@ public final class ExtensionMetadataTypeUtils {
     });
 
     return basic.get();
+  }
+
+  public static boolean isParameterGroup(ObjectFieldType type) {
+    return type.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
   }
 }

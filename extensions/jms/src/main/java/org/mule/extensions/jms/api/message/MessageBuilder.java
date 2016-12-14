@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.operation;
+package org.mule.extensions.jms.api.message;
 
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.extensions.jms.api.operation.JmsOperationCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
 import static org.mule.extensions.jms.internal.message.JMSXDefinedPropertiesNames.JMSX_NAMES;
 import static org.mule.extensions.jms.internal.message.JmsMessageUtils.encodeKey;
 import static org.mule.extensions.jms.internal.message.JmsMessageUtils.toMessage;
@@ -18,7 +18,6 @@ import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
 import org.mule.extensions.jms.api.destination.JmsDestination;
 import org.mule.extensions.jms.api.exception.DestinationNotFoundException;
-import org.mule.extensions.jms.api.message.JmsxProperties;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -62,7 +61,6 @@ public class MessageBuilder {
    */
   @Parameter
   @Optional
-  @XmlHints(allowReferences = false)
   private String jmsType;
 
   /**
@@ -70,7 +68,6 @@ public class MessageBuilder {
    */
   @Parameter
   @Optional
-  @XmlHints(allowReferences = false)
   private String correlationId;
 
   /**
@@ -104,13 +101,22 @@ public class MessageBuilder {
   private String encoding;
 
   /**
-   * the JMSReplyTo header information of the {@link Destination} where
-   * {@code this} {@link Message} should be replied to
+     * the JMSReplyTo header information of the {@link Destination} where
+     * {@code this} {@link Message} should be replied to
    */
   @Parameter
   @Optional
   @Summary("The destination where a reply to the message should be sent")
   private JmsDestination replyTo;
+
+  /**
+   * the custom user properties that should be set to this {@link Message}
+   */
+  @Content
+  @Parameter
+  @Optional
+  @NullSafe
+  private Map<String, Object> properties;
 
   /**
    * the JMSX properties that should be set to this {@link Message}
@@ -121,15 +127,6 @@ public class MessageBuilder {
   private JmsxProperties jmsxProperties;
 
   /**
-   * the custom user properties that should be set to this {@link Message}
-   */
-  @Parameter
-  @Optional
-  @NullSafe
-  @Content
-  private Map<String, Object> properties;
-
-  /**
    * Creates a {@link Message} based on the provided configurations
    * @param jmsSupport the {@link JmsSupport} used to create the JMSReplyTo {@link Destination}
    * @param session the current {@link Session}
@@ -137,7 +134,7 @@ public class MessageBuilder {
    * @return the {@link Message} created by the user
    * @throws JMSException if an error occurs
    */
-  Message build(JmsSupport jmsSupport, Session session, JmsConfig config)
+  public Message build(JmsSupport jmsSupport, Session session, JmsConfig config)
       throws JMSException {
 
     Message message = toMessage(body, session);
@@ -161,9 +158,6 @@ public class MessageBuilder {
 
   private void setJmsReplyToHeader(JmsSupport jmsSupport, Session session, Message message, JmsDestination replyDestination) {
     try {
-
-      // TODO NullSafe should not propagate default objects unless inner NullSafe is declared
-
       if (replyDestination != null &&
           !isBlank(replyDestination.getDestination())) {
         Destination destination = jmsSupport.createDestination(session, replyDestination.getDestination(),
