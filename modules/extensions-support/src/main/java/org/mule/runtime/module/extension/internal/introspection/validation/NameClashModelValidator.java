@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
@@ -51,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -115,6 +117,8 @@ public final class NameClashModelValidator implements ModelValidator {
 
         @Override
         public void onSource(HasSourceModels owner, SourceModel model) {
+          validateCallbackNames(model.getSuccessCallback(), model);
+          validateCallbackNames(model.getErrorCallback(), model);
           defaultValidation(model);
         }
 
@@ -131,6 +135,11 @@ public final class NameClashModelValidator implements ModelValidator {
 
         private void registerNamedObject(ParameterizedModel named) {
           namedObjects.add(new DescribedReference<>(named, dslSyntaxResolver.resolve(named).getElementName()));
+        }
+
+        private void validateCallbackNames(Optional<SourceCallbackModel> sourceCallback, SourceModel model) {
+          sourceCallback.ifPresent(cb -> validateParameterNames(cb.getAllParameterModels(), getComponentModelTypeName(model),
+                                                                model.getName()));
         }
       }.walk(extensionModel);
 
@@ -159,12 +168,16 @@ public final class NameClashModelValidator implements ModelValidator {
     }
 
     private void validateParameterNames(ParameterizedModel model) {
-      Set<String> repeatedParameters = collectRepeatedNames(model.getAllParameterModels());
+      validateParameterNames(model.getAllParameterModels(), getComponentModelTypeName(model), model.getName());
+    }
+
+    private void validateParameterNames(List<ParameterModel> parameterizedModel, String modelTypeName, String modelName) {
+      Set<String> repeatedParameters = collectRepeatedNames(parameterizedModel);
       if (!repeatedParameters.isEmpty()) {
         throw new IllegalModelDefinitionException(format("Extension '%s' defines the %s '%s' which has parameters "
             + "with repeated names. Offending parameters are: [%s]",
-                                                         extensionModel.getName(), model.getClass().getSimpleName(),
-                                                         model.getName(), Joiner.on(",").join(repeatedParameters)));
+                                                         extensionModel.getName(), modelTypeName,
+                                                         modelName, Joiner.on(",").join(repeatedParameters)));
       }
     }
 
