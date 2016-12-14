@@ -37,7 +37,11 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("On Error Continue")
 public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   public static final int TIMEOUT = 5000;

@@ -15,7 +15,11 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Error Types")
 public class SingleErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTestCase {
 
   @Test

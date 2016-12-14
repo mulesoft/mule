@@ -17,7 +17,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Error Types")
 public class ErrorTypeBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String NAMESPACE = "CUSTOM";

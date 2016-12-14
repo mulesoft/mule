@@ -44,7 +44,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("On Error Continue")
 @RunWith(MockitoJUnitRunner.class)
 public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 

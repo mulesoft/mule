@@ -15,6 +15,8 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_I
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
@@ -27,6 +29,8 @@ public abstract class Errors {
   public static final String CORE_NAMESPACE_NAME = CORE_NAMESPACE.toUpperCase();
 
   public static final class Identifiers {
+
+    // HANDLEABLE
 
     /**
      * Indicates that a problem occurred when transforming a value
@@ -65,29 +69,35 @@ public abstract class Errors {
     public static final String SECURITY_ERROR_IDENTIFIER = "SECURITY";
 
     /**
-     * Indicates a problem of overloading occ urredand the execution was rejected
+     * Wild card that matches with any error
      */
-    public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
+    public static final String ANY_IDENTIFIER = "ANY";
+
+    // UNHANDLEABLE
 
     /**
-     * Indicates that an unknown and unexpected error occurred
+     * Indicates that an unknown and unexpected error occurred. Cannot be handled directly, only through ANY.
      */
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
 
     /**
-     * Indicates that a severe and un handleable error occurred
+     * Indicates that a severe error occurred. Cannot be handled. Other unhandleable errors should go under it.
      */
     public static final String CRITICAL_IDENTIFIER = "CRITICAL";
 
     /**
-     * Wild card that matches with any error
+     * Indicates a problem of overloading occurred and the execution was rejected. Cannot be handled.
      */
-    public static final String ANY_IDENTIFIER = "ANY";
+    public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
 
   }
 
   public static final class ComponentIdentifiers {
 
+    public static final ComponentIdentifier ANY =
+        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ANY_IDENTIFIER).build();
+    public static final ComponentIdentifier CRITICAL =
+        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(CRITICAL_IDENTIFIER).build();
     public static final ComponentIdentifier TRANSFORMATION =
         new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier EXPRESSION =

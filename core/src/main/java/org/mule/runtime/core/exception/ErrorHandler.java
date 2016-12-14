@@ -8,7 +8,7 @@ package org.mule.runtime.core.exception;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.core.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
