@@ -8,12 +8,15 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -25,12 +28,17 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -39,6 +47,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,6 +67,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static final String OPERATION_NAME = "operation";
   private static final String TOP_LEVEL_OPERATION_PARAM_NAME = "topLevelOperationParam";
   private static final String CONFIG_NAME = "config";
+  private static final String SOURCE_NAME = "source";
   private static final String CONNECTION_PROVIDER_NAME = "connectionProvider";
   private static final String SIMPLE_PARAM_NAME = "simple";
 
@@ -78,6 +88,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Mock
   private ConnectionProviderModel connectionProviderModel;
+
+  @Mock
+  private SourceModel sourceModel;
 
   private XmlDslModel xmlDslModel = new XmlDslModel();
   private ParameterModel simpleConfigParam;
@@ -108,6 +121,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getConfigurationModels()).thenReturn(singletonList(configurationModel));
     when(extensionModel.getOperationModels()).thenReturn(singletonList(operationModel));
     when(extensionModel.getConnectionProviders()).thenReturn(singletonList(connectionProviderModel));
+    when(extensionModel.getSourceModels()).thenReturn(singletonList(sourceModel));
     when(extensionModel.getXmlDslModel()).thenReturn(xmlDslModel);
 
     simpleConfigParam = getParameter(SIMPLE_PARAM_NAME, String.class);
@@ -132,6 +146,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(connectionProviderModel.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProviderModel.getAllParameterModels())
         .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam));
+
+    when(sourceModel.getName()).thenReturn(SOURCE_NAME);
+    when(sourceModel.getModelProperty(any())).thenReturn(empty());
+    when(sourceModel.getErrorCallback()).thenReturn(Optional.empty());
+    when(sourceModel.getSuccessCallback()).thenReturn(Optional.empty());
   }
 
   private void mockModelProperties(EnrichableModel model) {
@@ -277,6 +296,46 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     when(connectionProviderModel.getAllParameterModels())
         .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
+    validate();
+  }
+
+  @Test
+  public void sourceWithRepeatedParameterNameWithinCallback() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
+    SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
+    when(sourceCallbackModel.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam, offending));
+    when(sourceModel.getErrorCallback()).thenReturn(Optional.of(sourceCallbackModel));
+    validate();
+  }
+
+  @Test
+  public void sourceWithRepeatedParameterNameAmongCallbackAndSource() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
+    SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
+    when(sourceCallbackModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam));
+
+    ParameterGroupModel group = mock(ParameterGroupModel.class);
+    when(group.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(group.getParameterModels()).thenReturn(asList(offending));
+
+    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
+                                                       Optional.of(sourceCallbackModel), Optional.empty(), null, emptySet());
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
+    validate();
+  }
+
+  @Test
+  public void sourceWithRepeatedParameterNameAmongCallbacks() {
+    SourceCallbackModel errorCallBack = mock(SourceCallbackModel.class);
+    when(errorCallBack.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam));
+    when(sourceModel.getErrorCallback()).thenReturn(Optional.of(errorCallBack));
+
+    SourceCallbackModel successCallback = mock(SourceCallbackModel.class);
+    when(successCallback.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam));
+    when(sourceModel.getSuccessCallback()).thenReturn(Optional.of(successCallback));
     validate();
   }
 

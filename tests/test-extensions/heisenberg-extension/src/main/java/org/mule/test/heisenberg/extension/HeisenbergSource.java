@@ -70,12 +70,12 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @OnSuccess
-  public void onResponse(@Optional(defaultValue = "#[payload]") Long payment) {
+  public void onResponse(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter) {
     heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
   @OnError
-  public void onError(Error error) {
+  public void onError(Error error, @Optional String sameNameParameter) {
     heisenberg.setMoney(BigDecimal.valueOf(-1));
   }
 

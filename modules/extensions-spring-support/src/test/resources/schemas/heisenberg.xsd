@@ -538,6 +538,7 @@
                 <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
