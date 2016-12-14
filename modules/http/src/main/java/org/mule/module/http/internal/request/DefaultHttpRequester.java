@@ -6,8 +6,11 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -29,8 +32,12 @@ import org.mule.util.AttributeEvaluator;
 
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DefaultHttpRequester implements MessageProcessor, Initialisable, MuleContextAware
@@ -39,6 +46,10 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
     public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
     public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
+    private static final Logger logger = LoggerFactory.getLogger(DefaultHttpRequester.class);
+
+    private static final String REMOTELY_CLOSED = "Remotely closed";
+    private static final int DEFAULT_RETRY_ATTEMPTS = 3;
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -73,7 +84,7 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
     {
         if (requestConfig == null)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("The config-ref attribute is required in the HTTP request element"), this);
+            throw new InitialisationException(createStaticMessage("The config-ref attribute is required in the HTTP request element"), this);
         }
         if (requestBuilder == null)
         {
@@ -91,10 +102,10 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         initializeAttributeEvaluators(host, port, method, path, basePath, url, followRedirects,
                                       requestStreamingMode, sendBodyMode, parseResponse, responseTimeout);
 
-        notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false );
+        notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
     }
 
-    private void setEmptyAttributesFromConfig()  throws InitialisationException
+    private void setEmptyAttributesFromConfig() throws InitialisationException
     {
         if (host.getRawValue() == null)
         {
@@ -143,22 +154,22 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         {
             if (host.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("No host defined. Set the host attribute " +
-                                                                                   "either in the request or request-config elements"), this);
+                throw new InitialisationException(createStaticMessage("No host defined. Set the host attribute " +
+                                                                      "either in the request or request-config elements"), this);
             }
             if (port.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("No port defined. Set the host attribute " +
-                                                                                   "either in the request or request-config elements"), this);
+                throw new InitialisationException(createStaticMessage("No port defined. Set the host attribute " +
+                                                                      "either in the request or request-config elements"), this);
             }
             if (path.getRawValue() == null)
             {
-                throw new InitialisationException(CoreMessages.createStaticMessage("The path attribute is required in the HTTP request element"), this);
+                throw new InitialisationException(createStaticMessage("The path attribute is required in the HTTP request element"), this);
             }
         }
     }
 
-    private void initializeAttributeEvaluators(AttributeEvaluator ... attributeEvaluators)
+    private void initializeAttributeEvaluators(AttributeEvaluator... attributeEvaluators)
     {
         for (AttributeEvaluator attributeEvaluator : attributeEvaluators)
         {
@@ -172,10 +183,21 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
     @Override
     public MuleEvent process(final MuleEvent muleEvent) throws MuleException
     {
-        return innerProcess(muleEvent, true);
+        return innerProcess(muleEvent, DEFAULT_RETRY_ATTEMPTS);
     }
 
-    private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException
+    private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount)
+    {
+        boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
+        if (shouldRetry)
+        {
+            logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+                        + "`. Request will be retried " + retryCount + " time(s) before failing.");
+        }
+        return shouldRetry;
+    }
+
+    private MuleEvent innerProcess(MuleEvent muleEvent, int retryCount) throws MuleException
     {
         HttpRequestBuilder builder = muleEventToHttpRequest.create(muleEvent, method.resolveStringValue(muleEvent), resolveURI(muleEvent));
 
@@ -198,16 +220,25 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e);
+            // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
+            // a "IOException: Remotely Closed"
+            if (shouldRetryRemotelyClosed(e, retryCount))
+            {
+                return innerProcess(muleEvent, retryCount - 1);
+            }
+            else
+            {
+                throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e, this);
+            }
         }
 
         httpResponseToMuleEvent.convert(muleEvent, response);
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
-        if (checkRetry && authentication != null && authentication.shouldRetry(muleEvent))
+        if (retryCount > 0 && authentication != null && authentication.shouldRetry(muleEvent))
         {
             consumePayload(muleEvent);
-            muleEvent = innerProcess(muleEvent, false);
+            muleEvent = innerProcess(muleEvent, 0);
         }
         else
         {
