@@ -215,10 +215,10 @@ public class Jms102bSupport extends Jms11Support {
    * {@inheritDoc}
    */
   @Override
-  public void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority,
-                   long ttl, boolean topic)
+  public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic)
       throws JMSException {
     if (LOGGER.isDebugEnabled()) {
+      Destination dest = producer.getDestination();
       LOGGER.debug(format("Sending message to [%s], persistent:[%s], with priority:[%s] and ttl:[%s]",
                           dest instanceof Queue ? ((Queue) dest).getQueueName() : ((Topic) dest).getTopicName(),
                           persistent, priority, ttl));
@@ -227,10 +227,10 @@ public class Jms102bSupport extends Jms11Support {
     int deliveryMode = persistent ? PERSISTENT : NON_PERSISTENT;
 
     if (topic && producer instanceof TopicPublisher) {
-      ((TopicPublisher) producer).publish((Topic) dest, message, deliveryMode, priority, ttl);
+      ((TopicPublisher) producer).publish(message, deliveryMode, priority, ttl);
 
     } else if (producer instanceof QueueSender) {
-      ((QueueSender) producer).send((Queue) dest, message, deliveryMode, priority, ttl);
+      ((QueueSender) producer).send(message, deliveryMode, priority, ttl);
 
     } else {
       throw new IllegalArgumentException("Producer and domain type do not match");

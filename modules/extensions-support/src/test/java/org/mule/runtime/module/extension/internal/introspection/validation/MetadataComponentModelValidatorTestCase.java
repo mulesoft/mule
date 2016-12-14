@@ -29,6 +29,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -90,6 +91,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Mock
   private SourceModel sourceModel;
+
+  @Mock
+  private SourceCallbackModel sourceCallbackModel;
 
   private BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
   private DictionaryType dictionaryType;
@@ -162,6 +166,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
         .thenReturn(new ImmutableOutputModel(StringUtils.EMPTY, create(JAVA).voidType().build(), false, emptySet()));
 
     when(sourceModel.getName()).thenReturn("source");
+    when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
+    when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     mockMetadataResolverFactory(sourceModel, null);
 
     MetadataKeyIdModelProperty keyIdModelProperty =

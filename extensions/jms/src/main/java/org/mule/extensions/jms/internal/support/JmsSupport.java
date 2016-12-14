@@ -116,7 +116,6 @@ public interface JmsSupport {
    *
    * @param producer the {@link MessageProducer} to use for sending the message
    * @param message the {@link Message} to send
-   * @param destination the {@link Destination} where the message should be sent
    * @param persistent {@code true} if {@link DeliveryMode#PERSISTENT} should be used
    * @param priority the {@link Message#getJMSPriority} to be set on send
    * @param ttl the message's lifetime (in milliseconds)
@@ -124,7 +123,7 @@ public interface JmsSupport {
    *              as {@link TopicPublisher} or a {@link QueueSender}
    * @throws JMSException if an error occurs during messsage sending
    */
-  void send(MessageProducer producer, Message message, Destination destination, boolean persistent, int priority,
+  void send(MessageProducer producer, Message message, boolean persistent, int priority,
             long ttl, boolean topic)
       throws JMSException;
 

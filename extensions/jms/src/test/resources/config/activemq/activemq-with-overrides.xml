@@ -10,8 +10,6 @@
             <jmsn:factory-configuration brokerUrl="vm://localhost?broker.useJmx=false"
                                        maxRedelivery="3" initialRedeliveryDelay="10" redeliveryDelay="20"/>
         </jmsn:active-mq-connection>
-        <jmsn:consumer-config ackMode="DUPS_OK" maxRedelivery="5"/>
-        <jmsn:producer-config disableMessageId="true" disableMessageTimestamp="true" priority="6"/>
     </jmsn:config>
 
 </mule>

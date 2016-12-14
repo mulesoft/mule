@@ -7,10 +7,15 @@
 package org.mule.extensions.jms.api.connection;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Optional;
 
+import javax.jms.JMSException;
 import javax.jms.Session;
+
+import org.slf4j.Logger;
 
 /**
  * Wrapper element for a JMS {@link Session} that relates the
@@ -18,12 +23,15 @@ import javax.jms.Session;
  *
  * @since 4.0
  */
-public final class JmsSession {
+public final class JmsSession implements AutoCloseable {
+
+  private static final Logger LOGGER = getLogger(JmsSession.class);
 
   private final Session session;
   private String ackId;
 
   public JmsSession(Session session) {
+    checkArgument(session != null, "A non null Session is required to use as delegate");
     this.session = session;
   }
 
@@ -44,5 +52,13 @@ public final class JmsSession {
    */
   public Optional<String> getAckId() {
     return ofNullable(ackId);
+  }
+
+  @Override
+  public void close() throws JMSException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Closing session " + session);
+    }
+    session.close();
   }
 }

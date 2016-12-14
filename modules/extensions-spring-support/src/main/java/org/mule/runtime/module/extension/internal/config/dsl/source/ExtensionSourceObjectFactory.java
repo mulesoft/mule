@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -96,7 +97,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private ResolverSet getCallbackParameters(Optional<SourceCallbackModel> callbackModel) throws ConfigurationException {
     return getParametersAsResolverSet(sourceModel,
-                                      callbackModel.map(callback -> callback.getAllParameterModels()).orElse(emptyList()));
+                                      callbackModel.map(ParameterizedModel::getAllParameterModels).orElse(emptyList()));
   }
 
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,

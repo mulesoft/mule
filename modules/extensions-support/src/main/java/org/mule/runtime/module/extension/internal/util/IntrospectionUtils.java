@@ -56,6 +56,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.core.util.ClassUtils;
@@ -113,6 +114,7 @@ public final class IntrospectionUtils {
   private static final String OPERATION = "operation";
   private static final String CONNECTION_PROVIDER = "connection provider";
   private static final String SOURCE = "source";
+  private static final String SOURCE_CALLBACK = "source callback";
 
   private IntrospectionUtils() {}
 
@@ -685,6 +687,8 @@ public final class IntrospectionUtils {
       return CONNECTION_PROVIDER;
     } else if (component instanceof SourceModel) {
       return SOURCE;
+    } else if (component instanceof SourceCallbackModel) {
+      return SOURCE_CALLBACK;
     }
 
     throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",

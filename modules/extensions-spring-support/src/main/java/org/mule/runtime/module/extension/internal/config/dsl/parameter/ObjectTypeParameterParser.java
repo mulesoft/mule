@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -28,7 +29,6 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
@@ -187,9 +187,5 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         return false;
       }
     });
-  }
-
-  private boolean isParameterGroup(ObjectFieldType type) {
-    return type.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
   }
 }

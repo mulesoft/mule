@@ -8,6 +8,7 @@ package org.mule.test.vegan.extension;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 public class VeganPolicy {
 
@@ -15,7 +16,14 @@ public class VeganPolicy {
   @Optional(defaultValue = "false")
   private Boolean meetAllowed;
 
+  @ParameterGroup("Ingredients")
+  private VeganIngredients ingredients;
+
   public Boolean getMeetAllowed() {
     return meetAllowed;
+  }
+
+  public VeganIngredients getIngredients() {
+    return ingredients;
   }
 }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <flow name="publisher">
+        <jmsn:publish config-ref="config"
+                      destination="#[dw:destination]"
+                      deliveryDelay="#[dw:deliveryDelay]"
+                      destinationType="#[dw:destinationType]"
+                      disableMessageId="#[dw:disableMessageId]"
+                      disableMessageTimestamp="#[dw:disableMessageTimestamp]"
+                      deliveryDelayUnit="#[dw:deliveryDelayUnit]"
+                      persistentDelivery="#[dw:persistentDelivery]"
+                      priority="#[dw:priority]"
+                      timeToLive="#[dw:timeToLive]"
+                      timeToLiveUnit="#[dw:timeToLiveUnit]">
+            <jmsn:message-builder contentType="#[dw:contentType]"
+                                  correlationId="#[dw:correlationId]"
+                                  encoding="#[dw:encoding]"
+                                  jmsType="#[dw:jmsType]"
+                                  sendContentType="#[dw:sendContentType]"
+                                  sendEncoding="#[dw:sendEncoding]">
+                <jmsn:body>"#[dw:destination]"</jmsn:body>
+                <jmsn:reply-to destination="#[dw:replyDestination]" destinationType="#[dw:replyDestinationType]"/>
+                <jmsn:properties>
+                    #[dw:properties]
+                </jmsn:properties>
+            </jmsn:message-builder>
+        </jmsn:publish>
+    </flow>
+
+    <flow name="consumer">
+        <jmsn:consume config-ref="config"
+                      destination="#[dw:destination]"
+                      maximumWait="#[dw:maximumWait]"
+                      waitTimeUnit="#[dw:waitTimeUnit]"
+                      encoding="#[dw:encoding]"
+                      ackMode="#[dw:ackMode]"
+                      consumerType="#[dw:consumerType]"
+                      contentType="#[dw:contentType]"
+                      selector="#[dw:selector]"/>
+    </flow>
+
+</mule>

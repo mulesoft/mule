@@ -14,6 +14,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -31,8 +32,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -66,7 +69,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate,
                                         MetadataType type,
-                                        MuleContext muleContext) {
+                                        MuleContext muleContext,
+                                        ObjectTypeParametersResolver parametersResolver) {
     checkArgument(delegate != null, "delegate cannot be null");
 
     ValueHolder<ValueResolver> value = new ValueHolder<>();
@@ -77,8 +81,10 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
         Class<?> clazz = getType(objectType);
 
         String requiredFields = objectType.getFields().stream()
-            .filter(ObjectFieldType::isRequired).map(MetadataTypeUtils::getLocalPart)
+            .filter(f -> f.isRequired() && !isParameterGroup(f))
+            .map(MetadataTypeUtils::getLocalPart)
             .collect(joining(", "));
+
         if (!isBlank(requiredFields)) {
           throw new IllegalParameterModelDefinitionException(
                                                              format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields: [%s]",
@@ -97,6 +103,15 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
           Optional<String> defaultValue = getDefaultValue(objectField);
           if (defaultValue.isPresent()) {
             resolver = new TypeSafeExpressionValueResolver(defaultValue.get(), field.getType(), muleContext);
+
+          } else if (isParameterGroup(objectField)) {
+            DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(objectField.getValue()));
+            resolverSet.add(field.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
+
+            ObjectType childGroup = (ObjectType) objectField.getValue();
+            parametersResolver.resolveParameters(childGroup, groupBuilder);
+            parametersResolver.resolveParameterGroups(childGroup, groupBuilder);
+
           } else {
             NullSafe nullSafe = field.getAnnotation(NullSafe.class);
             if (nullSafe != null) {
@@ -109,7 +124,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
                     .build();
               }
 
-              resolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType, muleContext);
+              resolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType,
+                                                         muleContext, parametersResolver);
             }
           }
 
@@ -167,4 +183,5 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
   public boolean isDynamic() {
     return delegate.isDynamic();
   }
+
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -42,6 +44,9 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
   private SourceModel sourceModel;
 
   @Mock
+  private SourceCallbackModel sourceCallbackModel;
+
+  @Mock
   private ParameterModel invalidParameterModel;
 
   @Mock
@@ -58,6 +63,8 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
     when(sourceModel.getOutput()).thenReturn(outputModel);
     when(outputModel.getType()).thenReturn(toMetadataType(void.class));
     when(sourceModel.getName()).thenReturn("dummySource");
+    when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
+    when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)

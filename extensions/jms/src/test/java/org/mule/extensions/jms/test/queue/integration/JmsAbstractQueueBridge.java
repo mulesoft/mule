@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.test.queue;
+package org.mule.extensions.jms.test.queue.integration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.JmsMessageProperties;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
@@ -55,9 +56,7 @@ public abstract class JmsAbstractQueueBridge extends JmsAbstractTestCase {
   }
 
   protected void assertExpectedMessage(InternalMessage message) {
-    assertThat(message, not(nullValue()));
-    assertThat(message.getPayload(), not(nullValue()));
-    assertThat(message.getPayload().getValue(), is(equalTo(BRIDGED_PREFIX + FIRST_MESSAGE)));
+    assertThat(message, hasPayload(equalTo(BRIDGED_PREFIX + FIRST_MESSAGE)));
     assertThat(message.getAttributes(), not(nullValue()));
 
     JmsMessageProperties properties = ((JmsAttributes) message.getAttributes()).getProperties();
@@ -68,7 +67,8 @@ public abstract class JmsAbstractQueueBridge extends JmsAbstractTestCase {
   protected InternalMessage receiveMessageFromBridgeTarget() throws Exception {
     return flowRunner(BRIDGE_RECEIVER_FLOW)
         .withVariable(FINAL_DESTINATION_VAR, FINAL_DESTINATION)
-        .run().getMessage();
+        .run()
+        .getMessage();
   }
 
 
@@ -85,6 +85,7 @@ public abstract class JmsAbstractQueueBridge extends JmsAbstractTestCase {
         .withVariable(INITIAL_DESTINATION_VAR, INITIAL_DESTINATION)
         .withVariable(PROPERTY_KEY_VAR, PROPERTY_KEY_VALUE)
         .withVariable(PROPERTY_VALUE_VAR, PROPERTY_VALUE_VALUE)
-        .withPayload(FIRST_MESSAGE).run();
+        .withPayload(FIRST_MESSAGE)
+        .run();
   }
 }

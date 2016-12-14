@@ -47,7 +47,6 @@ public class JmsResultFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(JmsResultFactory.class);
 
   /**
-   *
    * Creates a {@link Result} from a JMS {@link Message} based on the current configurations
    *
    * @param jmsMessage the JMS {@link Message} to convert
@@ -68,7 +67,7 @@ public class JmsResultFactory {
         LOGGER.debug("Resulting JMS Message was [null], creating an empty result");
       }
 
-      return Result.<Object, JmsAttributes>builder().output(null).build();
+      return createEmptyResult();
     }
 
     if (LOGGER.isDebugEnabled()) {
@@ -84,6 +83,15 @@ public class JmsResultFactory {
         .output(payload).mediaType(getMediaType(contentType, encoding))
         .attributes(createJmsAttributes(jmsHeaders, jmsProperties, ackId))
         .build();
+  }
+
+  /**
+   * Creates an empty {@link Result}
+   *
+   * @return an Operation {@link Result} containing the a {@code null} payload and no attributes
+   */
+  public Result<Object, JmsAttributes> createEmptyResult() {
+    return Result.<Object, JmsAttributes>builder().output(null).build();
   }
 
   private JmsAttributes createJmsAttributes(JmsHeaders jmsHeaders, JmsMessageProperties jmsProperties,

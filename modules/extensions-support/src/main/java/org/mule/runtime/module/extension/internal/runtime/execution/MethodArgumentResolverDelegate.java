@@ -122,9 +122,15 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     Object[] parameterValues = new Object[argumentResolvers.length];
     int i = 0;
-    for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
-      parameterValues[i++] = argumentResolver.resolve(executionContext);
+    try {
+      for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
+        parameterValues[i++] = argumentResolver.resolve(executionContext);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
     }
+
 
     return resolvePrimitiveTypes(parameterTypes, parameterValues);
   }

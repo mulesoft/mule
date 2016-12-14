@@ -10,6 +10,8 @@ import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 import static javax.jms.Session.CLIENT_ACKNOWLEDGE;
 import static javax.jms.Session.DUPS_OK_ACKNOWLEDGE;
 import static javax.jms.Session.SESSION_TRANSACTED;
+import org.mule.extensions.jms.api.operation.JmsConsume;
+import org.mule.extensions.jms.api.source.JmsSubscribe;
 
 import javax.jms.Session;
 
@@ -35,7 +37,9 @@ public enum AckMode {
   NONE(0),
 
   /**
-   * Mule ACKs the message only if the flow is finished successfully
+   * This is JMS {@link Session#AUTO_ACKNOWLEDGE} mode.
+   * The session automatically acknowledges the receipt when it successfully delivered the message
+   * to a {@link JmsConsume#consume} or {@link JmsSubscribe} handler.
    */
   AUTO(AUTO_ACKNOWLEDGE),
 
@@ -45,7 +49,7 @@ public enum AckMode {
   MANUAL(CLIENT_ACKNOWLEDGE),
 
   /**
-   * JMS message is acked automatically but in a lazy fashion which may lead to duplicates
+   * Similar to AUTO, the JMS message is acknowledged automatically but in a lazy fashion which may lead to duplicates.
    */
   DUPS_OK(DUPS_OK_ACKNOWLEDGE),
 

@@ -16,9 +16,9 @@
     </flow>
 
     <flow name="bridge">
-        <jmsn:consume config-ref="config" destination="#[dw:initialDestination]" maximumWaitTime="1000">
+        <jmsn:consume config-ref="config" destination="#[dw:initialDestination]" maximumWait="1000">
             <jmsn:consumer-type>
-                <jmsn:topic-consumer/>
+                <jmsn:topic-consumer isShared="true" subscriptionName="subsName"/>
             </jmsn:consumer-type>
         </jmsn:consume>
         <jmsn:publish config-ref="config" destination="#[dw:finalDestination]" destinationType="TOPIC">
@@ -30,7 +30,7 @@
     </flow>
 
     <flow name="bridge-receiver">
-        <jmsn:consume config-ref="config" destination="#[dw:finalDestination]" maximumWaitTime="1000">
+        <jmsn:consume config-ref="config" destination="#[dw:finalDestination]" maximumWait="1000">
             <jmsn:consumer-type>
                 <jmsn:topic-consumer/>
             </jmsn:consumer-type>

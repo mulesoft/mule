@@ -51,7 +51,7 @@ import javax.jms.ConnectionFactory;
     baseType = ConnectionFactory.class, subTypes = {JndiConnectionFactory.class})
 @SubTypeMapping(
     baseType = JndiNameResolver.class, subTypes = {SimpleJndiNameResolver.class, CachedJndiNameResolver.class})
-@Export(classes = ConnectionFactory.class)
+@Export(classes = {ConnectionFactory.class})
 public class JmsExtension {
 
 }
