@@ -204,17 +204,11 @@ public class ClassPathClassifierContext {
   }
 
   /**
-   * @return {@link List} of {@link Class}es that are going to be exported in addition to the ones already exported by
+   * @return {@link List} of {@link Class classes} that are going to be exported in addition to the ones already exported by
    * rootArtifact. For testing purposes only.
-   * @param pluginArtifact
    */
-  public List<Class> getExportPluginClasses(Artifact pluginArtifact) {
-    // Plugin exported classes must come from the root artifact
-    if (pluginArtifact == rootArtifact) {
-      return this.exportPluginClasses;
-    } else {
-      return emptyList();
-    }
+  public List<Class> getExportPluginClasses() {
+    return this.exportPluginClasses;
   }
 
   /**

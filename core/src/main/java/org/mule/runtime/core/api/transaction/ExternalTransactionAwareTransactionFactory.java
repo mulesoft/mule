@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 
 
@@ -20,7 +21,7 @@ public interface ExternalTransactionAwareTransactionFactory extends TransactionF
    * Create and begins a new transaction
    *
    * @return a new Transaction representing an existing external transaction
-   * @throws org.mule.runtime.core.api.transaction.TransactionException if the transaction cannot be created or begun
+   * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    */
   Transaction joinExternalTransaction(MuleContext muleContext) throws TransactionException;

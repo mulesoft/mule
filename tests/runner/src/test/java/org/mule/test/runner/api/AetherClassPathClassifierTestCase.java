@@ -83,13 +83,14 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   private AetherClassPathClassifier classifier;
 
   private Artifact rootArtifact;
+  private Artifact serviceArtifact;
   private Dependency fooCoreDep;
   private Dependency fooToolsArtifactDep;
   private Dependency fooTestsSupportDep;
   private Dependency guavaDep;
   private Dependency derbyDriverDep;
-  private Dependency fooServiceDep;
 
+  private Dependency fooServiceDep;
   private List<Dependency> directDependencies;
 
   @Before
@@ -101,7 +102,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     this.fooTestsSupportDep = new Dependency(new DefaultArtifact("org.foo.tests:foo-tests-support:1.0-SNAPSHOT"), TEST);
     this.derbyDriverDep = new Dependency(new DefaultArtifact("org.apache.derby:derby:10.11.1.1"), TEST);
     this.guavaDep = new Dependency(new DefaultArtifact("org.google:guava:18.0"), COMPILE);
-    this.fooServiceDep = new Dependency(new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0-SNAPSHOT"), PROVIDED);
+    serviceArtifact = new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0-SNAPSHOT");
+    this.fooServiceDep = new Dependency(serviceArtifact, PROVIDED);
 
     this.dependencyResolver = mock(DependencyResolver.class);
     this.context = mock(ClassPathClassifierContext.class);
@@ -329,6 +331,14 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
         .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
             .thenReturn(rootArtifactResult);
 
+    File serviceArtifactFile = temporaryFolder.newFile();
+    ArtifactResult serviceArtifactResult = mock(ArtifactResult.class);
+    Artifact jarServiceArtifact = serviceArtifact.setFile(serviceArtifactFile);
+    when(serviceArtifactResult.getArtifact()).thenReturn(jarServiceArtifact);
+
+    when(dependencyResolver
+        .resolveArtifact(argThat(new ArtifactMatcher(serviceArtifact.getGroupId(), serviceArtifact.getArtifactId()))))
+            .thenReturn(serviceArtifactResult);
 
     ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
 

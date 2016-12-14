@@ -6,37 +6,58 @@
                http://www.mulesoft.org/schema/mule/tx http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd">
 
 
-    <tx:config name="localTx">
+    <tx:config name="localTx1">
+        <tx:connection>
+            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx:connection>
+    </tx:config>
+
+    <tx:config name="localTx2">
         <tx:connection>
             <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
         </tx:connection>
     </tx:config>
 
     <flow name="commitLocalTx">
-        <tx:verify-no-transaction/>
+        <tx:verify-no-transaction config-ref="localTx1"/>
         <block transactionalAction="ALWAYS_BEGIN">
-            <tx:verify-transaction-begun/>
+            <tx:verify-transaction-begun config-ref="localTx1"/>
         </block>
-        <tx:verify-transaction-commited/>
+        <tx:verify-transaction-commited config-ref="localTx1"/>
     </flow>
 
     <flow name="rollbackLocalTx">
-        <tx:verify-no-transaction/>
+        <tx:verify-no-transaction config-ref="localTx1"/>
         <block transactionalAction="ALWAYS_BEGIN">
-            <tx:verify-transaction-begun/>
+            <tx:verify-transaction-begun config-ref="localTx1"/>
             <tx:fail/>
         </block>
         <error-handler>
             <on-error-continue>
-                <tx:verify-transaction-rolledback/>
+                <tx:verify-transaction-rolledback config-ref="localTx1"/>
             </on-error-continue>
         </error-handler>
     </flow>
 
     <flow name="executeTransactionless">
-        <tx:verify-no-transaction/>
+        <tx:verify-no-transaction config-ref="localTx1"/>
         <block transactionalAction="ALWAYS_BEGIN">
-            <tx:get-connection transactionalAction="NOT_SUPPORTED"/>
+            <tx:get-connection transactionalAction="NOT_SUPPORTED" config-ref="localTx1"/>
         </block>
+    </flow>
+
+    <flow name="localTxDoesntSupportMultipleResources">
+        <block transactionalAction="ALWAYS_BEGIN" >
+            <tx:verify-transaction-begun config-ref="localTx1"/>
+            <tx:verify-transaction-begun config-ref="localTx2"/>
+        </block>
+    </flow>
+
+    <flow name="localTxSupportsMultipleOperationsFromSameResource">
+        <block transactionalAction="ALWAYS_BEGIN">
+            <tx:verify-transaction-begun config-ref="localTx1"/>
+            <tx:verify-transaction-begun config-ref="localTx1"/>
+        </block>
+        <tx:verify-transaction-commited config-ref="localTx1"/>
     </flow>
 </mule>

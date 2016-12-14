@@ -151,6 +151,11 @@
                             <classifier>mule-plugin</classifier>
                         </configuration>
                     </execution>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

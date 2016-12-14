@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.UniversalTransactionFactory;
 
 /**

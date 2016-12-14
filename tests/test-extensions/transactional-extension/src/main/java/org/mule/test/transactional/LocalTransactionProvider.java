@@ -10,12 +10,20 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class LocalTransactionProvider implements PoolingConnectionProvider<TestTransactionalConnection> {
 
+  private DummyXaResource dummyXaResource = new DummyXaResource();
+
+  @Parameter
+  @Optional(defaultValue = "false")
+  boolean useXa;
+
   @Override
   public TestTransactionalConnection connect() throws ConnectionException {
-    return new TestTransactionalConnection();
+    return useXa ? new TestXaTransactionalConnection(dummyXaResource) : new TestLocalTransactionalConnection();
   }
 
   @Override

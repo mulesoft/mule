@@ -7,41 +7,57 @@
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <flow name="jdbcRollback">
-        <block transactionalAction="ALWAYS_BEGIN">
-            <db:update config-ref="dbConfig">
-                <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+    <flow name="commitTxUpdateOutsideABlock">
+        <db:update config-ref="dbConfig">
+            <db:sql>
+                update PLANET set NAME='Mercury' where POSITION=4
+            </db:sql>
+        </db:update>
+        <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
+    </flow>
+
+    <flow name="commitAnOptionalTxUpdateIsANonTxBlock">
+        <block transactionalAction="INDIFFERENT">
+            <db:update transactionalAction="JOIN_IF_POSSIBLE">
+                <db:sql>
+                    update PLANET set NAME='Mercury' where POSITION=4
+                </db:sql>
             </db:update>
-            <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
+            <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
         </block>
     </flow>
 
-    <flow name="jdbcCommit">
-        <block transactionalAction="ALWAYS_BEGIN">
-            <db:update config-ref="dbConfig">
-                <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+    <flow name="commitNonTxUpdateInATxBlock">
+        <block transactionalAction="BEGIN_OR_JOIN">
+            <db:update transactionalAction="NOT_SUPPORTED">
+                <db:sql>
+                    update PLANET set NAME='Mercury' where POSITION=4
+                </db:sql>
             </db:update>
-        </block>
 
-        <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
-    </flow>
-
-    <flow name="rollbackWithNonTransactionalMP">
-        <block transactionalAction="ALWAYS_BEGIN">
-            <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
-                <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
-            </db:update>
-            <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
+            <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
         </block>
     </flow>
 
-    <flow name="commitWithNonTransactionalMP">
-        <block transactionalAction="ALWAYS_BEGIN">
-            <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
-                <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+    <flow name="rollbackTxUpdateInATxBlock">
+        <block transactionalAction="BEGIN_OR_JOIN">
+            <db:update config-ref="dbConfig" transactionalAction="ALWAYS_JOIN">
+                <db:sql>
+                    update PLANET set NAME='Earth' where POSITION=4
+                </db:sql>
             </db:update>
+            <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
         </block>
+    </flow>
 
-        <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
+    <flow name="rollbackOptionalTxUpdateInATxBlock">
+        <block transactionalAction="ALWAYS_BEGIN">
+            <db:update transactionalAction="JOIN_IF_POSSIBLE">
+                <db:sql>
+                    update PLANET set NAME='Mercury' where POSITION=4
+                </db:sql>
+            </db:update>
+            <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
+        </block>
     </flow>
 </mule>

@@ -35,7 +35,7 @@ public final class DerbyConnectionParameters extends BaseDbConnectionParameters 
   private String database;
 
   /**
-   * Specifies the type of SubsubProtocol to be used by Derby. The avaiable options are:
+   * Specifies the type of SubsubProtocol to be used by Derby. The available options are:
    * 'directory', 'memory', 'classpath' and 'jar'.
    */
   @Parameter

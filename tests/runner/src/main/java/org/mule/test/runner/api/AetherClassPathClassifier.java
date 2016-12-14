@@ -40,7 +40,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +48,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -532,7 +532,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         })
         .forEach(artifactDependencies::add);
 
-    final ArrayList<Class> exportClasses = newArrayList(context.getExportPluginClasses(artifactToClassify));
+    final List<Class> exportClasses = getArtifactExportedClasses(artifactToClassify, context);
+
     ArtifactClassificationNode artifactUrlClassification = new ArtifactClassificationNode(artifactToClassify,
                                                                                           urls,
                                                                                           exportClasses,
@@ -542,8 +543,35 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier
-   * especified.
+   * Resolves the exported plugin classes from the given {@link Artifact}
+   *
+   * @param exporterArtifact {@link Artifact} used to resolve the exported classes
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @return {@link List} of {@link Class} that the given {@link Artifact} exports
+   */
+  private List<Class> getArtifactExportedClasses(Artifact exporterArtifact, ClassPathClassifierContext context) {
+    final AtomicReference<URL> artifactUrl = new AtomicReference<>();
+    try {
+      artifactUrl.set(dependencyResolver.resolveArtifact(exporterArtifact).getArtifact().getFile().toURI().toURL());
+    } catch (MalformedURLException | ArtifactResolutionException e) {
+      throw new IllegalStateException("Unable to resolve artifact URL", e);
+    }
+    Artifact rootArtifact = context.getRootArtifact();
+
+    return context.getExportPluginClasses().stream()
+        .filter(clazz -> {
+          boolean isFromCurrentArtifact = clazz.getProtectionDomain().getCodeSource().getLocation().equals(artifactUrl.get());
+          if (isFromCurrentArtifact && exporterArtifact != rootArtifact) {
+            logger.warn("Exported class '{}' from plugin '{}' is being used from another artifact, {}", clazz.getSimpleName(),
+                        exporterArtifact, rootArtifact);
+          }
+          return isFromCurrentArtifact;
+        })
+        .collect(toList());
+  }
+
+  /**
+   * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier specified.
    *
    * @param directDependencies {@link List} of direct {@link Dependency}
    * @return {@link List} of {@link Artifact}s for those dependencies classified as with the give classifier, can be
