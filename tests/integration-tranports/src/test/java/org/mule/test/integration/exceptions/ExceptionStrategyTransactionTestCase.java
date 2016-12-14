@@ -14,7 +14,7 @@ import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 

@@ -8,43 +8,15 @@ package org.mule.test.transactional;
 
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
-public class TestTransactionalConnection implements TransactionalConnection {
+public interface TestTransactionalConnection extends TransactionalConnection {
 
-  private boolean transactionBegun, transactionCommited, transactionRolledback = false;
-  private boolean connected = true;
+  boolean isTransactionBegun();
 
-  @Override
-  public void begin() throws Exception {
-    transactionBegun = true;
-  }
+  boolean isTransactionCommited();
 
-  @Override
-  public void commit() throws Exception {
-    transactionCommited = true;
-  }
+  boolean isTransactionRolledback();
 
-  @Override
-  public void rollback() throws Exception {
-    transactionRolledback = true;
-  }
+  void disconnect();
 
-  public boolean isTransactionBegun() {
-    return transactionBegun;
-  }
-
-  public boolean isTransactionCommited() {
-    return transactionCommited;
-  }
-
-  public boolean isTransactionRolledback() {
-    return transactionRolledback;
-  }
-
-  public void disconnect() {
-    connected = false;
-  }
-
-  public boolean isConnected() {
-    return connected;
-  }
+  boolean isConnected();
 }

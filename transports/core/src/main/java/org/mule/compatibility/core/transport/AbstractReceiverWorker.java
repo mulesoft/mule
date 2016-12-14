@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.message.SessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 

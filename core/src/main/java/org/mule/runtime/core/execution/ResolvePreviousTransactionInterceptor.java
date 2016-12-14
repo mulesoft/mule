@@ -9,7 +9,7 @@ package org.mule.runtime.core.execution;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.slf4j.Logger;

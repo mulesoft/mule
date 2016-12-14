@@ -33,7 +33,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;

@@ -9,9 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static javax.transaction.xa.XAResource.TMSUCCESS;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public class XAExtensionTransactionalResource<T extends XATransactionalConnection> extends ExtensionTransactionalResource<T>
-    implements XaTransaction.MuleXaObject {
+    implements MuleXaObject {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(XAExtensionTransactionalResource.class);
 

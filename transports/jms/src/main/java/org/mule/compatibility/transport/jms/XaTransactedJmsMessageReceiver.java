@@ -21,8 +21,8 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.MapUtils;
 
@@ -170,9 +170,9 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
           }
           ctx.consumer = null;
           Transaction tx = TransactionCoordination.getInstance().getTransaction();
-          if (ctx.session != null && tx instanceof XaTransaction.MuleXaObject) {
-            if (ctx.session instanceof XaTransaction.MuleXaObject) {
-              ((XaTransaction.MuleXaObject) ctx.session).setReuseObject(false);
+          if (ctx.session != null && tx instanceof MuleXaObject) {
+            if (ctx.session instanceof MuleXaObject) {
+              ((MuleXaObject) ctx.session).setReuseObject(false);
             } else {
               logger.warn("Session should be XA, but is of type " + ctx.session.getClass().getName());
             }
@@ -349,8 +349,8 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
       } else {
         session = this.connector.getSession(endpoint);
         if (session != null && tx != null) {
-          if (session instanceof XaTransaction.MuleXaObject) {
-            ((XaTransaction.MuleXaObject) session).setReuseObject(reuseSession);
+          if (session instanceof MuleXaObject) {
+            ((MuleXaObject) session).setReuseObject(reuseSession);
           } else {
             logger.warn("Session should be XA, but is of type " + session.getClass().getName());
           }

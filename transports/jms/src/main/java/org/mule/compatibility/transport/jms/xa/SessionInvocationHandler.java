@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.jms.xa;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.core.util.proxy.TargetInvocationHandler;
@@ -68,18 +69,18 @@ public class SessionInvocationHandler implements TargetInvocationHandler {
     }
 
     // processing method from MuleXaObject
-    if (XaTransaction.MuleXaObject.DELIST_METHOD_NAME.equals(method.getName())) {
+    if (MuleXaObject.DELIST_METHOD_NAME.equals(method.getName())) {
       return delist();
-    } else if (XaTransaction.MuleXaObject.ENLIST_METHOD_NAME.equals(method.getName())) {
+    } else if (MuleXaObject.ENLIST_METHOD_NAME.equals(method.getName())) {
       return enlist();
-    } else if (XaTransaction.MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName())) {
+    } else if (MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName())) {
       reuseObject = (Boolean) args[0];
       return null;
-    } else if (XaTransaction.MuleXaObject.IS_REUSE_OBJECT_METHOD_NAME.equals(method.getName())) {
+    } else if (MuleXaObject.IS_REUSE_OBJECT_METHOD_NAME.equals(method.getName())) {
       return reuseObject;
-    } else if (XaTransaction.MuleXaObject.GET_TARGET_OBJECT_METHOD_NAME.equals(method.getName())) {
+    } else if (MuleXaObject.GET_TARGET_OBJECT_METHOD_NAME.equals(method.getName())) {
       return getTargetObject();
-    } else if (XaTransaction.MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName())) {
+    } else if (MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName())) {
       // some jms implementation need both sessions closed, some not
       try {
         session.close();

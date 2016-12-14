@@ -10,7 +10,7 @@ import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;

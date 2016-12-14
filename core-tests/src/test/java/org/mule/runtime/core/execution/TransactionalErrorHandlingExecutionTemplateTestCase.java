@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;

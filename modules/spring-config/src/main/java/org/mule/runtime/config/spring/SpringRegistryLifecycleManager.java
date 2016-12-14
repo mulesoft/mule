@@ -79,9 +79,9 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExtendedExpressionLanguage.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
       initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));

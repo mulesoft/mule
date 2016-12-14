@@ -28,8 +28,8 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -79,7 +79,7 @@ public class XaTransactedJmsMessageReceiverTest extends AbstractMuleTestCase {
     when(mockJmsConnector.getTopicResolver()).thenReturn(mock(JmsTopicResolver.class));
     when(mockJmsConnector.getSelector(mockInboundEndpoint)).thenReturn(null);
     when(mockJmsConnector.getSession(mockInboundEndpoint))
-        .thenReturn(mock(Session.class, withSettings().extraInterfaces(XaTransaction.MuleXaObject.class)));
+        .thenReturn(mock(Session.class, withSettings().extraInterfaces(MuleXaObject.class)));
 
     when(mockInboundEndpoint.getEndpointURI()).thenReturn(mock(EndpointURI.class));
     when(mockInboundEndpoint.getProperties()).thenReturn(emptyMap());

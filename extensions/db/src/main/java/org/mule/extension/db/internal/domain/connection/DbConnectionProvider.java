@@ -7,6 +7,7 @@
 package org.mule.extension.db.internal.domain.connection;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -33,6 +34,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
@@ -104,11 +106,12 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   public final DbConnection connect() throws ConnectionException {
     try {
       Connection jdbcConnection = jdbcConnectionFactory.createConnection(dataSource, resolvedCustomTypes);
+      java.util.Optional<XAConnection> optionalXaConnection = getXaConnection(jdbcConnection);
 
       DbConnection connection = createDbConnection(jdbcConnection);
 
-      if (jdbcConnection instanceof XAConnection) {
-        connection = new XADbConnection(connection, (XAConnection) jdbcConnection);
+      if (optionalXaConnection.isPresent()) {
+        connection = new XADbConnection(connection, optionalXaConnection.get());
       }
 
       return connection;
@@ -237,5 +240,15 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   public DataSource getConfiguredDataSource() {
     return dataSource;
+  }
+
+  private boolean isXaConnection(Connection jdbcConnection) {
+    return jdbcConnection instanceof MuleXaObject && ((MuleXaObject) jdbcConnection).getTargetObject() instanceof XAConnection;
+  }
+
+  private java.util.Optional<XAConnection> getXaConnection(Connection jdbcConnection) {
+    return isXaConnection(jdbcConnection)
+        ? java.util.Optional.of((XAConnection) ((MuleXaObject) jdbcConnection).getTargetObject())
+        : empty();
   }
 }

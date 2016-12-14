@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.vm;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transaction.AbstractSingleResourceTransaction;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;

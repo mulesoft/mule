@@ -28,10 +28,9 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.TransactionCollection;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;

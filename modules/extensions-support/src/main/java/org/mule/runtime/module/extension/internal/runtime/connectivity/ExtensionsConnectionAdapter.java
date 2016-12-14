@@ -17,7 +17,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
@@ -123,13 +123,13 @@ public class ExtensionsConnectionAdapter {
           return new TransactionalConnectionHandler(txResource);
         } else if (transactionConfig.isTransacted()) {
           throw new TransactionException(
-                                         createStaticMessage(format("%s '%s' of extension '%s' is transactional but current transaction doesn't "
-                                             + "support connections of type '%s'",
+                                         createStaticMessage(format("%s '%s' of extension '%s' uses a transactional connection '%s', but the current transaction "
+                                             + "doesn't support it and could not being bound",
                                                                     getComponentModelTypeName(executionContext
                                                                         .getComponentModel()),
                                                                     executionContext.getComponentModel().getName(),
                                                                     executionContext.getExtensionModel().getName(),
-                                                                    connectionHandler.getClass().getName())));
+                                                                    connection.getClass().getName())));
         }
       } finally {
         if (!bound) {

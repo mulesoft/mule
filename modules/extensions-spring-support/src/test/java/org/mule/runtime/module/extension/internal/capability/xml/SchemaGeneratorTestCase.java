@@ -41,6 +41,7 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
+import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.IOException;
@@ -93,6 +94,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
         put(PetStoreConnector.class, "petstore.xsd");
         put(MetadataExtension.class, "metadata.xsd");
         put(HeisenbergExtension.class, "heisenberg.xsd");
+        put(TransactionalExtension.class, "tx-ext.xsd");
         put(SubTypesMappingConnector.class, "subtypes.xsd");
       }
     };
