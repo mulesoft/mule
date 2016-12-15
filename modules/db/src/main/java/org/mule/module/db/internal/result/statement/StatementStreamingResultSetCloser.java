@@ -20,13 +20,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StatementStreamingResultSetCloser extends AbstractStreamingResultSetCloser
 {
+
     private final ConcurrentHashMap<DbConnection, Set<ResultSet>> connectionResultSets = new ConcurrentHashMap<DbConnection, Set<ResultSet>>();
 
     private final ConcurrentHashMap<DbConnection, Object> connectionLocks = new ConcurrentHashMap<DbConnection, Object>();
 
     /**
      * Closes all tracked {@link ResultSet}s for the passed {@code connection}.
-     * 
+     *
      * @param connection
      */
     public void closeResultSets(DbConnection connection)
@@ -46,7 +47,7 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
                 }
             }
 
-            releaseResources(connection, connectionLock);
+            releaseResources(connection);
         }
     }
 
@@ -68,7 +69,7 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
             {
                 if (resultSets.size() == 0)
                 {
-                    releaseResources(connection, connectionLock);
+                    releaseResources(connection);
                 }
             }
         }
@@ -78,7 +79,7 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
      * Adds a resultSet for tracking in order to be able to close it later
      *
      * @param connection connection that holds the resultSet
-     * @param resultSet resultSet to track
+     * @param resultSet  resultSet to track
      */
     public void trackResultSet(DbConnection connection, ResultSet resultSet)
     {
@@ -110,11 +111,10 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
         return connectionLock;
     }
 
-    protected void releaseResources(DbConnection connection, Object connectionLock)
+    protected void releaseResources(DbConnection connection)
     {
         connectionResultSets.remove(connection);
-
-        connectionLocks.remove(connectionLock);
+        connectionLocks.remove(connection);
 
         connection.release();
     }
@@ -153,5 +153,10 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
         }
 
         return connectionLock;
+    }
+
+    protected int getLocksCount()
+    {
+        return connectionLocks.size();
     }
 }
