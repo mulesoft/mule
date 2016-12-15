@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule   xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+    http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <wsc:config name="decrypt">
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/decrypt?wsdl" service="TestService" port="TestPort">
+            <reconnect blocking="false" />
+            <wsc:security-strategies>
+                <wsc:wss-decrypt-security-strategy>
+                    <wsc:key-store-configuration keyStorePath="security/ssltest-keystore.jks" keyPassword="changeit" password="changeit" alias="s1as" />
+                </wsc:wss-decrypt-security-strategy>
+            </wsc:security-strategies>
+        </wsc:connection>
+    </wsc:config>
+
+    <flow name="decryptFlow">
+        <wsc:consume config-ref="decrypt" operation="echo">
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+            </wsc:message>
+        </wsc:consume>
+    </flow>
+
+    <flow name="decryptServer">
+        <http:listener config-ref="httpConfig" path="/decrypt" />
+        <cxf:jaxws-service configuration-ref="cxfConfig" serviceClass="${serviceClass}" >
+            <cxf:outInterceptors>
+                <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                    <spring:constructor-arg>
+                        <spring:map>
+                            <spring:entry key="action" value="Encrypt" />
+                            <spring:entry key="encryptionUser" value="s1as" />
+                            <spring:entry key="encryptionPropRefId" value="securityProperties" />
+                            <spring:entry key="securityProperties">
+                                <spring:props>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.password">changeit</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.file">security/ssltest-cacerts.jks</spring:prop>
+                                </spring:props>
+                            </spring:entry>
+                        </spring:map>
+                    </spring:constructor-arg>
+                </spring:bean>
+            </cxf:outInterceptors>
+        </cxf:jaxws-service>
+        <component class="${serviceClass}"/>
+    </flow>
+
+</mule>
+

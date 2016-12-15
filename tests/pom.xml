@@ -25,6 +25,8 @@
         <module>test-policies</module>
         <module>test-services</module>
         <module>runner</module>
+        <module>wsc</module>
+        <!-- <module>wsc</module> -->
     </modules>
 
     <build>

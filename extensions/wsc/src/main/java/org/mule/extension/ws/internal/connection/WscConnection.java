@@ -51,6 +51,7 @@ public class WscConnection {
   private final boolean mtomEnabled;
   private final AttachmentRequestEnricher requestEnricher;
   private final AttachmentResponseEnricher responseEnricher;
+  private final SoapVersion soapVersion;
 
   public WscConnection(String wsdlLocation,
                        String address,
@@ -60,6 +61,7 @@ public class WscConnection {
                        List<SecurityStrategy> securityStrategies,
                        boolean mtomEnabled)
       throws ConnectionException {
+    this.soapVersion = soapVersion;
     this.wsdlIntrospecter = new WsdlIntrospecter(wsdlLocation, service, port);
 
     if (wsdlIntrospecter.isRpcStyle()) {
@@ -134,5 +136,9 @@ public class WscConnection {
       bop = bop.getUnwrappedOperation();
     }
     return bop;
+  }
+
+  public SoapVersion getSoapVersion() {
+    return soapVersion;
   }
 }

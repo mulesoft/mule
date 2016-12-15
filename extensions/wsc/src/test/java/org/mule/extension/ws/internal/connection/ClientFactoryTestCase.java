@@ -77,7 +77,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks the creation of a basic client without security")
   public void basicClient() throws ConnectionException {
-    Client client = factory.create(service.get11Address(), null, SOAP12, emptyList(), false);
+    Client client = factory.create(service.getAddress(), null, SOAP12, emptyList(), false);
     assertThat(client.getEndpoint().getBinding().getBindingInfo().getBindingId(), containsString("soap12"));
     assertThat(client.getEndpoint().get(MTOM_ENABLED), is(false));
 
@@ -90,7 +90,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks the creation of a client that works with MTOM but with no security")
   public void basicClientMtom() throws ConnectionException {
-    Client client = factory.create(service.get11Address(), null, SOAP11, emptyList(), true);
+    Client client = factory.create(service.getAddress(), null, SOAP11, emptyList(), true);
     assertThat(client.getEndpoint().get(MTOM_ENABLED), is(true));
 
     assertThat(inInterceptorNames(client),
@@ -115,7 +115,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
     })));
     when(verify.buildPasswordCallbackHandler()).thenReturn(Optional.empty());
 
-    Client client = factory.create(service.get11Address(), null, SOAP11, asList(sign, verify), false);
+    Client client = factory.create(service.getAddress(), null, SOAP11, asList(sign, verify), false);
 
     assertThat(inInterceptorNames(client),
                hasItems(NAMESPACE_RESTORER, NAMESPACE_SAVER, STREAM_CLOSING, CHECK_FAULT, OUT_SOAP_HEADERS, SOAP_ACTION, WSS_IN));

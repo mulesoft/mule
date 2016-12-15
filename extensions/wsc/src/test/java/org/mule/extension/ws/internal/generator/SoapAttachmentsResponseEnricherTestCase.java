@@ -21,7 +21,7 @@ import org.apache.cxf.message.Exchange;
 public class SoapAttachmentsResponseEnricherTestCase extends ResponseEnricherTestCase {
 
   private static final String RESPONSE =
-      "<con:downloadAttachmentResponse xmlns:con=\"http://consumer.ws.extension.mule.org/\">"
+      "<con:downloadAttachmentResponse xmlns:con=\"http://service.ws.extension.mule.org/\">"
           + "<attachment>U29tZSBDb250ZW50</attachment>"
           + "</con:downloadAttachmentResponse>";
 

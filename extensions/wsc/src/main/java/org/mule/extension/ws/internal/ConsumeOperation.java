@@ -9,6 +9,7 @@ package org.mule.extension.ws.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static org.mule.extension.ws.api.SoapVersion.SOAP12;
 import static org.mule.extension.ws.internal.util.TransformationUtils.stringToDomElement;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.SoapAttachment;
@@ -113,7 +114,11 @@ public class ConsumeOperation {
 
     props.put(MULE_WSC_ENCODING, config.getEncoding());
     props.put(MULE_HEADERS_KEY, transformToCxfHeaders(headers));
-    props.put(MULE_SOAP_ACTION, operation);
+
+    if (connection.getSoapVersion() == SOAP12) {
+      props.put(MULE_SOAP_ACTION, operation);
+    }
+
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(Client.REQUEST_CONTEXT, props);
     return ctx;

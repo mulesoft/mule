@@ -29,16 +29,26 @@ public class HttpDispatcher {
 
     OutputStream os = message.getContent(OutputStream.class);
     OkHttpClient client = new OkHttpClient();
-    MediaType mediaType = MediaType.parse((String) message.get(Message.CONTENT_TYPE));
+
+    String contentType = (String) message.get(Message.CONTENT_TYPE);
+    if (contentType.contains("action")) {
+      // TODO: MULE-11100: MediaType.parse cannot parse a content type that carries the action element.
+      contentType = contentType.substring(0, contentType.indexOf("action")).concat("\"");
+    }
+
+    MediaType mediaType = MediaType.parse(contentType);
     RequestBody body = RequestBody.create(mediaType, os.toString());
-    Request request = new Request.Builder()
+    Request.Builder request = new Request.Builder()
         .url(address)
         .post(body)
-        .addHeader("cache-control", "no-cache")
-        .addHeader("SOAPAction", soapAction)
-        .build();
+        .addHeader("cache-control", "no-cache");
+
+    if (soapAction != null) {
+      request.addHeader("SOAPAction", soapAction);
+    }
+
     try {
-      return client.newCall(request).execute();
+      return client.newCall(request.build()).execute();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

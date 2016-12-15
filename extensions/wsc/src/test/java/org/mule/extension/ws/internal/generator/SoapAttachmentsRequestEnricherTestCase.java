@@ -26,7 +26,7 @@ public class SoapAttachmentsRequestEnricherTestCase extends AbstractRequestEnric
   @Override
   protected String getExpectedResult() {
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-        + "<con:uploadAttachment xmlns:con=\"http://consumer.ws.extension.mule.org/\">"
+        + "<con:uploadAttachment xmlns:con=\"http://service.ws.extension.mule.org/\">"
         + "<attachment>U29tZSBDb250ZW50</attachment>"
         + "</con:uploadAttachment>";
   }

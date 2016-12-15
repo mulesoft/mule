@@ -33,17 +33,18 @@ public class WssKeyStoreConfiguration implements WssStoreConfiguration {
 
   @Parameter
   @Summary("The password used to access the private key.")
+  @Optional
   @Password
   private String keyPassword;
-
-  @Parameter
-  @Summary("The location of the KeyStore file")
-  private String keyStorePath;
 
   @Parameter
   @Summary("The password to access the store.")
   @Password
   private String password;
+
+  @Parameter
+  @Summary("The location of the KeyStore file")
+  private String keyStorePath;
 
   @Parameter
   @Optional(defaultValue = "jks")
@@ -97,9 +98,13 @@ public class WssKeyStoreConfiguration implements WssStoreConfiguration {
     properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
     properties.setProperty(KEYSTORE_TYPE, type);
     properties.setProperty(KEYSTORE_PASSWORD, password);
-    properties.setProperty(KEYSTORE_PRIVATE_PASSWORD, keyPassword);
     properties.setProperty(KEYSTORE_ALIAS, alias);
     properties.setProperty(KEYSTORE_FILE, keyStorePath);
+
+    if (keyPassword != null) {
+      properties.setProperty(KEYSTORE_PRIVATE_PASSWORD, keyPassword);
+    }
+
     return properties;
   }
 }
