@@ -65,7 +65,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-@Alias("subscribe")
+@Alias("listener")
 @EmitsResponse
 @MetadataScope(outputResolver = JmsOutputResolver.class)
 public class JmsSubscribe extends Source<Object, JmsAttributes> {

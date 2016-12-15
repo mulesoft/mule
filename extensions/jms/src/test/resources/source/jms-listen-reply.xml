@@ -18,11 +18,11 @@
     </flow>
 
     <flow name="listener">
-        <jmsn:subscribe config-ref="config" destination="topicListenerDestination">
+        <jmsn:listener config-ref="config" destination="topicListenerDestination">
             <jmsn:consumer-type>
                 <jmsn:topic-consumer/>
             </jmsn:consumer-type>
-        </jmsn:subscribe>
+        </jmsn:listener>
         <set-payload value="#[dw:'received_' ++ payload]"/>
     </flow>
 

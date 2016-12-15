@@ -23,30 +23,6 @@
         <activemq.version>5.14.1</activemq.version>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${mavenCompilerVersion}</version>
-                <configuration>
-                    <encoding>ISO-8859-1</encoding>
-                    <fork>true</fork>
-                    <maxmem>512m</maxmem>
-                    <source>${javaVersion}</source>
-                    <target>${javaVersion}</target>
-                    <proc>none</proc>
-                    <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
-                    <useIncrementalCompilation>false</useIncrementalCompilation>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                    <testCompilerArgument>-parameters</testCompilerArgument>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
 
         <dependency>

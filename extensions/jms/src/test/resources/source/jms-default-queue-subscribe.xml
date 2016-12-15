@@ -6,7 +6,7 @@
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <flow name="subscriber">
-        <jmsn:subscribe config-ref="config" destination="#[dw:destination]"/>
+        <jmsn:listener config-ref="config" destination="#[dw:destination]"/>
         <flow-ref name="onIncomingConnection"/>
     </flow>
 

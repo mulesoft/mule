@@ -6,11 +6,11 @@
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <flow name="default-topic-subscriber">
-        <jmsn:subscribe config-ref="config" destination="topicSubscriberDestinationToOnIncomingConnection">
+        <jmsn:listener config-ref="config" destination="topicSubscriberDestinationToOnIncomingConnection">
             <jmsn:consumer-type>
                 <jmsn:topic-consumer/>
             </jmsn:consumer-type>
-        </jmsn:subscribe>
+        </jmsn:listener>
         <expression-component>
             new org.mule.extensions.jms.test.JmsAbstractTestCase$OnIncomingConnection().onCall(message)
         </expression-component>
