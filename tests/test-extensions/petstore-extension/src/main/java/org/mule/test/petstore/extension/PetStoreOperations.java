@@ -9,6 +9,8 @@ package org.mule.test.petstore.extension;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
@@ -31,6 +33,11 @@ public class PetStoreOperations {
 
   public ExclusiveCashier getCashier(@ParameterGroup("Exclusive") ExclusiveCashier cashier) {
     return cashier;
+  }
+
+  public String getDefaultEncoding(boolean usePhoneNumber, @Optional PhoneNumber phoneNumber,
+                                   @DefaultEncoding String encoding) {
+    return usePhoneNumber ? phoneNumber.getCountryEncoding() : encoding;
   }
 
   public List<Pet> getForbiddenPets(List<Pet> forbiddenPets) {

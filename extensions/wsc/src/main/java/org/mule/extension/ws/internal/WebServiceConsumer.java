@@ -15,19 +15,15 @@ import org.mule.extension.ws.api.security.WssTimestampSecurityStrategy;
 import org.mule.extension.ws.api.security.WssUsernameTokenSecurityStrategy;
 import org.mule.extension.ws.api.security.WssVerifySignatureSecurityStrategy;
 import org.mule.extension.ws.internal.connection.WscConnectionProvider;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import javax.inject.Inject;
 
 /**
  * Web Service Consumer extension used to consume SOAP web services.
@@ -42,27 +38,17 @@ import javax.inject.Inject;
         WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
 @Extension(name = "Web Service Consumer")
 @Xml(namespace = "wsc")
-public class WebServiceConsumer implements Initialisable {
-
-  @Inject
-  private MuleContext muleContext;
+public class WebServiceConsumer {
 
   /**
    * Default character encoding to be used in all the messages. If not specified, the default charset in the mule configuration
    * will be used
    */
   @Parameter
-  @Optional
+  @DefaultEncoding
   private String encoding;
 
   public String getEncoding() {
     return encoding;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (encoding == null) {
-      encoding = muleContext.getConfiguration().getDefaultEncoding();
-    }
   }
 }

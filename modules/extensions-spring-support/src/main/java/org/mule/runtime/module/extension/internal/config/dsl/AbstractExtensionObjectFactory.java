@@ -33,9 +33,11 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.DefaultEncodingAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
@@ -112,12 +114,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
       if (parameters.containsKey(parameterName)) {
         resolver = toValueResolver(parameters.get(parameterName));
       } else {
-        Object defaultValue = p.getDefaultValue();
-        if (defaultValue instanceof String) {
-          resolver = new TypeSafeExpressionValueResolver((String) defaultValue, getType(p.getType()), muleContext);
-        } else if (defaultValue != null) {
-          resolver = new StaticValueResolver<>(defaultValue);
-        }
+        resolver = getValueResolverForAbsentParameter(p);
       }
 
       if (isNullSafe(p)) {
@@ -197,12 +194,16 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
       ValueResolver<?> valueResolver = null;
       Field objectField = getField(objectClass, key);
+      final boolean hasDefaultEncoding = field.getAnnotation(DefaultEncodingAnnotation.class).isPresent();
+
       if (parameters.containsKey(key)) {
         valueResolver = toValueResolver(parameters.get(key));
       } else if (!isParameterGroup) {
-        valueResolver = getDefaultValue(field)
-            .map(value -> new TypeSafeExpressionValueResolver<>(value, objectField.getType(), muleContext))
-            .orElse(null);
+        if (hasDefaultEncoding) {
+          valueResolver = new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding());
+        } else if (getDefaultValue(field).isPresent()) {
+          valueResolver = new TypeSafeExpressionValueResolver<>(getDefaultValue(field).get(), objectField.getType(), muleContext);
+        }
       }
 
       Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
@@ -273,6 +274,30 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
                                       createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
                                                                  getComponentModelTypeName(model), getModelName(model),
                                                                  Joiner.on(", ").join(definedExclusiveParameters))));
+  }
+
+  /**
+   * Gets a {@link ValueResolver} for the {@code parameterModel} if it has an associated a default value or encoding.
+   *
+   * @param parameterModel to be resolved
+   * @return a {@link ValueResolver} for cases such having a non null default value or depending on the runtime's default
+   *         encoding, {@code null} otherwise.
+   */
+  private ValueResolver<?> getValueResolverForAbsentParameter(ParameterModel parameterModel) {
+    ValueResolver<?> resolver = null;
+    final boolean hasDefaultEncoding = parameterModel.getModelProperty(DefaultEncodingModelProperty.class).isPresent();
+    if (hasDefaultEncoding) {
+      resolver = new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding());
+    } else {
+      Object defaultValue = parameterModel.getDefaultValue();
+      if (defaultValue instanceof String) {
+        resolver = new TypeSafeExpressionValueResolver((String) defaultValue, getType(parameterModel.getType()), muleContext);
+      } else if (defaultValue != null) {
+        resolver = new StaticValueResolver<>(defaultValue);
+      }
+    }
+
+    return resolver;
   }
 
   private Field getField(Class<?> objectClass, String key) {

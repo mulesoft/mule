@@ -48,7 +48,7 @@ public final class SendCommand {
           .withSubject(emailBuilder.getSubject())
           .withAttachments(emailBuilder.getAttachments())
           .withBody(body.getContent(), body.getContentType(),
-                    body.getCharset() == null ? configuration.getDefaultCharset() : body.getCharset())
+                    body.getEncoding() == null ? configuration.getDefaultEncoding() : body.getEncoding())
           .withHeaders(emailBuilder.getHeaders())
           .build();
 

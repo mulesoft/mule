@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -55,7 +56,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    * @return A {@code boolean} indicating whether the parameter is a required or not
    */
   default boolean isRequired() {
-    return !(isAnnotatedWith(Optional.class));
+    return !(isAnnotatedWith(Optional.class) || isAnnotatedWith(DefaultEncoding.class));
   }
 
   /**
