@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -47,7 +48,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -149,8 +149,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     when(sourceModel.getName()).thenReturn(SOURCE_NAME);
     when(sourceModel.getModelProperty(any())).thenReturn(empty());
-    when(sourceModel.getErrorCallback()).thenReturn(Optional.empty());
-    when(sourceModel.getSuccessCallback()).thenReturn(Optional.empty());
+    when(sourceModel.getErrorCallback()).thenReturn(empty());
+    when(sourceModel.getSuccessCallback()).thenReturn(empty());
   }
 
   private void mockModelProperties(EnrichableModel model) {
@@ -305,7 +305,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
     when(sourceCallbackModel.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam, offending));
-    when(sourceModel.getErrorCallback()).thenReturn(Optional.of(sourceCallbackModel));
+    when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     validate();
   }
 
@@ -322,7 +322,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(group.getParameterModels()).thenReturn(asList(offending));
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
-                                                       Optional.of(sourceCallbackModel), Optional.empty(), null, emptySet());
+                                                       of(sourceCallbackModel), empty(), false, false,
+                                                       null, emptySet());
+
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }
@@ -331,11 +333,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void sourceWithRepeatedParameterNameAmongCallbacks() {
     SourceCallbackModel errorCallBack = mock(SourceCallbackModel.class);
     when(errorCallBack.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam));
-    when(sourceModel.getErrorCallback()).thenReturn(Optional.of(errorCallBack));
+    when(sourceModel.getErrorCallback()).thenReturn(of(errorCallBack));
 
     SourceCallbackModel successCallback = mock(SourceCallbackModel.class);
     when(successCallback.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam));
-    when(sourceModel.getSuccessCallback()).thenReturn(Optional.of(successCallback));
+    when(sourceModel.getSuccessCallback()).thenReturn(of(successCallback));
     validate();
   }
 

@@ -8,6 +8,7 @@
 package org.mule.extension.db.integration.insert;
 
 import static java.sql.Statement.SUCCESS_NO_INFO;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -56,8 +57,8 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     expectedException
-        .expectMessage(is("Query defines parameters ['unused'] but they aren't present in the query."));
-    Message response = flowRunner("bulkInsertWithUnusedParameterType").withPayload(values()).run().getMessage();
+        .expectMessage(containsString("Query defines parameters ['unused'] but they aren't present in the query"));
+    flowRunner("bulkInsertWithUnusedParameterType").withPayload(values()).run().getMessage();
   }
 
   private List<Map<String, Object>> values() {
