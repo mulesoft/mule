@@ -7,15 +7,17 @@
 
 package org.mule.module.db.internal.result.statement;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.sql.ResultSet;
 
+import org.junit.After;
 import org.junit.Test;
 
 @SmallTest
@@ -26,6 +28,11 @@ public class StatementStreamingResultSetCloserTestCase extends AbstractMuleTestC
     private final DbConnection connection = mock(DbConnection.class);
     private final ResultSet resultSet1 = mock(ResultSet.class);
     private final ResultSet resultSet2 = mock(ResultSet.class);
+
+    @After
+    public void after() {
+        assertThat(resultSetCloser.getLocksCount(), is(0));
+    }
 
     @Test
     public void closesRegisteredResultSet() throws Exception
@@ -60,7 +67,6 @@ public class StatementStreamingResultSetCloserTestCase extends AbstractMuleTestC
     public void throwsExceptionWhenClosingUnTrackedResultSet() throws Exception
     {
         resultSetCloser.trackResultSet(connection, resultSet1);
-        resultSetCloser.trackResultSet(connection, resultSet2);
 
         resultSetCloser.close(connection, resultSet1);
         resultSetCloser.close(connection, resultSet1);

@@ -46,7 +46,7 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
                 }
             }
 
-            releaseResources(connection, connectionLock);
+            releaseResources(connection);
         }
     }
 
@@ -68,7 +68,7 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
             {
                 if (resultSets.size() == 0)
                 {
-                    releaseResources(connection, connectionLock);
+                    releaseResources(connection);
                 }
             }
         }
@@ -110,11 +110,10 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
         return connectionLock;
     }
 
-    protected void releaseResources(DbConnection connection, Object connectionLock)
+    protected void releaseResources(DbConnection connection)
     {
         connectionResultSets.remove(connection);
-
-        connectionLocks.remove(connectionLock);
+        connectionLocks.remove(connection);
 
         connection.release();
     }
@@ -153,5 +152,9 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
         }
 
         return connectionLock;
+    }
+
+    protected int getLocksCount()  {
+        return connectionLocks.size();
     }
 }
