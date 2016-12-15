@@ -12,7 +12,7 @@ public class Villain {
 
   private boolean alive = true;
 
-  public String hitByMissile() {
+  public String takeHit(Missile missile) {
     alive = false;
     return KABOOM;
   }

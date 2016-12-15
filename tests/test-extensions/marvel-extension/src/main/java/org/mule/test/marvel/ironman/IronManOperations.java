@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.marvel;
+package org.mule.test.marvel.ironman;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -15,9 +15,11 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.test.marvel.model.Missile;
 import org.mule.test.marvel.model.Villain;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,14 +43,18 @@ public class IronManOperations implements Initialisable, Disposable {
     }
   }
 
-  public void fireMissile(@UseConfig IronMan ironMan, Villain at, NonBlockingCallback<String, NullAttributes> callback) {
+  public void fireMissile(@UseConfig IronMan ironMan,
+                          @Connection Missile missile,
+                          Villain at,
+                          NonBlockingCallback<String, NullAttributes> callback) {
     final Runnable launch = () -> {
       try {
-        callback.onComplete(Result.<String, NullAttributes>builder()
-            .output(at.hitByMissile())
+        ironMan.track(missile);
+        callback.success(Result.<String, NullAttributes>builder()
+            .output(missile.fireAt(at))
             .attributes(NULL_ATTRIBUTES).build());
       } catch (Exception e) {
-        callback.onException(e);
+        callback.error(e);
       }
     };
 
@@ -59,7 +65,7 @@ public class IronManOperations implements Initialisable, Disposable {
   @Execution(CPU_INTENSIVE)
   public void computeFlightPlan(@UseConfig IronMan ironMan, NonBlockingCallback<Void, NullAttributes> callback) {
     final Runnable launch = () -> {
-      callback.onComplete(Result.<Void, NullAttributes>builder().build());
+      callback.success(Result.<Void, NullAttributes>builder().build());
       ironMan.setFlightPlan(FLIGHT_PLAN);
     };
 

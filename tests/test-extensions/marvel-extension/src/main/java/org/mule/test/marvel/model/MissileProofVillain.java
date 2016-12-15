@@ -11,7 +11,7 @@ public class MissileProofVillain extends Villain {
   public static final String MISSILE_PROOF = "Missile proof";
 
   @Override
-  public String hitByMissile() {
+  public String takeHit(Missile missile) {
     throw new UnsupportedOperationException(MISSILE_PROOF);
   }
 }

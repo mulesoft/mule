@@ -31,12 +31,12 @@ final class ReactorCallback implements NonBlockingCallback<Object, Attributes> {
   }
 
   @Override
-  public void onComplete(Result<Object, Attributes> result) {
+  public void success(Result<Object, Attributes> result) {
     sink.success(result);
   }
 
   @Override
-  public void onException(Exception e) {
+  public void error(Exception e) {
     //TODO: MULE-11184 - it shouldn't be necessary to create the MessagingException here.
     // it shouldn't even be necessary to keep the event at all.
     sink.error(new MessagingException(event, e));
