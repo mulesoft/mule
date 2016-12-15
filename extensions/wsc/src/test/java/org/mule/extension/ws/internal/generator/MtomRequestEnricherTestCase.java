@@ -26,7 +26,7 @@ public class MtomRequestEnricherTestCase extends AbstractRequestEnricherTestCase
   @Override
   protected String getExpectedResult() {
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-        + "<con:uploadAttachment xmlns:con=\"http://consumer.ws.extension.mule.org/\">"
+        + "<con:uploadAttachment xmlns:con=\"http://service.ws.extension.mule.org/\">"
         + "<attachment>"
         + "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:attachment-id\"/>"
         + "</attachment>"

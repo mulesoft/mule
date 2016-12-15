@@ -381,7 +381,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         builder.payload(getResponseOutputHandler(exchange))
             .mediaType(message.getPayload().getDataType().getMediaType().withCharset(charset.get()));
       } else {
-        builder.payload(getResponseOutputHandler(exchange)).mediaType(message.getPayload().getDataType().getMediaType());
+        String ct = (String) exchange.get(Message.CONTENT_TYPE);
+        MediaType mediaType = ct != null ? MediaType.parse(ct) : message.getPayload().getDataType().getMediaType();
+        builder.payload(getResponseOutputHandler(exchange)).mediaType(mediaType);
       }
     }
 

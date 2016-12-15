@@ -7,6 +7,7 @@
 package org.mule.runtime.module.cxf.support;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
 import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
@@ -90,7 +91,8 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
   }
 
   private void extractAndSetContentType(Message message, InternalMessage.Builder builder) {
-    String ct = (String) message.get(Message.CONTENT_TYPE);
+    String ct = (String) message.get(CONTENT_TYPE);
+    message.getExchange().put(CONTENT_TYPE, ct);
     if (ct != null) {
       builder.mediaType(MediaType.parse(ct).withCharset(getEncoding(message)));
     }

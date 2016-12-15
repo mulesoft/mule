@@ -1,0 +1,237 @@
+<definitions xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://service.ws.extension.mule.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://service.ws.extension.mule.org/" name="TestService">
+<types>
+    <xs:schema xmlns:tns="http://service.ws.extension.mule.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://service.ws.extension.mule.org/">
+        <xs:element name="EchoException" nillable="true" type="tns:echoFault"/>
+        <xs:element name="echo" type="tns:echo"/>
+        <xs:element name="echoAccount" type="tns:echoAccount"/>
+        <xs:element name="echoAccountResponse" type="tns:echoAccountResponse"/>
+        <xs:element name="echoResponse" type="tns:echoResponse"/>
+        <xs:element name="echoWithHeaders" type="tns:echoWithHeaders"/>
+        <xs:element name="echoWithHeadersResponse" type="tns:echoWithHeadersResponse"/>
+        <xs:element name="fail" type="tns:fail"/>
+        <xs:element name="failResponse" type="tns:failResponse"/>
+        <xs:element name="headerIn" nillable="true" type="xs:string"/>
+        <xs:element name="headerInOut" nillable="true" type="xs:string"/>
+        <xs:element name="headerOut" nillable="true" type="xs:string"/>
+        <xs:element name="noParams" type="tns:noParams"/>
+        <xs:element name="noParamsResponse" type="tns:noParamsResponse"/>
+        <xs:element name="noParamsWithHeader" type="tns:noParamsWithHeader"/>
+        <xs:element name="noParamsWithHeaderResponse" type="tns:noParamsWithHeaderResponse"/>
+        <xs:complexType name="fail">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="failResponse">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echoFault">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echoWithHeaders">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echoWithHeadersResponse">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="noParams">
+            <xs:sequence/>
+        </xs:complexType>
+        <xs:complexType name="noParamsResponse">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="noParamsWithHeader">
+            <xs:sequence/>
+        </xs:complexType>
+        <xs:complexType name="noParamsWithHeaderResponse">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echoAccount">
+            <xs:sequence>
+                <xs:element name="account" type="tns:account" minOccurs="0"/>
+                <xs:element name="name" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="account">
+            <xs:sequence>
+                <xs:element name="clientName" type="xs:string" minOccurs="0"/>
+                <xs:element name="id" type="xs:long" minOccurs="0"/>
+                <xs:element name="items" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="startingDate" type="xs:dateTime" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echoAccountResponse">
+            <xs:sequence>
+                <xs:element name="account" type="tns:account" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echo">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="echoResponse">
+            <xs:sequence>
+                <xs:element name="text" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:schema>
+</types>
+<message name="echo">
+<part name="parameters" element="tns:echo"/>
+</message>
+<message name="echoResponse">
+<part name="parameters" element="tns:echoResponse"/>
+</message>
+<message name="fail">
+<part name="parameters" element="tns:fail"/>
+</message>
+<message name="failResponse">
+<part name="parameters" element="tns:failResponse"/>
+</message>
+<message name="EchoException">
+<part name="fault" element="tns:EchoException"/>
+</message>
+<message name="echoWithHeaders">
+<part name="parameters" element="tns:echoWithHeaders"/>
+<part name="headerIn" element="tns:headerIn"/>
+<part name="headerInOut" element="tns:headerInOut"/>
+</message>
+<message name="echoWithHeadersResponse">
+<part name="result" element="tns:echoWithHeadersResponse"/>
+<part name="headerOut" element="tns:headerOut"/>
+<part name="headerInOut" element="tns:headerInOut"/>
+</message>
+<message name="noParams">
+<part name="parameters" element="tns:noParams"/>
+</message>
+<message name="noParamsResponse">
+<part name="parameters" element="tns:noParamsResponse"/>
+</message>
+<message name="noParamsWithHeader">
+<part name="parameters" element="tns:noParamsWithHeader"/>
+<part name="headerIn" element="tns:headerIn"/>
+</message>
+<message name="noParamsWithHeaderResponse">
+<part name="result" element="tns:noParamsWithHeaderResponse"/>
+</message>
+<message name="echoAccount">
+<part name="parameters" element="tns:echoAccount"/>
+</message>
+<message name="echoAccountResponse">
+<part name="parameters" element="tns:echoAccountResponse"/>
+</message>
+<portType name="TestService">
+<operation name="echo">
+    <input wsam:Action="echoOperation" message="tns:echo"/>
+    <output wsam:Action="http://service.ws.extension.mule.org/TestService/echoResponse" message="tns:echoResponse"/>
+</operation>
+<operation name="fail">
+    <input wsam:Action="fail" message="tns:fail"/>
+    <output wsam:Action="http://service.ws.extension.mule.org/TestService/failResponse" message="tns:failResponse"/>
+    <fault message="tns:EchoException" name="EchoException" wsam:Action="http://service.ws.extension.mule.org/TestService/fail/Fault/EchoException"/>
+</operation>
+<operation name="echoWithHeaders" parameterOrder="parameters headerIn headerOut headerInOut">
+    <input wsam:Action="echoWithHeaders" message="tns:echoWithHeaders"/>
+    <output wsam:Action="http://service.ws.extension.mule.org/TestService/echoWithHeadersResponse" message="tns:echoWithHeadersResponse"/>
+    <fault message="tns:EchoException" name="EchoException" wsam:Action="http://service.ws.extension.mule.org/TestService/echoWithHeaders/Fault/EchoException"/>
+</operation>
+<operation name="noParams">
+    <input wsam:Action="noParams" message="tns:noParams"/>
+    <output wsam:Action="http://service.ws.extension.mule.org/TestService/noParamsResponse" message="tns:noParamsResponse"/>
+</operation>
+<operation name="noParamsWithHeader" parameterOrder="parameters headerIn">
+    <input wsam:Action="noParams" message="tns:noParamsWithHeader"/>
+    <output wsam:Action="http://service.ws.extension.mule.org/TestService/noParamsWithHeaderResponse" message="tns:noParamsWithHeaderResponse"/>
+</operation>
+<operation name="echoAccount">
+    <input wsam:Action="echoAccount" message="tns:echoAccount"/>
+    <output wsam:Action="http://service.ws.extension.mule.org/TestService/echoAccountResponse" message="tns:echoAccountResponse"/>
+</operation>
+</portType>
+<binding name="TestPortBinding" type="tns:TestService">
+<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+<operation name="echo">
+    <soap:operation soapAction="echoOperation"/>
+    <input>
+        <soap:body use="literal"/>
+    </input>
+    <output>
+        <soap:body use="literal"/>
+    </output>
+</operation>
+<operation name="fail">
+    <soap:operation soapAction="fail"/>
+    <input>
+        <soap:body use="literal"/>
+    </input>
+    <output>
+        <soap:body use="literal"/>
+    </output>
+    <fault name="EchoException">
+        <soap:fault name="EchoException" use="literal"/>
+    </fault>
+</operation>
+<operation name="echoWithHeaders">
+    <soap:operation soapAction="echoWithHeaders"/>
+    <input>
+        <soap:body use="literal" parts="parameters"/>
+        <soap:header message="tns:echoWithHeaders" part="headerIn" use="literal"/>
+        <soap:header message="tns:echoWithHeaders" part="headerInOut" use="literal"/>
+    </input>
+    <output>
+        <soap:body use="literal" parts="result"/>
+        <soap:header message="tns:echoWithHeadersResponse" part="headerOut" use="literal"/>
+        <soap:header message="tns:echoWithHeadersResponse" part="headerInOut" use="literal"/>
+    </output>
+    <fault name="EchoException">
+        <soap:fault name="EchoException" use="literal"/>
+    </fault>
+</operation>
+<operation name="noParams">
+    <soap:operation soapAction="noParams"/>
+    <input>
+        <soap:body use="literal"/>
+    </input>
+    <output>
+        <soap:body use="literal"/>
+    </output>
+</operation>
+<operation name="noParamsWithHeader">
+    <soap:operation soapAction="noParams"/>
+    <input>
+        <soap:body use="literal" parts="parameters"/>
+        <soap:header message="tns:noParamsWithHeader" part="headerIn" use="literal"/>
+    </input>
+    <output>
+        <soap:body use="literal"/>
+    </output>
+</operation>
+<operation name="echoAccount">
+    <soap:operation soapAction="echoAccount"/>
+    <input>
+        <soap:body use="literal"/>
+    </input>
+    <output>
+        <soap:body use="literal"/>
+    </output>
+</operation>
+</binding>
+<service name="TestService">
+<port name="TestPort" binding="tns:TestPortBinding">
+    <soap:address location="http://localhost:8082/simpleService"/>
+</port>
+</service>
+        </definitions>

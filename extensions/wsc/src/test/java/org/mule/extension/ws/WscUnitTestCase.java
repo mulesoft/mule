@@ -6,11 +6,12 @@
  */
 package org.mule.extension.ws;
 
-import org.mule.extension.ws.consumer.Simple11Service;
+import org.mule.extension.ws.service.Simple11Service;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -32,7 +33,7 @@ public abstract class WscUnitTestCase {
 
   @Before
   public void setup() {
-    introspecter = new WsdlIntrospecter(service.get11Address() + "?wsdl", "TestService", "TestPort");
+    introspecter = new WsdlIntrospecter(service.getAddress() + "?wsdl", "TestService", "TestPort");
     loader = new XmlTypeLoader(introspecter.getSchemas());
   }
 }

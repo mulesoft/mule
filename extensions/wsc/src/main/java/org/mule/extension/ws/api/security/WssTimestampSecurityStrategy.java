@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ws.api.security;
 
-import static java.lang.Long.valueOf;
 import static java.util.Optional.empty;
 import static org.apache.ws.security.handler.WSHandlerConstants.TIMESTAMP;
 import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
@@ -64,6 +63,7 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
 
   @Override
   public Map<String, Object> buildSecurityProperties() {
-    return ImmutableMap.<String, Object>builder().put(TTL_TIMESTAMP, valueOf(timeToLiveUnit.toSeconds(timeToLive))).build();
+    return ImmutableMap.<String, Object>builder().put(TTL_TIMESTAMP, String.valueOf(timeToLiveUnit.toSeconds(timeToLive)))
+        .build();
   }
 }

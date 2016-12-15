@@ -1,0 +1,17 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="httpConfig" host="0.0.0.0" port="${servicePort}" />
+    <cxf:configuration name="cxfConfig" enableMuleSoapHeaders="true" initializeStaticBusInstance="true"/>
+
+    <flow name="sv">
+        <http:listener config-ref="httpConfig" path="/server" parseRequest="false"/>
+        <cxf:jaxws-service configuration-ref="cxfConfig" serviceClass="${serviceClass}" />
+        <component class="${serviceClass}"/>
+    </flow>
+</mule>

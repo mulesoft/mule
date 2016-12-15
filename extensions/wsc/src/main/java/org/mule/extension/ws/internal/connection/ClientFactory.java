@@ -11,8 +11,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.cxf.message.Message.MTOM_ENABLED;
 import static org.apache.ws.security.handler.WSHandlerConstants.ACTION;
 import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;
-import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
 import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
+import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
 import org.mule.extension.ws.api.SoapVersion;
 import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.extension.ws.internal.WebServiceConsumer;
@@ -28,8 +28,8 @@ import org.mule.extension.ws.internal.transport.WscTransportFactory;
 import org.mule.runtime.api.connection.ConnectionException;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -118,29 +118,30 @@ final class ClientFactory {
       return emptyMap();
     }
 
-    ImmutableMap.Builder<String, Object> propsBuilder = ImmutableMap.builder();
+    Map<String, Object> props = new HashMap<>();
     StringJoiner actionsJoiner = new StringJoiner(" ");
 
     ImmutableList.Builder<CallbackHandler> callbackHandlersBuilder = ImmutableList.builder();
     strategies.stream()
         .filter(s -> s.securityType().equals(type))
         .forEach(s -> {
-          propsBuilder.putAll(s.buildSecurityProperties());
+          props.putAll(s.buildSecurityProperties());
           actionsJoiner.add(s.securityAction());
           s.buildPasswordCallbackHandler().ifPresent(callbackHandlersBuilder::add);
         });
 
     List<CallbackHandler> handlers = callbackHandlersBuilder.build();
     if (!handlers.isEmpty()) {
-      propsBuilder.put(PW_CALLBACK_REF, new CompositeCallbackHandler(handlers));
+      props.put(PW_CALLBACK_REF, new CompositeCallbackHandler(handlers));
     }
 
     String actions = actionsJoiner.toString();
     if (isNotBlank(actions)) {
-      propsBuilder.put(ACTION, actions);
+      props.put(ACTION, actions);
     }
 
-    return propsBuilder.build();
+    // This Map needs to be mutable, cxf will add properties if needed.
+    return props;
   }
 
   private void addRequestInterceptors(Client client) {

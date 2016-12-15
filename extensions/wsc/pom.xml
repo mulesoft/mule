@@ -18,7 +18,7 @@
     <description>A Mule extension that provides functionality for consuming SOAP web services</description>
 
     <properties>
-        <cxfVersion>2.7.15</cxfVersion>
+        <cxfVersion>2.7.18</cxfVersion>
         <metadataModelXmlVersion>1.0.0-SNAPSHOT</metadataModelXmlVersion>
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -140,6 +140,12 @@
             <artifactId>commons-lang</artifactId>
             <version>${commonsLangVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-rm</artifactId>
+            <version>${cxfVersion}</version>
+        </dependency>
+
         <!--TODO remove MULE-10783-->
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
