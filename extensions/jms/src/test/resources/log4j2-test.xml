@@ -22,7 +22,6 @@
         <!--<AsyncLogger name="org.mule.test.runner" level="DEBUG"/>-->
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
-        <!--<AsyncLogger name="org.springframework.jms.connection" level="TRACE"/>-->
         <!--<AsyncLogger name="org.mule.extensions.jms" level="DEBUG"/>-->
         <!--<AsyncLogger name="org.mule.extensions.jms.test" level="DEBUG"/>-->
 
