@@ -526,7 +526,36 @@
     <xs:complexType name="ListenPaymentsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-                <xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="labeled-ricin">
+                                    <xs:complexType>
+                                        <xs:sequence maxOccurs="1">
+                                            <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
+                                        </xs:sequence>
+                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="next-door">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
                 </xs:sequence>
@@ -539,6 +568,9 @@
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
