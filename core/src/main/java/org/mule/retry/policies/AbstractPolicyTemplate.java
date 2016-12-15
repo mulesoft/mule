@@ -138,4 +138,10 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     {
         // ignore
     }
+
+    @Override
+    public boolean isSynchronous()
+    {
+        return true;
+    }
 }

@@ -30,4 +30,6 @@ public interface RetryPolicyTemplate
     void setNotifier(RetryNotifier retryNotifier);
 
     RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception;
+
+    boolean isSynchronous();
 }
