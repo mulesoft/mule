@@ -44,15 +44,14 @@ public class SimpleRetryPolicy implements RetryPolicy {
   @Override
   public <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                       Predicate<Throwable> shouldRetry,
-                                      Consumer<Publisher<T>> onExhausted) {
+                                      Consumer<Throwable> onExhausted) {
     final int actualCount = count + 1;
     return from(publisher).retryWhen(errors -> errors.zipWith(range(1, actualCount), Tuples::of)
         .flatMap(tuple -> {
           final Throwable exception = tuple.getT1();
-          Mono<T> error = error(exception);
           if (tuple.getT2() == actualCount || !shouldRetry.test(exception)) {
-            onExhausted.accept(error);
-            return error;
+            onExhausted.accept(exception);
+            return (Mono<T>) error(exception);
           } else {
             return delayMillis(frequency);
           }

@@ -19,11 +19,30 @@ import org.reactivestreams.Publisher;
  */
 public interface RetryPolicy {
 
+  /**
+   * Applies the retry policy by performing a blocking action.
+   *
+   * @param cause the failure which causes the retry
+   * @return a {@link PolicyStatus}
+   */
   PolicyStatus applyPolicy(Throwable cause);
 
+
+  /**
+   * Applies the retry policy in a non blocking manner by transforming
+   * the given {@code publisher} into one configured to apply the retry
+   * logic.
+   *
+   * @param publisher   a publisher with the items which might fail
+   * @param shouldRetry a predicate which evaluates each item to know if it should be retried or not
+   * @param onExhausted an action to perform when the retry action has been exhausted
+   * @param <T>         the generic type of the publisher's content
+   * @return a {@link Publisher} configured with the retry policy.
+   * @since 4.0
+   */
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                        Predicate<Throwable> shouldRetry,
-                                       Consumer<Publisher<T>> onExhausted) {
+                                       Consumer<Throwable> onExhausted) {
     return publisher;
   }
 

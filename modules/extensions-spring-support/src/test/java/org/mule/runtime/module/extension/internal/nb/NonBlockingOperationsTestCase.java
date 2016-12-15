@@ -53,7 +53,7 @@ public class NonBlockingOperationsTestCase extends ExtensionFunctionalTestCase {
     expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 
     Villain villain = new MissileProofVillain();
-    flowRunner("fireMissile").withPayload(villain).run();
+    flowRunner("fireMissile").withPayload(villain).nonBlocking().run();
 
     assertThat(villain.isAlive(), is(true));
   }
@@ -80,7 +80,7 @@ public class NonBlockingOperationsTestCase extends ExtensionFunctionalTestCase {
     Villain villain = new Villain();
     String result = (String) flowRunner(flowName)
         .withPayload(villain)
-        .run().getMessage().getPayload().getValue();
+        .nonBlocking().run().getMessage().getPayload().getValue();
 
     assertThat(villain.isAlive(), is(false));
     assertThat(result, is(KABOOM));
