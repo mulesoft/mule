@@ -7,11 +7,10 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
-import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObject implements ObjectFactory<T> {
+public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObjectFactory<T> {
 
   @Inject
   private MuleContext muleContext;
@@ -33,11 +32,8 @@ public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObject implem
   private Map<String, Object> parameters = new HashMap<>();
 
   @Override
-  public T getObject() throws Exception {
+  public T doGetObject() throws Exception {
     Object instance = factory.createInstance(parameters);
-    if (instance instanceof AnnotatedObject) {
-      ((AnnotatedObject) instance).setAnnotations(getAnnotations());
-    }
     if (commonConfiguratorType != null) {
       ObjectFactoryCommonConfigurator commonConfigurator = instanciateClass(commonConfiguratorType);
       commonConfigurator.configure(instance, parameters);

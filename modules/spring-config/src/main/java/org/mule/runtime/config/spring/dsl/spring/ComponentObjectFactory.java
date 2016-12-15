@@ -7,9 +7,6 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
-import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
@@ -21,6 +18,8 @@ import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +31,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class ComponentObjectFactory extends AbstractAnnotatedObject implements ObjectFactory<Component> {
+public class ComponentObjectFactory extends AbstractAnnotatedObjectFactory<Component> {
 
   private Class clazz;
   private org.mule.runtime.core.api.object.ObjectFactory objectFactory;
@@ -44,7 +43,7 @@ public class ComponentObjectFactory extends AbstractAnnotatedObject implements O
   private List<Interceptor> interceptors = new ArrayList<>();
 
   @Override
-  public Component getObject() throws Exception {
+  public Component doGetObject() throws Exception {
     if (clazz != null && objectFactory != null) {
       throw new MuleRuntimeException(createStaticMessage("Only one of class attribute or object factory is allowed in a component"));
     }
