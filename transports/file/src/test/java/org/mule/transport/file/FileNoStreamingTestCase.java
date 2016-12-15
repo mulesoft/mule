@@ -12,13 +12,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.junit.Test;
 
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
+import static org.mule.util.FileUtils.openDirectory;
 
 /**
  * When a file connector has the streaming attribute unset,
@@ -44,8 +45,8 @@ public class FileNoStreamingTestCase extends FunctionalTestCase
     @Test
     public void fileToStringNoStreamingFileConnector() throws Exception
     {
-        File tmpDir = FileUtils.openDirectory(getFileInsideWorkingDirectory("in").getAbsolutePath());
-        createDataFile(tmpDir, TEST_MESSAGE, StandardCharsets.UTF_8.name());
+        File tmpDir = openDirectory(getFileInsideWorkingDirectory("in").getAbsolutePath());
+        createDataFile(tmpDir, TEST_MESSAGE, UTF_8.name());
 
         muleContext.start();
 
