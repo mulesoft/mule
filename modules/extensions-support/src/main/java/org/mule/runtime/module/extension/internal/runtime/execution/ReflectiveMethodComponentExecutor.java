@@ -15,21 +15,22 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.slf4j.Logger;
 
 /**
- * Executes a task associated to a {@link ExecutionContext} by invoking a given
- * {@link Method}
+ * Executes a task associated to a {@link ExecutionContext} by invoking a given {@link Method}
  *
  * @param <M> the generic type of the associated {@link ComponentModel}
  * @since 4.0
@@ -57,12 +58,13 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel> impleme
 
   private MuleContext muleContext;
 
-  public ReflectiveMethodComponentExecutor(M componentModel, Method method, Object componentInstance) {
+  public ReflectiveMethodComponentExecutor(List<ParameterGroupModel> parameterGroupModels, Method method,
+                                           Object componentInstance) {
     this.method = method;
     this.componentInstance = componentInstance;
     argumentResolverDelegate = isEmpty(method.getParameterTypes())
         ? NO_ARGS_DELEGATE
-        : new MethodArgumentResolverDelegate(componentModel, method);
+        : new MethodArgumentResolverDelegate(parameterGroupModels, method);
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 

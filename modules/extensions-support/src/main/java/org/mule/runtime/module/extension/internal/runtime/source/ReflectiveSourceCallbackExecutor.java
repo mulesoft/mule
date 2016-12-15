@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,12 +23,13 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * Implementation of {@link SourceCallbackExecutor} which uses reflection to
- * execute the callback through a {@link Method}
+ * Implementation of {@link SourceCallbackExecutor} which uses reflection to execute the callback through a {@link Method}
  *
  * @since 4.0
  */
@@ -40,12 +44,12 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   /**
    * Creates a new instance
    *
-   * @param extensionModel        the {@link ExtensionModel} of the owning component
+   * @param extensionModel the {@link ExtensionModel} of the owning component
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the component requires a config
-   * @param sourceModel           the model of the {@code source}
-   * @param source                a {@link Source} instance
-   * @param method                the method to be executed
-   * @param muleContext           the current {@link MuleContext}
+   * @param sourceModel the model of the {@code source}
+   * @param source a {@link Source} instance
+   * @param method the method to be executed
+   * @param muleContext the current {@link MuleContext}
    */
   public ReflectiveSourceCallbackExecutor(ExtensionModel extensionModel,
                                           Optional<ConfigurationInstance> configurationInstance,
@@ -58,7 +62,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     this.configurationInstance = configurationInstance;
     this.sourceModel = sourceModel;
     this.muleContext = muleContext;
-    executor = new ReflectiveMethodComponentExecutor<>(sourceModel, method, source);
+    executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel), method, source);
   }
 
   /**
@@ -80,5 +84,17 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);
     return executionContext;
+  }
+
+  private List<ParameterGroupModel> getAllGroups(SourceModel model) {
+    List<ParameterGroupModel> all = new LinkedList<>();
+    List<ParameterGroupModel> callbackParameters = new LinkedList<>();
+
+    all.addAll(model.getParameterGroupModels());
+    model.getSuccessCallback().ifPresent(callback -> callbackParameters.addAll(callback.getParameterGroupModels()));
+    model.getErrorCallback().ifPresent(callback -> callbackParameters.addAll(callback.getParameterGroupModels()));
+    all.addAll(callbackParameters.stream().distinct().collect(toList()));
+
+    return unmodifiableList(all);
   }
 }

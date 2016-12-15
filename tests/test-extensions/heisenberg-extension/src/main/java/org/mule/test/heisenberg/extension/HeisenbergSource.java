@@ -9,7 +9,7 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
@@ -21,7 +21,9 @@ import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -32,6 +34,7 @@ import javax.inject.Inject;
 
 
 @Alias("ListenPayments")
+@EmitsResponse
 public class HeisenbergSource extends Source<String, Attributes> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
@@ -70,7 +73,8 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @OnSuccess
-  public void onResponse(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter) {
+  public void onResponse(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter,
+                         @ParameterGroup(RICIN_GROUP_NAME) RicinGroup ricin) {
     heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
   }
 

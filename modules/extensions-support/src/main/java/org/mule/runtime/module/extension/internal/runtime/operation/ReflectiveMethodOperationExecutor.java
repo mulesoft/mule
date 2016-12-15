@@ -26,8 +26,7 @@ import java.lang.reflect.Method;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link OperationExecutor} which works by using reflection to invoke
- * a method from a class.
+ * Implementation of {@link OperationExecutor} which works by using reflection to invoke a method from a class.
  *
  * @since 3.7.0
  */
@@ -39,7 +38,8 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
   private MuleContext muleContext;
 
   public ReflectiveMethodOperationExecutor(OperationModel operationModel, Method operationMethod, Object operationInstance) {
-    executor = new ReflectiveMethodComponentExecutor<>(operationModel, operationMethod, operationInstance);
+    executor =
+        new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
   }
 
   /**
