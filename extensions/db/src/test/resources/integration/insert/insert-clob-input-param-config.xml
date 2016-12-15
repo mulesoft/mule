@@ -10,9 +10,8 @@
            <db:sql>
                INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)
            </db:sql>
-            <db:parameter-types></db:parameter-types>
             <db:input-parameters>
-                <db:input-parameter key="description" value="#[payload]"/>
+                #[['description' : payload]]
             </db:input-parameters>
         </db:insert>
 
@@ -28,7 +27,7 @@
                 <db:parameter-type key="description" type="CLOB"/>
             </db:parameter-types>
             <db:input-parameters>
-                <db:input-parameter key="description" value="#[payload]"/>
+                #[['description' : payload]]
             </db:input-parameters>
         </db:insert>
 

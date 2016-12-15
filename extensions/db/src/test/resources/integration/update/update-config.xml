@@ -24,7 +24,7 @@
         <db:update>
             <db:sql>update PLANET set NAME= :name where NAME='Mars'</db:sql>
             <db:input-parameters>
-                <db:input-parameter key="name" value="#[payload]"/>
+                #[['name' : payload]]
             </db:input-parameters>
         </db:update>
     </flow>
@@ -33,7 +33,7 @@
         <db:update>
             <db:sql>update PLANET set PICTURE = :pic where NAME='Mars'</db:sql>
             <db:input-parameters>
-                <db:input-parameter key="pic" value="#[payload]"/>
+                #[['pic' : payload]]
             </db:input-parameters>
         </db:update>
     </flow>

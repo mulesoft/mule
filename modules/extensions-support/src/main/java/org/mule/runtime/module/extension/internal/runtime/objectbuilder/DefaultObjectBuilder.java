@@ -78,10 +78,19 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
   public T build(Event event) throws MuleException {
     T object = createInstance(prototypeClass);
 
-    for (Map.Entry<Field, ValueResolver<Object>> resolver : resolvers.entrySet()) {
-      setField(resolver.getKey(), object, resolver.getValue().resolve(event));
+    for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
+      setField(entry.getKey(), object, resolve(entry.getValue(), event));
     }
 
     return object;
+  }
+
+  private Object resolve(ValueResolver resolver, Event event) throws MuleException {
+    Object value = resolver.resolve(event);
+    if (value instanceof ValueResolver) {
+      value = resolve((ValueResolver) value, event);
+    }
+
+    return value;
   }
 }
