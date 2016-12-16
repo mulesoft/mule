@@ -30,6 +30,11 @@ public class RetryConnectionFactory extends AbstractConnectionFactory
     {
         this.retryPolicyTemplate = retryPolicyTemplate;
         this.delegate = delegate;
+
+        if (!retryPolicyTemplate.isSynchronous())
+        {
+            throw new IllegalArgumentException("This component doesn't support asynchronous retry policies.");
+        }
     }
 
     @Override

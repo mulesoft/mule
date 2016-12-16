@@ -90,4 +90,10 @@ public class AsynchronousRetryTemplate implements RetryPolicyTemplate
     {
         this.startLatch = latch;
     }
+
+    @Override
+    public boolean isSynchronous()
+    {
+        return false;
+    }
 }
