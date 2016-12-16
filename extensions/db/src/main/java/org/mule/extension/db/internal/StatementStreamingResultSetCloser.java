@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.internal;
 
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.result.statement.AbstractStreamingResultSetCloser;
@@ -14,12 +15,13 @@ import org.mule.extension.db.internal.result.statement.AbstractStreamingResultSe
 import java.sql.ResultSet;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Closes a {@link ResultSet} once it has been processed
- * 
+ *
  * @since 4.0
  */
 public class StatementStreamingResultSetCloser extends AbstractStreamingResultSetCloser {
@@ -37,7 +39,7 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
 
   /**
    * Closes all tracked {@link ResultSet}s for the passed {@code connection}.
-   * 
+   *
    * @param connection
    */
   public void closeResultSets(DbConnection connection) {
@@ -53,33 +55,33 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
         }
       }
 
-      releaseResources(connection, connectionLock);
+      releaseResources(connection);
     }
   }
 
   @Override
   public void close(DbConnection connection, ResultSet resultSet) {
-    Object connectionLock = getTrackedConnectionLock(connection);
+    getTrackedConnectionLock(connection).ifPresent(connectionLock -> {
+      synchronized (connectionLock) {
+        checkValidConnectionLock(connection, connectionLock);
 
-    synchronized (connectionLock) {
-      checkValidConnectionLock(connection, connectionLock);
-
-      Set<ResultSet> resultSets = getConnectionResultSets(connection, resultSet);
-      try {
-        super.close(connection, resultSet);
-      } finally {
-        if (isEmpty(resultSets)) {
-          releaseResources(connection, connectionLock);
+        Set<ResultSet> resultSets = getConnectionResultSets(connection, resultSet);
+        try {
+          super.close(connection, resultSet);
+        } finally {
+          if (isEmpty(resultSets)) {
+            releaseResources(connection);
+          }
         }
       }
-    }
+    });
   }
 
   /**
    * Adds a resultSet for tracking in order to be able to close it later
    *
    * @param connection connection that holds the resultSet
-   * @param resultSet resultSet to track
+   * @param resultSet  resultSet to track
    */
   public void trackResultSet(DbConnection connection, ResultSet resultSet) {
     Object connectionLock = getConnectionLock(connection);
@@ -96,19 +98,13 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
     }
   }
 
-  protected Object getTrackedConnectionLock(DbConnection connection) {
-    Object connectionLock = connectionLocks.get(connection);
-
-    if (connectionLock == null) {
-      throw new IllegalStateException("Attempting to close resultSet from non tracked connection");
-    }
-
-    return connectionLock;
+  protected Optional<Object> getTrackedConnectionLock(DbConnection connection) {
+    return ofNullable(connectionLocks.get(connection));
   }
 
-  protected void releaseResources(DbConnection connection, Object connectionLock) {
+  protected void releaseResources(DbConnection connection) {
     connectionResultSets.remove(connection);
-    connectionLocks.remove(connectionLock);
+    connectionLocks.remove(connection);
 
     connection.release();
   }
@@ -140,5 +136,9 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
     }
 
     return connectionLock;
+  }
+
+  protected int getLocksCount() {
+    return connectionLocks.size();
   }
 }
