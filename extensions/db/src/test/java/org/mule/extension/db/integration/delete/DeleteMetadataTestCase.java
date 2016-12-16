@@ -44,6 +44,24 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  public void bulkDeleteNoParametersInputMetadata() throws Exception {
+    ParameterMetadataDescriptor parameters =
+        getParameterValuesMetadata("bulkDeleteMetadata", "DELETE FROM PLANET WHERE name = 'Mars'");
+
+    assertThat(parameters.getType(), is(instanceOf(NullType.class)));
+  }
+
+  @Test
+  public void bulkDeleteParameterizedInputMetadata() throws Exception {
+    ParameterMetadataDescriptor parameters =
+        getParameterValuesMetadata("bulkDeleteMetadata", "DELETE FROM PLANET WHERE name = :name");
+
+    assertThat(parameters.getType(), is(instanceOf(ObjectType.class)));
+    assertThat(((ObjectType) parameters.getType()).getFields().size(), equalTo(1));
+    assertFieldOfType(((ObjectType) parameters.getType()), "name", testDatabase.getNameFieldMetaDataType());
+  }
+
+  @Test
   public void deleteNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = 'Mars'");

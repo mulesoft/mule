@@ -45,6 +45,23 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  public void bulkInsertNoParametersInputMetadata() throws Exception {
+    ParameterMetadataDescriptor parameters =
+        getParameterValuesMetadata("bulkInsertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')");
+    assertThat(parameters.getType(), is(instanceOf(NullType.class)));
+  }
+
+  @Test
+  public void bulkInsertParameterizedInputMetadata() throws Exception {
+    ParameterMetadataDescriptor parameters =
+        getParameterValuesMetadata("bulkInsertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)");
+
+    assertThat(parameters.getType(), is(instanceOf(ObjectType.class)));
+    assertThat(((ObjectType) parameters.getType()).getFields().size(), equalTo(1));
+    assertFieldOfType(((ObjectType) parameters.getType()), "name", testDatabase.getNameFieldMetaDataType());
+  }
+
+  @Test
   public void insertNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')");

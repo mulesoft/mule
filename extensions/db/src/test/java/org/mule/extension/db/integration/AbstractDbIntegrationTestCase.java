@@ -216,4 +216,11 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     assertThat(output.isSuccess(), is(true));
     assertThat(output.get().getType(), is(type));
   }
+
+  protected ParameterMetadataDescriptor getParameterValuesMetadata(String flow, String query) throws RegistrationException {
+    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, query);
+    assertThat(metadata.isSuccess(), is(true));
+    return metadata.get().getInputMetadata().get().getParameterMetadata("parameterValues").get();
+  }
+
 }
