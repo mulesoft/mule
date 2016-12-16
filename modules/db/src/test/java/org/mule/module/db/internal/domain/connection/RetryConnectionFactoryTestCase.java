@@ -11,9 +11,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.junit.Before;
 import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.retry.policies.AbstractPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -33,8 +35,15 @@ public class RetryConnectionFactoryTestCase extends AbstractMuleTestCase
 
     private final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
     private final ConnectionFactory delegate = mock(ConnectionFactory.class);
-    private final RetryConnectionFactory connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, delegate);
     private final DataSource dataSource = mock(DataSource.class);
+    private RetryConnectionFactory connectionFactory;
+
+    @Before
+    public void init()
+    {
+        when(retryPolicyTemplate.isSynchronous()).thenReturn(true);
+        connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, delegate);
+    }
 
     @Test
     public void createsConnection() throws Exception
