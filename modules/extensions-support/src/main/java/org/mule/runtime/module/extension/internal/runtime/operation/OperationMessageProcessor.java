@@ -23,6 +23,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.exception.MuleException;
@@ -182,7 +183,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
-        .defaultIfEmpty(returnDelegate.asReturnValue(null, operationContext))
+        .otherwiseIfEmpty(fromCallable(() -> returnDelegate.asReturnValue(null, operationContext)))
         .mapError(Exceptions::unwrap);
   }
 
