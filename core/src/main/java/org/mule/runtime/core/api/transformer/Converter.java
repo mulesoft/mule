@@ -36,7 +36,7 @@ public interface Converter extends Transformer {
   void setPriorityWeighting(int weighting);
 
   @Override
-  default ProcessingType getProccesingType() {
+  default ProcessingType getProcessingType() {
     if (getReturnDataType().isStreamType()
         || getSourceDataTypes().stream().filter(dataType -> !dataType.isStreamType()).count() > 0) {
       return IO_RW;

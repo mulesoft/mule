@@ -465,7 +465,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     @Override
-    public ProcessingType getProccesingType() {
+    public ProcessingType getProcessingType() {
       return CPU_LITE;
     }
 

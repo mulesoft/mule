@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.connector;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
@@ -18,7 +19,7 @@ import org.junit.rules.ExpectedException;
 
 public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTestCase {
 
-  private static final String INVALID_CREDENTIALS_ERROR_MESSAGE = "Invalid credentials.";
+  private static final String INVALID_CREDENTIALS_ERROR_MESSAGE = "Invalid credentials";
 
 
   @Rule
@@ -33,7 +34,7 @@ public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTest
   public void getInvalidConnection() throws Exception {
     expectedEx.expect(MessagingException.class);
     expectedEx.expectCause(is(instanceOf(Exception.class)));
-    expectedEx.expectMessage(is(INVALID_CREDENTIALS_ERROR_MESSAGE));
+    expectedEx.expectMessage(containsString(INVALID_CREDENTIALS_ERROR_MESSAGE));
 
     runFlow("getPetsWithInvalidConfigWithConnectionValidation").getMessage().getPayload().getValue();
   }

@@ -11,18 +11,21 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import java.lang.reflect.Method;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
@@ -46,8 +49,12 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
    * {@inheritDoc}
    */
   @Override
-  public Object execute(ExecutionContext<OperationModel> executionContext) throws Exception {
-    return executor.execute(executionContext);
+  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+    try {
+      return justOrEmpty(executor.execute(executionContext));
+    } catch (Exception e) {
+      return error(e);
+    }
   }
 
   @Override

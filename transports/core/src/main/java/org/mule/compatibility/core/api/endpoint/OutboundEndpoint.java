@@ -37,7 +37,7 @@ public interface OutboundEndpoint
   boolean isDynamic();
 
   @Override
-  default ProcessingType getProccesingType() {
+  default ProcessingType getProcessingType() {
     return BLOCKING;
   }
 

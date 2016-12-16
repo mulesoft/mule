@@ -30,9 +30,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -70,6 +72,7 @@ import org.mule.runtime.extension.api.annotation.ExtensionOf;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -79,6 +82,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -89,8 +93,10 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
+import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.FunctionParameterTypeContributor;
@@ -330,6 +336,8 @@ public final class AnnotationsBasedDescriber implements Describer {
 
     source
         .hasResponse(sourceType.isAnnotatedWith(EmitsResponse.class))
+        .requiresConnection(connectionParameter.isPresent())
+        .transactional(false) // TODO: MULE-10961
         .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
         .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()))
         .withOutput().ofType(typeLoader.load(sourceGenerics.get(0)));
@@ -426,15 +434,80 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                                                          method)));
 
       addExceptionEnricher(operationMethod, operation);
-      operation.withOutput().ofType(getMethodReturnType(method, typeLoader));
-      operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, typeLoader));
-      addInterceptingCallbackModelProperty(operationMethod, operation);
-      addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
+      processOperationConnectivity(operation, operationMethod);
+
+      if (!processNonBlockingOperation(operation, operationMethod)) {
+        operation.blocking(true).withOutput().ofType(getMethodReturnType(method, typeLoader));
+        operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, typeLoader));
+        processInterceptingOperation(operationMethod, operation);
+
+        addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
+      }
+
+      addExecutionType(operation, operationMethod);
       declareMethodBasedParameters(operation, operationMethod.getParameters(),
                                    new ParameterDeclarationContext(OPERATION, operation.getDeclaration()));
       calculateExtendedTypes(declaringClass, method, operation);
       operationDeclarers.put(operationMethod, operation);
     }
+  }
+
+  private void processOperationConnectivity(OperationDeclarer operation, MethodElement operationMethod) {
+    final List<ExtensionParameter> connectionParameters = operationMethod.getParametersAnnotatedWith(Connection.class);
+    if (connectionParameters.isEmpty()) {
+      operation.requiresConnection(false).transactional(false);
+    } else if (connectionParameters.size() == 1) {
+      ExtensionParameter connectionParameter = connectionParameters.get(0);
+      operation.requiresConnection(true)
+          .transactional(TransactionalConnection.class.isAssignableFrom(connectionParameter.getType().getDeclaringClass()))
+          .withModelProperty(new ConnectivityModelProperty(connectionParameter.getMetadataType(typeLoader)));
+    } else if (connectionParameters.size() > 1) {
+      throw new IllegalOperationModelDefinitionException(format(
+                                                                "Operation '%s' defines %d parameters annotated with @%s. Only one is allowed",
+                                                                operationMethod.getAlias(), connectionParameters.size(),
+                                                                Connection.class.getSimpleName()));
+    }
+  }
+
+  private boolean processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod) {
+    List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
+        .filter(p -> CompletionCallback.class.equals(p.getType().getDeclaringClass()))
+        .collect(toList());
+
+    if (callbackParameters.isEmpty()) {
+      return false;
+    }
+
+    if (callbackParameters.size() > 1) {
+      throw new IllegalOperationModelDefinitionException(format(
+                                                                "Operation '%s' defines more than one %s parameters. Only one is allowed",
+                                                                operationMethod.getAlias(),
+                                                                CompletionCallback.class.getSimpleName()));
+    }
+
+    if (!isVoid(operationMethod.getMethod())) {
+      throw new IllegalOperationModelDefinitionException(format(
+                                                                "Operation '%s' has a parameter of type %s but is not void. Non-blocking operations have to be declared as void and the "
+                                                                    + "return type provided through the callback",
+                                                                operationMethod.getAlias(),
+                                                                CompletionCallback.class.getSimpleName()));
+    }
+
+    ExtensionParameter callbackParameter = callbackParameters.get(0);
+    java.lang.reflect.Parameter methodParameter = (java.lang.reflect.Parameter) callbackParameter.getDeclaringElement();
+    List<MetadataType> genericTypes = getGenerics(methodParameter.getParameterizedType(), typeLoader);
+
+    if (genericTypes.isEmpty()) {
+      throw new IllegalParameterModelDefinitionException(format("Generics are mandatory on the %s parameter of Operation '%s'",
+                                                                CompletionCallback.class.getSimpleName(),
+                                                                operationMethod.getAlias()));
+    }
+
+    operation.withOutput().ofType(genericTypes.get(0));
+    operation.withOutputAttributes().ofType(genericTypes.get(1));
+    operation.blocking(false);
+
+    return true;
   }
 
   private boolean isInvalidConfigSupport(boolean supportsConfig, Optional<ExtensionParameter>... parameters) {
@@ -830,10 +903,15 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                   operationMethod.getName()));
       }
       operation.withModelProperty(new PagedOperationModelProperty());
+      operation.requiresConnection(true);
     }
   }
 
-  private void addInterceptingCallbackModelProperty(MethodElement operationMethod, OperationDeclarer operation) {
+  private void addExecutionType(OperationDeclarer operationDeclarer, MethodElement operationMethod) {
+    operationMethod.getAnnotation(Execution.class).ifPresent(a -> operationDeclarer.withExecutionType(a.value()));
+  }
+
+  private void processInterceptingOperation(MethodElement operationMethod, OperationDeclarer operation) {
     if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType())) {
       operation.withModelProperty(new InterceptingModelProperty());
     }

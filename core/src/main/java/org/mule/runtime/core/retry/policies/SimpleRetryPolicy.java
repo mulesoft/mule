@@ -6,13 +6,22 @@
  */
 package org.mule.runtime.core.retry.policies;
 
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.range;
+import static reactor.core.publisher.Mono.delayMillis;
+import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.retry.PolicyStatus;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 /**
  * Allows to configure how many times a retry should be attempted and how long to wait between retries.
@@ -30,6 +39,23 @@ public class SimpleRetryPolicy implements RetryPolicy {
     this.frequency = frequency;
     this.count = retryCount;
     retryCounter = new RetryCounter();
+  }
+
+  @Override
+  public <T> Publisher<T> applyPolicy(Publisher<T> publisher,
+                                      Predicate<Throwable> shouldRetry,
+                                      Consumer<Throwable> onExhausted) {
+    final int actualCount = count + 1;
+    return from(publisher).retryWhen(errors -> errors.zipWith(range(1, actualCount), Tuples::of)
+        .flatMap(tuple -> {
+          final Throwable exception = tuple.getT1();
+          if (tuple.getT2() == actualCount || !shouldRetry.test(exception)) {
+            onExhausted.accept(exception);
+            return (Mono<T>) error(exception);
+          } else {
+            return delayMillis(frequency);
+          }
+        }));
   }
 
   public PolicyStatus applyPolicy(Throwable cause) {
@@ -56,7 +82,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
   /**
    * Indicates if the policy is applicable for the cause that caused the policy invocation. Subclasses can override this method in
    * order to filter the type of exceptions that does not deserve a retry.
-   * 
+   *
    * @return true if the policy is applicable, false otherwise.
    */
   protected boolean isApplicableTo(Throwable cause) {

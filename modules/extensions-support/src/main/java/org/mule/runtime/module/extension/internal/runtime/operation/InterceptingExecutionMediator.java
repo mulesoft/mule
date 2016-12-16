@@ -4,14 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+
+import org.reactivestreams.Publisher;
 
 /**
  * An {@link ExecutionMediator} for intercepting operations.
@@ -39,19 +45,21 @@ public final class InterceptingExecutionMediator implements ExecutionMediator {
   }
 
   @Override
-  public Object execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable {
-    Object resultValue = intercepted.execute(executor, context);
-    if (!(resultValue instanceof InterceptingCallback)) {
-      throw new IllegalStateException(format("%s '%s' was expected to return a '%s' but a '%s' was found instead",
-                                             getComponentModelTypeName(context.getComponentModel()),
-                                             context.getComponentModel().getName(), InterceptingCallback.class.getSimpleName(),
-                                             resultValue));
+  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) {
+    try {
+      Object resultValue = from(intercepted.execute(executor, context)).block();
+      if (!(resultValue instanceof InterceptingCallback)) {
+        throw new IllegalStateException(format("%s '%s' was expected to return a '%s' but a '%s' was found instead",
+                                               getComponentModelTypeName(context.getComponentModel()),
+                                               context.getComponentModel().getName(), InterceptingCallback.class.getSimpleName(),
+                                               resultValue));
+      }
+
+      context.setVariable(INTERCEPTING_CALLBACK_PARAM, resultValue);
+
+      return just(((InterceptingCallback) resultValue).getResult());
+    } catch (Exception e) {
+      return error(e);
     }
-
-    context.setVariable(INTERCEPTING_CALLBACK_PARAM, resultValue);
-
-    return ((InterceptingCallback) resultValue).getResult();
   }
-
-
 }

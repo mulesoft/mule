@@ -4,18 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Executes operations while coordinating the several moving parts that are affected by the execution process, so that such pieces
  * can remain decoupled.
  * <p/>
  * This mediator will coordinate {@link OperationExecutor operation executors}, {@link Interceptor interceptors},
- * {@link RetryRequest}, configuration expiration, statistics, etc.
+ * configuration expiration, statistics, etc.
+ * <p>
+ * This mediator supports reactive streams and hence returns the operation result in the form of a {@link Mono}.
  *
  * @since 4.0
  */
@@ -25,9 +30,8 @@ public interface ExecutionMediator {
    * Coordinates the execution of the {@code executor} using the given {@code context}
    *
    * @param executor an {@link OperationExecutor}
-   * @param context an {@link ExecutionContextAdapter}
-   * @return the operation's result
-   * @throws Exception if any exception is encountered
+   * @param context  an {@link ExecutionContextAdapter}
+   * @return a {@link Mono} with the operation's result
    */
-  Object execute(OperationExecutor executor, ExecutionContextAdapter context) throws Throwable;
+  Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context);
 }

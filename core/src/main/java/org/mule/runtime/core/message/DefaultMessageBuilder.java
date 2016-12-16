@@ -15,7 +15,7 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
 import static org.mule.runtime.core.util.ObjectUtils.getDouble;

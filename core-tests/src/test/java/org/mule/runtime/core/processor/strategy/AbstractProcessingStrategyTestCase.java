@@ -51,21 +51,21 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   protected Processor cpuLightProcessor = new ThreadTrackingProcessor() {
 
     @Override
-    public ProcessingType getProccesingType() {
+    public ProcessingType getProcessingType() {
       return ProcessingType.CPU_LITE;
     }
   };
   protected Processor cpuIntensiveProcessor = new ThreadTrackingProcessor() {
 
     @Override
-    public ProcessingType getProccesingType() {
+    public ProcessingType getProcessingType() {
       return ProcessingType.CPU_INTENSIVE;
     }
   };
   protected Processor blockingProcessor = new ThreadTrackingProcessor() {
 
     @Override
-    public ProcessingType getProccesingType() {
+    public ProcessingType getProcessingType() {
       return ProcessingType.BLOCKING;
     }
   };
@@ -220,7 +220,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     }
 
     @Override
-    public ProcessingType getProccesingType() {
+    public ProcessingType getProcessingType() {
       return type;
     }
 

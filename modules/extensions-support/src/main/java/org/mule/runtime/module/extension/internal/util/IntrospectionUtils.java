@@ -180,6 +180,16 @@ public final class IntrospectionUtils {
     return type != null ? typeLoader.load(type) : typeBuilder().voidType().build();
   }
 
+  public static List<MetadataType> getGenerics(Type type, ClassTypeLoader typeLoader) {
+    if (type instanceof ParameterizedType) {
+      ParameterizedType parameterizedType = (ParameterizedType) type;
+      Type[] generics = parameterizedType.getActualTypeArguments();
+      return Stream.of(generics).map(typeLoader::load).collect(toList());
+    }
+
+    return new LinkedList<>();
+  }
+
   private static ResolvableType getMethodType(Method method) {
     ResolvableType methodType = getMethodResolvableType(method);
     if (isInterceptingCallback(methodType)) {
@@ -191,7 +201,7 @@ public final class IntrospectionUtils {
     return methodType;
   }
 
-  static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {
+  public static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {
     if (!isEmpty(type.getGenerics())) {
       ResolvableType genericType = type.getGenerics()[genericIndex];
       if (genericType.getRawClass() != null) {
@@ -456,8 +466,19 @@ public final class IntrospectionUtils {
 
   public static Collection<Method> getOperationMethods(Class<?> declaringClass) {
     return getMethodsStream(declaringClass)
-        .filter(method -> !method.isAnnotationPresent(Ignore.class))
+        .filter(method -> !method.isAnnotationPresent(Ignore.class) && !isLifecycleMethod(method))
         .collect(toCollection(LinkedHashSet::new));
+  }
+
+  private static boolean isLifecycleMethod(Method method) {
+    return isLifecycleMethod(method, Initialisable.class, "initialise")
+        || isLifecycleMethod(method, Startable.class, "start")
+        || isLifecycleMethod(method, Stoppable.class, "stop")
+        || isLifecycleMethod(method, Disposable.class, "dispose");
+  }
+
+  private static boolean isLifecycleMethod(Method method, Class<?> lifecycleClass, String lifecycleMethodName) {
+    return lifecycleClass.isAssignableFrom(method.getDeclaringClass()) && method.getName().equals(lifecycleMethodName);
   }
 
   /**
@@ -475,6 +496,7 @@ public final class IntrospectionUtils {
 
   private static Stream<Method> getMethodsStream(Class<?> declaringClass) {
     return getAllSuperTypes(declaringClass).stream()
+        .filter(type -> !type.isInterface())
         .flatMap(type -> Stream.of(type.getDeclaredMethods()))
         .filter(method -> isPublic(method.getModifiers()));
   }

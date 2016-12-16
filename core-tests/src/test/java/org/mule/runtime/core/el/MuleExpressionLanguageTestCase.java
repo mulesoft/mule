@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
 import org.mule.runtime.core.message.BaseAttributes;
-import org.mule.runtime.core.message.NullAttributes;
+import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

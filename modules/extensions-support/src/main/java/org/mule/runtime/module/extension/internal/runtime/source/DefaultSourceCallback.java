@@ -47,11 +47,6 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       return this;
     }
 
-    public Builder<T, A> setConfigName(String configName) {
-      product.configName = configName;
-      return this;
-    }
-
     public Builder<T, A> setFlowConstruct(FlowConstruct flowConstruct) {
       product.flowConstruct = flowConstruct;
       return this;
@@ -102,7 +97,6 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   }
 
   private Processor listener;
-  private String configName;
   private FlowConstruct flowConstruct;
   private ExceptionCallback exceptionCallback;
   private MessageProcessingManager messageProcessingManager;

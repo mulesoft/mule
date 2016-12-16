@@ -234,6 +234,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                       toOutputModel(declaration.getOutputAttributes()),
                                                       toSourceCallback(declaration.getSuccessCallback()),
                                                       toSourceCallback(declaration.getErrorCallback()),
+                                                      declaration.isRequiresConnection(),
+                                                      declaration.isTransactional(),
                                                       declaration.getDisplayModel(),
                                                       declaration.getModelProperties()));
     }
@@ -257,6 +259,10 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                                       toParameterGroups(declaration.getParameterGroups()),
                                                                       toOutputModel(declaration.getOutput()),
                                                                       toOutputModel(declaration.getOutputAttributes()),
+                                                                      declaration.isBlocking(),
+                                                                      declaration.getExecutionType(),
+                                                                      declaration.isRequiresConnection(),
+                                                                      declaration.isTransactional(),
                                                                       declaration.getDisplayModel(),
                                                                       declaration.getErrorModels(),
                                                                       declaration.getModelProperties()));

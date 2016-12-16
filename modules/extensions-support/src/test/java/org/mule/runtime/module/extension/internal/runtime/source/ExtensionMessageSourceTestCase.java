@@ -193,7 +193,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
 
     sourceCallback = spy(DefaultSourceCallback.builder()
-        .setConfigName(CONFIG_NAME)
         .setFlowConstruct(flowConstruct)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
@@ -483,7 +482,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
-                                   retryPolicyTemplate, extensionManager, muleContext.getErrorTypeRepository());
+                                   retryPolicyTemplate, extensionManager);
     messageSource.setListener(messageProcessor);
     messageSource.setFlowConstruct(flowConstruct);
     muleContext.getInjector().inject(messageSource);

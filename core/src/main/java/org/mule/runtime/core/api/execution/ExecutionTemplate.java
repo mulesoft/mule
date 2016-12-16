@@ -15,5 +15,5 @@ package org.mule.runtime.core.api.execution;
  */
 public interface ExecutionTemplate<T> {
 
-  public T execute(ExecutionCallback<T> callback) throws Exception;
+  T execute(ExecutionCallback<T> callback) throws Exception;
 }

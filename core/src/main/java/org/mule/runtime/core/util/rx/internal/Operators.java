@@ -15,9 +15,11 @@ import java.util.function.Function;
 import reactor.core.publisher.SynchronousSink;
 
 /**
- * Reuseable operators to be use with project reactor.
+ * Reusable operators to be use with project reactor.
  */
 public final class Operators {
+
+  private Operators() {}
 
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return

@@ -35,7 +35,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HttpMessageProcessTemplateTestCase {
+public class HttpMessageExecutionTemplateTestCase {
 
   public static final Charset ENCODING = UTF_8;
 

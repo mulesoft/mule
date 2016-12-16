@@ -63,6 +63,10 @@
             <artifactId>spring-core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
         <!--Test Dependencies-->
         <dependency>
             <groupId>org.mule</groupId>
@@ -128,6 +132,12 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
+            <version>4.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-marvel-extension</artifactId>
             <version>4.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>

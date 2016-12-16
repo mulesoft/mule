@@ -42,6 +42,9 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
   @Override
   public OperationExecutor createExecutor(OperationModel operationModel) {
     OperationExecutor executor = delegate.createExecutor(operationModel);
-    return new InterceptableOperationExecutorWrapper(executor, interceptors);
+    executor = new ReactiveOperationExecutionWrapper(executor);
+    executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
+
+    return executor;
   }
 }

@@ -28,7 +28,7 @@ public interface Component extends Processor, FlowConstructAware {
   ComponentStatistics getStatistics();
 
   @Override
-  default ProcessingType getProccesingType() {
+  default ProcessingType getProcessingType() {
     return BLOCKING;
   }
 
