@@ -13,6 +13,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -59,9 +61,12 @@ public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
   public void bulkUpdateParameterizedInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getParameterValuesMetadata("bulkUpdateMetadata", "update PLANET set NAME='Mercury' where NAME= :name");
-    assertThat(parameters.getType(), is(instanceOf(ObjectType.class)));
-    assertThat(((ObjectType) parameters.getType()).getFields().size(), equalTo(1));
-    assertFieldOfType(((ObjectType) parameters.getType()), "name", testDatabase.getNameFieldMetaDataType());
+
+    assertThat(parameters.getType(), is(instanceOf(ArrayType.class)));
+    assertThat(((ArrayType) parameters.getType()).getType(), is(instanceOf(ObjectType.class)));
+    MetadataType listGeneric = ((ArrayType) parameters.getType()).getType();
+    assertThat(((ObjectType) listGeneric).getFields().size(), equalTo(1));
+    assertFieldOfType(((ObjectType) listGeneric), "name", testDatabase.getNameFieldMetaDataType());
   }
 
   @Test

@@ -12,6 +12,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -56,9 +58,11 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
     ParameterMetadataDescriptor parameters =
         getParameterValuesMetadata("bulkDeleteMetadata", "DELETE FROM PLANET WHERE name = :name");
 
-    assertThat(parameters.getType(), is(instanceOf(ObjectType.class)));
-    assertThat(((ObjectType) parameters.getType()).getFields().size(), equalTo(1));
-    assertFieldOfType(((ObjectType) parameters.getType()), "name", testDatabase.getNameFieldMetaDataType());
+    assertThat(parameters.getType(), is(instanceOf(ArrayType.class)));
+    assertThat(((ArrayType) parameters.getType()).getType(), is(instanceOf(ObjectType.class)));
+    MetadataType listGeneric = ((ArrayType) parameters.getType()).getType();
+    assertThat(((ObjectType) listGeneric).getFields().size(), equalTo(1));
+    assertFieldOfType(((ObjectType) listGeneric), "name", testDatabase.getNameFieldMetaDataType());
   }
 
   @Test
