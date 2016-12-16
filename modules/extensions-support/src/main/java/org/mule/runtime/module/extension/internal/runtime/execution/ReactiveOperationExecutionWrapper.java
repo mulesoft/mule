@@ -57,7 +57,7 @@ public final class ReactiveOperationExecutionWrapper implements OperationExecuto
 
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
     return Mono.create(sink -> {
-      ReactorCallback callback = new ReactorCallback(sink, context.getEvent());
+      ReactorCompletionCallback callback = new ReactorCompletionCallback(sink, context.getEvent());
       context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
 
       try {

@@ -31,7 +31,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.NonBlockingCallbackArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
@@ -59,7 +59,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Event> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
   private static final ArgumentResolver<CompletionCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
-      new NonBlockingCallbackArgumentResolver();
+      new CompletionCallbackArgumentResolver();
 
 
   private final Method method;

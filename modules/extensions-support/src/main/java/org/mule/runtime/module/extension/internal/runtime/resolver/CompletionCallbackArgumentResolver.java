@@ -20,7 +20,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
  *
  * @since 4.0
  */
-public final class NonBlockingCallbackArgumentResolver implements ArgumentResolver<CompletionCallback> {
+public final class CompletionCallbackArgumentResolver implements ArgumentResolver<CompletionCallback> {
 
   @Override
   public CompletionCallback resolve(ExecutionContext executionContext) {

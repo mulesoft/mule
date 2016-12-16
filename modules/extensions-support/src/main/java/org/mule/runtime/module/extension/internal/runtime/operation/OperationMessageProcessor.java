@@ -25,7 +25,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -164,17 +163,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
       ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
 
-      if (operationModel.isBlocking()) {
-        OperationExecutionFunction operationExecutionFunction =
-            (parameters, operationEvent) -> doProcess(operationEvent, operationContext).block();
-        OperationPolicy policy =
-            policyManager.createOperationPolicy(operationIdentifier, event,
-                                                operationParameters,
-                                                operationExecutionFunction);
-        return justOrEmpty(policy.process(event));
-      } else {
-        return doProcess(event, operationContext);
-      }
+      return doProcess(event, operationContext);
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     })));

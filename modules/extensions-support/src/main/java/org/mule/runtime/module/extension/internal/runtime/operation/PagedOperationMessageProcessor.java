@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -45,19 +46,22 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
   @Override
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
+    try {
+      Event resultEvent = super.doProcess(event, operationContext).block();
+      PagingProvider<?, ?> pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
 
-    Event resultEvent = super.doProcess(event, operationContext).block();
-    PagingProvider<?, ?> pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
+      if (pagingProvider == null) {
+        throw new IllegalStateException("Obtained paging delegate cannot be null");
+      }
 
-    if (pagingProvider == null) {
-      throw new IllegalStateException("Obtained paging delegate cannot be null");
+      Producer<?> producer =
+          new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
+                                     connectionManager);
+      Consumer<?> consumer = new ListConsumer(producer);
+
+      return just(returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext));
+    } catch (Exception e) {
+      return error(e);
     }
-
-    Producer<?> producer =
-        new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
-                                   connectionManager);
-    Consumer<?> consumer = new ListConsumer(producer);
-
-    return just(returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext));
   }
 }

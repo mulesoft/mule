@@ -46,17 +46,17 @@ public final class InterceptingExecutionMediator implements ExecutionMediator {
 
   @Override
   public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) {
-    Object resultValue = from(intercepted.execute(executor, context)).block();
-    if (!(resultValue instanceof InterceptingCallback)) {
-      throw new IllegalStateException(format("%s '%s' was expected to return a '%s' but a '%s' was found instead",
-                                             getComponentModelTypeName(context.getComponentModel()),
-                                             context.getComponentModel().getName(), InterceptingCallback.class.getSimpleName(),
-                                             resultValue));
-    }
-
-    context.setVariable(INTERCEPTING_CALLBACK_PARAM, resultValue);
-
     try {
+      Object resultValue = from(intercepted.execute(executor, context)).block();
+      if (!(resultValue instanceof InterceptingCallback)) {
+        throw new IllegalStateException(format("%s '%s' was expected to return a '%s' but a '%s' was found instead",
+                                               getComponentModelTypeName(context.getComponentModel()),
+                                               context.getComponentModel().getName(), InterceptingCallback.class.getSimpleName(),
+                                               resultValue));
+      }
+
+      context.setVariable(INTERCEPTING_CALLBACK_PARAM, resultValue);
+
       return just(((InterceptingCallback) resultValue).getResult());
     } catch (Exception e) {
       return error(e);
