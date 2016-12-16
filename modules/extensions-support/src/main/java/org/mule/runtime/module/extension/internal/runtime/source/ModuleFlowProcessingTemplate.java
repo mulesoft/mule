@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -20,20 +21,26 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.BlockingSink;
+
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
   private final Message message;
   private final Processor messageProcessor;
   private final SourceCompletionHandler completionHandler;
   private final MessageProcessContext messageProcessorContext;
+  private final Sink sink;
 
   ModuleFlowProcessingTemplate(Message message,
                                Processor messageProcessor,
-                               SourceCompletionHandler completionHandler, MessageProcessContext messageProcessContext) {
+                               SourceCompletionHandler completionHandler, MessageProcessContext messageProcessContext,
+                               Sink sink) {
     this.message = message;
     this.messageProcessor = messageProcessor;
     this.completionHandler = completionHandler;
     this.messageProcessorContext = messageProcessContext;
+    this.sink = sink;
   }
 
   @Override
@@ -57,10 +64,15 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
+  public Publisher<Event> dispatchEvent(Event muleEvent) {
+    sink.accept(muleEvent);
+    return muleEvent.getContext();
+  }
+
+  @Override
   public void sendResponseToClient(Event event, Map<String, Object> parameters,
                                    Function<Event, Map<String, Object>> errorResponseParametersFunction,
-                                   ResponseCompletionCallback responseCompletionCallback)
-      throws MuleException {
+                                   ResponseCompletionCallback responseCompletionCallback) {
     Consumer<MessagingException> errorResponseCallback = (messagingException) -> {
       completionHandler.onFailure(messagingException, errorResponseParametersFunction.apply(messagingException.getEvent()));
     };
@@ -71,8 +83,7 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public void sendFailureResponseToClient(MessagingException messagingException,
-                                          Map<String, Object> parameters, ResponseCompletionCallback responseCompletionCallback)
-      throws MuleException {
+                                          Map<String, Object> parameters, ResponseCompletionCallback responseCompletionCallback) {
     runAndNotify(() -> completionHandler.onFailure(messagingException, parameters), messagingException.getEvent(),
                  responseCompletionCallback);
   }

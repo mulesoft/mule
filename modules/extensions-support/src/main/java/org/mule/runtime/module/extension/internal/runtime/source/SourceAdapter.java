@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -25,6 +27,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.util.func.UnsafeRunnable;
@@ -71,6 +74,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
 
   private ConnectionHandler<Object> connectionHandler;
   private FlowConstruct flowConstruct;
+  private SourceCallback sourceCallback;
 
   @Inject
   private ConnectionManager connectionManager;
@@ -188,7 +192,9 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
       setConfiguration(configurationInstance);
       setConnection();
       muleContext.getInjector().inject(source);
-      source.onStart(createSourceCallback());
+      sourceCallback = createSourceCallback();
+      startIfNeeded(sourceCallback);
+      source.onStart(sourceCallback);
     } catch (Exception e) {
       throw new DefaultMuleException(e);
     }
@@ -197,6 +203,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
   @Override
   public void stop() throws MuleException {
     try {
+      stopIfNeeded(sourceCallback);
       source.onStop();
     } catch (Exception e) {
       throw new DefaultMuleException(e);
