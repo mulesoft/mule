@@ -7,14 +7,14 @@
 
     <db:query name="updateTemplate">
         <db:input-parameters>
-            <db:input-parameter key="position" value="4"/>
+            #[['position' : 4]]
         </db:input-parameters>
         <db:sql>update PLANET set NAME='Mercury' where POSITION= :position</db:sql>
     </db:query>
 
     <db:query name="overriddenUpdateParam" template="updateTemplate">
         <db:input-parameters>
-            <db:input-parameter key="position" value="2"/>
+            #[['position' : 2]]
         </db:input-parameters>
     </db:query>
 
@@ -29,7 +29,7 @@
     <flow name="inlineOverriddenParams">
         <db:update template="overriddenUpdateParam">
             <db:input-parameters>
-            <db:input-parameter key="position" value="3"/>
+                #[['position' : 3]]
             </db:input-parameters>
         </db:update>
     </flow>

@@ -10,10 +10,10 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.extension.db.internal.domain.metadata.DbInputMetadataResolver;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.HashMap;
@@ -40,11 +40,11 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * The map's values will contain the actual assignation for each parameter.
    */
   @Parameter
-  @Optional
+  @Optional(defaultValue = "#[new java.util.HashMap()]")
+  @Content
   @Placement(order = 2)
   @TypeResolver(DbInputMetadataResolver.class)
-  @XmlHints(allowReferences = false)
-  protected LinkedHashMap<String, Object> inputParameters = new LinkedHashMap<>();
+  protected Map<String, Object> inputParameters = new LinkedHashMap<>();
 
   /**
    * Returns a {@link Map} which keys are the names of the input parameters and the values are its values

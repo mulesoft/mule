@@ -7,6 +7,8 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.tck.testmodels.fruit.Fruit;
 
 import java.util.List;
@@ -22,7 +24,8 @@ public class VeganFidelityOperation {
     throw new IllegalArgumentException("I SHALL NEVER EAT " + food.toString());
   }
 
-  public List<Map<String, String>> tryToEatThisListOfMaps(List<Map<String, String>> foods) {
+  public List<Map<String, String>> tryToEatThisListOfMaps(@Optional(
+      defaultValue = "#[new java.util.ArrayList()]") @Content List<Map<String, String>> foods) {
     if (foods != null) {
       return foods;
     }

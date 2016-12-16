@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -21,6 +25,7 @@ import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
@@ -29,6 +34,7 @@ import org.mule.runtime.extension.api.declaration.DescribingContext;
 import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ExtensionFactory;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
@@ -39,6 +45,7 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -115,6 +122,30 @@ public class DefaultExtensionFactoryTestCase extends AbstractMuleTestCase {
     assertThat(operation.getExecutionType(), is(CPU_LITE));
     assertThat(operation.getOutput().getType(), equalTo(typeLoader.load(String.class)));
     assertThat(operation.getOutputAttributes().getType(), equalTo(typeLoader.load(NullAttributes.class)));
+  }
+
+  @Test
+  public void contentParameter() {
+    assertSinglePrimaryContentParameter(createExtension(VeganExtension.class), "getAllApples", PAYLOAD);
+  }
+
+  @Test
+  public void contentParameterWithCustomDefault() {
+    assertSinglePrimaryContentParameter(createExtension(VeganExtension.class), "tryToEatThisListOfMaps",
+                                        "#[new java.util.ArrayList()]");
+  }
+
+  private void assertSinglePrimaryContentParameter(ExtensionModel extensionModel, String operationName, String defaultValue) {
+    OperationModel appleOperation = aggressiveGet(extensionModel.getOperationModel(operationName));
+    List<ParameterModel> contentParameters = appleOperation.getAllParameterModels().stream()
+        .filter(ExtensionModelUtils::isContent)
+        .collect(toList());
+
+    assertThat(contentParameters, hasSize(1));
+    ParameterModel contentParameter = contentParameters.get(0);
+    assertThat(contentParameter.isRequired(), is(false));
+    assertThat(contentParameter.getDefaultValue(), is(defaultValue));
+    assertThat(contentParameter.getRole(), is(PRIMARY_CONTENT));
   }
 
   private <T> T aggressiveGet(Optional<T> optional) {

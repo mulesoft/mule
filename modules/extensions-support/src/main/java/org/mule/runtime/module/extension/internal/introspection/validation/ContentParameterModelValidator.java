@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -143,15 +142,6 @@ public class ContentParameterModelValidator implements ModelValidator {
                                + "content parameter is allowed. Offending parameters are [%s]",
                                   primaryContents.size(),
                                   join(primaryContents)));
-    }
-
-    validateDefaultsToPayload(extensionModel, model, primaryContents.get(0));
-  }
-
-  private void validateDefaultsToPayload(ExtensionModel extensionModel, ParameterizedModel model, ParameterModel parameter) {
-    if (!PAYLOAD.equals(parameter.getDefaultValue())) {
-      throw modelException(extensionModel, model, format("which contains parameter '%s' which is set as primary content "
-          + "but does not default to the payload", parameter.getName()));
     }
   }
 

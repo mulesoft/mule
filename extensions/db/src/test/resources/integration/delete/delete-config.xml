@@ -15,7 +15,7 @@
         <db:delete>
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
             <db:input-parameters>
-                <db:input-parameter key="name" value="#[payload]"/>
+                #[['name' : payload]]
             </db:input-parameters>
         </db:delete>
     </flow>

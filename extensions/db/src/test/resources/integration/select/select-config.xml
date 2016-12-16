@@ -55,7 +55,7 @@
         <db:select>
             <db:sql>select * from PLANET where name = :name</db:sql>
             <db:input-parameters>
-                <db:input-parameter key="name" value="#[payload]"/>
+                #[['name' : payload]]
             </db:input-parameters>
         </db:select>
     </flow>

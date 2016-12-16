@@ -85,8 +85,10 @@ public class ContentParameterModelEnricher implements ModelEnricher {
   }
 
   private void defaultToPayload(ParameterDeclaration p) {
-    p.setRequired(false);
-    p.setDefaultValue(PAYLOAD);
+    if (p.getDefaultValue() == null) {
+      p.setRequired(false);
+      p.setDefaultValue(PAYLOAD);
+    }
   }
 
   private List<ParameterDeclaration> getContentParameters(List<ParameterDeclaration> parameters) {

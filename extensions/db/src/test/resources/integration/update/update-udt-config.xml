@@ -17,7 +17,7 @@
             <db:update>
                 <db:sql>update REGION_MANAGERS set DETAILS = :details where REGION_NAME = 'Northwest'</db:sql>
                 <db:input-parameters>
-                    <db:input-parameter key="details" value="#[payload]"/>
+                    #[['details' : payload]]
                 </db:input-parameters>
             </db:update>
 
@@ -38,7 +38,7 @@
                     <db:parameter-type key="details" customType="CONTACT_DETAILS"/>
                 </db:parameter-types>
                 <db:input-parameters>
-                    <db:input-parameter key="details" value="#[payload]"/>
+                    #[['details' : payload]]
                 </db:input-parameters>
             </db:update>
 
