@@ -18,7 +18,7 @@ import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.BulkUpdateExecutor;
-import org.mule.extension.db.internal.domain.metadata.DbInputMetadataResolver;
+import org.mule.extension.db.internal.domain.metadata.DbBulkInputMetadataResolver;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
@@ -64,7 +64,7 @@ public class BulkOperations extends BaseDbOperations {
    * @throws SQLException if an error is produced
    */
   public int[] bulkInsert(@Content @Placement(
-      order = 1) @TypeResolver(DbInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
+      order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
                           @ParameterGroup(QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
@@ -87,7 +87,7 @@ public class BulkOperations extends BaseDbOperations {
    * @throws SQLException if an error is produced
    */
   public int[] bulkUpdate(@Content @Placement(
-      order = 1) @TypeResolver(DbInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
+      order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
                           @ParameterGroup(QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
@@ -110,7 +110,7 @@ public class BulkOperations extends BaseDbOperations {
    * @throws SQLException if an error is produced
    */
   public int[] bulkDelete(@Content @Placement(
-      order = 1) @TypeResolver(DbInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
+      order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
                           @ParameterGroup(QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
