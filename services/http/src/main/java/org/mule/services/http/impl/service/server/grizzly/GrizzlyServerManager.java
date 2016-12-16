@@ -12,6 +12,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -133,14 +134,19 @@ public class GrizzlyServerManager implements HttpServerManager {
   }
 
   /**
-   * Starts the transport and the {@code idleTimeoutExecutorService} if not started. This is because they should be started lazily
-   * when the first server is registered (otherwise there will be Grizzly threads even if there is no listener-config in the app).
+   * Starts the transport if not started. This is because it should be started lazily when the first server is registered
+   * (otherwise there will be Grizzly threads even if there is no HTTP usage in any app).
    */
   private void startTransportIfNotStarted() throws IOException {
-    if (!transportStarted) {
-      transportStarted = true;
-      transport.start();
-    }
+    withContextClassLoader(this.getClass().getClassLoader(), () -> {
+      if (!transportStarted) {
+        transportStarted = true;
+        transport.start();
+      }
+      return null;
+    }, IOException.class, e -> {
+      throw new IOException(e);
+    });
   }
 
   @Override
