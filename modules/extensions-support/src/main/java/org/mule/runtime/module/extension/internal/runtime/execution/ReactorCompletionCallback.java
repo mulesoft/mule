@@ -20,12 +20,12 @@ import reactor.core.publisher.MonoSink;
  *
  * @since 4.0
  */
-final class ReactorCallback implements CompletionCallback<Object, Attributes> {
+final class ReactorCompletionCallback implements CompletionCallback<Object, Attributes> {
 
   private final MonoSink<Object> sink;
   private final Event event;
 
-  ReactorCallback(MonoSink<Object> sink, Event event) {
+  ReactorCompletionCallback(MonoSink<Object> sink, Event event) {
     this.sink = sink;
     this.event = event;
   }
