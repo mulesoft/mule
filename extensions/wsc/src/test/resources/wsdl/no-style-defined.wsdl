@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:mio="http://demo7411933.mockable.io/service/1"
+                  targetNamespace="http://demo7411933.mockable.io/service/1">
+
+    <wsdl:documentation>
+        mockable.io generated WSDL
+    </wsdl:documentation>
+
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    targetNamespace="http://demo7411933.mockable.io/service/1">
+
+            <xsd:element name="sendRequest" type="xsd:anyType"/>
+            <xsd:element name="sendResponse" type="xsd:anyType"/>
+
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="sendInputMessage">
+        <wsdl:part name="sendInputPart" element="mio:sendRequest"/>
+    </wsdl:message>
+    <wsdl:message name="sendOutputMessage">
+        <wsdl:part name="sendOutputPart" element="mio:sendResponse"/>
+    </wsdl:message>
+
+    <wsdl:portType name="messagingPortType">
+
+        <wsdl:operation name="send">
+            <wsdl:input name="sendInput"
+                        message="mio:sendInputMessage"/>
+            <wsdl:output name="sendOutput"
+                         message="mio:sendOutputMessage"/>
+        </wsdl:operation>
+
+    </wsdl:portType>
+
+    <wsdl:binding name="messagingBinding" type="mio:messagingPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <wsdl:operation name="send">
+            <soap:operation
+                    soapAction="send"/>
+            <wsdl:input name="sendInput">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="sendOutput">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+    </wsdl:binding>
+
+    <wsdl:service name="messagingService">
+        <wsdl:port name="messagingPort" binding="mio:messagingBinding">
+            <soap:address
+                    location="http://demo7411933.mockable.io/messaging"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>
