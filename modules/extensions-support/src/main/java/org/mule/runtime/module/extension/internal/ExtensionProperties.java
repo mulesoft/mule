@@ -13,7 +13,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
 /**
  * Constants for the Extensions Framework
@@ -33,10 +33,10 @@ public class ExtensionProperties {
   public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
 
   /**
-   * The key of an execution context variable which holds the {@link NonBlockingCallback} that a non blocking
+   * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking
    * component will use to notify completion or failure
    */
-  public static final String REACTIVE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "REACTIVE_CALLBACK_CONTEXT_PARAM";
+  public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
 
   /**
    * The key of an execution context variable on which the {@link InterceptingCallback} is stored

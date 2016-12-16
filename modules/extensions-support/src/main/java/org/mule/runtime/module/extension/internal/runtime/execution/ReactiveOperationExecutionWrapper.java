@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.REACTIVE_CALLBACK_CONTEXT_PARAM;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 import org.reactivestreams.Publisher;
@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
  * Decorates an {@link OperationExecutor} adding the necessary logic to execute non blocking operations.
  * <p>
  * If the operation being executed is blocking, then it delegates to the wrapped executor transparently.
- * If the operation is non blocking, then it creates and injects a {@link NonBlockingCallback} on which the operation
+ * If the operation is non blocking, then it creates and injects a {@link CompletionCallback} on which the operation
  * result will be notified.
  * <p>
  * It also implements {@link Lifecycle} and {@link MuleContextAware}, propagating those to the decoratee if necessary
@@ -58,7 +58,7 @@ public final class ReactiveOperationExecutionWrapper implements OperationExecuto
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
     return Mono.create(sink -> {
       ReactorCallback callback = new ReactorCallback(sink, context.getEvent());
-      context.setVariable(REACTIVE_CALLBACK_CONTEXT_PARAM, callback);
+      context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
 
       try {
         delegate.execute(executionContext);

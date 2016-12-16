@@ -12,7 +12,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
@@ -46,7 +45,7 @@ public final class InterceptingExecutionMediator implements ExecutionMediator {
   }
 
   @Override
-  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException {
+  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) {
     Object resultValue = from(intercepted.execute(executor, context)).block();
     if (!(resultValue instanceof InterceptingCallback)) {
       throw new IllegalStateException(format("%s '%s' was expected to return a '%s' but a '%s' was found instead",

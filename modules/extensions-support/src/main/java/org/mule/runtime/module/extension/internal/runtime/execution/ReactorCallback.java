@@ -10,17 +10,17 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
 import reactor.core.publisher.MonoSink;
 
 /**
- * Implementation of {@link NonBlockingCallback} which works using
+ * Implementation of {@link CompletionCallback} which works using
  * project Reactor.
  *
  * @since 4.0
  */
-final class ReactorCallback implements NonBlockingCallback<Object, Attributes> {
+final class ReactorCallback implements CompletionCallback<Object, Attributes> {
 
   private final MonoSink<Object> sink;
   private final Event event;

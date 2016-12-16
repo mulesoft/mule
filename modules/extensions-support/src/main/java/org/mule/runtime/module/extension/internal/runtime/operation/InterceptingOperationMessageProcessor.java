@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -56,11 +57,10 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
   }
 
   @Override
-  protected Mono<Event> doProcess(org.mule.runtime.core.api.Event event, ExecutionContextAdapter operationContext)
-      throws MuleException {
+  protected Mono<Event> doProcess(org.mule.runtime.core.api.Event event, ExecutionContextAdapter operationContext) {
     Event resultEvent = super.doProcess(event, operationContext).block();
     InterceptingCallback<?> interceptingCallback = getInterceptorCallback(operationContext);
-
+    Mono<Event> result;
     try {
       if (interceptingCallback.shouldProcessNext()) {
         LOGGER.debug("Intercepting operation '{}' will proceed to execute intercepted chain",
@@ -68,22 +68,27 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
 
         try {
           resultEvent = processNext(resultEvent, operationContext);
+          onSuccess(operationContext, resultEvent, interceptingCallback);
+          result = just(resultEvent);
         } catch (Exception e) {
-          throw onException(interceptingCallback, resultEvent, operationContext, e);
+          result = error(onException(interceptingCallback, resultEvent, operationContext, e));
         }
 
-        onSuccess(operationContext, resultEvent, interceptingCallback);
       } else {
+        result = just(resultEvent);
         LOGGER.debug("Intercepting operation '{}' skipped processing of intercepted chain",
                      operationContext.getComponentModel().getName());
       }
     } finally {
       operationContext.removeVariable(INTERCEPTING_CALLBACK_PARAM);
-      onComplete(interceptingCallback, event, operationContext);
+      try {
+        onComplete(interceptingCallback, event, operationContext);
+      } catch (MuleException e) {
+        result = error(e);
+      }
     }
 
-    return just(resultEvent);
-
+    return result;
   }
 
   private MuleException onException(InterceptingCallback<?> interceptingCallback, Event event,

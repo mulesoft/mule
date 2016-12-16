@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.REACTIVE_CALLBACK_CONTEXT_PARAM;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
- * {@link ArgumentResolver} which returns the {@link ExtensionProperties#REACTIVE_CALLBACK_CONTEXT_PARAM}
+ * {@link ArgumentResolver} which returns the {@link ExtensionProperties#COMPLETION_CALLBACK_CONTEXT_PARAM}
  * context variable.
  * <p>
  * Notice that this resolver only works if the {@link ExecutionContext} is a {@link ExecutionContextAdapter}
  *
  * @since 4.0
  */
-public final class NonBlockingCallbackArgumentResolver implements ArgumentResolver<NonBlockingCallback> {
+public final class NonBlockingCallbackArgumentResolver implements ArgumentResolver<CompletionCallback> {
 
   @Override
-  public NonBlockingCallback resolve(ExecutionContext executionContext) {
-    return (NonBlockingCallback) ((ExecutionContextAdapter) executionContext).getVariable(REACTIVE_CALLBACK_CONTEXT_PARAM);
+  public CompletionCallback resolve(ExecutionContext executionContext) {
+    return (CompletionCallback) ((ExecutionContextAdapter) executionContext).getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
   }
 }

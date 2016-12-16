@@ -96,7 +96,7 @@ import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.introspection.describer.contributor.FunctionParameterTypeContributor;
@@ -471,7 +471,7 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   private boolean processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod) {
     List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
-        .filter(p -> NonBlockingCallback.class.equals(p.getType().getDeclaringClass()))
+        .filter(p -> CompletionCallback.class.equals(p.getType().getDeclaringClass()))
         .collect(toList());
 
     if (callbackParameters.isEmpty()) {
@@ -482,7 +482,7 @@ public final class AnnotationsBasedDescriber implements Describer {
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "Operation '%s' defines more than one %s parameters. Only one is allowed",
                                                                 operationMethod.getAlias(),
-                                                                NonBlockingCallback.class.getSimpleName()));
+                                                                CompletionCallback.class.getSimpleName()));
     }
 
     if (!isVoid(operationMethod.getMethod())) {
@@ -490,7 +490,7 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                 "Operation '%s' has a parameter of type %s but is not void. Non-blocking operations have to be declared as void and the "
                                                                     + "return type provided through the callback",
                                                                 operationMethod.getAlias(),
-                                                                NonBlockingCallback.class.getSimpleName()));
+                                                                CompletionCallback.class.getSimpleName()));
     }
 
     ExtensionParameter callbackParameter = callbackParameters.get(0);
@@ -499,7 +499,7 @@ public final class AnnotationsBasedDescriber implements Describer {
 
     if (genericTypes.isEmpty()) {
       throw new IllegalParameterModelDefinitionException(format("Generics are mandatory on the %s parameter of Operation '%s'",
-                                                                NonBlockingCallback.class.getSimpleName(),
+                                                                CompletionCallback.class.getSimpleName(),
                                                                 operationMethod.getAlias()));
     }
 

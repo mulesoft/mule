@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.marvel.model.Missile;
 import org.mule.test.marvel.model.Villain;
 
@@ -46,7 +46,7 @@ public class IronManOperations implements Initialisable, Disposable {
   public void fireMissile(@UseConfig IronMan ironMan,
                           @Connection Missile missile,
                           Villain at,
-                          NonBlockingCallback<String, NullAttributes> callback) {
+                          CompletionCallback<String, NullAttributes> callback) {
     final Runnable launch = () -> {
       try {
         ironMan.track(missile);
@@ -63,7 +63,7 @@ public class IronManOperations implements Initialisable, Disposable {
   }
 
   @Execution(CPU_INTENSIVE)
-  public void computeFlightPlan(@UseConfig IronMan ironMan, NonBlockingCallback<Void, NullAttributes> callback) {
+  public void computeFlightPlan(@UseConfig IronMan ironMan, CompletionCallback<Void, NullAttributes> callback) {
     final Runnable launch = () -> {
       callback.success(Result.<Void, NullAttributes>builder().build());
       ironMan.setFlightPlan(FLIGHT_PLAN);

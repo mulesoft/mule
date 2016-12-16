@@ -179,14 +179,14 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
     })));
   }
 
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) throws MuleException {
+  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
         .defaultIfEmpty(returnDelegate.asReturnValue(null, operationContext))
         .mapError(Exceptions::unwrap);
   }
 
-  private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) throws MuleException {
+  private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) {
     return Mono.from(executionMediator.execute(operationExecutor, operationContext));
   }
 

@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
@@ -58,7 +58,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new SourceCallbackContextArgumentResolver();
   private static final ArgumentResolver<Event> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
-  private static final ArgumentResolver<NonBlockingCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
+  private static final ArgumentResolver<CompletionCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
       new NonBlockingCallbackArgumentResolver();
 
 
@@ -113,7 +113,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
       } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
-      } else if (NonBlockingCallback.class.isAssignableFrom(parameterType)) {
+      } else if (CompletionCallback.class.isAssignableFrom(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));

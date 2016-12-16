@@ -9,22 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
-import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
@@ -91,7 +89,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
   @Override
-  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException {
+  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) {
     final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
     final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
     stats.ifPresent(s -> s.addInflightOperation());
@@ -100,7 +98,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
       return (Mono<Object>) getExecutionTemplate(context)
           .execute(() -> executeWithInterceptors(executor, context, interceptors, stats));
     } catch (Exception e) {
-      throw new DefaultMuleException(e);
+      return error(e);
     }
   }
 
@@ -110,6 +108,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
                                                Optional<MutableConfigurationStats> stats) {
 
     List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
+    // If the operation is retried, then the interceptors need to be executed again,
+    // so we wrap the mono which executes the operation into another which sets up
+    // the context and is the one configured with the retry logic
     Mono<Object> publisher = Mono.create(sink -> {
       Mono<Object> result;
 
@@ -144,7 +145,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     });
 
     return from(getRetryPolicyTemplate(context.getConfiguration()).applyPolicy(publisher,
-                                                                               e -> ExceptionUtils.extractConnectionException(e)
+                                                                               e -> extractConnectionException(e)
                                                                                    .isPresent(),
                                                                                e -> stats.ifPresent(s -> s
                                                                                    .discountInflightOperation())));

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -33,7 +32,6 @@ public interface ExecutionMediator {
    * @param executor an {@link OperationExecutor}
    * @param context  an {@link ExecutionContextAdapter}
    * @return a {@link Mono} with the operation's result
-   * @throws MuleException if the {@link Mono} could not be created
    */
-  Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) throws MuleException;
+  Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context);
 }

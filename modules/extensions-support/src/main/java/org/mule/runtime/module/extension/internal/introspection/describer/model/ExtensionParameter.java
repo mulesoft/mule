@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.runtime.process.NonBlockingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import com.google.common.collect.ImmutableSet;
@@ -39,7 +39,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(InternalMessage.class)
       .add(Error.class)
       .add(SourceCallbackContext.class)
-      .add(NonBlockingCallback.class)
+      .add(CompletionCallback.class)
       .build();
 
   /**
