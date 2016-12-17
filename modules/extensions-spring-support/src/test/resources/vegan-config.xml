@@ -36,7 +36,11 @@
     </flow>
 
     <flow name="eatComplexListOfMaps">
-        <vegan:try-to-eat-this-list-of-maps foods="#[payload]"/>
+        <vegan:try-to-eat-this-list-of-maps>
+            <vegan:foods>
+                #[payload]
+            </vegan:foods>
+        </vegan:try-to-eat-this-list-of-maps>
     </flow>
 
 </mule>

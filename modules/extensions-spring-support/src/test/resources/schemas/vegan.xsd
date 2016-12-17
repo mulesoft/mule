@@ -421,8 +421,8 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -568,7 +568,9 @@
     <xs:complexType name="TryToEatThisListOfMapsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:attribute type="mule:expressionList" use="required" name="foods"></xs:attribute>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="foods"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
