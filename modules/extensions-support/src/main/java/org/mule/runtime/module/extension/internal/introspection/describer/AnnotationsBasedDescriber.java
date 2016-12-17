@@ -647,6 +647,7 @@ public final class AnnotationsBasedDescriber implements Describer {
   private void parseDefaultEncoding(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     // TODO: MULE-9220 - Add a syntax validator which checks that the annotated parameter is a String
     if (extensionParameter.getAnnotation(DefaultEncoding.class).isPresent()) {
+      parameter.getDeclaration().setRequired(false);
       parameter.withModelProperty(new DefaultEncodingModelProperty());
     }
   }
