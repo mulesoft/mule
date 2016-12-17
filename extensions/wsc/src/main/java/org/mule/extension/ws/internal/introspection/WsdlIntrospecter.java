@@ -185,10 +185,10 @@ public class WsdlIntrospecter {
       // if not defined in the binding, one operation is taken to see if the style is defined there.
       BindingOperation bop = (BindingOperation) bindingOperations.get(0);
       bindingStyle = bop.getExtensibilityElements().stream()
-        .filter(e -> e instanceof SOAP12OperationImpl || e instanceof SOAPOperationImpl)
-        .map(e -> e instanceof SOAPOperationImpl ? ((SOAPOperationImpl) e).getStyle() : ((SOAP12OperationImpl) e).getStyle())
-        .filter(Objects::nonNull)
-        .findAny();
+          .filter(e -> e instanceof SOAP12OperationImpl || e instanceof SOAPOperationImpl)
+          .map(e -> e instanceof SOAPOperationImpl ? ((SOAPOperationImpl) e).getStyle() : ((SOAP12OperationImpl) e).getStyle())
+          .filter(Objects::nonNull)
+          .findAny();
     }
 
     // if no style was found, the default one is DOCUMENT
