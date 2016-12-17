@@ -16,9 +16,12 @@ import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.metadata.xml.SchemaCollector;
 
 import com.ibm.wsdl.extensions.schema.SchemaSerializer;
+import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
+import com.ibm.wsdl.extensions.soap12.SOAP12OperationImpl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.wsdl.BindingInput;
@@ -164,19 +167,32 @@ public class WsdlIntrospecter {
     return isWsdlStyle(DOCUMENT_STYLE);
   }
 
+  /**
+   * Checks if the provided {@code style} is the same style as the introspected WSDL.
+   */
   private boolean isWsdlStyle(String style) {
-    List elements = port.getBinding().getExtensibilityElements();
 
+    List elements = port.getBinding().getExtensibilityElements();
+    // Looking the style value in the binding.
     Optional<String> bindingStyle = elements.stream()
         .filter(e -> e instanceof SOAP12Binding || e instanceof SOAPBinding)
         .map(e -> e instanceof SOAP12Binding ? ((SOAP12Binding) e).getStyle() : ((SOAPBinding) e).getStyle())
+        .filter(Objects::nonNull)
         .findAny();
 
-    if (!bindingStyle.isPresent()) {
-      throw new InvalidWsdlException(format("No SOAP binding found for the specified port [%s]", port.getName()));
+    List bindingOperations = port.getBinding().getBindingOperations();
+    if (!bindingStyle.isPresent() && !bindingOperations.isEmpty()) {
+      // if not defined in the binding, one operation is taken to see if the style is defined there.
+      BindingOperation bop = (BindingOperation) bindingOperations.get(0);
+      bindingStyle = bop.getExtensibilityElements().stream()
+          .filter(e -> e instanceof SOAP12OperationImpl || e instanceof SOAPOperationImpl)
+          .map(e -> e instanceof SOAPOperationImpl ? ((SOAPOperationImpl) e).getStyle() : ((SOAP12OperationImpl) e).getStyle())
+          .filter(Objects::nonNull)
+          .findAny();
     }
 
-    return bindingStyle.get().equalsIgnoreCase(style);
+    // if no style was found, the default one is DOCUMENT
+    return bindingStyle.orElse(DOCUMENT_STYLE).equalsIgnoreCase(style);
   }
 
   /**
