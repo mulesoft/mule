@@ -15,6 +15,7 @@ import static javax.mail.Part.INLINE;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.CONTENT_TYPE_HEADER;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.MULTIPART;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.exception.EmailException;
@@ -22,9 +23,10 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -180,15 +182,18 @@ public final class MessageBuilder {
    * @return this {@link MessageBuilder}
    */
   public MessageBuilder withAttachments(List<EmailAttachment> attachments) {
-    Map<String, DataHandler> attachmentsMap = new HashMap<>();
-    attachments.forEach(a -> {
-      try {
-        DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
-        attachmentsMap.put(a.getId(), dataHandler);
-      } catch (Exception e) {
-        throw new EmailException(ERROR + " could not add attachments", e);
-      }
-    });
+    Map<String, DataHandler> attachmentsMap = new LinkedHashMap<>();
+    attachments
+        .stream().map(a -> a.getContent() instanceof InputStream
+            ? new EmailAttachment(a.getId(), toByteArray((InputStream) a.getContent()), a.getContentType()) : a)
+        .forEach(a -> {
+          try {
+            DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
+            attachmentsMap.put(a.getId(), dataHandler);
+          } catch (Exception e) {
+            throw new EmailException(ERROR + " could not add attachments", e);
+          }
+        });
     this.attachments = attachmentsMap;
     return this;
   }
