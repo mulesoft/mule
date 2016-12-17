@@ -76,6 +76,7 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -126,6 +127,7 @@ import org.mule.runtime.module.extension.internal.model.property.ConfigurationFa
 import org.mule.runtime.module.extension.internal.model.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -295,7 +297,7 @@ public final class AnnotationsBasedDescriber implements Describer {
                                     HasSourceDeclarer declarer,
                                     SourceElement sourceType,
                                     boolean supportsConfig) {
-    //TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
+    // TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
 
     if (isLifecycle(sourceType.getDeclaringClass())) {
       throw new IllegalSourceModelDefinitionException(
@@ -364,7 +366,7 @@ public final class AnnotationsBasedDescriber implements Describer {
     final Optional<MethodElement> onResponseMethod = sourceType.getOnResponseMethod();
     final Optional<MethodElement> onErrorMethod = sourceType.getOnErrorMethod();
 
-    //TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
+    // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
     declareSourceCallbackParameters(source, onResponseMethod, source::onSuccess);
     declareSourceCallbackParameters(source, onErrorMethod, source::onError);
 
@@ -630,6 +632,7 @@ public final class AnnotationsBasedDescriber implements Describer {
       parseParameterRole(extensionParameter, parameter);
       parseExpressionSupport(extensionParameter, parameter);
       parseNullSafe(extensionParameter, parameter);
+      parseDefaultEncoding(extensionParameter, parameter);
       addTypeRestrictions(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
       addImplementingTypeModelProperty(extensionParameter, parameter);
@@ -639,6 +642,14 @@ public final class AnnotationsBasedDescriber implements Describer {
     }
 
     return declarerList;
+  }
+
+  private void parseDefaultEncoding(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+    // TODO: MULE-9220 - Add a syntax validator which checks that the annotated parameter is a String
+    if (extensionParameter.getAnnotation(DefaultEncoding.class).isPresent()) {
+      parameter.getDeclaration().setRequired(false);
+      parameter.withModelProperty(new DefaultEncodingModelProperty());
+    }
   }
 
   private boolean declaredAsGroup(ParameterizedDeclarer component,
@@ -677,7 +688,6 @@ public final class AnnotationsBasedDescriber implements Describer {
 
     final List<FieldElement> annotatedParameters = type.getAnnotatedFields(Parameter.class);
 
-    // TODO: MULE-9220: Add a syntax validator for this
     if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
       throw new IllegalParameterModelDefinitionException(format(
                                                                 "@%s can not be applied alongside with @%s. Affected parameter is [%s].",

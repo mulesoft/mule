@@ -12,9 +12,7 @@ import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -25,10 +23,7 @@ import javax.inject.Inject;
  * 
  * @since 4.0
  */
-public class AbstractSocketConfig implements Initialisable {
-
-  @Inject
-  private MuleContext muleContext;
+public class AbstractSocketConfig {
 
   /**
    * Default encoding used for serializing {@link String}. This encoding is used in
@@ -39,16 +34,10 @@ public class AbstractSocketConfig implements Initialisable {
    */
   @Parameter
   @Optional
+  @DefaultEncoding
   private String defaultEncoding;
 
   public String getDefaultEncoding() {
     return defaultEncoding;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (defaultEncoding == null) {
-      defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
-    }
   }
 }
