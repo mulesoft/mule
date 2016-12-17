@@ -14,7 +14,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Exception Mappings")
 public class ExceptionMapperTestCase extends AbstractMuleTestCase {
 
   private ErrorType runtimeExceptionErrorType = mock(ErrorType.class);

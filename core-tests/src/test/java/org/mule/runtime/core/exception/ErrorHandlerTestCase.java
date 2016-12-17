@@ -13,7 +13,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.core.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
@@ -34,9 +35,13 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-@RunWith(MockitoJUnitRunner.class)
 @SmallTest
+@Features("Error Handling")
+@Stories("Error Handler")
+@RunWith(MockitoJUnitRunner.class)
 public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Mock

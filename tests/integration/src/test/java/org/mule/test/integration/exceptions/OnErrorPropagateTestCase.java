@@ -24,7 +24,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("On Error Propagate")
 public class OnErrorPropagateTestCase extends AbstractIntegrationTestCase {
 
   @Override
