@@ -24,7 +24,8 @@
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
                        labAddress="#['Pollos Hermanos']"
-                       weaponTypeFunction="#[weaponType]">
+                       weaponTypeFunction="#[weaponType]"
+                       knownAddresses="#[[]]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -96,7 +97,8 @@
                        candidateDoors="${candidateDoors}"
                        labAddress="#['Pollos Hermanos']"
                        deathsBySeasons="${deathsBySeasons}"
-                       labeledRicin="${labeledRicin}">
+                       labeledRicin="${labeledRicin}"
+                       knownAddresses="#[[]]">
         <heisenberg:enemies>
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
@@ -132,7 +134,8 @@
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="monthlyIncomes"
                        deathsBySeasons="deathsBySeasons"
-                       labeledRicin="labeledRicins">
+                       labeledRicin="labeledRicins"
+                       knownAddresses="#[[]]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
@@ -152,7 +155,8 @@
                        weaponTypeFunction="#[weaponType]"
                        monthlyIncomes="#[[12000L, 500L]]"
                        deathsBySeasons="#[['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
-                       labeledRicin="#[app.registry.labeledRicins]">
+                       labeledRicin="#[app.registry.labeledRicins]"
+                       knownAddresses="#[[]]">
         <heisenberg:enemies>
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>
@@ -187,7 +191,8 @@
                        monthlyIncomes="#[app.registry.monthlyIncomes]"
                        deathsBySeasons="#[app.registry.deathsBySeasons]"
                        labeledRicin="#[app.registry.labeledRicins]"
-                       weapon="#[weapon]">
+                       weapon="#[weapon]"
+                       knownAddresses="#[[]]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 

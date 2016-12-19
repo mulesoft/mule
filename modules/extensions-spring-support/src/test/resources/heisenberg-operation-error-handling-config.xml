@@ -25,6 +25,9 @@
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>
         </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>

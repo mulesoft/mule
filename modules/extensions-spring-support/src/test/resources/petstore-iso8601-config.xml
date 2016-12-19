@@ -7,22 +7,37 @@
 
     <petstore:config name="petstoreWithTimeZone" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53:23+05:00"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <petstore:config name="petstoreWithDateTime" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53:23"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <petstore:config name="petstoreWithDate" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <petstore:config name="petstoreWithTimeZoneNoSeconds" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53+05:00"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <petstore:config name="petstoreWithTimeZoneNoMinutes" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15+05:00"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <petstore:config name="petstoreClosedForHolidays" cashierName="jim">
@@ -31,6 +46,9 @@
               <petstore:closed-for-holiday value="2008-09-15"/>
           </petstore:closed-for-holidays>
         </petstore:connection>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <petstore:config name="petstoreDiscountDates" cashierName="jim">
@@ -39,6 +57,9 @@
                 <petstore:discount-date value="2008-09-15T15:53:23"/>
             </petstore:discount-dates>
         </petstore:connection>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <flow name="getWithTimeZone">

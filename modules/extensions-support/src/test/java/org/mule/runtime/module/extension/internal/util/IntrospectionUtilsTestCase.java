@@ -139,7 +139,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void getFieldsWithGettersOnly() {
     Collection<Field> fieldsWithGetters = getFieldsWithGetters(PhoneNumber.class);
-    assertThat(fieldsWithGetters.size(), is(3));
+    assertThat(fieldsWithGetters.size(), is(4));
   }
 
   @Test

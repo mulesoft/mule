@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.Event;
+import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -45,21 +46,11 @@ public class DynamicConfigExpirationTestCase extends ExtensionFunctionalTestCase
     assertThat(config.getPersonalInfo().getName(), is(myName));
 
     PollingProber prober = new PollingProber(5000, 1000);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      protected boolean test() throws Exception {
-        assertThat(config.getStop(), is(1));
-        assertThat(config.getDispose(), is(1));
-
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return "config was not stopped or disposed";
-      }
-    });
+    prober.check(new JUnitLambdaProbe(() -> {
+      assertThat(config.getStop(), is(1));
+      assertThat(config.getDispose(), is(1));
+      return true;
+    }, "config was not stopped or disposed"));
 
     assertThat(config.getInitialise(), is(1));
     assertThat(config.getStart(), is(1));

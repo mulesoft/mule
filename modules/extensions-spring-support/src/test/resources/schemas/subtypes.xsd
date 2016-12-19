@@ -124,7 +124,7 @@
                     <xs:annotation>
                         <xs:documentation>Default configuration</xs:documentation>
                     </xs:annotation>
-                     <xs:sequence minOccurs="1" maxOccurs="1">
+                    <xs:sequence minOccurs="1" maxOccurs="1">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
@@ -309,7 +309,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                 <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
                             <xs:complexType>
@@ -383,7 +383,7 @@
     <xs:complexType name="SubtypesSourceType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="door-param">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -399,21 +399,11 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentDoorsType" substitutionGroup="mule:abstract-operator" name="content-doors"></xs:element>
-  <xs:complexType name="ContentDoorsType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content-map"></xs:element>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoorRetrieverType" substitutionGroup="mule:abstract-operator" name="door-retriever"></xs:element>
     <xs:complexType name="DoorRetrieverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="door">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -449,7 +439,7 @@
     <xs:complexType name="ProcessDoorType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-              <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="door">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -485,27 +475,11 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-      <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="RequiredChildType" substitutionGroup="mule:abstract-operator" name="required-child"></xs:element>
-      <xs:complexType name="RequiredChildType">
-        <xs:complexContent>
-          <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-            <xs:sequence minOccurs="1" maxOccurs="1">
-              <xs:element minOccurs="1" maxOccurs="1" name="required-child-only-pojo">
-                <xs:complexType>
-                  <xs:complexContent>
-                    <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
-                  </xs:complexContent>
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-          </xs:extension>
-        </xs:complexContent>
-      </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShapeRetrieverType" substitutionGroup="mule:abstract-operator" name="shape-retriever"></xs:element>
     <xs:complexType name="ShapeRetrieverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="shape">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -536,7 +510,7 @@
     <xs:complexType name="SubtypedAndConcreteParametersType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-               <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" name="base-shape">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">

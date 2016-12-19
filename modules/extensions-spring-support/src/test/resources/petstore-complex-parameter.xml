@@ -23,16 +23,25 @@
 
     <petstore:config name="configWithReferences" cashierName="jim" >
         <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
         <petstore:cage birds="#[app.registry.birds]" ammenities="#[app.registry.ammenities]"/>
     </petstore:config>
 
     <petstore:config name="configWithMELReferences" cashierName="jim" >
         <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
         <petstore:cage ammenities="#[['spinning wheel', 'food can']]" birds="#[['mockingjay':15, 'mockingbird': 10]]"/>
     </petstore:config>
 
     <petstore:config name="configWithChildElements" cashierName="jim" >
         <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
         <petstore:cage>
             <petstore:birds>
                 <petstore:bird key="mockingjay" value="15"/>

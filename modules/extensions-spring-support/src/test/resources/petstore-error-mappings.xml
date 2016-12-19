@@ -7,6 +7,9 @@
 
     <petstore:config name="config" cashierName="cashierName">
         <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <flow name="noMapping">
