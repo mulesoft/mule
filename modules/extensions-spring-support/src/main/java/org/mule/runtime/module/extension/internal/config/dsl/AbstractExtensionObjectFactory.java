@@ -15,12 +15,14 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+import com.google.common.base.Joiner;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
@@ -34,7 +36,6 @@ import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.DefaultEncodingAnnotation;
-import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.DefaultEncodingModelProperty;
@@ -50,8 +51,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
-
-import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -134,6 +133,11 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
       if (resolver != null) {
         resolverSet.add(parameterName, resolver);
+      } else if (p.isRequired()) {
+        throw new IllegalStateException(format("Parameter '%s' from the %s '%s' is required but is not set",
+                                               parameterName,
+                                               getComponentModelTypeName(model),
+                                               getModelName(model)));
       }
     });
 
@@ -196,7 +200,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
   @Override
   public void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
     final Class<?> objectClass = getType(objectType);
-    final boolean isParameterGroup = objectType.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
+    final boolean isParameterGroup = isParameterGroup(objectType);
     final Map<String, Object> parameters = getParameters();
     objectType.getFields().forEach(field -> {
       final String key = getLocalPart(field);
@@ -223,6 +227,9 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
       if (valueResolver != null) {
         builder.addPropertyResolver(objectField.getName(), valueResolver);
+      } else if (field.isRequired() && !isParameterGroup(field)) {
+        throw new IllegalStateException(format("The object '%s' requires the parameter '%s' but is not set",
+                                               objectClass.getSimpleName(), objectField.getName()));
       }
     });
   }

@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension.model;
 
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
@@ -16,9 +17,12 @@ public class KnockeableDoor {
 
   @Parameter
   private String victim;
+
   @Parameter
   private String address;
+
   @Parameter
+  @Optional
   private KnockeableDoor previous;
 
   public KnockeableDoor() {}

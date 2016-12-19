@@ -14,8 +14,18 @@
                        money="100000"
                        initialHealth="CANCER"
                        finalHealth="CANCER">
-
         <heisenberg:connection saulPhoneNumber="123-12-3"/>
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
     </heisenberg:config>
 
     <flow name="getPersonalInfo">

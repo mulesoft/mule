@@ -6,15 +6,11 @@
  */
 package org.mule.extension.email.internal.mailbox.imap;
 
-import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.IMAPS_PORT;
 import org.mule.extension.email.internal.EmailConnectionSettings;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * Groups IMAP connection parameters
@@ -31,22 +27,8 @@ public final class IMAPConnectionSettings extends EmailConnectionSettings {
   @Placement(order = 2)
   private String port;
 
-  /**
-   * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. Allows to create a TLS secured
-   * connections.
-   */
-  @Parameter
-  @Summary("TLS Configuration for the secure connection of the IMAPS protocol")
-  @Placement(order = 5)
-  @DisplayName(TLS_CONFIGURATION)
-  private TlsContextFactory tlsContextFactory;
-
   @Override
   public String getPort() {
     return port;
-  }
-
-  public TlsContextFactory getTlsContextFactory() {
-    return tlsContextFactory;
   }
 }

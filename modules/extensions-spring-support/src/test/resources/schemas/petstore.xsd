@@ -9,9 +9,23 @@
     <xs:complexType name="org.mule.test.petstore.extension.PhoneNumber">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="area-codes">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="area-code">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="required" name="mobile"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="home"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="countryEncoding"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="areaCodes"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -403,6 +417,23 @@
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MakePhoneCallType" substitutionGroup="mule:abstract-operator" name="make-phone-call"></xs:element>
+    <xs:complexType name="MakePhoneCallType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

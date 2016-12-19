@@ -58,5 +58,4 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
     assertThat(config.getHealthProgression().size(), is(3));
     assertThat(config.getHealthProgression(), contains(HEALTHY, CANCER, DEAD));
   }
-
 }

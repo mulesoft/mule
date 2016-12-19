@@ -58,4 +58,6 @@ public class PetStoreOperations {
   public PetCage getCage(@UseConfig PetStoreConnector config) {
     return config.getCage();
   }
+
+  public void makePhoneCall(PhoneNumber phoneNumber) {}
 }

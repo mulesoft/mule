@@ -15,6 +15,13 @@
                        initialHealth="CANCER"
                        finalHealth="CANCER"
                        enemies="#[[]]">
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">

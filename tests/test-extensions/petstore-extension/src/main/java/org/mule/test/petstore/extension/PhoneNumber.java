@@ -11,6 +11,8 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.util.List;
+
 @XmlHints(allowTopLevelDefinition = true)
 public class PhoneNumber {
 
@@ -24,6 +26,9 @@ public class PhoneNumber {
   @DefaultEncoding
   private String countryEncoding;
 
+  @Parameter
+  private List<String> areaCodes;
+
   public String getMobile() {
     return mobile;
   }
@@ -34,5 +39,9 @@ public class PhoneNumber {
 
   public String getCountryEncoding() {
     return countryEncoding;
+  }
+
+  public List<String> getAreaCodes() {
+    return areaCodes;
   }
 }

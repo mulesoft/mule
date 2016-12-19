@@ -6,7 +6,11 @@
                http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
 
-    <vegan:apple-config name="apple" parameterizedFunction="#[['Apple' : 'Tasty']]"/>
+    <vegan:apple-config name="apple" parameterizedFunction="#[['Apple' : 'Tasty']]">
+        <vegan:cook-book>
+            <vegan:vegan-cook-book/>
+        </vegan:cook-book>
+    </vegan:apple-config>
     <vegan:banana-config name="banana"/>
     <vegan:kiwi-config name="kiwi"/>
     <vegan:peach-config name="peach">
