@@ -22,14 +22,19 @@
                     <email:content>Email Content</email:content>
                 </email:body>
                 <email:attachments>
+                    <email:email-attachment id="text-attachment" contentType="text/plain">
+                        <email:content>
+                            #['This is the email text attachment']
+                        </email:content>
+                    </email:email-attachment>
                     <email:email-attachment id="json-attachment">
                         <email:content>
                             #[app.registry.jsonAttachmentResource.getURL()]
                         </email:content>
                     </email:email-attachment>
-                    <email:email-attachment id="text-attachment" contentType="text/plain">
+                    <email:email-attachment id="stream-attachment" contentType="application/octet-stream">
                         <email:content>
-                            #['This is the email text attachment']
+                            #[new java.io.ByteArrayInputStream("This is the email text attachment".getBytes());]
                         </email:content>
                     </email:email-attachment>
                 </email:attachments>

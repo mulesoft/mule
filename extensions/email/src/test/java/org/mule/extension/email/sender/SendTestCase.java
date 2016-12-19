@@ -14,6 +14,10 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
 
+import org.mule.runtime.core.util.IOUtils;
+
+import java.io.InputStream;
+
 import javax.activation.DataHandler;
 import javax.mail.Message;
 import javax.mail.Multipart;
@@ -56,7 +60,7 @@ public class SendTestCase extends SMTPTestCase {
     Message[] messages = getReceivedMessagesAndAssertCount(4);
     for (Message message : messages) {
       Multipart content = (Multipart) message.getContent();
-      assertThat(content.getCount(), is(3));
+      assertThat(content.getCount(), is(4));
 
       Object body = content.getBodyPart(0).getContent();
       assertBodyContent((String) body);
@@ -66,6 +70,9 @@ public class SendTestCase extends SMTPTestCase {
 
       DataHandler jsonAttachment = content.getBodyPart(2).getDataHandler();
       assertJsonAttachment(jsonAttachment);
+
+      DataHandler streamAttachment = content.getBodyPart(3).getDataHandler();
+      assertThat(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, is(IOUtils.toString((InputStream) streamAttachment.getContent())));
     }
   }
 
