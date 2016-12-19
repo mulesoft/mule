@@ -32,6 +32,8 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -84,7 +86,8 @@ public class ConsumeOperation {
   public Result<Object, WscAttributes> consume(@UseConfig WebServiceConsumer config,
                                                @Connection WscConnection connection,
                                                @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                               @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
+                                               //TODO MULE-11235
+                                               @NullSafe @Optional @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
       throws SoapFaultException {
     Map<String, SoapAttachment> attachments = message.getAttachments();
     Map<String, String> headers = message.getHeaders();
