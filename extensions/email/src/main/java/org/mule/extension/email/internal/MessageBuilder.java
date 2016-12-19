@@ -12,10 +12,11 @@ import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Part.ATTACHMENT;
 import static javax.mail.Part.INLINE;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.CONTENT_TRANSFER_ENCODING;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.CONTENT_TYPE_HEADER;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.DEFAULT_CONTENT_TRANSFER_ENCODING;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.MULTIPART;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.exception.EmailException;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -183,17 +185,14 @@ public final class MessageBuilder {
    */
   public MessageBuilder withAttachments(List<EmailAttachment> attachments) {
     Map<String, DataHandler> attachmentsMap = new LinkedHashMap<>();
-    attachments
-        .stream().map(a -> a.getContent() instanceof InputStream
-            ? new EmailAttachment(a.getId(), toByteArray((InputStream) a.getContent()), a.getContentType()) : a)
-        .forEach(a -> {
-          try {
-            DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
-            attachmentsMap.put(a.getId(), dataHandler);
-          } catch (Exception e) {
-            throw new EmailException(ERROR + " could not add attachments", e);
-          }
-        });
+    attachments.forEach(a -> {
+      try {
+        DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
+        attachmentsMap.put(a.getId(), dataHandler);
+      } catch (Exception e) {
+        throw new EmailException(ERROR + " could not add attachments", e);
+      }
+    });
     this.attachments = attachmentsMap;
     return this;
   }
@@ -286,7 +285,7 @@ public final class MessageBuilder {
           attachmentPart.setFileName(attachment);
           DataHandler attachmentDataHandler = attachments.get(attachment);
           attachmentPart.setDataHandler(attachmentDataHandler);
-          attachmentPart.setHeader(CONTENT_TYPE_HEADER, attachmentDataHandler.getContentType());
+          setAttachmentHeaders(attachmentPart, attachmentDataHandler);
           multipart.addBodyPart(attachmentPart);
         } catch (Exception e) {
           throw new EmailException("Error while adding attachment: " + attachment, e);
@@ -331,5 +330,20 @@ public final class MessageBuilder {
    */
   private Address[] toAddressArray(List<String> addresses) {
     return addresses.stream().map(this::toAddress).toArray(Address[]::new);
+  }
+
+  /**
+   * Sets headers to attachment the {@link MimeBodyPart}
+   * 
+   * @param part {@link MimeBodyPart} that contains the attachment
+   * @param dataHandler {@link DataHandler} for the content of the attachment
+   * @throws MessagingException
+   * @throws IOException
+   */
+  private void setAttachmentHeaders(MimeBodyPart part, DataHandler dataHandler) throws MessagingException, IOException {
+    part.setHeader(CONTENT_TYPE_HEADER, dataHandler.getContentType());
+    if (dataHandler.getContent() instanceof InputStream) {
+      part.setHeader(CONTENT_TRANSFER_ENCODING, DEFAULT_CONTENT_TRANSFER_ENCODING);
+    }
   }
 }
