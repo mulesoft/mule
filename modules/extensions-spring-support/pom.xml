@@ -33,11 +33,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
-            <artifactId>mule-extensions-api-xml-dsl</artifactId>
-            <version>${muleExtensionsApiVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>

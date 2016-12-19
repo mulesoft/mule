@@ -49,22 +49,26 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -78,18 +82,33 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-public abstract class ExtensionsTestUtils {
+public final class ExtensionsTestUtils {
 
   public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   public static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
 
   public static final String HELLO_WORLD = "Hello World!";
 
+  private ExtensionsTestUtils() {}
+
   public static MetadataType toMetadataType(Class<?> type) {
     return TYPE_LOADER.load(type);
+  }
+
+  public static ProblemsReporter validate(Class<?> clazz, ExtensionModelValidator validator) {
+    return validate(MuleExtensionUtils.loadExtension(clazz), validator);
+  }
+
+  public static ProblemsReporter validate(ExtensionModel model, ExtensionModelValidator validator) {
+    ProblemsReporter problemsReporter = new ProblemsReporter(model);
+    validator.validate(model, problemsReporter);
+
+    if (problemsReporter.hasErrors()) {
+      throw new IllegalModelDefinitionException(problemsReporter.toString());
+    }
+
+    return problemsReporter;
   }
 
   public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType) {
@@ -291,17 +310,13 @@ public abstract class ExtensionsTestUtils {
     when(configurationFactory.newInstance()).thenReturn(config);
     when(configurationFactory.getObjectType()).thenReturn((Class) config.getClass());
 
-    when(configurationModel.getModelProperty(any())).thenAnswer(new Answer<Optional<ModelProperty>>() {
-
-      @Override
-      public Optional<ModelProperty> answer(InvocationOnMock invocationOnMock) throws Throwable {
-        Class<? extends ModelProperty> propertyType = (Class<? extends ModelProperty>) invocationOnMock.getArguments()[0];
-        if (ConfigurationFactoryModelProperty.class.equals(propertyType)) {
-          return of(new ConfigurationFactoryModelProperty(configurationFactory));
-        }
-
-        return empty();
+    when(configurationModel.getModelProperty(any())).thenAnswer(invocationOnMock -> {
+      Class<? extends ModelProperty> propertyType = (Class<? extends ModelProperty>) invocationOnMock.getArguments()[0];
+      if (ConfigurationFactoryModelProperty.class.equals(propertyType)) {
+        return of(new ConfigurationFactoryModelProperty(configurationFactory));
       }
+
+      return empty();
     });
   }
 

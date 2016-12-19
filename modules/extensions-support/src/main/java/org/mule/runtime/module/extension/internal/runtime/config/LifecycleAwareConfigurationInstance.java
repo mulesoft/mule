@@ -38,7 +38,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
 import java.util.Optional;

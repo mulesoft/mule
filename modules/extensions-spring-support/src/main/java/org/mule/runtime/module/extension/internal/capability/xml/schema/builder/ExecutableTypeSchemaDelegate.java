@@ -28,12 +28,12 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.Extensible;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -44,7 +44,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Na
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypeRestrictionModelProperty;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -156,7 +156,7 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   private boolean isOperation(MetadataType type) {
-    ValueHolder<Boolean> isOperation = new ValueHolder<>(false);
+    Reference<Boolean> isOperation = new Reference<>(false);
     type.accept(new MetadataTypeVisitor() {
 
       @Override

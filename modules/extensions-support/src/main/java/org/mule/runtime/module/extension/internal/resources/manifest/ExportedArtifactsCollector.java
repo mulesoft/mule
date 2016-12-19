@@ -23,13 +23,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.extension.api.model.property.ExportModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -72,7 +70,9 @@ final public class ExportedArtifactsCollector {
     return exportedResources.build();
   }
 
-  /**   
+  /**
+   *    
+   *
    * @return The {@link Set} of default java package names that the extension should export
    */
   public Set<String> getExportedPackages() {
@@ -92,10 +92,7 @@ final public class ExportedArtifactsCollector {
     addMetaInfResource("spring.handlers");
     addMetaInfResource("spring.schemas");
 
-    Optional<ExportModelProperty> exportProperty = getExportModelProperty();
-    if (exportProperty.isPresent()) {
-      exportedResources.addAll(exportProperty.get().getExportedResources());
-    }
+    exportedResources.addAll(extensionModel.getResources());
   }
 
   private void addMetaInfResource(String resource) {
@@ -109,12 +106,7 @@ final public class ExportedArtifactsCollector {
   }
 
   private void collectManuallyExportedPackages() {
-    getExportModelProperty().map(ExportModelProperty::getExportedTypes)
-        .ifPresent(types -> types.forEach(c -> exportedClasses.add(getType(c))));
-  }
-
-  private Optional<ExportModelProperty> getExportModelProperty() {
-    return extensionModel.getModelProperty(ExportModelProperty.class);
+    extensionModel.getTypes().forEach(c -> exportedClasses.add(getType(c)));
   }
 
   private void collectDefault() {

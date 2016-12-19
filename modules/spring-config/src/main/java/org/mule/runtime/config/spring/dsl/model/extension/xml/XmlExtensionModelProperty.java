@@ -27,7 +27,7 @@ public class XmlExtensionModelProperty implements ModelProperty {
   }
 
   @Override
-  public boolean isExternalizable() {
+  public boolean isPublic() {
     return false;
   }
 }

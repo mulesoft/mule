@@ -18,7 +18,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.internal.utils.MetadataTypeUtils;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -37,11 +36,10 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.model.property.ExportModelProperty;
+import org.mule.runtime.extension.api.dsl.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.connection.ConnectionProviderDefinitionParser;
@@ -54,7 +52,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.operation.Operation
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
-import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -282,13 +280,11 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                                     Builder definitionBuilder,
                                                     ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                                     ExtensionParsingContext parsingContext) {
-    extensionModel.getModelProperty(ExportModelProperty.class)
-        .map(ExportModelProperty::getExportedTypes)
-        .ifPresent(exportedTypes -> registerTopLevelParameters(exportedTypes.stream(),
-                                                               definitionBuilder,
-                                                               extensionClassLoader,
-                                                               dslSyntaxResolver,
-                                                               parsingContext));
+    registerTopLevelParameters(extensionModel.getTypes().stream(),
+                               definitionBuilder,
+                               extensionClassLoader,
+                               dslSyntaxResolver,
+                               parsingContext);
   }
 
   private void registerSubTypes(Builder definitionBuilder,
@@ -306,11 +302,11 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                parsingContext);
   }
 
-  private void registerTopLevelParameters(Stream<MetadataType> parameters, Builder definitionBuilder,
+  private void registerTopLevelParameters(Stream<? extends MetadataType> parameters, Builder definitionBuilder,
                                           ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                           ExtensionParsingContext parsingContext) {
 
-    parameters.filter(ExtensionMetadataTypeUtils::isInstantiable)
+    parameters.filter(IntrospectionUtils::isInstantiable)
         .forEach(subType -> registerTopLevelParameter(subType,
                                                       definitionBuilder,
                                                       extensionClassLoader,

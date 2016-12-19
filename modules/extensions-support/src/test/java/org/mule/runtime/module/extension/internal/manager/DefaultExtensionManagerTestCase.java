@@ -24,12 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -37,7 +32,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -45,26 +40,17 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
-import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
 
@@ -305,34 +291,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     final int registeredExtensionsCount = extensionsManager.getExtensions().size();
     registerExtensions(extensionModel1, extensionModel1, extensionModel1);
     assertThat(extensionsManager.getExtensions(), hasSize(registeredExtensionsCount));
-  }
-
-  @Test
-  public void registerFromManifest() throws Exception {
-    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(anyObject(), anyObject())).thenReturn(asList(new XmlModelEnricher()));
-
-    final String version = "4.0.0";
-    ExtensionManifestBuilder builder =
-        new ExtensionManifestBuilder().setName(HEISENBERG).setDescription(EXTENSION_DESCRIPTION).setVersion(version);
-    builder.withDescriber().setId(DESCRIBER_ID).addProperty(TYPE_PROPERTY_NAME, HeisenbergExtension.class.getName());
-
-    Describer describer = new DescriberResolver().resolve(builder.build(), classLoader);
-    final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
-
-    ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader());
-
-    ExtensionModel extensionModel =
-        withContextClassLoader(classLoader, () -> extensionFactory.createFrom(describer.describe(context), context));
-
-    extensionsManager.registerExtension(extensionModel);
-
-    Optional<ExtensionModel> registered = extensionsManager.getExtension(HEISENBERG);
-    assertThat(registered.isPresent(), is(true));
-
-    final ExtensionModel registeredExtension = registered.get();
-    assertThat(registeredExtension.getName(), is(HEISENBERG));
-    assertThat(registeredExtension.getVersion(), is(version));
   }
 
   @Test

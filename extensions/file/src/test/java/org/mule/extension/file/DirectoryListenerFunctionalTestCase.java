@@ -15,14 +15,13 @@ import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
-
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -195,7 +194,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
 
   private Message listen(FileEventType type, File file) {
     PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    ValueHolder<Message> messageHolder = new ValueHolder<>();
+    Reference<Message> messageHolder = new Reference<>();
     prober.check(new JUnitLambdaProbe(() -> {
       for (Message message : receivedMessages) {
         ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();

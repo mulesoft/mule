@@ -14,7 +14,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.isParameterGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -27,15 +27,14 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.internal.utils.MetadataTypeUtils;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
-import org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -46,7 +45,7 @@ import java.util.Optional;
  * <p>
  * The values are generated according to the rules described in {@link NullSafe}.
  * <p>
- * Instances are to be obtained through the {@link #of(ValueResolver, MetadataType, MuleContext)}
+ * Instances are to be obtained through the {@link #of(ValueResolver, MetadataType, MuleContext, ObjectTypeParametersResolver)} )}
  * factory method
  *
  * @param <T> the generic type of the produced values.
@@ -73,7 +72,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
                                         ObjectTypeParametersResolver parametersResolver) {
     checkArgument(delegate != null, "delegate cannot be null");
 
-    ValueHolder<ValueResolver> value = new ValueHolder<>();
+    Reference<ValueResolver> value = new Reference<>();
     type.accept(new MetadataTypeVisitor() {
 
       @Override

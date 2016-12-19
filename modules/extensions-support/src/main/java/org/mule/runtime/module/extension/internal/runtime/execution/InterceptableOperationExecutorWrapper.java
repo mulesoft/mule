@@ -17,7 +17,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
 

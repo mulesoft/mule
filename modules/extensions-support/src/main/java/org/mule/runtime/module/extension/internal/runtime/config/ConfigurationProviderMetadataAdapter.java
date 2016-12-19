@@ -41,7 +41,7 @@ import javax.inject.Inject;
  * Adds the capability to expose all the {@link MetadataKey}s associated with the {@link StaticConfigurationProvider}'s
  * components.
  *
- * @since 1.0
+ * @since 4.0
  */
 public final class ConfigurationProviderMetadataAdapter extends StaticConfigurationProvider
     implements MetadataKeyProvider {

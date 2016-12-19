@@ -10,8 +10,8 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
-import org.mule.runtime.extension.xml.dsl.api.resources.spi.SchemaResourceFactory;
+import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.resources.spi.SchemaResourceFactory;
 
 /**
  * Implementation of {@link AbstractXmlResourceFactory} which generates the extension's XSD schema

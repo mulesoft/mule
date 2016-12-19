@@ -30,8 +30,8 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 
 import java.util.List;

@@ -45,13 +45,6 @@ public interface ExtensionManagerAdapter extends ExtensionManager {
   Optional<ConfigurationProvider> getConfigurationProvider(String configurationProviderName);
 
   /**
-   * Registers the given {@link ExtensionModel}.
-   *
-   * @param extensionModel the {@link ExtensionModel} to be registered. Cannot be {@code null}
-   */
-  void registerExtension(ExtensionModel extensionModel);
-
-  /**
    * Registered the given {@link ConfigurationProvider} which should be later be used to serve invocations to
    * {@link #getConfigurationProvider(ExtensionModel)} and {@link #getConfiguration(String, MuleEvent)}
    *

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Handles the result of flow processing.
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface SourceCompletionHandler {
 
