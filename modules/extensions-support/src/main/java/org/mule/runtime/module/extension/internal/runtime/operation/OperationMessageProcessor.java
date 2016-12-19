@@ -144,10 +144,12 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       return from(publisher).map(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
         Optional<ConfigurationInstance> configuration = getConfiguration(event);
         Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
-        ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
 
-        OperationExecutionFunction operationExecutionFunction =
-            (parameters, operationEvent) -> doProcess(operationEvent, operationContext).block();
+        OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent) -> {
+          ExecutionContextAdapter operationContext = createExecutionContext(configuration, parameters, operationEvent);
+          return doProcess(operationEvent, operationContext).block();
+        };
+
         OperationPolicy policy =
             policyManager.createOperationPolicy(operationIdentifier, event,
                                                 operationParameters,
