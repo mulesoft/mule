@@ -25,6 +25,6 @@ public class PetStoreMissingRequiredParameterInConfigTestCase extends InvalidExt
   @Override
   protected void additionalExceptionAssertions(ExpectedException expectedException) {
     expectedException
-        .expectMessage("Parameter 'pets' of type java.util.List from the configuration 'config' is required but wasn't set");
+        .expectMessage("Parameter 'pets' from the configuration 'config' is required but is not set");
   }
 }

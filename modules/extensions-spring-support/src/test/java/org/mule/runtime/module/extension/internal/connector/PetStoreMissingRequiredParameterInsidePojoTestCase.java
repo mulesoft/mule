@@ -29,6 +29,6 @@ public class PetStoreMissingRequiredParameterInsidePojoTestCase extends InvalidE
   @Override
   protected void additionalExceptionAssertions(ExpectedException expectedException) {
     expectedException
-        .expectMessage(is(containsString("Class org.mule.test.petstore.extension.PhoneNumber contains field 'areaCodes' of type java.util.List which is required but wasn't set")));
+        .expectMessage(is(containsString("The object 'PhoneNumber' requires the parameter 'areaCodes' but is not set")));
   }
 }
