@@ -91,7 +91,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 /**
- * TODO MULE-10600 Upgrade to a version that contains the changes from https://issues.apache.org/jira/browse/CXF-7058
+ * TODO MULE-10600 Upgrade to a version that contains the changes from:
+ * <ul>
+ * <li><a href="https://issues.apache.org/jira/browse/CXF-7058">CXF-7058</a></li>
+ * <li><a href="https://issues.apache.org/jira/browse/CXF-7162">CXF-7162</a></li>
+ * </ul>
  */
 public final class StaxUtils {
     // System properies for defaults, but also contextual properties usable
@@ -754,6 +758,7 @@ public final class StaxUtils {
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.SPACE:
                 String s = reader.getText();
                 if (s != null) {
                     writer.writeCharacters(s);
