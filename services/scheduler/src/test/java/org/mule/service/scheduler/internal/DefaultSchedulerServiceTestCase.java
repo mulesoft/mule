@@ -7,11 +7,14 @@
 package org.mule.service.scheduler.internal;
 
 import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -22,6 +25,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.junit.Rule;
@@ -54,6 +58,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   public ExpectedException expected = none();
 
   @Test
+  @Description("Tests that dispatching a task to a throttled scheduler already running its maximum tasks throws the appropriate exception.")
   public void executorRejects() throws MuleException {
     final Latch latch = new Latch();
     final DefaultSchedulerService service = new DefaultSchedulerService();
@@ -80,6 +85,24 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
       assertThat(custom.shutdownNow(), not(hasItem(task)));
       service.stop();
     }
+  }
 
+  @Test
+  @Description("Tests that a dispatched task has inherited the context classloader.")
+  public void classLoaderPropagates() throws Exception {
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    final Scheduler scheduler = service.cpuLightScheduler();
+
+    final ClassLoader contextClassLoader = mock(ClassLoader.class);
+    currentThread().setContextClassLoader(contextClassLoader);
+
+    final Future<?> submit = scheduler.submit(() -> {
+      assertThat(currentThread().getContextClassLoader(), sameInstance(contextClassLoader));
+    });
+
+    submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
   }
 }

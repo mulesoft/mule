@@ -27,6 +27,7 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
   private static final Logger logger = getLogger(RunnableFutureDecorator.class);
 
   private final RunnableFuture<V> task;
+  private final ClassLoader classLoader;
 
   private final DefaultScheduler scheduler;
 
@@ -36,13 +37,16 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
    * Decorates the given {@code task}
    * 
    * @param task the task to be decorated
+   * @param classLoader the context {@link ClassLoader} on which the {@code task} should be executed
    * @param scheduler the owner {@link Executor} of this task
    * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
    * @param id a unique it for this task.
    */
-  RunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler, String taskAsString, Integer id) {
+  RunnableFutureDecorator(RunnableFuture<V> task, ClassLoader classLoader, DefaultScheduler scheduler, String taskAsString,
+                          Integer id) {
     super(id);
     this.task = task;
+    this.classLoader = classLoader;
     this.scheduler = scheduler;
     this.taskAsString = taskAsString;
   }
@@ -50,9 +54,16 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
   @Override
   public void run() {
     long startTime = beforeRun();
+
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(classLoader);
+
     try {
       task.run();
     } finally {
+      currentThread.setContextClassLoader(currentClassLoader);
+
       wrapUp();
       if (logger.isTraceEnabled()) {
         logger.trace("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
