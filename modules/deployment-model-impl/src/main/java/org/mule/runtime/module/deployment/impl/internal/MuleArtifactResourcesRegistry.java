@@ -12,12 +12,16 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
@@ -100,14 +104,23 @@ public class MuleArtifactResourcesRegistry {
 
     domainFactory = new DefaultDomainFactory(this.domainClassLoaderFactory, domainManager, containerClassLoader,
                                              artifactClassLoaderManager, serviceManager);
+
+    ArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
+        trackArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
+    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
+        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, artifactPluginRepository,
+                                                               artifactPluginClassLoaderFactory,
+                                                               pluginDependenciesResolver);
+
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                                        artifactPluginRepository, domainManager, serviceManager,
-                                                       artifactClassLoaderManager);
+                                                       artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory);
     temporaryApplicationFactory = new TemporaryApplicationFactory(applicationClassLoaderBuilderFactory,
                                                                   new TemporaryApplicationDescriptorFactory(artifactPluginDescriptorLoader,
                                                                                                             artifactPluginRepository),
                                                                   artifactPluginRepository, domainManager, serviceManager,
-                                                                  artifactClassLoaderManager);
+                                                                  artifactClassLoaderManager,
+                                                                  policyTemplateClassLoaderBuilderFactory);
 
     temporaryArtifactClassLoaderBuilderFactory =
         new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginClassLoaderFactory,

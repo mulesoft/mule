@@ -22,7 +22,6 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
@@ -42,34 +41,29 @@ import java.util.Set;
  */
 public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtifactClassLoaderBuilder> {
 
-  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
-  private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
+  protected final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
-  private ArtifactDescriptor artifactDescriptor;
+  protected ArtifactDescriptor artifactDescriptor;
   private ArtifactClassLoader parentClassLoader;
-  private List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
+  protected List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
 
   /**
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
-   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
-   *        null.
+   *
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
    * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
-  public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                            ArtifactPluginRepository artifactPluginRepository,
+  public AbstractArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
                                             ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                             PluginDependenciesResolver pluginDependenciesResolver) {
-    checkArgument(artifactClassLoaderFactory != null, "artifact class loader factory cannot be null");
     checkArgument(artifactPluginRepository != null, "artifact plugin repository cannot be null");
     checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
 
-    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
@@ -136,8 +130,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     final List<ArtifactClassLoader> pluginClassLoaders =
         createPluginClassLoaders(artifactId, regionClassLoader, effectiveArtifactPluginDescriptors);
 
-    final ArtifactClassLoader artifactClassLoader =
-        artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
     ArtifactClassLoaderFilter artifactClassLoaderFilter = createClassLoaderFilter(artifactDescriptor.getClassLoaderModel());
     regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
 
@@ -149,6 +142,15 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
     return artifactClassLoader;
   }
+
+  /**
+   * Creates the class loader for the artifact being built.
+   *
+   * @param artifactId identifies the artifact being created. Non empty.
+   * @param regionClassLoader class loader containing the artifact and dependant class loaders. Non null.
+   * @return
+   */
+  protected abstract ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader);
 
   private ArtifactClassLoaderFilter createClassLoaderFilter(ClassLoaderModel classLoaderModel) {
     return new DefaultArtifactClassLoaderFilter(classLoaderModel.getExportedPackages(), classLoaderModel.getExportedResources());

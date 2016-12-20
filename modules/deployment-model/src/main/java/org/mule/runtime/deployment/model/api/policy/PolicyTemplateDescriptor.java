@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.runtime.deployment.model.api.policy;
+
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+
+import java.io.File;
+
+
+/**
+ * Describes how to create a {@link PolicyTemplate} artifact
+ *
+ * @since 4.0
+ */
+public class PolicyTemplateDescriptor extends ArtifactDescriptor {
+
+  public static final String DEFAULT_POLICY_CONFIGURATION_RESOURCE = "policy.xml";
+
+  private File[] configResourceFiles;
+
+  /**
+   * Creates a new descriptor for a named artifact
+   *
+   * @param name artifact name. Non empty.
+   */
+  public PolicyTemplateDescriptor(String name) {
+    super(name);
+  }
+
+  public File[] getConfigResourceFiles() {
+    return configResourceFiles;
+  }
+
+  public void setConfigResourceFiles(File[] configResourceFiles) {
+    this.configResourceFiles = configResourceFiles;
+  }
+}

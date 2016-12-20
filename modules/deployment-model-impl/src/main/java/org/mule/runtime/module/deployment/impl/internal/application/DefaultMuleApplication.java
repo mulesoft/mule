@@ -71,12 +71,14 @@ public class DefaultMuleApplication implements Application {
   protected MuleContextListener muleContextListener;
   private ServerNotificationListener<MuleContextNotification> statusListener;
   private ArtifactContext artifactContext;
+  private ApplicationPolicyProvider policyManager;
 
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
                                 ServiceRepository serviceRepository, File location,
-                                ClassLoaderRepository classLoaderRepository) {
+                                ClassLoaderRepository classLoaderRepository,
+                                ApplicationPolicyProvider applicationPolicyProvider) {
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
@@ -84,6 +86,7 @@ public class DefaultMuleApplication implements Application {
     this.artifactPlugins = artifactPlugins;
     this.location = location;
     this.deploymentClassLoader = deploymentClassLoader;
+    this.policyManager = applicationPolicyProvider;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -176,7 +179,8 @@ public class DefaultMuleApplication implements Application {
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
               .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
-              .setClassLoaderRepository(classLoaderRepository);
+              .setClassLoaderRepository(classLoaderRepository)
+              .setPolicyProvider(policyManager);
 
       Domain domain = domainRepository.getDomain(descriptor.getDomain());
       if (domain.getMuleContext() != null) {
@@ -359,6 +363,22 @@ public class DefaultMuleApplication implements Application {
   @Override
   public ApplicationStatus getStatus() {
     return status;
+  }
+
+  @Override
+  public RegionClassLoader getRegionClassLoader() {
+    ClassLoader parentClassLoader = deploymentClassLoader.getClassLoader().getParent();
+
+    if (parentClassLoader instanceof RegionClassLoader) {
+      return (RegionClassLoader) parentClassLoader;
+    } else {
+      throw new IllegalStateException("Application is not a region owner");
+    }
+  }
+
+  @Override
+  public ApplicationPolicyProvider getPolicyManager() {
+    return policyManager;
   }
 
   @Override

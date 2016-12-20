@@ -12,24 +12,26 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
@@ -66,6 +68,7 @@ public class ArtifactContextBuilder {
   protected static final String SERVICE_REPOSITORY_CANNOT_BE_NULL = "serviceRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL = "classLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
+  protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
@@ -83,6 +86,8 @@ public class ArtifactContextBuilder {
   private boolean enableLazyInit;
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
+  private PolicyProvider policyProvider;
+  private List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
 
   private ArtifactContextBuilder() {}
 
@@ -245,6 +250,11 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  public ArtifactContextBuilder setPolicyProvider(PolicyProvider policyProvider) {
+    this.policyProvider = policyProvider;
+    return this;
+  }
+
   /**
    * Allows to lazily create the artifact resources.
    *
@@ -274,6 +284,18 @@ public class ArtifactContextBuilder {
   }
 
   /**
+   * Adds a service configurator to configure the created context.
+   *
+   * @param serviceConfigurator used to configure the create context. Non null.
+   * @return the builder
+   */
+  public ArtifactContextBuilder withServiceConfigurator(MuleContextServiceConfigurator serviceConfigurator) {
+    checkState(serviceConfigurator != null, SERVICE_CONFIGURATOR_CANNOT_BE_NULL);
+    this.serviceConfigurators.add(serviceConfigurator);
+    return this;
+  }
+
+  /**
    * @return the {@code MuleContext} created with the provided configuration
    * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
@@ -297,6 +319,17 @@ public class ArtifactContextBuilder {
 
           @Override
           public void configure(MuleContext muleContext) throws ConfigurationException {
+            if (serviceRepository != null) {
+              serviceConfigurators.add(new ContainerServicesMuleContextConfigurator(serviceRepository));
+            }
+            if (classLoaderRepository != null) {
+              serviceConfigurators.add(customizationService -> customizationService
+                  .registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository));
+            }
+            if (policyProvider != null) {
+              serviceConfigurators.add(customizationService -> customizationService
+                  .registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, policyProvider));
+            }
             ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
                 ArtifactContextConfiguration.builder()
                     .setMuleContext(muleContext)
@@ -305,10 +338,7 @@ public class ArtifactContextBuilder {
                     .setArtifactProperties(artifactProperties)
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
-                    .setServiceConfigurators(asList(new ContainerServicesMuleContextConfigurator(serviceRepository),
-                                                    customizationService -> customizationService
-                                                        .registerCustomServiceImpl(MuleProperties.OBJECT_CLASSLOADER_REPOSITORY,
-                                                                                   classLoaderRepository)));
+                    .setServiceConfigurators(serviceConfigurators);
             if (parentContext != null) {
               artifactContextConfigurationBuilder.setParentContext(parentContext);
             }

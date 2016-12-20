@@ -20,7 +20,6 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
@@ -49,7 +48,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
     application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class), appLocation,
-                                             null);
+                                             null, null);
     application.setArtifactContext(mockArtifactContext);
   }
 
@@ -92,7 +91,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
-                                   null, appLocation, null);
+                                   null, appLocation, null, null);
     application.install();
     assertThat(application.deploymentClassLoader, is(notNullValue()));
     application.dispose();
