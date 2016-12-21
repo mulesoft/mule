@@ -42,4 +42,9 @@ final class BodyElementResolver extends NodeElementResolver {
                                                           INVALID_CONFIGURATION));
     return buildPartMetadataType(connection.getTypeLoader(), body);
   }
+
+  @Override
+  public String getResolverName() {
+    return "BodyElementResolver";
+  }
 }

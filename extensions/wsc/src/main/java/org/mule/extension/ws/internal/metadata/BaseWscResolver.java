@@ -26,21 +26,13 @@ public abstract class BaseWscResolver implements NamedTypeResolver {
 
   static final MetadataType NULL_TYPE = create(XML).nullType().build();
   private static final String WSC_CATEGORY = "WebServiceConsumerCategory";
-  private static final String WSC_NAME = "BaseWscResolver";
   public static final String BODY_FIELD = "body";
   public static final String HEADERS_FIELD = "headers";
   public static final String ATTACHMENTS_FIELD = "attachments";
 
-
-
   @Override
   public String getCategoryName() {
     return WSC_CATEGORY;
-  }
-
-  @Override
-  public String getResolverName() {
-    return WSC_NAME;
   }
 
   protected WscConnection getConnection(MetadataContext context) throws MetadataResolvingException, ConnectionException {

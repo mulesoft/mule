@@ -49,7 +49,6 @@ public final class BooleanKeyResolver implements TypeKeysResolver {
     return categoryName;
   }
 
-
   /**
    * {@inheritDoc}
    */

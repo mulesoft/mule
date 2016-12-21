@@ -78,4 +78,9 @@ final class HeadersElementResolver extends NodeElementResolver {
     }
     return emptyList();
   }
+
+  @Override
+  public String getResolverName() {
+    return "HeadersElementResolver";
+  }
 }
