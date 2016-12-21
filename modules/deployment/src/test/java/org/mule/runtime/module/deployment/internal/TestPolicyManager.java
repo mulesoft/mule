@@ -91,8 +91,8 @@ public class TestPolicyManager implements DeploymentListener {
    */
   public void addPolicy(String appName, String policyTemplateName, PolicyParametrization policyParametrization) {
 
-    checkArgument(isEmpty(appName), "appName cannot be empty");
-    checkArgument(isEmpty(policyTemplateName), "policyTemplateName cannot be empty");
+    checkArgument(!isEmpty(appName), "appName cannot be empty");
+    checkArgument(!isEmpty(policyTemplateName), "policyTemplateName cannot be empty");
     checkArgument(policyParametrization != null, "policyParametrization cannot be ull");
 
     Optional<PolicyTemplateDescriptor> policyTemplateDescriptor =
