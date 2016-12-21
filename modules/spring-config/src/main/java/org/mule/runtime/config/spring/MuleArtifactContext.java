@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -48,7 +47,6 @@ import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -114,7 +112,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
   private final ArtifactConfiguration artifactConfiguration;
-  private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = new XmlConfigurationDocumentLoader();
+  private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
@@ -154,6 +152,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.artifactConfiguration = artifactConfiguration;
+    this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
@@ -172,6 +171,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();
+  }
+
+  protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
+    return new XmlConfigurationDocumentLoader();
   }
 
   private ErrorTypeLocator createComponentErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
