@@ -62,12 +62,12 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
     try {
       task.run();
     } finally {
-      currentThread.setContextClassLoader(currentClassLoader);
-
       wrapUp();
       if (logger.isTraceEnabled()) {
         logger.trace("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
       }
+
+      currentThread.setContextClassLoader(currentClassLoader);
     }
   }
 

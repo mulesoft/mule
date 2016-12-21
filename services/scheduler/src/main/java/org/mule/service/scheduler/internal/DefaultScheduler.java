@@ -319,7 +319,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     return newDecoratedTaskFor(super.newTaskFor(runnable, value), runnable.getClass());
   }
 
-  protected <T> RunnableFuture<T> newDecoratedTaskFor(final RunnableFuture<T> newTaskFor, final Class<?> taskClass) {
+  private <T> RunnableFuture<T> newDecoratedTaskFor(final RunnableFuture<T> newTaskFor, final Class<?> taskClass) {
     return new RunnableFutureDecorator<>(newTaskFor, currentThread().getContextClassLoader(), this, taskClass.getName(),
                                          idGenerator.getAndIncrement());
   }

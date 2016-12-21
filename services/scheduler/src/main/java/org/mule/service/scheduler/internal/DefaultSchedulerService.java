@@ -309,6 +309,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       waitForExecutorTermination(startMillis, cpuLightExecutor, CPU_LIGHT_THREADS_NAME);
       waitForExecutorTermination(startMillis, ioExecutor, IO_THREADS_NAME);
       waitForExecutorTermination(startMillis, computationExecutor, COMPUTATION_THREADS_NAME);
+
+      // When graceful shutdown timeouts, forceful shutdown will remove the custom scheduler from the list.
+      // In that case, not creating a new collection here will cause a ConcurrentModificationException.
       for (ExecutorService customSchedulerExecutor : new ArrayList<>(customSchedulersExecutors)) {
         waitForExecutorTermination(startMillis, customSchedulerExecutor, COMPUTATION_THREADS_NAME);
       }
