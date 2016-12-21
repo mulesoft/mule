@@ -15,8 +15,8 @@ import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstance;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceFactory;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProvider;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
 
 import java.util.ArrayList;
@@ -29,20 +29,21 @@ import java.util.List;
 public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider, PolicyProvider, Disposable {
 
   private final PolicyTemplateFactory policyTemplateFactory;
-  private final PolicyInstanceFactory policyInstanceFactory;
+  private final PolicyInstanceProviderFactory policyInstanceProviderFactory;
   private final List<PolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
-  private final List<PolicyInstance> registeredPolicyInstances = new LinkedList<>();
+  private final List<PolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
   private Application application;
 
   /**
    * Creates a new provider
    *
    * @param policyTemplateFactory used to create the policy templates for the application. Non null.
-   * @param policyInstanceFactory used to create the policy instances for the application. Non null.
+   * @param policyInstanceProviderFactory used to create the policy instances for the application. Non null.
    */
-  public MuleApplicationPolicyProvider(PolicyTemplateFactory policyTemplateFactory, PolicyInstanceFactory policyInstanceFactory) {
+  public MuleApplicationPolicyProvider(PolicyTemplateFactory policyTemplateFactory,
+                                       PolicyInstanceProviderFactory policyInstanceProviderFactory) {
     this.policyTemplateFactory = policyTemplateFactory;
-    this.policyInstanceFactory = policyInstanceFactory;
+    this.policyInstanceProviderFactory = policyInstanceProviderFactory;
   }
 
   @Override
@@ -53,8 +54,9 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         policyTemplateFactory.createArtifact(policyTemplateDescriptor, application.getRegionClassLoader());
     registeredPolicyTemplates.add(policyTemplate);
 
-    PolicyInstance policyInstance = policyInstanceFactory.create(application, policyTemplate, parametrization);
-    registeredPolicyInstances.add(policyInstance);
+    PolicyInstanceProvider policyInstanceProvider = policyInstanceProviderFactory
+        .create(application, policyTemplate, parametrization);
+    registeredPolicyInstanceProviders.add(policyInstanceProvider);
   }
 
   @Override
@@ -62,10 +64,10 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
                                                                                    PolicyPointcutParameters policyPointcutParameters) {
     List<org.mule.runtime.core.policy.Policy> policies = new ArrayList<>();
 
-    if (!registeredPolicyInstances.isEmpty()) {
-      for (PolicyInstance policyInstance : registeredPolicyInstances) {
-        if (policyInstance.getPointcut().matches(policyPointcutParameters)) {
-          policies.addAll(policyInstance.findSourceParameterizedPolicies(policyPointcutParameters));
+    if (!registeredPolicyInstanceProviders.isEmpty()) {
+      for (PolicyInstanceProvider policyInstanceProvider : registeredPolicyInstanceProviders) {
+        if (policyInstanceProvider.getPointcut().matches(policyPointcutParameters)) {
+          policies.addAll(policyInstanceProvider.findSourceParameterizedPolicies(policyPointcutParameters));
         }
       }
     }
@@ -79,10 +81,10 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
                                                                                       PolicyPointcutParameters policyPointcutParameters) {
     List<org.mule.runtime.core.policy.Policy> policies = new ArrayList<>();
 
-    if (!registeredPolicyInstances.isEmpty()) {
-      for (PolicyInstance policyInstance : registeredPolicyInstances) {
-        if (policyInstance.getPointcut().matches(policyPointcutParameters)) {
-          policies.addAll(policyInstance.findOperationParameterizedPolicies(policyPointcutParameters));
+    if (!registeredPolicyInstanceProviders.isEmpty()) {
+      for (PolicyInstanceProvider policyInstanceProvider : registeredPolicyInstanceProviders) {
+        if (policyInstanceProvider.getPointcut().matches(policyPointcutParameters)) {
+          policies.addAll(policyInstanceProvider.findOperationParameterizedPolicies(policyPointcutParameters));
         }
       }
     }
@@ -93,8 +95,8 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   @Override
   public void dispose() {
 
-    for (PolicyInstance registeredPolicyInstance : registeredPolicyInstances) {
-      registeredPolicyInstance.dispose();
+    for (PolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
+      registeredPolicyInstanceProvider.dispose();
     }
 
     for (PolicyTemplate registeredPolicyTemplate : registeredPolicyTemplates) {

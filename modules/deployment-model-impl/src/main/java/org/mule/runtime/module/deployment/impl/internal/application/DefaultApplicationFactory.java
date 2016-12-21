@@ -19,15 +19,15 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
-import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceFactory;
+import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -114,9 +114,9 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     MuleApplicationPolicyProvider applicationPolicyProvider =
         new MuleApplicationPolicyProvider(
                                           new DefaultPolicyTemplateFactory(policyTemplateClassLoaderBuilderFactory),
-                                          new DefaultPolicyInstanceFactory(
-                                                                           serviceRepository,
-                                                                           classLoaderRepository));
+                                          new DefaultPolicyInstanceProviderFactory(
+                                                                                   serviceRepository,
+                                                                                   classLoaderRepository));
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, descriptor.getArtifactLocation(), classLoaderRepository,

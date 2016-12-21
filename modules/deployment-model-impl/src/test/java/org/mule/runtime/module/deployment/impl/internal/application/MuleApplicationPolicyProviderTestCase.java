@@ -20,8 +20,8 @@ import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstance;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceFactory;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProvider;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -36,17 +36,17 @@ import org.junit.Test;
 public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase {
 
 
-  private final PolicyInstanceFactory policyInstanceFactory = mock(PolicyInstanceFactory.class);
+  private final PolicyInstanceProviderFactory policyInstanceProviderFactory = mock(PolicyInstanceProviderFactory.class);
   private final PolicyTemplateFactory policyTemplateFactory = mock(PolicyTemplateFactory.class);
   private final MuleApplicationPolicyProvider policyProvider =
-      new MuleApplicationPolicyProvider(policyTemplateFactory, policyInstanceFactory);
+      new MuleApplicationPolicyProvider(policyTemplateFactory, policyInstanceProviderFactory);
   private final Application application = mock(Application.class);
   private final PolicyPointcut pointcut = mock(PolicyPointcut.class);
   private final PolicyParametrization parametrization = new PolicyParametrization("policyId", pointcut, emptyMap());
   private final PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor("testPolicy");
   private final PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
   private PolicyTemplate policyTemplate = mock(PolicyTemplate.class);
-  private final PolicyInstance policyInstance = mock(PolicyInstance.class);
+  private final PolicyInstanceProvider policyInstanceProvider = mock(PolicyInstanceProvider.class);
   private final Policy policy1 = mock(Policy.class);
   private final Policy policy2 = mock(Policy.class);
   private final List<Policy> policiesToApply = new ArrayList<>();
@@ -55,10 +55,10 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void setUp() throws Exception {
     policyProvider.setApplication(application);
     when(policyTemplateFactory.createArtifact(policyTemplateDescriptor, null)).thenReturn(policyTemplate);
-    when(policyInstance.getPointcut()).thenReturn(pointcut);
-    when(policyInstance.findOperationParameterizedPolicies(policyPointcutParameters)).thenReturn(policiesToApply);
-    when(policyInstance.findSourceParameterizedPolicies(policyPointcutParameters)).thenReturn(policiesToApply);
-    when(policyInstanceFactory.create(application, policyTemplate, parametrization)).thenReturn(policyInstance);
+    when(policyInstanceProvider.getPointcut()).thenReturn(pointcut);
+    when(policyInstanceProvider.findOperationParameterizedPolicies(policyPointcutParameters)).thenReturn(policiesToApply);
+    when(policyInstanceProvider.findSourceParameterizedPolicies(policyPointcutParameters)).thenReturn(policiesToApply);
+    when(policyInstanceProviderFactory.create(application, policyTemplate, parametrization)).thenReturn(policyInstanceProvider);
   }
 
   @Test

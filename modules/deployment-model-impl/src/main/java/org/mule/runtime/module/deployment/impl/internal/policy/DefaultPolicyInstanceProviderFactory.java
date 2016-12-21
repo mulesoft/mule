@@ -15,9 +15,9 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 /**
- * Creates instances of {@link DefaultPolicyInstance}
+ * Creates instances of {@link DefaultPolicyInstanceProvider}
  */
-public class DefaultPolicyInstanceFactory implements PolicyInstanceFactory {
+public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProviderFactory {
 
   private final ServiceRepository serviceRepository;
   private final ClassLoaderRepository classLoaderRepository;
@@ -28,7 +28,7 @@ public class DefaultPolicyInstanceFactory implements PolicyInstanceFactory {
    * @param serviceRepository contains available service instances. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    */
-  public DefaultPolicyInstanceFactory(ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository) {
+  public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository) {
     checkArgument(serviceRepository != null, "serviceRepository cannot be null");
     checkArgument(classLoaderRepository != null, "classLoaderRepository cannot be null");
 
@@ -37,9 +37,10 @@ public class DefaultPolicyInstanceFactory implements PolicyInstanceFactory {
   }
 
   @Override
-  public PolicyInstance create(Application application, PolicyTemplate policyTemplate,
-                               PolicyParametrization parametrization) {
-    return new DefaultPolicyInstance(application, policyTemplate, parametrization, serviceRepository, classLoaderRepository);
+  public PolicyInstanceProvider create(Application application, PolicyTemplate policyTemplate,
+                                       PolicyParametrization parametrization) {
+    return new DefaultPolicyInstanceProvider(application, policyTemplate, parametrization, serviceRepository,
+                                             classLoaderRepository);
   }
 
 }

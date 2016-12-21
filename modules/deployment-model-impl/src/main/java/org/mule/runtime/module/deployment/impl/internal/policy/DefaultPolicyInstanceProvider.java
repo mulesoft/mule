@@ -15,6 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.policy.Policy;
+import org.mule.runtime.core.policy.PolicyInstance;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
@@ -30,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Default implementation of {@link PolicyInstance} that depends on a {@link PolicyTemplate} artifact.
+ * Default implementation of {@link PolicyInstanceProvider} that depends on a {@link PolicyTemplate} artifact.
  */
-public class DefaultPolicyInstance implements PolicyInstance {
+public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
 
   private ArtifactContext policyContext;
   private final Application application;
@@ -40,7 +41,7 @@ public class DefaultPolicyInstance implements PolicyInstance {
   private final PolicyParametrization parametrization;
   private final ServiceRepository serviceRepository;
   private final ClassLoaderRepository classLoaderRepository;
-  private org.mule.runtime.core.policy.PolicyInstance policyInstance;
+  private PolicyInstance policyInstance;
 
   /**
    * Creates a new policy instance
@@ -51,9 +52,9 @@ public class DefaultPolicyInstance implements PolicyInstance {
    * @param serviceRepository repository of available services. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    */
-  public DefaultPolicyInstance(Application application, PolicyTemplate template,
-                               PolicyParametrization parametrization, ServiceRepository serviceRepository,
-                               ClassLoaderRepository classLoaderRepository) {
+  public DefaultPolicyInstanceProvider(Application application, PolicyTemplate template,
+                                       PolicyParametrization parametrization, ServiceRepository serviceRepository,
+                                       ClassLoaderRepository classLoaderRepository) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
@@ -95,8 +96,7 @@ public class DefaultPolicyInstance implements PolicyInstance {
   }
 
   @Override
-  public List<Policy> findSourceParameterizedPolicies(
-                                                      PolicyPointcutParameters policyPointcutParameters) {
+  public List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
 
     initPolicyInstance();
 
@@ -115,9 +115,10 @@ public class DefaultPolicyInstance implements PolicyInstance {
           policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(
                                                                                      org.mule.runtime.core.policy.DefaultPolicyInstance.class);
         } catch (RegistrationException e) {
-          throw new IllegalStateException(String.format("More than one %s found on context", PolicyInstance.class), e);
+          throw new IllegalStateException(String.format("More than one %s found on context", PolicyInstanceProvider.class), e);
         }
 
+        // TODO(pablo.kraan): lifecycle has to be manually applied because of MULE-11242
         try {
           policyInstance.initialise();
           policyInstance.start();

@@ -13,7 +13,7 @@ import org.mule.runtime.core.policy.PolicyProvider;
 /**
  * Defines a policy provider for a given parametrized policy
  */
-public interface PolicyInstance extends PolicyProvider {
+public interface PolicyInstanceProvider extends PolicyProvider {
 
   /**
    * @return the policy's pointcut used to determine whether to apply or ignore the policy when a request arrives. No null.
