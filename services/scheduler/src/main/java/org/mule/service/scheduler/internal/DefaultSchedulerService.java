@@ -29,6 +29,7 @@ import org.mule.service.scheduler.ThreadType;
 import org.mule.service.scheduler.internal.config.ThreadPoolsConfig;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -162,11 +163,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     if (config.getMaxConcurrentTasks() == null) {
       throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
     }
-    final ExecutorService executor =
+    final ThreadPoolExecutor executor =
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
                                new SynchronousQueue<Runnable>(),
                                new SchedulerThreadFactory(customGroup,
                                                           "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
                             scheduledExecutor, quartzScheduler, CUSTOM);
@@ -179,11 +181,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     if (config.getMaxConcurrentTasks() == null) {
       throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
     }
-    final ExecutorService executor =
+    final ThreadPoolExecutor executor =
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
                                new LinkedBlockingQueue<Runnable>(queueSize),
                                new SchedulerThreadFactory(customGroup,
                                                           "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
                             scheduledExecutor, quartzScheduler, CUSTOM);
@@ -215,9 +218,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     @Override
     public List<Runnable> shutdownNow() {
+      customSchedulersExecutors.remove(this);
+
       final List<Runnable> cancelledTasks = super.shutdownNow();
       executor.shutdownNow();
-      customSchedulersExecutors.remove(this);
       return cancelledTasks;
     }
   }
@@ -305,7 +309,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
       waitForExecutorTermination(startMillis, cpuLightExecutor, CPU_LIGHT_THREADS_NAME);
       waitForExecutorTermination(startMillis, ioExecutor, IO_THREADS_NAME);
       waitForExecutorTermination(startMillis, computationExecutor, COMPUTATION_THREADS_NAME);
-      for (ExecutorService customSchedulerExecutor : customSchedulersExecutors) {
+
+      // When graceful shutdown timeouts, forceful shutdown will remove the custom scheduler from the list.
+      // In that case, not creating a new collection here will cause a ConcurrentModificationException.
+      for (ExecutorService customSchedulerExecutor : new ArrayList<>(customSchedulersExecutors)) {
         waitForExecutorTermination(startMillis, customSchedulerExecutor, COMPUTATION_THREADS_NAME);
       }
 

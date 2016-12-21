@@ -311,13 +311,16 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-    return new RunnableFutureDecorator<>(super.newTaskFor(callable), this, callable.getClass().getName(),
-                                         idGenerator.getAndIncrement());
+    return newDecoratedTaskFor(super.newTaskFor(callable), callable.getClass());
   }
 
   @Override
   protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-    return new RunnableFutureDecorator<>(super.newTaskFor(runnable, value), this, runnable.getClass().getName(),
+    return newDecoratedTaskFor(super.newTaskFor(runnable, value), runnable.getClass());
+  }
+
+  private <T> RunnableFuture<T> newDecoratedTaskFor(final RunnableFuture<T> newTaskFor, final Class<?> taskClass) {
+    return new RunnableFutureDecorator<>(newTaskFor, currentThread().getContextClassLoader(), this, taskClass.getName(),
                                          idGenerator.getAndIncrement());
   }
 
