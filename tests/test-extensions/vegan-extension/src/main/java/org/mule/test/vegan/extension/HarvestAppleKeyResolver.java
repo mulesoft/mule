@@ -28,6 +28,11 @@ public class HarvestAppleKeyResolver implements TypeKeysResolver, OutputTypeReso
   }
 
   @Override
+  public String getResolverName() {
+    return "HarvestAppleKeyResolver";
+  }
+
+  @Override
   public String getCategoryName() {
     return "HarvestedKeys";
   }

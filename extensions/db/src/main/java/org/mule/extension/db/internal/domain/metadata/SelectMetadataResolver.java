@@ -33,6 +33,11 @@ public class SelectMetadataResolver extends BaseDbMetadataResolver implements Ou
   }
 
   @Override
+  public String getResolverName() {
+    return "SelectResolver";
+  }
+
+  @Override
   public MetadataType getOutputType(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 

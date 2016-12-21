@@ -13,7 +13,15 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
+import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -32,22 +40,20 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import com.google.common.collect.Table;
 
 /**
  * Validates that all {@link OperationModel operations} which return type is a {@link Object} or a {@link Map} have defined a
@@ -57,11 +63,15 @@ import java.util.Set;
  */
 public class MetadataComponentModelValidator implements ExtensionModelValidator {
 
+  public static final String EMPTY_RESOLVER_NAME = "%s '%s' specifies a metadata resolver [%s] which has an empty %s name";
+
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     if (!(extensionModel instanceof ExtensionModel)) {
       return;
     }
+
+    final Table<String, String, Class<?>> names = HashBasedTable.create();
     new ExtensionWalker() {
 
       @Override
@@ -80,9 +90,40 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         validateMetadataOutputAttributes(model, resolverFactory, problemsReporter);
         validateMetadataKeyId(model, resolverFactory, problemsReporter);
         validateCategoriesInScope(model, resolverFactory, problemsReporter);
+          validateResolversName(model, resolverFactory, names, problemsReporter);
       }
     }.walk(extensionModel);
   }
+
+    private void validateResolversName(ComponentModel model, MetadataResolverFactory resolverFactory,
+                                       Table<String, String, Class<?>> names,  ProblemsReporter problemsReporter) {
+        List<NamedTypeResolver> resolvers = new LinkedList<>();
+        resolvers.addAll(getAllInputResolvers(model, resolverFactory));
+        resolvers.add(resolverFactory.getOutputResolver());
+
+        resolvers.stream()
+                .filter(r -> !NULL_RESOLVER_NAME.equals(r.getResolverName()))
+                .forEach(r -> {
+
+                    if (isBlank(r.getResolverName())) {
+                        problemsReporter.addError(new Problem(model,
+                                format(EMPTY_RESOLVER_NAME,
+                                       getComponentModelTypeName(model), model.getName(),
+                                       r.getClass().getSimpleName(), "resolver"));
+                    }
+
+                    if (names.get(r.getCategoryName(), r.getResolverName()) != null
+                        && names.get(r.getCategoryName(), r.getResolverName()) != r.getClass()) {
+                        problemsReporter.addError(new Problem(model, format("%s [%s] specifies metadata resolvers with repeated name [%s] for the same category [%s]. Resolver names should be unique for a given category. Affected resolvers are '%s' and '%s'",
+                                                                         getComponentModelTypeName(model), model.getName(),
+                                                                         r.getResolverName(), r.getCategoryName(),
+                                                                         names.get(r.getCategoryName(), r.getResolverName()).getSimpleName(),
+                                                                         r.getClass().getSimpleName()));
+
+                    }
+                    names.put(r.getCategoryName(), r.getResolverName(), r.getClass());
+                });
+    }
 
   private void validateMetadataKeyId(ComponentModel model, MetadataResolverFactory resolverFactory,
                                      ProblemsReporter problemsReporter) {
@@ -180,9 +221,9 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                                      NamedTypeResolver... resolvers) {
     stream(resolvers).filter(r -> StringUtils.isBlank(r.getCategoryName()))
         .findFirst().ifPresent(r -> problemsReporter.addError(new Problem(componentModel, String
-            .format("%s '%s' specifies a metadata resolver [%s] which has an empty category name",
+            .format(EMPTY_RESOLVER_NAME,
                     getComponentModelTypeName(componentModel), componentModel.getName(),
-                    r.getClass().getSimpleName()))));
+                    r.getClass().getSimpleName(), "category"))));
 
     Set<String> names = stream(resolvers)
         .map(NamedTypeResolver::getCategoryName)

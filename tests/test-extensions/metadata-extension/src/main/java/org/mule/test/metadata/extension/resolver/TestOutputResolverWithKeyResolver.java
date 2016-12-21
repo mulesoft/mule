@@ -24,6 +24,11 @@ public class TestOutputResolverWithKeyResolver implements TypeKeysResolver, Outp
   }
 
   @Override
+  public String getResolverName() {
+    return "TestOutputResolverWithKeyResolver";
+  }
+
+  @Override
   public MetadataType getOutputType(MetadataContext context, String key) throws MetadataResolvingException {
     return TestMetadataResolverUtils.getMetadata(key);
   }

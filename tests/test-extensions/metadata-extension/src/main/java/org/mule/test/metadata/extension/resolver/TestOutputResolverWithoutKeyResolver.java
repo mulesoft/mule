@@ -24,4 +24,9 @@ public class TestOutputResolverWithoutKeyResolver implements OutputTypeResolver<
   public String getCategoryName() {
     return "MetadataExtensionResolver";
   }
+
+  @Override
+  public String getResolverName() {
+    return "TestOutputResolverWithoutKeyResolver";
+  }
 }

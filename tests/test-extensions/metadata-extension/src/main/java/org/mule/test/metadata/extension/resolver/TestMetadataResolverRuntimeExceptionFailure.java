@@ -24,6 +24,11 @@ public class TestMetadataResolverRuntimeExceptionFailure
     return "MetadataExtensionResolver";
   }
 
+  @Override
+  public String getResolverName() {
+    return "TestMetadataResolverRuntimeExceptionFailure";
+  }
+
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException {
     throw new RuntimeException("Runtime Exception thrown");
   }

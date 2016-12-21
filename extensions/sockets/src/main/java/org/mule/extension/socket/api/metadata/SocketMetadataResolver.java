@@ -40,6 +40,11 @@ public class SocketMetadataResolver
   }
 
   @Override
+  public String getResolverName() {
+    return "SocketMetadataResolver";
+  }
+
+  @Override
   public MetadataType getOutputType(MetadataContext metadataContext, Boolean key)
       throws MetadataResolvingException, ConnectionException {
     return key ? BaseTypeBuilder.create(JAVA).binaryType().build()

@@ -35,6 +35,11 @@ public class ConsumeOutputResolver extends BaseWscResolver implements OutputType
     this.bodyElementResolver = new BodyElementResolver(new OutputTypeIntrospecterDelegate());
   }
 
+  @Override
+  public String getResolverName() {
+    return "ConsumeOutputResolver";
+  }
+
   /**
    * {@inheritDoc}
    */

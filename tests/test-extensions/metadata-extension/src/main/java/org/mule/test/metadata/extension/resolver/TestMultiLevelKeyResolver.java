@@ -52,6 +52,11 @@ public class TestMultiLevelKeyResolver implements TypeKeysResolver, InputTypeRes
   }
 
   @Override
+  public String getResolverName() {
+    return "TestMultiLevelKeyResolver";
+  }
+
+  @Override
   public MetadataType getInputMetadata(MetadataContext context, LocationKey key)
       throws MetadataResolvingException, ConnectionException {
     checkLocationKey(key);

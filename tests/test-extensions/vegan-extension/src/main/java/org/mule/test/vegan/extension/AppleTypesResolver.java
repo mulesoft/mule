@@ -28,6 +28,11 @@ public class AppleTypesResolver implements TypeKeysResolver, OutputTypeResolver 
   }
 
   @Override
+  public String getResolverName() {
+    return "AppleTypesResolver";
+  }
+
+  @Override
   public String getCategoryName() {
     return "AppleKeys";
   }

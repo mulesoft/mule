@@ -42,6 +42,11 @@ public class TestResolverWithCache
   }
 
   @Override
+  public String getResolverName() {
+    return "TestResolverWithCache";
+  }
+
+  @Override
   public MetadataType getInputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     MetadataCache cache = context.getCache();

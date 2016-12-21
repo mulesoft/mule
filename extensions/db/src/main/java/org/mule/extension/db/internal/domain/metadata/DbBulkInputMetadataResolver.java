@@ -20,6 +20,11 @@ public class DbBulkInputMetadataResolver extends DbInputMetadataResolver {
   }
 
   @Override
+  public String getResolverName() {
+    return "BulkInput";
+  }
+
+  @Override
   public MetadataType getInputMetadata(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 

@@ -46,4 +46,9 @@ public class TestOutputAttributesResolverWithKeyResolver
   public String getCategoryName() {
     return "MetadataExtensionResolver";
   }
+
+  @Override
+  public String getResolverName() {
+    return "TestOutputAttributesResolverWithKeyResolver";
+  }
 }
