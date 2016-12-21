@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
@@ -52,12 +54,14 @@ public class EntityMetadataMediator {
       Set<MetadataKey> entityKeys = queryEntityResolver.getEntityKeys(context);
       final MetadataKeysContainerBuilder keyBuilder = MetadataKeysContainerBuilder.getInstance();
       if (entityKeys.stream().anyMatch(key -> key.getChilds().size() > 0)) {
-        throw new IllegalArgumentException("Entity keys must not contain childs. "
-            + "Only single level keys are supported for Entity Metadata Retrieval");
+        return failure(newFailure()
+                         .withMessage("Error retrieving entity keys, Only single level keys are supported for entity metadata")
+                         .withReason("There are at least one key that contains childs")
+                         .withFailureCode(INVALID_METADATA_KEY).onKeys());
       }
       return success(keyBuilder.add(queryEntityResolver.getClass().getSimpleName(), entityKeys).build());
     } catch (Exception e) {
-      return failure(e);
+      return failure(newFailure(e).onKeys());
     }
   }
 
@@ -66,7 +70,7 @@ public class EntityMetadataMediator {
       MetadataType entityMetadata = resolverFactory.getQueryEntityResolver().getEntityMetadata(context, entityKey.getId());
       return success(typeDescriptor().withType(entityMetadata).build());
     } catch (Exception e) {
-      return failure(e);
+      return failure(newFailure(e).onEntity());
     }
   }
 

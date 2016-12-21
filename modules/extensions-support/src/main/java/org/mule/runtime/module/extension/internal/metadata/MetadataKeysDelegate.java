@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
@@ -43,7 +44,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
   private static final int INITIAL_PART_LEVEL = 1;
   private final List<ParameterModel> keyParts;
 
-  public MetadataKeysDelegate(ComponentModel componentModel, List<ParameterModel> metadataKeyParts) {
+  MetadataKeysDelegate(ComponentModel componentModel, List<ParameterModel> metadataKeyParts) {
     super(componentModel);
     keyParts = metadataKeyParts;
   }
@@ -78,7 +79,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
       return success(keysContainer.build());
 
     } catch (Exception e) {
-      return failure(e);
+      return failure(newFailure(e).onKeys());
     }
   }
 

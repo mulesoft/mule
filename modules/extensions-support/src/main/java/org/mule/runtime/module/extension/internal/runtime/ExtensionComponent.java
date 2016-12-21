@@ -111,12 +111,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   public final void initialise() throws InitialisationException {
     withContextClassLoader(getExtensionClassLoader(), () -> {
       validateConfigurationProviderIsNotExpression();
-      Optional<ConfigurationProvider> provider = findConfigurationProvider();
-
-      if (provider.isPresent()) {
-        validateOperationConfiguration(provider.get());
-      }
-
+      findConfigurationProvider().ifPresent(this::validateOperationConfiguration);
       doInitialise();
       return null;
     }, InitialisationException.class, e -> {
