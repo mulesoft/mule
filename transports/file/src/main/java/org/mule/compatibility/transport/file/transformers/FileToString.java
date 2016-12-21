@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 public class FileToString extends FileToByteArray {
 
   public FileToString() {
+    registerSourceType(DataType.BYTE_ARRAY);
     setReturnDataType(DataType.STRING);
   }
 
@@ -28,7 +29,14 @@ public class FileToString extends FileToByteArray {
    */
   @Override
   public Object doTransform(Object src, Charset encoding) throws TransformerException {
-    byte[] bytes = (byte[]) super.doTransform(src, encoding);
+    byte[] bytes;
+
+    if (src instanceof byte[]) {
+      bytes = (byte[]) src;
+    } else {
+      bytes = (byte[]) super.doTransform(src, encoding);
+    }
+
     return new String(bytes, encoding);
   }
 
