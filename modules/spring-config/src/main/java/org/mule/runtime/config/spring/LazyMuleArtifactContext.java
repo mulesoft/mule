@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
@@ -14,12 +15,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
@@ -30,6 +31,8 @@ import java.util.Map;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components
@@ -60,6 +63,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController, artifactProperties,
           artifactType);
+  }
+
+  @Override
+  protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
+    return new XmlConfigurationDocumentLoader(() -> new NoOpErrorHandler());
   }
 
   private void createComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel, boolean mustBeRoot) {
@@ -134,5 +142,32 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       metadataService = new LazyMetadataService(this, muleContext.getRegistry().get(OBJECT_METADATA_SERVICE));
     }
     return metadataService;
+  }
+
+  /**
+   * {@link XmlGathererErrorHandler} implementation that doesn't handle errors.
+   */
+  class NoOpErrorHandler implements XmlGathererErrorHandler {
+
+    @Override
+    public List<SAXParseException> getErrors() {
+      return emptyList();
+    }
+
+    @Override
+    public void warning(SAXParseException exception) throws SAXException {
+
+    }
+
+    @Override
+    public void error(SAXParseException exception) throws SAXException {
+
+    }
+
+    @Override
+    public void fatalError(SAXParseException exception) throws SAXException {
+
+    }
+
   }
 }
