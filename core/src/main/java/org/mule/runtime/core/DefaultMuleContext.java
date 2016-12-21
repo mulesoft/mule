@@ -43,7 +43,6 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -103,7 +102,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.ApplicationShutdownSplashScreen;
@@ -116,7 +114,6 @@ import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.core.util.rx.Exceptions;
 import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.extension.api.ExtensionManager;
 
@@ -132,7 +129,6 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -259,8 +255,6 @@ public class DefaultMuleContext implements MuleContext {
       }
     });
   }
-
-  private PolicyManager policyManager;
 
   /**
    * @deprecated Use empty constructor instead and use setter for dependencies.

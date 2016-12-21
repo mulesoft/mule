@@ -61,6 +61,7 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.MAVEN_ID_CLASSLOADER_MODEL_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.invocationCount;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
@@ -77,6 +78,8 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.policy.PolicyParametrization;
+import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -97,6 +100,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoa
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -129,6 +133,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -137,6 +142,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
@@ -154,6 +161,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
+  private static final String FOO_POLICY_NAME = "fooPolicy";
+
   private DefaultClassLoaderManager artifactClassLoaderManager;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
@@ -303,6 +312,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   protected DeploymentListener applicationDeploymentListener;
   protected DeploymentListener domainDeploymentListener;
   private ArtifactClassLoader containerClassLoader;
+  private TestPolicyManager policyManager;
 
   @Rule
   public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "10");
@@ -356,6 +366,24 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                                   muleArtifactResourcesRegistry.getApplicationFactory());
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
+
+    policyManager = new TestPolicyManager(deploymentService);
+    configurePolicyManagerListener();
+
+    // Reset test component state
+    invocationCount = 0;
+  }
+
+  private void configurePolicyManagerListener() {
+    // Invokes the policy manager when an application is deployed
+    doAnswer(new Answer() {
+
+      @Override
+      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+        policyManager.onDeploymentSuccess((String) invocationOnMock.getArguments()[0]);
+        return null;
+      }
+    }).when(applicationDeploymentListener).onMuleContextConfigured(any(), any());
   }
 
   @After
@@ -2931,6 +2959,56 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
   }
 
+  @Test
+  public void appliesApplicationPolicy() throws Exception {
+    doApplicationPolicyExecutionTest(parameters -> true, 1);
+  }
+
+  @Test
+  public void skipsApplicationPolicy() throws Exception {
+    doApplicationPolicyExecutionTest(parameters -> false, 0);
+  }
+
+  private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations) throws Exception {
+    final PolicyFileBuilder policyFileBuilder =
+        new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").configuredWith("policy.name", FOO_POLICY_NAME);
+    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
+
+    final ServiceFileBuilder echoService =
+        new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
+            .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
+    File installedService = new File(services, echoService.getArtifactFile().getName());
+    copyFile(echoService.getArtifactFile(), installedService);
+
+    final ServiceFileBuilder fooService = new ServiceFileBuilder("fooService")
+        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.foo.FooServiceProvider")
+        .usingLibrary(defaultFooServiceJarFile.getAbsolutePath());
+    installedService = new File(services, fooService.getArtifactFile().getName());
+    copyFile(fooService.getArtifactFile(), installedService);
+
+    ArtifactPluginFileBuilder extensionPlugin =
+        new ArtifactPluginFileBuilder("extensionPlugin").usingLibrary(helloExtensionJarFile.getAbsolutePath())
+            .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                            "/,  META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
+        .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
+                            new PolicyParametrization("testPolicy",
+                                                      pointcut,
+                                                      new HashedMap()));
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+
+    assertThat(invocationCount, equalTo(expectedPolicyInvocations));
+  }
+
   private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction)
       throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
@@ -3565,6 +3643,21 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     public static void reset() {
       componentInitializedLatch = new Latch();
       waitLatch = new Latch();
+    }
+  }
+
+  /**
+   * Component used on deployment test that require policies to check that they are invoked
+   * <p/>
+   * Static state must be reset before each test is executed
+   */
+  public static class TestPolicyComponent {
+
+    public static volatile int invocationCount;
+
+    public Object execute(Object payload) {
+      invocationCount++;
+      return payload;
     }
   }
 }

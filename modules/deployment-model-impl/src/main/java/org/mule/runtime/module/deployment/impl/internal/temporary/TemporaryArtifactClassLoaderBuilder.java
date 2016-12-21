@@ -14,6 +14,7 @@ import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResol
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
@@ -49,8 +50,12 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
                                              ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                              PluginDependenciesResolver pluginDependenciesResolver) {
-    super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository,
-          artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+  }
+
+  @Override
+  protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
+    return artifactPluginClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   /**

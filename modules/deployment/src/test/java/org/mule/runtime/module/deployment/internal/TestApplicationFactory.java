@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mockito.Mockito.mock;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -14,6 +15,7 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
@@ -44,9 +46,10 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                 ApplicationDescriptorFactory applicationDescriptorFactory,
                                 ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository) {
+                                ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository,
+                                PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
-          serviceRepository, classLoaderRepository);
+          serviceRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory);
   }
 
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
@@ -68,8 +71,10 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                                  new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
                                                                                           new ArtifactPluginClassLoaderFactory()),
                                                  pluginDependenciesResolver);
+
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                      applicationPluginRepository, domainManager, serviceRepository, artifactClassLoaderManager);
+                                      applicationPluginRepository, domainManager, serviceRepository, artifactClassLoaderManager,
+                                      mock(PolicyTemplateClassLoaderBuilderFactory.class));
   }
 
   @Override

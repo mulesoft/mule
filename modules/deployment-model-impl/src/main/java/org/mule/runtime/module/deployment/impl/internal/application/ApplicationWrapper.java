@@ -9,10 +9,12 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +42,16 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
   @Override
   public ApplicationStatus getStatus() {
     return getDelegate().getStatus();
+  }
+
+  @Override
+  public RegionClassLoader getRegionClassLoader() {
+    return getDelegate().getRegionClassLoader();
+  }
+
+  @Override
+  public ApplicationPolicyManager getPolicyManager() {
+    return getDelegate().getPolicyManager();
   }
 
   @Override

@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.IOException;
  */
 public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<ApplicationClassLoaderBuilder> {
 
+  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private Domain domain;
 
   /**
@@ -48,8 +50,9 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
                                        ArtifactPluginRepository artifactPluginRepository,
                                        ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                        PluginDependenciesResolver pluginDependenciesResolver) {
-    super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginClassLoaderFactory,
-          pluginDependenciesResolver);
+    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+
+    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }
 
   /**
@@ -63,6 +66,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
     checkState(domain != null, "Domain cannot be null");
 
     return (MuleDeployableArtifactClassLoader) super.build();
+  }
+
+  @Override
+  protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
   }
 
   @Override

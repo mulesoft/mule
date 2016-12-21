@@ -40,6 +40,7 @@ import java.net.URL;
 public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<ToolingPluginClassLoaderBuilder> {
 
   private static final String TOOLING_EXTENSION_MODEL = "tooling-extension-model";
+  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private ArtifactPluginDescriptor artifactPluginDescriptor;
 
   private ArtifactClassLoader parentClassLoader;
@@ -56,10 +57,14 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
                                          ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                          ArtifactPluginDescriptor artifactPluginDescriptor,
                                          PluginDependenciesResolver pluginDependenciesResolver) {
-    super(artifactClassLoaderFactory, artifactPluginRepository,
-          artifactPluginClassLoaderFactory,
-          pluginDependenciesResolver);
+    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
     this.artifactPluginDescriptor = artifactPluginDescriptor;
+    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
+  }
+
+  @Override
+  protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
   }
 
   /**
