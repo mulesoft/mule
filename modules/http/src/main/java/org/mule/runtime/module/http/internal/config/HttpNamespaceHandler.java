@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.http.internal.config;
 
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
@@ -23,13 +22,14 @@ import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
 import org.mule.runtime.module.http.internal.request.DefaultProxyConfig;
 import org.mule.runtime.module.http.internal.request.FailureStatusCodeValidator;
-import org.mule.service.http.api.client.HttpAuthenticationType;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
 import org.mule.runtime.module.http.internal.request.RamlApiConfiguration;
 import org.mule.runtime.module.http.internal.request.SuccessStatusCodeValidator;
+import org.mule.service.http.api.client.HttpAuthenticationType;
 
 public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler {
 
+  @Override
   public void init() {
     final ChildDefinitionParser listenerDefinitionParser = new ChildDefinitionParser("messageSource", DefaultHttpListener.class);
     registerBeanDefinitionParser("listener", listenerDefinitionParser);
@@ -78,9 +78,6 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     registerBeanDefinitionParser("raml-api-configuration",
                                  new ChildDefinitionParser("apiConfiguration", RamlApiConfiguration.class));
-    registerBeanDefinitionParser("worker-threading-profile",
-                                 new HttpThreadingProfileDefinitionParser("workerThreadingProfile",
-                                                                          MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
 
     registerMuleBeanDefinitionParser("header", new HttpHeaderDefinitionParser()).addCollection("headers");
 

@@ -6,6 +6,9 @@
  */
 package org.mule.compatibility.config.spring.handlers;
 
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.IDENTIFIER_PROPERTY;
 import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.VARIABLE_NAME_ATTRIBUTE;
 
@@ -46,13 +49,13 @@ import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataTypeDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.module.cxf.CxfConstants;
 
@@ -67,6 +70,16 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
                                  new ChildDefinitionParser("messageProcessor", SimpleAsyncEndpointRequestReplyRequester.class));
     registerBeanDefinitionParser("default-exception-strategy",
                                  new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
+
+    // Legacy threading
+    registerBeanDefinitionParser("default-threading-profile",
+                                 new DefaultThreadingProfileDefinitionParser(OBJECT_DEFAULT_THREADING_PROFILE));
+    registerBeanDefinitionParser("default-dispatcher-threading-profile",
+                                 new DefaultThreadingProfileDefinitionParser(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
+    registerBeanDefinitionParser("default-receiver-threading-profile",
+                                 new DefaultThreadingProfileDefinitionParser(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+    registerBeanDefinitionParser("threading-profile",
+                                 new ThreadingProfileDefinitionParser("threadingProfile", OBJECT_DEFAULT_THREADING_PROFILE));
 
     // TODO MULE-10457 Remove this element and perform the wrapping transparently
     registerBeanDefinitionParser("mutator-transformer",
@@ -93,10 +106,10 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
     // Connector elements
     registerBeanDefinitionParser("dispatcher-threading-profile",
                                  new ThreadingProfileDefinitionParser("dispatcherThreadingProfile",
-                                                                      MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
+                                                                      OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
     registerBeanDefinitionParser("receiver-threading-profile",
                                  new ThreadingProfileDefinitionParser("receiverThreadingProfile",
-                                                                      MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+                                                                      OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
     registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
     registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
 

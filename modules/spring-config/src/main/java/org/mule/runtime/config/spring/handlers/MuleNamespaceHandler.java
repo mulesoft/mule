@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.spring.handlers;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
-
 import org.mule.runtime.config.spring.factories.AggregationStrategyDefinitionParser;
 import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
@@ -42,7 +40,6 @@ import org.mule.runtime.config.spring.parsers.specific.AsyncMessageProcessorsDef
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ExpressionComponentDefintionParser;
@@ -79,7 +76,6 @@ import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionP
 import org.mule.runtime.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SplitterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.StaticComponentDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
@@ -219,14 +215,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     // Common elements
     registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
     registerBeanDefinitionParser("global-property", new GlobalPropertyDefinitionParser());
-    registerBeanDefinitionParser("default-threading-profile",
-                                 new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE));
-    registerBeanDefinitionParser("default-dispatcher-threading-profile",
-                                 new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
-    registerBeanDefinitionParser("default-receiver-threading-profile",
-                                 new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-    registerBeanDefinitionParser("threading-profile",
-                                 new ThreadingProfileDefinitionParser("threadingProfile", OBJECT_DEFAULT_THREADING_PROFILE));
     registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
     registerBeanDefinitionParser("expression-language", new ExpressionLanguageDefinitionParser());
     registerBeanDefinitionParser("global-functions", new GlobalFunctionsDefintionParser("globalFunctionsString"));

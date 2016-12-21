@@ -6,10 +6,17 @@
  */
 package org.mule.compatibility.core.config.builders;
 
-import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
+
 import org.mule.compatibility.core.endpoint.DefaultEndpointFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 
 public class TransportsConfigurationBuilder extends DefaultsConfigurationBuilder {
@@ -18,6 +25,20 @@ public class TransportsConfigurationBuilder extends DefaultsConfigurationBuilder
   protected void doConfigure(MuleContext muleContext) throws Exception {
     super.doConfigure(muleContext);
 
-    registerObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory(), muleContext);
+    configureThreadingProfiles(muleContext);
+
+    registerObject(OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory(), muleContext);
+  }
+
+  protected void configureThreadingProfiles(MuleContext muleContext) throws RegistrationException {
+    ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
+    registerObject(OBJECT_DEFAULT_THREADING_PROFILE, defaultThreadingProfile, muleContext);
+
+    registerObject(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
+                   muleContext);
+    registerObject(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
+                   muleContext);
+    registerObject(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
+                   muleContext);
   }
 }

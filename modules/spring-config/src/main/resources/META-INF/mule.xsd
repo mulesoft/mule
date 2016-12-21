@@ -1149,13 +1149,6 @@
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
                 <xsd:sequence>
-                    <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The default threading profile, used by components for dispatching and receiving if no more specific configuration is given.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                     <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -2014,18 +2007,6 @@
     </xsd:complexType>
 
     <!--==============================================================-->
-
-    <xsd:element name="abstract-service-threading-profile" abstract="true"
-                 type="abstractServiceThreadingProfileType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for the service threading profile element. Threading profiles define how thread pools are used by a service.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractServiceThreadingProfileType"/>
-
-    <!--==============================================================-->
     <!--   Flow Constructs                                            -->
     <!--==============================================================-->
 
@@ -2804,47 +2785,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:attributeGroup name="commonThreadPoolAttributes">
-        <xsd:attribute name="threadTTL" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Determines how long an inactive thread is kept in the pool before being discarded.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="poolExhaustedAction">
-            <xsd:annotation>
-                <xsd:documentation>
-                    When the maximum pool size or queue size is bounded, this value determines how to handle incoming tasks. Possible values are: WAIT (wait until a thread becomes available; don't use this value if the minimum number of threads is zero, in which case a thread may never become available), DISCARD (throw away the current request and return), DISCARD_OLDEST (throw away the oldest request and return), ABORT (throw a RuntimeException), and RUN (the default; the thread making the execute request runs the task itself, which helps guard against lockup).
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="WAIT"/>
-                    <xsd:enumeration value="DISCARD"/>
-                    <xsd:enumeration value="DISCARD_OLDEST"/>
-                    <xsd:enumeration value="ABORT"/>
-                    <xsd:enumeration value="RUN"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="threadWaitTimeout" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    How long to wait in milliseconds when the pool exhausted action is WAIT. If the value is negative, it will wait indefinitely.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="maxBufferSize" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Determines how many requests are queued when the pool is at maximum usage capacity and the pool exhausted action is WAIT. The buffer is used as an overflow.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
-
 
     <!--==============================================================-->
     <!--   Filter elements                                            -->
@@ -4032,53 +3972,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="threading-profile" type="threadingProfileType"
-                 substitutionGroup="abstract-service-threading-profile">
-        <xsd:annotation>
-            <xsd:documentation>
-                The threading profile to use for the service.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <!-- this is a general threading type used by various elements here -->
-    <xsd:complexType name="threadingProfileType">
-        <xsd:complexContent>
-            <xsd:extension base="asynchronousThreadingProfileType">
-                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether threading should be used (default is true).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="asynchronousThreadingProfileType">
-        <xsd:complexContent>
-            <!-- this is a hack that allows us to use this general threading profile as a component threading profile
-                 without retyping everything -->
-            <xsd:extension base="abstractServiceThreadingProfileType">
-                <xsd:attribute name="maxThreadsActive" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The maximum number of threads that will be used.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="maxThreadsIdle" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The maximum number of idle or inactive threads that can be in the pool before they are destroyed.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attributeGroup ref="commonThreadPoolAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

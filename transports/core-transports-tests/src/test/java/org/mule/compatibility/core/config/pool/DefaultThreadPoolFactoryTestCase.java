@@ -4,14 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.config.pool;
+package org.mule.compatibility.core.config.pool;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 
 import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.config.pool.DefaultThreadPoolFactory;
+import org.mule.runtime.core.config.pool.ThreadPoolFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.ExecutorService;
@@ -27,14 +30,14 @@ public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void defaultThreadPoolFactory() throws Exception {
-    final ThreadingProfile tp = muleContext.getDefaultThreadingProfile();
+    final ThreadingProfile tp = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_THREADING_PROFILE);
     final ThreadPoolFactory pf = tp.getPoolFactory();
     assertThat(pf, instanceOf(DefaultThreadPoolFactory.class));
   }
 
   @Test
   public void threadPoolDefaults() throws Exception {
-    final ThreadingProfile threadingProfile = muleContext.getDefaultThreadingProfile();
+    final ThreadingProfile threadingProfile = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_THREADING_PROFILE);
     final ExecutorService executorService = threadingProfile.createPool("sapo pepe");
     assertThat(executorService, notNullValue());
     assertThat(executorService, instanceOf(ThreadPoolExecutor.class));
@@ -46,7 +49,7 @@ public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void scheduledThreadPoolDefaults() throws Exception {
-    ThreadingProfile threadingProfile = muleContext.getDefaultThreadingProfile();
+    ThreadingProfile threadingProfile = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_THREADING_PROFILE);
     ScheduledExecutorService executorService = threadingProfile.createScheduledPool("sapo pepe");
     assertThat(executorService, notNullValue());
     assertThat(executorService, instanceOf(ScheduledThreadPoolExecutor.class));
@@ -59,7 +62,7 @@ public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void scheduledThreadPoolRejectHandler() throws Exception {
-    ThreadingProfile threadingProfile = muleContext.getDefaultThreadingProfile();
+    ThreadingProfile threadingProfile = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_THREADING_PROFILE);
     ThreadPoolExecutor.DiscardOldestPolicy expectedRejectedExecutionHandler = new ThreadPoolExecutor.DiscardOldestPolicy();
     threadingProfile.setRejectedExecutionHandler(expectedRejectedExecutionHandler);
     ScheduledExecutorService executorService = threadingProfile.createScheduledPool("sapo pepe");

@@ -9,9 +9,9 @@ package org.mule.runtime.module.http.internal.listener;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,10 +21,8 @@ import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.config.MutableThreadingProfile;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -66,7 +64,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   private HttpListenerConnectionManager connectionManager;
   private TlsContextFactory tlsContext;
   private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
-  private ThreadingProfile workerThreadingProfile;
   private boolean started = false;
   private HttpServer server;
   private Scheduler workManager;
@@ -79,10 +76,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
 
   DefaultHttpListenerConfig(HttpListenerConnectionManager connectionManager) {
     this.connectionManager = connectionManager;
-  }
-
-  public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile) {
-    this.workerThreadingProfile = workerThreadingProfile;
   }
 
   public void setName(String name) {
@@ -128,10 +121,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
       return;
     }
     basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-    if (workerThreadingProfile == null) {
-      workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
-      workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
-    }
 
     if (port == null) {
       port = protocol.getDefaultPort();

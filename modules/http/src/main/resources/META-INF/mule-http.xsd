@@ -119,7 +119,6 @@
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
                     <xsd:element ref="tls:context" minOccurs="0" maxOccurs="1" />
-                    <xsd:element name="worker-threading-profile" type="mule:asynchronousThreadingProfileType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>

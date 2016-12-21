@@ -13,7 +13,6 @@ import org.mule.runtime.core.DataTypeConversionResolver;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -41,7 +40,6 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.util.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.extension.api.ExtensionManager;
@@ -201,18 +199,6 @@ public interface MuleContext extends Lifecycle {
   Injector getInjector();
 
   MuleConfiguration getConfiguration();
-
-  @Deprecated
-  ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
-
-  @Deprecated
-  ThreadingProfile getDefaultMessageRequesterThreadingProfile();
-
-  @Deprecated
-  ThreadingProfile getDefaultMessageReceiverThreadingProfile();
-
-  @Deprecated
-  ThreadingProfile getDefaultThreadingProfile();
 
   /**
    * Returns the configured {@link org.mule.runtime.core.api.util.StreamCloserService}
