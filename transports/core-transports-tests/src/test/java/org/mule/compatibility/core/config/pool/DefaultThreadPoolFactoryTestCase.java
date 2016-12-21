@@ -12,10 +12,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.config.pool.DefaultThreadPoolFactory;
-import org.mule.runtime.core.config.pool.ThreadPoolFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.compatibility.core.api.config.ThreadingProfile;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -26,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCase {
+public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextEndpointTestCase {
 
   @Test
   public void defaultThreadPoolFactory() throws Exception {

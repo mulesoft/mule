@@ -22,13 +22,15 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.AbstractExceptionListener;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
@@ -47,6 +49,12 @@ public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends Us
 
   protected AbstractScriptWithBindingsConfigBuilderTestCase(boolean legacy) {
     this.legacy = legacy;
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ThreadingProfileConfigurationBuilder());
   }
 
   @Test

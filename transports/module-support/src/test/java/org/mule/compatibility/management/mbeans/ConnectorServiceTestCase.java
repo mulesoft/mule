@@ -11,26 +11,66 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.r
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
+import org.mule.runtime.module.management.agent.RmiRegistryAgent;
+import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.runtime.module.management.support.JmxSupport;
+import org.mule.runtime.module.management.support.JmxSupportFactory;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.test.management.AbstractMuleJmxTestCase;
 
+import java.lang.management.ManagementFactory;
 import java.util.Set;
 
+import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.junit.Test;
 
-public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase {
+public class ConnectorServiceTestCase extends AbstractMuleContextEndpointTestCase {
 
   protected String domainName;
   protected JmxApplicationAgent jmxAgent;
 
+  protected MBeanServer mBeanServer;
+  protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+  protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+
   @Override
   protected void doSetUp() throws Exception {
-    super.doSetUp();
-    jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+    RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
+    rmiRegistryAgent.setMuleContext(muleContext);
+    rmiRegistryAgent.initialise();
+    muleContext.getRegistry().registerAgent(rmiRegistryAgent);
 
+    mBeanServer = ManagementFactory.getPlatformMBeanServer();
+
+    jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+    domainName = jmxSupport.getDomainName(muleContext);
+  }
+
+  protected void unregisterMBeansByMask(final String mask) throws Exception {
+    Set<ObjectInstance> objectInstances = mBeanServer.queryMBeans(jmxSupport.getObjectName(mask), null);
+    for (ObjectInstance instance : objectInstances) {
+      try {
+        mBeanServer.unregisterMBean(instance.getObjectName());
+      } catch (Exception e) {
+        // ignore
+      }
+    }
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    unregisterMBeansByMask(domainName + ":*");
+    unregisterMBeansByMask(domainName + ".1:*");
+    unregisterMBeansByMask(domainName + ".2:*");
+    mBeanServer = null;
+  }
+
+  @Test
+  public void testDummy() {
+    // this method only exists to silence the test runner
   }
 
   @Test
@@ -40,7 +80,6 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase {
     registerConnector(muleContext.getRegistry(), connector);
     muleContext.start();
 
-    domainName = jmxSupport.getDomainName(muleContext);
     final String query = domainName + ":*";
     final ObjectName objectName = jmxSupport.getObjectName(query);
     Set<ObjectInstance> mbeans = mBeanServer.queryMBeans(objectName, null);
@@ -59,10 +98,5 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase {
 
     mbeans = mBeanServer.queryMBeans(objectName, null);
     assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    unregisterMBeansByMask(domainName + ":*");
   }
 }

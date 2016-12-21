@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.compatibility.core.api.config.ThreadingProfile;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class DefaultThreadingProfileTestCase extends AbstractMuleContextTestCase {
+public class DefaultThreadingProfileTestCase extends AbstractMuleContextEndpointTestCase {
 
   @Test
   public void testDefaultThreadingProfile() {

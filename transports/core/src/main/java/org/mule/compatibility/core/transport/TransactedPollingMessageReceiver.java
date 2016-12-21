@@ -6,19 +6,19 @@
  */
 package org.mule.compatibility.core.transport;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
@@ -116,25 +116,21 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but several workers
         // may have been started
-        ExecutionCallback<Event> cb = new ExecutionCallback<Event>() {
-
-          @Override
-          public Event process() throws Exception {
-            // this is not ideal, but jdbc receiver returns a list of maps, not List<Message>
-            List messages = getMessages();
-            LinkedList<Event> results = new LinkedList<Event>();
-            if (messages != null && messages.size() > 0) {
-              for (Object message : messages) {
-                results.add(processMessage(message));
-              }
-            } else {
-              // If not message was processed mark exception for rollback to avoid tx timeout exceptions in XA
-              Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
-              currentTx.setRollbackOnly();
-              return null;
+        ExecutionCallback<Event> cb = () -> {
+          // this is not ideal, but jdbc receiver returns a list of maps, not List<Message>
+          List messages = getMessages();
+          LinkedList<Event> results = new LinkedList<>();
+          if (messages != null && messages.size() > 0) {
+            for (Object message : messages) {
+              results.add(processMessage(message));
             }
-            return defaultRouterResultsHandler.aggregateResults(results, results.getLast());
+          } else {
+            // If not message was processed mark exception for rollback to avoid tx timeout exceptions in XA
+            Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
+            currentTx.setRollbackOnly();
+            return null;
           }
+          return defaultRouterResultsHandler.aggregateResults(results, results.getLast());
         };
         pt.execute(cb);
       } else {

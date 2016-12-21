@@ -19,15 +19,15 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Test;
 
-public class EndpointFactoryTestCase extends AbstractMuleContextTestCase {
+public class EndpointFactoryTestCase extends AbstractMuleContextEndpointTestCase {
 
   @Test
   public void testCreateInboundEndpoint() throws Exception {

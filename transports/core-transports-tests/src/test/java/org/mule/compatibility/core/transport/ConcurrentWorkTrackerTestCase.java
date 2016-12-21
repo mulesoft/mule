@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.work.ConcurrentWorkTracker;
+import org.mule.compatibility.core.work.ConcurrentWorkTracker;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

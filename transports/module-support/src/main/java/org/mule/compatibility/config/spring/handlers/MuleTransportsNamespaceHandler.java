@@ -15,7 +15,9 @@ import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.VARIA
 import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.parsers.specific.BindingDefinitionParser;
+import org.mule.compatibility.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.compatibility.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
+import org.mule.compatibility.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.compatibility.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.compatibility.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.compatibility.core.agent.EndpointNotificationLoggerAgent;
@@ -49,13 +51,11 @@ import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataTypeDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.module.cxf.CxfConstants;
 

@@ -16,6 +16,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -55,7 +56,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;

@@ -26,7 +26,6 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -46,7 +45,6 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
       mock(UntilSuccessfulConfiguration.class, Answers.RETURNS_DEEP_STUBS.get());
   private Processor mockRoute = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
   private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
-  private ThreadingProfile mockThreadingProfile = mock(ThreadingProfile.class, Answers.RETURNS_DEEP_STUBS.get());
   private ListableObjectStore<Event> mockObjectStore = mock(ListableObjectStore.class, Answers.RETURNS_DEEP_STUBS.get());
 
   @Before

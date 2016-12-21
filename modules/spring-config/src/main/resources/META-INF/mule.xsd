@@ -1145,10 +1145,24 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-configuration-element" abstract="true" type="abstractConfigurationElement">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for configuration elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractConfigurationElement">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="configurationType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
                 <xsd:sequence>
+                    <xsd:element ref="abstract-configuration-element" minOccurs="0"/>
                     <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>

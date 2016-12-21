@@ -11,10 +11,10 @@ import static org.junit.Assert.fail;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.config.ImmutableThreadingProfile;
+import org.mule.compatibility.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;

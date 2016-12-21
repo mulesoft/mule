@@ -32,7 +32,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractServiceThreadingProfileType"/>
+    <xsd:complexType name="abstractServiceThreadingProfileType" abstract="true">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractConfigurationElement"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="threading-profile" type="threadingProfileType"
                  substitutionGroup="abstract-service-threading-profile">
@@ -163,32 +167,42 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="endpointConfigurationType">
+    <xsd:element name="default-threading-profile" type="threadingProfileType" substitutionGroup="mule:abstract-configuration-element">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default threading profile, used by components for dispatching and receiving if no more specific configuration is given.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="compatibilityConfiguration" type="compatibilityConfigurationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Specifies defaults and general settings for compatibility module in the Mule instance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="compatibilityConfigurationType">
         <xsd:complexContent>
-            <xsd:extension base="mule:configurationType">
+            <xsd:extension base="mule:annotatedType">
                 <xsd:sequence>
-                    <xsd:element name="default-threading-profile" type="mule:threadingProfileType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The default threading profile, used by components for dispatching and receiving if no more specific configuration is given.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="default-dispatcher-threading-profile" type="mule:threadingProfileType" minOccurs="0">
+                    <xsd:element ref="default-threading-profile" minOccurs="0"/>
+                    <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The default dispatching threading profile, which modifies the default-threading-profile values and is used by endpoints for dispatching messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="default-receiver-threading-profile" type="mule:threadingProfileType" minOccurs="0">
+                    <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The default receiving threading profile, which modifies the default-threading-profile values and is used by endpoints for receiving messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="default-service-threading-profile" type="mule:threadingProfileType" minOccurs="0">
+                    <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The default service threading profile, which modifies the default-threading-profile and is used by services for processing messages. This can also be configured on models or services, in which case these configurations will be used instead of this default.
@@ -671,14 +685,14 @@
                     <!-- for normal connectors, this is for emergency use only, but it is
                          critical for custom connector -->
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="receiver-threading-profile" type="mule:threadingProfileType" minOccurs="0">
+                    <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The threading profile to use when a connector receives messages.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="dispatcher-threading-profile" type="mule:threadingProfileType" minOccurs="0">
+                    <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The threading profile to use when a connector dispatches messages.

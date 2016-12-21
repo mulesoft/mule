@@ -13,7 +13,9 @@ import org.mule.compatibility.module.management.agent.TransportsJmxApplicationAg
 import org.mule.compatibility.module.management.agent.mbean.ConnectorService;
 import org.mule.compatibility.module.management.agent.mbean.EndpointService;
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.management.support.JmxSupport;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,6 +36,12 @@ public class MBeansRegistrationTestCase extends UsesHttpExtensionFunctionalTestC
   private MBeanServer mBeanServer;
   private String domainName;
   private JmxSupport jmxSupport;
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ThreadingProfileConfigurationBuilder());
+  }
 
   @Override
   protected String getConfigFile() {

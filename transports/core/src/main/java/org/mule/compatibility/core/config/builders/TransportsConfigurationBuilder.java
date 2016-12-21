@@ -12,11 +12,11 @@ import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJE
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
+import org.mule.compatibility.core.config.ChainedThreadingProfile;
 import org.mule.compatibility.core.endpoint.DefaultEndpointFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 
 public class TransportsConfigurationBuilder extends DefaultsConfigurationBuilder {

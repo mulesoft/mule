@@ -36,7 +36,6 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -70,11 +69,6 @@ import org.mule.runtime.core.util.store.MuleObjectStoreManager;
  * <li>{@link QueueManager}
  * <li>{@link SecurityManager}
  * <li>{@link ObjectStore}
- * <li>{@link ThreadingProfile} defaultThreadingProfile
- * <li>{@link ThreadingProfile} defaultMessageDispatcherThreadingProfile
- * <li>{@link ThreadingProfile} defaultMessageRequesterThreadingProfile
- * <li>{@link ThreadingProfile} defaultMessageReceiverThreadingProfile
- * <li>{@link ThreadingProfile} defaultComponentThreadingProfile
  * </ul>
  */
 public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
