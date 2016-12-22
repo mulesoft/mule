@@ -12,12 +12,22 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROP
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCaseRunnerConfig;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
+
+import java.util.List;
 
 import org.junit.Test;
 
 public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase implements
     CompatibilityFunctionalTestCaseRunnerConfig {
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ThreadingProfileConfigurationBuilder());
+  }
 
   @Override
   protected String getConfigFile() {

@@ -29,7 +29,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +59,7 @@ import org.springframework.jms.connection.SingleConnectionFactory;
  * Tests that JMS message are correctly sent when caching elements
  */
 @RunWith(MockitoJUnitRunner.class)
-public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContextTestCase {
+public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContextEndpointTestCase {
 
   private static String USERNAME = "username";
   private static String PASSWORD = "password";

@@ -39,7 +39,6 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.util.NotificationUtils;
-import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
- * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of
+ * Processes {@link Event}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
  * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be executed in a
  * different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is present then an
  * exception is thrown.

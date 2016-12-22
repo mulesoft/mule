@@ -10,4 +10,10 @@ public class MuleEndpointProperties {
 
   public static final String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
 
+  public static final String OBJECT_DEFAULT_THREADING_PROFILE = "_defaultThreadingProfile";
+  public static final String OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "_defaultMessageDispatcherThreadingProfile";
+  public static final String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
+  public static final String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
+  public static final String OBJECT_DEFAULT_SERVICE_THREADING_PROFILE = "_defaultServiceThreadingProfile";
+
 }

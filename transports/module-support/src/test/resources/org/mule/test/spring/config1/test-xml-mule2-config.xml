@@ -13,7 +13,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30">
-        <default-threading-profile maxBufferSize="42" maxThreadsActive="16"
+        <transports:default-threading-profile maxBufferSize="42" maxThreadsActive="16"
                                    maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
     </configuration>
 

@@ -11,10 +11,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.functional.Either;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -52,6 +54,11 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase {
     return Arrays.asList(new Object[][] {{"domain/jms/jms-activemq-embedded-shared-connector.xml"},
         {"domain/jms/jms-custom-shared-connector.xml"}, {"domain/jms/jms-shared-connnector.xml"},
         {"domain/jms/jms-caching-connection-factory-shared-connnector.xml"}});
+  }
+
+  @Override
+  protected ConfigurationBuilder getBuilder() {
+    return new ThreadingProfileConfigurationBuilder();
   }
 
   @Override

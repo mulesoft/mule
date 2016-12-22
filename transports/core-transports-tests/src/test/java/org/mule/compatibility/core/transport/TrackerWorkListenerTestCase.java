@@ -8,16 +8,14 @@ package org.mule.compatibility.core.transport;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-
 import static org.mule.compatibility.core.transport.WorkEventMatcher.aCompletedWorkEventFor;
 import static org.mule.compatibility.core.transport.WorkEventMatcher.aRejectedWorkEventFor;
 import static org.mule.compatibility.core.transport.WorkEventMatcher.aStartedWorkEventFor;
 import static org.mule.compatibility.core.transport.WorkEventMatcher.anAcceptedWorkEventFor;
 
-import org.mule.runtime.core.work.TrackerWorkListener;
+import org.mule.compatibility.core.work.TrackerWorkListener;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;

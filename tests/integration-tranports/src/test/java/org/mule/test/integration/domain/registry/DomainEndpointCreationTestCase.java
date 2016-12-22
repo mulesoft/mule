@@ -13,9 +13,11 @@ import static org.hamcrest.Matchers.equalTo;
 import org.mule.compatibility.core.endpoint.AbstractEndpoint;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 
 import org.junit.Test;
 
@@ -23,6 +25,11 @@ public class DomainEndpointCreationTestCase extends DomainFunctionalTestCase {
 
   private static final String APP = "app";
   private static final String[] APPLICATION_RESOURCES = new String[] {"domain/app-jms-endpoints-config.xml"};
+
+  @Override
+  protected ConfigurationBuilder getBuilder() {
+    return new ThreadingProfileConfigurationBuilder();
+  }
 
   @Override
   protected String getDomainConfig() {

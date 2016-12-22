@@ -7,6 +7,10 @@
 package org.mule.functional.extensions;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
+
+import java.util.List;
 
 /**
  * Provides the extension dependencies of the compatibility plugin for runnint its tests in an isolated manner.
@@ -15,5 +19,11 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
  */
 public abstract class CompatibilityFunctionalTestCase extends MuleArtifactFunctionalTestCase
     implements CompatibilityFunctionalTestCaseRunnerConfig {
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ThreadingProfileConfigurationBuilder());
+  }
 
 }

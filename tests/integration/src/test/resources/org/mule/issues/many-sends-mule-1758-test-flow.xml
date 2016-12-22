@@ -8,10 +8,6 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <configuration>
-        <default-threading-profile threadWaitTimeout="60000" threadTTL="60000"/>
-    </configuration>
-
     <flow name="mySynchService">
         <test:component>
             <test:return-data>Polo</test:return-data>

@@ -10,13 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
+import org.mule.compatibility.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;

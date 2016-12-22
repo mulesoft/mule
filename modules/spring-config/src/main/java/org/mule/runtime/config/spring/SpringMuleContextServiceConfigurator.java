@@ -16,12 +16,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXCEPTION_LOCATION_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
@@ -72,7 +68,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.context.notification.RegistryNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
-import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.factories.HostNameFactory;
 import org.mule.runtime.core.connectivity.DefaultConnectivityTestingService;
@@ -130,7 +125,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * {@code MuleContext#getCustomizationService}.
  * <p>
  * This class takes cares of registering bean definitions for each of the provided services so dependency injection can be
- * propertly done through the use of {@link javax.inject.Inject}.
+ * properly done through the use of {@link javax.inject.Inject}.
  *
  * @since 4.0
  */
@@ -201,16 +196,6 @@ class SpringMuleContextServiceConfigurator {
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER)
                .getBeanDefinition())
       .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class))
-      .put(OBJECT_DEFAULT_THREADING_PROFILE, getBeanDefinition(ChainedThreadingProfile.class))
-      .put(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE,
-           getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE)
-               .getBeanDefinition())
-      .put(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE,
-           getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE)
-               .getBeanDefinition())
-      .put(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
-           getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE)
-               .getBeanDefinition())
       .put("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class))
       .put("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition())
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(MuleSecurityManager.class))

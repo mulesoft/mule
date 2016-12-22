@@ -12,10 +12,7 @@
     <global-property name="beanProperty1" value="this was set from the manager properties!"/>
     <global-property name="OS_Version" value="${os.version}"/>
 
-    <configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30">
-        <default-threading-profile maxBufferSize="42" maxThreadsActive="16"
-                                        maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
-    </configuration>
+    <configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30"/>
 
     <custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 

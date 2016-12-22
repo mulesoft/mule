@@ -6,13 +6,13 @@
  */
 package org.mule.compatibility.transport.http;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.compatibility.core.config.MutableThreadingProfile;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.config.MutableThreadingProfile;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 

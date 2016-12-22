@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
+import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -28,7 +29,8 @@ public class EmbeddedMuleTestCase extends AbstractMuleTestCase {
   public void testStartup() throws Exception {
     SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("org/mule/test/spring/mule-root-test.xml");
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    MuleContext context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), builder);
+    MuleContext context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(),
+                                                               new TransportsConfigurationBuilder(), builder);
     // MuleContext must be started explicitly after MULE-1988
     assertFalse(context.isStarted());
     context.start();

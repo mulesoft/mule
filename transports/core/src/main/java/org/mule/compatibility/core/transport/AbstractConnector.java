@@ -8,11 +8,15 @@ package org.mule.compatibility.core.transport;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
 import static org.mule.compatibility.core.config.i18n.TransportCoreMessages.connectorCausedError;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
+import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -45,13 +49,13 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -68,7 +72,6 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
@@ -1097,7 +1100,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    */
   public ThreadingProfile getDispatcherThreadingProfile() {
     if (dispatcherThreadingProfile == null && muleContext != null) {
-      dispatcherThreadingProfile = muleContext.getDefaultMessageDispatcherThreadingProfile();
+      dispatcherThreadingProfile =
+          (ThreadingProfile) muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
     }
     return dispatcherThreadingProfile;
   }
@@ -1118,7 +1122,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    */
   public ThreadingProfile getRequesterThreadingProfile() {
     if (requesterThreadingProfile == null && muleContext != null) {
-      requesterThreadingProfile = muleContext.getDefaultMessageRequesterThreadingProfile();
+      requesterThreadingProfile = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
     }
     return requesterThreadingProfile;
   }
@@ -1139,7 +1143,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    */
   public ThreadingProfile getReceiverThreadingProfile() {
     if (receiverThreadingProfile == null && muleContext != null) {
-      receiverThreadingProfile = muleContext.getDefaultMessageReceiverThreadingProfile();
+      receiverThreadingProfile = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
     }
     return receiverThreadingProfile;
   }

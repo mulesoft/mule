@@ -19,6 +19,7 @@ import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationMuleArtifactFactory;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -140,6 +141,7 @@ public class UnsupportedConnectorsMuleArtifactTestCase extends AbstractMuleTestC
       protected void addBuilders(List<ConfigurationBuilder> builders) {
         super.addBuilders(builders);
         builders.add(testServicesConfigurationBuilder);
+        builders.add(new ThreadingProfileConfigurationBuilder());
       }
     };
   }

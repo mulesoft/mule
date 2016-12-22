@@ -12,7 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.compatibility.core.agent.EndpointNotificationLoggerAgent;
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -22,6 +26,12 @@ public class ManagementNamespaceHandlerTestCase extends UsesHttpExtensionFunctio
     super();
     // do not start the muleContext, we're only doing registry lookups in this test case
     setStartContext(false);
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ThreadingProfileConfigurationBuilder());
   }
 
   @Override
