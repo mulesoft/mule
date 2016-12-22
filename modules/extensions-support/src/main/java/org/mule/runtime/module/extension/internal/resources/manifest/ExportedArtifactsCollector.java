@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-final class ExportedArtifactsCollector {
+final public class ExportedArtifactsCollector {
 
   private static final String META_INF_PREFIX = "/META-INF";
   private final Set<String> filteredPackages =
@@ -54,7 +54,7 @@ final class ExportedArtifactsCollector {
    *
    * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
    */
-  ExportedArtifactsCollector(ExtensionModel extensionModel) {
+  public ExportedArtifactsCollector(ExtensionModel extensionModel) {
     this.extensionModel = extensionModel;
     this.extensionClassloader = getClassLoader(extensionModel);
   }
@@ -62,7 +62,7 @@ final class ExportedArtifactsCollector {
   /**
    * @return The {@link Set} of default resource paths that the extension should export
    */
-  Set<String> getExportedResources() {
+  public Set<String> getExportedResources() {
     // TODO: remove at Kraan's notice
     addMetaInfResource("");
 
@@ -75,7 +75,7 @@ final class ExportedArtifactsCollector {
   /**   
    * @return The {@link Set} of default java package names that the extension should export
    */
-  Set<String> getExportedPackages() {
+  public Set<String> getExportedPackages() {
     collectDefault();
     collectManuallyExportedPackages();
 

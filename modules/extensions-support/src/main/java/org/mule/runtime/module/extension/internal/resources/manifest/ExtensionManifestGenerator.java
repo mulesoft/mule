@@ -21,6 +21,7 @@ import java.util.Optional;
 
 /**
  * A {@link GeneratedResourceFactory} which generates a {@link ExtensionManifest} and stores it in {@code XML} format
+ * TODO(fernandezlautaro): MULE-11136 this generator should be deleted
  *
  * @since 4.0
  */

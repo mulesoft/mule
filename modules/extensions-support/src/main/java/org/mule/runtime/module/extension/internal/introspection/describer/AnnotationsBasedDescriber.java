@@ -170,7 +170,7 @@ public final class AnnotationsBasedDescriber implements Describer {
   /**
    * The ID which represents {@code this} {@link Describer} in a {@link DescriberManifest}
    */
-  public static final String DESCRIBER_ID = "annotations";
+  public static final String DESCRIBER_ID = "java";
 
   /**
    * A {@link DescriberManifest} property key which points to the class which should be introspected by instances of this class
