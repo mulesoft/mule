@@ -80,14 +80,14 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
     final StringBuilder explodedUrlSuffix = new StringBuilder();
     final StringBuilder packagedUrlSuffix = new StringBuilder();
     if (isTestArtifact(artifact)) {
-      explodedUrlSuffix.append("test-classes/");
+      explodedUrlSuffix.append("test-classes");
       packagedUrlSuffix.append(".*-tests.jar");
     } else {
-      explodedUrlSuffix.append("classes/");
+      explodedUrlSuffix.append("classes");
       packagedUrlSuffix.append("^(?!.*?(?:-tests.jar)).*.jar");
     }
     final Optional<URL> localFile = classPath.stream().filter(url -> {
-      String path = url.getPath();
+      String path = toFile(url).getAbsolutePath();
       if (path.contains(moduleFolder)) {
         String pathSuffix = path.substring(path.lastIndexOf(moduleFolder.toString()) + moduleFolder.length(), path.length());
         return pathSuffix.matches(explodedUrlSuffix.toString()) || pathSuffix.matches(packagedUrlSuffix.toString());
