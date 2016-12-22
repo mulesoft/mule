@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.transaction.TransactionCoordination;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -45,7 +45,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
-public class JmsConnectorTestCase extends AbstractMuleContextTestCase {
+public class JmsConnectorTestCase extends AbstractMuleContextEndpointTestCase {
 
   private static final String CLIENT_ID1 = "client1";
   private static final String CLIENT_ID2 = "client2";

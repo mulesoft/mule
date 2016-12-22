@@ -49,7 +49,18 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUpMuleContexts() throws Exception {
-    domainContext = new DomainContextBuilder().setDomainConfig(getDomainConfig()).build();
+    final DomainContextBuilder domainContextBuilder = new DomainContextBuilder() {
+
+      @Override
+      protected void addBuilders(List<ConfigurationBuilder> builders) {
+        super.addBuilders(builders);
+        if (getBuilder() != null) {
+          builders.add(getBuilder());
+        }
+      }
+    }.setDomainConfig(getDomainConfig());
+
+    domainContext = domainContextBuilder.build();
     ApplicationConfig[] applicationConfigs = getConfigResources();
     for (ApplicationConfig applicationConfig : applicationConfigs) {
       MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);
@@ -84,7 +95,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     return domainContext;
   }
 
-  protected ConfigurationBuilder getBuilder() throws Exception {
+  protected ConfigurationBuilder getBuilder() {
     return null;
   }
 

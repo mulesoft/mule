@@ -7,7 +7,9 @@
 package org.mule.module.management.agent;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.management.agent.JmxDomainAgent;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,11 @@ public class SharedResourcesWithJmxAgentTestCase extends DomainFunctionalTestCas
   public static final String FLOW_APP1 = "flowApp1";
   public static final String FLOW_APP2 = "flowApp2";
   public static final String TYPE_ENDPOINT = "type=Endpoint";
+
+  @Override
+  protected ConfigurationBuilder getBuilder() {
+    return new ThreadingProfileConfigurationBuilder();
+  }
 
   @Override
   protected String getDomainConfig() {
@@ -58,7 +65,7 @@ public class SharedResourcesWithJmxAgentTestCase extends DomainFunctionalTestCas
   }
 
   private int getNamesCount(Set<ObjectName> objectNames, String... filters) {
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
     for (ObjectName objectName : objectNames) {
       String canonicalName = objectName.getCanonicalName();
       if (containsAll(canonicalName, filters)) {

@@ -6,11 +6,11 @@
  */
 package org.mule.test.spring;
 
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class DefaultThreadingProfileMule2083TestCase extends AbstractIntegrationTestCase {
+public class DefaultThreadingProfileMule2083TestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String[] getConfigFiles() {

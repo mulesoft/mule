@@ -15,7 +15,7 @@
        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd">
 
     <configuration>
-        <default-threading-profile doThreading="false"/>
+        <transports:default-threading-profile doThreading="false"/>
     </configuration>
 
     <file:connector name="fileConnector" autoDelete="true" fileAge="1000">

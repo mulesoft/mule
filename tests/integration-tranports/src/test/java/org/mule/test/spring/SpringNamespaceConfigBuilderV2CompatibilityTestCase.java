@@ -9,12 +9,17 @@ package org.mule.test.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.AbstractConfigBuilderTestCase;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCaseRunnerConfig;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.ThreadingProfileConfigurationBuilder;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -32,6 +37,12 @@ public class SpringNamespaceConfigBuilderV2CompatibilityTestCase extends Abstrac
   public SpringNamespaceConfigBuilderV2CompatibilityTestCase() {
     super(true);
     setDisposeContextPerClass(true);
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ThreadingProfileConfigurationBuilder());
   }
 
   @Override
