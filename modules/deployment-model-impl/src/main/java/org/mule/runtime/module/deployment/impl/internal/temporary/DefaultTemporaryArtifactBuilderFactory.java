@@ -10,6 +10,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.logging.log4j.core.util.FileUtils.getFileExtension;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.runtime.api.exception.MuleException;
@@ -140,6 +141,14 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
                   .setParentClassLoader(muleArtifactResourcesRegistry.getContainerClassLoader())
                   .addArtifactPluginDescriptors(this.artifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
                   .setArtifactId(artifactId);
+
+          // Just add the "classes" folder in order to avoid issues when looking for log4j configuration
+          final File classes = new File(artifactRootFolder, "classes");
+          if (!classes.mkdir()) {
+            throw new MuleRuntimeException(createStaticMessage("Couldn't create classes folder for temporary application"));
+          }
+          temporaryArtifactClassLoaderBuilder.addUrl(classes.toURI().toURL());
+
           artifactLibraryFiles.stream().forEach(file -> {
             try {
               temporaryArtifactClassLoaderBuilder.addUrl(file.toURI().toURL());

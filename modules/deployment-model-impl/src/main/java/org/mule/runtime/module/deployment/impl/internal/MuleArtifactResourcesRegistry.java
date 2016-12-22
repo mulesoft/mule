@@ -124,8 +124,8 @@ public class MuleArtifactResourcesRegistry {
 
     temporaryArtifactClassLoaderBuilderFactory =
         new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginClassLoaderFactory,
-                                                       artifactPluginDescriptorFactory,
-                                                       dependenciesProvider, pluginDependenciesResolver);
+                                                       applicationClassLoaderFactory,
+                                                       pluginDependenciesResolver);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
