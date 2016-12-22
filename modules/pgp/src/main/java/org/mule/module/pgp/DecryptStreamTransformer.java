@@ -185,6 +185,7 @@ public class DecryptStreamTransformer implements StreamTransformer
             {
                 throw new PGPException(String.format("User selected private key ID %s (through secretAliasId) but message was encrypted for key ID %s", pgpPrivateKey.getKeyID(), keyID));
             }
-            return pgpPrivateKey;        }
+            return pgpPrivateKey;
+        }
     }
 }
