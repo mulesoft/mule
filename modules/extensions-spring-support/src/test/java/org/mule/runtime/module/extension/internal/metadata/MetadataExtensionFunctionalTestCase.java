@@ -193,7 +193,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     if (!isBlank(traceContains)) {
       assertThat(failure.getReason(), containsString(traceContains));
     }
-    assertThat(failure.getFailingPart(), is(failingComponent));
+    assertThat(failure.getFailingComponent(), is(failingComponent));
     if (!isBlank(failingElement)) {
       assertThat(failure.getFailingElement().isPresent(), is(true));
       assertThat(failure.getFailingElement().get(), is(failingElement));
@@ -227,7 +227,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     assertThat(descriptor.isDynamic(), is(false));
   }
 
-  private void assertExpectedType(TypeMetadataDescriptor descriptor, MetadataType type){
+  private void assertExpectedType(TypeMetadataDescriptor descriptor, MetadataType type) {
     assertThat(descriptor.getType(), is(type));
   }
 

@@ -105,10 +105,10 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
         return success(metadata);
       }
       MetadataFailure failure = newFailure()
-        .withMessage(format("Error resolving metadata for the [%s] input parameter", parameter.getName()))
-        .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
-        .withReason(NULL_TYPE_ERROR)
-        .onParameter(parameter.getName());
+          .withMessage(format("Error resolving metadata for the [%s] input parameter", parameter.getName()))
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onParameter(parameter.getName());
       return failure(parameter.getType(), failure);
     } catch (Exception e) {
       return failure(parameter.getType(), newFailure(e).onParameter(parameter.getName()));

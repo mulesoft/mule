@@ -69,7 +69,7 @@ public class MetadataMediator {
     this.inputDelegate = new MetadataInputDelegate(componentModel);
 
     componentModel.getModelProperty(MetadataKeyIdModelProperty.class)
-      .ifPresent(keyIdMP -> keyContainerName = keyIdMP.getParameterName());
+        .ifPresent(keyIdMP -> keyContainerName = keyIdMP.getParameterName());
   }
 
   /**
@@ -139,9 +139,9 @@ public class MetadataMediator {
     }
 
     List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
-      .addAll(output.getFailures())
-      .addAll(input.getFailures())
-      .build();
+        .addAll(output.getFailures())
+        .addAll(input.getFailures())
+        .build();
 
     return failure(componentDescriptor, failures);
   }

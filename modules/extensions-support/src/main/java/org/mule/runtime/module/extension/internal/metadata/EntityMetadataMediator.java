@@ -55,9 +55,9 @@ public class EntityMetadataMediator {
       final MetadataKeysContainerBuilder keyBuilder = MetadataKeysContainerBuilder.getInstance();
       if (entityKeys.stream().anyMatch(key -> key.getChilds().size() > 0)) {
         return failure(newFailure()
-                         .withMessage("Error retrieving entity keys, Only single level keys are supported for entity metadata")
-                         .withReason("There are at least one key that contains childs")
-                         .withFailureCode(INVALID_METADATA_KEY).onKeys());
+            .withMessage("Error retrieving entity keys, Only single level keys are supported for entity metadata")
+            .withReason("There are at least one key that contains childs")
+            .withFailureCode(INVALID_METADATA_KEY).onKeys());
       }
       return success(keyBuilder.add(queryEntityResolver.getClass().getSimpleName(), entityKeys).build());
     } catch (Exception e) {

@@ -141,7 +141,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void failToGetMetadataFromNonExistingConfig() throws IOException {
     final MetadataResult<MetadataKeysContainer> result =
-      metadataService.getMetadataKeys(new ConfigurationId(NON_EXISTING_CONFIG));
+        metadataService.getMetadataKeys(new ConfigurationId(NON_EXISTING_CONFIG));
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
                           format("Configuration named [%s] doesn't exist", NON_EXISTING_CONFIG),
@@ -153,7 +153,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   public void failToGetMetadataFromDynamicConfig() throws IOException {
     ComponentId componentId = new ConfigurationId("dynamic-config");
     final MetadataResult<MetadataKeysContainer> result =
-      metadataService.getMetadataKeys(componentId);
+        metadataService.getMetadataKeys(componentId);
 
     assertMetadataFailure(result.getFailures().get(0),
                           format(NO_DYNAMIC_KEY_AVAILABLE, componentId),

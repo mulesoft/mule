@@ -57,17 +57,18 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
 
     MetadataResult<TypeMetadataDescriptor> outputDescriptor =
-      toMetadataDescriptorResult(component.getOutput().getType(), component.getOutput().hasDynamicType(), output);
+        toMetadataDescriptorResult(component.getOutput().getType(), component.getOutput().hasDynamicType(), output);
     MetadataResult<TypeMetadataDescriptor> attributesDescriptor =
         toMetadataDescriptorResult(component.getOutputAttributes().getType(), false, attributes);
 
-    OutputMetadataDescriptor descriptor = outputDescriptor().withReturnType(outputDescriptor.get()).withAttributesType(attributesDescriptor.get()).build();
+    OutputMetadataDescriptor descriptor =
+        outputDescriptor().withReturnType(outputDescriptor.get()).withAttributesType(attributesDescriptor.get()).build();
 
     if (!output.isSuccess() || !attributes.isSuccess()) {
       List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
-        .addAll(output.getFailures())
-        .addAll(attributes.getFailures())
-        .build();
+          .addAll(output.getFailures())
+          .addAll(attributes.getFailures())
+          .build();
 
       return failure(descriptor, failures);
     }
@@ -93,10 +94,10 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
         return success(metadata);
       }
       MetadataFailure failure = newFailure()
-        .withMessage("Error resolving Output Payload metadata")
-        .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
-        .withReason(NULL_TYPE_ERROR)
-        .onOutputPayload();
+          .withMessage("Error resolving Output Payload metadata")
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onOutputPayload();
       return failure(output.getType(), failure);
     } catch (Exception e) {
       return failure(output.getType(), newFailure(e).onOutputAttributes());
@@ -122,10 +123,10 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
         return success(metadata);
       }
       MetadataFailure failure = newFailure()
-        .withMessage("Error resolving Output Attributes metadata")
-        .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
-        .withReason(NULL_TYPE_ERROR)
-        .onOutputAttributes();
+          .withMessage("Error resolving Output Attributes metadata")
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onOutputAttributes();
       return failure(attributes.getType(), failure);
     } catch (Exception e) {
       return failure(attributes.getType(), newFailure(e).onOutputAttributes());
