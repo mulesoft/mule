@@ -24,6 +24,7 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   public static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_JSON = "mule-plugin.json";
   public static final String MULE_PLUGIN_POM = "pom.xml";
+  public static final String REPOSITORY = "repository";
 
   private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();

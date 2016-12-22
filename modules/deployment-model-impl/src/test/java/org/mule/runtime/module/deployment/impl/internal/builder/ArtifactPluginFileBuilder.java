@@ -13,6 +13,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.REPOSITORY;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -120,6 +121,21 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
     resources.add(new ZipResource(resourceFile, META_INF + "/" + alias));
+    return this;
+  }
+
+  /**
+   * Adds a resource file to the application {@link ArtifactPluginDescriptor#META_INF} folder.
+   *
+   * @param resourceFile resource file from a external file or test resource.
+   * @param alias relative path of the artifact to "install" in the plugin's {@link ArtifactPluginDescriptor#REPOSITORY}
+   *              folder, it must respect the Maven repository format. E.g.: /org/mule/modules/mule-module-ble/4.0-SNAPSHOT/mule-module-ble-4.0-SNAPSHOT.jar
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder containingRepositoryResource(String resourceFile, String alias) {
+    checkImmutable();
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+    resources.add(new ZipResource(resourceFile, REPOSITORY + "/" + alias));
     return this;
   }
 
