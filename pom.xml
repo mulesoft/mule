@@ -162,7 +162,7 @@
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
-        <commonsNetVersion>3.3</commonsNetVersion>
+        <commonsNetVersion>3.5</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
         <cxfVersion>2.7.18</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
