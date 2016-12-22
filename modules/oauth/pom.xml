@@ -46,6 +46,8 @@
             <scope>provided</scope>
             <classifier>mule-service</classifier>
         </dependency>
+
+        <!--TODO: MULE-10837 remove dependency-->
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-scheduler</artifactId>
