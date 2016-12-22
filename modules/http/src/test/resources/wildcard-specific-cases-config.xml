@@ -13,4 +13,12 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         <http:listener path="${path2}" config-ref="HTTP_Listener_Configuration"/>
         <set-payload value="${response2}"/>
     </flow>
+    <flow name="flow-3">
+        <http:listener path="${path3}" config-ref="HTTP_Listener_Configuration"/>
+        <set-payload value="${response}"/>
+    </flow>
+    <flow name="flow-4">
+        <http:listener path="${path4}" config-ref="HTTP_Listener_Configuration"/>
+        <set-payload value="${response}"/>
+    </flow>
 </mule>
