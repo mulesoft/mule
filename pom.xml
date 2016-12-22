@@ -178,7 +178,7 @@
         <commonsIoVersion>2.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
-        <commonsNetVersion>2.2</commonsNetVersion>
+        <commonsNetVersion>3.5</commonsNetVersion>
         <cxfVersion>2.7.15</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
