@@ -7,12 +7,14 @@
 package org.mule.runtime.module.deployment.impl.internal.temporary;
 
 import static com.google.common.collect.Lists.newArrayList;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
@@ -39,23 +41,28 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
 
   private ArtifactClassLoader parentClassLoader;
   private List<URL> urls = newArrayList();
+  private DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
 
   /**
    * Creates an {@link TemporaryArtifactClassLoaderBuilder}.
    * 
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory for creating class loaders for artifact plugins. Must be not null.
+   * @param artifactClassLoaderFactory creates artifact class loaders from descriptors
    * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
                                              ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+                                             DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                              PluginDependenciesResolver pluginDependenciesResolver) {
     super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+
+    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactPluginClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
   }
 
   /**
@@ -83,7 +90,7 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    */
   @Override
   public MuleDeployableArtifactClassLoader build() throws IOException {
-    final ArtifactDescriptor artifactDescriptor = new ArtifactDescriptor("temp");
+    final ApplicationDescriptor artifactDescriptor = new ApplicationDescriptor("temp");
     if (!urls.isEmpty()) {
       ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
 
