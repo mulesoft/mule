@@ -59,6 +59,7 @@ import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.mule.runtime.api.deployment.meta.MulePluginLoaderDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -126,7 +127,8 @@ public class MavenClassLoaderModelLoader {
    * attributes from the {@link MulePluginLoaderDescriptor#getAttributes()} map.
    *
    * @param pluginFolder {@link File} where the current plugin to work with.
-   * @param attributes
+   * @param attributes a set of attributes to work with, where the current implementation of this class will look for {@link MavenClassLoaderConstants#EXPORTED_PACKAGES}
+   *                   and {@link MavenClassLoaderConstants#EXPORTED_RESOURCES}
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
    * @see BundlePluginDependenciesResolver#getArtifactsWithDependencies(List, Set)
    */
@@ -175,12 +177,6 @@ public class MavenClassLoaderModelLoader {
       // Adding all needed jar's file dependencies
       classLoaderModelBuilder.containing(getUrl(pluginFolder, artifact.getFile()));
     });
-  }
-
-  private void loadClassLoaderModelBuilderFromDescriptor(File pluginFolder,
-                                                         ClassLoaderModelBuilder classLoaderModelBuilder,
-                                                         Map<String, Object> attributes) {
-
   }
 
   /**
