@@ -20,7 +20,7 @@
     }
   },
   "extensionModelLoaderDescriptor":{
-    "id":"annotations",
+    "id":"java",
     "attributes":{
       "type":"org.mule.test.heisenberg.extension.HeisenbergExtension",
       "version":"4.0-SNAPSHOT"
