@@ -179,7 +179,13 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
         else
         {
-            return pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(pass.toCharArray()));
+            PGPPrivateKey pgpPrivateKey = pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(pass.toCharArray()));
+            // We are still ignoring the keyID parameter, but at least fail if the obtained key doesn't match
+            if (pgpPrivateKey.getKeyID() != keyID)
+            {
+                throw new PGPException(String.format("User selected private key ID %s (through secretAliasId) but message was encrypted for key ID %s", pgpPrivateKey.getKeyID(), keyID));
+            }
+            return pgpPrivateKey;
         }
     }
 }
