@@ -372,7 +372,40 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(EmptyCategoryName.class),
                                                                    emptyMap(),
                                                                    SIMPLE_OUTPUT_RESOLVER,
-                                                                   SIMPLE_OUTPUT_RESOLVER));
+                                                                   NULL_RESOLVER_SUPPLIER));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void metadataResolverWithEmptyResolverName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage(endsWith("which has an empty resolver name"));
+
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER,
+                                                                   emptyMap(),
+                                                                   ResolverSupplier.of(EmptyResolverName.class),
+                                                                   NULL_RESOLVER_SUPPLIER));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void metadataResolverWithRepeatedResolverName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage(containsString("Resolver names should be unique for a given category"));
+    Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashedMap();
+    ParameterModel parameterModel = mock(ParameterModel.class);
+    when(parameterModel.getName()).thenReturn(PARAMETER_NAME);
+    when(parameterModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(java.util.Optional.empty());
+    when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(java.util.Optional.empty());
+    mockParameters(sourceModel, parameterModel);
+    inputResolvers.put(PARAMETER_NAME, ResolverSupplier.of(SimpleInputResolver.class));
+
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER,
+                                                                   inputResolvers,
+                                                                   SIMPLE_OUTPUT_RESOLVER,
+                                                                   NULL_RESOLVER_SUPPLIER));
     validate(extensionModel, validator);
   }
 
@@ -397,7 +430,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
     validate(extensionModel, validator);
   }
-
 
   @Test
   public void metadataKeyWithoutDefaultValues() {
