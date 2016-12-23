@@ -25,14 +25,9 @@ public class StoreProcedureOutputMetadataTestCase extends AbstractDbIntegrationT
 
   @Test
   public void updateMetadata() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata =
-        getMetadata("storedMetadata", "{ call getTestRecords() }");
-
+    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("storedMetadata", "{ call getTestRecords() }");
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getOutputMetadata().isSuccess(), is(true));
-    MetadataResult<TypeMetadataDescriptor> output = metadata.get().getOutputMetadata().get().getPayloadMetadata();
-    assertThat(output.isSuccess(), is(true));
-
-    assertThat(output.get().getType(), is(typeBuilder.objectType().build()));
+    TypeMetadataDescriptor output = metadata.get().getOutputMetadata().getPayloadMetadata();
+    assertThat(output.getType(), is(typeBuilder.objectType().build()));
   }
 }

@@ -36,7 +36,7 @@ public class AttachmentMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Input Metadata of an operation that requires input attachments")
   public void getUploadAttachmentMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(UPLOAD_ATTACHMENT, UPLOAD_ATTACHMENT);
-    MetadataType message = result.get().getInputMetadata().get().getParameterMetadata(MESSAGE_PARAM).get().getType();
+    MetadataType message = result.get().getInputMetadata().getParameterMetadata(MESSAGE_PARAM).getType();
     MetadataType body = getMessageBuilderFieldType(message, BODY_FIELD);
     assertThat(body, is(instanceOf(NullType.class)));
     ObjectType attachments = toObjectType(getMessageBuilderFieldType(message, ATTACHMENTS_FIELD));
@@ -49,7 +49,7 @@ public class AttachmentMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Input Metadata of an operation without attachments")
   public void getEchoMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_FLOW, ECHO);
-    MetadataType message = result.get().getInputMetadata().get().getParameterMetadata(MESSAGE_PARAM).get().getType();
+    MetadataType message = result.get().getInputMetadata().getParameterMetadata(MESSAGE_PARAM).getType();
     MetadataType attachments = getMessageBuilderFieldType(message, ATTACHMENTS_FIELD);
     assertThat(attachments, is(instanceOf(NullType.class)));
   }

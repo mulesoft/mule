@@ -18,18 +18,15 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
@@ -43,7 +40,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("selectMetadata", "select * from PLANET");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType(),
+    assertThat(metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType(),
                is(instanceOf(NullType.class)));
   }
 
@@ -55,7 +52,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
                     "select * from PLANET where id = #[payload.id] and name = #[message.outboundProperties.updateCount]");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType(),
+    assertThat(metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType(),
                is(typeBuilder.anyType().build()));
   }
 
@@ -66,7 +63,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
     assertThat(metadata.isSuccess(), is(true));
     ObjectType type =
-        (ObjectType) metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get().getType();
+        (ObjectType) metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType();
     assertThat(type.getFields().size(), equalTo(2));
 
     Optional<ObjectFieldType> id = type.getFieldByName("id");

@@ -200,7 +200,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, query);
 
     assertThat(metadata.isSuccess(), is(true));
-    return metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get();
+    return metadata.get().getInputMetadata().getParameterMetadata("inputParameters");
   }
 
   protected void assertFieldOfType(ObjectType record, String name, MetadataType type) {
@@ -211,16 +211,14 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
 
   protected void assertOutputPayload(MetadataResult<ComponentMetadataDescriptor> metadata, MetadataType type) {
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getOutputMetadata().isSuccess(), is(true));
-    MetadataResult<TypeMetadataDescriptor> output = metadata.get().getOutputMetadata().get().getPayloadMetadata();
-    assertThat(output.isSuccess(), is(true));
-    assertThat(output.get().getType(), is(type));
+    TypeMetadataDescriptor output = metadata.get().getOutputMetadata().getPayloadMetadata();
+    assertThat(output.getType(), is(type));
   }
 
   protected ParameterMetadataDescriptor getParameterValuesMetadata(String flow, String query) throws RegistrationException {
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, query);
     assertThat(metadata.isSuccess(), is(true));
-    return metadata.get().getInputMetadata().get().getParameterMetadata("parameterValues").get();
+    return metadata.get().getInputMetadata().getParameterMetadata("parameterValues");
   }
 
 }

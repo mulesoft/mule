@@ -13,10 +13,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.runtime.api.metadata.ConfigurationId;
@@ -28,11 +24,15 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
-
-import java.util.Set;
 
 @Features("Sockets Connector")
 @Stories("Metadata")
@@ -70,11 +70,11 @@ public class SocketMetadataTestCase extends SocketExtensionTestCase {
   public void resolveMetadata() {
     ComponentMetadataDescriptor metadataWithOutResponse =
         service.getMetadata(new ProcessorId("tcp-send-without-response", "0")).get();
-    assertThat(metadataWithOutResponse.getOutputMetadata().get().getPayloadMetadata().get().getType(),
+    assertThat(metadataWithOutResponse.getOutputMetadata().getPayloadMetadata().getType(),
                is(instanceOf(AnyType.class)));
 
     ComponentMetadataDescriptor metadataWithResponse = service.getMetadata(new ProcessorId("tcp-send-with-response", "0")).get();
-    assertThat(metadataWithResponse.getOutputMetadata().get().getPayloadMetadata().get().getType(),
+    assertThat(metadataWithResponse.getOutputMetadata().getPayloadMetadata().getType(),
                is(instanceOf(BinaryType.class)));
   }
 }

@@ -12,10 +12,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.AnyType;
@@ -34,16 +30,20 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.junit4.rule.DynamicPort;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
-import org.mule.service.http.api.domain.ParameterMap;
 
 import java.io.InputStream;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("HTTP Connector")
 @Stories("Metadata")
@@ -99,7 +99,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   public void getListenerMetadata() {
     MetadataResult<ComponentMetadataDescriptor> server = service.getMetadata(new SourceId("server"));
     assertThat(server.isSuccess(), is(true));
-    assertThat(server.get().getOutputMetadata().get().getPayloadMetadata().get().getType(), is(instanceOf(AnyType.class)));
+    assertThat(server.get().getOutputMetadata().getPayloadMetadata().getType(), is(instanceOf(AnyType.class)));
   }
 
   @Description("Resolves the MetadataKeys of a Request Configuration. The resolution of keys is done implicitly from" +
@@ -127,7 +127,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   private TypeMetadataDescriptor getMetadata(String flowName) {
     MetadataResult<ComponentMetadataDescriptor> result = service.getMetadata(new ProcessorId(flowName, "0"));
     assertThat(result.isSuccess(), is(true));
-    return result.get().getOutputMetadata().get().getPayloadMetadata().get();
+    return result.get().getOutputMetadata().getPayloadMetadata();
   }
 
   private void verifyAny(TypeMetadataDescriptor any) {

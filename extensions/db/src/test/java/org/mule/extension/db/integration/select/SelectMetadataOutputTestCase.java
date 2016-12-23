@@ -9,6 +9,7 @@ package org.mule.extension.db.integration.select;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.DbTestUtil.DbType.MYSQL;
 import static org.mule.extension.db.internal.domain.metadata.SelectMetadataResolver.DUPLICATE_COLUMN_LABEL_ERROR;
@@ -25,7 +26,6 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 
 import java.sql.Blob;
 import java.sql.Clob;
-import java.util.Optional;
 
 import org.junit.Test;
 
@@ -76,22 +76,17 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
   @Test
   public void selectInvalidJoin() throws Exception {
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("selectMetadata", "select NAME, NAME from PLANET");
-
     assertThat(metadata.isSuccess(), is(false));
-    assertThat(metadata.get().getOutputMetadata().isSuccess(), is(false));
-    Optional<MetadataFailure> failure = metadata.get().getOutputMetadata().getFailure();
-    assertThat(failure.isPresent(), is(true));
-    assertThat(failure.get().getFailureCode(), is(FailureCode.INVALID_METADATA_KEY));
-    assertThat(failure.get().getMessage(), is(DUPLICATE_COLUMN_LABEL_ERROR));
+    assertThat(metadata.getFailures(), hasSize(1));
+    MetadataFailure failure = metadata.getFailures().get(0);
+    assertThat(failure.getFailureCode(), is(FailureCode.INVALID_METADATA_KEY));
+    assertThat(failure.getMessage(), is(DUPLICATE_COLUMN_LABEL_ERROR));
   }
 
   private ObjectType getSelectOutputMetadata(String query) throws RegistrationException {
     MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("selectMetadata", query);
-
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getOutputMetadata().isSuccess(), is(true));
-    assertThat(metadata.get().getOutputMetadata().get().getPayloadMetadata().isSuccess(), is(true));
-    ArrayType output = (ArrayType) metadata.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
+    ArrayType output = (ArrayType) metadata.get().getOutputMetadata().getPayloadMetadata().getType();
     return (ObjectType) output.getType();
   }
 }
