@@ -6,18 +6,24 @@
  */
 package org.mule.util.store;
 
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.FileUtils;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.util.FileUtils.deleteTree;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class TextFileStoreTestCase extends AbstractMuleContextTestCase
 {
+
     public static final String DIR = ".mule/temp";
     TextFileObjectStore store;
 
@@ -25,7 +31,7 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        FileUtils.deleteTree(new File(DIR));
+        deleteTree(new File(DIR));
     }
 
     @Override
@@ -35,7 +41,7 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase
         {
             store.dispose();
         }
-        FileUtils.deleteTree(new File(DIR));
+        deleteTree(new File(DIR));
         super.doTearDown();
     }
 
@@ -43,175 +49,145 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase
     public void testTimedExpiry() throws Exception
     {
         // entryTTL=3 and expiryInterval=1 will cause background expiry
-        store = new TextFileObjectStore();
-        store.setDirectory(DIR);
-        store.setMuleContext(muleContext);
-        store.setName("timed");
-        store.setMaxEntries(3);
-        store.setEntryTTL(3000);
-        store.setExpirationInterval(1000);
-        store.initialise();
+        createObjectStore("timed", 3000, 1000);
 
         // store entries in quick succession
-        store.store("1", "1");
-        store.store("2", "2");
-        store.store("3", "3");
+        storeObjects("1", "2", "3");
 
         // they should still be alive at this point
-        assertTrue(store.contains("1"));
-        assertTrue(store.contains("2"));
-        assertTrue(store.contains("3"));
+        assertObjectsInStore("timed.dat", "1", "2", "3");
 
         // wait until the entry TTL has been exceeded
         Thread.sleep(4000);
 
         // make sure all values are gone
-        assertFalse(store.contains("1"));
-        assertFalse(store.contains("2"));
-        assertFalse(store.contains("3"));
+        assertObjectsExpired("timed.dat", "1", "2", "3");
     }
 
     @Test
     public void testTimedExpiryWithRestart() throws Exception
     {
         // entryTTL=3 and expiryInterval=1 will cause background expiry
-        store = new TextFileObjectStore();
-        store.setDirectory(DIR);
-        store.setMuleContext(muleContext);
-        store.setName("timed");
-        store.setMaxEntries(3);
-        store.setEntryTTL(3000);
-        store.setExpirationInterval(1000);
-        store.initialise();
+        createObjectStore("timed", 3000, 1000);
 
         // store entries in quick succession
-        store.store("1", "1");
-        store.store("2", "2");
-        store.store("3", "3");
+        storeObjects("1", "2", "3");
 
         // they should still be alive at this point
-        assertTrue(store.contains("1"));
-        assertTrue(store.contains("2"));
-        assertTrue(store.contains("3"));
+        assertObjectsInStore("timed.dat", "1", "2", "3");
 
         store.dispose();
 
-        store = new TextFileObjectStore();
-        store.setDirectory(DIR);
-        store.setMuleContext(muleContext);
-        store.setName("timed");
-        store.setMaxEntries(3);
-        store.setEntryTTL(3000);
-        store.setExpirationInterval(1000);
-        store.initialise();
+        createObjectStore("timed", 3000, 1000);
 
-        assertTrue(store.contains("1"));
-        assertTrue(store.contains("2"));
-        assertTrue(store.contains("3"));
+        assertObjectsInStore("timed.dat", "1", "2", "3");
 
         // wait until the entry TTL has been exceeded
         Thread.sleep(4000);
 
         // make sure all values are gone
-        assertFalse(store.contains("1"));
-        assertFalse(store.contains("2"));
-        assertFalse(store.contains("3"));
+        assertObjectsExpired("timed.dat", "1", "2", "3");
 
         store.dispose();
 
-        store = new TextFileObjectStore();
-        store.setDirectory(DIR);
-        store.setMuleContext(muleContext);
-        store.setName("timed");
-        store.setMaxEntries(3);
-        store.setEntryTTL(3000);
-        store.setExpirationInterval(1000);
-        store.initialise();
+        createObjectStore("timed", 3000, 1000);
 
         // make sure all values are gone
-        assertFalse(store.contains("1"));
-        assertFalse(store.contains("2"));
-        assertFalse(store.contains("3"));
+        assertObjectsExpired("timed.dat", "1", "2", "3");
     }
 
     @Test
     public void testTimedExpiryWithObjects() throws Exception
     {
-        // entryTTL=3 and expiryInterval=1 will cause background expiry
-        store = new TextFileObjectStore();
-        store.setDirectory(DIR);
-        store.setMuleContext(muleContext);
-        store.setName("timed");
-        store.setMaxEntries(3);
-        store.setEntryTTL(3000);
-        store.setExpirationInterval(1000);
-        store.initialise();
+        // entryTTL=3 and expirationInterval=1 will cause background expiry
+        createObjectStore("timed", 3000, 1000);
     }
 
     @Test
     public void testMaxSize() throws Exception
     {
         // entryTTL=-1 means we will have to expire manually
-        store = new TextFileObjectStore();
-        store.setDirectory(DIR);
-        store.setMuleContext(muleContext);
-        store.setName("bounded");
-        store.setMaxEntries(3);
-        store.setEntryTTL(-1);
-        store.setExpirationInterval(1000);
-        store.initialise();
+        createObjectStore("bounded", -1, 1000);
 
+        storeObjects("1", "2", "3");
 
-        store.store("1", "1");
-        store.store("2", "2");
-        store.store("3", "3");
-
-        assertTrue(store.contains("1"));
-        assertTrue(store.contains("2"));
-        assertTrue(store.contains("3"));
+        assertObjectsInStore("bounded.dat", "1", "2", "3");
 
         // sleep a bit to make sure that entries are not expired, even though the expiry
         // thread is running every second
         Thread.sleep(3000);
-        assertTrue(store.contains("1"));
-        assertTrue(store.contains("2"));
-        assertTrue(store.contains("3"));
+
+        assertObjectsInStore("bounded.dat", "1", "2", "3");
 
         // exceed threshold
-        store.store("4", "4");
+        storeObjects("4");
 
-        // the oldest entry should still be there
-        assertTrue(store.contains("1"));
-
-        // expire manually
+        // expire manually in case the expiration
+        // monitor has not update the store yet
         store.expire();
-        assertFalse(store.contains("1"));
-        assertTrue(store.contains("2"));
-        assertTrue(store.contains("3"));
-        assertTrue(store.contains("4"));
+
+        assertObjectsExpired("bounded.dat", "1");
+        assertObjectsInStore("bounded.dat", "2", "3", "4");
 
         // exceed some more
-        store.store("5", "5");
+        storeObjects("5");
+
         store.expire();
-        assertFalse(store.contains("2"));
-        assertTrue(store.contains("3"));
-        assertTrue(store.contains("4"));
-        assertTrue(store.contains("5"));
+
+        assertObjectsExpired("bounded.dat", "2");
+        assertObjectsInStore("bounded.dat", "3", "4", "5");
 
         // and multiple times
-        store.store("6", "6");
-        store.store("7", "7");
-        store.store("8", "8");
-        store.store("9", "9");
+        storeObjects("6", "7", "8", "9");
 
         store.expire();
-        assertTrue(store.contains("7"));
-        assertTrue(store.contains("8"));
-        assertTrue(store.contains("9"));
-        assertFalse(store.contains("3"));
-        assertFalse(store.contains("4"));
-        assertFalse(store.contains("5"));
-        assertFalse(store.contains("6"));
+
+        assertObjectsExpired("bounded.dat", "3", "4", "5");
+        assertObjectsInStore("bounded.dat", "7", "8", "9");
+    }
+
+    private void assertObjectsExpired(String file, String... identifiers) throws Exception
+    {
+        Properties props = new Properties();
+        props.load(new FileInputStream(new File(DIR + "/" + file)));
+
+        for (String id : identifiers)
+        {
+            assertThat(store.contains(id), equalTo(false));
+            assertThat(props.values(), not(hasItem(id)));
+        }
+    }
+
+    private void assertObjectsInStore(String file, String... identifiers) throws Exception
+    {
+        Properties props = new Properties();
+        props.load(new FileInputStream(new File(DIR + "/" + file)));
+
+        for (String id : identifiers)
+        {
+            assertThat(store.contains(id), equalTo(true));
+            assertThat(props.values(), hasItem(id));
+        }
+    }
+
+    private void storeObjects(String... objects) throws Exception
+    {
+        for (String entry : objects)
+        {
+            store.store(entry, entry);
+        }
+    }
+
+    private void createObjectStore(String fileName, int ttl, int expirationInterval) throws InitialisationException
+    {
+        store = new TextFileObjectStore();
+        store.setDirectory(DIR);
+        store.setMuleContext(muleContext);
+        store.setName(fileName);
+        store.setMaxEntries(3);
+        store.setEntryTTL(ttl);
+        store.setExpirationInterval(expirationInterval);
+        store.initialise();
     }
 
 }

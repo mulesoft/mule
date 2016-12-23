@@ -129,7 +129,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
         throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
     }
-    
+
     @Override
     public void clear() throws ObjectStoreException
     {
@@ -139,44 +139,75 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
         }
     }
 
-    @Override
-    public void expire()
+    protected int expireAndCount()
+    {
+        // first we trim the store according to max size
+        int expiredEntries = 0;
+
+        final long now = System.nanoTime();
+
+        Map.Entry<?, ?> oldestEntry;
+
+        purge:
+        while ((oldestEntry = store.firstEntry()) != null)
+        {
+            Long oldestKey = (Long) oldestEntry.getKey();
+            long oldestKeyValue = oldestKey.longValue();
+
+            if (TimeUnit.NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL)
+            {
+                store.remove(oldestKey);
+                expiredEntries++;
+            }
+            else
+            {
+                break purge;
+            }
+        }
+
+        return expiredEntries;
+    }
+
+    protected boolean isTrimNeeded(int currentSize)
+    {
+        return currentSize > maxEntries;
+    }
+
+    protected boolean isExpirationNeeded()
     {
         // this is not guaranteed to be precise, but we don't mind
         int currentSize = store.size();
 
-        // first trim to maxSize if necessary
-        currentSize = trimToMaxSize(currentSize);
+        // should expire further if entry TTLs are enabled
+        return entryTTL > 0 && currentSize != 0;
+    }
 
-        // expire further if entry TTLs are enabled
-        if ((entryTTL > 0) && (currentSize != 0))
+    @Override
+    public void expire()
+    {
+        int expiredEntries = doTrimAndExpire();
+
+        if (logger.isDebugEnabled() && expiredEntries != 0)
         {
-            final long now = System.nanoTime();
-            int expiredEntries = 0;
-            Map.Entry<?, ?> oldestEntry;
-
-            purge:
-            while ((oldestEntry = store.firstEntry()) != null)
-            {
-                Long oldestKey = (Long) oldestEntry.getKey();
-                long oldestKeyValue = oldestKey.longValue();
-
-                if (TimeUnit.NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL)
-                {
-                    store.remove(oldestKey);
-                    expiredEntries++;
-                }
-                else
-                {
-                    break purge;
-                }
-            }
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Expired " + expiredEntries + " old entries");
-            }
+            logger.debug("Expired " + expiredEntries + " old entries");
         }
+    }
+
+    protected int doTrimAndExpire()
+    {
+        int expiredEntries = 0;
+
+        if (isTrimNeeded(store.size()))
+        {
+            expiredEntries += trimToMaxSize(store.size());
+        }
+
+        if (isExpirationNeeded())
+        {
+            expiredEntries = trimToMaxSize(store.size());
+            expiredEntries += this.expireAndCount();
+        }
+        return expiredEntries;
     }
 
     private int trimToMaxSize(int currentSize)
@@ -200,7 +231,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
                 logger.debug("Expired " + excess + " excess entries");
             }
         }
-        return currentSize;
+        return excess;
     }
 
     @Override
