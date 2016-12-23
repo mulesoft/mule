@@ -18,7 +18,7 @@
         <resource>/META-INF/spring.schemas</resource>
     </exportedResources>
     <describer>
-        <id>annotations</id>
+        <id>java</id>
         <properties>
             <property key="type" value="org.mule.test.heisenberg.extension.HeisenbergExtension"/>
         </properties>
