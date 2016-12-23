@@ -87,7 +87,7 @@ public class QuartzConnector extends AbstractConnector
         String instanceName = factoryProperties.getProperty(QUARTZ_INSTANCE_NAME_PROPERTY);
         if (instanceName == null)
         {
-            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, "scheduler-" + muleContext.getConfiguration().getId());
+            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, "scheduler-" + muleContext.getConfiguration().getId() + "-" + getName());
         }
         else
         {
