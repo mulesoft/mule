@@ -21,7 +21,14 @@ public class CaseInsensitiveParameterMap extends ParameterMap
         this.paramsMap = new CaseInsensitiveMapWrapper<>(LinkedHashMap.class);
         for (String key : paramsMap.keySet())
         {
-            this.paramsMap.put(key, new LinkedList<>(paramsMap.getAll(key)));
+            LinkedList paramsMapValues = new LinkedList<>(paramsMap.getAll(key));
+
+            if(this.paramsMap.containsKey(key))
+            {
+                paramsMapValues.addAll(this.paramsMap.get(key));
+            }
+
+            this.paramsMap.put(key, paramsMapValues);
         }
     }
 }
