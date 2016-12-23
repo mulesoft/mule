@@ -40,24 +40,14 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
-import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -73,9 +63,9 @@ import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
-import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 
 import com.google.common.collect.ImmutableList;
 
@@ -109,12 +99,6 @@ import org.springframework.core.ResolvableType;
  * @since 3.7.0
  */
 public final class IntrospectionUtils {
-
-  private static final String CONFIGURATION = "configuration";
-  private static final String OPERATION = "operation";
-  private static final String CONNECTION_PROVIDER = "connection provider";
-  private static final String SOURCE = "source";
-  private static final String SOURCE_CALLBACK = "source callback";
 
   private IntrospectionUtils() {}
 
@@ -424,6 +408,10 @@ public final class IntrospectionUtils {
     }
   }
 
+  public static boolean isInstantiable(MetadataType type) {
+    return isInstantiable(getType(type));
+  }
+
   public static boolean isInstantiable(Class<?> declaringClass) {
     return isInstantiable(declaringClass, true);
   }
@@ -698,46 +686,6 @@ public final class IntrospectionUtils {
    */
   public static boolean isParameterContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType) {
     return (annotations.contains(ParameterGroup.class) || isMultiLevelMetadataKeyId(annotations, parameterType));
-  }
-
-  public static String getComponentModelTypeName(Object component) {
-    if (component instanceof OperationModel) {
-      return OPERATION;
-    } else if (component instanceof ConfigurationModel) {
-      return CONFIGURATION;
-    } else if (component instanceof ConnectionProviderModel) {
-      return CONNECTION_PROVIDER;
-    } else if (component instanceof SourceModel) {
-      return SOURCE;
-    } else if (component instanceof SourceCallbackModel) {
-      return SOURCE_CALLBACK;
-    }
-
-    throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",
-                                              component.toString(), CONFIGURATION, CONNECTION_PROVIDER, OPERATION, SOURCE));
-  }
-
-  public static String getComponentDeclarationTypeName(Object component) {
-    if (component instanceof OperationDeclaration) {
-      return OPERATION;
-    } else if (component instanceof ConfigurationDeclaration) {
-      return CONFIGURATION;
-    } else if (component instanceof ConnectionProviderDeclaration) {
-      return CONNECTION_PROVIDER;
-    } else if (component instanceof SourceDeclaration) {
-      return SOURCE;
-    }
-
-    throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",
-                                              component.toString(), CONFIGURATION, CONNECTION_PROVIDER, OPERATION, SOURCE));
-  }
-
-  public static String getModelName(Object model) {
-    if (model instanceof NamedObject) {
-      return ((NamedObject) model).getName();
-    }
-
-    throw new IllegalArgumentException(format("Model '%s' is not a named type"));
   }
 
   public static java.util.Optional<AnnotatedElement> getAnnotatedElement(BaseDeclaration<?> declaration) {

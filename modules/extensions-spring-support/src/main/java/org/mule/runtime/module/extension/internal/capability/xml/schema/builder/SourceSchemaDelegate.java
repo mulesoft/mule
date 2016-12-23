@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_REDELIVERY_POLICY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;

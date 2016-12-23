@@ -25,8 +25,8 @@ import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.ExceptionMapper;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.xml.dsl.api.resolver.SingleExtensionImportTypesStrategy;
+import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.resolver.SingleExtensionImportTypesStrategy;
 
 import java.util.Optional;
 import java.util.Set;

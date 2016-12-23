@@ -14,6 +14,8 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,13 +29,14 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber;
+import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,8 +79,16 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Discovered extension " + artifactPlugin.getArtifactName());
         }
+        //TODO: Remove when MULE-11136
         ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-        extensionManager.registerExtension(extensionManifest, artifactPlugin.getArtifactClassLoader().getClassLoader());
+        Map<String, Object> params = new HashMap<>();
+        params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
+        params.put(VERSION, extensionManifest.getVersion());
+
+        extensionManager.registerExtension(
+                                           new JavaExtensionModelLoader()
+                                               .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(),
+                                                                   params));
       } else {
         discoverExtensionThroughJsonDescriber(artifactPlugin, extensionManager);
       }
@@ -85,18 +96,20 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
   }
 
   /**
-   * Looks for an extension using the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file, where if available it will parse it calling the
-   * {@link XmlBasedDescriber} describer.
+   * Looks for an extension using the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file, where if available it will parse it
+   * using the {@link ExtensionModelLoader} which {@link ExtensionModelLoader#getId() id} matches the plugin's
+   * descriptor id.
    *
-   * @param artifactPlugin to introspect for the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} and further resources from its {@link ClassLoader}
+   * @param artifactPlugin   to introspect for the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} and further resources from its {@link ClassLoader}
    * @param extensionManager object to store the generated {@link ExtensionModel} if exists
    * @throws IllegalArgumentException if the {@link MulePluginModel#getExtensionModelLoaderDescriptor()} is present, and
-   * the ID in it wasn't discovered through SPI.
+   *                                  the ID in it wasn't discovered through SPI.
    */
   private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, ExtensionManagerAdapter extensionManager) {
     artifactPlugin.getDescriptor().getExtensionModelDescriptorProperty().ifPresent(descriptorProperty -> {
       if (!extensionsModelLoaders.containsKey(descriptorProperty.getId())) {
-        throw new IllegalArgumentException(format("The identifier '%s' does not match with the describers available to generate an ExtensionModel (working with the plugin '%s', existing identifiers to generate the %s are '%s')",
+        throw new IllegalArgumentException(format(
+                                                  "The identifier '%s' does not match with the describers available to generate an ExtensionModel (working with the plugin '%s', existing identifiers to generate the %s are '%s')",
                                                   descriptorProperty.getId(), artifactPlugin.getDescriptor().getName(),
                                                   ExtensionModel.class.getName(),
                                                   join(",", extensionsModelLoaders.keySet())));
@@ -149,7 +162,8 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
                        .append("] is being returned by the following classes [").append(classes).append("]");
                  });
     if (isNotBlank(sb.toString())) {
-      throw new IllegalStateException(format("There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
+      throw new IllegalStateException(format(
+                                             "There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
                                              providerClass.getName(), sb.toString()));
     }
     return extensionModelLoaders.stream().collect(Collectors.toMap(ExtensionModelLoader::getId, identity()));

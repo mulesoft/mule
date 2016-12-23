@@ -106,7 +106,6 @@ public class MacroExpansionModuleModel {
         ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
         if (extensionModel != null) {
 
-          // TODO(fernandezlautaro): MULE-11057	clean the usage of the HasOperationModels
           HasOperationModels hasOperationModels = extensionModel;
           final Optional<ConfigurationModel> configurationModel =
               extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME);

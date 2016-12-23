@@ -126,7 +126,6 @@
                 <!-- extensions API -->
                 <include>org.mule.extensions:mule-extensions-api</include>
                 <include>org.mule.extensions:mule-extensions-api-persistence</include>
-                <include>org.mule.extensions:mule-extensions-api-xml-dsl</include>
                 <include>org.mule.extensions:mule-extensions-api-dsql</include>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
@@ -205,7 +204,6 @@
                 <!--extensions API-->
                 <exclude>org.mule.extensions:mule-extensions-api</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-persistence</exclude>
-                <exclude>org.mule.extensions:mule-extensions-api-xml-dsl</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-dsql</exclude>
                 <!--Services-->
                 <exclude>org.mule.modules:mule-service-http-api</exclude>

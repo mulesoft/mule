@@ -8,20 +8,20 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TARGET_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
 
 import javax.xml.namespace.QName;
 
@@ -57,7 +57,7 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
   }
 
   private QName getOperationSubstitutionGroup(OperationModel operationModel) {
-    ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_OPERATOR);
+    Reference<QName> substitutionGroup = new Reference<>(MULE_ABSTRACT_OPERATOR);
     operationModel.getModelProperty(ExtendingOperationModelProperty.class)
         .ifPresent(property -> substitutionGroup.set(getSubstitutionGroup(property.getType())));
 

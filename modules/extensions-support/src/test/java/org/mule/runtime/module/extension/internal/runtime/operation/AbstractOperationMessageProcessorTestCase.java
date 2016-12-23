@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -58,16 +59,16 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
-import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -178,6 +179,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     });
 
     when(extensionModel.getName()).thenReturn(EXTENSION_NAMESPACE);
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     when(operationModel.getName()).thenReturn(getClass().getName());
     when(operationModel.isBlocking()).thenReturn(true);
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
@@ -240,6 +242,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationProvider.getConfigurationModel()).thenReturn(configurationModel);
     when(configurationProvider.getName()).thenReturn(configurationName);
 
+    when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
     connectionManager = new DefaultConnectionManager(context);
@@ -276,8 +279,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
-    messageProcessor.initialise();
     muleContext.getInjector().inject(messageProcessor);
+    messageProcessor.initialise();
     return messageProcessor;
   }
 

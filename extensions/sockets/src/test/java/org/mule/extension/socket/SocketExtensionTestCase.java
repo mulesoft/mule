@@ -11,13 +11,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -118,7 +117,7 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
 
   protected Message receiveConnection() {
     PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    ValueHolder<Message> messageHolder = new ValueHolder<>();
+    Reference<Message> messageHolder = new Reference<>();
     prober.check(new JUnitLambdaProbe(() -> {
       if (!receivedMessages.isEmpty()) {
         messageHolder.set(receivedMessages.remove(0));

@@ -7,10 +7,6 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
-
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -54,18 +50,6 @@ public class ExtensionProperties {
   public static final String ENCODING_PARAMETER_NAME = "outputEncoding";
 
   /**
-   * The name of a synthetic parameter that's automatically added to all non void operations. The meaning of it is requesting the
-   * runtime to place the resulting {@link Message} on a flowVar pointed by this parameter instead of replacing the message
-   * carried by the {@link Event} that's travelling through the pipeline
-   */
-  public static final String TARGET_ATTRIBUTE = "target";
-
-  /**
-   * The name of an attribute which allows referencing a {@link TlsContextFactory}
-   */
-  public static final String TLS_ATTRIBUTE_NAME = "tlsContext";
-
-  /**
    * The name of a file which contains each plugin's {@link ExtensionManifest}
    */
   public static final String EXTENSION_MANIFEST_FILE_NAME = "extension-manifest.xml";
@@ -76,30 +60,11 @@ public class ExtensionProperties {
   public static final String EXTENSION_MODEL_JSON_FILE_NAME = "extension-model.json";
 
   /**
-   * The name of a property which points to the {@link ClassLoader} that an extension should use
-   */
-  public static final String EXTENSION_CLASSLOADER = "extension_classloader";
-
-  /**
-   * The name of the parameter for configuring transactional actions
-   */
-  public static final String TRANSACTIONAL_ACTION_PARAMETER_NAME = "transactionalAction";
-
-  /**
-   * The name of the tab in which transaction parameters should appear
-   */
-  public static final String TRANSACTIONAL_TAB_NAME = "Transaction";
-
-  /**
    * The name of the tab in which advanced parameters should appear
    */
   public static final String ADVANCED_TAB_NAME = "Advanced";
 
-  /**
-   * The description of the parameter for configuring transactional actions
-   */
-  public static final String TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION =
-      "The type of joining action that operations can take regarding transactions.";
+  public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
 
   private ExtensionProperties() {}
 }

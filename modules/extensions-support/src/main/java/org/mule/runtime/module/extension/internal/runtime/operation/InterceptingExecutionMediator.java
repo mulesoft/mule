@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;

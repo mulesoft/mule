@@ -35,8 +35,8 @@ import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.util.Reference;
 
 import javax.xml.namespace.QName;
 
@@ -44,7 +44,7 @@ public final class SchemaTypeConversion {
 
   public static QName convertType(final MetadataType type, ExpressionSupport expressionSupport) {
     final boolean dynamic = acceptsExpressions(expressionSupport);
-    final ValueHolder<QName> qName = new ValueHolder<>();
+    final Reference<QName> qName = new Reference<>(null);
     type.accept(new MetadataTypeVisitor() {
 
       @Override

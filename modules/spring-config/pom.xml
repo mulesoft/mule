@@ -163,10 +163,5 @@
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.extensions</groupId>
-            <artifactId>mule-extensions-api-xml-dsl</artifactId>
-            <version>${muleExtensionsApiVersion}</version>
-        </dependency>
     </dependencies>
 </project>

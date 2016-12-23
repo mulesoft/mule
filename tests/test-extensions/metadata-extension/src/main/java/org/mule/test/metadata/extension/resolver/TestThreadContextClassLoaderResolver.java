@@ -13,16 +13,16 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.util.Reference;
 
 import java.util.Set;
 
 public class TestThreadContextClassLoaderResolver
     implements TypeKeysResolver, InputTypeResolver<String>, OutputTypeResolver<String> {
 
-  private static ValueHolder<ClassLoader> contextClassLoader = new ValueHolder<>();
+  private static Reference<ClassLoader> contextClassLoader = new Reference<>();
 
   public static void reset() {
     contextClassLoader.set(null);

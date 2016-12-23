@@ -12,9 +12,8 @@ import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 

@@ -51,7 +51,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
-import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;

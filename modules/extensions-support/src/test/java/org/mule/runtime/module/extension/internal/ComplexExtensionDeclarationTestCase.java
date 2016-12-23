@@ -28,24 +28,46 @@ import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase {
+public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
-  private final TestHttpConnectorDeclarer reference = new TestHttpConnectorDeclarer();
+  private ExtensionModel extensionModel;
+
+  @Before
+  public void before() {
+    extensionModel = new ExtensionModelLoader() {
+
+      @Override
+      public String getId() {
+        return "test";
+      }
+
+      @Override
+      protected void declareExtension(ExtensionLoadingContext context) {
+        new TestHttpConnectorDeclarer().declareOn(context.getExtensionDeclarer());
+      }
+    }.loadExtensionModel(getClass().getClassLoader(), new HashMap<>());
+  }
+
 
   @Test
   public void assertDeclaration() {
@@ -121,10 +143,5 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
     ConnectionProviderModel provider =
         extensionModel.getConfigurationModel(REQUESTER_CONFIG_NAME).get().getConnectionProviders().get(0);
     assertThat(provider.getName(), is(REQUESTER_PROVIDER));
-  }
-
-  @Override
-  protected ExtensionDeclarer createDeclarationDescriptor() {
-    return reference.getExtensionDeclarer();
   }
 }

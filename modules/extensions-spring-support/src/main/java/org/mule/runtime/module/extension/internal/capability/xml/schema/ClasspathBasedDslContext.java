@@ -7,19 +7,13 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.util.annotation.AnnotationUtils.getAnnotation;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.reflections.util.ClasspathHelper.forClassLoader;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
 
 import java.net.URL;
 import java.util.Collection;
@@ -44,8 +38,6 @@ class ClasspathBasedDslContext implements DslResolvingContext {
   private final ClassLoader classLoader;
   private final Map<String, Class<?>> extensionsByName = new HashMap<>();
   private final Map<String, ExtensionModel> resolvedModels = new HashMap<>();
-  private final ExtensionFactory extensionFactory =
-      new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
 
   ClasspathBasedDslContext(ClassLoader classLoader) {
     this.classLoader = classLoader;
@@ -57,13 +49,11 @@ class ClasspathBasedDslContext implements DslResolvingContext {
    */
   @Override
   public Optional<ExtensionModel> getExtension(String name) {
-
     if (!resolvedModels.containsKey(name) && extensionsByName.containsKey(name)) {
-      Describer describer = new AnnotationsBasedDescriber(extensionsByName.get(name), new StaticVersionResolver("4.0"));
-      DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
-      resolvedModels.put(name, extensionFactory.createFrom(describer.describe(context), context));
+      resolvedModels.put(name, loadExtension(extensionsByName.get(name)));
     }
-    return Optional.ofNullable(resolvedModels.get(name));
+
+    return ofNullable(resolvedModels.get(name));
   }
 
   private void findExtensionsInClasspath() {

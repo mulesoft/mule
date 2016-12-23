@@ -9,15 +9,18 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
@@ -53,7 +56,6 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
@@ -62,16 +64,18 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
-import org.mule.runtime.module.extension.internal.model.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -82,7 +86,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -536,6 +542,16 @@ public class MuleExtensionUtils {
 
   private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
     return dslModel.getNamespace().toUpperCase();
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz) {
+    return loadExtension(clazz, new HashMap<>());
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
+    params.put(TYPE_PROPERTY_NAME, clazz.getName());
+    params.put(VERSION, getProductVersion());
+    return new JavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), params);
   }
 
   private static class NamedObjectComparator implements Comparator<NamedObject> {

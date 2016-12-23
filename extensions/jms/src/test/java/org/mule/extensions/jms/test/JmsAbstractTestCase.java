@@ -23,9 +23,9 @@ import org.mule.extensions.jms.api.message.JmsHeaders;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -69,7 +69,7 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
 
   protected Message receiveIncomingMessage() {
     PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    ValueHolder<Message> messageHolder = new ValueHolder<>();
+    Reference<Message> messageHolder = new Reference<>();
     prober.check(new JUnitLambdaProbe(() -> {
       if (!receivedMessages.isEmpty()) {
         messageHolder.set(receivedMessages.remove(0));

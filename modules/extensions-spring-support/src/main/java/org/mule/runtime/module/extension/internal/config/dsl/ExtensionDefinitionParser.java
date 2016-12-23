@@ -33,6 +33,7 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -41,20 +42,20 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.util.TemplateParser;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValueResolverParsingDelegate;
@@ -65,10 +66,9 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDeleg
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
-import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
-import org.mule.runtime.module.extension.internal.introspection.describer.FunctionParameterTypeModelProperty;
-import org.mule.runtime.module.extension.internal.introspection.describer.ParameterResolverTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.FunctionParameterTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
@@ -515,7 +515,7 @@ public abstract class ExtensionDefinitionParser {
     }
 
     if (resolver == null && value != null) {
-      final ValueHolder<ValueResolver> resolverValueHolder = new ValueHolder<>();
+      final Reference<ValueResolver> resolverValueHolder = new Reference<>();
       expectedType.accept(new BasicTypeMetadataVisitor() {
 
         @Override

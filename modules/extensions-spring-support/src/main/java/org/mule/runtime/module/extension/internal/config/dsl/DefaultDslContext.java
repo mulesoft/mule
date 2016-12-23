@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
 
 import java.util.Optional;
 

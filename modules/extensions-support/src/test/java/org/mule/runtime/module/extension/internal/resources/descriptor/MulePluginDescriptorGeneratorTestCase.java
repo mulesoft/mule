@@ -9,28 +9,21 @@ package org.mule.runtime.module.extension.internal.resources.descriptor;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.io.InputStream;
 import java.util.Optional;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedResourceFactoryTestCase {
@@ -41,12 +34,7 @@ public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedReso
 
   @Before
   public void before() {
-    Describer describer =
-        new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
-    ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
-    final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
-
-    extensionModel = extensionFactory.createFrom(describer.describe(context), context);
+    extensionModel = loadExtension(HeisenbergExtension.class);
   }
 
   @Override

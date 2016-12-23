@@ -7,17 +7,17 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;

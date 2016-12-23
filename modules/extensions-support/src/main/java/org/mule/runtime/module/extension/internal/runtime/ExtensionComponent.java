@@ -31,6 +31,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -72,6 +73,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider, FlowConstructAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
+
   protected final ExtensionManagerAdapter extensionManager;
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
@@ -79,6 +81,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   private final ConfigurationProvider configurationProvider;
   private final MetadataMediator metadataMediator;
   private final ClassTypeLoader typeLoader;
+  private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
@@ -268,7 +271,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    * @return a configuration instance for the current component with a given {@link Event}
    */
   protected Optional<ConfigurationInstance> getConfiguration(Event event) {
-    if (!requiresConfig(componentModel)) {
+    if (!requiresConfig.get()) {
       return empty();
     }
 
@@ -290,13 +293,17 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   }
 
   private Optional<ConfigurationProvider> findConfigurationProvider() {
-    if (requiresConfig(componentModel)) {
+    if (requiresConfig.get()) {
       return isConfigurationSpecified()
           ? of(configurationProvider)
           : getConfigurationProviderByModel();
     }
 
     return empty();
+  }
+
+  private boolean computeRequiresConfig() {
+    return requiresConfig(extensionModel, componentModel);
   }
 
   private Optional<ConfigurationProvider> getConfigurationProviderByModel() {

@@ -12,15 +12,15 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.LOADER_ID;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 
 import java.util.Optional;
@@ -52,7 +52,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
         .addProperty(EXPORTED_PACKAGES, exportCollector.getExportedPackages())
         .addProperty(EXPORTED_RESOURCES, exportCollector.getExportedResources());
     builder.withExtensionModelDescriber()
-        .setId(DESCRIBER_ID)
+        .setId(LOADER_ID)
         .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())
         //TODO(fernandezlautaro): MULE-11136 remove this property when the manifest is dropped as generating an extension model should not require version
         .addProperty("version", extensionModel.getVersion());

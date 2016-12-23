@@ -14,26 +14,25 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
-
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
-import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
@@ -207,8 +206,8 @@ final class MetadataKeyIdObjectResolver {
 
   private abstract class KeyMetadataTypeVisitor extends MetadataTypeVisitor {
 
-    private final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
-    private final ValueHolder<MetadataResolvingException> exceptionValueHolder = new ValueHolder<>();
+    private final Reference<Object> keyValueHolder = new Reference<>();
+    private final Reference<MetadataResolvingException> exceptionValueHolder = new Reference<>();
     private String id;
     private Class metadataKeyType;
 

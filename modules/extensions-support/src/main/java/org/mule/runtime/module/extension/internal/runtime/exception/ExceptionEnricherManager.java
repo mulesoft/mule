@@ -14,7 +14,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
-import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;

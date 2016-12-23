@@ -12,7 +12,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 

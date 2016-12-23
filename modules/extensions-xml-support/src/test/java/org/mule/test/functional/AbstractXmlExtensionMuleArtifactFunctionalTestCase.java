@@ -7,23 +7,19 @@
 package org.mule.test.functional;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.declaration.DescribingContext;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
-import org.mule.runtime.extension.internal.introspection.describer.XmlBasedDescriber;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.
@@ -58,14 +54,10 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
         initialiseIfNeeded(extensionManager, muleContext);
 
         ClassLoader pluginClassLoader = getClass().getClassLoader();
-        DescribingContext context = new DefaultDescribingContext(pluginClassLoader);
-        ExtensionFactory defaultExtensionFactory =
-            new DefaultExtensionFactory(new SpiServiceRegistry(), muleContext.getExecutionClassLoader());
-        XmlBasedDescriber describer = new XmlBasedDescriber(getModulePath());
-        ExtensionModel extensionModel =
-            withContextClassLoader(pluginClassLoader,
-                                   () -> defaultExtensionFactory.createFrom(describer.describe(context), context));
+        Map<String, Object> params = new HashMap<>();
+        params.put(XmlExtensionModelLoader.RESOURCE_XML, getModulePath());
 
+        ExtensionModel extensionModel = new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), params);
         extensionManager.registerExtension(extensionModel);
       }
     });
