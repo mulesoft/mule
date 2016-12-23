@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
 import static org.mule.test.runner.classification.DefaultWorkspaceReader.findClassPathURL;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -47,6 +46,8 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
 
   private Artifact artifact;
   private File bar;
+  private List<URL> urls;
+  private File targetClasses;
 
   @Before
   public void before() throws Exception {
@@ -54,17 +55,20 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
 
     bar = new File(temporaryFolder.newFolder(ORG_FOO_FOLDER), BAR);
     if (!bar.exists()) {
-      assumeThat(bar.mkdir(), is(true));
+      assertThat(bar.mkdir(), is(true));
     }
+    setUpTargetClassesFolder();
+  }
+
+  private void setUpTargetClassesFolder() throws Exception {
+    urls = newArrayList();
+    targetClasses = new File(new File(bar, TARGET), CLASSES);
+    assertThat(targetClasses.mkdirs(), is(true));
+    urls.add(targetClasses.toURI().toURL());
   }
 
   @Test
   public void handleEncodedURLs() throws Exception {
-    List<URL> urls = newArrayList();
-    File targetClasses = new File(new File(bar, TARGET), CLASSES);
-    assumeThat(targetClasses.mkdirs(), is(true));
-    urls.add(targetClasses.toURI().toURL());
-
     File result = findClassPathURL(artifact, bar, urls);
     assertThat(result, not(nullValue()));
     assertThat(result, equalTo(targetClasses));
@@ -72,12 +76,8 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void handleTestAndTargetClassesURLs() throws Exception {
-    List<URL> urls = newArrayList();
-    File targetClasses = new File(new File(bar, TARGET), CLASSES);
-    assumeThat(targetClasses.mkdirs(), is(true));
-    urls.add(targetClasses.toURI().toURL());
     File targetTestClasses = new File(new File(bar, TARGET), TEST_CLASSES);
-    assumeThat(targetTestClasses.mkdirs(), is(true));
+    assertThat(targetTestClasses.mkdirs(), is(true));
     urls.add(targetTestClasses.toURI().toURL());
 
     File result = findClassPathURL(artifact, bar, urls);
