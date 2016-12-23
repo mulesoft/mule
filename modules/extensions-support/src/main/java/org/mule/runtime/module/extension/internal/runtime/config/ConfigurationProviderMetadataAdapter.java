@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
@@ -67,9 +67,8 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
       addComponentKeys(getConfigurationModel().getOperationModels(), metadataContext, keysBuilder);
       addComponentKeys(getConfigurationModel().getSourceModels(), metadataContext, keysBuilder);
     } catch (Exception e) {
-      return failure(null, format("%s: %s"), e);
+      return failure(newFailure(e).onKeys());
     }
-
     return success(keysBuilder.build());
   }
 

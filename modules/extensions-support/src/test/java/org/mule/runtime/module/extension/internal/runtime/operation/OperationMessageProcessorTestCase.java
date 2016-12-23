@@ -322,17 +322,17 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     assertThat(metadata.isSuccess(), is(true));
 
-    MetadataResult<OutputMetadataDescriptor> outputMetadataDescriptor = metadata.get().getOutputMetadata();
+    OutputMetadataDescriptor outputMetadataDescriptor = metadata.get().getOutputMetadata();
 
-    MetadataResult<TypeMetadataDescriptor> payloadMetadata = outputMetadataDescriptor.get().getPayloadMetadata();
-    assertThat(payloadMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
+    TypeMetadataDescriptor payloadMetadata = outputMetadataDescriptor.getPayloadMetadata();
+    assertThat(payloadMetadata.getType(), is(TYPE_BUILDER.booleanType().build()));
 
-    MetadataResult<TypeMetadataDescriptor> attributesMetadata = outputMetadataDescriptor.get().getAttributesMetadata();
-    assertThat(attributesMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
+    TypeMetadataDescriptor attributesMetadata = outputMetadataDescriptor.getAttributesMetadata();
+    assertThat(attributesMetadata.getType(), is(TYPE_BUILDER.booleanType().build()));
 
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("content").get().getType(),
+    assertThat(metadata.get().getInputMetadata().getParameterMetadata("content").getType(),
                is(TYPE_BUILDER.stringType().build()));
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("type").get().getType(), is(stringType));
+    assertThat(metadata.get().getInputMetadata().getParameterMetadata("type").getType(), is(stringType));
   }
 
   @Test
@@ -348,9 +348,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     final MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata();
     assertThat(metadata.isSuccess(), is(true));
-    final MetadataResult<OutputMetadataDescriptor> outputMetadata = metadata.get().getOutputMetadata();
-    assertThat(outputMetadata.isSuccess(), is(true));
-    assertThat(outputMetadata.get().getPayloadMetadata().get().getType(), is(objectType));
+    OutputMetadataDescriptor outputMetadata = metadata.get().getOutputMetadata();
+    assertThat(outputMetadata.getPayloadMetadata().getType(), is(objectType));
 
     verify(resolverSet.getResolvers(), times(1));
   }

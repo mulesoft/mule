@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.outputDescriptor;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.metadata.api.model.MetadataType;
@@ -24,6 +26,10 @@ import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+
 /**
  * Metadata service delegate implementations that handles the resolution
  * of a {@link ComponentModel} {@link OutputMetadataDescriptor}
@@ -32,7 +38,7 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
  */
 class MetadataOutputDelegate extends BaseMetadataDelegate {
 
-  public MetadataOutputDelegate(ComponentModel componentModel) {
+  MetadataOutputDelegate(ComponentModel componentModel) {
     super(componentModel);
   }
 
@@ -47,23 +53,25 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * resolution fails for any reason.
    */
   MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, Object key) {
-    MetadataResult<MetadataType> outputMetadataResult = getOutputMetadata(context, key);
-    MetadataResult<MetadataType> attributesMetadataResult = getOutputAttributesMetadata(context, key);
+    MetadataResult<MetadataType> output = getOutputMetadata(context, key);
+    MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
 
-    MetadataResult<TypeMetadataDescriptor> outputDescriptor = toMetadataDescriptorResult(component.getOutput().getType(),
-                                                                                         component.getOutput().hasDynamicType(),
-                                                                                         outputMetadataResult);
+    MetadataResult<TypeMetadataDescriptor> outputDescriptor =
+        toMetadataDescriptorResult(component.getOutput().getType(), component.getOutput().hasDynamicType(), output);
     MetadataResult<TypeMetadataDescriptor> attributesDescriptor =
-        toMetadataDescriptorResult(component.getOutputAttributes().getType(), false,
-                                   attributesMetadataResult);
+        toMetadataDescriptorResult(component.getOutputAttributes().getType(), false, attributes);
 
     OutputMetadataDescriptor descriptor =
-        outputDescriptor().withReturnType(outputDescriptor).withAttributesType(attributesDescriptor).build();
+        outputDescriptor().withReturnType(outputDescriptor.get()).withAttributesType(attributesDescriptor.get()).build();
 
-    if (!outputMetadataResult.isSuccess() || !attributesMetadataResult.isSuccess()) {
-      return mergeFailures(descriptor, outputMetadataResult, attributesMetadataResult);
+    if (!output.isSuccess() || !attributes.isSuccess()) {
+      List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
+          .addAll(output.getFailures())
+          .addAll(attributes.getFailures())
+          .build();
+
+      return failure(descriptor, failures);
     }
-
     return success(descriptor);
   }
 
@@ -80,9 +88,20 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
       return success(output.getType());
     }
-
-    return resolveMetadataType(false, output.getType(),
-                               () -> resolverFactory.getOutputResolver().getOutputType(context, key), "Output");
+    try {
+      MetadataType metadata = resolverFactory.getOutputResolver().getOutputType(context, key);
+      if (isMetadataResolvedCorrectly(metadata, false)) {
+        return success(metadata);
+      }
+      MetadataFailure failure = newFailure()
+          .withMessage("Error resolving Output Payload metadata")
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onOutputPayload();
+      return failure(output.getType(), failure);
+    } catch (Exception e) {
+      return failure(output.getType(), newFailure(e).onOutputAttributes());
+    }
   }
 
   /**
@@ -98,26 +117,31 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
     }
-
-    return resolveMetadataType(false, attributes.getType(),
-                               () -> resolverFactory.getOutputAttributesResolver().getAttributesType(context, key),
-                               "OutputAttributes");
+    try {
+      MetadataType metadata = resolverFactory.getOutputAttributesResolver().getAttributesType(context, key);
+      if (isMetadataResolvedCorrectly(metadata, false)) {
+        return success(metadata);
+      }
+      MetadataFailure failure = newFailure()
+          .withMessage("Error resolving Output Attributes metadata")
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onOutputAttributes();
+      return failure(attributes.getType(), failure);
+    } catch (Exception e) {
+      return failure(attributes.getType(), newFailure(e).onOutputAttributes());
+    }
   }
 
-  private MetadataResult<TypeMetadataDescriptor> toMetadataDescriptorResult(MetadataType type, boolean isDynamic,
+  private MetadataResult<TypeMetadataDescriptor> toMetadataDescriptorResult(MetadataType type,
+                                                                            boolean isDynamic,
                                                                             MetadataResult<MetadataType> result) {
     MetadataType resultingType = result.get() == null ? type : result.get();
-
     TypeMetadataDescriptor descriptor = typeDescriptor()
         .withType(resultingType)
         .dynamic(isDynamic)
         .build();
 
-    if (result.isSuccess()) {
-      return success(descriptor);
-    }
-    MetadataFailure failure = result.getFailure().get();
-    return failure(descriptor, failure.getMessage(), failure.getFailureCode(), failure.getReason());
+    return result.isSuccess() ? success(descriptor) : failure(descriptor, result.getFailures());
   }
-
 }

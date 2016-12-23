@@ -10,6 +10,7 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.metadata.ComponentId;
@@ -171,9 +172,9 @@ public class MuleMetadataService implements MetadataService, Initialisable {
     try {
       return producer.get();
     } catch (InvalidComponentIdException e) {
-      return failure(e, e.getFailureCode());
+      return failure(newFailure(e).withFailureCode(e.getFailureCode()).onComponent());
     } catch (Exception e) {
-      return failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
+      return failure(newFailure(e).onComponent());
     }
   }
 

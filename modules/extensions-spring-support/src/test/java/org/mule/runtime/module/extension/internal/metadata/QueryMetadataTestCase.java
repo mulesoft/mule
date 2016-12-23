@@ -71,7 +71,7 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
     MetadataResult<ComponentMetadataDescriptor> entityMetadata = getComponentDynamicMetadata(dsqlKey);
     assertThat(entityMetadata.isSuccess(), is(true));
 
-    TypeMetadataDescriptor descriptor = entityMetadata.get().getOutputMetadata().get().getPayloadMetadata().get();
+    TypeMetadataDescriptor descriptor = entityMetadata.get().getOutputMetadata().getPayloadMetadata();
     MetadataType generatedType = descriptor.getType();
     assertThat(generatedType, is(instanceOf(ArrayType.class)));
 
@@ -89,7 +89,7 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
     MetadataResult<ComponentMetadataDescriptor> entityMetadata = getComponentDynamicMetadata(nativeKey);
 
     assertThat(entityMetadata.isSuccess(), is(true));
-    TypeMetadataDescriptor output = entityMetadata.get().getOutputMetadata().get().getPayloadMetadata().get();
+    TypeMetadataDescriptor output = entityMetadata.get().getOutputMetadata().getPayloadMetadata();
     assertThat(output.getType(), is(CIRCLE_TYPE));
   }
 }

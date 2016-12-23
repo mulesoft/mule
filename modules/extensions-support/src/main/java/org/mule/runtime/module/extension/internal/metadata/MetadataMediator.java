@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.componentDescriptor;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -24,6 +24,7 @@ import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
@@ -33,6 +34,8 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,11 +68,8 @@ public class MetadataMediator {
     this.outputDelegate = new MetadataOutputDelegate(componentModel);
     this.inputDelegate = new MetadataInputDelegate(componentModel);
 
-    final Optional<MetadataKeyIdModelProperty> optionalKeyIdModelProperty =
-        componentModel.getModelProperty(MetadataKeyIdModelProperty.class);
-    if (optionalKeyIdModelProperty.isPresent()) {
-      keyContainerName = optionalKeyIdModelProperty.get().getParameterName();
-    }
+    componentModel.getModelProperty(MetadataKeyIdModelProperty.class)
+        .ifPresent(keyIdMP -> keyContainerName = keyIdMP.getParameterName());
   }
 
   /**
@@ -102,7 +102,7 @@ public class MetadataMediator {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
       return getMetadata(context, p -> resolvedKey);
     } catch (MetadataResolvingException e) {
-      return failure(e, e.getFailure());
+      return failure(newFailure(e).onComponent());
     }
   }
 
@@ -129,11 +129,21 @@ public class MetadataMediator {
     MetadataResult<OutputMetadataDescriptor> output = outputDelegate.getOutputMetadataDescriptor(context, keyValue);
     MetadataResult<InputMetadataDescriptor> input = inputDelegate.getInputMetadataDescriptors(context, keyValue);
     ComponentMetadataDescriptor componentDescriptor = componentDescriptor(component.getName())
-        .withInputDescriptor(input)
-        .withOutputDescriptor(output)
+        .withInputDescriptor(input.get())
+        .withOutputDescriptor(output.get())
         .build();
 
-    return mergeResults(componentDescriptor, output, input);
+
+    if (output.isSuccess() && input.isSuccess()) {
+      return success(componentDescriptor);
+    }
+
+    List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
+        .addAll(output.getFailures())
+        .addAll(input.getFailures())
+        .build();
+
+    return failure(componentDescriptor, failures);
   }
 
   private MetadataResult<Object> getMetadataKeyObjectValue(ParameterValueResolver metadataKeyResolver) {
@@ -141,7 +151,7 @@ public class MetadataMediator {
       Object keyValue = getContainerName().isPresent() ? metadataKeyResolver.getParameterValue(getContainerName().get()) : null;
       return success(keyValue);
     } catch (Exception e) {
-      return failure(e);
+      return failure(newFailure(e).onComponent());
     }
   }
 
