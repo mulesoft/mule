@@ -6,7 +6,9 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -23,12 +25,10 @@ import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -99,8 +99,30 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         flow.process(event);
 
         final Collection<String> values = headers.get("testName1");
-        assertThat(values, Matchers.containsInAnyOrder(Arrays.asList("testValue1", "testValueNew").toArray(new String[2])));
+        assertThat(values, containsInAnyOrder(asList("testValue1", "testValueNew", "testValue2").toArray()));
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
+    }
+
+    @Test
+    public void overridesHeadersCaseInsensitive() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("headerOverrideCaseInsensitive");
+
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("testName1", "testValueNewHeadersExpression1");
+        params.put("TestName1", "testValueNewHeadersExpression2");
+        params.put("testName2", "testValue2NewHeadersExpression");
+
+        event.getMessage().setInvocationProperty("headers", params);
+
+        flow.process(event);
+
+        final Collection<String> values = headers.get("testName1");
+        assertThat(values, containsInAnyOrder(asList("testValueNewHeadersExpression1", "testValueNewHeadersExpression2", "testValueConfigHeader1", "testValueConfigHeader2", "testValueOutboundPropertyInConfigXml").toArray()));
+        assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2NewHeadersExpression"));
     }
 
     @Test

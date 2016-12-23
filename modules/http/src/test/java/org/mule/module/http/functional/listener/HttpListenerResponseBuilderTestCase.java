@@ -74,6 +74,9 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public SystemProperty headerDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
 
     @Rule
+    public SystemProperty headerDuplicatesAndDifferentCaseResponseBuilderPath = new SystemProperty("headerDuplicatesAndDifferentCaseResponseBuilderPath","headerDuplicatesAndDifferentCaseResponseBuilderPath");
+
+    @Rule
     public SystemProperty errorEmptyResponseBuilderPath = new SystemProperty("emptyResponseBuilderPath","emptyResponseBuilderPath");
 
     @Rule
@@ -86,7 +89,10 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public SystemProperty errorHeadersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
 
     @Rule
-    public SystemProperty errorHeaderDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
+    public SystemProperty errorHeaderDuplicatesResponseBuilderPath = new SystemProperty("errorHeaderDuplicatesResponseBuilderPath","errorHeaderDuplicatesResponseBuilderPath");
+
+    @Rule
+    public SystemProperty errorHeaderDuplicatesAndDifferentCaseResponseBuilderPath = new SystemProperty("errorHeaderDuplicatesAndDifferentCaseResponseBuilderPath","errorHeaderDuplicatesAndDifferentCaseResponseBuilderPath");
 
     @Rule
     public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath = new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath","responseBuilderAndErrorResponseBuilderNotTheSamePath");
@@ -174,6 +180,13 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void headerWithDuplicatesAndDifferentCaseResponseBuilder() throws Exception
+    {
+        final String url = getUrl(headerDuplicatesAndDifferentCaseResponseBuilderPath);
+        headersWithDuplicatesResponseBuilderTest(url);
+    }
+
+    @Test
     public void errorEmptyResponseBuilder() throws Exception
     {
         final String url = getUrl(errorEmptyResponseBuilderPath);
@@ -203,6 +216,13 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
 
     @Test
     public void errorHeaderWithDuplicatesResponseBuilder() throws Exception
+    {
+        final String url = getUrl(errorHeaderDuplicatesResponseBuilderPath);
+        headersWithDuplicatesResponseBuilderTest(url);
+    }
+
+    @Test
+    public void errorHeaderWithDuplicatesAndDifferentCaseResponseBuilder() throws Exception
     {
         final String url = getUrl(errorHeaderDuplicatesResponseBuilderPath);
         headersWithDuplicatesResponseBuilderTest(url);
