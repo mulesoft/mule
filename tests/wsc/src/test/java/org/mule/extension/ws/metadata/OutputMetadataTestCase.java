@@ -47,7 +47,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Output Body Metadata for an operation that returns a simple string")
   public void getEchoOutputBodyMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_FLOW, ECHO);
-    MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
+    MetadataType type = result.get().getOutputMetadata().getPayloadMetadata().getType();
     Collection<ObjectFieldType> resultFields = toObjectType(type).getFields();
     assertThat(resultFields, hasSize(1));
     ObjectType echoType = toObjectType(resultFields.iterator().next().getValue());
@@ -62,7 +62,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Output Body Metadata for an operation that returns a complex element")
   public void getEchoAccountOutputBodyMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
-    MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
+    MetadataType type = result.get().getOutputMetadata().getPayloadMetadata().getType();
     Collection<ObjectFieldType> operationFields = toObjectType(type).getFields();
     assertThat(operationFields, hasSize(1));
     ObjectType echoType = toObjectType(operationFields.iterator().next().getValue());
@@ -78,7 +78,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Output Attributes Metadata for an operation without output soap headers")
   public void getEchoOutputAttributesMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_FLOW, ECHO);
-    MetadataType type = result.get().getOutputMetadata().get().getAttributesMetadata().get().getType();
+    MetadataType type = result.get().getOutputMetadata().getAttributesMetadata().getType();
     Collection<ObjectFieldType> attributeFields = toObjectType(type).getFields();
     assertThat(attributeFields, hasSize(2));
 
@@ -93,7 +93,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Output Attributes Metadata for an operation with output soap headers")
   public void getEchoWithHeadersOutputAttributesMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(ECHO_HEADERS_FLOW, ECHO_HEADERS);
-    MetadataType type = result.get().getOutputMetadata().get().getAttributesMetadata().get().getType();
+    MetadataType type = result.get().getOutputMetadata().getAttributesMetadata().getType();
     Collection<ObjectFieldType> attributesFields = toObjectType(type).getFields();
     assertThat(attributesFields, hasSize(2));
     Optional<ObjectFieldType> soapHeaders = attributesFields.stream().filter(e -> e.getValue() instanceof ObjectType).findFirst();
@@ -112,7 +112,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Output Metadata of an operation that contains output attachments")
   public void getDownloadAttachmentMetadata() {
     MetadataResult<ComponentMetadataDescriptor> result = getMetadata(DOWNLOAD_ATTACHMENT, DOWNLOAD_ATTACHMENT);
-    MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
+    MetadataType type = result.get().getOutputMetadata().getPayloadMetadata().getType();
     Collection<ObjectFieldType> attributesFields = toObjectType(type).getFields();
     assertThat(attributesFields, hasSize(2));
     Iterator<ObjectFieldType> iterator = attributesFields.iterator();

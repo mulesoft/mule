@@ -31,7 +31,7 @@ public class FileMetadataResolverTestCommon {
   public void testTreeNodeType(MetadataService service, Class type) {
     MetadataResult<ComponentMetadataDescriptor> list = service.getMetadata(new ProcessorId("list", "0"));
     assertThat(list.isSuccess(), is(true));
-    TypeMetadataDescriptor payload = list.get().getOutputMetadata().get().getPayloadMetadata().get();
+    TypeMetadataDescriptor payload = list.get().getOutputMetadata().getPayloadMetadata();
     List<ObjectFieldType> fields = copyOf(((ObjectType) payload.getType()).getFields());
 
     assertThat(fields, hasSize(3));
@@ -44,7 +44,7 @@ public class FileMetadataResolverTestCommon {
     MetadataResult<ComponentMetadataDescriptor> read = service.getMetadata(new ProcessorId("read", "0"));
 
     assertThat(read.isSuccess(), is(true));
-    TypeMetadataDescriptor attributes = read.get().getOutputMetadata().get().getAttributesMetadata().get();
+    TypeMetadataDescriptor attributes = read.get().getOutputMetadata().getAttributesMetadata();
     assertAttributesMetadata(attributes.getType(), type);
   }
 
