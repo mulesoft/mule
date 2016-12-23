@@ -18,6 +18,8 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -60,6 +62,15 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
     }
     // TODO: MULE-10765 - Define global bindings
     this.globalBindingContext = BindingContext.builder().build();
+  }
+
+  /**
+   * Registers the given {@link BindingContext} as global.
+   *
+   * @param bindingContext the context to register
+   */
+  public void registerGlobalContext(BindingContext bindingContext) {
+    expressionExecutor.addGlobalBindings(bindingContext);
   }
 
   @Override
