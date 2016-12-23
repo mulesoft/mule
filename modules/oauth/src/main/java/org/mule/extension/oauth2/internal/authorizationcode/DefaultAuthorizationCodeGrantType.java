@@ -7,21 +7,22 @@
 package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
@@ -179,6 +180,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
       if ((localCallbackConfig == null) != (localCallbackConfigPath == null)) {
         throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackConfigPath must be both present or absent");
       }
+
+      if (tlsContextFactory != null) {
+        initialiseIfNeeded(tlsContextFactory);
+        tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
+      }
+      tokenRequestHandler.initialise();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
@@ -244,6 +251,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     if (tokenRequestHandler != null) {
       tokenRequestHandler.setOauthConfig(this);
       tokenRequestHandler.init();
+      tokenRequestHandler.start();
     }
   }
 }

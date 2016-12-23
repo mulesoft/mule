@@ -53,10 +53,10 @@ public class HttpResponseToMuleMessage {
   private static final String MULTI_PART_PREFIX = "multipart/";
 
   private final Boolean parseResponse;
-  private final HttpRequesterConfig config;
+  private final HttpRequesterCookieConfig config;
   private final MuleContext muleContext;
 
-  public HttpResponseToMuleMessage(HttpRequesterConfig config, Boolean parseResponse, MuleContext muleContext) {
+  public HttpResponseToMuleMessage(HttpRequesterCookieConfig config, Boolean parseResponse, MuleContext muleContext) {
     this.config = config;
     this.parseResponse = parseResponse;
     this.muleContext = muleContext;

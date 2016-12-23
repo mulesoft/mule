@@ -18,23 +18,26 @@ import org.mule.extension.oauth2.internal.TokenResponseProcessor;
 import org.mule.extension.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.module.http.api.HttpHeaders;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handler for calling the token url, parsing the response and storing the oauth context data.
  */
 public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHandler {
+
+  private static final Logger logger = LoggerFactory.getLogger(ClientCredentialsTokenRequestHandler.class);
 
   private String scopes;
   private ApplicationCredentials applicationCredentials;
@@ -62,7 +65,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
   }
 
   private Event setMapPayloadWithTokenRequestParameters(final Event event) throws MuleException {
-    final HashMap<String, String> formData = new HashMap<>();
+    final Map<String, String> formData = new HashMap<>();
     formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
     String clientId = applicationCredentials.getClientId();
     String clientSecret = applicationCredentials.getClientSecret();
@@ -73,7 +76,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
       formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
     } else {
       String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
-      builder.addOutboundProperty(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
+      builder.attributes(new OAuthAuthorizationAttributes("Basic " + encodedCredentials));
     }
     if (scopes != null) {
       formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
