@@ -147,11 +147,6 @@ public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
   @Override
   public void dispose() {
     if (policyContext != null) {
-      try {
-        policyContext.getMuleContext().stop();
-      } catch (MuleException e) {
-        // Ignore, try to dispose it anyway
-      }
       policyContext.getMuleContext().dispose();
     }
   }

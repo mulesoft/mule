@@ -22,4 +22,12 @@ public interface ApplicationPolicyManager {
    * @param parametrization parametrization used to instantiate the policy. Non null
    */
   void addPolicy(PolicyTemplateDescriptor policyTemplateDescriptor, PolicyParametrization parametrization);
+
+  /**
+   * Removes a policy from the application
+   *
+   * @param parametrizedPolicyId identifies the parametrized policy. Non empty.?
+   * @return true is the policy was previously applied to the application, false otherwise
+   */
+  boolean removePolicy(String parametrizedPolicyId);
 }

@@ -161,6 +161,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
   private static final String FOO_POLICY_NAME = "fooPolicy";
+  public static final String TEST_POLICY_ID = "testPolicy";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
 
@@ -299,6 +300,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new DomainFileBuilder("shared-domain").definedBy("shared-domain-config.xml");
   private final DomainFileBuilder sharedBundleDomainFileBuilder = new DomainFileBuilder("shared-domain")
       .definedBy("shared-domain-config.xml").containing(sharedAAppFileBuilder).containing(sharedBAppFileBuilder);
+
+  // Policy file builders
+  private static final PolicyFileBuilder policyFileBuilder =
+      new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").configuredWith("policy.name", FOO_POLICY_NAME);
 
   private final boolean parallelDeployment;
   protected File muleHome;
@@ -1520,24 +1525,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysAppZipWithExtensionPlugin() throws Exception {
-    final ServiceFileBuilder echoService =
-        new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
-            .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
-    File installedService = new File(services, echoService.getArtifactFile().getName());
-    copyFile(echoService.getArtifactFile(), installedService);
-
-    final ServiceFileBuilder fooService = new ServiceFileBuilder("fooService")
-        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.foo.FooServiceProvider")
-        .usingLibrary(defaultFooServiceJarFile.getAbsolutePath());
-    installedService = new File(services, fooService.getArtifactFile().getName());
-    copyFile(fooService.getArtifactFile(), installedService);
-
-    ArtifactPluginFileBuilder extensionPlugin =
-        new ArtifactPluginFileBuilder("extensionPlugin").usingLibrary(helloExtensionJarFile.getAbsolutePath())
-            .configuredWith(EXPORTED_RESOURCE_PROPERTY,
-                            "/, META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
-    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
-        .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -2976,10 +2964,46 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations) throws Exception {
-    final PolicyFileBuilder policyFileBuilder =
-        new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").configuredWith("policy.name", FOO_POLICY_NAME);
     policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
 
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
+                            new PolicyParametrization(TEST_POLICY_ID, pointcut, new HashedMap()));
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(expectedPolicyInvocations));
+  }
+
+  @Test
+  public void removesApplicationPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
+                            new PolicyParametrization(TEST_POLICY_ID, parameters -> true, new HashedMap()));
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+
+    policyManager.removePolicy(applicationFileBuilder.getId(), TEST_POLICY_ID);
+
+    executeApplicationFlow("main");
+    assertThat("Policy is still applied on the application", invocationCount, equalTo(1));
+  }
+
+  private ApplicationFileBuilder createExtensionApplicationWithServices() throws Exception {
     final ServiceFileBuilder echoService =
         new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
             .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
@@ -2998,21 +3022,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                             "/,  META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
         .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization("testPolicy",
-                                                      pointcut,
-                                                      new HashedMap()));
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-
-    executeApplicationFlow("main");
-
-    assertThat(invocationCount, equalTo(expectedPolicyInvocations));
+    //addPackedAppFromBuilder(applicationFileBuilder);
+    return applicationFileBuilder;
   }
 
   private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction)
