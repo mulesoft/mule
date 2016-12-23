@@ -13,7 +13,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -93,13 +92,13 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     }.walk(extensionModel);
   }
 
-    private void validateResolversName(ComponentModel model, MetadataResolverFactory resolverFactory,
-                                       Table<String, String, Class<?>> names,  ProblemsReporter problemsReporter) {
-        List<NamedTypeResolver> resolvers = new LinkedList<>();
-        resolvers.addAll(getAllInputResolvers(model, resolverFactory));
-        resolvers.add(resolverFactory.getOutputResolver());
+  private void validateResolversName(ComponentModel model, MetadataResolverFactory resolverFactory,
+                                     Table<String, String, Class<?>> names, ProblemsReporter problemsReporter) {
+    List<NamedTypeResolver> resolvers = new LinkedList<>();
+    resolvers.addAll(getAllInputResolvers(model, resolverFactory));
+    resolvers.add(resolverFactory.getOutputResolver());
 
-        resolvers.stream()
+    resolvers.stream()
         .filter(r -> !r.getClass().equals(NullMetadataResolver.class))
         .forEach(r -> {
           if (isBlank(r.getResolverName())) {
@@ -107,22 +106,22 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                                                   format(EMPTY_RESOLVER_NAME,
                                                          getComponentModelTypeName(model), model.getName(),
                                                          r.getClass().getSimpleName(), "resolver")));
-          }
+          } else {
+            if (names.get(r.getCategoryName(), r.getResolverName()) != null
+                && names.get(r.getCategoryName(), r.getResolverName()) != r.getClass()) {
+              problemsReporter
+                  .addError(new Problem(model,
+                                        format("%s [%s] specifies metadata resolvers with repeated name [%s] for the same category [%s]. Resolver names should be unique for a given category. Affected resolvers are '%s' and '%s'",
+                                               getComponentModelTypeName(model), model.getName(),
+                                               r.getResolverName(), r.getCategoryName(),
+                                               names.get(r.getCategoryName(), r.getResolverName()).getSimpleName(),
+                                               r.getClass().getSimpleName())));
 
-          if (names.get(r.getCategoryName(), r.getResolverName()) != null
-              && names.get(r.getCategoryName(), r.getResolverName()) != r.getClass()) {
-            problemsReporter
-                .addError(new Problem(model,
-                                      format("%s [%s] specifies metadata resolvers with repeated name [%s] for the same category [%s]. Resolver names should be unique for a given category. Affected resolvers are '%s' and '%s'",
-                                             getComponentModelTypeName(model), model.getName(),
-                                             r.getResolverName(), r.getCategoryName(),
-                                             names.get(r.getCategoryName(), r.getResolverName()).getSimpleName(),
-                                             r.getClass().getSimpleName())));
-
+            }
+            names.put(r.getCategoryName(), r.getResolverName(), r.getClass());
           }
-          names.put(r.getCategoryName(), r.getResolverName(), r.getClass());
         });
-    }
+  }
 
   private void validateMetadataKeyId(ComponentModel model, MetadataResolverFactory resolverFactory,
                                      ProblemsReporter problemsReporter) {
@@ -225,8 +224,8 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                     r.getClass().getSimpleName(), "category"))));
 
     Set<String> names = stream(resolvers)
+        .filter(r -> !r.getClass().equals(NullMetadataResolver.class))
         .map(NamedTypeResolver::getCategoryName)
-        .filter(r -> !r.equals(NULL_CATEGORY_NAME))
         .collect(toSet());
 
     if (names.size() > 1) {

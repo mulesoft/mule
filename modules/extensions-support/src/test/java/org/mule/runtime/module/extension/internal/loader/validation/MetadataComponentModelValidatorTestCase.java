@@ -14,7 +14,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -366,7 +365,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Test
   public void metadataResolverWithEmptyCategoryName() {
     exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage(endsWith("which has an empty category name"));
+    exception.expectMessage(containsString("which has an empty category name"));
 
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(EmptyCategoryName.class),
@@ -379,7 +378,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Test
   public void metadataResolverWithEmptyResolverName() {
     exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage(endsWith("which has an empty resolver name"));
+    exception.expectMessage(containsString("which has an empty resolver name"));
 
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER,
