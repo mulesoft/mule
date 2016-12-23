@@ -32,9 +32,12 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class QuartzConnector extends AbstractConnector
 {
-    public static final String QUARTZ = "quartz";
 
-    public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
+	public static final String QUARTZ = "quartz";
+
+	public static final String QUARTZ_SCHEDULER_PREFIX = "scheduler-";
+
+	public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
     public static final String PROPERTY_CRON_TIME_ZONE = "cronTimeZone";
     public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
@@ -73,6 +76,11 @@ public class QuartzConnector extends AbstractConnector
         super(context);
     }
     
+    public String getFullName()
+    {
+    	return QUARTZ_SCHEDULER_PREFIX + muleContext.getConfiguration().getId() + "-" + getName();
+    }
+    
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -87,7 +95,7 @@ public class QuartzConnector extends AbstractConnector
         String instanceName = factoryProperties.getProperty(QUARTZ_INSTANCE_NAME_PROPERTY);
         if (instanceName == null)
         {
-            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, "scheduler-" + muleContext.getConfiguration().getId());
+            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, getFullName());
         }
         else
         {
