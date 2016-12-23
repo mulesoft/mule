@@ -33,7 +33,6 @@ public class DefaultFunctionDataType extends SimpleDataType implements FunctionD
     super(type, mediaType, consumable);
     this.parameters = unmodifiableList(parameters);
     this.returnType = returnType != null ? of(returnType) : empty();
-
   }
 
   @Override
