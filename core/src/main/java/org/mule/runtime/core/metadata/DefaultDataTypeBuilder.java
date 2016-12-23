@@ -7,23 +7,11 @@
 package org.mule.runtime.core.metadata;
 
 import static com.google.common.cache.CacheBuilder.newBuilder;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
-
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.CollectionDataType;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeBuilder;
-import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
-
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -42,12 +30,27 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.CollectionDataType;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
+
 /**
  * Provides a way to build immutable {@link DataType} objects.
  *
  * @since 4.0
  */
-public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.DataTypeCollectionTypeBuilder {
+public class DefaultDataTypeBuilder
+    implements DataTypeBuilder, DataTypeBuilder.DataTypeCollectionTypeBuilder, DataTypeBuilder.DataTypeFunctionTypeBuilder {
 
   private static ConcurrentHashMap<String, ProxyIndicator> proxyClassCache = new ConcurrentHashMap<>();
 
@@ -63,6 +66,8 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
   private Reference<Class<?>> typeRef = new WeakReference<>(Object.class);
   private DataTypeBuilder itemTypeBuilder;
   private MediaType mediaType = MediaType.ANY;
+  private DataType returnType;
+  private List<FunctionParameter> parametersType;
 
   private boolean built = false;
 
@@ -203,6 +208,25 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     return this;
   }
 
+  @Override
+  public DataTypeFunctionTypeBuilder functionType(Class<? extends ExpressionFunction> functionType) {
+    validateAlreadyBuilt();
+
+    checkNotNull(functionType, "'functionType' cannot be null.");
+    if (!ExpressionFunction.class.isAssignableFrom(functionType)) {
+      throw new IllegalArgumentException("functionType " + functionType.getName() + " is not an ExpressionFunction type");
+    }
+
+    this.typeRef = new WeakReference<>(handleProxy(functionType));
+
+    return asFunctionTypeBuilder();
+  }
+
+  @Override
+  public DataTypeFunctionTypeBuilder asFunctionTypeBuilder() {
+    return this;
+  }
+
   /**
    * Sets the given types for the {@link DefaultCollectionDataType} to be built. See {@link DefaultCollectionDataType#getType()}
    * and {@link DefaultCollectionDataType#getItemDataType()}.
@@ -221,6 +245,18 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
       this.itemTypeBuilder = DataType.builder();
     }
     this.itemTypeBuilder.type(handleProxy(itemType));
+    return this;
+  }
+
+  @Override
+  public DataTypeFunctionTypeBuilder returnType(DataType dataType) {
+    this.returnType = dataType;
+    return this;
+  }
+
+  @Override
+  public DataTypeFunctionTypeBuilder parametersType(List<FunctionParameter> list) {
+    this.parametersType = list;
     return this;
   }
 
@@ -306,6 +342,13 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     }
   }
 
+  @Override
+  public DataTypeFunctionTypeBuilder fromFunction(ExpressionFunction expressionFunction) {
+    return functionType(expressionFunction.getClass())
+        .returnType(expressionFunction.returnType().orElse(null))
+        .parametersType(expressionFunction.parameters());
+  }
+
   private Optional<String> getObjectMimeType(Object value) {
     if (value instanceof DataHandler) {
       return of(((DataHandler) value).getContentType());
@@ -336,6 +379,9 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
       return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType,
                                            isConsumable(type));
+    } else if (ExpressionFunction.class.isAssignableFrom(type)) {
+      return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
+                                         isConsumable(type));
     } else {
       return new SimpleDataType(type, mediaType, isConsumable(type));
     }

@@ -11,11 +11,14 @@ import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -24,21 +27,26 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.el.context.AppContext;
+import org.mule.runtime.core.el.context.MuleInstanceContext;
+import org.mule.runtime.core.el.context.ServerContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.TemplateParser;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class DefaultExpressionManager implements ExtendedExpressionManager {
+public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
   public static final String DW_PREFIX = "dw:";
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
@@ -56,6 +64,15 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
     this.muleContext = muleContext;
     this.muleExpressionLanguage = new MuleExpressionLanguage(muleContext.getExecutionClassLoader());
     mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    Collection<GlobalBindingContextProvider> contextProviders =
+        muleContext.getRegistry().lookupObjects(GlobalBindingContextProvider.class);
+    for (GlobalBindingContextProvider contextProvider : contextProviders) {
+      muleExpressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
+    }
   }
 
   @Override
