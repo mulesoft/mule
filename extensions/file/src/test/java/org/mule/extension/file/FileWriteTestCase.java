@@ -6,21 +6,24 @@
  */
 package org.mule.extension.file;
 
+import static java.lang.String.format;
 import static java.nio.charset.Charset.availableCharsets;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
-
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.FileErrors;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -65,26 +68,26 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
   @Test
   public void createNewOnExistingFile() throws Exception {
-    expectedException.expectCause(instanceOf(MuleRuntimeException.class));
-    doWriteOnExistingFile(CREATE_NEW);
+    assertError(doWriteOnExistingFileExpectingException(CREATE_NEW), FileErrors.FILE_ALREADY_EXISTS.getType(),
+                FileAlreadyExistsException.class, "Use a different write mode or point to a path which doesn't exists");
   }
 
   @Test
   public void appendOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
+    assertError(doWriteOnNotExistingParentWithoutCreateFolder(APPEND).runExpectingException(),
+                FileErrors.ILLEGAL_PATH.getType(), IllegalPathException.class, "because path to it doesn't exist");
   }
 
   @Test
   public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
+    assertError(doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE).runExpectingException(),
+                FileErrors.ILLEGAL_PATH.getType(), IllegalPathException.class, "because path to it doesn't exist");
   }
 
   @Test
   public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
+    assertError(doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW).runExpectingException(),
+                FileErrors.ILLEGAL_PATH.getType(), IllegalPathException.class, "because path to it doesn't exist");
   }
 
   @Test
@@ -114,8 +117,8 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
   @Test
   public void writeStaticContent() throws Exception {
-    String path = String.format("%s/%s", temporaryFolder.newFolder().getPath(), TEST_FILENAME);
-    doWrite("writeStaticContent", path, "", CREATE_NEW, false);
+    String path = format("%s/%s", temporaryFolder.newFolder().getPath(), TEST_FILENAME);
+    doWrite("writeStaticContent", path, "", CREATE_NEW, false).run();
 
     String content = readPathAsString(path);
     assertThat(content, is(HELLO_WORLD));
@@ -132,7 +135,7 @@ public class FileWriteTestCase extends FileConnectorTestCase {
     assertThat(customEncoding, is(notNullValue()));
     final String filename = "encoding.txt";
 
-    doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
+    doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding).run();
     byte[] content = readFileToByteArray(new File(temporaryFolder.getRoot(), filename));
 
     assertThat(Arrays.equals(content, HELLO_WORLD.getBytes(customEncoding)), is(true));
@@ -140,9 +143,9 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
   private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception {
     File folder = temporaryFolder.newFolder();
-    final String path = String.format("%s/a/b/%s", folder.getAbsolutePath(), TEST_FILENAME);
+    final String path = format("%s/a/b/%s", folder.getAbsolutePath(), TEST_FILENAME);
 
-    doWrite(path, HELLO_WORLD, mode, true);
+    doWrite(path, HELLO_WORLD, mode, true).run();
 
     String content = readPathAsString(path);
     assertThat(content, is(HELLO_WORLD));
@@ -150,25 +153,32 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
 
   private void doWriteOnNotExistingFile(FileWriteMode mode) throws Exception {
-    String path = String.format("%s/%s", temporaryFolder.newFolder().getPath(), TEST_FILENAME);
-    doWrite(path, HELLO_WORLD, mode, false);
+    String path = format("%s/%s", temporaryFolder.newFolder().getPath(), TEST_FILENAME);
+    doWrite(path, HELLO_WORLD, mode, false).run();
 
     String content = readPathAsString(path);
     assertThat(content, is(HELLO_WORLD));
   }
 
-  private void doWriteOnNotExistingParentWithoutCreateFolder(FileWriteMode mode) throws Exception {
+  private FlowRunner doWriteOnNotExistingParentWithoutCreateFolder(FileWriteMode mode) throws Exception {
     File folder = temporaryFolder.newFolder();
-    final String path = String.format("%s/a/b/%s", folder.getAbsolutePath(), TEST_FILENAME);
+    final String path = format("%s/a/b/%s", folder.getAbsolutePath(), TEST_FILENAME);
 
-    doWrite(path, HELLO_WORLD, mode, false);
+    return doWrite(path, HELLO_WORLD, mode, false);
   }
 
   private String doWriteOnExistingFile(FileWriteMode mode) throws Exception {
     File file = temporaryFolder.newFile();
     FileUtils.writeStringToFile(file, HELLO_WORLD);
 
-    doWrite(file.getAbsolutePath(), HELLO_WORLD, mode, false);
+    doWrite(file.getAbsolutePath(), HELLO_WORLD, mode, false).run();
     return readPathAsString(file.getAbsolutePath());
+  }
+
+  private MessagingException doWriteOnExistingFileExpectingException(FileWriteMode mode) throws Exception {
+    File file = temporaryFolder.newFile();
+    FileUtils.writeStringToFile(file, HELLO_WORLD);
+
+    return doWrite(file.getAbsolutePath(), HELLO_WORLD, mode, false).runExpectingException();
   }
 }

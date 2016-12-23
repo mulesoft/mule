@@ -6,15 +6,20 @@
  */
 package org.mule.extension.file;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.IOUtils;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -23,11 +28,11 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
+  protected static final String NAMESPACE = "FILE";
   protected static final String HELLO_WORLD = "Hello World!";
   protected static final String HELLO_FILE_NAME = "hello.json";
   protected static final String HELLO_PATH = "files/" + HELLO_FILE_NAME;
@@ -39,7 +44,7 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
   public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Rule
-  public ExpectedException expectedException = none();
+  public ExpectedError expectedError = none();
 
   @Rule
   public SystemProperty workingDir = new SystemProperty("workingDir", temporaryFolder.getRoot().getAbsolutePath());
@@ -63,33 +68,42 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
   }
 
   protected Event readHelloWorld() throws Exception {
-    return getPath(HELLO_PATH);
+    return getPath(HELLO_PATH).run();
   }
 
-  protected Message readPath(String path) throws Exception {
-    return getPath(path).getMessage();
+  protected FlowRunner readPath(String path) throws Exception {
+    return getPath(path);
   }
 
-  protected Event getPath(String path) throws Exception {
-    return flowRunner("read").withVariable("path", path).run();
+  protected FlowRunner getPath(String path) throws Exception {
+    return flowRunner("read").withVariable("path", path);
   }
 
   protected String readPathAsString(String path) throws Exception {
-    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload().getValue());
+    return IOUtils.toString((AbstractFileInputStream) readPath(path).run().getMessage().getPayload().getValue());
   }
 
-  protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
-    doWrite("write", path, content, mode, createParent);
+  protected FlowRunner doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    return doWrite("write", path, content, mode, createParent);
   }
 
-  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
-    doWrite(flow, path, content, mode, createParent, null);
-  }
-
-  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding)
+  protected FlowRunner doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent)
       throws Exception {
-    flowRunner(flow).withVariable("path", path).withVariable("createParent", createParent).withVariable("mode", mode)
-        .withVariable("encoding", encoding).withPayload(content).run();
+    return doWrite(flow, path, content, mode, createParent, null);
+  }
+
+  protected FlowRunner doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent,
+                               String encoding)
+      throws Exception {
+    return flowRunner(flow).withVariable("path", path).withVariable("createParent", createParent).withVariable("mode", mode)
+        .withVariable("encoding", encoding).withPayload(content);
+  }
+
+  protected void assertError(MessagingException exception, String errorTypeDefinition, Class<?> cause, String message) {
+    Event event = exception.getEvent();
+    assertThat(event.getError().get().getErrorType(), is(errorType(NAMESPACE, errorTypeDefinition)));
+    assertThat(event.getError().get().getCause(), instanceOf(cause));
+    assertThat(event.getError().get().getDescription(), containsString(message));
   }
 
   protected File createHelloWorldFile() throws IOException {

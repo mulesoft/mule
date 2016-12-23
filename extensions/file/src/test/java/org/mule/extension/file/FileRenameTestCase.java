@@ -10,7 +10,11 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.functional.junit4.rules.ExpectedError.expectError;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
@@ -62,7 +66,7 @@ public class FileRenameTestCase extends FileConnectorTestCase {
     File nonEmptyTargetDirectory = temporaryFolder.newFolder(RENAME_TO_DIRECTORY);
     File nonEmptyTargetDirectoryFile = new File(nonEmptyTargetDirectory, RENAME_TO);
     nonEmptyTargetDirectoryFile.createNewFile();
-    doRename("rename", origin.getAbsolutePath(), RENAME_TO_DIRECTORY, true);
+    doRename(getFlowName(), origin.getAbsolutePath(), RENAME_TO_DIRECTORY, true);
 
     assertExists(false, origin);
     assertThat(readPathAsString(format("%s/%s", nonEmptyTargetDirectory.getAbsolutePath(), HELLO_FILE_NAME)), is(HELLO_WORLD));
@@ -70,33 +74,34 @@ public class FileRenameTestCase extends FileConnectorTestCase {
 
   @Test
   public void failOnOverwriteANonReadableDirectory() throws Exception {
+    expectedError.expectCause(instanceOf(MuleRuntimeException.class));
+
     File origin = createHelloWorldFile().getParentFile();
     File nonReadableTargetDirectory = temporaryFolder.newFolder(RENAME_TO_DIRECTORY);
     nonReadableTargetDirectory.setReadable(false);
 
-    expectedException.expectCause(instanceOf(MuleRuntimeException.class));
     doRename("rename", origin.getAbsolutePath(), RENAME_TO_DIRECTORY, true);
   }
 
   @Test
   public void renameUnexisting() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     doRename("not-there.txt");
   }
 
   @Test
   public void targetPathContainsParts() throws Exception {
+    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                "parameter of rename operation should not contain any file separator character");
     File origin = temporaryFolder.newFile("source");
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     doRename("rename", origin.getAbsolutePath(), "path/with/parts", true);
   }
 
   @Test
   public void targetAlreadyExistsWithoutOverwrite() throws Exception {
+    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
     File origin = temporaryFolder.newFile("source");
     temporaryFolder.newFile(RENAME_TO);
-
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     doRename(origin.getAbsolutePath());
   }
 
@@ -128,5 +133,9 @@ public class FileRenameTestCase extends FileConnectorTestCase {
 
   private void doRename(String flow, String source, String to, boolean overwrite) throws Exception {
     flowRunner(flow).withVariable("path", source).withVariable("to", to).withVariable("overwrite", overwrite).run();
+  }
+
+  private String getFlowName() {
+    return "rename";
   }
 }

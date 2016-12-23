@@ -6,17 +6,22 @@
  */
 package org.mule.extension.file;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.functional.junit4.FlowRunner;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -55,9 +60,11 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void listWithoutReadPermission() throws Exception {
+    expectError(expectedError, NAMESPACE, ACCESS_DENIED.getType(), FileAccessDeniedException.class,
+                "access was denied by the operating system");
+
     temporaryFolder.newFolder("forbiddenDirectory").setReadable(false);
-    expectedException.expectCause(is(instanceOf(MuleRuntimeException.class)));
-    TreeNode node = doList(".", true);
+    doList(".", true);
   }
 
   private void assertRecursiveTreeNode(TreeNode node) throws Exception {
@@ -77,14 +84,14 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void notDirectory() throws Exception {
-    expectedException.expectCause(is(instanceOf(IllegalArgumentException.class)));
-    doList(String.format(TEST_FILE_PATTERN, 0), false);
+    assertError(getFlow(getFlowName(), format(TEST_FILE_PATTERN, 0), false).runExpectingException(),
+                ILLEGAL_PATH.getType(), IllegalPathException.class, "Only directories can be listed");
   }
 
   @Test
   public void notExistingPath() throws Exception {
-    expectedException.expectCause(is(instanceOf(IllegalArgumentException.class)));
-    doList(String.format("whatever", 0), false);
+    assertError(getFlow(getFlowName(), format("whatever", 0), false).runExpectingException(),
+                ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
   }
 
   @Test
@@ -136,11 +143,11 @@ public class FileListTestCase extends FileConnectorTestCase {
   }
 
   private TreeNode doList(String path, boolean recursive) throws Exception {
-    return doList("list", path, recursive);
+    return doList(getFlowName(), path, recursive);
   }
 
   private TreeNode doList(String flowName, String path, boolean recursive) throws Exception {
-    TreeNode node = (TreeNode) flowRunner(flowName).withVariable("path", path).withVariable("recursive", recursive).run()
+    TreeNode node = (TreeNode) getFlow(flowName, path, recursive).run()
         .getMessage().getPayload().getValue();
 
     assertThat(node, is(notNullValue()));
@@ -149,8 +156,15 @@ public class FileListTestCase extends FileConnectorTestCase {
     FileAttributes attributes = node.getAttributes();
     assertThat(attributes.isDirectory(), is(true));
     assertThat(attributes.getPath(), equalTo(Paths.get(temporaryFolder.getRoot().toURI()).resolve(path).toString()));
-    assertThat(attributes.isDirectory(), is(true));
 
     return node;
+  }
+
+  private FlowRunner getFlow(String flowName, String path, boolean recursive) {
+    return flowRunner(flowName).withVariable("path", path).withVariable("recursive", recursive);
+  }
+
+  private String getFlowName() {
+    return "list";
   }
 }

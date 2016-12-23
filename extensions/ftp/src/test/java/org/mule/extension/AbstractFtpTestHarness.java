@@ -68,7 +68,7 @@ public abstract class AbstractFtpTestHarness extends ExternalResource implements
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
-      expectedException = ExpectedException.none();
+      expectedException = none();
     }
   }
 

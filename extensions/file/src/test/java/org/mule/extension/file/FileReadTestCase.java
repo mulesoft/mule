@@ -7,13 +7,16 @@
 package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
@@ -63,7 +66,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
     File binaryFile = new File(temporaryFolder.getRoot(), binaryFileName);
     FileUtils.writeByteArrayToFile(binaryFile, binaryPayload);
 
-    Event response = getPath(binaryFile.getAbsolutePath());
+    Event response = getPath(binaryFile.getAbsolutePath()).run();
 
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
                is(MediaType.BINARY.getPrimaryType()));
@@ -86,28 +89,31 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readUnexisting() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    readPath("files/not-there.txt");
+    assertError(readPath("files/not-there.txt").runExpectingException(),
+                ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
   }
 
   @Test
   public void readWithLockAndWithoutEnoughPermissions() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     File forbiddenFile = temporaryFolder.newFile("forbiddenFile");
     forbiddenFile.createNewFile();
     forbiddenFile.setWritable(false);
-    readWithLock(forbiddenFile.getAbsolutePath());
+
+    assertError(readWithLock(forbiddenFile.getAbsolutePath()).runExpectingException(),
+                ACCESS_DENIED.getType(), FileAccessDeniedException.class, "access was denied by the operating system");
   }
 
   @Test
   public void readDirectory() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    readPath("files");
+    assertError(readPath("files").runExpectingException(),
+                ILLEGAL_PATH.getType(), IllegalPathException.class, "since it's a directory");
   }
 
   @Test
   public void readLockReleasedOnContentConsumed() throws Exception {
-    final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload().getValue();
+    final Message message = readWithLock().run().getMessage();
+    final AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload().getValue();
+
     IOUtils.toString(payload);
 
     assertThat(payload.isLocked(), is(false));
@@ -115,9 +121,11 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readLockReleasedOnEarlyClose() throws Exception {
-    final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload().getValue();
-    payload.close();
+    final Message message = readWithLock().run().getMessage();
+    final AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload().getValue();
 
+    assertThat(payload.isLocked(), is(true));
+    payload.close();
     assertThat(payload.isLocked(), is(false));
   }
 
@@ -139,15 +147,12 @@ public class FileReadTestCase extends FileConnectorTestCase {
     assertThat(filePayload.isRegularFile(), is(true));
   }
 
-  private Message readWithLock() throws Exception {
+  private FlowRunner readWithLock() throws Exception {
     return readWithLock(HELLO_PATH);
   }
 
-  private Message readWithLock(String path) throws Exception {
-    Message message = flowRunner("readWithLock").withVariable("path", path).run().getMessage();
-    assertThat(((AbstractFileInputStream) message.getPayload().getValue()).isLocked(), is(true));
-
-    return message;
+  private FlowRunner readWithLock(String path) throws Exception {
+    return flowRunner("readWithLock").withVariable("path", path);
   }
 
   private void assertTime(LocalDateTime dateTime, FileTime fileTime) {

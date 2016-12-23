@@ -6,13 +6,17 @@
  */
 package org.mule.extension.ftp;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_FILE_NAME;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 
 import java.nio.file.Paths;
 
@@ -59,25 +63,26 @@ public class FtpRenameTestCase extends FtpConnectorTestCase {
 
   @Test
   public void renameUnexisting() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     doRename("not-there.txt");
   }
 
   @Test
   public void targetPathContainsParts() throws Exception {
+    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                "parameter of rename operation should not contain any file separator character");
     testHarness.createHelloWorldFile();
     final String sourcePath = Paths.get(HELLO_PATH).getParent().toString();
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
     doRename("rename", sourcePath, "path/with/parts", true);
   }
 
   @Test
   public void targetAlreadyExistsWithoutOverwrite() throws Exception {
+    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
     final String sourceFile = "renameme.txt";
     testHarness.write(sourceFile, "rename me");
     testHarness.write(RENAME_TO, "I was here first");
 
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
     doRename(sourceFile);
   }
 

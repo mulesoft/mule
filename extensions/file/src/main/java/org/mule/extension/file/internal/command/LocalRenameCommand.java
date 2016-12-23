@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import org.mule.extension.file.common.api.command.RenameCommand;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.nio.file.Files;
@@ -39,7 +40,7 @@ public final class LocalRenameCommand extends LocalFileCommand implements Rename
 
     if (Files.exists(target)) {
       if (!overwrite) {
-        throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
+        throw new FileAlreadyExistsException(format("'%s' cannot be renamed because '%s' already exists", source, target));
       }
 
       try {

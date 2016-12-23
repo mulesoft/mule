@@ -6,19 +6,22 @@
  */
 package org.mule.extension.ftp;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.FtpTestHarness;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -73,14 +76,14 @@ public class FtpListTestCase extends FtpConnectorTestCase {
 
   @Test
   public void notDirectory() throws Exception {
-    testHarness.expectedException().expectCause(is(instanceOf(IllegalArgumentException.class)));
-    doList(String.format(TEST_FILE_PATTERN, 0), false);
+    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "Only directories can be listed");
+    doList("list", format(TEST_FILE_PATTERN, 0), false);
   }
 
   @Test
   public void notExistingPath() throws Exception {
-    testHarness.expectedException().expectCause(is(instanceOf(IllegalArgumentException.class)));
-    doList(String.format("whatever", 0), false);
+    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    doList("list", format("whatever", 0), false);
   }
 
   @Test

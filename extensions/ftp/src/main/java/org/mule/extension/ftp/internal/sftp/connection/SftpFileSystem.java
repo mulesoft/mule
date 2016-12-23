@@ -19,6 +19,7 @@ import org.mule.extension.file.common.api.command.MoveCommand;
 import org.mule.extension.file.common.api.command.ReadCommand;
 import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.extension.file.common.api.lock.URLPathLock;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
@@ -65,7 +66,7 @@ public class SftpFileSystem extends FtpFileSystem {
       try {
         return client.getWorkingDirectory();
       } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("SFTP working dir was not specified and failed to resolve a default one"),
+        throw new IllegalPathException("SFTP working dir was not specified and failed to resolve a default one",
                                        e);
       }
     }

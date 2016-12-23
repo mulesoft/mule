@@ -15,12 +15,14 @@ import org.mule.extension.file.api.LocalFilePredicateBuilder;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.extension.file.common.api.exceptions.FileErrors;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 /**
  * File connector used to manipulate file systems mounted on the host operation system.
@@ -35,6 +37,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @ConnectionProviders(LocalFileConnectionProvider.class)
 @Sources(DirectoryListener.class)
+@ErrorTypes(FileErrors.class)
 @Export(classes = {LocalFileAttributes.class, FileEventType.class, ListenerFileAttributes.class, EventedFileAttributes.class,
     DeletedFileAttributes.class})
 public class FileConnector extends FileConnectorConfig {

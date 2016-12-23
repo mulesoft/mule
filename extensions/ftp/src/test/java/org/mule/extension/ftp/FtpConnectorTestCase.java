@@ -13,6 +13,7 @@ import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -29,10 +30,14 @@ import org.junit.runners.Parameterized.Parameters;
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {SftpClientFactory.class, SftpClient.class})
 public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
+  protected static final String NAMESPACE = "FTP";
   private final String name;
 
   @Rule
   public final FtpTestHarness testHarness;
+
+  @Rule
+  public ExpectedError expectedError = ExpectedError.none();
 
   @Parameters(name = "{0}")
   public static Collection<Object[]> data() {
