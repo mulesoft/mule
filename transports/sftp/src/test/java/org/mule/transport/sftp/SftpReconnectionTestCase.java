@@ -22,8 +22,8 @@ import org.mule.tck.listener.FlowExecutionListener;
 public class SftpReconnectionTestCase extends AbstractSftpTestCase
 {
 
-    private static final long DELTA = 20l;
-    private static final long RECONNECTION_FREQUENCY = 1000l - DELTA;
+    private static final double DELTA = 30.0;
+    private static final double RECONNECTION_FREQUENCY = 1000.0;
     private static final String INBOUND_ENDPOINT_DIRECTORY = "data";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static final String SFTP_RECEIVING_FLOW_NAME = "receiving";
@@ -86,7 +86,7 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
                 .setExpectedAction(ConnectionNotification.CONNECTION_FAILED)
                 .setNumberOfExecutionsRequired(2)
                 .waitUntilNotificationsAreReceived();
-        connectionListener.assertMinimumTimeBetweenNotifications(RECONNECTION_FREQUENCY);
+        connectionListener.assertMinimumTimeBetweenNotifications(RECONNECTION_FREQUENCY, DELTA);
     }
 
     @Override
