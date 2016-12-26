@@ -9,7 +9,7 @@ package org.mule.extension.ws.internal.interceptor;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_HEADERS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_HEADERS_KEY;
 import static org.mule.extension.ws.internal.util.TransformationUtils.nodeToString;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.extension.ws.api.exception.BadResponseException;

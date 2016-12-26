@@ -9,7 +9,7 @@ package org.mule.extension.ws.internal.generator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_ATTACHMENTS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_ATTACHMENTS_KEY;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentResponseEnricher;
 import org.mule.extension.ws.internal.generator.attachment.SoapAttachmentResponseEnricher;
 import org.mule.runtime.api.message.Message;

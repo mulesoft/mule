@@ -15,8 +15,11 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.service.http.api.HttpService;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * {@link ConnectionProvider} that returns instances of {@link WscConnection}.
@@ -24,6 +27,9 @@ import java.util.List;
  * @since 4.0
  */
 public class WscConnectionProvider implements PoolingConnectionProvider<WscConnection> {
+
+  @Inject
+  private HttpService httpService;
 
   /**
    * The WSDL file URL remote or local.
@@ -58,6 +64,10 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   @NullSafe
   private List<SecurityStrategy> securityStrategies;
 
+  @Parameter
+  @Optional
+  private String transportConfiguration;
+
   /**
    * The soap version of the WSDL.
    */
@@ -77,7 +87,15 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
    */
   @Override
   public WscConnection connect() throws ConnectionException {
-    return new WscConnection(wsdlLocation, address, service, port, soapVersion, securityStrategies, mtomEnabled);
+    return new WscConnection(wsdlLocation,
+                             address,
+                             service,
+                             port,
+                             soapVersion,
+                             mtomEnabled,
+                             securityStrategies,
+                             httpService,
+                             null);
   }
 
   /**

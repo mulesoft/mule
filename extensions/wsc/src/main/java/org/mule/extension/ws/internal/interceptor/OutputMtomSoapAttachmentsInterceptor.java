@@ -9,7 +9,7 @@ package org.mule.extension.ws.internal.interceptor;
 import static java.util.Collections.emptyList;
 import static org.apache.cxf.interceptor.Fault.FAULT_CODE_SERVER;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_ATTACHMENTS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_ATTACHMENTS_KEY;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;

@@ -40,6 +40,16 @@ public enum WscErrors implements ErrorTypeDefinition<WscErrors> {
   BAD_RESPONSE("Bad Response"),
 
   /**
+   *  a problem occurred while sending the request.
+   */
+  CANNOT_DISPATCH("Error Sending Request"),
+
+  /**
+   * Error thrown when the outgoing request took longer than the server prepared to wait.
+   */
+  TIMEOUT("Timeout"),
+
+  /**
    * Error thrown when a SOAP Fault occurred.
    */
   SOAP_FAULT("Soap Fault");

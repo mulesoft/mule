@@ -8,25 +8,17 @@ package org.mule.extension.ws.internal.interceptor;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.ENCODING;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_WSC_ENCODING;
-import static org.mule.runtime.api.metadata.MediaType.MULTIPART_RELATED;
-import org.mule.extension.ws.api.exception.BadResponseException;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_WSC_ENCODING;
+import static org.mule.extension.ws.internal.connection.WscClient.WSC_DISPATCHER;
 import org.mule.extension.ws.internal.connection.WscConnection;
-import org.mule.extension.ws.internal.transport.HttpDispatcher;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.extension.ws.internal.transport.WscDispatcher;
+import org.mule.extension.ws.internal.transport.WscResponse;
 
-import com.squareup.okhttp.Response;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.Exchange;
@@ -43,57 +35,42 @@ import org.apache.cxf.transport.MessageObserver;
  */
 public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Message> {
 
-  private String address;
   private final MessageObserver messageObserver;
 
-  public MessageDispatcherInterceptor(String address, MessageObserver messageObserver) {
+  public MessageDispatcherInterceptor(MessageObserver messageObserver) {
     super(SEND_ENDING);
-    this.address = address;
     this.messageObserver = messageObserver;
   }
 
-  // TODO: MULE-10783
+  /**
+   * Intercepts the SOAP message and performs the dispatch of it, receiving the response and
+   * sending it to the IN intercepting processor chain.
+   */
   @Override
   public void handleMessage(Message message) throws Fault {
+    Exchange exchange = message.getExchange();
 
     String encoding = (String) message.getExchange().get(MULE_WSC_ENCODING);
 
     // Performs all the remaining interceptions before sending.
     message.getInterceptorChain().doIntercept(message);
 
-    Response response = new HttpDispatcher().dispatch(address, message);
-
-    // We wipe the request attachment list, so don't get mixed with the response ones.
+    // Wipe the request attachment list, so don't get mixed with the response ones.
     message.setAttachments(emptyList());
 
-    String body;
-    try {
-      body = IOUtils.toString(response.body().byteStream());
-    } catch (IOException e) {
-      throw new BadResponseException("Error while getting body response content", e);
-    }
+    WscDispatcher dispatcher = (WscDispatcher) exchange.get(WSC_DISPATCHER);
+    WscResponse response = dispatcher.dispatch(message);
 
-    Exchange exchange = message.getExchange();
-    if (isNotBlank(body)) {
+    // This needs to be set because we want the wsc closes the final stream,
+    // otherwise cxf will close it too early when handling message in the StaxInEndingInterceptor.
+    exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, TRUE);
 
-      // This needs to be set because we want the wsc closes the final stream,
-      // otherwise cxf will close it too early when handling message in the StaxInEndingInterceptor.
-      exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, TRUE);
-
-      InputStream is = new ByteArrayInputStream(body.getBytes());
-      Message inMessage = new MessageImpl();
-
-      // TODO make encoding policy
-      inMessage.put(ENCODING, encoding);
-
-      String contentType = response.header(CONTENT_TYPE);
-      inMessage.put(CONTENT_TYPE, contentType);
-      inMessage.setContent(InputStream.class, is);
-      inMessage.setExchange(exchange);
-      messageObserver.onMessage(inMessage);
-    } else {
-      exchange.put(ClientImpl.FINISHED, TRUE);
-      throw new BadResponseException("Web Service Response is blank");
-    }
+    Message inMessage = new MessageImpl();
+    // TODO make encoding policy
+    inMessage.put(ENCODING, encoding);
+    inMessage.put(CONTENT_TYPE, response.getContentType());
+    inMessage.setContent(InputStream.class, response.getBody());
+    inMessage.setExchange(exchange);
+    messageObserver.onMessage(inMessage);
   }
 }

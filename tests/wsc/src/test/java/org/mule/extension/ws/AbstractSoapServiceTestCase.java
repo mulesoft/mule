@@ -38,7 +38,7 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
   public SoapVersion soapVersion;
 
   @Parameterized.Parameter(1)
-  public String serviceClass;
+  public String serviceClass = Soap11Service.class.getName();
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {

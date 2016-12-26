@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -26,9 +29,9 @@ import java.util.Optional;
 public class DefaultMetadataContext implements MetadataContext {
 
   private final Optional<ConfigurationInstance> configInstance;
-  private final ConnectionManager connectionManager;
   private final MetadataCache cache;
   private final ClassTypeLoader typeLoader;
+  private final ConnectionHandler connectionHandler;
 
   /**
    * Retrieves the configuration for the related component
@@ -41,11 +44,17 @@ public class DefaultMetadataContext implements MetadataContext {
    */
   public DefaultMetadataContext(Optional<ConfigurationInstance> configInstance,
                                 ConnectionManager connectionManager,
-                                MetadataCache cache, ClassTypeLoader typeLoader) {
+                                MetadataCache cache, ClassTypeLoader typeLoader)
+      throws ConnectionException {
     this.configInstance = configInstance;
-    this.connectionManager = connectionManager;
     this.cache = cache;
     this.typeLoader = typeLoader;
+
+    if (configInstance.isPresent() && configInstance.get().getConnectionProvider().isPresent()) {
+      this.connectionHandler = connectionManager.getConnection(configInstance.get().getValue());
+    } else {
+      this.connectionHandler = null;
+    }
   }
 
   /**
@@ -67,12 +76,7 @@ public class DefaultMetadataContext implements MetadataContext {
    */
   @Override
   public <C> Optional<C> getConnection() throws ConnectionException {
-    ConfigurationInstance config = configInstance.orElse(null);
-    if (config == null || !config.getConnectionProvider().isPresent()) {
-      return Optional.empty();
-    }
-
-    return Optional.of((C) connectionManager.getConnection(config.getValue()).getConnection());
+    return connectionHandler != null ? of((C) connectionHandler.getConnection()) : empty();
   }
 
   @Override
@@ -90,4 +94,10 @@ public class DefaultMetadataContext implements MetadataContext {
     return BaseTypeBuilder.create(JAVA);
   }
 
+  @Override
+  public void dispose() {
+    if (connectionHandler != null) {
+      connectionHandler.release();
+    }
+  }
 }

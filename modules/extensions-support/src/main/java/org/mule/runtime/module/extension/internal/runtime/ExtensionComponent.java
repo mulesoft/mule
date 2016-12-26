@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
@@ -17,6 +19,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -55,6 +58,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -82,6 +86,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   private final MetadataMediator metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
+  protected final ClassLoader classLoader;
 
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
@@ -97,11 +102,12 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
                                ConfigurationProvider configurationProvider,
                                ExtensionManagerAdapter extensionManager) {
     this.extensionModel = extensionModel;
+    this.classLoader = getClassLoader(extensionModel);
     this.componentModel = componentModel;
     this.configurationProvider = configurationProvider;
     this.extensionManager = extensionManager;
     this.metadataMediator = new MetadataMediator(componentModel);
-    this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getExtensionClassLoader());
+    this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
   /**
@@ -112,7 +118,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    */
   @Override
   public final void initialise() throws InitialisationException {
-    withContextClassLoader(getExtensionClassLoader(), () -> {
+    withContextClassLoader(classLoader, () -> {
       validateConfigurationProviderIsNotExpression();
       findConfigurationProvider().ifPresent(this::validateOperationConfiguration);
       doInitialise();
@@ -129,7 +135,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    */
   @Override
   public final void start() throws MuleException {
-    withContextClassLoader(getExtensionClassLoader(), () -> {
+    withContextClassLoader(classLoader, () -> {
       doStart();
       return null;
     }, MuleException.class, e -> {
@@ -144,7 +150,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    */
   @Override
   public final void stop() throws MuleException {
-    withContextClassLoader(getExtensionClassLoader(), () -> {
+    withContextClassLoader(classLoader, () -> {
       doStop();
       return null;
     }, MuleException.class, e -> {
@@ -158,7 +164,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   @Override
   public final void dispose() {
     try {
-      withContextClassLoader(getExtensionClassLoader(), () -> {
+      withContextClassLoader(classLoader, () -> {
         doDispose();
         return null;
       });
@@ -211,8 +217,13 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    */
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
-    final MetadataContext metadataContext = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(getClassLoader(this.extensionModel),
+                                                                      () -> metadataMediator.getMetadataKeys(context)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
   }
 
   /**
@@ -220,9 +231,13 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    */
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException {
-    MetadataContext context = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel),
-                                  () -> metadataMediator.getMetadata(context, getParameterValueResolver()));
+    try {
+      return runWithMetadataContext(context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator
+                                                                          .getMetadata(context, getParameterValueResolver())));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
   }
 
   /**
@@ -230,8 +245,13 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    */
   @Override
   public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException {
-    MetadataContext context = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(context, key));
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(getClassLoader(this.extensionModel),
+                                                                      () -> metadataMediator.getMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
   }
 
   @Override
@@ -239,7 +259,16 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
     this.flowConstruct = flowConstruct;
   }
 
-  protected MetadataContext getMetadataContext() throws MetadataResolvingException {
+
+  protected <R> R runWithMetadataContext(Function<MetadataContext, R> metadataContextFunction)
+      throws MetadataResolvingException, ConnectionException {
+    MetadataContext context = getMetadataContext();
+    R result = metadataContextFunction.apply(context);
+    context.dispose();
+    return result;
+  }
+
+  private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
     Event fakeEvent = getInitialiserEvent(muleContext);
 
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
@@ -283,10 +312,6 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
         .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event)));
   }
 
-  protected ClassLoader getExtensionClassLoader() {
-    return getClassLoader(extensionModel);
-  }
-
   private Optional<ConfigurationProvider> findConfigurationProvider() {
     if (requiresConfig.get()) {
       return isConfigurationSpecified()
@@ -305,7 +330,8 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
     try {
       return extensionManager.getConfigurationProvider(extensionModel);
     } catch (TooManyConfigsException e) {
-      throw new IllegalStateException(format("No config-ref was specified for component '%s' of extension '%s', but %d are registered. Please specify which to use",
+      throw new IllegalStateException(format(
+                                             "No config-ref was specified for component '%s' of extension '%s', but %d are registered. Please specify which to use",
                                              componentModel.getName(), extensionModel.getName(), e.getConfigsCount()),
                                       e);
     }
@@ -317,8 +343,10 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
 
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
     if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.getName())) {
-      throw new InitialisationException(createStaticMessage(format("Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
-          + "Expressions are not allowed as config references", flowConstruct.getName(), hyphenize(componentModel.getName()),
+      throw new InitialisationException(
+                                        createStaticMessage(format("Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+                                            + "Expressions are not allowed as config references", flowConstruct.getName(),
+                                                                   hyphenize(componentModel.getName()),
                                                                    configurationProvider)),
                                         this);
     }
