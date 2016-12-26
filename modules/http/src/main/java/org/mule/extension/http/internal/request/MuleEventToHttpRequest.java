@@ -68,13 +68,13 @@ public class MuleEventToHttpRequest {
 
   private final String uri;
   private final String method;
-  private final HttpRequesterConfig config;
+  private final HttpRequesterCookieConfig config;
   private final HttpStreamingType streamingMode;
   private final HttpSendBodyMode sendBodyMode;
   private final TransformationService transformationService;
 
 
-  public MuleEventToHttpRequest(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
+  public MuleEventToHttpRequest(HttpRequesterCookieConfig config, String uri, String method, HttpStreamingType streamingMode,
                                 HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
     this.config = config;
     this.uri = uri;

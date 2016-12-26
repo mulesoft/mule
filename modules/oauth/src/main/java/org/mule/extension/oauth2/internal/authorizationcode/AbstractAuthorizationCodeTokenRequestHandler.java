@@ -6,20 +6,25 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import static java.util.Arrays.asList;
+import static org.mule.extension.http.api.HttpConstants.Methods.GET;
+import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
+import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
+
 import org.mule.extension.oauth2.internal.AbstractTokenRequestHandler;
-import org.mule.extension.oauth2.internal.DynamicFlowFactory;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.module.http.api.listener.HttpListener;
-import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
+import org.mule.service.http.api.server.RequestHandlerManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +36,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private AuthorizationCodeGrantType oauthConfig;
-  private HttpListener redirectUrlListener;
+  private RequestHandlerManager redirectUrlHandlerManager;
 
 
   /**
@@ -96,12 +101,15 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
 
   protected void createListenerForCallbackUrl() throws MuleException {
     String flowName = "OAuthCallbackUrlFlow";
-    final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext());
+
+    final PathAndMethodRequestMatcher requestMatcher;
 
     if (getOauthConfig().getLocalCallbackUrl() != null) {
       flowName = flowName + getOauthConfig().getLocalCallbackUrl();
       try {
-        httpListenerBuilder.setUrl(new URL(getOauthConfig().getLocalCallbackUrl()));
+        final URL localCallbackUrl = new URL(getOauthConfig().getLocalCallbackUrl());
+        // TODO MULE-11283 improve this API
+        requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
       } catch (MalformedURLException e) {
         logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
         throw new DefaultMuleException(e);
@@ -109,22 +117,28 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
     } else if (getOauthConfig().getLocalCallbackConfig() != null) {
       flowName =
           flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
-      httpListenerBuilder
-          .setListenerConfig(getOauthConfig().getLocalCallbackConfig())
-          .setPath(getOauthConfig().getLocalCallbackConfigPath());
+      requestMatcher =
+          new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
+    } else {
+      throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
 
-    final Flow redirectUrlFlow =
-        DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
-    httpListenerBuilder.setFlow(redirectUrlFlow);
+    final Flow redirectUrlFlow = createDynamicFlow(getMuleContext(), flowName, asList(createRedirectUrlProcessor()));
 
-    if (getOauthConfig().getTlsContext() != null) {
-      httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
-    }
+    this.redirectUrlHandlerManager =
+        addRequestHandler(getOauthConfig().getServer(), requestMatcher, redirectUrlFlow, logger);
+  }
 
-    this.redirectUrlListener = httpListenerBuilder.build();
-    this.redirectUrlListener.initialise();
-    this.redirectUrlListener.start();
+  @Override
+  public void start() throws MuleException {
+    redirectUrlHandlerManager.start();
+    super.start();
+  }
+
+  @Override
+  public void stop() {
+    super.stop();
+    redirectUrlHandlerManager.stop();
   }
 
   protected abstract Processor createRedirectUrlProcessor();

@@ -6,26 +6,35 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.extension.http.api.HttpConstants.Methods.GET;
+import static org.mule.extension.http.api.HttpHeaders.Names.LOCATION;
+import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
+import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
 
-import org.mule.extension.oauth2.internal.DynamicFlowFactory;
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.internal.StateEncoder;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.module.http.api.listener.HttpListener;
-import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.server.RequestHandlerManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +46,8 @@ import org.slf4j.LoggerFactory;
  * Handles the call to the localAuthorizationUrl and redirects the user to the oauth authentication server authorization url so
  * the user can grant access to the resources to the mule application.
  */
-public class AuthorizationRequestHandler implements MuleContextAware {
+public class AuthorizationRequestHandler implements MuleContextAware, Startable, Stoppable {
 
-  public static final String REDIRECT_STATUS_CODE = "302";
   public static final String OAUTH_STATE_ID_FLOW_VAR_NAME = "resourceOwnerId";
 
   private Logger logger = LoggerFactory.getLogger(AuthorizationRequestHandler.class);
@@ -48,7 +56,7 @@ public class AuthorizationRequestHandler implements MuleContextAware {
   private String localAuthorizationUrl;
   private String authorizationUrl;
   private Map<String, String> customParameters = new HashMap<>();
-  private HttpListener listener;
+  private RequestHandlerManager redirectUrlHandlerManager;
   private MuleContext muleContext;
   private AuthorizationCodeGrantType oauthConfig;
   private AttributeEvaluator stateEvaluator;
@@ -80,16 +88,15 @@ public class AuthorizationRequestHandler implements MuleContextAware {
   public void init() throws MuleException {
     try {
       stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionManager());
-      final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(muleContext);
-      final String flowName = "authorization-request-handler-" + localAuthorizationUrl;
-      final Flow flow = DynamicFlowFactory.createDynamicFlow(muleContext, flowName, createLocalAuthorizationUrlListener());
-      httpListenerBuilder.setUrl(new URL(localAuthorizationUrl)).setSuccessStatusCode(REDIRECT_STATUS_CODE).setFlow(flow);
-      if (oauthConfig.getTlsContext() != null) {
-        httpListenerBuilder.setTlsContextFactory(oauthConfig.getTlsContext());
-      }
-      this.listener = httpListenerBuilder.build();
-      this.listener.initialise();
-      this.listener.start();
+
+      this.redirectUrlHandlerManager =
+          addRequestHandler(getOauthConfig().getServer(),
+                            // TODO MULE-11283 improve this API
+                            new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()),
+                                                       new URL(localAuthorizationUrl).getPath()),
+                            createDynamicFlow(muleContext, "authorization-request-handler-" + localAuthorizationUrl,
+                                              createLocalAuthorizationUrlListener()),
+                            logger);
     } catch (MalformedURLException e) {
       logger.warn("Could not parse provided url %s. Validate that the url is correct", localAuthorizationUrl);
       throw new DefaultMuleException(e);
@@ -101,7 +108,7 @@ public class AuthorizationRequestHandler implements MuleContextAware {
       final Builder builder = Event.builder(muleEvent);
 
       final String onCompleteRedirectToValue =
-          ((Map<String, String>) muleEvent.getMessage().getInboundProperty("http.query.params")).get("onCompleteRedirectTo");
+          ((HttpRequestAttributes) muleEvent.getMessage().getAttributes()).getQueryParams().get("onCompleteRedirectTo");
       final String resourceOwnerId =
           getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
       muleEvent = builder.addVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
@@ -118,12 +125,12 @@ public class AuthorizationRequestHandler implements MuleContextAware {
           .setCustomParameters(customParameters).setRedirectUrl(oauthConfig.getExternalCallbackUrl())
           .setState(stateEncoder.getEncodedState()).setScope(scopes).buildUrl();
 
-      return builder
-          .message(InternalMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams)
-              .build())
-          .build();
+      return builder.message(InternalMessage.builder(muleEvent.getMessage())
+          .attributes(new HttpResponseAttributes(MOVED_TEMPORARILY.getStatusCode(), MOVED_TEMPORARILY.getReasonPhrase(),
+                                                 new ParameterMap(singletonMap(LOCATION, authorizationUrlWithParams))))
+          .build()).build();
     };
-    return Arrays.asList(listenerMessageProcessor);
+    return asList(listenerMessageProcessor);
   }
 
   @Override
@@ -138,4 +145,15 @@ public class AuthorizationRequestHandler implements MuleContextAware {
   public AuthorizationCodeGrantType getOauthConfig() {
     return oauthConfig;
   }
+
+  @Override
+  public void start() throws MuleException {
+    redirectUrlHandlerManager.start();
+  }
+
+  @Override
+  public void stop() {
+    redirectUrlHandlerManager.stop();
+  }
+
 }

@@ -12,13 +12,14 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SE
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.RamlApiConfiguration;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -42,7 +43,7 @@ import javax.inject.Inject;
 @Configuration(name = "request-config")
 @ConnectionProviders(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
-public class HttpRequesterConfig implements Initialisable {
+public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
 
   @ParameterGroup(URL_CONFIGURATION)
   @NullSafe
@@ -105,6 +106,7 @@ public class HttpRequesterConfig implements Initialisable {
     return responseSettings.getResponseTimeout();
   }
 
+  @Override
   public boolean isEnableCookies() {
     return otherSettings.isEnableCookies();
   }
@@ -113,6 +115,7 @@ public class HttpRequesterConfig implements Initialisable {
     return apiConfiguration;
   }
 
+  @Override
   public CookieManager getCookieManager() {
     return cookieManager;
   }
