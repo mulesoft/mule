@@ -27,7 +27,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -38,6 +40,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,44 +54,59 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
   public static final String OAUTH_STATE_ID_FLOW_VAR_NAME = "resourceOwnerId";
 
   private Logger logger = LoggerFactory.getLogger(AuthorizationRequestHandler.class);
+
+  /**
+   * Scope required by this application to execute. Scopes define permissions over resources.
+   */
+  @Parameter
+  @Optional
   private String scopes;
-  private String state;
+
+  /**
+   * State parameter for holding state between the authentication request and the callback done by the oauth authorization server
+   * to the redirectUrl.
+   */
+  @Parameter
+  @Optional(defaultValue = "#[null]")
+  private Function<Event, String> state;
+
+  /**
+   * Identifier under which the oauth authentication attributes are stored (accessToken, refreshToken, etc).
+   * <p>
+   * This attribute is only required when the applications needs to access resources from more than one user in the OAuth
+   * authentication server.
+   */
+  @Parameter
+  @Optional(defaultValue = "#[null]")
+  private Function<Event, String> localAuthorizationUrlResourceOwnerId;
+
+  /**
+   * If this attribute is provided mule will automatically create and endpoint in the host server that the user can hit to
+   * authenticate and grant access to the application for his account.
+   */
+  @Parameter
   private String localAuthorizationUrl;
+
+  /**
+   * The oauth authentication server url to authorize the app for a certain user.
+   */
+  @Parameter
   private String authorizationUrl;
+
+  /**
+   * Custom parameters to send to the authorization request url or the oauth authorization sever.
+   */
+  @Parameter
+  @Optional
+  @Alias("custom-parameters")
   private Map<String, String> customParameters = new HashMap<>();
+
   private RequestHandlerManager redirectUrlHandlerManager;
   private MuleContext muleContext;
   private AuthorizationCodeGrantType oauthConfig;
-  private AttributeEvaluator stateEvaluator;
-
-  public void setScopes(final String scopes) {
-    this.scopes = scopes;
-  }
-
-  public void setState(final String state) {
-    this.state = state;
-  }
-
-  public void setLocalAuthorizationUrl(final String localAuthorizationUrl) {
-    this.localAuthorizationUrl = localAuthorizationUrl;
-  }
-
-  public void setAuthorizationUrl(final String authorizationUrl) {
-    this.authorizationUrl = authorizationUrl;
-  }
-
-  public Map<String, String> getCustomParameters() {
-    return customParameters;
-  }
-
-  public void setCustomParameters(final Map<String, String> customParameters) {
-    this.customParameters = customParameters;
-  }
 
   public void init() throws MuleException {
     try {
-      stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionManager());
-
       this.redirectUrlHandlerManager =
           addRequestHandler(getOauthConfig().getServer(),
                             // TODO MULE-11283 improve this API
@@ -109,11 +127,9 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
 
       final String onCompleteRedirectToValue =
           ((HttpRequestAttributes) muleEvent.getMessage().getAttributes()).getQueryParams().get("onCompleteRedirectTo");
-      final String resourceOwnerId =
-          getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
+      final String resourceOwnerId = localAuthorizationUrlResourceOwnerId.apply(muleEvent);
       muleEvent = builder.addVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
-      final String stateValue = stateEvaluator.resolveStringValue(muleEvent);
-      final StateEncoder stateEncoder = new StateEncoder(stateValue);
+      final StateEncoder stateEncoder = new StateEncoder(state.apply(muleEvent));
       if (resourceOwnerId != null) {
         stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
       }

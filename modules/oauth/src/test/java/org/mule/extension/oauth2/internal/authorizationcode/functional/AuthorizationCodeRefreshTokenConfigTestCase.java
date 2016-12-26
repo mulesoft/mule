@@ -9,8 +9,8 @@ package org.mule.extension.oauth2.internal.authorizationcode.functional;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
+import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.runtime.module.http.internal.request.ResponseValidatorException;
 
 import org.junit.Rule;
 import org.junit.Test;

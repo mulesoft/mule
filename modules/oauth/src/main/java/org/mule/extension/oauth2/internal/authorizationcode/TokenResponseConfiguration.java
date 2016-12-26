@@ -6,48 +6,57 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import org.mule.extension.oauth2.internal.OAuthConstants;
-import org.mule.extension.oauth2.internal.ParameterExtractor;
+import static java.util.Collections.emptyList;
+import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_EXPRESSION;
+import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRATION_TIME_EXPRESSION;
+import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_EXPRESSION;
 
-import java.util.Collections;
+import org.mule.extension.oauth2.internal.ParameterExtractor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Provides configuration to handle a token url call response.
  */
 public class TokenResponseConfiguration {
 
-  private String accessToken = OAuthConstants.ACCESS_TOKEN_EXPRESSION;
-  private String refreshToken = OAuthConstants.REFRESH_TOKEN_EXPRESSION;
-  private String expiresIn = OAuthConstants.EXPIRATION_TIME_EXPRESSION;
+  /**
+   * MEL expression to extract the access token parameter.
+   */
+  @Parameter
+  @Optional(defaultValue = ACCESS_TOKEN_EXPRESSION)
+  private Function<Event, String> accessToken;
 
-  private List<ParameterExtractor> parameterExtractors = Collections.emptyList();
+  @Parameter
+  @Optional(defaultValue = REFRESH_TOKEN_EXPRESSION)
+  private Function<Event, String> refreshToken;
+
+  /**
+   * MEL expression to extract the expired in parameter.
+   */
+  @Parameter
+  @Optional(defaultValue = EXPIRATION_TIME_EXPRESSION)
+  private Function<Event, String> expiresIn;
+
+  private List<ParameterExtractor> parameterExtractors = emptyList();
 
   public void setParameterExtractors(final List<ParameterExtractor> parameterExtractors) {
     this.parameterExtractors = parameterExtractors;
   }
 
-  public void setAccessToken(final String accessToken) {
-    this.accessToken = accessToken;
-  }
-
-  public void setRefreshToken(final String refreshToken) {
-    this.refreshToken = refreshToken;
-  }
-
-  public void setExpiresIn(final String expiresIn) {
-    this.expiresIn = expiresIn;
-  }
-
-  public String getAccessToken() {
+  public Function<Event, String> getAccessToken() {
     return accessToken;
   }
 
-  public String getRefreshToken() {
+  public Function<Event, String> getRefreshToken() {
     return refreshToken;
   }
 
-  public String getExpiresIn() {
+  public Function<Event, String> getExpiresIn() {
     return expiresIn;
   }
 

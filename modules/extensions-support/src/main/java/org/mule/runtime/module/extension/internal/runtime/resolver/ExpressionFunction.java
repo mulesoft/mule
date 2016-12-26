@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.util.function.Function;
 
@@ -39,7 +39,13 @@ final class ExpressionFunction<T> implements Function<Event, T> {
   @Override
   public T apply(Event event) {
     try {
-      return new TypeSafeExpressionValueResolver<T>(expression, getType(type), muleContext).resolve(event);
+      // TODO MULE-11292 Provide a proper fix for this
+      Class<Object> type = getType(this.type);
+      if (type.isAssignableFrom(Function.class)) {
+        return (T) new TypeSafeExpressionValueResolver<>(expression, Object.class, muleContext).resolve(event);
+      } else {
+        return new TypeSafeExpressionValueResolver<T>(expression, type, muleContext).resolve(event);
+      }
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

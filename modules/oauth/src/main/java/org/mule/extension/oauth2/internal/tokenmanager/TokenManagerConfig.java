@@ -15,6 +15,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.ConfigName;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,15 +28,29 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * It can be referenced to access the state inside a flow for custom processing of oauth dance content.
  */
+@Alias("token-manager-config")
+@XmlHints(allowTopLevelDefinition = true)
 public class TokenManagerConfig implements Initialisable, MuleContextAware {
 
   public static AtomicInteger defaultTokenManagerConfigIndex = new AtomicInteger(0);
+  /**
+   * Identifier for the token manager configuration.
+   */
+  @ConfigName
   private String name;
+  /**
+   * References an object store to use for storing oauth context data
+   */
+  @Parameter
+  @Optional
+  @Alias("objectStore-ref")
   private ListableObjectStore objectStore;
-  private ConfigOAuthContext configOAuthContext;
-  private MuleContext muleContext;
-  private boolean initialised;
 
+  private MuleContext muleContext;
+
+  private ConfigOAuthContext configOAuthContext;
+
+  private boolean initialised;
 
   public void setObjectStore(ListableObjectStore objectStore) {
     this.objectStore = objectStore;
@@ -70,11 +89,6 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
     return configOAuthContext;
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
   /**
    * Provides support for the oauthContext MEL function for this configuration
    *
@@ -91,5 +105,10 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
       resourceOwnerId = (String) params[0];
     }
     return getConfigOAuthContext().getContextForResourceOwner(resourceOwnerId);
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

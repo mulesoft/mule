@@ -6,12 +6,13 @@
  */
 package org.mule.extension.oauth2.internal.clientcredentials.functional;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class ClientCredentialsNoTokenManagerConfigTestCase extends AbstractClientCredentialsBasicTestCase {
@@ -20,10 +21,10 @@ public class ClientCredentialsNoTokenManagerConfigTestCase extends AbstractClien
   public void authenticationIsDoneOnStartup() throws Exception {
     verifyRequestDoneToTokenUrlForClientCredentials();
 
-    TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
+    final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
     final ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext()
-        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-    assertThat(oauthContext.getAccessToken(), Is.is(ACCESS_TOKEN));
+        .getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
+    assertThat(oauthContext.getAccessToken(), is(ACCESS_TOKEN));
   }
 
 }

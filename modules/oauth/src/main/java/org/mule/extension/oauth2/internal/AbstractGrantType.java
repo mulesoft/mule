@@ -6,12 +6,28 @@
  */
 package org.mule.extension.oauth2.internal;
 
-import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.extension.http.api.request.authentication.HttpAuthentication;
+import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
  * Common interface for all grant types must extend this interface.
  */
-public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials {
+public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials, MuleContextAware {
+
+  protected MuleContext muleContext;
+
+  /**
+   * The token manager configuration to use for this grant type.
+   */
+  @Parameter
+  @Optional
+  @Alias("tokenManager-ref")
+  protected TokenManagerConfig tokenManager;
 
   /**
    * @param accessToken an ouath access token
@@ -21,4 +37,8 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
     return "Bearer " + accessToken;
   }
 
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

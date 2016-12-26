@@ -28,5 +28,4 @@
             </httpn:authentication>
         </httpn:request-connection>
     </httpn:request-config>
-
 </mule>
