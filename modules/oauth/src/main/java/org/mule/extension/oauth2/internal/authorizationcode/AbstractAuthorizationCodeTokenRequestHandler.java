@@ -121,17 +121,13 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
   protected void createListenerForCallbackUrl() throws MuleException {
     String flowName = "OAuthCallbackUrlFlow";
 
-    // final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
     final ListenerRequestMatcher requestMatcher;
     final ListenerPath listenerPath;
-    // final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext());
 
     if (getOauthConfig().getLocalCallbackUrl() != null) {
       flowName = flowName + getOauthConfig().getLocalCallbackUrl();
       try {
         final URL localCallbackUrl = new URL(getOauthConfig().getLocalCallbackUrl());
-        // serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
-        // httpListenerBuilder.setUrl(localCallbackUrl);
         requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
         listenerPath = new ListenerPath(localCallbackUrl.getPath(), "/");
       } catch (MalformedURLException e) {
@@ -141,37 +137,14 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
     } else if (getOauthConfig().getLocalCallbackConfig() != null) {
       flowName =
           flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
-
-      // serverConfigBuilder
-      // .setHost(getOauthConfig().getLocalCallbackConfig().getHost())
-      // .setPort(getOauthConfig().getLocalCallbackConfig().getPort())
-      // .setTlsContextFactory(getOauthConfig().getLocalCallbackConfig().getTlsContext());
-      // httpListenerBuilder
-      // .setListenerConfig(getOauthConfig().getLocalCallbackConfig())
-      // .setPath(getOauthConfig().getLocalCallbackConfigPath());
-
       requestMatcher =
           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
       listenerPath = new ListenerPath(getOauthConfig().getLocalCallbackConfigPath(), "/");
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
-    //
-    // if (getOauthConfig().getTlsContext() != null) {
-    // serverConfigBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
-    // }
 
     final Flow redirectUrlFlow = createDynamicFlow(getMuleContext(), flowName, asList(createRedirectUrlProcessor()));
-
-    // HttpServerConfiguration serverConfiguration = serverConfigBuilder
-    // .setSchedulerSupplier(() -> muleContext.getSchedulerService().ioScheduler()).build();
-
-    // try {
-    // server = muleContext.getRegistry().lookupObject(HttpService.class).getServerFactory().create(serverConfiguration);
-    // } catch (ConnectionException e) {
-    // logger.warn("Could not create server for OAuth callback.");
-    // throw new DefaultMuleException(e);
-    // }
 
     // MULE-11277 Support non-blocking in OAuth http listeners
     this.redirectUrlHandlerManager =
@@ -227,17 +200,6 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
             currentThread().setContextClassLoader(previousCtxClassLoader);
           }
         });
-
-
-
-    // httpListenerBuilder.setFlow(redirectUrlFlow);
-
-    // if (getOauthConfig().getTlsContext() != null) {
-    // httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
-    // }
-
-    // this.redirectUrlHandlerManager = httpListenerBuilder.build();
-    // this.redirectUrlHandlerManager.initialise();
   }
 
   private void sendErrorResponse(final HttpConstants.HttpStatus status, String message,

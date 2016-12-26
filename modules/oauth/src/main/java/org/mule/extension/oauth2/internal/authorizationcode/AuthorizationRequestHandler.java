@@ -67,7 +67,6 @@ import org.slf4j.LoggerFactory;
  */
 public class AuthorizationRequestHandler implements MuleContextAware, Startable, Stoppable {
 
-  public static final String REDIRECT_STATUS_CODE = "302";
   public static final String OAUTH_STATE_ID_FLOW_VAR_NAME = "resourceOwnerId";
 
   private Logger logger = LoggerFactory.getLogger(AuthorizationRequestHandler.class);
@@ -108,7 +107,6 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
   public void init() throws MuleException {
     try {
       stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionManager());
-      // final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(muleContext);
       final String flowName = "authorization-request-handler-" + localAuthorizationUrl;
       final Flow flow = createDynamicFlow(muleContext, flowName, createLocalAuthorizationUrlListener());
 
@@ -118,13 +116,6 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
       requestMatcher =
           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), parserLoacalAuthorizationUrl.getPath());
       listenerPath = new ListenerPath(parserLoacalAuthorizationUrl.getPath(), "/");
-      // httpListenerBuilder.setUrl(new URL(localAuthorizationUrl)).setSuccessStatusCode(REDIRECT_STATUS_CODE).setFlow(flow);
-      // if (oauthConfig.getTlsContext() != null) {
-      // httpListenerBuilder.setTlsContextFactory(oauthConfig.getTlsContext());
-      // }
-      // this.listener = httpListenerBuilder.build();
-      // this.listener.initialise();
-      // this.listener.start();
 
       // MULE-11277 Support non-blocking in OAuth http listeners
       this.redirectUrlHandlerManager =
@@ -193,8 +184,6 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
 
       final String onCompleteRedirectToValue =
           ((HttpRequestAttributes) muleEvent.getMessage().getAttributes()).getQueryParams().get("onCompleteRedirectTo");
-      // final String onCompleteRedirectToValue =
-      // ((Map<String, String>) muleEvent.getMessage().getInboundProperty("http.query.params")).get("onCompleteRedirectTo");
       final String resourceOwnerId =
           getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
       muleEvent = builder.addVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();

@@ -8,6 +8,7 @@ package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
@@ -28,7 +29,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
@@ -214,17 +214,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     String flowName = "OAuthCallbackUrlFlow";
 
     final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
-    // final ListenerRequestMatcher requestMatcher;
-    // final ListenerPath listenerPath;
 
     if (getLocalCallbackUrl() != null) {
       flowName = flowName + getLocalCallbackUrl();
       try {
         final URL localCallbackUrl = new URL(getLocalCallbackUrl());
         serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
-        // httpListenerBuilder.setUrl(localCallbackUrl);
-        // requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
-        // listenerPath = new ListenerPath(localCallbackUrl.getPath(), "/");
       } catch (MalformedURLException e) {
         logger.warn("Could not parse provided url %s. Validate that the url is correct", getLocalCallbackUrl());
         throw new InitialisationException(e, this);
@@ -236,12 +231,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
           .setHost(getLocalCallbackConfig().getHost())
           .setPort(getLocalCallbackConfig().getPort())
           .setTlsContextFactory(getLocalCallbackConfig().getTlsContext());
-      // httpListenerBuilder
-      // .setListenerConfig(getOauthConfig().getLocalCallbackConfig())
-      // .setPath(getOauthConfig().getLocalCallbackConfigPath());
-
-      // requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getLocalCallbackConfigPath());
-      // listenerPath = new ListenerPath(getLocalCallbackConfigPath(), "/");
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
@@ -276,7 +265,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
                                                                                  "No access token for the %s user. Verify that you have authenticated the user before trying to execute an operation to the API.",
                                                                                  resourceOwnerId)));
     }
-    builder.addHeader(HttpHeaders.Names.AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
+    builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
   }
 
   @Override

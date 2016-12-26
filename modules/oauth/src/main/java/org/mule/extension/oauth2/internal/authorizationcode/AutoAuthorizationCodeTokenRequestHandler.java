@@ -146,10 +146,6 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
 
       String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
       if (!isEmpty(onCompleteRedirectToValue)) {
-        // builder.addOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
-        // builder.addOutboundProperty(LOCATION,
-        // appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY,
-        // valueOf(finalAuthorizationStatus)));
         responseAttributes = new HttpResponseAttributes(MOVED_TEMPORARILY.getStatusCode(), MOVED_TEMPORARILY.getReasonPhrase(),
                                                         new ParameterMap(singletonMap(LOCATION,
                                                                                       appendQueryParam(onCompleteRedirectToValue,
@@ -176,8 +172,8 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     final Map<String, String> queryParams = ((HttpRequestAttributes) event.getMessage().getAttributes()).getQueryParams();
     final String authorizationCode = queryParams.get(CODE_PARAMETER);
     if (authorizationCode == null) {
-      logger
-          .info("HTTP Request to redirect URL done by the OAuth provider does not contains a code query parameter. Code query parameter is required to get the access token.");
+      logger.info("HTTP Request to redirect URL done by the OAuth provider does not contains a code query parameter. "
+          + "Code query parameter is required to get the access token.");
       throw new NoAuthorizationCodeException();
     }
     return authorizationCode;
