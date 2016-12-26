@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public final class JavaExtensionModelLoader extends ExtensionModelLoader {
+public class JavaExtensionModelLoader extends ExtensionModelLoader {
 
   public static final String LOADER_ID = "java";
   public static final String TYPE_PROPERTY_NAME = "type";
