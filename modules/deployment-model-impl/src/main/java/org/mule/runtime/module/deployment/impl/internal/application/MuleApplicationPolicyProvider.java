@@ -56,7 +56,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     checkArgument(application != null, "application was not configured on the policy provider");
 
     Optional<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProvider = registeredPolicyInstanceProviders.stream()
-        .filter(p -> p.policyId.equals(parametrization.getId())).findFirst();
+        .filter(p -> p.getPolicyId().equals(parametrization.getId())).findFirst();
     if (registeredPolicyInstanceProvider.isPresent()) {
       throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
     }
@@ -85,10 +85,10 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   @Override
   public synchronized boolean removePolicy(String parametrizedPolicyId) {
     Optional<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProvider = registeredPolicyInstanceProviders.stream()
-        .filter(p -> p.policyId.equals(parametrizedPolicyId)).findFirst();
+        .filter(p -> p.getPolicyId().equals(parametrizedPolicyId)).findFirst();
 
     registeredPolicyInstanceProvider.ifPresent(provider -> {
-      provider.applicationPolicyInstance.dispose();
+      provider.getApplicationPolicyInstance().dispose();
       registeredPolicyInstanceProviders.remove(provider);
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
@@ -116,9 +116,9 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
     if (!registeredPolicyInstanceProviders.isEmpty()) {
       for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-        if (registeredPolicyInstanceProvider.applicationPolicyInstance.getPointcut().matches(policyPointcutParameters)) {
-          if (registeredPolicyInstanceProvider.applicationPolicyInstance.getSourcePolicy().isPresent()) {
-            policies.add(registeredPolicyInstanceProvider.applicationPolicyInstance.getSourcePolicy().get());
+        if (registeredPolicyInstanceProvider.getApplicationPolicyInstance().getPointcut().matches(policyPointcutParameters)) {
+          if (registeredPolicyInstanceProvider.getApplicationPolicyInstance().getSourcePolicy().isPresent()) {
+            policies.add(registeredPolicyInstanceProvider.getApplicationPolicyInstance().getSourcePolicy().get());
           }
         }
       }
@@ -133,9 +133,9 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
     if (!registeredPolicyInstanceProviders.isEmpty()) {
       for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-        if (registeredPolicyInstanceProvider.applicationPolicyInstance.getPointcut().matches(policyPointcutParameters)) {
-          if (registeredPolicyInstanceProvider.applicationPolicyInstance.getOperationPolicy().isPresent()) {
-            policies.add(registeredPolicyInstanceProvider.applicationPolicyInstance.getOperationPolicy().get());
+        if (registeredPolicyInstanceProvider.getApplicationPolicyInstance().getPointcut().matches(policyPointcutParameters)) {
+          if (registeredPolicyInstanceProvider.getApplicationPolicyInstance().getOperationPolicy().isPresent()) {
+            policies.add(registeredPolicyInstanceProvider.getApplicationPolicyInstance().getOperationPolicy().get());
           }
         }
       }
@@ -148,7 +148,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   public void dispose() {
 
     for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-      registeredPolicyInstanceProvider.applicationPolicyInstance.dispose();
+      registeredPolicyInstanceProvider.getApplicationPolicyInstance().dispose();
     }
     registeredPolicyInstanceProviders.clear();
 
@@ -195,6 +195,14 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     @Override
     public int compareTo(RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider) {
       return compare(applicationPolicyInstance.getOrder(), registeredPolicyInstanceProvider.applicationPolicyInstance.getOrder());
+    }
+
+    public ApplicationPolicyInstance getApplicationPolicyInstance() {
+      return applicationPolicyInstance;
+    }
+
+    public String getPolicyId() {
+      return policyId;
     }
   }
 }
