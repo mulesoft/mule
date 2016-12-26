@@ -16,8 +16,7 @@ import java.util.Map;
 /**
  * Parametrizes a policy template
  * <p/>
- * A policy template is a Mule artifact consistent of a context with dependencies deployed inside
- * a Mule application.
+ * A policy template is a Mule artifact consistent of a context with dependencies deployed inside a Mule application.
  *
  * @since 4.0
  */
@@ -26,22 +25,27 @@ public class PolicyParametrization {
   private final String id;
   private final PolicyPointcut pointcut;
   private final Map<String, Object> parameters;
+  private final int order;
 
   /**
    * Creates a new parametrization
-   *
+   * 
    * @param id parametrization identifier. Non empty.
    * @param pointcut used to determine if the policy must be applied on a given request. Non null
+   * @param order indicates how this policy must be ordered related to other applied policies. A policy with a given order
+   *        has to be applied before polices with smaller order and after policies with bigger order. Must be positive
    * @param parameters parameters for the policy template on which the parametrization is based on. Non null.
    */
-  public PolicyParametrization(String id, PolicyPointcut pointcut, Map<String, Object> parameters) {
+  public PolicyParametrization(String id, PolicyPointcut pointcut, int order, Map<String, Object> parameters) {
     checkArgument(!isEmpty(id), "id cannot be null");
     checkArgument(pointcut != null, "pointcut cannot be null");
     checkArgument(parameters != null, "parameters cannot be null");
+    checkArgument(order > 0, "order must be positive");
 
     this.id = id;
     this.pointcut = pointcut;
     this.parameters = unmodifiableMap(parameters);
+    this.order = order;
   }
 
   /**
@@ -56,6 +60,13 @@ public class PolicyParametrization {
    */
   public PolicyPointcut getPointcut() {
     return pointcut;
+  }
+
+  /**
+   * @return order of the policy parametrization
+   */
+  public int getOrder() {
+    return order;
   }
 
   /**

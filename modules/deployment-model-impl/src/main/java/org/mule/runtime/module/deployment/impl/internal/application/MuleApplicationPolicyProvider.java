@@ -7,17 +7,19 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.lang.Integer.compare;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProvider;
+import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
 
@@ -71,11 +73,12 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       registeredPolicyTemplates.add(registeredPolicyTemplate.get());
     }
 
-    PolicyInstanceProvider policyInstanceProvider = policyInstanceProviderFactory
+    ApplicationPolicyInstance applicationPolicyInstance = policyInstanceProviderFactory
         .create(application, registeredPolicyTemplate.get().policyTemplate, parametrization);
     registeredPolicyInstanceProviders
-        .add(new RegisteredPolicyInstanceProvider(policyInstanceProvider,
+        .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance,
                                                   parametrization.getId()));
+    registeredPolicyInstanceProviders.sort(null);
     registeredPolicyTemplate.get().count++;
   }
 
@@ -85,7 +88,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         .filter(p -> p.policyId.equals(parametrizedPolicyId)).findFirst();
 
     registeredPolicyInstanceProvider.ifPresent(provider -> {
-      provider.policyInstanceProvider.dispose();
+      provider.applicationPolicyInstance.dispose();
       registeredPolicyInstanceProviders.remove(provider);
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
@@ -108,15 +111,15 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   }
 
   @Override
-  public List<org.mule.runtime.core.policy.Policy> findSourceParameterizedPolicies(
-                                                                                   PolicyPointcutParameters policyPointcutParameters) {
-    List<org.mule.runtime.core.policy.Policy> policies = new ArrayList<>();
+  public List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
+    List<Policy> policies = new ArrayList<>();
 
     if (!registeredPolicyInstanceProviders.isEmpty()) {
       for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-        if (registeredPolicyInstanceProvider.policyInstanceProvider.getPointcut().matches(policyPointcutParameters)) {
-          policies.addAll(registeredPolicyInstanceProvider.policyInstanceProvider
-              .findSourceParameterizedPolicies(policyPointcutParameters));
+        if (registeredPolicyInstanceProvider.applicationPolicyInstance.getPointcut().matches(policyPointcutParameters)) {
+          if (registeredPolicyInstanceProvider.applicationPolicyInstance.getSourcePolicy().isPresent()) {
+            policies.add(registeredPolicyInstanceProvider.applicationPolicyInstance.getSourcePolicy().get());
+          }
         }
       }
     }
@@ -125,16 +128,15 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   }
 
   @Override
-  public List<org.mule.runtime.core.policy.Policy> findOperationParameterizedPolicies(
-
-                                                                                      PolicyPointcutParameters policyPointcutParameters) {
-    List<org.mule.runtime.core.policy.Policy> policies = new ArrayList<>();
+  public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
+    List<Policy> policies = new ArrayList<>();
 
     if (!registeredPolicyInstanceProviders.isEmpty()) {
       for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-        if (registeredPolicyInstanceProvider.policyInstanceProvider.getPointcut().matches(policyPointcutParameters)) {
-          policies.addAll(registeredPolicyInstanceProvider.policyInstanceProvider
-              .findOperationParameterizedPolicies(policyPointcutParameters));
+        if (registeredPolicyInstanceProvider.applicationPolicyInstance.getPointcut().matches(policyPointcutParameters)) {
+          if (registeredPolicyInstanceProvider.applicationPolicyInstance.getOperationPolicy().isPresent()) {
+            policies.add(registeredPolicyInstanceProvider.applicationPolicyInstance.getOperationPolicy().get());
+          }
         }
       }
     }
@@ -146,7 +148,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   public void dispose() {
 
     for (RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider : registeredPolicyInstanceProviders) {
-      registeredPolicyInstanceProvider.policyInstanceProvider.dispose();
+      registeredPolicyInstanceProvider.applicationPolicyInstance.dispose();
     }
     registeredPolicyInstanceProviders.clear();
 
@@ -180,14 +182,19 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     }
   }
 
-  private static class RegisteredPolicyInstanceProvider {
+  private static class RegisteredPolicyInstanceProvider implements Comparable<RegisteredPolicyInstanceProvider> {
 
-    private final PolicyInstanceProvider policyInstanceProvider;
+    private final ApplicationPolicyInstance applicationPolicyInstance;
     private final String policyId;
 
-    public RegisteredPolicyInstanceProvider(PolicyInstanceProvider policyInstanceProvider, String policyId) {
-      this.policyInstanceProvider = policyInstanceProvider;
+    public RegisteredPolicyInstanceProvider(ApplicationPolicyInstance applicationPolicyInstance, String policyId) {
+      this.applicationPolicyInstance = applicationPolicyInstance;
       this.policyId = policyId;
+    }
+
+    @Override
+    public int compareTo(RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider) {
+      return compare(applicationPolicyInstance.getOrder(), registeredPolicyInstanceProvider.applicationPolicyInstance.getOrder());
     }
   }
 }

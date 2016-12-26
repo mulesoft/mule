@@ -12,7 +12,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 
 /**
- * Creates {@link PolicyInstanceProvider} instances
+ * Creates {@link ApplicationPolicyInstance} instances
  */
 public interface PolicyInstanceProviderFactory {
 
@@ -24,5 +24,5 @@ public interface PolicyInstanceProviderFactory {
    * @param parametrization parameters used to configure the template. Non null/
    * @return
    */
-  PolicyInstanceProvider create(Application application, PolicyTemplate policyTemplate, PolicyParametrization parametrization);
+  ApplicationPolicyInstance create(Application application, PolicyTemplate policyTemplate, PolicyParametrization parametrization);
 }
