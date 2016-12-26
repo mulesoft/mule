@@ -33,11 +33,11 @@ import org.quartz.impl.StdSchedulerFactory;
 public class QuartzConnector extends AbstractConnector
 {
 
-	public static final String QUARTZ = "quartz";
+    public static final String QUARTZ = "quartz";
 
-	public static final String QUARTZ_SCHEDULER_PREFIX = "scheduler-";
+    public static final String QUARTZ_SCHEDULER_PREFIX = "scheduler-";
 
-	public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
+    public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
     public static final String PROPERTY_CRON_TIME_ZONE = "cronTimeZone";
     public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
@@ -75,12 +75,20 @@ public class QuartzConnector extends AbstractConnector
     {
         super(context);
     }
-    
-    public String getFullName()
+
+    /**
+     * obtains a full unique name for each quartz configuration
+     * 
+     * @param contextId context id
+     * @param connectorName connector name
+     * 
+     * @return full name for connector
+     */
+    public static String getFullName(String contextId, String connectorName)
     {
-    	return QUARTZ_SCHEDULER_PREFIX + muleContext.getConfiguration().getId() + "-" + getName();
+        return QUARTZ_SCHEDULER_PREFIX + contextId + "-" + connectorName;
     }
-    
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -95,7 +103,7 @@ public class QuartzConnector extends AbstractConnector
         String instanceName = factoryProperties.getProperty(QUARTZ_INSTANCE_NAME_PROPERTY);
         if (instanceName == null)
         {
-            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, getFullName());
+            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, getFullName(muleContext.getConfiguration().getId(), getName()));
         }
         else
         {
@@ -109,8 +117,7 @@ public class QuartzConnector extends AbstractConnector
                 SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
                 quartzScheduler = factory.getScheduler();
             }
-            quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);            
-        
+            quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
         }
         catch (Exception e)
         {

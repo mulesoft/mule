@@ -23,9 +23,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class QuartzMultipleConnectorsDifferentConfigTestCase extends FunctionalTestCase
 {
 
-    private static String QUARTZ_CONNECTOR_NAME_1 = "Quartz1";
+    private static final String QUARTZ_CONNECTOR_NAME_1 = "Quartz1";
 
-    private static String QUARTZ_CONNECTOR_NAME_2 = "Quartz2";
+    private static final String QUARTZ_CONNECTOR_NAME_2 = "Quartz2";
 
 
     public QuartzMultipleConnectorsDifferentConfigTestCase()
@@ -42,11 +42,11 @@ public class QuartzMultipleConnectorsDifferentConfigTestCase extends FunctionalT
     @Test
     public void twoConnectorsWithDifferentNamesCreatesSchedulersWithDifferentNames() throws Exception
     {
-        QuartzConnector quartzConnector1 = (QuartzConnector) muleContext.getRegistry().lookupConnector(QUARTZ_CONNECTOR_NAME_1);
-        QuartzConnector quartzConnector2 = (QuartzConnector) muleContext.getRegistry().lookupConnector(QUARTZ_CONNECTOR_NAME_2);
+        QuartzConnector quartzConnector1 = muleContext.getRegistry().lookupObject(QUARTZ_CONNECTOR_NAME_1);
+        QuartzConnector quartzConnector2 = muleContext.getRegistry().lookupObject(QUARTZ_CONNECTOR_NAME_2);
 
-        assertThat(quartzConnector1.getQuartzScheduler().getSchedulerName(), equalTo(quartzConnector1.getFullName()));
-        assertThat(quartzConnector2.getQuartzScheduler().getSchedulerName(), equalTo(quartzConnector2.getFullName()));
+        assertThat(quartzConnector1.getQuartzScheduler().getSchedulerName(), equalTo(QuartzConnector.getFullName(muleContext.getConfiguration().getId(), quartzConnector1.getName())));
+        assertThat(quartzConnector2.getQuartzScheduler().getSchedulerName(), equalTo(QuartzConnector.getFullName(muleContext.getConfiguration().getId(), quartzConnector2.getName())));
     }
 
 }
