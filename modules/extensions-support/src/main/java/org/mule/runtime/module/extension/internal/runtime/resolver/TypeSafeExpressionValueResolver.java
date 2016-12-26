@@ -21,6 +21,7 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.function.BiConsumer;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -42,7 +43,16 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
   private final AttributeEvaluator evaluator;
   private final MuleContext muleContext;
 
-  private boolean evaluatorInitted = false;
+  private boolean evaluatorInitialized = false;
+  private BiConsumer<AttributeEvaluator, MuleContext> evaluatorInitialiser = (evaluator, context) -> {
+    synchronized (context) {
+      if (!evaluatorInitialized) {
+        evaluator.initialize(context.getExpressionManager());
+        evaluatorInitialiser = (e, c) -> {};
+        evaluatorInitialized = true;
+      }
+    }
+  };
 
   public TypeSafeExpressionValueResolver(String expression, Class<?> expectedType, MuleContext muleContext) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
@@ -50,26 +60,18 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
 
     this.expectedType = expectedType;
     evaluator = new AttributeEvaluator(expression);
-
     this.muleContext = muleContext;
-  }
-
-  protected void initEvaluator(MuleContext muleContext) {
-    if (!evaluatorInitted) {
-      evaluatorInitted = true;
-      evaluator.initialize(muleContext.getExpressionManager());
-    }
   }
 
   @Override
   public T resolve(Event event) throws MuleException {
-    initEvaluator(muleContext);
+    initEvaluator();
     T evaluated = (T) evaluator.resolveValue(event);
     return evaluated != null ? transform(evaluated, event) : null;
   }
 
   private T transform(T object, Event event) throws MuleException {
-    initEvaluator(muleContext);
+    initEvaluator();
     if (ClassUtils.isInstance(expectedType, object)) {
       return object;
     }
@@ -102,6 +104,10 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     }
   }
 
+  private void initEvaluator() {
+    evaluatorInitialiser.accept(evaluator, muleContext);
+  }
+
   /**
    * @return {@code true}
    */
@@ -109,10 +115,4 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
   public boolean isDynamic() {
     return true;
   }
-
-  private interface EvaluatorDelegate {
-
-    Object resolveValue(Event event);
-  }
-
 }
