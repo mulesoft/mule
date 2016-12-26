@@ -9,7 +9,11 @@ package org.mule.extension.ws.internal.transport;
 import java.io.InputStream;
 
 /**
+ * An generic web service response object that can be constructed with any protocol specific response content such as JMS or HTTP.
+ * <p>
+ * An instance of this class aims to be returned in each {@link WscDispatcher} implementation.
  *
+ * @since 1.0
  */
 public class WscResponse {
 
