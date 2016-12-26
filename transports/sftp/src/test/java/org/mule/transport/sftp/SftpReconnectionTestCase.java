@@ -6,25 +6,24 @@
  */
 package org.mule.transport.sftp;
 
-import org.mule.api.MuleException;
-import org.mule.context.notification.ConnectionNotification;
-import org.mule.tck.listener.ConnectionListener;
-import org.mule.tck.listener.FlowExecutionListener;
-
-import com.jcraft.jsch.SftpException;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.jcraft.jsch.SftpException;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import org.mule.api.MuleException;
+import org.mule.context.notification.ConnectionNotification;
+import org.mule.tck.listener.ConnectionListener;
+import org.mule.tck.listener.FlowExecutionListener;
 
 public class SftpReconnectionTestCase extends AbstractSftpTestCase
 {
 
-    private static final long RECONNECTION_FREQUENCY = 1000l;
+    private static final double DELTA = 30.0;
+    private static final double RECONNECTION_FREQUENCY = 1000.0;
     private static final String INBOUND_ENDPOINT_DIRECTORY = "data";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static final String SFTP_RECEIVING_FLOW_NAME = "receiving";
@@ -66,12 +65,6 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
         verifySftpFlowIsRunning();
     }
 
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 9999999;
-    }
-
     private void verifySftpFlowIsRunning() throws Exception
     {
         FlowExecutionListener sftpInboundEndpointFlowExecutionListener = new FlowExecutionListener(SFTP_RECEIVING_FLOW_NAME, muleContext).setTimeoutInMillis(TIMEOUT);
@@ -93,7 +86,7 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
                 .setExpectedAction(ConnectionNotification.CONNECTION_FAILED)
                 .setNumberOfExecutionsRequired(2)
                 .waitUntilNotificationsAreReceived();
-        connectionListener.assertMinimumTimeBetweenNotifications(RECONNECTION_FREQUENCY);
+        connectionListener.assertMinimumTimeBetweenNotifications(RECONNECTION_FREQUENCY, DELTA);
     }
 
     @Override
