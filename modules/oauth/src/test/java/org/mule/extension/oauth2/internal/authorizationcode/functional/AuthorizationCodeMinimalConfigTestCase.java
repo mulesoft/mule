@@ -31,7 +31,7 @@ public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizatio
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), "tokenManagerConfig")
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get("tokenManagerConfig"))
         .assertAccessTokenIs(ACCESS_TOKEN).assertRefreshTokenIs(REFRESH_TOKEN);
   }
 

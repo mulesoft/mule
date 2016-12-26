@@ -134,7 +134,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), "tokenManagerConfig")
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get("tokenManagerConfig"))
         .assertAccessTokenIs(ACCESS_TOKEN).assertExpiresInIs(EXPIRES_IN).assertRefreshTokenIs(REFRESH_TOKEN)
         .assertState(state.getValue())
         .assertContainsCustomTokenResponseParam(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE)
