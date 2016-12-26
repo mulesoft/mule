@@ -2,34 +2,37 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
 
-    <http:request-config name="requestConfig">
-        <oauth2:authorization-code-grant-type
-                clientId="${client.id}"
-                clientSecret="${client.secret}"
-                localCallbackUrl="${local.callback.url}"
-                externalCallbackUrl="${local.callback.url}">
-            <oauth2:authorization-request
-                    localAuthorizationUrl="${local.authorization.url}"
-                    authorizationUrl="${authorization.url}">
-            </oauth2:authorization-request>
-            <oauth2:token-request
-                    tokenUrl="${token.url}"/>
-        </oauth2:authorization-code-grant-type>
-    </http:request-config>
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection>
+            <httpn:authentication>
+                <oauth2:authorization-code-grant-type
+                        clientId="${client.id}"
+                        clientSecret="${client.secret}"
+                        localCallbackUrl="${local.callback.url}"
+                        externalCallbackUrl="${local.callback.url}"
+                        localAuthorizationUrl="${local.authorization.url}"
+                        authorizationUrl="${authorization.url}"
+                        tokenUrl="${token.url}">
+                </oauth2:authorization-code-grant-type>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${onCompleteUrlPort}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${onCompleteUrlPort}"/>
+    </httpn:listener-config>
 
     <flow name="someFlow">
-        <http:listener config-ref="listenerConfig" path="/afterLogin"/>
-        <test:assert expression="#[message.inboundProperties['http.query.params']['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
+        <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
+        <test:assert expression="#[message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
     </flow>
 
 </mule>

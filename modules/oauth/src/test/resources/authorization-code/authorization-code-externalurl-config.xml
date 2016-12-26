@@ -2,28 +2,29 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
 
     <oauth2:token-manager-config name="tokenManagerConfig"/>
 
-    <http:request-config name="requestConfig">
-        <oauth2:authorization-code-grant-type
-                clientId="${client.id}"
-                clientSecret="${client.secret}"
-                localCallbackUrl="${local.callback.url}"
-                externalCallbackUrl="${external.redirect.url}"
-                tokenManager-ref="tokenManagerConfig">
-            <oauth2:authorization-request
-                    localAuthorizationUrl="${local.authorization.url}"
-                    authorizationUrl="${authorization.url}">
-            </oauth2:authorization-request>
-            <oauth2:token-request
-                    tokenUrl="${token.url}"/>
-        </oauth2:authorization-code-grant-type>
-    </http:request-config>
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection>
+            <httpn:authentication>
+                <oauth2:authorization-code-grant-type
+                        clientId="${client.id}"
+                        clientSecret="${client.secret}"
+                        localCallbackUrl="${local.callback.url}"
+                        externalCallbackUrl="${external.redirect.url}"
+                        tokenManager-ref="tokenManagerConfig"
+                        localAuthorizationUrl="${local.authorization.url}"
+                        authorizationUrl="${authorization.url}"
+                        tokenUrl="${token.url}">
+                </oauth2:authorization-code-grant-type>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
 
 </mule>
