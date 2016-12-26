@@ -6,6 +6,14 @@
  */
 package org.mule.el.datetime;
 
+import static java.util.Calendar.DATE;
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.DAY_OF_WEEK;
+import static java.util.Calendar.DAY_OF_YEAR;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.WEEK_OF_MONTH;
+import static java.util.Calendar.WEEK_OF_YEAR;
+import static java.util.Calendar.YEAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -24,8 +32,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 @SmallTest
@@ -40,16 +46,16 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     public void isBefore()
     {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        Assert.assertTrue(now.isBefore(new DateTime(cal).withTimeZone("UTC")));
+        cal.add(DATE, 1);
+        assertTrue(now.isBefore(new DateTime(cal).withTimeZone("UTC")));
     }
 
     @Test
     public void isAfter()
     {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        Assert.assertTrue(now.isAfter(new DateTime(cal).withTimeZone("UTC")));
+        cal.add(DATE, -1);
+        assertTrue(now.isAfter(new DateTime(cal).withTimeZone("UTC")));
     }
 
     @Test
@@ -57,37 +63,37 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     {
         SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d, yyyy");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Assert.assertEquals(df.format(now.toDate()), now.format("EEE, MMM d, yyyy"));
+        assertEquals(df.format(now.toDate()), now.format("EEE, MMM d, yyyy"));
     }
 
     @Test
     public void timeZone()
     {
-        Assert.assertEquals(TimeZone.getTimeZone("UTC").getDisplayName(), now.getTimeZone());
+        assertEquals(TimeZone.getTimeZone("UTC").getDisplayName(), now.getTimeZone());
     }
 
     @Test
     public void plusDays()
     {
-        Assert.assertEquals((currentCalendar.get(Calendar.DAY_OF_YEAR) % 365) + 1, now.plusDays(1).getDayOfYear());
+        assertEquals((currentCalendar.get(DAY_OF_YEAR) % currentCalendar.getActualMaximum(DAY_OF_YEAR)) + 1, now.plusDays(1).getDayOfYear());
     }
 
     @Test
     public void plusWeeks()
     {
-        Assert.assertEquals((currentCalendar.get(Calendar.WEEK_OF_YEAR) % 52) + 1, now.plusWeeks(1).getWeekOfYear());
+        assertEquals((currentCalendar.get(WEEK_OF_YEAR) % currentCalendar.getWeeksInWeekYear()) + 1, now.plusWeeks(1).plusYears(-1).getWeekOfYear());
     }
 
     @Test
     public void plusMonths()
     {
-        Assert.assertEquals(((currentCalendar.get(Calendar.MONTH) + 1) % 12) + 1, now.plusMonths(1).getMonth());
+        assertEquals(((currentCalendar.get(MONTH) + 1) % 12) + 1, now.plusMonths(1).getMonth());
     }
 
     @Test
     public void plusYears()
     {
-        Assert.assertEquals(currentCalendar.get(Calendar.YEAR) + 1, now.plusYears(1).getYear());
+        assertEquals(currentCalendar.get(YEAR) + 1, now.plusYears(1).getYear());
     }
 
     @Test
@@ -101,37 +107,37 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     @Test
     public void dayOfWeek()
     {
-        assertEquals(currentCalendar.get(Calendar.DAY_OF_WEEK), now.getDayOfWeek());
+        assertEquals(currentCalendar.get(DAY_OF_WEEK), now.getDayOfWeek());
     }
 
     @Test
     public void dayOfMonth()
     {
-        assertEquals(currentCalendar.get(Calendar.DAY_OF_MONTH), now.getDayOfMonth());
+        assertEquals(currentCalendar.get(DAY_OF_MONTH), now.getDayOfMonth());
     }
 
     @Test
     public void dayOfYear()
     {
-        assertEquals(currentCalendar.get(Calendar.DAY_OF_YEAR), now.getDayOfYear());
+        assertEquals(currentCalendar.get(DAY_OF_YEAR), now.getDayOfYear());
     }
 
     @Test
     public void weekOfMonth()
     {
-        assertEquals(currentCalendar.get(Calendar.WEEK_OF_MONTH), now.getWeekOfMonth());
+        assertEquals(currentCalendar.get(WEEK_OF_MONTH), now.getWeekOfMonth());
     }
 
     @Test
     public void weekOfYear()
     {
-        assertEquals(currentCalendar.get(Calendar.WEEK_OF_YEAR), now.getWeekOfYear());
+        assertEquals(currentCalendar.get(WEEK_OF_YEAR), now.getWeekOfYear());
     }
 
     @Test
     public void monthOfYear()
     {
-        assertEquals(currentCalendar.get(Calendar.MONTH) + 1, now.getMonth());
+        assertEquals(currentCalendar.get(MONTH) + 1, now.getMonth());
     }
 
     @Test
@@ -174,9 +180,9 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     public void fromCalendar()
     {
         Calendar cal = new GregorianCalendar();
-        cal.set(Calendar.YEAR, 1900);
-        cal.set(Calendar.MONTH, 0);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(YEAR, 1900);
+        cal.set(MONTH, 0);
+        cal.set(DAY_OF_MONTH, 1);
         assertEquals(1900, new DateTime(cal).getYear());
         assertEquals(1, new DateTime(cal).getMonth());
         assertEquals(1, new DateTime(cal).getDayOfMonth());
