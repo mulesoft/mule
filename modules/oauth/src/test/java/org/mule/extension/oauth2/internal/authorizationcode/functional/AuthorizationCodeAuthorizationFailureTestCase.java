@@ -18,6 +18,7 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.NO_AUTHORIZATION_CODE_STATUS;
 import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_NOT_FOUND_STATUS;
 import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_URL_CALL_FAILED_STATUS;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
@@ -117,8 +118,8 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
     Get(getRedirectUrlWithOnCompleteUrlAndCodeQueryParams()).connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT)
         .execute();
     final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
-    final ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext()
-        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    final ResourceOwnerOAuthContext oauthContext =
+        tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
 
     assertThat(oauthContext.getAccessToken(), is(ACCESS_TOKEN));
     assertThat(oauthContext.getRefreshToken(), is(nullValue()));
@@ -132,8 +133,8 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
         .execute();
 
     final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
-    ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext()
-        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    ResourceOwnerOAuthContext oauthContext =
+        tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
 
     // Validates that the oauth context has both tokens
     assertThat(oauthContext.getAccessToken(), is(ACCESS_TOKEN));
@@ -147,8 +148,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
         .execute();
 
     // We need to retrieve the oauth context again to get it updated...
-    oauthContext = tokenManagerConfig.getConfigOAuthContext()
-        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    oauthContext = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
 
     assertThat(oauthContext.getAccessToken(), is(REFRESHED_ACCESS_TOKEN));
     assertThat(oauthContext.getRefreshToken(), is(REFRESH_TOKEN));

@@ -17,6 +17,7 @@ import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasR
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.extension.oauth2.AbstractOAuthAuthorizationTestCase;
+import org.mule.extension.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.extension.oauth2.internal.TokenNotFoundException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.service.http.api.HttpService;
@@ -33,8 +34,6 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,18 +59,6 @@ public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorization
   public ExpectedException expectedException = ExpectedException.none();
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(dynamicPort.getNumber()));
-
-  private HttpService httpService = new HttpServiceImplementation();
-
-  @Before
-  public void before() throws MuleException {
-    startIfNeeded(httpService);
-  }
-
-  @After
-  public void after() throws MuleException {
-    stopIfNeeded(httpService);
-  }
 
   @Override
   protected String getConfigFile() {

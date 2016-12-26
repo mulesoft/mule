@@ -58,7 +58,7 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
     return configFile;
   }
 
-  public ClientCredentialsFullConfigTestCase(String name, String configFile) {
+  public ClientCredentialsFullConfigTestCase(String configFile) {
     this.configFile = configFile;
   }
 

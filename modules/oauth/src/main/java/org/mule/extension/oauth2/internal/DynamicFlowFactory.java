@@ -6,8 +6,8 @@
  */
 package org.mule.extension.oauth2.internal;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 
@@ -29,7 +29,6 @@ public class DynamicFlowFactory {
     final Flow flow = new Flow(flowName, muleContext);
     flow.setMessageProcessors(messageProcessors);
     muleContext.getRegistry().registerFlowConstruct(flow);
-    flow.start();
     return flow;
   }
 }

@@ -18,12 +18,12 @@
                         clientSecret="${client.secret}"
                         localCallbackUrl="${local.callback.url}"
                         externalCallbackUrl="${local.callback.url}"
-                        localAuthorizationUrlResourceOwnerId="#[message.inboundProperties['http.properties'].queryParams['userId']]"
+                        localAuthorizationUrlResourceOwnerId="#[message.attributes.queryParams.userId]"
                         resourceOwnerId="#[flowVars['userId']]"
                         tokenManager-ref="multitenantOauthConfig"
                         localAuthorizationUrl="${local.authorization.url}"
                         authorizationUrl="${authorization.url}"
-                        refreshTokenWhen="#[message.inboundProperties['http.status'] == 500]"
+                        refreshTokenWhen="#[message.attributes.statusCode == 500]"
                         tokenUrl="${token.url}">
                 </oauth2:authorization-code-grant-type>
             </httpn:authentication>
@@ -34,5 +34,4 @@
         <httpn:request host="localhost" port="${oauth.server.port}" path="/resource" method="POST"
                       config-ref="multitenantRequestConfig"/>
     </flow>
-
 </mule>

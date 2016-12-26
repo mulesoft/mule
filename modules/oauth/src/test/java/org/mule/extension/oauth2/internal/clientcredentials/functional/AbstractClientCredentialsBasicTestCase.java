@@ -12,6 +12,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.extension.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
@@ -56,10 +58,11 @@ public abstract class AbstractClientCredentialsBasicTestCase extends AbstractOAu
     configureWireMockToExpectTokenPathRequestForClientCredentialsGrantType(NEW_ACCESS_TOKEN);
 
     wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(ACCESS_TOKEN))
-        .willReturn(aResponse().withStatus(401).withHeader(WWW_AUTHENTICATE, "Basic realm=\"myRealm\"")));
+        .willReturn(aResponse().withStatus(UNAUTHORIZED.getStatusCode()).withHeader(WWW_AUTHENTICATE,
+                                                                                    "Basic realm=\"myRealm\"")));
 
     wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(NEW_ACCESS_TOKEN))
-        .willReturn(aResponse().withBody(TEST_MESSAGE).withStatus(200)));
+        .willReturn(aResponse().withBody(TEST_MESSAGE).withStatus(OK.getStatusCode())));
 
     flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
 

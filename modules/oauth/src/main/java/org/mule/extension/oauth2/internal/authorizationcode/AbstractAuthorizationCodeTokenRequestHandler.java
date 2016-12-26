@@ -26,15 +26,11 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Base class for token request handler.
  */
 public abstract class AbstractAuthorizationCodeTokenRequestHandler extends AbstractTokenRequestHandler {
 
-  protected Logger logger = LoggerFactory.getLogger(getClass());
   private AuthorizationCodeGrantType oauthConfig;
   private RequestHandlerManager redirectUrlHandlerManager;
 
@@ -114,11 +110,12 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
         logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
         throw new DefaultMuleException(e);
       }
-    } else if (getOauthConfig().getLocalCallbackConfig() != null) {
-      flowName =
-          flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
-      requestMatcher =
-          new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
+      // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
+      // } else if (getOauthConfig().getLocalCallbackConfig() != null) {
+      // flowName =
+      // flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
+      // requestMatcher =
+      // new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }

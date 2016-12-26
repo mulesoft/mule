@@ -13,19 +13,27 @@ import org.mule.runtime.core.api.Event;
  */
 public class TokenNotFoundException extends Exception {
 
-  private final TokenResponseProcessor tokenResponseProcessor;
+  private static final long serialVersionUID = -4161482371227766961L;
+
+  private final String tokenResponseAccessToken;
+  private final String tokenResponseRefreshToken;
   private final Event tokenUrlResponse;
 
-  public TokenNotFoundException(Event tokenUrlResponse, TokenResponseProcessor tokenResponseProcessor) {
+  public TokenNotFoundException(Event tokenUrlResponse, String accessToken, String refreshToken) {
     this.tokenUrlResponse = tokenUrlResponse;
-    this.tokenResponseProcessor = tokenResponseProcessor;
-  }
-
-  public TokenResponseProcessor getTokenResponseProcessor() {
-    return tokenResponseProcessor;
+    this.tokenResponseAccessToken = accessToken;
+    this.tokenResponseRefreshToken = refreshToken;
   }
 
   public Event getTokenUrlResponse() {
     return tokenUrlResponse;
+  }
+
+  public String getTokenResponseAccessToken() {
+    return tokenResponseAccessToken;
+  }
+
+  public String getTokenResponseRefreshToken() {
+    return tokenResponseRefreshToken;
   }
 }

@@ -34,5 +34,4 @@
         <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
         <test:assert expression="#[message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
     </flow>
-
 </mule>
