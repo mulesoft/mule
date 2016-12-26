@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ws.internal.connection;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.cxf.message.Message.MTOM_ENABLED;
@@ -58,7 +59,8 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
  */
 final class ClientFactory {
 
-  private ClientFactory() {}
+  private ClientFactory() {
+  }
 
   static ClientFactory getInstance() {
     return new ClientFactory();
@@ -77,7 +79,7 @@ final class ClientFactory {
                    List<SecurityStrategy> securities,
                    HttpService httpService,
                    String transportConfig)
-      throws ConnectionException {
+    throws ConnectionException {
     WscTransportFactory factory = new WscTransportFactory();
     Client client = factory.createClient(address, soapVersion.getVersion());
     client.getEndpoint().put(MTOM_ENABLED, mtomEnabled);
@@ -112,12 +114,12 @@ final class ClientFactory {
 
     ImmutableList.Builder<CallbackHandler> callbackHandlersBuilder = ImmutableList.builder();
     strategies.stream()
-        .filter(s -> s.securityType().equals(type))
-        .forEach(s -> {
-          props.putAll(s.buildSecurityProperties());
-          actionsJoiner.add(s.securityAction());
-          s.buildPasswordCallbackHandler().ifPresent(callbackHandlersBuilder::add);
-        });
+      .filter(s -> s.securityType().equals(type))
+      .forEach(s -> {
+        props.putAll(s.buildSecurityProperties());
+        actionsJoiner.add(s.securityAction());
+        s.buildPasswordCallbackHandler().ifPresent(callbackHandlersBuilder::add);
+      });
 
     List<CallbackHandler> handlers = callbackHandlersBuilder.build();
     if (!handlers.isEmpty()) {
@@ -163,21 +165,16 @@ final class ClientFactory {
     inInterceptors.removeIf(i -> i instanceof PhaseInterceptor && ((PhaseInterceptor) i).getId().equals(name));
   }
 
-  private WscDispatcher createDispatcher(String address, HttpService httpService, String transportConfig) {
-    //try {
-    //  URL addressUrl = new URL(address);
-    //  String protocol = addressUrl.getProtocol();
-    //  if (transportConfig == null) {
-    //    if (protocol.equals("http")) {
-    return HttpDispatcher.createDefault(address, httpService);
-    //    }
-    //    throw new ConnectionException(format("Cannot create a default dispatcher for the [%s] protocol", protocol));
-    //  }
-    //  // TODO: MULE-10783: use custom transport configuration
-    //  throw new UnsupportedOperationException("cannot create a dispatcher for the given configuration");
-    //} catch (MalformedURLException e) {
-    //  throw new ConnectionException(format("The provided address [%s] is not a valid URL", address), e);
-    //}
-
+  private WscDispatcher createDispatcher(String address, HttpService httpService, String transportConfig)
+    throws ConnectionException {
+    String protocol = address.substring(0, address.indexOf("://"));
+    if (transportConfig == null) {
+      if (protocol.equals("http")) {
+        return HttpDispatcher.createDefault(address, httpService);
+      }
+      throw new ConnectionException(format("Cannot create a default dispatcher for the [%s] protocol", protocol));
+    }
+    // TODO: MULE-10783: use custom transport configuration
+    throw new UnsupportedOperationException(format("cannot create a dispatcher for config [%s]", transportConfig));
   }
 }

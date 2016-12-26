@@ -145,6 +145,13 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
     assertThat(outProps.get(PW_CALLBACK_REF), notNullValue());
   }
 
+  @Test
+  public void invalidProtocol() throws ConnectionException {
+    exception.expect(ConnectionException.class);
+    exception.expectMessage("Cannot create a default dispatcher for the [jms] protocol");
+    factory.create("jms://host:7001/this/address", SOAP11, true, emptyList(), httpService, null);
+  }
+
   private List<String> inInterceptorNames(Client client) {
     return client.getInInterceptors().stream().map(i -> i.getClass().getSimpleName()).collect(toList());
   }
