@@ -42,6 +42,8 @@ public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotate
       stream(exportAnnotation.classes())
           .map(typeLoader::load)
           .forEach(type -> registerType(declarer, type));
+
+      stream(exportAnnotation.resources()).forEach(declarer::withResource);
     }
   }
 
