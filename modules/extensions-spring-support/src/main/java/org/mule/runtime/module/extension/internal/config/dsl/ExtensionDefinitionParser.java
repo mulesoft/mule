@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
+import static java.util.Collections.emptySet;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -26,6 +27,9 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import com.google.common.collect.ImmutableList;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -68,17 +72,19 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.loader.java.FunctionParameterTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import com.google.common.collect.ImmutableList;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -99,11 +105,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -142,7 +143,7 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Creates a new instance
    *
-   * @param baseDefinitionBuilder a {@link Builder} used as a prototype to generate new defitintions
+   * @param baseDefinitionBuilder a {@link Builder} used as a prototype to generate new definitions
    * @param dslSyntaxResolver     a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
    * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
@@ -335,9 +336,9 @@ public abstract class ExtensionDefinitionParser {
             .withIdentifier(valueDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
             .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true,
-                                                      modelProperties, false))
+                                                      emptySet(), false))
             .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true,
-                                                   modelProperties, false))
+                                                   emptySet(), false))
             .build());
       }
 
@@ -370,7 +371,7 @@ public abstract class ExtensionDefinitionParser {
                   .withTypeDefinition(fromType(getType(metadataType)))
                   .withTypeConverter(
                                      value -> resolverOf(parameterName, metadataType, value, getDefaultValue(metadataType),
-                                                         getExpressionSupport(metadataType), false, modelProperties))
+                                                         getExpressionSupport(metadataType), false, emptySet()))
                   .build());
             }
 
@@ -441,7 +442,7 @@ public abstract class ExtensionDefinitionParser {
           Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
               .withTypeDefinition(fromType(getType(metadataType)))
               .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
-                                                     getExpressionSupport(metadataType), false, modelProperties));
+                                                     getExpressionSupport(metadataType), false, emptySet()));
           addDefinition(itemDefinitionBuilder.build());
         }
 
@@ -498,17 +499,15 @@ public abstract class ExtensionDefinitionParser {
 
     ValueResolver resolver = null;
 
-    if (isExpressionFunction(modelProperties) && value != null) {
-      resolver =
-          new ExpressionFunctionValueResolver<>((String) value, expectedType, muleContext);
-    }
-    if (isExpressionResolver(modelProperties) && value != null) {
-      resolver =
-          new ExpressionBasedParameterResolverValueResolver<>((String) value, expectedType, muleContext);
-    }
-
     final Class<Object> expectedClass = getType(expectedType);
-    if (resolver == null) {
+
+    if (isExpressionFunction(modelProperties) && value != null) {
+      resolver = new ExpressionFunctionValueResolver<>((String) value, expectedType, muleContext);
+    } else if (isParameterResolver(modelProperties) && value != null) {
+      resolver = new ExpressionBasedParameterResolverValueResolver<>((String) value, expectedType, muleContext);
+    } else if (isTypedValue(modelProperties)) {
+      resolver = new ExpressionTypedValueValueResolver((String) value, expectedClass, muleContext);
+    } else {
       if (isExpression(value, parser)) {
         resolver = new TypeSafeExpressionValueResolver((String) value, expectedClass, muleContext);
       }
@@ -764,10 +763,12 @@ public abstract class ExtensionDefinitionParser {
     return modelProperties.stream().anyMatch(property -> property instanceof FunctionParameterTypeModelProperty);
   }
 
-  private boolean isExpressionResolver(Set<ModelProperty> modelProperties) {
-    return modelProperties
-        .stream()
-        .anyMatch(property -> property instanceof ParameterResolverTypeModelProperty);
+  private boolean isParameterResolver(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty);
+  }
+
+  private boolean isTypedValue(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TypedValueTypeModelProperty);
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {

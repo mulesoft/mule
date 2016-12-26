@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+    <context:property-placeholder location="heisenberg.properties"/>
+
+    <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
+
+    <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+
+    <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
+        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+    </heisenberg:ricin>
+
+    <flow name="processWeaponAsStaticChildElement">
+        <heisenberg:process-weapon>
+            <heisenberg:weapon>
+                <heisenberg:ricin microgramsPerKilo="100">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:weapon>
+        </heisenberg:process-weapon>
+    </flow>
+
+    <flow name="processWeaponAsDynamicChildElement">
+        <set-payload value="#[100L]"/>
+        <heisenberg:process-weapon>
+            <heisenberg:weapon>
+                <heisenberg:ricin microgramsPerKilo="#[payload]">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:weapon>
+        </heisenberg:process-weapon>
+    </flow>
+
+    <flow name="processWeapon">
+        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
+        <heisenberg:process-weapon weapon="#[payload]"/>
+    </flow>
+
+    <flow name="processNullWeapon">
+        <heisenberg:process-weapon/>
+    </flow>
+
+    <flow name="processWeaponWithDefaultValue">
+        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
+        <heisenberg:process-weapon-with-default-value/>
+    </flow>
+
+    <flow name="processWrongWeapon">
+        <set-payload value="#[app.registry['door']]"/>
+        <heisenberg:process-weapon weapon="#[payload]"/>
+    </flow>
+
+    <flow name="processWeaponList">
+        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
+        <set-payload value="#[[payload]]"/>
+        <heisenberg:process-weapon-list weapons="#[payload]"/>
+    </flow>
+
+    <flow name="processWeaponListAsChild">
+        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
+        <set-payload value="#[[payload]]"/>
+        <heisenberg:process-weapon-list>
+            <heisenberg:weapons>
+                <heisenberg:ricin microgramsPerKilo="100">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+                <heisenberg:ricin microgramsPerKilo="100">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:weapons>
+        </heisenberg:process-weapon-list>
+    </flow>
+
+    <flow name="processAddressBookAsExpression">
+        <heisenberg:process-address-book phoneNumbers="#[['123-333-33','333-333-333']]"/>
+    </flow>
+    <flow name="processAddressBookAsChild">
+        <heisenberg:process-address-book>
+            <heisenberg:phone-numbers>
+                <heisenberg:phone-number value="123-333-33"/>
+                <heisenberg:phone-number value="333-333-333"/>
+            </heisenberg:phone-numbers>
+        </heisenberg:process-address-book>
+    </flow>
+</mule>

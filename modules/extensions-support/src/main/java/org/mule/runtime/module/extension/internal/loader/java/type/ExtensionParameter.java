@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.assignableFromAny;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
@@ -74,8 +76,19 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
     return optionalDefaultValue;
   }
 
+  @Override
+  default MetadataType getMetadataType(ClassTypeLoader typeLoader) {
+    return typeLoader.load(getJavaType());
+  }
+
   /**
    * @return The {@link AnnotatedElement} form which {@code this} instance was derived
    */
   AnnotatedElement getDeclaringElement();
+
+  /**
+   * @return The {@link Type} of an {@link ExtensionParameter}
+   */
+  java.lang.reflect.Type getJavaType();
+
 }

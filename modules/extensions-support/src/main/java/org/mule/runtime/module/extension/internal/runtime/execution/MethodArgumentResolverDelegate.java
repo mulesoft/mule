@@ -16,6 +16,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -36,6 +37,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCal
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -115,6 +117,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
       } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
+      } else if (TypedValue.class.isAssignableFrom(parameterType)) {
+        argumentResolver = new TypedValueArgumentResolver<>(paramNames.get(i));
       } else if (CompletionCallback.class.isAssignableFrom(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else {

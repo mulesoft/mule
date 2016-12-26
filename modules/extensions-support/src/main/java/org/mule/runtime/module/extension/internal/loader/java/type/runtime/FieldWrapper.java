@@ -7,17 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
-
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
+import static org.springframework.core.ResolvableType.forField;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Optional;
-
-import org.springframework.core.ResolvableType;
 
 /**
  * Wrapper for {@link Field} that provide utility methods to facilitate the introspection of a {@link Field}
@@ -76,8 +72,8 @@ public class FieldWrapper implements FieldElement {
    * {@inheritDoc}
    */
   @Override
-  public MetadataType getMetadataType(ClassTypeLoader typeLoader) {
-    return typeLoader.load(ResolvableType.forField(field).getType());
+  public java.lang.reflect.Type getJavaType() {
+    return forField(field).getType();
   }
 
   /**
