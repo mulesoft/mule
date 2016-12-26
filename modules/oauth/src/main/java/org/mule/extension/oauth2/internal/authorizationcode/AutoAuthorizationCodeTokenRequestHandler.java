@@ -13,6 +13,7 @@ import static org.mule.extension.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.extension.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
@@ -22,7 +23,6 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_REFRE
 import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
 import static org.springframework.util.StringUtils.isEmpty;
 

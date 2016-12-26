@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.server.RequestHandlerManager;
@@ -103,14 +102,12 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
     String flowName = "OAuthCallbackUrlFlow";
 
     final ListenerRequestMatcher requestMatcher;
-    final ListenerPath listenerPath;
 
     if (getOauthConfig().getLocalCallbackUrl() != null) {
       flowName = flowName + getOauthConfig().getLocalCallbackUrl();
       try {
         final URL localCallbackUrl = new URL(getOauthConfig().getLocalCallbackUrl());
         requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
-        listenerPath = new ListenerPath(localCallbackUrl.getPath(), "/");
       } catch (MalformedURLException e) {
         logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
         throw new DefaultMuleException(e);
@@ -120,7 +117,6 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
           flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
       requestMatcher =
           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
-      listenerPath = new ListenerPath(getOauthConfig().getLocalCallbackConfigPath(), "/");
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
@@ -128,7 +124,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
     final Flow redirectUrlFlow = createDynamicFlow(getMuleContext(), flowName, asList(createRedirectUrlProcessor()));
 
     this.redirectUrlHandlerManager =
-        addRequestHandler(getOauthConfig().getServer(), requestMatcher, listenerPath, redirectUrlFlow, logger);
+        addRequestHandler(getOauthConfig().getServer(), requestMatcher, redirectUrlFlow, logger);
   }
 
   @Override

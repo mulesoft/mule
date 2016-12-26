@@ -6,9 +6,9 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
+import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
@@ -211,12 +211,9 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   }
 
   private void buildHttpServer() throws InitialisationException {
-    String flowName = "OAuthCallbackUrlFlow";
-
     final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
 
     if (getLocalCallbackUrl() != null) {
-      flowName = flowName + getLocalCallbackUrl();
       try {
         final URL localCallbackUrl = new URL(getLocalCallbackUrl());
         serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
@@ -225,8 +222,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
         throw new InitialisationException(e, this);
       }
     } else if (getLocalCallbackConfig() != null) {
-      flowName = flowName + getLocalCallbackConfig().getName() + "_" + getLocalCallbackConfigPath();
-
       serverConfigBuilder
           .setHost(getLocalCallbackConfig().getHost())
           .setPort(getLocalCallbackConfig().getPort())

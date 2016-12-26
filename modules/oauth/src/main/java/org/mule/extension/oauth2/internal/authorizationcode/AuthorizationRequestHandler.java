@@ -10,9 +10,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
 import static org.mule.extension.http.api.HttpConstants.Methods.GET;
+import static org.mule.extension.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -28,7 +28,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -94,7 +93,6 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
           addRequestHandler(getOauthConfig().getServer(),
                             new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()),
                                                        new URL(localAuthorizationUrl).getPath()),
-                            new ListenerPath(new URL(localAuthorizationUrl).getPath(), "/"),
                             createDynamicFlow(muleContext, "authorization-request-handler-" + localAuthorizationUrl,
                                               createLocalAuthorizationUrlListener()),
                             logger);

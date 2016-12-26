@@ -56,7 +56,6 @@ class RequestHandlerUtils {
    * @return
    */
   public static RequestHandlerManager addRequestHandler(HttpServer server, ListenerRequestMatcher matcher,
-                                                        ListenerPath listenerPath,
                                                         Flow flow, Logger logger) {
     // MULE-11277 Support non-blocking in OAuth http listeners
     return server.addRequestHandler(matcher, (requestContext, responseCallback) -> {
@@ -65,7 +64,7 @@ class RequestHandlerUtils {
       try {
         currentThread().setContextClassLoader(RequestHandlerUtils.class.getClassLoader());
 
-        result = transform(requestContext, flow.getMuleContext(), true, listenerPath);
+        result = transform(requestContext, flow.getMuleContext(), true, new ListenerPath(matcher.getPath(), "/"));
         final Message message = Message.builder()
             .payload(result.getOutput())
             .mediaType(result.getMediaType().orElse(ANY))

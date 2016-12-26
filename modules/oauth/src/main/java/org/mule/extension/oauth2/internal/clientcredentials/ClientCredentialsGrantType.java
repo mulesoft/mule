@@ -6,12 +6,14 @@
  */
 package org.mule.extension.oauth2.internal.clientcredentials;
 
+import static java.lang.String.format;
+import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,7 +25,6 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
@@ -109,13 +110,13 @@ public class ClientCredentialsGrantType extends AbstractGrantType
 
   @Override
   public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
-    final String accessToken = tokenManager.getConfigOAuthContext()
-        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
+    final String accessToken =
+        tokenManager.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
     if (accessToken == null) {
-      throw new RequestAuthenticationException(createStaticMessage(String
-          .format("No access token found. Verify that you have authenticated before trying to execute an operation to the API.")));
+      throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
+          + "Verify that you have authenticated before trying to execute an operation to the API.")));
     }
-    builder.addHeader(HttpHeaders.Names.AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
+    builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
   }
 
   @Override
