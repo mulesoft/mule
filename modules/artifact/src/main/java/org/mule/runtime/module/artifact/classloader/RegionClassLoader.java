@@ -11,8 +11,8 @@ import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
@@ -45,12 +45,13 @@ import sun.misc.CompoundEnumeration;
  */
 public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
+  protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";
+
   static {
     registerAsParallelCapable();
   }
 
-  private final List<ArtifactClassLoader> filteredClassLoaders = new ArrayList<>();
-  private final List<ArtifactClassLoader> unfilteredClassLoaders = new ArrayList<>();
+  private final List<RegisteredClassLoader> registeredClassLoaders = new ArrayList<>();
   private final Map<String, ArtifactClassLoader> packageMapping = new HashMap<>();
   private final Map<String, List<ArtifactClassLoader>> resourceMapping = new HashMap<>();
 
@@ -71,8 +72,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   public List<ArtifactClassLoader> getArtifactPluginClassLoaders() {
 
     List<ArtifactClassLoader> result = emptyList();
-    if (unfilteredClassLoaders.size() > 1) {
-      result = unfilteredClassLoaders.subList(1, unfilteredClassLoaders.size());
+    if (registeredClassLoaders.size() > 1) {
+      result =
+          registeredClassLoaders.subList(1, registeredClassLoaders.size()).stream().map(r -> r.unfilteredClassLoader).collect(
+                                                                                                                              toList());
     }
 
     return result;
@@ -85,14 +88,17 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @param filter filter used to provide access to the added classloader. Non null
    * @throws IllegalArgumentException if the class loader is already a region member.
    */
-  public void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
+  public synchronized void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
     checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");
     checkArgument(filter != null, "filter cannot be null");
-    if (filteredClassLoaders.contains(artifactClassLoader)) {
-      throw new IllegalArgumentException("Region already contains classloader " + artifactClassLoader);
+    RegisteredClassLoader registeredClassLoader = findRegisteredClassLoader(artifactClassLoader);
+    if (registeredClassLoader != null) {
+      throw new IllegalArgumentException(createClassLoaderAlreadyInRegionError(artifactClassLoader.getArtifactId()));
     }
-    filteredClassLoaders.add(new FilteringArtifactClassLoader(artifactClassLoader, filter));
-    unfilteredClassLoaders.add(artifactClassLoader);
+
+    registeredClassLoaders.add(
+                               new RegisteredClassLoader(artifactClassLoader,
+                                                         new FilteringArtifactClassLoader(artifactClassLoader, filter), filter));
 
     filter.getExportedClassPackages().forEach(p -> packageMapping.put(p, artifactClassLoader));
 
@@ -106,6 +112,50 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
       classLoaders.add(artifactClassLoader);
     }
+  }
+
+  private RegisteredClassLoader findRegisteredClassLoader(ArtifactClassLoader artifactClassLoader) {
+    for (RegisteredClassLoader registeredClassLoader : registeredClassLoaders) {
+      if (registeredClassLoader.unfilteredClassLoader == artifactClassLoader) {
+        return registeredClassLoader;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Removes a class loader member from the region.
+   * <p/>
+   * Only region members that do not export any package or resoruce can be removed from the region as they are not visible to
+   * other members.
+   * 
+   * @param artifactClassLoader class loader to remove. Non null
+   * @return true if the class loader is a region member and was removed, false if it is not a region member.
+   * @throws IllegalArgumentException if the class loader is the region owner or is a regiion member that exports packages or
+   *         resources.
+   */
+  public synchronized boolean removeClassLoader(ArtifactClassLoader artifactClassLoader) {
+    checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");
+
+    RegisteredClassLoader registeredClassLoader = findRegisteredClassLoader(artifactClassLoader);
+
+    int index = registeredClassLoaders.indexOf(registeredClassLoader);
+    if (index == 0) {
+      throw new IllegalArgumentException(REGION_OWNER_CANNOT_BE_REMOVED_ERROR);
+    }
+    if (index < 0) {
+      return false;
+    }
+
+    if (!registeredClassLoader.filter.getExportedClassPackages().isEmpty()
+        || !registeredClassLoader.filter.getExportedResources().isEmpty()) {
+      throw new IllegalArgumentException(createCannotRemoveClassLoaderError(artifactClassLoader.getArtifactId()));
+    }
+
+    registeredClassLoaders.remove(index);
+
+    return true;
   }
 
   @Override
@@ -145,7 +195,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   @Override
   public final Enumeration<URL> findResources(final String name) throws IOException {
     final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(name);
-    List<Enumeration<URL>> enumerations = new ArrayList<>(filteredClassLoaders.size());
+    List<Enumeration<URL>> enumerations = new ArrayList<>(registeredClassLoaders.size());
 
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
@@ -162,7 +212,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public void dispose() {
-    for (ArtifactClassLoader classLoader : unfilteredClassLoaders) {
+    registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(classLoader -> {
       try {
         classLoader.dispose();
       } catch (Exception e) {
@@ -173,10 +223,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
           logger.error(message, getArtifactDescriptor().getName());
         }
       }
-    }
+    });
 
-    unfilteredClassLoaders.clear();
-    filteredClassLoaders.clear();
+    registeredClassLoaders.clear();
 
     super.dispose();
   }
@@ -192,12 +241,34 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   }
 
   private ArtifactClassLoader getOwnerClassLoader() {
-    return filteredClassLoaders.get(0);
+    return registeredClassLoaders.get(0).filteredClassLoader;
   }
 
   @Override
   public String toString() {
     return format("%s[%s] -> %s@%s", getClass().getName(), getArtifactId(), packageMapping.toString(),
                   toHexString(identityHashCode(this)));
+  }
+
+  static String createCannotRemoveClassLoaderError(String artifactId) {
+    return format("Cannot remove classloader '%s' as it exports at least a package or resource", artifactId);
+  }
+
+  static String createClassLoaderAlreadyInRegionError(String artifactId) {
+    return "Region already contains classloader for artifact:" + artifactId;
+  }
+
+  private static class RegisteredClassLoader {
+
+    final FilteringArtifactClassLoader filteredClassLoader;
+    final ArtifactClassLoader unfilteredClassLoader;
+    final ArtifactClassLoaderFilter filter;
+
+    private RegisteredClassLoader(ArtifactClassLoader unfilteredClassLoader, FilteringArtifactClassLoader filteredClassLoader,
+                                  ArtifactClassLoaderFilter filter) {
+      this.filteredClassLoader = filteredClassLoader;
+      this.unfilteredClassLoader = unfilteredClassLoader;
+      this.filter = filter;
+    }
   }
 }

@@ -112,6 +112,26 @@ public class TestPolicyManager implements DeploymentListener {
     appPolicyParametrizations.add(new AppPolicyParametrization(policyTemplateDescriptor.get(), policyParametrization));
   }
 
+  /**
+   * Removes a parametized policy
+   *
+   * @param appName application where the policy is applied. Non empty.
+   * @param policyId identifies the policy parametrization. Non empty.
+   * @return true if the poclicy was removed, false if the policy is not applied in the application.
+   * @throws IllegalArgumentException if the application does not exists or there is an invalid parameter value.
+   */
+  public boolean removePolicy(String appName, String policyId) {
+    checkArgument(!isEmpty(appName), "appName cannot be empty");
+    checkArgument(!isEmpty(policyId), "policyId cannot be empty");
+
+    Application application = deploymentService.findApplication(appName);
+    if (application == null) {
+      throw new IllegalArgumentException("Cannot find application named: " + appName);
+    }
+
+    return application.getPolicyManager().removePolicy(policyId);
+  }
+
   private File getPoliciesTempFolder() {
     return new File(getExecutionFolder(), "policies");
   }
