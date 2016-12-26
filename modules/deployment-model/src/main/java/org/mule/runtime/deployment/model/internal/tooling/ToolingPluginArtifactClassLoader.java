@@ -58,7 +58,9 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
   private ArtifactClassLoader getPluginArtifactClassLoader(ArtifactPluginDescriptor artifactPluginDescriptor,
                                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
     return artifactPluginClassLoaders.stream()
-        .filter(artifactClassLoader -> artifactClassLoader.getArtifactId().equals(artifactPluginDescriptor.getName())).findFirst()
+        .filter(artifactClassLoader -> artifactClassLoader.getArtifactId()
+            .endsWith("/plugin/" + artifactPluginDescriptor.getName()))
+        .findFirst()
         .orElseThrow(() -> new DependencyNotFoundException(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
                                                                   artifactPluginDescriptor.getName())));
   }
