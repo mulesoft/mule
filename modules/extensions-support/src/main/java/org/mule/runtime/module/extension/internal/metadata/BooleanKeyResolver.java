@@ -7,10 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Collections.unmodifiableSet;
-import static org.mule.metadata.internal.utils.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;

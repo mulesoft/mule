@@ -25,6 +25,11 @@ public class TestMetadataResolverMetadataResolvingFailure
     return "MetadataExtensionResolver";
   }
 
+  @Override
+  public String getResolverName() {
+    return "TestMetadataResolverMetadataResolvingFailure";
+  }
+
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException {
     throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
   }

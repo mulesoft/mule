@@ -13,12 +13,14 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -36,6 +38,7 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -56,9 +59,11 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,6 +85,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
       ResolverSupplier.of(MockResolver.class);
   private static final Supplier<SimpleOutputResolver> SIMPLE_OUTPUT_RESOLVER =
       ResolverSupplier.of(SimpleOutputResolver.class);
+  public static final String PARAMETER_NAME = "parameterName";
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -106,6 +112,11 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public static class SimpleOutputResolver implements OutputTypeResolver<String>, AttributesTypeResolver<String> {
 
     @Override
+    public String getResolverName() {
+      return "SimpleOutputResolver";
+    }
+
+    @Override
     public MetadataType getOutputType(MetadataContext context, String key)
         throws MetadataResolvingException, ConnectionException {
       return null;
@@ -123,6 +134,25 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     }
   }
 
+  public static class SimpleInputResolver implements InputTypeResolver<String> {
+
+    @Override
+    public MetadataType getInputMetadata(MetadataContext context, String key)
+        throws MetadataResolvingException, ConnectionException {
+      return null;
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "SimpleOutputResolver";
+    }
+
+    @Override
+    public String getResolverName() {
+      return "SimpleOutputResolver";
+    }
+  }
+
 
   public static class DifferentCategoryResolver implements TypeKeysResolver {
 
@@ -134,6 +164,11 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     @Override
     public String getCategoryName() {
       return "NotSimpleOutputResolver";
+    }
+
+    @Override
+    public String getResolverName() {
+      return "DifferentCategoryResolver";
     }
   }
 
@@ -147,6 +182,35 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     @Override
     public String getCategoryName() {
+      return null;
+    }
+
+    @Override
+    public String getResolverName() {
+      return "EmptyCategoryName";
+    }
+  }
+
+  public static class EmptyResolverName implements TypeKeysResolver, OutputTypeResolver {
+
+    @Override
+    public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+      return emptySet();
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "SimpleOutputResolver";
+    }
+
+    @Override
+    public String getResolverName() {
+      return null;
+    }
+
+    @Override
+    public MetadataType getOutputType(MetadataContext context, Object key)
+        throws MetadataResolvingException, ConnectionException {
       return null;
     }
   }
@@ -286,25 +350,61 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     validate(extensionModel, validator);
   }
 
+  @Test
   public void metadataResolverWithDifferentCategories() {
     exception.expect(IllegalModelDefinitionException.class);
-
+    exception.expectMessage(containsString("specifies metadata resolvers that doesn't belong to the same category"));
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(DifferentCategoryResolver.class),
                                                                    emptyMap(),
                                                                    SIMPLE_OUTPUT_RESOLVER,
-                                                                   SIMPLE_OUTPUT_RESOLVER));
+                                                                   NULL_RESOLVER_SUPPLIER));
     validate(extensionModel, validator);
   }
 
+  @Test
   public void metadataResolverWithEmptyCategoryName() {
     exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage(containsString("which has an empty category name"));
 
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(EmptyCategoryName.class),
                                                                    emptyMap(),
                                                                    SIMPLE_OUTPUT_RESOLVER,
-                                                                   SIMPLE_OUTPUT_RESOLVER));
+                                                                   NULL_RESOLVER_SUPPLIER));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void metadataResolverWithEmptyResolverName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage(containsString("which has an empty resolver name"));
+
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER,
+                                                                   emptyMap(),
+                                                                   ResolverSupplier.of(EmptyResolverName.class),
+                                                                   NULL_RESOLVER_SUPPLIER));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void metadataResolverWithRepeatedResolverName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage(containsString("Resolver names should be unique for a given category"));
+    Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashedMap();
+    ParameterModel parameterModel = mock(ParameterModel.class);
+    when(parameterModel.getName()).thenReturn(PARAMETER_NAME);
+    when(parameterModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(java.util.Optional.empty());
+    when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(java.util.Optional.empty());
+    mockParameters(sourceModel, parameterModel);
+    inputResolvers.put(PARAMETER_NAME, ResolverSupplier.of(SimpleInputResolver.class));
+
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER,
+                                                                   inputResolvers,
+                                                                   SIMPLE_OUTPUT_RESOLVER,
+                                                                   NULL_RESOLVER_SUPPLIER));
     validate(extensionModel, validator);
   }
 
@@ -329,7 +429,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
     validate(extensionModel, validator);
   }
-
 
   @Test
   public void metadataKeyWithoutDefaultValues() {
@@ -402,6 +501,11 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     @Override
     public String getCategoryName() {
+      return "MockResolver";
+    }
+
+    @Override
+    public String getResolverName() {
       return "MockResolver";
     }
 

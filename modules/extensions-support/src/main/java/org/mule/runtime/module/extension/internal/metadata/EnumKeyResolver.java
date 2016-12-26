@@ -7,9 +7,6 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.internal.utils.StringUtils.isNotEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;

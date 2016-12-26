@@ -38,6 +38,11 @@ public class TestThreadContextClassLoaderResolver
   }
 
   @Override
+  public String getResolverName() {
+    return "TestThreadContextClassLoaderResolver";
+  }
+
+  @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     contextClassLoader.set(Thread.currentThread().getContextClassLoader());
     return TestMetadataResolverUtils.getKeys(context);

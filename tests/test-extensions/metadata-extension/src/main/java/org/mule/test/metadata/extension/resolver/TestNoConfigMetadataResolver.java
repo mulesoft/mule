@@ -33,6 +33,11 @@ public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputType
   }
 
   @Override
+  public String getResolverName() {
+    return "TestNoConfigMetadataResolver";
+  }
+
+  @Override
   public Set<MetadataKey> getKeys(MetadataContext context) {
     return Arrays.stream(KeyIds.values()).map(e -> MetadataKeyBuilder.newKey(e.name()).build()).collect(Collectors.toSet());
   }

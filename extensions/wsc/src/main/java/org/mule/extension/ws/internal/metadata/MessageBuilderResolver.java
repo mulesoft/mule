@@ -40,6 +40,11 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
     headersElementResolver = new HeadersElementResolver(delegate);
   }
 
+  @Override
+  public String getResolverName() {
+    return "ConsumeInputResolver";
+  }
+
   /**
    * {@inheritDoc}
    * <p>

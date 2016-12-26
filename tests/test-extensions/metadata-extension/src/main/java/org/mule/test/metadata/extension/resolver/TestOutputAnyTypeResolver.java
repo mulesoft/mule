@@ -26,4 +26,9 @@ public class TestOutputAnyTypeResolver implements OutputTypeResolver<String> {
   public String getCategoryName() {
     return "MetadataExtensionResolver";
   }
+
+  @Override
+  public String getResolverName() {
+    return "TestOutputAnyTypeResolver";
+  }
 }
