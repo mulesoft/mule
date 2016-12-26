@@ -4514,7 +4514,8 @@
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use to determine when a message has been redelivered. For example,it would be possible to combine to headers as the unique ID of the message : '#[headers:foo,bar]'. Or, you could combine the message ID with a header: '#[message:id]-#[header:foo]'. This property may only be set if useSecureHash is false..
+                            Defines one or more expressions to use to determine when a message has been redelivered.
+                            This property may only be set if useSecureHash is false..
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -5400,7 +5401,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="evictionCheckIntervalMillis" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed..</xsd:documentation>
+                        <xsd:documentation>Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="minEvictionMillis" type="xsd:string">

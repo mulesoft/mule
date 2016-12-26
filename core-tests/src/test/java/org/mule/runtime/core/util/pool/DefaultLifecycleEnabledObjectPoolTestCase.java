@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.util.pool;
 
+import static org.junit.Assert.assertEquals;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.PoolingProfile;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class DefaultLifecycleEnabledObjectPoolTestCase extends AbstractPoolingTestCase {
 

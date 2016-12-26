@@ -7,7 +7,10 @@
 
 package org.mule.runtime.module.extension.internal.xml;
 
-import org.mule.runtime.module.extension.internal.ExtensionProperties;
+import static java.lang.String.format;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.DEFAULT_SCHEMA_LOCATION_MASK;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_PREFIX;
 
 import javax.xml.namespace.QName;
 
@@ -19,27 +22,23 @@ public final class SchemaConstants {
   public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION =
       "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
   public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-  public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
 
-  public static final String MULE_EXTENSION_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "extension");
+  public static final String MULE_EXTENSION_NAMESPACE = format(DEFAULT_SCHEMA_LOCATION_MASK, "extension");
   public static final String MULE_EXTENSION_PREFIX = "extension";
   public static final String MULE_EXTENSION_SCHEMA_LOCATION =
       "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
 
-  public static final String MULE_TLS_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "tls");
+  public static final String MULE_TLS_NAMESPACE = format(DEFAULT_SCHEMA_LOCATION_MASK, "tls");
   public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
   public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
   public static final String GROUP_SUFFIX = "-group";
-  public static final String MULE_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "core");
-  public static final String MULE_PREFIX = "mule";
 
   public static final QName MULE_ABSTRACT_MESSAGE_SOURCE_TYPE =
-      new QName(MULE_NAMESPACE, "abstractMessageSourceType", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", MULE_PREFIX);
-  public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE = new QName(MULE_NAMESPACE, "propertyPlaceholderType", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_POOLING_PROFILE_TYPE =
-      new QName(MULE_NAMESPACE, "abstractPoolingProfileType", MULE_PREFIX);
-  public static final QName MULE_POOLING_PROFILE_TYPE = new QName(MULE_NAMESPACE, "pooling-profile", MULE_PREFIX);
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstractMessageSourceType", MULE_PREFIX);
+  public static final QName MULE_ABSTRACT_EXTENSION =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-extension", MULE_PREFIX);
+  public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "propertyPlaceholderType", MULE_PREFIX);
   public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT =
       new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProvider", MULE_EXTENSION_PREFIX);
   public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE =
@@ -48,41 +47,39 @@ public final class SchemaConstants {
       new QName(MULE_EXTENSION_NAMESPACE, "dynamic-config-policy", MULE_EXTENSION_PREFIX);
   public static final QName MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE =
       new QName(MULE_EXTENSION_NAMESPACE, "operationTransactionalActionType", MULE_EXTENSION_PREFIX);
-  public static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", MULE_PREFIX);
+  public static final QName MULE_ABSTRACT_EXTENSION_TYPE =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstractExtensionType", MULE_PREFIX);
   public static final QName MULE_ABSTRACT_OPERATOR =
-      new QName(MULE_NAMESPACE, "abstract-operator", MULE_PREFIX);
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-operator", MULE_PREFIX);
   public static final QName MULE_ABSTRACT_OPERATOR_TYPE =
-      new QName(MULE_NAMESPACE, "abstractOperatorType", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_MESSAGE_SOURCE = new QName(MULE_NAMESPACE, "abstract-message-source", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY =
-      new QName(MULE_NAMESPACE, "abstract-reconnection-strategy", MULE_PREFIX);
-  public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY_TYPE =
-      new QName(MULE_NAMESPACE, "abstractReconnectionStrategyType", MULE_PREFIX);
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstractOperatorType", MULE_PREFIX);
+  public static final QName MULE_ABSTRACT_MESSAGE_SOURCE =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-message-source", MULE_PREFIX);
   public static final QName MULE_MESSAGE_PROCESSOR_TYPE =
-      new QName(MULE_NAMESPACE, "messageProcessorOrMixedContentMessageProcessor", MULE_PREFIX);
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "messageProcessorOrMixedContentMessageProcessor", MULE_PREFIX);
   public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, "context", "tls");
-  public static final QName MULE_ABSTRACT_REDELIVERY_POLICY =
-      new QName(MULE_NAMESPACE, "abstract-redelivery-policy", MULE_PREFIX);
 
   // TYPES
-  public static final QName SUBSTITUTABLE_INT = new QName(MULE_NAMESPACE, "substitutableInt", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_LONG = new QName(MULE_NAMESPACE, "substitutableLong", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_BOOLEAN = new QName(MULE_NAMESPACE, "substitutableBoolean", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_DECIMAL = new QName(MULE_NAMESPACE, "substitutableDecimal", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_DATE_TIME = new QName(MULE_NAMESPACE, "substitutableDateTime", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_NAME = new QName(MULE_NAMESPACE, "substitutableName", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_MAP = new QName(MULE_NAMESPACE, "mapType", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_INT = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableInt", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_LONG = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableLong", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_BOOLEAN =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableBoolean", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_DECIMAL =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableDecimal", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_DATE_TIME =
+      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableDateTime", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_NAME = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableName", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_MAP = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "mapType", MULE_PREFIX);
   public static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
-  public static final QName EXPRESSION_STRING = new QName(MULE_NAMESPACE, "expressionString", MULE_PREFIX);
-  public static final QName EXPRESSION_LONG = new QName(MULE_NAMESPACE, "expressionLong", MULE_PREFIX);
-  public static final QName EXPRESSION_BOOLEAN = new QName(MULE_NAMESPACE, "expressionBoolean", MULE_PREFIX);
-  public static final QName EXPRESSION_INTEGER = new QName(MULE_NAMESPACE, "expressionInt", MULE_PREFIX);
-  public static final QName EXPRESSION_DOUBLE = new QName(MULE_NAMESPACE, "expressionDouble", MULE_PREFIX);
-  public static final QName EXPRESSION_DECIMAL = new QName(MULE_NAMESPACE, "expressionDecimal", MULE_PREFIX);
-  public static final QName EXPRESSION_OBJECT = new QName(MULE_NAMESPACE, "expressionObject", MULE_PREFIX);
-  public static final QName EXPRESSION_LIST = new QName(MULE_NAMESPACE, "expressionList", MULE_PREFIX);
-  public static final QName EXPRESSION_MAP = new QName(MULE_NAMESPACE, "expressionMap", MULE_PREFIX);
-  public static final QName EXPRESSION_DATE_TIME = new QName(MULE_NAMESPACE, "expressionDateTime", MULE_PREFIX);
+  public static final QName EXPRESSION_STRING = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionString", MULE_PREFIX);
+  public static final QName EXPRESSION_LONG = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionLong", MULE_PREFIX);
+  public static final QName EXPRESSION_BOOLEAN = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionBoolean", MULE_PREFIX);
+  public static final QName EXPRESSION_INTEGER = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionInt", MULE_PREFIX);
+  public static final QName EXPRESSION_DOUBLE = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionDouble", MULE_PREFIX);
+  public static final QName EXPRESSION_DECIMAL = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionDecimal", MULE_PREFIX);
+  public static final QName EXPRESSION_LIST = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionList", MULE_PREFIX);
+  public static final QName EXPRESSION_MAP = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionMap", MULE_PREFIX);
+  public static final QName EXPRESSION_DATE_TIME = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionDateTime", MULE_PREFIX);
 
   // ATTRIBUTES
   public static final String USE_REQUIRED = "required";
@@ -96,13 +93,7 @@ public final class SchemaConstants {
   public static final String UNBOUNDED = "unbounded";
   public static final String MAX_ONE = "1";
   public static final String ATTRIBUTE_NAME_NAME = "name";
-  public static final String XSD_EXTENSION = ".xsd";
-  public static final String DISABLE_VALIDATION = "disableValidation";
   public static final String CURRENT_VERSION = "current";
 
-  /**
-   * Human friendly description for {@link ExtensionProperties#TARGET_ATTRIBUTE}
-   */
-  public static final String TARGET_ATTRIBUTE_DESCRIPTION =
-      "The name of a variable on which the operation's output will be placed";
+  private SchemaConstants() {}
 }

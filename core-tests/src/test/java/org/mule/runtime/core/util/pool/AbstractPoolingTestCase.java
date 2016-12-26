@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.pool;
 
-import org.mule.runtime.core.config.PoolingProfile;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public abstract class AbstractPoolingTestCase extends AbstractMuleContextTestCase {

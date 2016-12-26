@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_ATTRIBUTE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.validator.OperationParametersModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -37,7 +37,7 @@ public class OperationParameterModelValidatorTestCase extends AbstractMuleTestCa
   @Mock
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private OperationModel operationModel;
 
   @Mock
@@ -49,6 +49,8 @@ public class OperationParameterModelValidatorTestCase extends AbstractMuleTestCa
   public void before() {
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
+    when(operationModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
+    when(operationModel.getOutputAttributes().getType()).thenReturn(TYPE_LOADER.load(NullAttributes.class));
     when(goodParameter.getName()).thenReturn("valid");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(operationModel.getAllParameterModels()).thenReturn(asList(goodParameter));
@@ -60,15 +62,6 @@ public class OperationParameterModelValidatorTestCase extends AbstractMuleTestCa
 
   @Test
   public void valid() {
-    validate();
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void targetParameter() {
-    ParameterModel offending = mock(ParameterModel.class);
-    when(offending.getName()).thenReturn(TARGET_ATTRIBUTE);
-
-    when(operationModel.getAllParameterModels()).thenReturn(asList(goodParameter, offending));
     validate();
   }
 

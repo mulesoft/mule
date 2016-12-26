@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.loader;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -37,9 +38,10 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("set-payload-concat-params-values");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(3));
     assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("value1"));
     assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is("value2"));
+    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
 
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
@@ -69,8 +71,9 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("set-payload-add-param-and-property-values");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getAllParameterModels().size(), is(1));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
     assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("value1"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =
@@ -102,9 +105,10 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-login");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(3));
     assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("someUser"));
     assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is("somePass"));
+    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =

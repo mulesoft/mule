@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_REDELIVERY_POLICY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -68,18 +67,12 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
     registerParameters(sourceType, flatParameters);
     inlineGroupedParameters.forEach(g -> builder.addInlineParameterGroup(g, sourceType.getSequence()));
 
-    builder.addRetryPolicy(sequence);
-    addMessageRedeliveryPolicy(sequence);
+    builder.addInfrastructureParameters(sourceModel, sequence);
   }
 
   private List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
     return model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
         .collect(toList());
-  }
-
-  private void addMessageRedeliveryPolicy(ExplicitGroup sequence) {
-    TopLevelElement redeliveryPolicy = builder.createRefElement(MULE_ABSTRACT_REDELIVERY_POLICY, false);
-    sequence.getParticle().add(objectFactory.createElement(redeliveryPolicy));
   }
 }
