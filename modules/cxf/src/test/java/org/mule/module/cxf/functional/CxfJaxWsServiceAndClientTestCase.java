@@ -8,8 +8,10 @@ package org.mule.module.cxf.functional;
 
 
 import static java.nio.charset.Charset.forName;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -17,6 +19,7 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -102,7 +105,9 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
 
-        assertThat(result.getDataType().getMimeType(), is("multipart/related"));
+        assertThat(result.getInboundProperty(HttpHeaders.Names.CONTENT_TYPE).toString(),
+                allOf(startsWith("multipart/related; type=\"application/xop+xml\"; boundary=\"uuid:"),
+                        endsWith("\"; start=\"<root.message@cxf.apache.org>\"; start-info=\"text/xml\"; charset=UTF-8")));
         assertThat(result.getPayload(), Is.<Object> is(NullPayload.getInstance()));
 
         final DataHandler part = result.getInboundAttachment(result.getInboundAttachmentNames().iterator().next());
