@@ -18,11 +18,8 @@ import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -52,8 +49,7 @@ import org.slf4j.LoggerFactory;
  * oauth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
  * authentication code and retrieve the access token
  */
-public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
-    implements Initialisable, AuthorizationCodeGrantType, Startable, Stoppable, Disposable {
+public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Lifecycle, AuthorizationCodeGrantType {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAuthorizationCodeGrantType.class);
 
