@@ -7,35 +7,34 @@
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
-import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+import org.springframework.core.ResolvableType;
 
-import java.util.Optional;
+import java.lang.reflect.Type;
 
 /**
- * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} of
- * {@link ParameterResolver} type changes the declared type of the {@link ParameterDeclarer} from a
- * {@link ParameterResolver} to the type of the generic.
- * Also adds a {@link ParameterResolverTypeModelProperty} which indicates that the Java parameters if of
- * {@link ParameterResolver} type
+ * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} of {@link this#classToUnwrap}
+ * type, replaces the parameter type with the generic type of it and adds a the given {@link this#modelProperty}
+ * to communicate the change.
  *
  * @since 4.0
- * @see ParameterResolver
  */
-public class ParameterResolverParameterTypeContributor implements ParameterDeclarerContributor {
+public class ParameterTypeUnwrapperContributor implements ParameterDeclarerContributor {
 
   private ClassTypeLoader typeLoader;
+  private Class<?> classToUnwrap;
+  private ModelProperty modelProperty;
 
-  public ParameterResolverParameterTypeContributor(ClassTypeLoader typeLoader) {
+  public ParameterTypeUnwrapperContributor(ClassTypeLoader typeLoader, Class classToUnwrap, ModelProperty modelProperty) {
     this.typeLoader = typeLoader;
+    this.classToUnwrap = classToUnwrap;
+    this.modelProperty = modelProperty;
   }
 
   /**
@@ -44,21 +43,25 @@ public class ParameterResolverParameterTypeContributor implements ParameterDecla
   @Override
   public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
                          ParameterDeclarationContext declarationContext) {
-    MetadataType metadataType = parameter.getMetadataType(typeLoader);
-    if (ParameterResolver.class.isAssignableFrom(parameter.getType().getDeclaringClass())) {
-      final Optional<MetadataType> expressionResolverType = getGenericTypeAt(metadataType, 0, typeLoader);
-      if (expressionResolverType.isPresent()) {
-        metadataType = expressionResolverType.get();
+
+    if (classToUnwrap.isAssignableFrom(parameter.getType().getDeclaringClass())) {
+      ResolvableType[] generics = ResolvableType.forType(parameter.getJavaType()).getGenerics();
+
+      MetadataType metadataType;
+      Type type;
+      if (generics.length > 0) {
+        type = generics[0].getType();
+        metadataType = typeLoader.load(type);
       } else {
         throw new IllegalParameterModelDefinitionException(
                                                            format(
                                                                   "The parameter [%s] from the Operation [%s] doesn't specify the %s parameterized type",
                                                                   parameter.getName(),
                                                                   declarationContext.getName(),
-                                                                  ParameterResolver.class.getSimpleName()));
+                                                                  classToUnwrap.getSimpleName()));
       }
       declarer.ofType(metadataType);
-      declarer.withModelProperty(new ParameterResolverTypeModelProperty());
+      declarer.withModelProperty(modelProperty);
     }
   }
 }

@@ -10,11 +10,13 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
@@ -32,6 +34,7 @@ import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -82,8 +85,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
   private static final String VICTIM = "Skyler";
   private static final String EMPTY_STRING = "";
-  private static final Matcher<? super Weapon> WEAPON_MATCHER =
-      allOf(notNullValue(), instanceOf(Ricin.class), hasProperty("microgramsPerKilo", is(100L)));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -425,26 +426,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test
-  public void operationWithExpressionResolver() throws Exception {
-    assertExpressionResolverWeapon("processWeapon", PAYLOAD, WEAPON_MATCHER);
-  }
-
-  @Test
-  public void operationWithExpressionResolverAsStaticChildElement() throws Exception {
-    assertExpressionResolverWeapon("processWeaponAsStaticChildElement", null, WEAPON_MATCHER);
-  }
-
-  @Test
-  public void operationWithExpressionResolverAsDynamicChildElement() throws Exception {
-    assertExpressionResolverWeapon("processWeaponAsDynamicChildElement", null, WEAPON_MATCHER);
-  }
-
-  @Test
-  public void parameterResolverWithDefaultValue() throws Exception {
-    assertExpressionResolverWeapon("processWeaponWithDefaultValue", PAYLOAD, WEAPON_MATCHER);
-  }
-
-  @Test
   public void listOfMapsAsParameter() throws Exception {
     String expectedMessage = "an Apple";
     List<Map<String, String>> listOfMaps = new ArrayList<>();
@@ -455,35 +436,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     List<Map<String, String>> result = (List<Map<String, String>>) event.getMessage().getPayload().getValue();
     assertThat(result, hasSize(1));
     assertThat(result.get(0).get(Apple.class.getSimpleName()), is(expectedMessage));
-  }
-
-  @Test
-  public void operationWithExpressionResolverAndNullWeapon() throws Exception {
-    assertExpressionResolverWeapon("processNullWeapon", null, is(nullValue()));
-  }
-
-  @Test
-  public void operationWithExpressionResolverNegative() throws Exception {
-    expectedException.expect(new ArgumentMatcher<MessagingException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof MuleRuntimeException &&
-            ((MuleRuntimeException) o).getCause().getCause() instanceof TransformerException;
-      }
-    });
-
-    final ParameterResolver<Weapon> weapon =
-        (ParameterResolver<Weapon>) flowRunner("processWrongWeapon").run().getMessage().getPayload().getValue();
-    weapon.resolve();
-  }
-
-  private void assertExpressionResolverWeapon(String flowName, String expression, Matcher<? super Weapon> weaponMatcher)
-      throws Exception {
-    ParameterResolver<Weapon> weaponInfo =
-        (ParameterResolver<Weapon>) flowRunner(flowName).run().getMessage().getPayload().getValue();
-    assertThat(weaponInfo.getExpression(), is(Optional.ofNullable(expression)));
-    assertThat(weaponInfo.resolve(), weaponMatcher);
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {

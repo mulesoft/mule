@@ -211,9 +211,22 @@ public class HeisenbergOperations {
     return weapon;
   }
 
+  public ParameterResolver<List<Weapon>> processWeaponList(@Optional ParameterResolver<List<Weapon>> weapons) {
+    return weapons;
+  }
+
   public ParameterResolver<Weapon> processWeaponWithDefaultValue(@Optional(
       defaultValue = "#[payload]") ParameterResolver<Weapon> weapon) {
     return weapon;
+  }
+
+  public ParameterResolver<List<Weapon>> processWeaponListWithDefaultValue(@Optional(
+      defaultValue = "#[payload]") ParameterResolver<List<Weapon>> weapons) {
+    return weapons;
+  }
+
+  public ParameterResolver<List<String>> processAddressBook(ParameterResolver<List<String>> phoneNumbers) {
+    return phoneNumbers;
   }
 
   @OnException(NullExceptionEnricher.class)

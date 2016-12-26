@@ -40,6 +40,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -58,11 +59,12 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.FunctionParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterResolverParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
@@ -122,8 +124,12 @@ public final class JavaModelLoaderDelegate {
 
     fieldParameterContributors =
         ImmutableList.of(new InfrastructureFieldContributor(), new FunctionParameterTypeContributor(typeLoader));
-    methodParameterContributors = ImmutableList.of(new ParameterResolverParameterTypeContributor(typeLoader),
-                                                   new FunctionParameterTypeContributor(typeLoader));
+    methodParameterContributors = ImmutableList.of(
+                                                   new FunctionParameterTypeContributor(typeLoader),
+                                                   new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class,
+                                                                                         new TypedValueTypeModelProperty()),
+                                                   new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class,
+                                                                                         new ParameterResolverTypeModelProperty()));
   }
 
   /**

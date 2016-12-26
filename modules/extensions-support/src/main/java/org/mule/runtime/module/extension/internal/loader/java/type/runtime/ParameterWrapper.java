@@ -7,17 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
-
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
+import static org.springframework.core.ResolvableType.forMethodParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.Optional;
-
-import org.springframework.core.ResolvableType;
 
 /**
  * Wrapper for {@link Parameter} that provide utility methods to facilitate the introspection of a {@link Parameter}
@@ -56,14 +53,6 @@ public final class ParameterWrapper implements ParameterElement {
    * {@inheritDoc}
    */
   @Override
-  public MetadataType getMetadataType(ClassTypeLoader typeLoader) {
-    return typeLoader.load(ResolvableType.forMethodParameter(owner, index).getType());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public Annotation[] getAnnotations() {
     return parameter.getAnnotations();
   }
@@ -90,5 +79,13 @@ public final class ParameterWrapper implements ParameterElement {
   @Override
   public String getOwnerDescription() {
     return format("Method: '%s'", owner.getName());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Type getJavaType() {
+    return forMethodParameter(owner, index).getType();
   }
 }

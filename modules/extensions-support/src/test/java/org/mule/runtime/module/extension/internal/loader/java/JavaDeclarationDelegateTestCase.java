@@ -154,6 +154,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String EXTENSION_VERSION = "4.0-SNAPSHOT";
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
   private static final String PROCESS_WEAPON = "processWeapon";
+  private static final String PROCESS_WEAPON_LIST = "processWeaponList";
   private static final String PROCESS_WEAPON_WITH_DEFAULT_VALUE = "processWeaponWithDefaultValue";
   private static final String PROCESS_INFO = "processSale";
   private static final String FAIL_TO_EXECUTE = "failToExecute";
@@ -420,7 +421,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(26));
+    assertThat(extensionDeclaration.getOperations(), hasSize(29));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(8));
@@ -452,6 +453,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, CONNECTION_PAGED_OPERATION, "");
     assertOperation(extensionDeclaration, PROCESS_INFO, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON, "");
+    assertOperation(extensionDeclaration, PROCESS_WEAPON_LIST, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE, "");
     assertOperation(extensionDeclaration, FAIL_TO_EXECUTE, "");
 
@@ -627,12 +629,32 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(operation.getAllParameters(), "weapon", "",
                     TYPE_LOADER.load(Weapon.class), false, SUPPORTED, null);
     assertConnected(operation, false);
+
+    operation = getOperation(extensionDeclaration, PROCESS_WEAPON_LIST);
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getAllParameters(), "weapons", "",
+                    TYPE_LOADER.load(new TypeToken<List<Weapon>>() {}.getType()), false, SUPPORTED, null);
+    assertConnected(operation, false);
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE);
     assertThat(operation, is(notNullValue()));
     assertParameter(operation.getAllParameters(), "weapon", "",
                     TYPE_LOADER.load(Weapon.class), false, SUPPORTED, PAYLOAD);
+    assertConnected(operation, false);
+    assertTransactional(operation, false);
+
+    operation = getOperation(extensionDeclaration, "processWeaponListWithDefaultValue");
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getAllParameters(), "weapons", "",
+                    TYPE_LOADER.load(new TypeToken<List<Weapon>>() {}.getType()), false, SUPPORTED, PAYLOAD);
+    assertConnected(operation, false);
+    assertTransactional(operation, false);
+
+    operation = getOperation(extensionDeclaration, "processAddressBook");
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getAllParameters(), "phoneNumbers", "",
+                    TYPE_LOADER.load(new TypeToken<List<String>>() {}.getType()), true, SUPPORTED, null);
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -689,7 +711,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertThat(param.getName(), equalTo(name));
     assertThat(param.getDescription(), equalTo(description));
-    assertThat(getType(param.getType()), equalTo(getType(metadataType)));
+    assertThat(param.getType(), is(metadataType));
     assertThat(param.isRequired(), is(required));
     assertThat(param.getExpressionSupport(), is(expressionSupport));
     assertThat(param.getDefaultValue(), equalTo(defaultValue));
