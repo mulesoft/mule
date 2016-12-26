@@ -6,21 +6,21 @@
  */
 package org.mule.tck.listener;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static java.lang.Double.valueOf;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Optional;
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.util.Preconditions;
 import org.mule.util.concurrent.Latch;
-
-import com.google.common.base.Optional;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Listener for connection notifications.
@@ -115,9 +115,9 @@ public class ConnectionListener
      * @return the minimum time tracked between all received notifications
      * @throws IllegalStateException if there were less than two notifications received
      */
-    public void assertMinimumTimeBetweenNotifications(long expectedTimeBetweenNotifications)
+    public void assertMinimumTimeBetweenNotifications(double expectedTimeBetweenNotifications, double delta)
     {
         Preconditions.checkState(minimumTimeBetweenNotifications.isPresent(), "At least two notifications must be received in order to get the minimum time between notifications");
-        assertThat(minimumTimeBetweenNotifications.get(), greaterThanOrEqualTo(expectedTimeBetweenNotifications));
+        assertThat(valueOf(minimumTimeBetweenNotifications.get()), closeTo(expectedTimeBetweenNotifications, delta));
     }
 }
