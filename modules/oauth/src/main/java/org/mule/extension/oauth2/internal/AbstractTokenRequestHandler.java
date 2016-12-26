@@ -8,13 +8,13 @@ package org.mule.extension.oauth2.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
+import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpSendBodyMode.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.NEVER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;

@@ -16,10 +16,10 @@
                 clientSecret="${client.secret}"
                 localCallbackUrl="${local.callback.url}"
                 externalCallbackUrl="${local.callback.url}"
-                localAuthorizationUrlResourceOwnerId="#[message.inboundProperties['http.query.params']['userId']]"
+                localAuthorizationUrlResourceOwnerId="#[message.attributes.queryParams.userId]"
                 tokenManager-ref="multitenantConfig">
             <oauth2:authorization-request
-                    state="#[message.inboundProperties['http.query.params'] == null ? '' : message.inboundProperties['http.query.params']['state']]"
+                    state="#[message.attributes.queryParams == null ? '' : message.attributes.queryParams.state]"
                     localAuthorizationUrl="${local.authorization.url}"
                     authorizationUrl="${authorization.url}">
             </oauth2:authorization-request>

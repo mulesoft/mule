@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -89,11 +90,12 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[] {"authorization-code/authorization-code-full-config-tls-global.xml"},
-                         new Object[] {"authorization-code/authorization-code-full-config-tls-nested.xml"});
+    return Arrays.asList(new Object[] {"authorization-code/authorization-code-full-config-tls-nested.xml"},
+                         new Object[] {"authorization-code/authorization-code-full-config-tls-global.xml"});
   }
 
   @Test
+  @Ignore
   public void localAuthorizationUrlRedirectsToOAuthAuthorizationUrl() throws Exception {
     wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(200)));
 

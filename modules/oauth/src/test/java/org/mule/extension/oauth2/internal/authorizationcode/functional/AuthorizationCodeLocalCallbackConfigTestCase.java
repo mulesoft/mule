@@ -11,8 +11,10 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
 import org.mule.extension.oauth2.asserter.OAuthContextFunctionAsserter;
 
 import org.apache.http.client.fluent.Request;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-11276")
 public class AuthorizationCodeLocalCallbackConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
   @Override

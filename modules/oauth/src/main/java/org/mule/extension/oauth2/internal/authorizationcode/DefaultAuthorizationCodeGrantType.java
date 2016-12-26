@@ -14,21 +14,34 @@ import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
+import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.HttpServerConfiguration;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the config element for oauth:authentication-code-config.
@@ -38,7 +51,9 @@ import org.apache.commons.lang.StringUtils;
  * authentication code and retrieve the access token
  */
 public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
-    implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware {
+    implements Initialisable, AuthorizationCodeGrantType, Startable, Stoppable, MuleContextAware {
+
+  private static final Logger logger = LoggerFactory.getLogger(DefaultAuthorizationCodeGrantType.class);
 
   private String clientId;
   private String clientSecret;
@@ -53,6 +68,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   private TokenManagerConfig tokenManagerConfig;
   private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
   private AttributeEvaluator resourceOwnerIdEvaluator;
+
+  private HttpServer server;
 
   public void setClientId(final String clientId) {
     this.clientId = clientId;
@@ -186,9 +203,63 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
         tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
       }
       tokenRequestHandler.initialise();
+
+      buildHttpServer();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
+  }
+
+  private void buildHttpServer() throws InitialisationException {
+    String flowName = "OAuthCallbackUrlFlow";
+
+    final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
+    // final ListenerRequestMatcher requestMatcher;
+    // final ListenerPath listenerPath;
+
+    if (getLocalCallbackUrl() != null) {
+      flowName = flowName + getLocalCallbackUrl();
+      try {
+        final URL localCallbackUrl = new URL(getLocalCallbackUrl());
+        serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
+        // httpListenerBuilder.setUrl(localCallbackUrl);
+        // requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
+        // listenerPath = new ListenerPath(localCallbackUrl.getPath(), "/");
+      } catch (MalformedURLException e) {
+        logger.warn("Could not parse provided url %s. Validate that the url is correct", getLocalCallbackUrl());
+        throw new InitialisationException(e, this);
+      }
+    } else if (getLocalCallbackConfig() != null) {
+      flowName = flowName + getLocalCallbackConfig().getName() + "_" + getLocalCallbackConfigPath();
+
+      serverConfigBuilder
+          .setHost(getLocalCallbackConfig().getHost())
+          .setPort(getLocalCallbackConfig().getPort())
+          .setTlsContextFactory(getLocalCallbackConfig().getTlsContext());
+      // httpListenerBuilder
+      // .setListenerConfig(getOauthConfig().getLocalCallbackConfig())
+      // .setPath(getOauthConfig().getLocalCallbackConfigPath());
+
+      // requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getLocalCallbackConfigPath());
+      // listenerPath = new ListenerPath(getLocalCallbackConfigPath(), "/");
+    } else {
+      throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
+    }
+
+    if (getTlsContext() != null) {
+      serverConfigBuilder.setTlsContextFactory(getTlsContext());
+    }
+
+    HttpServerConfiguration serverConfiguration = serverConfigBuilder
+        .setSchedulerSupplier(() -> muleContext.getSchedulerService().ioScheduler()).build();
+
+    try {
+      server = muleContext.getRegistry().lookupObject(HttpService.class).getServerFactory().create(serverConfiguration);
+    } catch (ConnectionException | RegistrationException e) {
+      logger.warn("Could not create server for OAuth callback.");
+      throw new InitialisationException(e, this);
+    }
+
   }
 
   @Override
@@ -244,14 +315,34 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
 
   @Override
   public void start() throws MuleException {
+    try {
+      server.start();
+    } catch (IOException e) {
+      throw new DefaultMuleException(e);
+    }
+
     if (authorizationRequestHandler != null) {
       authorizationRequestHandler.setOauthConfig(this);
       authorizationRequestHandler.init();
+      authorizationRequestHandler.start();
     }
     if (tokenRequestHandler != null) {
       tokenRequestHandler.setOauthConfig(this);
       tokenRequestHandler.init();
       tokenRequestHandler.start();
     }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    tokenRequestHandler.stop();
+    authorizationRequestHandler.stop();
+    server.stop();
+  }
+
+
+  @Override
+  public HttpServer getServer() {
+    return server;
   }
 }
