@@ -28,6 +28,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.temporary.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
@@ -80,6 +81,7 @@ public class FakeMuleServer {
   private DefaultMuleCoreExtensionManagerServer coreExtensionManager;
   private final ArtifactClassLoader containerClassLoader;
   private ServiceManager serviceManager;
+  private ExtensionModelLoaderManager extensionModelLoaderManager;
 
   public FakeMuleServer(String muleHomePath) {
     this(muleHomePath, new LinkedList<>());
@@ -89,6 +91,7 @@ public class FakeMuleServer {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
 
     this.coreExtensions = intialCoreExtensions;
     for (MuleCoreExtension extension : coreExtensions) {
@@ -130,6 +133,7 @@ public class FakeMuleServer {
   public void stop() throws MuleException {
     deploymentService.stop();
     serviceManager.stop();
+    extensionModelLoaderManager.stop();
     coreExtensionManager.stop();
     coreExtensionManager.dispose();
   }
@@ -138,6 +142,7 @@ public class FakeMuleServer {
     coreExtensionManager.initialise();
     coreExtensionManager.start();
     serviceManager.start();
+    extensionModelLoaderManager.start();
     deploymentService.start();
   }
 

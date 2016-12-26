@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
@@ -40,6 +41,7 @@ import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContextBuilder;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -66,6 +68,8 @@ public class ArtifactContextBuilder {
   protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT =
       "Only applications are allowed to have a parent context";
   protected static final String SERVICE_REPOSITORY_CANNOT_BE_NULL = "serviceRepository cannot be null";
+  protected static final String EXTENSION_MODEL_LOADER_REPOSITORY_CANNOT_BE_NULL =
+      "extensionModelLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL = "classLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
   protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
@@ -83,6 +87,7 @@ public class ArtifactContextBuilder {
   private MuleContextListener muleContextListener;
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
+  private ExtensionModelLoaderRepository extensionModelLoaderRepository = (loaderDescriber) -> empty();
   private boolean enableLazyInit;
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
@@ -250,6 +255,12 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  public ArtifactContextBuilder setExtensionModelLoaderRepository(ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+    checkArgument(extensionModelLoaderRepository != null, EXTENSION_MODEL_LOADER_REPOSITORY_CANNOT_BE_NULL);
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
+    return this;
+  }
+
   public ArtifactContextBuilder setPolicyProvider(PolicyProvider policyProvider) {
     this.policyProvider = policyProvider;
     return this;
@@ -309,7 +320,7 @@ public class ArtifactContextBuilder {
         List<ConfigurationBuilder> builders = new LinkedList<>();
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
-        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
+        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins, extensionModelLoaderRepository));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         ArtifactConfigurationProcessor artifactConfigurationProcessor = ArtifactConfigurationProcessor.discover();
         AtomicReference<ArtifactContext> artifactContext = new AtomicReference<>();

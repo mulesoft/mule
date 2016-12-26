@@ -28,6 +28,7 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPl
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -45,6 +46,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ServiceRepository serviceRepository;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private MuleContextListenerFactory muleContextListenerFactory;
@@ -53,6 +55,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
                                    ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
                                    ServiceRepository serviceRepository,
+                                   ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                    ClassLoaderRepository classLoaderRepository,
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory) {
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
@@ -60,6 +63,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     checkArgument(artifactPluginRepository != null, "Artifact plugin repository cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");
+    checkArgument(extensionModelLoaderRepository != null, "extensionModelLoaderRepository cannot be null");
     checkArgument(classLoaderRepository != null, "classLoaderRepository cannot be null");
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyClassLoaderBuilderFactory cannot be null");
 
@@ -69,6 +73,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.artifactPluginRepository = artifactPluginRepository;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
   }
 
@@ -119,7 +124,8 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                                                                    classLoaderRepository));
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
-                                   serviceRepository, descriptor.getArtifactLocation(), classLoaderRepository,
+                                   serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
+                                   classLoaderRepository,
                                    applicationPolicyProvider);
 
     applicationPolicyProvider.setApplication(delegate);

@@ -45,6 +45,7 @@ import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassL
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -63,6 +64,7 @@ public class DefaultMuleApplication implements Application {
   private final DomainRepository domainRepository;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ServiceRepository serviceRepository;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
   private ApplicationStatus status;
@@ -76,12 +78,14 @@ public class DefaultMuleApplication implements Application {
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository, File location,
+                                ServiceRepository serviceRepository,
+                                ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider) {
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.classLoaderRepository = classLoaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.location = location;
@@ -179,6 +183,7 @@ public class DefaultMuleApplication implements Application {
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
               .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
+              .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
               .setPolicyProvider(policyManager);
 

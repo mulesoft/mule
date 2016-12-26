@@ -7,12 +7,6 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.lang.System.lineSeparator;
-import static java.lang.Thread.currentThread;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.groupingBy;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
@@ -23,23 +17,21 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
@@ -55,17 +47,19 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
 
   private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
   private final List<ArtifactPlugin> artifactPlugins;
-  private final Map<String, ExtensionModelLoader> extensionsModelLoaders;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
-  public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins) {
-    this(artifactPlugins, new DefaultExtensionManagerAdapterFactory());
+  public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,
+                                                          ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+    this(artifactPlugins, new DefaultExtensionManagerAdapterFactory(), extensionModelLoaderRepository);
   }
 
   public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,
-                                                          ExtensionManagerAdapterFactory extensionManagerAdapterFactory) {
+                                                          ExtensionManagerAdapterFactory extensionManagerAdapterFactory,
+                                                          ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     this.artifactPlugins = artifactPlugins;
     this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
-    this.extensionsModelLoaders = getExtensionModelLoaders();
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
   }
 
   @Override
@@ -107,14 +101,11 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
    */
   private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, ExtensionManagerAdapter extensionManager) {
     artifactPlugin.getDescriptor().getExtensionModelDescriptorProperty().ifPresent(descriptorProperty -> {
-      if (!extensionsModelLoaders.containsKey(descriptorProperty.getId())) {
-        throw new IllegalArgumentException(format(
-                                                  "The identifier '%s' does not match with the describers available to generate an ExtensionModel (working with the plugin '%s', existing identifiers to generate the %s are '%s')",
-                                                  descriptorProperty.getId(), artifactPlugin.getDescriptor().getName(),
-                                                  ExtensionModel.class.getName(),
-                                                  join(",", extensionsModelLoaders.keySet())));
-      }
-      final ExtensionModelLoader extensionModelLoader = extensionsModelLoaders.get(descriptorProperty.getId());
+      final ExtensionModelLoader extensionModelLoader = extensionModelLoaderRepository.getExtensionModelLoader(descriptorProperty)
+          .orElseThrow(() -> new IllegalArgumentException(format(
+                                                                 "The identifier '%s' does not match with the describers available to generate an ExtensionModel (working with the plugin '%s')",
+                                                                 descriptorProperty.getId(),
+                                                                 artifactPlugin.getDescriptor().getName())));
       final ExtensionModel extensionModel = extensionModelLoader
           .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(), descriptorProperty.getAttributes());
       extensionManager.registerExtension(extensionModel);
@@ -129,43 +120,4 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
     }
   }
 
-  /**
-   * Will look through SPI every class that implements the {@code providerClass} and if there are repeated IDs, it will
-   * collect them all to throw an exception with the detailed message.
-   * <p/>
-   * The exception, if thrown, will have the following message:
-   * <pre>
-   *   There are several loaders that return the same ID when looking up providers for 'org.mule.runtime.module.artifact.ExtensionModelLoader'. Full error list:
-   *   ID [some-id] is being returned by the following classes [org.foo.FooLoader, org.bar.BarLoader]
-   *   ID [another-id] is being returned by the following classes [org.foo2.FooLoader2, org.bar2.BarLoader2]
-   * </pre>
-   *
-   * @return a {@link Map} with all the loaders.
-   * @throws IllegalStateException if there are loaders with repeated IDs.
-   */
-  private Map<String, ExtensionModelLoader> getExtensionModelLoaders() {
-    final Class<ExtensionModelLoader> providerClass = ExtensionModelLoader.class;
-    final SpiServiceRegistry spiServiceRegistry = new SpiServiceRegistry();
-    final ClassLoader classLoader = currentThread().getContextClassLoader();
-
-    final Collection<ExtensionModelLoader> extensionModelLoaders =
-        spiServiceRegistry.lookupProviders(providerClass, classLoader);
-    final StringBuilder sb = new StringBuilder();
-    extensionModelLoaders.stream().collect(groupingBy(ExtensionModelLoader::getId))
-        .entrySet().stream().filter(entry -> entry.getValue().size() > 1)
-        .forEach(
-                 entry -> {
-                   // At this point we are sure there are at least 2 classes that return the same ID, we will append it to the builder
-                   final String classes = entry.getValue().stream()
-                       .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(Collectors.joining(", "));
-                   sb.append(lineSeparator()).append("ID [").append(entry.getKey())
-                       .append("] is being returned by the following classes [").append(classes).append("]");
-                 });
-    if (isNotBlank(sb.toString())) {
-      throw new IllegalStateException(format(
-                                             "There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
-                                             providerClass.getName(), sb.toString()));
-    }
-    return extensionModelLoaders.stream().collect(Collectors.toMap(ExtensionModelLoader::getId, identity()));
-  }
 }

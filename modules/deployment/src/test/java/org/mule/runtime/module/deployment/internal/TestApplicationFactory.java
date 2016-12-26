@@ -27,6 +27,7 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -46,15 +47,18 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                 ApplicationDescriptorFactory applicationDescriptorFactory,
                                 ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository,
+                                ServiceRepository serviceRepository,
+                                ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                ClassLoaderRepository classLoaderRepository,
                                 PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
-          serviceRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory);
+          serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory);
   }
 
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
                                                                     DomainManager domainManager,
-                                                                    ServiceRepository serviceRepository) {
+                                                                    ServiceRepository serviceRepository,
+                                                                    ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory();
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
@@ -73,7 +77,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                                  pluginDependenciesResolver);
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                      applicationPluginRepository, domainManager, serviceRepository, artifactClassLoaderManager,
+                                      applicationPluginRepository, domainManager, serviceRepository,
+                                      extensionModelLoaderRepository, artifactClassLoaderManager,
                                       mock(PolicyTemplateClassLoaderBuilderFactory.class));
   }
 
