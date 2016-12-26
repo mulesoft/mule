@@ -59,8 +59,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
  */
 final class ClientFactory {
 
-  private ClientFactory() {
-  }
+  private ClientFactory() {}
 
   static ClientFactory getInstance() {
     return new ClientFactory();
@@ -79,7 +78,7 @@ final class ClientFactory {
                    List<SecurityStrategy> securities,
                    HttpService httpService,
                    String transportConfig)
-    throws ConnectionException {
+      throws ConnectionException {
     WscTransportFactory factory = new WscTransportFactory();
     Client client = factory.createClient(address, soapVersion.getVersion());
     client.getEndpoint().put(MTOM_ENABLED, mtomEnabled);
@@ -114,12 +113,12 @@ final class ClientFactory {
 
     ImmutableList.Builder<CallbackHandler> callbackHandlersBuilder = ImmutableList.builder();
     strategies.stream()
-      .filter(s -> s.securityType().equals(type))
-      .forEach(s -> {
-        props.putAll(s.buildSecurityProperties());
-        actionsJoiner.add(s.securityAction());
-        s.buildPasswordCallbackHandler().ifPresent(callbackHandlersBuilder::add);
-      });
+        .filter(s -> s.securityType().equals(type))
+        .forEach(s -> {
+          props.putAll(s.buildSecurityProperties());
+          actionsJoiner.add(s.securityAction());
+          s.buildPasswordCallbackHandler().ifPresent(callbackHandlersBuilder::add);
+        });
 
     List<CallbackHandler> handlers = callbackHandlersBuilder.build();
     if (!handlers.isEmpty()) {
@@ -166,7 +165,7 @@ final class ClientFactory {
   }
 
   private WscDispatcher createDispatcher(String address, HttpService httpService, String transportConfig)
-    throws ConnectionException {
+      throws ConnectionException {
     String protocol = address.substring(0, address.indexOf("://"));
     if (transportConfig == null) {
       if (protocol.equals("http")) {
