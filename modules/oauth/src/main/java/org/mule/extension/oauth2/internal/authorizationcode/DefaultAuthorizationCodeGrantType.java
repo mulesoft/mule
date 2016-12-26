@@ -239,6 +239,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
       serverConfigBuilder.setTlsContextFactory(getTlsContext());
     }
 
+    // TODO MULE-11272 Change to cpu-lite
     HttpServerConfiguration serverConfiguration = serverConfigBuilder
         .setSchedulerSupplier(() -> muleContext.getSchedulerService().ioScheduler()).build();
 

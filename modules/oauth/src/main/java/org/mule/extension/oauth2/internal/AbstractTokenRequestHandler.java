@@ -53,6 +53,9 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, I
   private TlsContextFactory tlsContextFactory;
 
   private HttpClient client;
+  private MuleEventToHttpRequest eventToHttpRequest;
+  private HttpResponseToMuleMessage httpResponseToMuleMessage;
+  private static final int TOKEN_REQUEST_TIMEOUT_MILLIS = 60000;
   private static final HttpRequesterCookieConfig REQUESTER_NO_COOKIE_CONFIG = new HttpRequesterCookieConfig() {
 
     @Override
@@ -105,14 +108,11 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, I
         requestBuilder.setHeaders(singletonMap(AUTHORIZATION, ((OAuthAuthorizationAttributes) attributes).getAuthorization()));
       }
 
-      final MuleEventToHttpRequest toHttpRequest =
-          new MuleEventToHttpRequest(REQUESTER_NO_COOKIE_CONFIG, tokenUrl, POST.name(), NEVER, ALWAYS, null);
       // TODO MULE-11272 Support doing non-blocking requests
       final HttpResponse response =
-          client.send(toHttpRequest.create(event, requestBuilder, null, muleContext), 60000, true, null);
+          client.send(eventToHttpRequest.create(event, requestBuilder, null, muleContext), TOKEN_REQUEST_TIMEOUT_MILLIS, true,
+                      null);
 
-      HttpResponseToMuleMessage httpResponseToMuleMessage =
-          new HttpResponseToMuleMessage(REQUESTER_NO_COOKIE_CONFIG, true, muleContext);
       Message responseMessage = httpResponseToMuleMessage.convert(event, response, tokenUrl);
       Event responseEvent = Event.builder(event).message(InternalMessage.builder(responseMessage).build()).build();
 
@@ -134,6 +134,8 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, I
 
   protected class TokenUrlResponseException extends Exception {
 
+    private static final long serialVersionUID = -570499835977961241L;
+
     private Event tokenUrlResponse;
 
     public TokenUrlResponseException(final Event tokenUrlResponse) {
@@ -147,8 +149,10 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, I
 
   @Override
   public void initialise() throws InitialisationException {
-    String threadNamePrefix = format("%soauthToken.requester", getPrefix(muleContext));
+    eventToHttpRequest = new MuleEventToHttpRequest(REQUESTER_NO_COOKIE_CONFIG, tokenUrl, POST.name(), NEVER, ALWAYS, null);
+    httpResponseToMuleMessage = new HttpResponseToMuleMessage(REQUESTER_NO_COOKIE_CONFIG, true, muleContext);
 
+    String threadNamePrefix = format("%soauthToken.requester", getPrefix(muleContext));
     HttpClientConfiguration clientConfiguration = new HttpClientConfiguration.Builder()
         .setTlsContextFactory(tlsContextFactory)
         .setThreadNamePrefix(threadNamePrefix)

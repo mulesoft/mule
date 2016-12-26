@@ -6,44 +6,25 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.extension.http.api.HttpConstants.Methods.GET;
-import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
 
-import org.mule.extension.http.api.HttpConstants;
-import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.service.http.api.domain.message.response.HttpResponse;
-import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.server.RequestHandlerManager;
-import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,82 +127,8 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
 
     final Flow redirectUrlFlow = createDynamicFlow(getMuleContext(), flowName, asList(createRedirectUrlProcessor()));
 
-    // MULE-11277 Support non-blocking in OAuth http listeners
     this.redirectUrlHandlerManager =
-        getOauthConfig().getServer().addRequestHandler(requestMatcher, (requestContext, responseCallback) -> {
-          Result<Object, HttpRequestAttributes> result;
-          final ClassLoader previousCtxClassLoader = currentThread().getContextClassLoader();
-          try {
-            currentThread().setContextClassLoader(AbstractAuthorizationCodeTokenRequestHandler.class.getClassLoader());
-
-            result = transform(requestContext, muleContext, true, listenerPath);
-            final Message message = Message.builder()
-                .payload(result.getOutput())
-                .mediaType(result.getMediaType().orElse(ANY))
-                .attributes(result.getAttributes().get())
-                .build();
-
-            final Event templateEvent =
-                Event.builder(create(redirectUrlFlow, "OAuthLocalCallback")).message((InternalMessage) message).build();
-
-            final Event processed = redirectUrlFlow.process(templateEvent);
-
-            final String body = (String) processed.getMessage().getPayload().getValue();
-            final HttpResponseAttributes responseAttributes = (HttpResponseAttributes) processed.getMessage().getAttributes();
-            final HttpResponseBuilder responseBuilder = HttpResponse.builder()
-                .setStatusCode(responseAttributes.getStatusCode())
-                .setReasonPhrase(responseAttributes.getReasonPhrase())
-                .setEntity(new ByteArrayHttpEntity(body.getBytes()))
-                .addHeader(CONTENT_LENGTH, "" + body.length());
-            for (Entry<String, String> entry : responseAttributes.getHeaders().entrySet()) {
-              responseBuilder.addHeader(entry.getKey(), entry.getValue());
-            }
-
-            responseCallback.responseReady(responseBuilder.build(), new ResponseStatusCallback() {
-
-              @Override
-              public void responseSendFailure(Throwable exception) {
-                logger.warn("Error while sending {} response {}", responseAttributes.getStatusCode(), exception.getMessage());
-                if (logger.isDebugEnabled()) {
-                  logger.debug("Exception thrown", exception);
-                }
-              }
-
-              @Override
-              public void responseSendSuccessfully() {}
-            });
-          } catch (HttpRequestParsingException e) {
-            logger.warn("Exception occurred parsing request:", e);
-            sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
-          } catch (MuleException e) {
-            logger.warn("Exception occurred processing request:", e);
-            sendErrorResponse(INTERNAL_SERVER_ERROR, "Server encountered a problem", responseCallback);
-          } finally {
-            currentThread().setContextClassLoader(previousCtxClassLoader);
-          }
-        });
-  }
-
-  private void sendErrorResponse(final HttpConstants.HttpStatus status, String message,
-                                 HttpResponseReadyCallback responseCallback) {
-    responseCallback.responseReady(HttpResponse.builder()
-        .setStatusCode(status.getStatusCode())
-        .setReasonPhrase(status.getReasonPhrase())
-        .setEntity(new ByteArrayHttpEntity(message.getBytes()))
-        .addHeader(CONTENT_LENGTH, "" + message.length())
-        .build(), new ResponseStatusCallback() {
-
-          @Override
-          public void responseSendFailure(Throwable exception) {
-            logger.warn("Error while sending {} response {}", status.getStatusCode(), exception.getMessage());
-            if (logger.isDebugEnabled()) {
-              logger.debug("Exception thrown", exception);
-            }
-          }
-
-          @Override
-          public void responseSendSuccessfully() {}
-        });
+        addRequestHandler(getOauthConfig().getServer(), requestMatcher, listenerPath, redirectUrlFlow, logger);
   }
 
   @Override
