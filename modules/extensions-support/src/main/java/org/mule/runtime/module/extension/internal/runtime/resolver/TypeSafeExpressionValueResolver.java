@@ -48,7 +48,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     synchronized (context) {
       if (!evaluatorInitialized) {
         evaluator.initialize(context.getExpressionManager());
-        evaluatorInitialiser = (e, c) -> {};
+        evaluatorInitialiser = (e, c) -> {
+        };
         evaluatorInitialized = true;
       }
     }
