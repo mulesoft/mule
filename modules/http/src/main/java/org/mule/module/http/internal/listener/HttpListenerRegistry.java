@@ -77,6 +77,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
     public class ServerAddressRequestHandlerRegistry
     {
+
         private PathMap serverRequestHandler;
         private PathMap rootPathMap = new PathMap();
         private PathMap catchAllPathMap = new PathMap();
@@ -125,17 +126,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 for (int i = 1; i < insertionLevel - 1; i++)
                 {
                     String currentPath = pathParts[i];
-                    PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
+                    PathMap pathMap = currentPathMap.getChildPathMap(currentPath, null);
                     if (i != insertionLevel - 1)
                     {
                         if (pathMap == null)
                         {
                             pathMap = new PathMap();
                             currentPathMap.addChildPathMap(currentPath, pathMap);
-                            if (currentPath.equals(WILDCARD_CHARACTER))
-                            {
-                                currentPathMap.addWildcardRequestHandler(new RequestHandlerMatcherPair(requestMatcher, requestHandler));
-                            }
                         }
                     }
 
@@ -207,11 +204,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 final PathMap pathMap = foundPaths.pop();
                 List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = pathMap.getRequestHandlerMatcherPairs();
 
-                if(requestHandlerMatcherPairs.size() == 0 && pathMap.getCatchAllPathMap() !=null)
+                if (requestHandlerMatcherPairs == null && pathMap.getCatchAllPathMap() != null)
                 {
                     requestHandlerMatcherPairs = pathMap.getCatchAllPathMap().requestHandlerMatcherPairs;
                 }
-                requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request,path);
+                requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request);
 
                 if (requestHandlerMatcherPair != null)
                 {
@@ -273,20 +270,20 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             for (int i = 1; i < pathParts.length && currentPathMap != null; i++)
             {
                 String currentPath = pathParts[i];
-                PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
+                PathMap pathMap = currentPathMap.getChildPathMap(currentPath, i < pathParts.length - 1 ? pathParts[i + 1] : null);
 
                 if (pathMap == null)
                 {
                     addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
                     pathMap = currentPathMap.getCatchAllCurrentPathMap();
                 }
-                else if(pathMap.getCatchAllPathMap()!=null)
+                else if (pathMap.getCatchAllPathMap() != null)
                 {
-                    auxPathMap =pathMap;
+                    auxPathMap = pathMap;
                 }
                 if (i == pathParts.length - 1)
                 {
-                    if (auxPathMap !=null)
+                    if (auxPathMap != null)
                     {
                         addCatchAllPathMapIfNotNull(auxPathMap, foundPaths);
                     }
@@ -314,27 +311,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
         }
 
-        private RequestHandlerMatcherPair findRequestHandlerMatcherPair(List<RequestHandlerMatcherPair> requestHandlerMatcherPairs, HttpRequest request, String path)
+        private RequestHandlerMatcherPair findRequestHandlerMatcherPair(List<RequestHandlerMatcherPair> requestHandlerMatcherPairs, HttpRequest request)
         {
-            final String[] pathParts = splitPath(path);
             for (RequestHandlerMatcherPair requestHandlerMatcherPair : requestHandlerMatcherPairs)
             {
                 if (requestHandlerMatcherPair.getRequestMatcher().matches(request))
                 {
-                    String requestHandlerPath = requestHandlerMatcherPair.getRequestMatcher().getPath();
-                    if (requestHandlerPath.contains(WILDCARD_CHARACTER) && !requestHandlerPath.endsWith(WILDCARD_CHARACTER) && !requestHandlerPath.endsWith("*/"))
-                    {
-                        String vector[] = requestHandlerMatcherPair.getRequestMatcher().getPath().split("\\*");
-                        for (String pathPart : pathParts)
-                        {
-                            if (vector.length > 0 && !pathPart.equals("") && vector[1].contains(pathPart))
-                            {
-                                return requestHandlerMatcherPair;
-                            }
-                        }
-                    }
-                    else
-                        return requestHandlerMatcherPair;
+                    return requestHandlerMatcherPair;
                 }
             }
             return null;
@@ -398,17 +381,41 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         }
 
         /**
-         * @param subPath a sub part of the path
+         * @param subPath the sub part of the path to find
+         * @param nextSubPath the next sub part of the path. It is useful for deciding between static paths and middle-wildcard paths when they are similar.
          * @return the node with the existent mappings. null if there's no such node.
          */
-        public PathMap getChildPathMap(final String subPath)
+        public PathMap getChildPathMap(final String subPath, String nextSubPath)
         {
-            if (isCatchAllPath(subPath) || isUriParameter(subPath))
+            if (isCatchAllPath(subPath) || isUriParameter(subPath) || (isViablePath(subPath, nextSubPath) && !matchesNextSubPaths(subPath, nextSubPath)))
             {
                 return getCatchAllCurrentPathMap();
             }
             PathMap pathMap = subPaths.get(subPath);
             return pathMap;
+        }
+
+        private boolean isViablePath(String subPath, String nextSubPath)
+        {
+            if (getCatchAllCurrentPathMap() != null && nextSubPath != null)
+            {
+                return getCatchAllCurrentPathMap().subPaths.containsKey(nextSubPath);
+            }
+
+            return false;
+        }
+
+        private boolean matchesNextSubPaths(String subPath, String nextSubPath)
+        {
+            if (subPaths.containsKey(subPath))
+            {
+                PathMap nextPathMap = subPaths.get(subPath);
+                if (nextPathMap.getSubPaths() != null)
+                {
+                    return nextPathMap.getSubPaths().containsKey(nextSubPath);
+                }
+            }
+            return false;
         }
 
         /**
