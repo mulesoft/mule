@@ -6,86 +6,72 @@
  */
 package org.mule.extension.oauth2.asserter;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.el.ExpressionManager;
 
-import org.hamcrest.core.Is;
+import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 
 public class OAuthContextFunctionAsserter {
 
-  private final ExpressionManager expressionManager;
-  private final String configName;
+  private final TokenManagerConfig tokenManagerConfig;
   private final String userId;
 
-  private OAuthContextFunctionAsserter(ExpressionManager expressionManager, String configName, String userId) {
-    this.expressionManager = expressionManager;
-    this.configName = configName;
+  private OAuthContextFunctionAsserter(TokenManagerConfig tokenManagerConfig, String userId) {
+    this.tokenManagerConfig = tokenManagerConfig;
     this.userId = userId;
   }
 
-  public static OAuthContextFunctionAsserter createFrom(ExpressionManager expressionManager, String configName) {
-    return new OAuthContextFunctionAsserter(expressionManager, configName, null);
+  public static OAuthContextFunctionAsserter createFrom(TokenManagerConfig tokenManagerConfig) {
+    return new OAuthContextFunctionAsserter(tokenManagerConfig, null);
   }
 
-  public static OAuthContextFunctionAsserter createFrom(ExpressionManager expressionManager, String configName, String userId) {
-    return new OAuthContextFunctionAsserter(expressionManager, configName, userId);
+  public static OAuthContextFunctionAsserter createFrom(TokenManagerConfig tokenManagerConfig, String userId) {
+    return new OAuthContextFunctionAsserter(tokenManagerConfig, userId);
   }
 
   public OAuthContextFunctionAsserter assertAccessTokenIs(String expectedAccessToken) {
     if (userId != null) {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s','%s').accessToken", configName, userId)).getValue(),
-                 Is.<Object>is(expectedAccessToken));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall(userId).getAccessToken(), is(expectedAccessToken));
     } else {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s').accessToken", configName)).getValue(),
-                 Is.<Object>is(expectedAccessToken));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall().getAccessToken(), is(expectedAccessToken));
     }
     return this;
   }
 
   public OAuthContextFunctionAsserter assertRefreshTokenIs(String expectedRefreshToken) {
     if (userId != null) {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s','%s').refreshToken", configName, userId))
-          .getValue(),
-                 Is.<Object>is(expectedRefreshToken));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall(userId).getRefreshToken(), is(expectedRefreshToken));
     } else {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s').refreshToken", configName)).getValue(),
-                 Is.<Object>is(expectedRefreshToken));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall().getRefreshToken(), is(expectedRefreshToken));
     }
     return this;
   }
 
   public OAuthContextFunctionAsserter assertState(String expectedState) {
     if (userId != null) {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s','%s').state", configName, userId)).getValue(),
-                 Is.<Object>is(expectedState));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall(userId).getState(), is(expectedState));
     } else {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s').state", configName)).getValue(),
-                 Is.<Object>is(expectedState));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall().getState(), is(expectedState));
     }
     return this;
   }
 
   public OAuthContextFunctionAsserter assertExpiresInIs(String expectedExpiresIs) {
     if (userId != null) {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s','%s').expiresIn", configName, userId)).getValue(),
-                 Is.<Object>is(expectedExpiresIs));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall(userId).getExpiresIn(), is(expectedExpiresIs));
     } else {
-      assertThat(expressionManager.evaluate(String.format("oauthContext('%s').expiresIn", configName)).getValue(),
-                 Is.<Object>is(expectedExpiresIs));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall().getExpiresIn(), is(expectedExpiresIs));
     }
     return this;
   }
 
   public OAuthContextFunctionAsserter assertContainsCustomTokenResponseParam(String paramName, String paramValue) {
     if (userId != null) {
-      assertThat(expressionManager
-          .evaluate(String.format("oauthContext('%s','%s').tokenResponseParameters['%s']", configName, userId, paramName))
-          .getValue(),
-                 Is.<Object>is(paramValue));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall(userId).getTokenResponseParameters().get(paramName),
+                 is(paramValue));
     } else {
-      assertThat(expressionManager
-          .evaluate(String.format("oauthContext('%s').tokenResponseParameters['%s']", configName, paramName)).getValue(),
-                 Is.<Object>is(paramValue));
+      assertThat(tokenManagerConfig.processOauthContextFunctionACall().getTokenResponseParameters().get(paramName),
+                 is(paramValue));
     }
     return this;
   }

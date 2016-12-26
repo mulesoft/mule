@@ -21,7 +21,6 @@ import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
@@ -29,6 +28,8 @@ import java.io.IOException;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
+
+import com.github.tomakehurst.wiremock.client.WireMock;
 
 public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthorizationTestCase {
 
@@ -67,9 +68,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, NO_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_JOHN)
         .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 
@@ -79,9 +80,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, TONY_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_JOHN)
         .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(JOHN_STATE);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(TONY_STATE);
   }
 
@@ -91,9 +92,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, NO_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_JOHN)
         .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 

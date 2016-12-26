@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Rule;
 
-public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends AbstractOAuthAuthorizationTestCase {
+public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends AbstractOAuthAuthorizationTestCase {
 
   private static final String RESOURCE_PATH = "/resource";
   public static final String RESOURCE_RESULT = "resource result";

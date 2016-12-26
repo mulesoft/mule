@@ -6,6 +6,8 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode.functional;
 
+import static org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig.defaultTokenManagerConfigIndex;
+
 import org.mule.extension.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
@@ -34,7 +36,8 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
 
   @Test
   public void afterFailureDoRefreshTokenWithCustomValueWithResourceOwnerId() throws Exception {
-    final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(MULTITENANT_OAUTH_CONFIG);
+    final TokenManagerConfig tokenManagerConfig =
+        muleContext.getRegistry().get("default-token-manager-config-" + (defaultTokenManagerConfigIndex.get() - 1));
     final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
 
     final ResourceOwnerOAuthContext contextForResourceOwnerTony = configOAuthContext.getContextForResourceOwner(USER_ID_TONY);
@@ -47,9 +50,9 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
 
     executeRefreshToken("testMultitenantFlow", MULTITENANT_OAUTH_CONFIG, multitenantUser.getValue(), 500);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_OAUTH_CONFIG, USER_ID_JOHN)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_OAUTH_CONFIG), USER_ID_JOHN)
         .assertAccessTokenIs(REFRESHED_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionManager(), MULTITENANT_OAUTH_CONFIG, USER_ID_TONY)
+    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_OAUTH_CONFIG), USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 
