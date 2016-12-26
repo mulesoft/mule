@@ -29,15 +29,15 @@ public class QuartzConnectorHotStopRestartTestCase extends FunctionalTestCase
     public void testStopRestartConnectorShouldPauseAndRestartJob() throws Exception
     {
         QuartzConnector connector = muleContext.getRegistry().lookupObject(QUARTZ_CONNECTOR_NAME);
-        QuartzMessageReceiver receiver = (QuartzMessageReceiver) connector.getReceivers().get("quartz://JustPingIt1");
+        QuartzMessageReceiver receiver = (QuartzMessageReceiver) connector.getReceivers().get("quartz://QuartzJob");
 
-        // Originally the scheduler must be started / not paused
-        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isInStandbyMode()));
+        // Initially the scheduler must be started
+        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isShutdown()));
         receiver.doStop();
-        // when a stop request is sent, the scheduler should be set in stand by mode
-        assertThat(TRUE, equalTo(connector.getQuartzScheduler().isInStandbyMode()));
+        // When a stop request is sent, the scheduler should be shutdown
+        assertThat(TRUE, equalTo(connector.getQuartzScheduler().isShutdown()));
         receiver.doStart();
-        // when a start request is performed, the scheduler should exist stand by mode.
-        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isInStandbyMode()));
+        // When a start request is performed, the scheduler should be shutdown
+        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isShutdown()));
     }
 }

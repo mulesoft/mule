@@ -84,13 +84,14 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
         try
         {
 
-            Scheduler scheduler = connector.getQuartzScheduler();
-
-            if (scheduler.isInStandbyMode())
+            if (connector.getQuartzScheduler().isShutdown())
             {
-                scheduler.start();
-                return;
+                // A shutdown scheduler must be reinitialized
+                connector.initializeScheduler();
+                connector.getQuartzScheduler().start();
             }
+
+            Scheduler scheduler = connector.getQuartzScheduler();
 
             JobConfig jobConfig = (JobConfig) endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
             if (jobConfig == null)

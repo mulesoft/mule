@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -89,6 +90,18 @@ public class QuartzConnector extends AbstractConnector
         return QUARTZ_SCHEDULER_PREFIX + contextId + "-" + connectorName;
     }
 
+    /**
+     * Initializes scheduler
+     * 
+     * @throws SchedulerException
+     */
+    protected void initializeScheduler() throws SchedulerException
+    {
+        SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
+        quartzScheduler = factory.getScheduler();
+        quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext); 
+    }
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -114,10 +127,8 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler == null)
             {
-                SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
-                quartzScheduler = factory.getScheduler();
+                initializeScheduler();
             }
-            quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
         }
         catch (Exception e)
         {
@@ -213,7 +224,7 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler != null)
             {
-                quartzScheduler.standby();
+                quartzScheduler.shutdown();
             }
         }
         catch (Exception e)
