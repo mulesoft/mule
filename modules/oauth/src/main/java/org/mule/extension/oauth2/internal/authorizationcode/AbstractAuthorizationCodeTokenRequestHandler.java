@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandlerManager;
 
 import java.net.MalformedURLException;
@@ -101,12 +102,13 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
   protected void createListenerForCallbackUrl() throws MuleException {
     String flowName = "OAuthCallbackUrlFlow";
 
-    final ListenerRequestMatcher requestMatcher;
+    final PathAndMethodRequestMatcher requestMatcher;
 
     if (getOauthConfig().getLocalCallbackUrl() != null) {
       flowName = flowName + getOauthConfig().getLocalCallbackUrl();
       try {
         final URL localCallbackUrl = new URL(getOauthConfig().getLocalCallbackUrl());
+        // TODO MULE-11283 improve this API
         requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
       } catch (MalformedURLException e) {
         logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());

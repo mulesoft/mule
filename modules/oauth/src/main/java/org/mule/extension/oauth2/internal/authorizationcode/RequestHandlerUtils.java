@@ -25,12 +25,12 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
@@ -55,7 +55,7 @@ class RequestHandlerUtils {
    * @param logger
    * @return
    */
-  public static RequestHandlerManager addRequestHandler(HttpServer server, ListenerRequestMatcher matcher,
+  public static RequestHandlerManager addRequestHandler(HttpServer server, PathAndMethodRequestMatcher matcher,
                                                         Flow flow, Logger logger) {
     // MULE-11277 Support non-blocking in OAuth http listeners
     return server.addRequestHandler(matcher, (requestContext, responseCallback) -> {

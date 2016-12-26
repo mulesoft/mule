@@ -18,6 +18,7 @@ import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -26,8 +27,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.service.http.api.HttpService;
@@ -38,6 +38,8 @@ import org.mule.service.http.api.server.HttpServerConfiguration;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -51,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * authentication code and retrieve the access token
  */
 public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
-    implements Initialisable, AuthorizationCodeGrantType, Startable, Stoppable, MuleContextAware {
+    implements Initialisable, AuthorizationCodeGrantType, Startable, Stoppable, Disposable {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAuthorizationCodeGrantType.class);
 
@@ -63,7 +65,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   private String externalCallbackUrl;
   private AuthorizationRequestHandler authorizationRequestHandler;
   private AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler;
+  @Inject
   private MuleContext muleContext;
+  @Inject
+  private HttpService httpService;
+  @Inject
+  private SchedulerService schedulerService;
   private TlsContextFactory tlsContextFactory;
   private TokenManagerConfig tokenManagerConfig;
   private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
@@ -163,11 +170,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   }
 
   @Override
-  public void setMuleContext(final MuleContext context) {
-    this.muleContext = context;
-  }
-
-  @Override
   public TlsContextFactory getTlsContext() {
     return tlsContextFactory;
   }
@@ -235,12 +237,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     }
 
     // TODO MULE-11272 Change to cpu-lite
-    HttpServerConfiguration serverConfiguration = serverConfigBuilder
-        .setSchedulerSupplier(() -> muleContext.getSchedulerService().ioScheduler()).build();
+    HttpServerConfiguration serverConfiguration =
+        serverConfigBuilder.setSchedulerSupplier(() -> schedulerService.ioScheduler()).build();
 
     try {
-      server = muleContext.getRegistry().lookupObject(HttpService.class).getServerFactory().create(serverConfiguration);
-    } catch (ConnectionException | RegistrationException e) {
+      server = httpService.getServerFactory().create(serverConfiguration);
+    } catch (ConnectionException e) {
       logger.warn("Could not create server for OAuth callback.");
       throw new InitialisationException(e, this);
     }
@@ -325,6 +327,10 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     server.stop();
   }
 
+  @Override
+  public void dispose() {
+    server.dispose();
+  }
 
   @Override
   public HttpServer getServer() {

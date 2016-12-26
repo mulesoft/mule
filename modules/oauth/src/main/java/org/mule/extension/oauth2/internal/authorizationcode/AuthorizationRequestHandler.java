@@ -91,6 +91,7 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
 
       this.redirectUrlHandlerManager =
           addRequestHandler(getOauthConfig().getServer(),
+                            // TODO MULE-11283 improve this API
                             new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()),
                                                        new URL(localAuthorizationUrl).getPath()),
                             createDynamicFlow(muleContext, "authorization-request-handler-" + localAuthorizationUrl,

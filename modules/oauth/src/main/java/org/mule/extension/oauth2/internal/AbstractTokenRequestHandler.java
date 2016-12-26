@@ -33,9 +33,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -45,9 +43,16 @@ import java.io.IOException;
 import java.net.CookieManager;
 import java.util.concurrent.TimeoutException;
 
-public abstract class AbstractTokenRequestHandler implements MuleContextAware, Initialisable, Startable, Stoppable {
+import javax.inject.Inject;
 
+public abstract class AbstractTokenRequestHandler implements Initialisable, Startable, Stoppable {
+
+  @Inject
   protected MuleContext muleContext;
+
+  @Inject
+  private HttpService httpService;
+
   private String refreshTokenWhen = DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
   private String tokenUrl;
   private TlsContextFactory tlsContextFactory;
@@ -78,11 +83,6 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, I
 
   public String getRefreshTokenWhen() {
     return refreshTokenWhen;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 
   protected MuleContext getMuleContext() {
@@ -158,11 +158,7 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, I
         .setThreadNamePrefix(threadNamePrefix)
         .build();
 
-    try {
-      client = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory().create(clientConfiguration);
-    } catch (RegistrationException e) {
-      throw new InitialisationException(e, this);
-    }
+    client = httpService.getClientFactory().create(clientConfiguration);
   }
 
   @Override

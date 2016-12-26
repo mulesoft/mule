@@ -24,18 +24,19 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
+
+import javax.inject.Inject;
 
 /**
  * Authorization element for client credentials oauth grant type
  */
-public class ClientCredentialsGrantType extends AbstractGrantType
-    implements Initialisable, Startable, Stoppable, MuleContextAware {
+public class ClientCredentialsGrantType extends AbstractGrantType implements Initialisable, Startable, Stoppable {
 
   private String clientId;
   private String clientSecret;
   private ClientCredentialsTokenRequestHandler tokenRequestHandler;
+  @Inject
   private MuleContext muleContext;
   private TokenManagerConfig tokenManager;
   private TlsContextFactory tlsContextFactory;
@@ -93,11 +94,6 @@ public class ClientCredentialsGrantType extends AbstractGrantType
       tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
     }
     tokenRequestHandler.initialise();
-  }
-
-  @Override
-  public void setMuleContext(final MuleContext context) {
-    this.muleContext = context;
   }
 
   public String getRefreshTokenWhen() {

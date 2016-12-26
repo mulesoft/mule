@@ -19,9 +19,9 @@ import org.mule.extension.oauth2.internal.authorizationcode.TokenResponseConfigu
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 
@@ -59,8 +59,8 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
   }
 
   @Override
-  public void setMuleContext(MuleContext muleContext) {
-    super.setMuleContext(muleContext);
+  public void initialise() throws InitialisationException {
+    super.initialise();
     muleEventLogger = new MuleEventLogger(logger, muleContext);
   }
 

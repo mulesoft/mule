@@ -15,8 +15,14 @@ import java.net.CookieManager;
  */
 public interface HttpRequesterCookieConfig {
 
+  /**
+   * @return {@code true} if cookies have to be sent with the produced request.
+   */
   boolean isEnableCookies();
 
+  /**
+   * @return the object where the cookies to be sent with the request and where the cookies sent with the response are stored.
+   */
   CookieManager getCookieManager();
 
 }
