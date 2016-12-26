@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -98,7 +99,7 @@ public class ToolingPluginArtifactClassLoaderTestCase extends AbstractMuleTestCa
 
     @Override
     public String getArtifactId() {
-      return artifactPluginDescriptor.getName();
+      return AbstractArtifactClassLoaderBuilder.getArtifactPluginId("parentId", artifactPluginDescriptor.getName());
     }
 
     @Override
