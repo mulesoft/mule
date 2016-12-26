@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.transport.quartz.QuartzConnector.getFullName;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -58,7 +59,7 @@ public class QuartzNamespaceHandlerFlowTestCase extends FunctionalTestCase
         assertNotNull(c.getQuartzScheduler());
         assertEquals(StdScheduler.class, c.getQuartzScheduler().getClass());
         StdScheduler scheduler = (StdScheduler) c.getQuartzScheduler();
-        String defaultSchedulerName = "scheduler-" + muleContext.getConfiguration().getId();
+        String defaultSchedulerName = getFullName(muleContext.getConfiguration().getId(), c.getName());
         assertEquals(defaultSchedulerName, scheduler.getSchedulerName());
 
         assertTrue(c.isConnected());
