@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.api.exception.MuleException;
@@ -18,7 +18,6 @@ import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyInstance;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
@@ -29,11 +28,12 @@ import org.mule.runtime.module.service.ServiceRepository;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Default implementation of {@link PolicyInstanceProvider} that depends on a {@link PolicyTemplate} artifact.
+ * Default implementation of {@link ApplicationPolicyInstance} that depends on a {@link PolicyTemplate} artifact.
  */
-public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
+public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstance {
 
   private ArtifactContext policyContext;
   private final Application application;
@@ -52,9 +52,9 @@ public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
    * @param serviceRepository repository of available services. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    */
-  public DefaultPolicyInstanceProvider(Application application, PolicyTemplate template,
-                                       PolicyParametrization parametrization, ServiceRepository serviceRepository,
-                                       ClassLoaderRepository classLoaderRepository) {
+  public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
+                                          PolicyParametrization parametrization, ServiceRepository serviceRepository,
+                                          ClassLoaderRepository classLoaderRepository) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
@@ -95,18 +95,7 @@ public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
     return paths.toArray(new String[0]);
   }
 
-  @Override
-  public List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
-
-    initPolicyInstance();
-
-    return policyInstance.getSourcePolicyChain()
-        .map(operationChain -> asList(new Policy(operationChain, parametrization.getId())))
-        .orElse(emptyList());
-  }
-
   private void initPolicyInstance() {
-
     if (policyInstance == null) {
       synchronized (this) {
         initPolicyContext();
@@ -115,7 +104,7 @@ public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
           policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(
                                                                                      org.mule.runtime.core.policy.DefaultPolicyInstance.class);
         } catch (RegistrationException e) {
-          throw new IllegalStateException(String.format("More than one %s found on context", PolicyInstanceProvider.class), e);
+          throw new IllegalStateException(String.format("More than one %s found on context", ApplicationPolicyInstance.class), e);
         }
 
         // TODO(pablo.kraan): lifecycle has to be manually applied because of MULE-11242
@@ -130,24 +119,41 @@ public class DefaultPolicyInstanceProvider implements PolicyInstanceProvider {
   }
 
   @Override
-  public List<Policy> findOperationParameterizedPolicies(
-                                                         PolicyPointcutParameters policyPointcutParameters) {
-    initPolicyInstance();
-
-    return policyInstance.getOperationPolicyChain()
-        .map(operationChain -> asList(new Policy(operationChain, parametrization.getId())))
-        .orElse(emptyList());
+  public PolicyPointcut getPointcut() {
+    return parametrization.getPointcut();
   }
 
   @Override
-  public PolicyPointcut getPointcut() {
-    return parametrization.getPointcut();
+  public int getOrder() {
+    return parametrization.getOrder();
   }
 
   @Override
   public void dispose() {
     if (policyContext != null) {
       policyContext.getMuleContext().dispose();
+    }
+  }
+
+  @Override
+  public Optional<Policy> getSourcePolicy() {
+    initPolicyInstance();
+
+    if (policyInstance.getSourcePolicyChain().isPresent()) {
+      return of(new Policy(policyInstance.getSourcePolicyChain().get(), parametrization.getId()));
+    } else {
+      return empty();
+    }
+  }
+
+  @Override
+  public Optional<Policy> getOperationPolicy() {
+    initPolicyInstance();
+
+    if (policyInstance.getOperationPolicyChain().isPresent()) {
+      return of(new Policy(policyInstance.getOperationPolicyChain().get(), parametrization.getId()));
+    } else {
+      return empty();
     }
   }
 }

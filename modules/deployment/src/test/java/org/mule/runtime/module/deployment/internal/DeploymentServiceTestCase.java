@@ -2971,7 +2971,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization(TEST_POLICY_ID, pointcut, emptyMap()));
+                            new PolicyParametrization(TEST_POLICY_ID, pointcut, 1, emptyMap()));
     startDeployment();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -2988,7 +2988,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedAppFromBuilder(applicationFileBuilder);
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization(TEST_POLICY_ID, parameters -> true, emptyMap()));
+                            new PolicyParametrization(TEST_POLICY_ID, parameters -> true, 1, emptyMap()));
 
     startDeployment();
 
@@ -3022,7 +3022,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                             "/,  META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
         .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
-    //addPackedAppFromBuilder(applicationFileBuilder);
+
     return applicationFileBuilder;
   }
 

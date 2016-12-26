@@ -15,7 +15,7 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 /**
- * Creates instances of {@link DefaultPolicyInstanceProvider}
+ * Creates instances of {@link DefaultApplicationPolicyInstance}
  */
 public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProviderFactory {
 
@@ -37,10 +37,10 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
   }
 
   @Override
-  public PolicyInstanceProvider create(Application application, PolicyTemplate policyTemplate,
-                                       PolicyParametrization parametrization) {
-    return new DefaultPolicyInstanceProvider(application, policyTemplate, parametrization, serviceRepository,
-                                             classLoaderRepository);
+  public ApplicationPolicyInstance create(Application application, PolicyTemplate policyTemplate,
+                                          PolicyParametrization parametrization) {
+    return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
+                                                classLoaderRepository);
   }
 
 }
