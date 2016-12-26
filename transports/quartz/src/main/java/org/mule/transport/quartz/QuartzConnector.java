@@ -77,9 +77,9 @@ public class QuartzConnector extends AbstractConnector
     }
 
     /**
-     * obtains a full unique name for each quartz configuration
+     * Obtains a full unique name for each Quartz configuration
      * 
-     * @param contextId context id
+     * @param contextId context ID
      * @param connectorName connector name
      * 
      * @return full name for connector
