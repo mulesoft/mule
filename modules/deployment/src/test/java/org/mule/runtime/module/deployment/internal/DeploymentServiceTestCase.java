@@ -12,6 +12,7 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
@@ -132,7 +133,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -2971,7 +2971,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization(TEST_POLICY_ID, pointcut, new HashedMap()));
+                            new PolicyParametrization(TEST_POLICY_ID, pointcut, emptyMap()));
     startDeployment();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -2988,7 +2988,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedAppFromBuilder(applicationFileBuilder);
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization(TEST_POLICY_ID, parameters -> true, new HashedMap()));
+                            new PolicyParametrization(TEST_POLICY_ID, parameters -> true, emptyMap()));
 
     startDeployment();
 
