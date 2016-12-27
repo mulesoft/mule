@@ -7,6 +7,7 @@
 package org.mule.extension.ws.internal.transport;
 
 
+import static java.lang.String.format;
 import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.mule.extension.ws.api.exception.WscErrors.CANNOT_DISPATCH;
 import static org.mule.extension.ws.api.exception.WscErrors.TIMEOUT;
@@ -64,7 +65,7 @@ public final class HttpDispatcher implements WscDispatcher {
     try {
       HttpResponse response = client.send(request, 5000, false, null);
       InputStream content = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-      return new WscResponse(content, response.getHeaderValue(CONTENT_TYPE.toLowerCase()));
+      return new WscResponse(content, response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     } catch (IOException e) {
       throw new ModuleException(e, CANNOT_DISPATCH, "An error occurred while sending the SOAP request");
     } catch (TimeoutException e) {
@@ -99,10 +100,11 @@ public final class HttpDispatcher implements WscDispatcher {
    * @return a new {@link HttpDispatcher} default instance.
    */
   public static HttpDispatcher createDefault(String address, HttpService httpService) {
+    String ownerName = format("wsc-default:[%s]", address);
     HttpClientFactory clientFactory = httpService.getClientFactory();
     HttpClient client = clientFactory.create(new HttpClientConfiguration.Builder()
-        .setThreadNamePrefix("wsc")
-        .setOwnerName("wsc")
+        .setThreadNamePrefix(ownerName)
+        .setOwnerName(ownerName)
         .build());
     client.start();
     return new HttpDispatcher(address, client);
