@@ -166,7 +166,6 @@
                 <include>org.mule.transports:mule-transport-sockets</include>
 
                 <!-- Shared libs -->
-                <include>org.mule.common:mule-common</include>
                 <include>org.mule.mvel:mule-mvel2</include>
             </includes>
             <excludes>
@@ -208,7 +207,6 @@
                 <!--Services-->
                 <exclude>org.mule.modules:mule-service-http-api</exclude>
                 <!-- lib/mule -->
-                <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.extensions:mule-extensions-all</exclude>
