@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -47,6 +48,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -183,7 +185,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {
-    Arrays.stream(extensionModels).forEach(extensionsManager::registerExtension);
+    Arrays.stream(extensionModels).forEach(extension -> {
+      when(extension.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(empty());
+      extensionsManager.registerExtension(extension);
+    });
   }
 
   @Test
@@ -234,7 +239,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
-    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
     ConfigurationInstance configInstance = extensionsManager.getConfiguration(extensionModel1, event);
     assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
@@ -246,7 +251,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
 
     MuleRegistry registry = muleContext.getRegistry();
-    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
 
     doAnswer(invocation -> {
