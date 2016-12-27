@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, MuleContextAware
 {
     protected RetryNotifier notifier = new ConnectNotifier();
-    
     /** This data will be made available to the RetryPolicy via the RetryContext. */
     private Map<Object, Object> metaInfo;
 
@@ -49,10 +48,9 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     {
         PolicyStatus status = null;
         RetryPolicy policy = createRetryInstance();
-        DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(), 
+        DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(),
             metaInfo);
         context.setMuleContext(muleContext);
-
         try
         {
             Exception cause = null;

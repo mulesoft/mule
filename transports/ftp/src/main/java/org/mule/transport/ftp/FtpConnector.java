@@ -18,12 +18,17 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
+import org.mule.api.transport.Connectable;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.model.streaming.CallbackOutputStream;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.ExpressionFilenameParser;
@@ -543,58 +548,45 @@ public class FtpConnector extends AbstractConnector
      *         does not support streaming
      */
     @Override
-    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException
+    public OutputStream getOutputStream(final OutboundEndpoint endpoint, MuleEvent event) throws MuleException
     {
         try
         {
             final EndpointURI uri = endpoint.getEndpointURI();
             String filename = getFilename(endpoint, event.getMessage());
 
-            final FTPClient client;
-            try
+            final FTPClient[] client = {null};
+            RetryCallback callbackReconnection = new RetryCallback()
             {
-                client = this.createFtpClient(endpoint);
-            }
-            catch (Exception e)
-            {
-                throw new ConnectException(e, this);
-            }
 
-            try
-            {
-                OutputStream out = client.storeFileStream(filename);
-                if (out == null)
+                @Override
+                public void doWork(RetryContext context) throws Exception
                 {
-                    throw new IOException("FTP operation failed: " + client.getReplyString());
+                    client[0] = createFtpClient(endpoint);
                 }
 
-                return new CallbackOutputStream(out,
-                        new CallbackOutputStream.Callback()
-                        {
-                            public void onClose() throws Exception
-                            {
-                                try
-                                {
-                                    if (!client.completePendingCommand())
-                                    {
-                                        client.logout();
-                                        client.disconnect();
-                                        throw new IOException("FTP Stream failed to complete pending request");
-                                    }
-                                }
-                                finally
-                                {
-                                    releaseFtp(uri, client);
-                                }
-                            }
-                        });
-            }
-            catch (Exception e)
+                @Override
+                public String getWorkDescription()
+                {
+                    return getConnectionDescription();
+                }
+
+                @Override
+                public Connector getWorkOwner()
+                {
+                    return FtpConnector.this;
+                }
+            };
+            try
             {
-                logger.debug("Error getting output stream: ", e);
-                releaseFtp(uri, client);
-                throw e;
+                getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
             }
+            catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+            {
+                throw retryPolicyExhaustedException;
+            }
+
+            return storeFileStream(client[0], filename, uri);
         }
         catch (ConnectException ce)
         {
@@ -604,6 +596,45 @@ public class FtpConnector extends AbstractConnector
         catch (Exception e)
         {
             throw new DispatchException(CoreMessages.streamingFailedNoStream(), event, endpoint, e);
+        }
+    }
+
+    private OutputStream storeFileStream(final FTPClient client, String filename, final EndpointURI uri) throws Exception
+    {
+        try
+        {
+            OutputStream out = client.storeFileStream(filename);
+            if (out == null)
+            {
+                throw new IOException("FTP operation failed: " + client.getReplyString());
+            }
+
+            return new CallbackOutputStream(out,
+                                            new CallbackOutputStream.Callback()
+                                            {
+                                                public void onClose() throws Exception
+                                                {
+                                                    try
+                                                    {
+                                                        if (!client.completePendingCommand())
+                                                        {
+                                                            client.logout();
+                                                            client.disconnect();
+                                                            throw new IOException("FTP Stream failed to complete pending request");
+                                                        }
+                                                    }
+                                                    finally
+                                                    {
+                                                        releaseFtp(uri, client);
+                                                    }
+                                                }
+                                            });
+        }
+        catch (Exception e)
+        {
+            logger.debug("Error getting output stream: ", e);
+            releaseFtp(uri, client);
+            throw e;
         }
     }
 
