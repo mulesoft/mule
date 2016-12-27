@@ -51,7 +51,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
   /**
-   * Create an instance of the configuration builder that uses the {@link DefaultExtensionManagerAdapterFactory}.
+   * Creates an instance of the configuration builder that uses the {@link DefaultExtensionManagerAdapterFactory}.
    *
    * @param artifactPlugins {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
@@ -62,7 +62,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
   }
 
   /**
-   * Create an instance of the configuration builder.
+   * Creates an instance of the configuration builder.
    *
    * @param artifactPlugins {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
    * @param extensionManagerAdapterFactory {@link ExtensionManagerAdapterFactory} in order to create the {@link ExtensionManagerAdapter}.
