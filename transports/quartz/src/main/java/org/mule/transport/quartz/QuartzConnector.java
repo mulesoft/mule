@@ -6,9 +6,13 @@
  */
 package org.mule.transport.quartz;
 
+
+import static java.util.TimeZone.getDefault;
+import static java.util.TimeZone.getTimeZone;
+import static org.mule.api.config.MuleProperties.MULE_CONTEXT_PROPERTY;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.CoreMessages;
@@ -19,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -82,6 +87,18 @@ public class QuartzConnector extends AbstractConnector
         return QUARTZ_SCHEDULER_PREFIX + contextId + "-" + connectorName;
     }
 
+    /**
+     * Initializes scheduler
+     * 
+     * @throws SchedulerException
+     */
+    protected void initializeScheduler() throws SchedulerException
+    {
+        SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
+        quartzScheduler = factory.getScheduler();
+        quartzScheduler.getContext().put(MULE_CONTEXT_PROPERTY, muleContext); 
+    }
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -107,10 +124,8 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler == null)
             {
-                SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
-                quartzScheduler = factory.getScheduler();
+                initializeScheduler();
             }
-            quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
         }
         catch (Exception e)
         {
@@ -206,7 +221,7 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler != null)
             {
-                quartzScheduler.standby();
+                quartzScheduler.shutdown();
             }
         }
         catch (Exception e)
