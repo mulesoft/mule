@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
@@ -336,15 +337,14 @@ public class MuleExtensionUtils {
 
   /**
    * If the {@code extensionModel} contains a {@link ClassLoaderModelProperty}, then it returns the {@link ClassLoader} associated
-   * to such property.
+   * to such property. Otherwise, it returns the current TCCL
    *
    * @param extensionModel a {@link ExtensionModel}
    * @return a {@link ClassLoader}
-   * @throws IllegalModelDefinitionException if no {@link ClassLoaderModelProperty} is set on the extension
    */
   public static ClassLoader getClassLoader(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
-        .orElseThrow(() -> noClassLoaderException(extensionModel.getName()));
+        .orElse(currentThread().getContextClassLoader());
   }
 
   /**
