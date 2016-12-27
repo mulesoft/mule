@@ -79,6 +79,14 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
+
+            if (connector.getQuartzScheduler().isShutdown())
+            {
+                // A shutdown scheduler must be reinitialized
+                connector.initializeScheduler();
+                connector.getQuartzScheduler().start();
+            }
+
             Scheduler scheduler = connector.getQuartzScheduler();
 
             JobConfig jobConfig = (JobConfig) endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
@@ -202,6 +210,13 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     protected void doDisconnect() throws Exception
     {
         // nothing to do
+    }
+    
+    @Override
+    protected void doStop() throws MuleException
+    {
+        super.doStop();
+        connector.doStop();
     }
 
 }
