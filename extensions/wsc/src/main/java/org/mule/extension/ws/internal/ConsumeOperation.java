@@ -8,8 +8,6 @@ package org.mule.extension.ws.internal;
 
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static org.mule.extension.ws.api.SoapVersion.SOAP12;
 import static org.mule.extension.ws.internal.util.TransformationUtils.stringToDomElement;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.SoapAttachment;
@@ -38,7 +36,6 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +44,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.SoapHeader;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -64,11 +60,6 @@ import org.apache.cxf.message.ExchangeImpl;
  * @since 4.0
  */
 public class ConsumeOperation {
-
-  public static final String MULE_ATTACHMENTS_KEY = "mule.wsc.attachments";
-  public static final String MULE_HEADERS_KEY = "mule.wsc.headers";
-  public static final String MULE_SOAP_ACTION = "mule.wsc.soap.action";
-  public static final String MULE_WSC_ENCODING = "mule.wsc.encoding";
 
   private final SoapRequestGenerator requestGenerator = new SoapRequestGenerator();
   private final SoapResponseGenerator responseGenerator = new SoapResponseGenerator();
@@ -91,40 +82,15 @@ public class ConsumeOperation {
       throws SoapFaultException {
     Map<String, SoapAttachment> attachments = message.getAttachments();
     Map<String, String> headers = message.getHeaders();
-    Map<String, Object> ctx = getInvocationContext(config, connection, headers, attachments, operation);
     XMLStreamReader request = requestGenerator.generate(connection, operation, message.getBody(), attachments);
     Exchange exchange = new ExchangeImpl();
-    Object[] response = connection.invoke(operation, request, ctx, exchange);
+    Object[] response = connection.invoke(operation,
+                                          request,
+                                          transformToCxfHeaders(headers),
+                                          transformToCxfAttachments(attachments),
+                                          config.getEncoding(),
+                                          exchange);
     return responseGenerator.generate(connection, operation, response, exchange);
-  }
-
-  /**
-   * Sets up a request context where the attachments, headers and the soap action required by cxf are populated.
-   */
-  private Map<String, Object> getInvocationContext(WebServiceConsumer config,
-                                                   WscConnection connection,
-                                                   Map<String, String> headers,
-                                                   Map<String, SoapAttachment> attachments,
-                                                   String operation) {
-    Map<String, Object> props = new HashMap<>();
-
-    // If is NOT MTOM the attachments must not be touched by cxf, we create a custom request embedding the attachment in the xml.
-    if (connection.isMtomEnabled()) {
-      props.put(MULE_ATTACHMENTS_KEY, transformToCxfAttachments(attachments));
-    } else {
-      props.put(MULE_ATTACHMENTS_KEY, emptyList());
-    }
-
-    props.put(MULE_WSC_ENCODING, config.getEncoding());
-    props.put(MULE_HEADERS_KEY, transformToCxfHeaders(headers));
-
-    if (connection.getSoapVersion() == SOAP12) {
-      props.put(MULE_SOAP_ACTION, operation);
-    }
-
-    Map<String, Object> ctx = new HashMap<>();
-    ctx.put(Client.REQUEST_CONTEXT, props);
-    return ctx;
   }
 
   /**

@@ -24,18 +24,26 @@ public class SoapFault {
   private final QName faultCode;
   private final QName subCode;
   private final Element detail;
-  private String reason;
+  private final String reason;
   private final String node;
   private final String role;
 
   public SoapFault(QName faultCode, QName subCode, Element detail, String reason, String node, String role) {
-
     this.faultCode = faultCode;
     this.subCode = subCode;
     this.detail = detail;
     this.reason = reason;
     this.node = node;
     this.role = role;
+  }
+
+  public SoapFault(QName faultCode, Element detail) {
+    this.faultCode = faultCode;
+    this.detail = detail;
+    reason = "";
+    node = null;
+    role = null;
+    subCode = null;
   }
 
   /**

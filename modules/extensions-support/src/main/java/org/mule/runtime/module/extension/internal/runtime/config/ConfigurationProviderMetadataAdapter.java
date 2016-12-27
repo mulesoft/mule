@@ -62,10 +62,11 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
 
     MetadataKeysContainerBuilder keysBuilder = MetadataKeysContainerBuilder.getInstance();
-    MetadataContext metadataContext = getMetadataContext();
     try {
+      MetadataContext metadataContext = getMetadataContext();
       addComponentKeys(getConfigurationModel().getOperationModels(), metadataContext, keysBuilder);
       addComponentKeys(getConfigurationModel().getSourceModels(), metadataContext, keysBuilder);
+      metadataContext.dispose();
     } catch (Exception e) {
       return failure(newFailure(e).onKeys());
     }
@@ -85,7 +86,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     }
   }
 
-  private MetadataContext getMetadataContext() throws MetadataResolvingException {
+  private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
     Event fakeEvent = getInitialiserEvent(muleContext);
     return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,

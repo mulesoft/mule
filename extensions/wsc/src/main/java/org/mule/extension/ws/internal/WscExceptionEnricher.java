@@ -30,17 +30,14 @@ public class WscExceptionEnricher implements ExceptionEnricher {
 
   /**
    * {@inheritDoc}
-   * <p>
-   * Wraps Soap Faults in a custom {@link SoapFaultException} otherwise return a {@link WscException} wrapping the unexpected
-   * exception.
    */
   @Override
   public Exception enrichException(Exception e) {
-    if (e instanceof SoapFaultException) {
-      return new ModuleException(e, SOAP_FAULT, "A SOAP Fault occur: " + e.getMessage());
-    }
     if (e instanceof WscEncodingException) {
       return new ModuleException(e, ENCODING);
+    }
+    if (e instanceof SoapFaultException) {
+      return new ModuleException(e, SOAP_FAULT);
     }
     if (e instanceof InvalidWsdlException) {
       return new ModuleException(e, INVALID_WSDL);

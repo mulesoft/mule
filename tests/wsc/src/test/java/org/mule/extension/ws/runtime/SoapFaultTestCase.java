@@ -13,9 +13,12 @@ import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import static org.mule.extension.ws.api.SoapVersion.SOAP11;
+import static org.mule.extension.ws.api.exception.WscErrors.BAD_REQUEST;
 import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
+import org.mule.extension.ws.api.exception.BadRequestException;
 import org.mule.extension.ws.api.exception.SoapFault;
 import org.mule.extension.ws.api.exception.SoapFaultException;
 import org.mule.runtime.api.message.Error;
@@ -53,7 +56,7 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
     // Receiver is for SOAP12. Server is for SOAP11
     assertThat(fault.getFaultCode().getLocalPart(), isOneOf("Server", "Receiver"));
-    assertThat(sf.getMessage(), is("Fail Message"));
+    assertThat(sf.getMessage(), containsString("Fail Message"));
   }
 
   @Test
@@ -65,14 +68,30 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
     Error error = me.getEvent().getError().get();
 
     assertThat(error.getErrorType(), is(errorType("WSC", SOAP_FAULT.getType())));
-
-    Throwable causeException = error.getCause();
-    assertThat(causeException, instanceOf(SoapFaultException.class));
-    SoapFaultException sf = (SoapFaultException) causeException;
+    assertThat(error.getCause(), instanceOf(SoapFaultException.class));
+    SoapFaultException sf = (SoapFaultException) error.getCause();
     SoapFault fault = (SoapFault) sf.getErrorMessage().getPayload().getValue();
 
     // Sender is for SOAP12. Client is for SOAP11
     assertThat(fault.getFaultCode().getLocalPart(), isOneOf("Client", "Sender"));
-    assertThat(sf.getMessage(), containsString("{http://service.ws.extension.mule.org/}noOperation was not recognized"));
+
+    String errorMessage;
+    if (soapVersion.equals(SOAP11)) {
+      errorMessage = "{http://service.ws.extension.mule.org/}noOperation was not recognized";
+    } else {
+      errorMessage = "Unexpected wrapper element {http://service.ws.extension.mule.org/}noOperation";
+    }
+    assertThat(sf.getMessage(), containsString(errorMessage));
+  }
+
+  @Test
+  @Description("Consumes an operation with a body that is not a valid XML")
+  public void echoBodyIsNotValidXml() throws Exception {
+    MessagingException me = flowRunner(FAIL_FLOW).withPayload("not a valid XML file").runExpectingException();
+    Error error = me.getEvent().getError().get();
+
+    assertThat(error.getErrorType(), is(errorType("WSC", BAD_REQUEST.getType())));
+    assertThat(error.getCause(), instanceOf(BadRequestException.class));
+    assertThat(error.getCause().getMessage(), is("Error consuming the operation [fail], the request body is not a valid XML"));
   }
 }

@@ -7,7 +7,7 @@
 package org.mule.extension.ws.internal.generator.attachment;
 
 import static java.lang.String.format;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_ATTACHMENTS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_ATTACHMENTS_KEY;
 import org.mule.extension.ws.api.exception.WscEncodingException;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.message.Message;

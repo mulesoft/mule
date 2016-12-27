@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -25,6 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -32,7 +35,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.EntityMetadataProvider;
-import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -49,9 +51,9 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
-import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -101,7 +103,6 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   private final ResolverSet resolverSet;
   private final String target;
   private final EntityMetadataMediator entityMetadataMediator;
-  private final ClassLoader classLoader;
 
   private ExecutionMediator executionMediator;
   private OperationExecutor operationExecutor;
@@ -126,7 +127,6 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
         .withName(operationModel.getName())
         .withNamespace(extensionModel.getName().toLowerCase())
         .build();
-    classLoader = getExtensionClassLoader();
   }
 
   @Override
@@ -239,16 +239,23 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
 
   @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
-    final MetadataContext metadataContext = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel),
-                                  () -> entityMetadataMediator.getEntityKeys(metadataContext));
+    try {
+      return runWithMetadataContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
+                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
   }
 
   @Override
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
-    final MetadataContext metadataContext = getMetadataContext();
-    return withContextClassLoader(getClassLoader(this.extensionModel),
-                                  () -> entityMetadataMediator.getEntityMetadata(metadataContext, key));
+    try {
+      return runWithMetadataContext(context -> withContextClassLoader(classLoader,
+                                                                      () -> entityMetadataMediator
+                                                                          .getEntityMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
   }
 
   protected ExecutionMediator createExecutionMediator() {

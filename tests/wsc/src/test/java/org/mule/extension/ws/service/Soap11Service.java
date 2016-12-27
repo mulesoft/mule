@@ -27,7 +27,7 @@ import javax.xml.ws.Holder;
 public class Soap11Service {
 
   @WebResult(name = "text")
-  @WebMethod(action = "echoOperation")
+  @WebMethod(action = "echo")
   public String echo(@WebParam(name = "text") String s) {
     return s + " response";
   }

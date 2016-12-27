@@ -11,6 +11,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 
+import org.apache.cxf.interceptor.Fault;
+
 /**
  * Exception thrown by the Web Service Consumer when processing a SOAP fault. The exception contains the details about the fault.
  *
@@ -28,6 +30,14 @@ public class SoapFaultException extends MuleRuntimeException implements ErrorMes
                                         cause.getReason(),
                                         cause.getNode(),
                                         cause.getRole());
+
+    this.message = Message.builder().payload(soapFault).build();
+  }
+
+  public SoapFaultException(Fault cause) {
+    super(createStaticMessage(cause.getMessage()));
+    SoapFault soapFault = new SoapFault(cause.getFaultCode(),
+                                        cause.getOrCreateDetail());
 
     this.message = Message.builder().payload(soapFault).build();
   }

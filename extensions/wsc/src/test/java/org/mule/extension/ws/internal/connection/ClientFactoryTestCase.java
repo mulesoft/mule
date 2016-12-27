@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.ws.api.SoapVersion.SOAP11;
@@ -36,6 +37,9 @@ import org.mule.extension.ws.internal.interceptor.SoapActionInterceptor;
 import org.mule.extension.ws.internal.interceptor.StreamClosingInterceptor;
 import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +51,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -72,12 +77,20 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
 
   private static final ClientFactory factory = ClientFactory.getInstance();
 
+  private HttpService httpService = mock(HttpService.class);
 
+  @Before
+  public void before() {
+    HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
+    HttpClient httpClient = mock(HttpClient.class);
+    when(httpClientFactory.create(any())).thenReturn(httpClient);
+    when(httpService.getClientFactory()).thenReturn(httpClientFactory);
+  }
 
   @Test
   @Description("Checks the creation of a basic client without security")
   public void basicClient() throws ConnectionException {
-    Client client = factory.create(service.getAddress(), null, SOAP12, emptyList(), false);
+    Client client = factory.create(service.getAddress(), SOAP12, false, emptyList(), httpService, null).getCxfClient();
     assertThat(client.getEndpoint().getBinding().getBindingInfo().getBindingId(), containsString("soap12"));
     assertThat(client.getEndpoint().get(MTOM_ENABLED), is(false));
 
@@ -90,7 +103,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
   @Test
   @Description("Checks the creation of a client that works with MTOM but with no security")
   public void basicClientMtom() throws ConnectionException {
-    Client client = factory.create(service.getAddress(), null, SOAP11, emptyList(), true);
+    Client client = factory.create(service.getAddress(), SOAP11, true, emptyList(), httpService, null).getCxfClient();
     assertThat(client.getEndpoint().get(MTOM_ENABLED), is(true));
 
     assertThat(inInterceptorNames(client),
@@ -115,7 +128,7 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
     })));
     when(verify.buildPasswordCallbackHandler()).thenReturn(Optional.empty());
 
-    Client client = factory.create(service.getAddress(), null, SOAP11, asList(sign, verify), false);
+    Client client = factory.create(service.getAddress(), SOAP11, true, asList(sign, verify), httpService, null).getCxfClient();
 
     assertThat(inInterceptorNames(client),
                hasItems(NAMESPACE_RESTORER, NAMESPACE_SAVER, STREAM_CLOSING, CHECK_FAULT, OUT_SOAP_HEADERS, SOAP_ACTION, WSS_IN));
@@ -130,6 +143,13 @@ public class ClientFactoryTestCase extends WscUnitTestCase {
     Map<String, Object> outProps = wssOut.getProperties();
     assertThat(outProps.get(ACTION), is(sign.securityAction()));
     assertThat(outProps.get(PW_CALLBACK_REF), notNullValue());
+  }
+
+  @Test
+  public void invalidProtocol() throws ConnectionException {
+    exception.expect(ConnectionException.class);
+    exception.expectMessage("Cannot create a default dispatcher for the [jms] protocol");
+    factory.create("jms://host:7001/this/address", SOAP11, true, emptyList(), httpService, null);
   }
 
   private List<String> inInterceptorNames(Client client) {

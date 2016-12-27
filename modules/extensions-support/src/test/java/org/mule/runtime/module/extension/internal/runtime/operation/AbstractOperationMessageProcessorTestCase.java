@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -51,10 +52,10 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
-import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -64,9 +65,9 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
@@ -165,8 +166,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected String configurationName = CONFIG_NAME;
   protected String target = EMPTY;
 
-  protected DefaultConnectionManager connectionManager;
-
   protected OperationPolicy mockOperationPolicy;
 
   @Before
@@ -245,9 +244,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
-    connectionManager = new DefaultConnectionManager(context);
-    connectionManager.initialise();
-    when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(connectionManager.getDefaultRetryPolicyTemplate());
+    when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
 
     mockSubTypes(extensionModel);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
@@ -267,6 +264,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
       return mockOperationPolicy;
     });
 
+    when(connectionManagerAdapter.getConnection(anyString())).thenReturn(null);
     messageProcessor = setUpOperationMessageProcessor();
   }
 
@@ -279,6 +277,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
+    muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
     muleContext.getInjector().inject(messageProcessor);
     messageProcessor.initialise();
     return messageProcessor;
@@ -309,4 +308,5 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     messageProcessor.dispose();
     verify((Disposable) operationExecutor).dispose();
   }
+
 }

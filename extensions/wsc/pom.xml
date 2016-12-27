@@ -145,12 +145,10 @@
             <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${cxfVersion}</version>
         </dependency>
-
-        <!--TODO remove MULE-10783-->
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>2.5.0</version>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-service-http-api</artifactId>
+            <version>${parent.version}</version>
         </dependency>
 
         <!--TODO: MULE-10837-->

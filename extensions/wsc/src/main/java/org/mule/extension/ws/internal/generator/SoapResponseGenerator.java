@@ -7,8 +7,8 @@
 package org.mule.extension.ws.internal.generator;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_ATTACHMENTS_KEY;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_HEADERS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_ATTACHMENTS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_HEADERS_KEY;
 import static org.mule.extension.ws.internal.util.TransformationUtils.xmlStreamReaderToDocument;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.ws.api.WscAttributes;
