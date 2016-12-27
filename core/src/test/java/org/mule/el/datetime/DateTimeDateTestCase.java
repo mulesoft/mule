@@ -81,7 +81,7 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     @Test
     public void plusWeeks()
     {
-        assertEquals((currentCalendar.get(WEEK_OF_YEAR) % currentCalendar.getWeeksInWeekYear()) + 1, now.plusWeeks(1).getWeekOfYear());
+        assertEquals((currentCalendar.get(WEEK_OF_YEAR) % currentCalendar.getActualMaximum(WEEK_OF_YEAR)) + 1, now.plusWeeks(1).getWeekOfYear());
     }
 
     @Test
