@@ -28,6 +28,7 @@ import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.ws.security.NoTimestampEnforcerWSS4JInInterceptor;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
@@ -325,7 +326,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
             if (!inConfigProperties.isEmpty())
             {
-                cxfBuilder.getInInterceptors().add(new WSS4JInInterceptor(inConfigProperties));
+                cxfBuilder.getInInterceptors().add(new NoTimestampEnforcerWSS4JInInterceptor(inConfigProperties));
             }
         }
 
