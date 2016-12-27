@@ -326,11 +326,6 @@
                 <version>${muleApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule.common</groupId>
-                <artifactId>mule-common</artifactId>
-                <version>${muleCommonVersion}</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.2</version>

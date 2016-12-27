@@ -153,10 +153,6 @@
                     <artifactId>commons-dbutils</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.common</groupId>
-                    <artifactId>mule-common</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>xmlunit</groupId>
                     <artifactId>xmlunit</artifactId>
                 </exclusion>

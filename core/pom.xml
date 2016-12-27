@@ -185,10 +185,6 @@
             <version>0.7.3</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.common</groupId>
-            <artifactId>mule-common</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>

@@ -120,7 +120,6 @@
 #
 /mule-standalone-${productVersion}/lib/mule
 /mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-common-3.8.0.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-persistence-1.0.0-SNAPSHOT.jar
@@ -289,7 +288,6 @@
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.9.1.jar
 /mule-standalone-${productVersion}/lib/opt/joni-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-4.6.jar
-/mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-1.7.24.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.5.jar
@@ -336,7 +334,6 @@
 /mule-standalone-${productVersion}/lib/opt/spring-security-ldap-4.0.4.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-ldap-core-2.0.2.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-4.1.9.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/stax-api-1.0-2.jar
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
@@ -355,7 +352,6 @@
 /mule-standalone-${productVersion}/lib/opt/xstream-1.4.9.jar
 /mule-standalone-${productVersion}/lib/opt/opensaml-2.6.1.jar
 /mule-standalone-${productVersion}/lib/opt/openws-1.5.1.jar
-/mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yecht-1.1-jruby.jar
