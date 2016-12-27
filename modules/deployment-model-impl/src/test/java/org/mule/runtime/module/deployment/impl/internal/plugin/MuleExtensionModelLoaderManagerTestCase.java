@@ -42,7 +42,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCase {
 
-  private static String ID = "ID";
+  private static final String ID = "ID";
   @Mock
   private LoaderDescriber loaderDescriber;
   @Mock

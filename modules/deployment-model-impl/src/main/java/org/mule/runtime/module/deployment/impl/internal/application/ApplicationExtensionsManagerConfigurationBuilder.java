@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
@@ -49,14 +50,31 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
+  /**
+   * Create an instance of the configuration builder that uses the {@link DefaultExtensionManagerAdapterFactory}.
+   *
+   * @param artifactPlugins {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   */
   public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,
                                                           ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     this(artifactPlugins, new DefaultExtensionManagerAdapterFactory(), extensionModelLoaderRepository);
   }
 
+  /**
+   * Create an instance of the configuration builder.
+   *
+   * @param artifactPlugins {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
+   * @param extensionManagerAdapterFactory {@link ExtensionManagerAdapterFactory} in order to create the {@link ExtensionManagerAdapter}.
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   */
   public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,
                                                           ExtensionManagerAdapterFactory extensionManagerAdapterFactory,
                                                           ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+    checkNotNull(artifactPlugins, "artifactPlugins cannot be null");
+    checkNotNull(extensionManagerAdapterFactory, "extensionManagerAdapterFactory cannot be null");
+    checkNotNull(extensionModelLoaderRepository, "extensionModelLoaderRepository cannot be null");
+
     this.artifactPlugins = artifactPlugins;
     this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;

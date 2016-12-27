@@ -214,7 +214,7 @@ public class MuleArtifactResourcesRegistry {
   }
 
   /**
-   * @return the manager of container extension loaders.
+   * @return the manager of available extension loaders.
    */
   public ExtensionModelLoaderManager getExtensionModelLoaderManager() {
     return extensionModelLoaderManager;

@@ -405,7 +405,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     }
 
     if (extensionModelLoaderManager != null) {
-      extensionModelLoaderManager.start();
+      extensionModelLoaderManager.stop();
     }
 
     FileUtils.deleteTree(muleHome);

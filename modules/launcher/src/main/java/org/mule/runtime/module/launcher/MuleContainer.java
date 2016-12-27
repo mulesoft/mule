@@ -257,6 +257,10 @@ public class MuleContainer {
       serviceManager.stop();
     }
 
+    if (extensionModelLoaderManager != null) {
+      extensionModelLoaderManager.stop();
+    }
+
     coreExtensionManager.dispose();
     if (LogManager.getFactory() instanceof MuleLog4jContextFactory) {
       ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();

@@ -255,6 +255,12 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  /**
+   * Sets a {@link ExtensionModelLoaderRepository} that allows to retrieve the available extension loaders.
+   *
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   * @return the builder
+   */
   public ArtifactContextBuilder setExtensionModelLoaderRepository(ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     checkArgument(extensionModelLoaderRepository != null, EXTENSION_MODEL_LOADER_REPOSITORY_CANNOT_BE_NULL);
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;

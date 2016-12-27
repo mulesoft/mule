@@ -12,7 +12,6 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -44,8 +43,8 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private ArtifactClassLoader containerClassLoader;
-  private Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
+  private final ArtifactClassLoader containerClassLoader;
+  private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
 
   /**
    * Creates an instance of the manager.
@@ -96,8 +95,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
                                                                 providerClass.getName(), sb.toString())));
     }
 
-    this.extensionModelLoaders =
-        extensionModelLoaders.stream().collect(Collectors.toMap(ExtensionModelLoader::getId, identity()));
+    extensionModelLoaders.stream().forEach(extensionModelLoader -> this.extensionModelLoaders.put(extensionModelLoader.getId(), extensionModelLoader));
     if (logger.isDebugEnabled()) {
       logger.debug("ExtensionModelLoader registered identifiers: {}", printExtensionModelLoaderIDs());
     }
@@ -105,7 +103,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
 
   @Override
   public void stop() throws MuleException {
-    extensionModelLoaders = newHashMap();
+    extensionModelLoaders.clear();
   }
 
   @Override
