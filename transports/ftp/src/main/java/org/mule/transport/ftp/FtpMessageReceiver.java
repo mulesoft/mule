@@ -15,10 +15,12 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connector;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -40,6 +42,7 @@ import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.net.ftp.FTPReply;
+import sun.net.ftp.FtpClient;
 
 public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -124,10 +127,52 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected FTPFile[] listFiles() throws Exception
     {
-        FTPClient client = null;
+        final FTPClient[] client = {null};
+        RetryCallback callbackReconnection = new RetryCallback()
+        {
+
+            @Override
+            public void doWork(RetryContext context) throws Exception
+            {
+                client[0] = connector.createFtpClient(endpoint);
+            }
+
+            @Override
+            public String getWorkDescription()
+            {
+                return getConnectionDescription();
+            }
+
+            @Override
+            public Connector getWorkOwner()
+            {
+                return connector;
+            }
+        };
         try
         {
-            client = connector.createFtpClient(endpoint);
+            retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+        }
+        catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+        {
+            if (retryPolicyExhaustedException.getCause() instanceof java.net.ConnectException)
+            {
+                throw new ConnectException(retryPolicyExhaustedException, this.connector);
+            }
+            else
+            {
+                throw retryPolicyExhaustedException;
+            }
+        }
+
+        return filesToFTPArray(client[0]);
+
+    }
+
+    private FTPFile [] filesToFTPArray (FTPClient client) throws Exception
+    {
+        try
+        {
             FTPListParseEngine engine = client.initiateListParsing();
             FTPFile[] files = null;
             List<FTPFile> v = new ArrayList<FTPFile>();
