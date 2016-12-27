@@ -8,6 +8,7 @@ package org.mule.transport.sftp;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -18,10 +19,12 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
+import org.mule.transport.DefaultMuleMessageFactory;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.ValueHolder;
 import org.mule.util.lock.LockFactory;
@@ -31,6 +34,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * <code>SftpMessageReceiver</code> polls and receives files from an sftp service
@@ -44,6 +48,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     private LockFactory lockFactory;
     private boolean poolOnPrimaryInstanceOnly;
     private final AtomicBoolean connecting = new AtomicBoolean(false);
+    SFTPMessageFactory sftpMessageFactory = new SFTPMessageFactory();
 
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
@@ -169,6 +174,19 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         return poolOnPrimaryInstanceOnly;
     }
 
+    @Override
+    public MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException
+    {
+        try
+        {
+            return sftpMessageFactory.create(transportMessage, encoding, endpoint.getMuleContext());
+        }
+        catch (Exception e)
+        {
+            throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e, this);
+        }
+    }
+
     protected void routeFile(final String path) throws Exception
     {
         final ValueHolder<InputStream> inputStreamReference = new ValueHolder<>();
@@ -267,7 +285,6 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
 
-
     public void doConnect() throws Exception
     {
         if (connecting.compareAndSet(false, true) && !isConnected())
@@ -325,5 +342,25 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     protected void doDispose()
     {
         // no op
+    }
+
+    private class SFTPMessageFactory extends DefaultMuleMessageFactory
+    {
+
+        private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+
+        @Override
+        protected String getMimeType(Object transportMessage)
+        {
+            if (transportMessage instanceof SftpInputStream)
+            {
+                SftpInputStream inputStreamTransportMessage = (SftpInputStream) transportMessage;
+                return mimetypesFileTypeMap.getContentType(inputStreamTransportMessage.getFileName().toLowerCase());
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
