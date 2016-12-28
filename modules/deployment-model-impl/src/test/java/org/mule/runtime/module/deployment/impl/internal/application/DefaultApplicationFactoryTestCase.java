@@ -31,6 +31,7 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
@@ -58,13 +59,15 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
   private final ApplicationDescriptorFactory applicationDescriptorFactory = mock(ApplicationDescriptorFactory.class);
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final ClassLoaderRepository classLoaderRepository = mock(ClassLoaderRepository.class);
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                    applicationPluginRepository, domainRepository, serviceRepository, classLoaderRepository,
-                                    policyTemplateClassLoaderBuilderFactory);
+                                    applicationPluginRepository, domainRepository, serviceRepository,
+                                    extensionModelLoaderRepository,
+                                    classLoaderRepository, policyTemplateClassLoaderBuilderFactory);
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);

@@ -104,6 +104,8 @@ import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -312,6 +314,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   protected File containerAppPluginsDir;
   protected File tmpAppsDir;
   protected ServiceManager serviceManager;
+  protected ExtensionModelLoaderManager extensionModelLoaderManager;
   protected MuleDeploymentService deploymentService;
   protected DeploymentListener applicationDeploymentListener;
   protected DeploymentListener domainDeploymentListener;
@@ -364,6 +367,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
+    extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     artifactClassLoaderManager = muleArtifactResourcesRegistry.getArtifactClassLoaderManager();
 
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
@@ -398,6 +402,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     if (serviceManager != null) {
       serviceManager.stop();
+    }
+
+    if (extensionModelLoaderManager != null) {
+      extensionModelLoaderManager.stop();
     }
 
     FileUtils.deleteTree(muleHome);
@@ -1209,7 +1217,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager);
+                                     domainManager, serviceManager, extensionModelLoaderManager);
     appFactory.setFailOnStopApplication(true);
 
     deploymentService.setAppFactory(appFactory);
@@ -1235,7 +1243,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager);
+                                     domainManager, serviceManager, extensionModelLoaderManager);
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1554,6 +1562,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .definedBy("app-with-extension-xml-plugin-module-bye.xml").containingPlugin(byeXmlExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
+    final DefaultDomainManager domainManager = new DefaultDomainManager();
+    domainManager.addDomain(createDefaultDomain());
+
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     domainManager, serviceManager, extensionModelLoaderManager);
+
+    deploymentService.setAppFactory(appFactory);
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -1583,6 +1599,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .containingPlugin(echoPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
+    final DefaultDomainManager domainManager = new DefaultDomainManager();
+    domainManager.addDomain(createDefaultDomain());
+
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     domainManager, serviceManager, extensionModelLoaderManager);
+
+    deploymentService.setAppFactory(appFactory);
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -3200,6 +3224,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private void startDeployment() throws MuleException {
     serviceManager.start();
+    extensionModelLoaderManager.start();
     deploymentService.start();
   }
 

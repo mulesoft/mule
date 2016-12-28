@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -49,12 +50,15 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private final ServiceManager serviceManager = mock(ServiceManager.class);
 
+  private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
+
   private ToolingService toolingService = mock(ToolingService.class);
 
   @Before
   public void setUp() throws Exception {
     coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
-    container = new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager);
+    container = new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
+                                  extensionModelLoaderManager);
     FileUtils.deleteDirectory(getExecutionFolder());
   }
 
