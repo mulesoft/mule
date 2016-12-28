@@ -95,7 +95,8 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
                                                                 providerClass.getName(), sb.toString())));
     }
 
-    extensionModelLoaders.stream().forEach(extensionModelLoader -> this.extensionModelLoaders.put(extensionModelLoader.getId(), extensionModelLoader));
+    extensionModelLoaders.stream()
+        .forEach(extensionModelLoader -> this.extensionModelLoaders.put(extensionModelLoader.getId(), extensionModelLoader));
     if (logger.isDebugEnabled()) {
       logger.debug("ExtensionModelLoader registered identifiers: {}", printExtensionModelLoaderIDs());
     }
