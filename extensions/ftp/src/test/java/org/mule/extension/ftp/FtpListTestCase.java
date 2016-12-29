@@ -16,7 +16,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
-import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.TreeNode;
@@ -76,13 +75,14 @@ public class FtpListTestCase extends FtpConnectorTestCase {
 
   @Test
   public void notDirectory() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "Only directories can be listed");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "Only directories can be listed");
     doList("list", format(TEST_FILE_PATTERN, 0), false);
   }
 
   @Test
   public void notExistingPath() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     doList("list", format("whatever", 0), false);
   }
 

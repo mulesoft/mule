@@ -12,9 +12,10 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 /**
  * @since 4.0
  */
-public final class LockConcurrencyException extends ModuleException {
+public final class FileLockedException extends ModuleException {
 
-  public LockConcurrencyException(String message) {
+  public FileLockedException(String message) {
     super(message, CONCURRENCY);
   }
 }
+

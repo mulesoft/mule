@@ -9,7 +9,6 @@ package org.mule.extension.ftp;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
-import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 
@@ -38,7 +37,8 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
 
   @Test
   public void createExistingDirectory() throws Exception {
-    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     final String directory = "washerefirst";
     testHarness.makeDir(directory);
     doCreateDirectory(directory);

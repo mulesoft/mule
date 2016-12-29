@@ -9,20 +9,11 @@ package org.mule.extension.file.common.api.exceptions;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 /**
+ * Errors for the file family extensions
+ * 
  * @since 4.0
  */
 public enum FileErrors implements ErrorTypeDefinition<FileErrors> {
 
-  FILE_NOT_FOUND, ILLEGAL_PATH, ILLEGAL_CONTENT, CONCURRENCY, FILE_ALREADY_EXISTS, ACCESS_DENIED;
-
-  //private ErrorTypeDefinition<?> parentErrorType;
-  //
-  //FileErrors(ErrorTypeDefinition parentErrorType) {
-  //  this.parentErrorType = parentErrorType;
-  //}
-  //
-  //@Override
-  //public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
-  //  return ofNullable(parentErrorType);
-  //}
+  FILE_NOT_FOUND, ILLEGAL_PATH, ILLEGAL_CONTENT, CONCURRENCY, FILE_ALREADY_EXISTS, ACCESS_DENIED
 }

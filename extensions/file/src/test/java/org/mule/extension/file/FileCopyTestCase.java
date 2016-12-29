@@ -14,8 +14,6 @@ import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALRE
 import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
-import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.exception.MessagingException;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,27 +44,28 @@ public class FileCopyTestCase extends FileConnectorTestCase {
   @Test
   public void toExistingFolder() throws Exception {
     String target = temporaryFolder.newFolder().getAbsolutePath();
-    getFlow(target, false, false).run();
+    doExecute(target, false, false);
 
     assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
   }
 
   @Test
   public void nullTarget() throws Exception {
-    assertError(getFlow(null, false, false).runExpectingException(),
-                ILLEGAL_PATH.getType(), IllegalPathException.class, "target path cannot be null nor blank");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                              "target path cannot be null nor blank");
+    doExecute(null, false, false);
   }
 
   @Test
   public void copyToItselfWithoutOverwrite() throws Exception {
-    assertError(getFlow(getFlowName(), sourcePath, sourcePath, false, false).runExpectingException(),
-                FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    doExecute(getFlowName(), sourcePath, sourcePath, false, false);
   }
 
   @Test
   public void copyReadFile() throws Exception {
     String target = temporaryFolder.newFolder().getAbsolutePath();
-    getFlow("readAndDo", target, false, false).run();
+    doExecute("readAndDo", target, false, false);
 
     assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
   }
@@ -74,16 +73,16 @@ public class FileCopyTestCase extends FileConnectorTestCase {
   @Test
   public void toNonExistingFolder() throws Exception {
     String target = format("%s/%s", temporaryFolder.newFolder().getAbsolutePath(), "a/b/c");
-    getFlow(target, false, true).run();
+    doExecute(target, false, true);
 
     assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
   }
 
   @Test
   public void toNonExistingFolderWithoutCreateParent() throws Exception {
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "destination path doesn't exists");
     String target = temporaryFolder.newFile().getAbsolutePath() + "a/b/c";
-    assertError(getFlow(target, false, false).runExpectingException(),
-                ILLEGAL_PATH.getType(), IllegalPathException.class, "destination path doesn't exists");
+    doExecute(target, false, false);
   }
 
   @Test
@@ -93,7 +92,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
 
     final String target = existingFile.getAbsolutePath();
 
-    getFlow(target, true, false).run();
+    doExecute(target, true, false);
     assertCopy(target);
   }
 
@@ -101,18 +100,18 @@ public class FileCopyTestCase extends FileConnectorTestCase {
   public void overwriteInDifferentDirectory() throws Exception {
     String target = temporaryFolder.newFolder().getAbsolutePath();
     write(new File(target, SOURCE_FILE_NAME), HELLO_WORLD);
-    getFlow(target, true, false).run();
+    doExecute(target, true, false);
 
     assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
   }
 
   @Test
   public void withoutOverwrite() throws Exception {
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
     File existingFile = temporaryFolder.newFile();
     write(existingFile, EXISTING_CONTENT);
 
-    assertError(getFlow(existingFile.getAbsolutePath(), false, false).runExpectingException(),
-                FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    doExecute(existingFile.getAbsolutePath(), false, false);
   }
 
   @Test
@@ -122,7 +121,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     sourcePath = sourceFolder.getAbsolutePath();
 
     File targetFolder = temporaryFolder.newFolder("target");
-    getFlow(targetFolder.getAbsolutePath(), false, false).run();
+    doExecute(targetFolder.getAbsolutePath(), false, false);
     assertCopy(format("%s/source/%s", targetFolder.getAbsolutePath(), SOURCE_FILE_NAME));
   }
 
@@ -133,7 +132,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     sourcePath = sourceFolder.getAbsolutePath();
 
     String target = "a/b/c";
-    getFlow(target, false, true).run();
+    doExecute(target, false, true);
 
     assertCopy(format("%s/source/%s", target, SOURCE_FILE_NAME));
   }
@@ -148,12 +147,13 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     File existingFile = new File(existingDirectory, SOURCE_FILE_NAME);
     write(existingFile, EXISTING_CONTENT);
 
-    getFlow(targetDirectory.getAbsolutePath(), true, false).run();
+    doExecute(targetDirectory.getAbsolutePath(), true, false);
     assertCopy(format("%s/%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME));
   }
 
   @Test
   public void directoryWithoutOverwrite() throws Exception {
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
     sourcePath = buildSourceDirectory().getAbsolutePath();
 
     File targetDirectory = temporaryFolder.newFolder("target");
@@ -162,11 +162,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     File existingFile = new File(existingDirectory, SOURCE_FILE_NAME);
     write(existingFile, EXISTING_CONTENT);
 
-    MessagingException exception =
-        getFlow(format("%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME), false, false)
-            .runExpectingException();
-
-    assertError(exception, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    doExecute(format("%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME), false, false);
   }
 
   private File buildSourceDirectory() throws IOException {
@@ -176,18 +172,18 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     return sourceFolder;
   }
 
-  private FlowRunner getFlow(String target, boolean overwrite, boolean createParentFolder) throws Exception {
-    return getFlow(getFlowName(), target, overwrite, createParentFolder);
+  private void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception {
+    doExecute(getFlowName(), target, overwrite, createParentFolder);
   }
 
-  private FlowRunner getFlow(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception {
-    return getFlow(flowName, sourcePath, target, overwrite, createParentFolder);
+  private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception {
+    doExecute(flowName, sourcePath, target, overwrite, createParentFolder);
   }
 
-  private FlowRunner getFlow(String flowName, String source, String target, boolean overwrite, boolean createParentFolder)
+  private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder)
       throws Exception {
-    return flowRunner(flowName).withVariable(SOURCE_DIRECTORY_NAME, source).withVariable("target", target)
-        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder);
+    flowRunner(flowName).withVariable(SOURCE_DIRECTORY_NAME, source).withVariable("target", target)
+        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).run();
 
   }
 

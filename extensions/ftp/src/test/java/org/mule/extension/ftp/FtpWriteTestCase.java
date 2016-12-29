@@ -17,7 +17,6 @@ import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
-import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -73,26 +72,29 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
   @Test
   public void createNewOnExistingFile() throws Exception {
-    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
-                "Use a different write mode or point to a path which doesn't exists");
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "Use a different write mode or point to a path which doesn't exists");
     doWriteOnExistingFile(CREATE_NEW);
   }
 
   @Test
   public void appendOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "because path to it doesn't exist");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
   }
 
   @Test
   public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "because path to it doesn't exist");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
   }
 
   @Test
   public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "because path to it doesn't exist");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
   }
 

@@ -15,7 +15,7 @@ import org.mule.extension.file.common.api.command.MoveCommand;
 import org.mule.extension.file.common.api.command.ReadCommand;
 import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
-import org.mule.extension.file.common.api.exceptions.LockConcurrencyException;
+import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
@@ -165,7 +165,7 @@ public abstract class AbstractFileSystem implements FileSystem {
   public final synchronized PathLock lock(Path path, Object... params) {
     PathLock lock = createLock(path, params);
     if (!lock.tryLock()) {
-      throw new LockConcurrencyException(format("Could not lock file '%s' because it's already owned by another process", path));
+      throw new FileLockedException(format("Could not lock file '%s' because it's already owned by another process", path));
     }
 
     return lock;
@@ -200,7 +200,7 @@ public abstract class AbstractFileSystem implements FileSystem {
   @Override
   public void verifyNotLocked(Path path) {
     if (isLocked(path)) {
-      throw new LockConcurrencyException(format("File '%s' is locked by another process", path));
+      throw new FileLockedException(format("File '%s' is locked by another process", path));
     }
   }
 

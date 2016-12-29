@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
-import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -85,21 +84,21 @@ public class FileRenameTestCase extends FileConnectorTestCase {
 
   @Test
   public void renameUnexisting() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     doRename("not-there.txt");
   }
 
   @Test
   public void targetPathContainsParts() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
-                "parameter of rename operation should not contain any file separator character");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                              "parameter of rename operation should not contain any file separator character");
     File origin = temporaryFolder.newFile("source");
-    doRename("rename", origin.getAbsolutePath(), "path/with/parts", true);
+    doRename(getFlowName(), origin.getAbsolutePath(), "path/with/parts", true);
   }
 
   @Test
   public void targetAlreadyExistsWithoutOverwrite() throws Exception {
-    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
     File origin = temporaryFolder.newFile("source");
     temporaryFolder.newFile(RENAME_TO);
     doRename(origin.getAbsolutePath());

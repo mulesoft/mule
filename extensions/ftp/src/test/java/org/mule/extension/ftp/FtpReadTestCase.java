@@ -13,7 +13,6 @@ import static org.mule.extension.FtpTestHarness.BINARY_FILE_NAME;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
-import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
@@ -83,13 +82,14 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void readUnexisting() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     readPath("files/not-there.txt");
   }
 
   @Test
   public void readDirectory() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "since it's a directory");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "since it's a directory");
     readPath("files");
   }
 

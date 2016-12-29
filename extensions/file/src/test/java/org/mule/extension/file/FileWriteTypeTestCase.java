@@ -62,7 +62,7 @@ public class FileWriteTypeTestCase extends FileConnectorTestCase {
   }
 
   private void write(Object content) throws Exception {
-    doWrite(path, content, FileWriteMode.APPEND, false).run();
+    doWrite(path, content, FileWriteMode.APPEND, false);
   }
 
   private static class TestOutputHandler implements OutputHandler {

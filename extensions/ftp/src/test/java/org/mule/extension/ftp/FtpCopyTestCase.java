@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
 import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
-import static org.mule.functional.junit4.rules.ExpectedError.expectError;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
@@ -71,14 +70,15 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void nullTarget() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
-                "target path cannot be null nor blank");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "target path cannot be null nor blank");
     doExecute(null, false, false);
   }
 
   @Test
   public void copyToItselfWithoutOverwrite() throws Exception {
-    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     doExecute(getFlowName(), sourcePath, sourcePath, false, false);
   }
 
@@ -102,7 +102,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void toNonExistingFolderWithoutCreateParent() throws Exception {
-    expectError(expectedError, NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "destination path doesn't exists");
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "destination path doesn't exists");
     testHarness.makeDir(TARGET_DIRECTORY);
     String target = format("%s/%s", TARGET_DIRECTORY, "a/b/c");
     doExecute(target, false, false);
@@ -133,7 +134,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void withoutOverwrite() throws Exception {
-    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     final String existingFileName = "existing";
     testHarness.write(existingFileName, EXISTING_CONTENT);
 
@@ -177,7 +179,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void directoryWithoutOverwrite() throws Exception {
-    expectError(expectedError, NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     sourcePath = buildSourceDirectory();
 
     final String target = "target";

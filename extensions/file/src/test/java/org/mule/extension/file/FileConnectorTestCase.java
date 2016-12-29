@@ -6,19 +6,15 @@
  */
 package org.mule.extension.file;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
-import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
-import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -68,42 +64,33 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
   }
 
   protected Event readHelloWorld() throws Exception {
-    return getPath(HELLO_PATH).run();
+    return getPath(HELLO_PATH);
   }
 
-  protected FlowRunner readPath(String path) throws Exception {
-    return getPath(path);
+  protected Message readPath(String path) throws Exception {
+    return getPath(path).getMessage();
   }
 
-  protected FlowRunner getPath(String path) throws Exception {
-    return flowRunner("read").withVariable("path", path);
+  protected Event getPath(String path) throws Exception {
+    return flowRunner("read").withVariable("path", path).run();
   }
 
   protected String readPathAsString(String path) throws Exception {
-    return IOUtils.toString((AbstractFileInputStream) readPath(path).run().getMessage().getPayload().getValue());
+    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload().getValue());
   }
 
-  protected FlowRunner doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
-    return doWrite("write", path, content, mode, createParent);
+  protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    doWrite("write", path, content, mode, createParent);
   }
 
-  protected FlowRunner doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent)
+  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    doWrite(flow, path, content, mode, createParent, null);
+  }
+
+  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding)
       throws Exception {
-    return doWrite(flow, path, content, mode, createParent, null);
-  }
-
-  protected FlowRunner doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent,
-                               String encoding)
-      throws Exception {
-    return flowRunner(flow).withVariable("path", path).withVariable("createParent", createParent).withVariable("mode", mode)
-        .withVariable("encoding", encoding).withPayload(content);
-  }
-
-  protected void assertError(MessagingException exception, String errorTypeDefinition, Class<?> cause, String message) {
-    Event event = exception.getEvent();
-    assertThat(event.getError().get().getErrorType(), is(errorType(NAMESPACE, errorTypeDefinition)));
-    assertThat(event.getError().get().getCause(), instanceOf(cause));
-    assertThat(event.getError().get().getDescription(), containsString(message));
+    flowRunner(flow).withVariable("path", path).withVariable("createParent", createParent).withVariable("mode", mode)
+        .withVariable("encoding", encoding).withPayload(content).run();
   }
 
   protected File createHelloWorldFile() throws IOException {

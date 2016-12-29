@@ -8,7 +8,7 @@ package org.mule.extension.file.internal.lock;
 
 import static java.lang.String.format;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
-import org.mule.extension.file.common.api.exceptions.LockConcurrencyException;
+import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -53,7 +53,7 @@ public final class LocalPathLock implements PathLock {
   @Override
   public boolean tryLock() {
     if (isLocked()) {
-      throw new LockConcurrencyException("Lock is already acquired");
+      throw new FileLockedException("Lock is already acquired");
     }
 
     try {

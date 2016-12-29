@@ -7,25 +7,25 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-
-import org.junit.Test;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
-import java.util.Optional;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class OperationErrorHandlingTestCase extends ExtensionFunctionalTestCase {
 
   private static final String HEISENBERG = "HEISENBERG";
+
+  @Rule
+  public ExpectedError expectedError = none();
 
   @Override
   protected String[] getConfigFiles() {
@@ -39,27 +39,19 @@ public class OperationErrorHandlingTestCase extends ExtensionFunctionalTestCase 
 
   @Test
   public void heisenbergThrowsAHealthErrorFromHeisenbergException() throws Exception {
-    assertErrorType("cureCancer", HeisenbergException.class, HEALTH.getType(), HEISENBERG);
+    expectedError.expectErrorType(HEISENBERG, HEALTH.getType()).expectCause(instanceOf(HeisenbergException.class));
+    flowRunner("cureCancer").run();
   }
 
   @Test
   public void connectionExceptionThrowsAnConnectivityError() throws Exception {
-    assertErrorType("connectionFails", ConnectionException.class, CONNECTIVITY_ERROR_IDENTIFIER, HEISENBERG);
+    expectedError.expectErrorType(HEISENBERG, CONNECTIVITY_ERROR_IDENTIFIER).expectCause(instanceOf(ConnectionException.class));
+    flowRunner("connectionFails").run();
   }
 
   @Test
   public void unrecognizedExceptionIsUnknown() throws Exception {
-    assertErrorType("unrecognizedException", HeisenbergException.class, UNKNOWN_ERROR_IDENTIFIER, HEISENBERG);
-  }
-
-  public void assertErrorType(String flowName, Class<? extends Throwable> throwable, String identifier, String namespace)
-      throws Exception {
-    MessagingException exception = flowRunner(flowName).runExpectingException();
-    Optional<Error> errorOptional = exception.getEvent().getError();
-    assertThat(errorOptional.isPresent(), is(true));
-    Error unknownError = errorOptional.get();
-    assertThat(unknownError.getCause(), is(instanceOf(throwable)));
-    assertThat(unknownError.getErrorType().getIdentifier(), is(identifier));
-    assertThat(unknownError.getErrorType().getNamespace(), is(namespace));
+    expectedError.expectErrorType(HEISENBERG, UNKNOWN_ERROR_IDENTIFIER).expectCause(instanceOf(HeisenbergException.class));
+    flowRunner("unrecognizedException").run();
   }
 }

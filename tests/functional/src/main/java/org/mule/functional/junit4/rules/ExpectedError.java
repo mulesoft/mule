@@ -6,6 +6,7 @@
  */
 package org.mule.functional.junit4.rules;
 
+import static com.google.common.base.Throwables.getStackTraceAsString;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -17,7 +18,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,16 +46,6 @@ public class ExpectedError implements TestRule {
     return new ExpectedError();
   }
 
-  /**
-   * Helper method to configure all the matchers that can be used with this rule at the same time.
-   */
-  public static void expectError(ExpectedError error, String namespace, String errorTypeDefinition, Class<?> cause,
-                                 String message) {
-    error.expectErrorType(namespace, errorTypeDefinition)
-        .expectCause(instanceOf(cause))
-        .expectMessage(containsString(message));
-  }
-
   private ExpectedError() {
     messageMatcher = null;
     errorTypeMatcher = null;
@@ -63,13 +53,22 @@ public class ExpectedError implements TestRule {
     matchers = new ArrayList<>();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Statement apply(Statement statement, Description description) {
     return new ExpectedErrorStatement(statement);
   }
 
-  private boolean expectsThrowable() {
-    return errorTypeMatcher != null || causeMatcher != null || messageMatcher != null;
+  /**
+   * Helper method to configure all the matchers that can be used with this rule at the same time.
+   */
+  public void expectError(String namespace, String errorTypeDefinition, Class<?> cause,
+                          String message) {
+    expectErrorType(namespace, errorTypeDefinition)
+        .expectCause(instanceOf(cause))
+        .expectMessage(containsString(message));
   }
 
   public ExpectedError expectMessage(Matcher<String> matcher) {
@@ -89,44 +88,28 @@ public class ExpectedError implements TestRule {
 
   }
 
+  private boolean expectsThrowable() {
+    return errorTypeMatcher != null || causeMatcher != null || messageMatcher != null;
+  }
+
   private void failDueToMissingException() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("No exception was thrown during the test");
-    builder.append("\n");
-    builder.append(this.toString());
-    fail(builder.toString());
+    fail(format("No exception was thrown during the test \n %s", this.toString()));
   }
 
   private void failWithNonMatchingException(Exception e) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("An exception was caught but it didn't met the following conditions:\n");
-    builder.append(Joiner.on("\n").join(matchers).toString());
-    builder.append("\n Caught exception was:\n");
-    builder.append(e);
-    builder.append(Throwables.getStackTraceAsString(e));
-    fail(builder.toString());
+    fail(format("An exception was caught but it didn't met the following conditions:\n %s \n %s Caught exception was:\n %s %s",
+                Joiner.on("\n").join(matchers).toString(), e, getStackTraceAsString(e)));
   }
 
   private void failDueToUnexpectedException(Throwable e) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("An exception was caught but it wasn't expected for the test");
-    builder.append("\n Caught exception was:\n");
-    builder.append(e);
-    builder.append(Throwables.getStackTraceAsString(e));
-    fail(builder.toString());
+    fail(format("An exception was caught but it wasn't expected for the test \n Caught exception was:\n %s %s", e,
+                getStackTraceAsString(e)));
   }
 
   private void failDueToExceptionWithoutError(Throwable e, Event event) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("An exception was caught but it didn't contain information about the error");
-    builder.append("\n Event:\n");
-    builder.append(event);
-    builder.append("\n Caught exception was:\n");
-    builder.append(e);
-    builder.append(Throwables.getStackTraceAsString(e));
-    fail(builder.toString());
+    fail(format("An exception was caught but it didn't contain information about the error \n Event: \n %s \n Caught exception was:\n %s %s",
+                event, e, getStackTraceAsString(e)));
   }
-
 
   @Override
   public String toString() {
