@@ -12,7 +12,7 @@ import static org.mule.transport.file.FileTestUtils.createDataFile;
 import static org.mule.transport.file.FileTestUtils.createFolder;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.LocalMuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +46,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
         tmpDir = createFolder(".mule/mule-file-test-EUC-JP");
         createDataFile(tmpDir, TEST_MESSAGE_EUC_JP_ENCODED, ENCODING);
 
-        MuleClient client = new MuleClient(muleContext);
+        LocalMuleClient client = muleContext.getClient();
         MuleMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT);
 
         assertNotNull(message);
