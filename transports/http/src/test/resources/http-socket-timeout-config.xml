@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+	">
+
+    <configuration defaultResponseTimeout="1000"/>
+
+    <http:connector name="httpConnTimeout" clientSoTimeout="2000" />
+    <http:connector name="httpConn"/>
+
+    <flow name="timeout">
+        <http:inbound-endpoint address="http://localhost:${port}/timeout" exchange-pattern="request-response" connector-ref="httpConn" />
+        <http:outbound-endpoint address="http://localhost:${port}/out" exchange-pattern="request-response" connector-ref="httpConnTimeout"/>
+    </flow>
+
+    <flow name="noTimeout">
+        <http:inbound-endpoint address="http://localhost:${port}/noTimeout" exchange-pattern="request-response" connector-ref="httpConn"/>
+        <http:outbound-endpoint address="http://localhost:${port}/out" exchange-pattern="request-response" connector-ref="httpConn"/>
+    </flow>
+
+    <flow name="out">
+        <http:inbound-endpoint address="http://localhost:${port}/out" exchange-pattern="request-response" connector-ref="httpConn"/>
+        <test:component waitTime="1500"/>
+    </flow>
+
+</mule>
