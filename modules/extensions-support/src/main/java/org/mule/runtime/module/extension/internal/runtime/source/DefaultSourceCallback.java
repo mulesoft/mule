@@ -6,11 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessage;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
@@ -21,14 +29,13 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import java.util.function.Supplier;
 
 /**
- * Default implementation of {@link SourceCallback}.
- * Instances are to be created through the {@link #builder()} method.
+ * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
  *
  * @param <T> the generic type of the output values of the generated results
  * @param <A> the generic type of the attributes of the generated results
  * @since 4.0
  */
-class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T, A> {
+class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T, A>, Startable, Stoppable {
 
   /**
    * A Builder to create instance of {@link DefaultSourceCallback}
@@ -79,7 +86,6 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       checkArgument(product.messageProcessingManager, "messageProcessingManager");
       checkArgument(product.processContextSupplier, "processContextSupplier");
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
-
       return product;
     }
 
@@ -102,6 +108,8 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;
   private SourceCompletionHandlerFactory completionHandlerFactory;
+  private Sink sink;
+  private Disposable streamCancellation;
 
   private DefaultSourceCallback() {}
 
@@ -124,7 +132,8 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
                                                                              listener,
                                                                              completionHandlerFactory
                                                                                  .createCompletionHandler(context),
-                                                                             messageProcessContext),
+                                                                             messageProcessContext,
+                                                                             sink),
                                             messageProcessContext);
   }
 
@@ -142,5 +151,19 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   @Override
   public SourceCallbackContext createContext() {
     return new DefaultSourceCallbackContext(this);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    if (flowConstruct instanceof Pipeline) {
+      sink = ((Pipeline) flowConstruct).getProcessingStrategy().createSink(flowConstruct, listener);
+    } else {
+      sink = SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, listener);
+    }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    sink.complete();
   }
 }

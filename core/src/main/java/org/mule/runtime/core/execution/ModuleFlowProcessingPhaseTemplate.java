@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
+
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
  */
@@ -38,6 +40,8 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @throws MuleException
    */
   Event routeEvent(Event event) throws MuleException;
+
+  Publisher<Event> dispatchEvent(Event event);
 
   /**
    * Template method to send a response after processing the message.

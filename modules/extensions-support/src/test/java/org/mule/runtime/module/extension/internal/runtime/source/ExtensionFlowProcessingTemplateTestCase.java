@@ -74,7 +74,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Before
   public void before() {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, completionHandler, messageProcessorContext);
+    template = new ModuleFlowProcessingTemplate(message, messageProcessor, completionHandler, messageProcessorContext, null);
   }
 
   @Test
