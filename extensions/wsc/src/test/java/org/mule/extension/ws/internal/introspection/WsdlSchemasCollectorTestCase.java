@@ -10,13 +10,14 @@ import static java.lang.Thread.currentThread;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.mule.runtime.core.util.IOUtils;
 
 public class WsdlSchemasCollectorTestCase {
 
@@ -30,6 +31,7 @@ public class WsdlSchemasCollectorTestCase {
     URL expectedXsd = currentThread().getContextClassLoader().getResource("schemas/simple-service-types.xsd");
     String expected = IOUtils.toString(expectedXsd.openStream());
     String result = IOUtils.toString(schemas.entrySet().iterator().next().getValue());
+    XMLUnit.setIgnoreWhitespace(true);
     assertSimilarXml(expected, result);
   }
 }
