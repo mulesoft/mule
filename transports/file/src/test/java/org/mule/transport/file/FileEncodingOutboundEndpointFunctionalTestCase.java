@@ -7,7 +7,6 @@
 package org.mule.transport.file;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.transport.file.FileTestUtils.createFolder;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -21,7 +20,6 @@ import org.junit.Test;
 public class FileEncodingOutboundEndpointFunctionalTestCase extends FunctionalTestCase
 {
     private static final String TEST_MESSAGE_EUC_JP_ENCODED = "\u3053";
-    private static final int FIVE_SECONDS_TIMEOUT = 5000;
     private static final String ENCODING = "EUC-JP";
 
     protected File tmpDir;
@@ -40,6 +38,6 @@ public class FileEncodingOutboundEndpointFunctionalTestCase extends FunctionalTe
 
         File outputFile = getFileInsideWorkingDirectory("mule-file-test-EUC-JP/mule-file-test-EUC-JP");
         assertThat(outputFile.exists(), is(true));
-        assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, IOUtils.toString(new FileInputStream(outputFile), ENCODING));
+        assertThat(TEST_MESSAGE_EUC_JP_ENCODED, is(IOUtils.toString(new FileInputStream(outputFile), ENCODING)));
     }
 }
