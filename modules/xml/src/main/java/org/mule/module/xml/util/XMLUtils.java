@@ -46,7 +46,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
@@ -535,7 +534,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
     {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         StringWriter stringWriter = new StringWriter();
-        transformer.transform(new StAXSource(xmlr), new StreamResult(stringWriter));
+        transformer.transform(new StaxSource(xmlr), new StreamResult(stringWriter));
         return stringWriter.toString();
     }
 
@@ -718,7 +717,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
     {
             XPath xp = createXPath(node);
             NodeList nl = (NodeList) xp.evaluate(xpath, node, XPathConstants.NODESET);
-            List<Node> nodeList = new ArrayList<Node>(nl.getLength());
+            List<Node> nodeList = new ArrayList<>(nl.getLength());
             for (int i = 0; i < nl.getLength(); i++)
             {
                 nodeList.add(nl.item(i));
@@ -741,6 +740,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
             this.document = document;
         }
 
+        @Override
         public String getNamespaceURI(String prefix)
         {
             if (prefix == null || prefix.equals(""))
@@ -753,14 +753,16 @@ public class XMLUtils extends org.mule.util.XMLUtils
             }
         }
 
+        @Override
         public String getPrefix(String namespaceURI)
         {
             return document.lookupPrefix(namespaceURI);
         }
 
+        @Override
         public Iterator<String> getPrefixes(String namespaceURI)
         {
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             list.add(getPrefix(namespaceURI));
             return list.iterator();
         }
