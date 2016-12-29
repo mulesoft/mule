@@ -15,7 +15,6 @@ import javax.wsdl.Definition;
  * A strategy to retrieve the wsdl from the url defined
  * 
  * @since 3.9
- *
  */
 public interface WsdlRetrieverStrategy 
 {

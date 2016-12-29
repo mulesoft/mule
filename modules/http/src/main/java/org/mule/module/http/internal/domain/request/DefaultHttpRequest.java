@@ -28,13 +28,6 @@ public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
 
     /**
      * DefaultHttpRequest constructor
-     * 
-     * @param uri target of the request
-     * @param path path of the request
-     * @param method http method of the request
-     * @param headers headers map
-     * @param queryParams query params map
-     * @param entity request http entity
      */
     public DefaultHttpRequest(String uri, String path, String method, ParameterMap headers, ParameterMap queryParams, HttpEntity entity)
     {

@@ -14,11 +14,11 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
 
 
 /**
- *	A wsdl retriever strategy implementation to get the wsdl directly.
- *
+ * A wsdl retriever strategy implementation to get the wsdl directly.
  */
 public class URLRetrieverStrategy extends AbstractInputStreamStrategy
 {
@@ -26,9 +26,9 @@ public class URLRetrieverStrategy extends AbstractInputStreamStrategy
     @Override
     public Definition retrieveWsdlFrom(URL url) throws Exception
     {
-    	InputStream responseStream = null;
-    	Definition wsdlDefinition = null;
-    	
+        InputStream responseStream = null;
+        Definition wsdlDefinition = null;
+
         URLConnection urlConnection = url.openConnection();
 
         if (url.getUserInfo() != null)
@@ -37,16 +37,23 @@ public class URLRetrieverStrategy extends AbstractInputStreamStrategy
         }
 
         responseStream = urlConnection.getInputStream();
-        
-        try 
+
+        try
         {
-        	wsdlDefinition = getWsdlDefinition(url, responseStream);
+            wsdlDefinition = getWsdlDefinition(url, responseStream);
         }
         finally
         {
-        	responseStream.close();
+            try
+            {
+                responseStream.close();
+            }
+            catch (Exception e)
+            {
+                throw new WSDLException("Exception closing streaming for url: %s", url.toString(), e);
+            }
         }
-        
+
         return wsdlDefinition;
     }
 

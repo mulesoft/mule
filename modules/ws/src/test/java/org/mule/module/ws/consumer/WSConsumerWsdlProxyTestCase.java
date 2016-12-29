@@ -25,7 +25,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-import com.google.common.net.MediaType;
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;;
 
 /**
  * This tests "mocks" a proxy server through which a wsdl file is served.
@@ -36,7 +36,7 @@ public class WSConsumerWsdlProxyTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
-    
+
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
     private static final String EXPECTED_OPERATION = "noParamsWithHeader";
@@ -92,9 +92,9 @@ public class WSConsumerWsdlProxyTestCase extends FunctionalTestCase
             {
                 public void service(Request request, Response response) throws Exception
                 {
-                    response.setContentType(MediaType.APPLICATION_XML_UTF_8.toString());
+                    response.setContentType(APPLICATION_XML_UTF_8.toString());
                     String contents = IOUtils.toString(this.getClass().getResourceAsStream(WSDL_FILE_LOCATION),
-                                                       UTF_8.name());
+                            UTF_8.name());
                     response.setContentLength(contents.length());
                     response.getWriter().write(contents);
                 }

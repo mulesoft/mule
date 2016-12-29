@@ -119,9 +119,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             wsdlRetrieverStrategy = new ProxyWsdlRetrieverStrategy(httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
         }
     }
+
     /**
-     * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set,
-     * then it is looked up in the registry (only one object of this type must exist in the registry, or an
+     * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set, then it
+     * is looked up in the registry (only one object of this type must exist in the registry, or an
      * InitializationException will be thrown).
      */
     private void initializeConfiguration() throws InitialisationException
@@ -134,7 +135,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 if (config == null)
                 {
                     throw new InitialisationException(CoreMessages.createStaticMessage("No configuration defined for the web service " +
-                                                                                       "consumer. Add a consumer-config element."), this);
+                                                                                       "consumer. Add a consumer-config element."),
+                            this);
                 }
             }
             catch (RegistrationException e)
@@ -145,8 +147,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Creates the message processor chain in which we will delegate the process of mule events.
-     * The chain composes a string transformer, a CXF client proxy and and outbound endpoint.
+     * Creates the message processor chain in which we will delegate the process of mule events. The chain composes a
+     * string transformer, a CXF client proxy and and outbound endpoint.
      */
     private MessageProcessor createMessageProcessor() throws MuleException
     {
@@ -174,8 +176,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             @Override
             protected MuleEvent processRequest(MuleEvent event) throws MuleException
             {
-                /* If the requestBody variable is set, it will be used as the payload to send instead
-                 * of the payload of the message. This will happen when an operation required no input parameters. */
+                /*
+                 * If the requestBody variable is set, it will be used as the payload to send instead of the payload of
+                 * the message. This will happen when an operation required no input parameters.
+                 */
                 if (requestBody != null)
                 {
                     event.getMessage().setPayload(requestBody);
@@ -195,8 +199,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 }
                 catch (DispatchException e)
                 {
-                    /* When a Soap Fault is returned in the response, CXF raises a SoapFault exception.
-                     * We need to wrap the information of this exception into a new exception of the WS consumer module */
+                    /*
+                     * When a Soap Fault is returned in the response, CXF raises a SoapFault exception. We need to wrap
+                     * the information of this exception into a new exception of the WS consumer module
+                     */
 
                     if (e.getCause() instanceof SoapFault)
                     {
@@ -352,7 +358,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private void parseWsdl() throws InitialisationException
     {
         Definition wsdlDefinition = null;
-        
+
         URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
         if (url == null)
         {
@@ -361,11 +367,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         try
         {
-        	wsdlDefinition = wsdlRetrieverStrategy.retrieveWsdlFrom(url);
+            wsdlDefinition = wsdlRetrieverStrategy.retrieveWsdlFrom(url);
         }
         catch (Exception e)
         {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), e, this);
         }
 
         Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
@@ -421,8 +427,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation
-     * properties with a set of CXF Attachment objects.
+     * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation properties with
+     * a set of CXF Attachment objects.
      */
     private void copyAttachmentsRequest(MuleEvent event)
     {
@@ -444,8 +450,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets
-     * them as inbound attachments in the Mule Message.
+     * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets them as inbound
+     * attachments in the Mule Message.
      */
     private void copyAttachmentsResponse(MuleEvent event) throws MessagingException
     {
@@ -458,12 +464,12 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             {
                 try
                 {
-                    ((DefaultMuleMessage)message).addInboundAttachment(attachment.getId(), attachment.getDataHandler());
+                    ((DefaultMuleMessage) message).addInboundAttachment(attachment.getId(), attachment.getDataHandler());
                 }
                 catch (Exception e)
                 {
                     throw new MessagingException(CoreMessages.createStaticMessage("Could not set inbound attachment %s",
-                                                                                  attachment.getId()), event, e, this);
+                            attachment.getId()), event, e, this);
                 }
             }
         }

@@ -27,8 +27,8 @@ public class HttpClientConfiguration
     private final Integer kernelCoreSize;
 
     private HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-                                           int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName,
-                                           Integer maxWorkerPoolSize,  Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize)
+            int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName,
+            Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -83,26 +83,28 @@ public class HttpClientConfiguration
     {
         return ownerName;
     }
-    
-    public Integer getMaxWorkerPoolSize() {
-		return maxWorkerPoolSize;
-	}
 
-	public Integer getWorkerCoreSize() {
-		return workerCoreSize;
-	}
+    public Integer getMaxWorkerPoolSize()
+    {
+        return maxWorkerPoolSize;
+    }
 
-	public Integer getMaxKernelPoolSize() {
-		return maxKernelPoolSize;
-	}
+    public Integer getWorkerCoreSize()
+    {
+        return workerCoreSize;
+    }
 
-	public Integer getKernelCoreSize() {
-		return kernelCoreSize;
-	}
+    public Integer getMaxKernelPoolSize()
+    {
+        return maxKernelPoolSize;
+    }
 
+    public Integer getKernelCoreSize()
+    {
+        return kernelCoreSize;
+    }
 
-
-	public static class Builder
+    public static class Builder
     {
         private TlsContextFactory tlsContextFactory;
         private ProxyConfig proxyConfig;
@@ -164,38 +166,36 @@ public class HttpClientConfiguration
             this.ownerName = ownerName;
             return this;
         }
-        
+
         public Builder setMaxWorkerPoolSize(Integer maxWorkerPoolSize)
         {
             this.maxWorkerPoolSize = maxWorkerPoolSize;
             return this;
         }
-        
+
         public Builder setWorkerCoreSize(Integer workerCoreSize)
         {
             this.workerCoreSize = workerCoreSize;
             return this;
         }
-        
+
         public Builder setMaxKernelPoolSize(Integer maxKernelPoolSize)
         {
             this.maxKernelPoolSize = maxKernelPoolSize;
             return this;
         }
-        
+
         public Builder setKernelCoreSize(Integer kernelCoreSize)
         {
             this.kernelCoreSize = kernelCoreSize;
             return this;
         }
-        
-        
 
         public HttpClientConfiguration build()
         {
             return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName,
-                                                  	  maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize);
+                    usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName,
+                    maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize);
         }
     }
 }

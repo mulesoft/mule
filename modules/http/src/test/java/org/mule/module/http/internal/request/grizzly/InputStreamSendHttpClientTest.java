@@ -11,12 +11,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jetty.http.HttpMethod;
+import static org.eclipse.jetty.http.HttpMethod.GET;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
@@ -63,19 +64,23 @@ public class InputStreamSendHttpClientTest
         InputStream responseStream = null;
 
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)
-                .setMaxConnections(1).setConnectionIdleTimeout(-1).build();
+                                                                                     .setMaxConnections(1)
+                                                                                     .setConnectionIdleTimeout(-1)
+                                                                                     .build();
 
         GrizzlyHttpClient httpClient = new GrizzlyHttpClient(configuration);
         httpClient.start();
 
         HttpRequest request = new DefaultHttpRequest(
-                PROTOCOL + "://" + HOST + ":" + dynamicPort.getNumber() + "/" + PATH, null, HttpMethod.GET.asString(),
+                PROTOCOL + "://" + HOST + ":" + dynamicPort.getNumber() + "/" + PATH, null, GET.asString(),
                 new ParameterMap(), new ParameterMap(), null);
         responseStream = httpClient.sendAndReceiveInputStream(request, TIMEOUT, FOLLOW_REDIRECTS, null);
 
-        String response = IOUtils.toString(responseStream, "UTF-8");
+        String response = IOUtils.toString(responseStream, UTF_8.name());
 
         assertThat(EXPECTED_RESULT, equalTo(response));
+
+        httpClient.stop();
     }
 
     /**

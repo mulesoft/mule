@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
 
 
 /**
@@ -70,21 +71,27 @@ public class ProxyWsdlRetrieverStrategy extends AbstractInputStreamStrategy
         String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(context), WSDL_RETRIEVER);
 
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-                .setTlsContextFactory(tlsContextFactory).setProxyConfig(proxyConfig)
-                .setClientSocketProperties(socketProperties).setMaxConnections(DEFAULT_CONNECTIONS)
-                .setUsePersistentConnections(DEFAULT_USE_PERSISTENT_CONNECTION)
-                .setConnectionIdleTimeout(DEFAULT_CONNECTION_IDLE_TIMEOUT).setThreadNamePrefix(threadNamePrefix)
-                .setOwnerName(WSDL_RETRIEVER).setMaxWorkerPoolSize(MINIMUM_WORKER_MAX_POOL_SIZE)
-                .setWorkerCoreSize(MINIMUM_WORKER_CORE_SIZE).setMaxKernelPoolSize(MINIMUM_KERNEL_MAX_POOL_SIZE)
-                .setKernelCoreSize(MINIMUM_KERNEL_CORE_SIZE).build();
+                                                                                     .setTlsContextFactory(tlsContextFactory)
+                                                                                     .setProxyConfig(proxyConfig)
+                                                                                     .setClientSocketProperties(socketProperties)
+                                                                                     .setMaxConnections(DEFAULT_CONNECTIONS)
+                                                                                     .setUsePersistentConnections(DEFAULT_USE_PERSISTENT_CONNECTION)
+                                                                                     .setConnectionIdleTimeout(DEFAULT_CONNECTION_IDLE_TIMEOUT)
+                                                                                     .setThreadNamePrefix(threadNamePrefix)
+                                                                                     .setOwnerName(WSDL_RETRIEVER)
+                                                                                     .setMaxWorkerPoolSize(MINIMUM_WORKER_MAX_POOL_SIZE)
+                                                                                     .setWorkerCoreSize(MINIMUM_WORKER_CORE_SIZE)
+                                                                                     .setMaxKernelPoolSize(MINIMUM_KERNEL_MAX_POOL_SIZE)
+                                                                                     .setKernelCoreSize(MINIMUM_KERNEL_CORE_SIZE)
+                                                                                     .build();
 
         GrizzlyHttpClient httpClient = new GrizzlyHttpClient(configuration);
         httpClient.start();
 
         HttpRequest request = new DefaultHttpRequest(url.toString(), null, HTTP_METHOD_WSDL_RETRIEVAL, new ParameterMap(),
-                                                     new ParameterMap(), null);
+                new ParameterMap(), null);
         responseStream = httpClient.sendAndReceiveInputStream(request, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_FOLLOW_REDIRECTS,
-                                                              basicAuthentication);
+                basicAuthentication);
 
         try
         {
@@ -92,8 +99,15 @@ public class ProxyWsdlRetrieverStrategy extends AbstractInputStreamStrategy
         }
         finally
         {
-            responseStream.close();
             httpClient.stop();
+            try
+            {
+                responseStream.close();
+            }
+            catch (Exception e)
+            {
+                throw new WSDLException("Exception closing input stream for url: %s", url.toString(), e);
+            }
         }
 
         return wsdlDefinition;

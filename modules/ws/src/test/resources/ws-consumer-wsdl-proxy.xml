@@ -22,7 +22,6 @@
                         wsdlLocation="http://fake.com/services/Test?wsdl" connectorConfig="HTTP_Request_Configuration"/>
 
     <flow name="test">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <ws:consumer config-ref="Web_Service_Consumer" operation="noParamsWithHeader"/>
     </flow>
 
