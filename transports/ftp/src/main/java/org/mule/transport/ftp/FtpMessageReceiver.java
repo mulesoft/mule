@@ -143,11 +143,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 return getConnectionDescription();
             }
 
-            @Override
-            public Connector getWorkOwner()
-            {
-                return connector;
-            }
         };
         try
         {

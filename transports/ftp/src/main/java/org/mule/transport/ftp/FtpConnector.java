@@ -571,11 +571,7 @@ public class FtpConnector extends AbstractConnector
                     return getConnectionDescription();
                 }
 
-                @Override
-                public Connector getWorkOwner()
-                {
-                    return FtpConnector.this;
-                }
+
             };
             try
             {
