@@ -7,7 +7,7 @@
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
     <flow name="outputTest">
-        <set-payload value="こ" />
+        <set-payload value="こ" encoding="EUC-JP"/>
         <file:outbound-endpoint path="${workingDirectory}/mule-file-test-EUC-JP" encoding="EUC-JP" outputPattern="mule-file-test-EUC-JP"/>
     </flow>
 
