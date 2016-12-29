@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd        
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="fake.com" responseTimeout="60000"  port="80" proxy-ref="Proxy_Configuration">
+    </http:request-config>
+    
+   <http:proxy name="Proxy_Configuration" host="localhost" port="9901"/>
+    
+
+    <ws:consumer-config name="Web_Service_Consumer" service="TestService" port="TestPort" serviceAddress="http://localhost:${port}/service/Test" wsdlLocation="http://fake.com/services/Test?wsdl"  connectorConfig="HTTP_Request_Configuration"/> 
+
+    <flow name="test">
+		<vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+        <ws:consumer config-ref="Web_Service_Consumer" operation="noParamsWithHeader"/>        
+    </flow>
+</mule>

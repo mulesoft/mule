@@ -15,6 +15,7 @@ import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -33,4 +34,19 @@ public interface HttpClient extends Startable, Stoppable
      */
     public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication, final CompletionHandler<HttpResponse, Exception> handler, WorkManager responseWorkManager);
 
+
+    /**
+     * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
+     * 
+     * @param request
+     * @param responseTimeout
+     * @param followRedirects
+     * @param authentication
+     * 
+     * @return inputstream of response
+     * 
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public InputStream sendAndReceiveInputStream(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException;    
 }

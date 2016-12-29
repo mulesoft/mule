@@ -7,36 +7,12 @@
 
 package org.mule.module.ws.consumer;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.PropertyScope;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
-import org.mule.module.ws.security.SecurityStrategy;
-import org.mule.module.ws.security.WSSecurity;
-import org.mule.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.processor.NonBlockingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.transport.http.HttpConnector;
-import org.mule.util.Base64;
-import org.mule.util.IOUtils;
-
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -66,6 +42,35 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.module.cxf.CxfConstants;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.ws.security.SecurityStrategy;
+import org.mule.module.ws.security.WSSecurity;
+import org.mule.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.processor.NonBlockingMessageProcessor;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.transport.http.HttpConnector;
+import org.mule.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -86,11 +91,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private String requestBody;
     private SoapVersion soapVersion;
     private boolean mtomEnabled;
+    private WsdlRetrieverStrategy wsdlRetrieverStrategy;
 
     @Override
     public void initialise() throws InitialisationException
     {
         initializeConfiguration();
+        initializeWsdlRetrievalStrategy();
         parseWsdl();
 
         try
@@ -111,6 +118,17 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
 
+    private void initializeWsdlRetrievalStrategy()
+    {
+        HttpRequesterConfig httpRequesterConfig = config.getConnectorConfig();
+
+
+        if (httpRequesterConfig == null || httpRequesterConfig.getProxyConfig() == null) {
+            wsdlRetrieverStrategy = new URLRetrieverStrategy();
+        } else {
+            wsdlRetrieverStrategy = new ProxyWsdlRetrieverStrategy(httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext, WSConsumer.class.getName());
+        }
+    }
     /**
      * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set,
      * then it is looked up in the registry (only one object of this type must exist in the registry, or an
@@ -334,7 +352,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new OutputSoapHeadersInterceptor(muleContext));
 
 
-
         return cxfOutboundMessageProcessor;
     }
 
@@ -346,25 +363,27 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         Definition wsdlDefinition = null;
 
+        InputStream inputStream = null;
+        
+
         URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
         if (url == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
         }
 
+        try {
+            inputStream = wsdlRetrieverStrategy.retrieveWsdl(url);
+        } catch (Exception e) {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), this);
+        }
+
         try
         {
             WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-
-            URLConnection urlConnection = url.openConnection();
-            if (url.getUserInfo() != null)
-            {
-                urlConnection.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes(url.getUserInfo().getBytes()));
-            }
-
-            wsdlDefinition = wsdlReader.readWSDL(url.toString(), new InputSource(urlConnection.getInputStream()));
+            wsdlDefinition = wsdlReader.readWSDL(url.toString(), new InputSource(inputStream));
         }
-        catch (WSDLException | IOException e)
+        catch (WSDLException e)
         {
             throw new InitialisationException(e, this);
         }
