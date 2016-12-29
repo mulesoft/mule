@@ -11,13 +11,12 @@ import org.mule.extension.oauth2.internal.authorizationcode.DefaultAuthorization
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.clientcredentials.ClientCredentialsGrantType;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
+import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
  * An extension to hook oauth2 to http extension connectors.
@@ -26,14 +25,11 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  */
 @Extension(name = "OAuth2")
 @Import(type = HttpAuthentication.class, from = "HTTP")
-// @Operations(OAuthOperations.class)
+@Operations(OAuthOperations.class)
 @SubTypeMapping(baseType = HttpAuthentication.class,
     subTypes = {DefaultAuthorizationCodeGrantType.class, ClientCredentialsGrantType.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/oauth2", namespace = "oauth2")
 @Export(classes = {TokenManagerConfig.class, ResourceOwnerOAuthContext.class, TokenNotFoundException.class})
 public class OAuthExtension {
 
-  @Parameter
-  @Alias("tokenManager-ref")
-  private TokenManagerConfig tokenManager;
 }

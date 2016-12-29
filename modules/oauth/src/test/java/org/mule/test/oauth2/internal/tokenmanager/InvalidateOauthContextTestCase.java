@@ -6,18 +6,20 @@
  */
 package org.mule.test.oauth2.internal.tokenmanager;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
-public class InvalidateOauthContextTestCase extends FunctionalTestCase {
+public class InvalidateOauthContextTestCase extends AbstractOAuthAuthorizationTestCase {
 
   public static final String ACCESS_TOKEN = "Access_token";
   public static final String RESOURCE_OWNER_JOHN = "john";
@@ -31,15 +33,17 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase {
   @Test
   public void invalidateTokenManagerGeneralOauthContext() throws Exception {
     TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
+    initialiseIfNeeded(tokenManagerConfig, muleContext);
     final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
-    loadResourceOwnerWithAccessToken(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    loadResourceOwnerWithAccessToken(configOAuthContext, DEFAULT_RESOURCE_OWNER_ID);
     flowRunner("invalidateOauthContext").withPayload(TEST_MESSAGE).run();
-    assertThatOAuthContextWasCleanForUser(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    assertThatOAuthContextWasCleanForUser(configOAuthContext, DEFAULT_RESOURCE_OWNER_ID);
   }
 
   @Test
   public void invalidateTokenManagerGeneralOauthContextForResourceOwnerId() throws Exception {
     TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
+    initialiseIfNeeded(tokenManagerConfig, muleContext);
     final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
     loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_JOHN);
     loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_TONY);
@@ -47,7 +51,7 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase {
     flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE)
         .withVariable("resourceOwnerId", RESOURCE_OWNER_TONY).run();
     assertThatOAuthContextWasCleanForUser(configOAuthContext, RESOURCE_OWNER_TONY);
-    assertThat(configOAuthContext.getContextForResourceOwner(RESOURCE_OWNER_JOHN).getAccessToken(), Is.is(ACCESS_TOKEN));
+    assertThat(configOAuthContext.getContextForResourceOwner(RESOURCE_OWNER_JOHN).getAccessToken(), is(ACCESS_TOKEN));
   }
 
   @Test
