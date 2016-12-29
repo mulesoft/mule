@@ -258,6 +258,24 @@
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>
+                                        <xsd:attribute name="signatureKeyIdentifier" use="optional">
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Defines which key identifier type to use for signature. The WS-Security specifications.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:enumeration value="DirectReference"/>
+                                                    <xsd:enumeration value="IssuerSerial"/>
+                                                    <xsd:enumeration value="X509KeyIdentifier"/>
+                                                    <xsd:enumeration value="SKIKeyIdentifier"/>
+                                                    <xsd:enumeration value="EmbeddedKeyName"/>
+                                                    <xsd:enumeration value="Thumbprint"/>
+                                                    <xsd:enumeration value="EncryptedKeySHA1"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:attribute>
                                     </xsd:complexType>
                                 </xsd:element>
                                 <xsd:element name="wss-verify-signature" minOccurs="0">
