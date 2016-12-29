@@ -7,14 +7,7 @@
 
 package org.mule.module.ws.consumer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Authenticator;
-import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
-import java.net.Proxy;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,11 +20,8 @@ import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
-import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.attachment.AttachmentImpl;
@@ -63,7 +53,6 @@ import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
@@ -73,7 +62,6 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
@@ -122,11 +110,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         HttpRequesterConfig httpRequesterConfig = config.getConnectorConfig();
 
-
-        if (httpRequesterConfig == null || httpRequesterConfig.getProxyConfig() == null) {
+        if (httpRequesterConfig == null || httpRequesterConfig.getProxyConfig() == null)
+        {
             wsdlRetrieverStrategy = new URLRetrieverStrategy();
-        } else {
-            wsdlRetrieverStrategy = new ProxyWsdlRetrieverStrategy(httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext, WSConsumer.class.getName());
+        }
+        else
+        {
+            wsdlRetrieverStrategy = new ProxyWsdlRetrieverStrategy(httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
         }
     }
     /**
@@ -362,30 +352,20 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private void parseWsdl() throws InitialisationException
     {
         Definition wsdlDefinition = null;
-
-        InputStream inputStream = null;
         
-
         URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
         if (url == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
         }
 
-        try {
-            inputStream = wsdlRetrieverStrategy.retrieveWsdl(url);
-        } catch (Exception e) {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), this);
-        }
-
         try
         {
-            WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-            wsdlDefinition = wsdlReader.readWSDL(url.toString(), new InputSource(inputStream));
+        	wsdlDefinition = wsdlRetrieverStrategy.retrieveWsdlFrom(url);
         }
-        catch (WSDLException e)
+        catch (Exception e)
         {
-            throw new InitialisationException(e, this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), this);
         }
 
         Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));

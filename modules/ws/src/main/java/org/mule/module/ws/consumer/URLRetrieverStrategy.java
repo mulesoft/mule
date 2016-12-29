@@ -7,36 +7,47 @@
 
 package org.mule.module.ws.consumer;
 
-import java.io.IOException;
+import static org.mule.util.Base64.encodeBytes;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.wsdl.WSDLException;
+import javax.wsdl.Definition;
 
-import org.mule.util.Base64;
 
-public class URLRetrieverStrategy implements WsdlRetrieverStrategy
+/**
+ *	A wsdl retriever strategy implementation to get the wsdl directly.
+ *
+ */
+public class URLRetrieverStrategy extends AbstractInputStreamStrategy
 {
 
     @Override
-    public InputStream retrieveWsdl(URL url) throws WSDLException
+    public Definition retrieveWsdlFrom(URL url) throws Exception
     {
-        try
-        {
-            URLConnection urlConnection = url.openConnection();
+    	InputStream responseStream = null;
+    	Definition wsdlDefinition = null;
+    	
+        URLConnection urlConnection = url.openConnection();
 
-            if (url.getUserInfo() != null)
-            {
-                urlConnection.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes(url.getUserInfo().getBytes()));
-            }
-
-            return urlConnection.getInputStream();
-        }
-        catch (IOException e)
+        if (url.getUserInfo() != null)
         {
-            throw new WSDLException("Could not retrieve wsdl %s", url.toString(), e);
+            urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(url.getUserInfo().getBytes()));
         }
+
+        responseStream = urlConnection.getInputStream();
+        
+        try 
+        {
+        	wsdlDefinition = getWsdlDefinition(url, responseStream);
+        }
+        finally
+        {
+        	responseStream.close();
+        }
+        
+        return wsdlDefinition;
     }
 
 }

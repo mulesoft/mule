@@ -37,16 +37,6 @@ public interface HttpClient extends Startable, Stoppable
 
     /**
      * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
-     * 
-     * @param request
-     * @param responseTimeout
-     * @param followRedirects
-     * @param authentication
-     * 
-     * @return inputstream of response
-     * 
-     * @throws IOException
-     * @throws TimeoutException
      */
     public InputStream sendAndReceiveInputStream(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException;    
 }
