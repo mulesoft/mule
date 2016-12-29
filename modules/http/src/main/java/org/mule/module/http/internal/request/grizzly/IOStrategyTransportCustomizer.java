@@ -13,8 +13,8 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 
 /**
- * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and sets appropriate names
- * for the threads that are used.
+ * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and sets appropriate names for the
+ * threads that are used.
  */
 public class IOStrategyTransportCustomizer implements TransportCustomizer
 {
@@ -34,7 +34,7 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
         this.maxKernelPoolSize = maxKernelPoolSize;
         this.kernelCoreSize = kernelCoreSize;
     }
-    
+
     public IOStrategyTransportCustomizer(String threadNamePrefix)
     {
         this.threadNamePrefix = threadNamePrefix;
@@ -47,31 +47,32 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
         transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
 
         customizePoolSize(transport);
-        
+
         transport.getWorkerThreadPoolConfig().setCorePoolSize(1).setMaxPoolSize(1);
         transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);
         transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + REQUESTER_WORKER_THREAD_NAME_SUFFIX);
     }
 
-	private void customizePoolSize(TCPNIOTransport transport) {
-		if (maxKernelPoolSize != null)
+    private void customizePoolSize(TCPNIOTransport transport)
+    {
+        if (maxKernelPoolSize != null)
         {
-        	transport.getKernelThreadPoolConfig().setMaxPoolSize(maxKernelPoolSize);
+            transport.getKernelThreadPoolConfig().setMaxPoolSize(maxKernelPoolSize);
         }
-        
+
         if (kernelCoreSize != null)
         {
-        	transport.getKernelThreadPoolConfig().setCorePoolSize(kernelCoreSize);
+            transport.getKernelThreadPoolConfig().setCorePoolSize(kernelCoreSize);
         }
-        
+
         if (maxWorkerPoolSize != null)
         {
-        	transport.getKernelThreadPoolConfig().setMaxPoolSize(maxWorkerPoolSize);
+            transport.getKernelThreadPoolConfig().setMaxPoolSize(maxWorkerPoolSize);
         }
-        
+
         if (workerCoreSize != null)
         {
-        	transport.getKernelThreadPoolConfig().setCorePoolSize(workerCoreSize);
+            transport.getKernelThreadPoolConfig().setCorePoolSize(workerCoreSize);
         }
-	}
+    }
 }

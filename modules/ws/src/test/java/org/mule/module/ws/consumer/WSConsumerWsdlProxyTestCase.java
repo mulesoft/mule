@@ -7,10 +7,15 @@
 
 package org.mule.module.ws.consumer;
 
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
@@ -20,12 +25,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.junit.After;
 import org.junit.Rule;
-import org.junit.Test;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
-
-import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;;
+import org.junit.Test;;
 
 /**
  * This tests "mocks" a proxy server through which a wsdl file is served.

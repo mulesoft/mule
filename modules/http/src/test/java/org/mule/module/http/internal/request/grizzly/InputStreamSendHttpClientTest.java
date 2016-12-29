@@ -7,30 +7,32 @@
 
 package org.mule.module.http.internal.request.grizzly;
 
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.eclipse.jetty.http.HttpMethod.GET;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
-import static org.eclipse.jetty.http.HttpMethod.GET;
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.mule.api.MuleException;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.request.HttpClientConfiguration;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.Response;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class InputStreamSendHttpClientTest
 {
@@ -52,24 +54,24 @@ public class InputStreamSendHttpClientTest
 
     private MockServer server = new MockServer(dynamicPort.getNumber());
 
+    private GrizzlyHttpClient httpClient;
+    
+    @Before
+    public void before() throws Exception
+    {
+        createClient();
+    }
     @After
     public void after() throws Exception
     {
         server.stop();
+        httpClient.stop();
     }
 
     @Test
     public void retrieveContentsFromInputStream() throws Exception
     {
         InputStream responseStream = null;
-
-        HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)
-                                                                                     .setMaxConnections(1)
-                                                                                     .setConnectionIdleTimeout(-1)
-                                                                                     .build();
-
-        GrizzlyHttpClient httpClient = new GrizzlyHttpClient(configuration);
-        httpClient.start();
 
         HttpRequest request = new DefaultHttpRequest(
                 PROTOCOL + "://" + HOST + ":" + dynamicPort.getNumber() + "/" + PATH, null, GET.asString(),
@@ -79,8 +81,16 @@ public class InputStreamSendHttpClientTest
         String response = IOUtils.toString(responseStream, UTF_8.name());
 
         assertThat(EXPECTED_RESULT, equalTo(response));
+    }
 
-        httpClient.stop();
+    private void createClient() throws MuleException
+    {
+        HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)
+                                                                                     .setMaxConnections(1)
+                                                                                     .setConnectionIdleTimeout(-1)
+                                                                                     .build();
+        httpClient = new GrizzlyHttpClient(configuration);
+        httpClient.start();
     }
 
     /**
