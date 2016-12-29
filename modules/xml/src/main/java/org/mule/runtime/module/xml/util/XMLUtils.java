@@ -9,8 +9,8 @@ package org.mule.runtime.module.xml.util;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
@@ -47,7 +47,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
@@ -419,7 +418,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   private static String getOuterXml(XMLStreamReader xmlr) throws TransformerFactoryConfigurationError, TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     StringWriter stringWriter = new StringWriter();
-    transformer.transform(new StAXSource(xmlr), new StreamResult(stringWriter));
+    transformer.transform(new StaxSource(xmlr), new StreamResult(stringWriter));
     return stringWriter.toString();
   }
 
