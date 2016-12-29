@@ -24,6 +24,7 @@
             <artifactId>mule-module-email</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -49,6 +50,7 @@
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -71,6 +73,7 @@
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>commons-io</groupId>
@@ -84,6 +87,7 @@
             <artifactId>mule-module-ftp</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -118,6 +122,7 @@
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -180,6 +185,7 @@
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -226,6 +232,7 @@
             <artifactId>mule-module-wsc</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <!--TODO(gfernandes): remove this, see validation's comment-->
             <exclusions>
                 <exclusion>
@@ -261,6 +268,7 @@
             <artifactId>mule-module-jms</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <!--TODO(gfernandes): remove this, see validation's comment-->
             <exclusions>
                 <exclusion>
@@ -304,6 +312,7 @@
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <!--TODO(gfernandes): https://www.mulesoft.org/jira/browse/MULE-9810
                 Remove explicit exclusions whenever this issue is fixed (this applies to all the zip type
                 dependencies
