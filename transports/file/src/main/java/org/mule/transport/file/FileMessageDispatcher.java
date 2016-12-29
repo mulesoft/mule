@@ -68,7 +68,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
             else if (data instanceof String)
             {
-                fos.write(data.toString().getBytes(event.getEncoding()));
+                fos.write(data.toString().getBytes(getEndpoint().getEncoding()));
             }
             else if (data instanceof OutputHandler)
             {
