@@ -18,9 +18,8 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
-public class WsdlSchemasCollectorTestCase extends AbstractMuleTestCase {
+public class WsdlSchemasCollectorTestCase {
 
   @Test
   public void wsdlWithEmbeddedTypeaSchema() throws Exception {
