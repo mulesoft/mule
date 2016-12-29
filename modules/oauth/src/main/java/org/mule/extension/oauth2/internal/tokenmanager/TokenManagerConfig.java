@@ -33,11 +33,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TokenManagerConfig implements Initialisable, MuleContextAware {
 
   public static AtomicInteger defaultTokenManagerConfigIndex = new AtomicInteger(0);
+
   /**
    * Identifier for the token manager configuration.
    */
   @ConfigName
   private String name;
+
   /**
    * References an object store to use for storing oauth context data
    */
@@ -51,6 +53,10 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
   private ConfigOAuthContext configOAuthContext;
 
   private boolean initialised;
+
+  public ListableObjectStore getObjectStore() {
+    return objectStore;
+  }
 
   public void setObjectStore(ListableObjectStore objectStore) {
     this.objectStore = objectStore;
