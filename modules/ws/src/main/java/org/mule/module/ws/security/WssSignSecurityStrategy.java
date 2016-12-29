@@ -8,6 +8,7 @@ package org.mule.module.ws.security;
 
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE_USER;
+import static org.apache.ws.security.handler.WSHandlerConstants.SIG_KEY_ID;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
 import static org.mule.module.ws.security.WSCryptoUtils.createKeyStoreProperties;
 import org.mule.transport.ssl.api.TlsContextFactory;
@@ -27,6 +28,7 @@ public class WssSignSecurityStrategy extends AbstractSecurityStrategy
     private static final String WS_SIGN_PROPERTIES_KEY = "signProperties";
 
     private TlsContextFactory tlsContextFactory;
+    private SignatureKeyIdentifier signatureKeyIdentifier;
 
     @Override
     public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
@@ -40,6 +42,11 @@ public class WssSignSecurityStrategy extends AbstractSecurityStrategy
         outConfigProperties.put(SIG_PROP_REF_ID, WS_SIGN_PROPERTIES_KEY);
         outConfigProperties.put(WS_SIGN_PROPERTIES_KEY, signProperties);
         outConfigProperties.put(SIGNATURE_USER, keyStoreConfig.getAlias());
+
+        if (signatureKeyIdentifier != null)
+        {
+            outConfigProperties.put(SIG_KEY_ID, signatureKeyIdentifier.toString());
+        }
 
         addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.SIGNATURE)
         {
@@ -61,4 +68,7 @@ public class WssSignSecurityStrategy extends AbstractSecurityStrategy
         this.tlsContextFactory = tlsContextFactory;
     }
 
+    public void setSignatureKeyIdentifier(SignatureKeyIdentifier signatureKeyIdentifier) {
+        this.signatureKeyIdentifier = signatureKeyIdentifier;
+    }
 }

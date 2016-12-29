@@ -27,7 +27,14 @@
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
                         service="TestService" port="TestPort" name="configWithSignature">
         <ws:security>
-            <ws:wss-sign tlsContext-ref="tlsContext" />
+            <ws:wss-sign tlsContext-ref="tlsContext" signatureKeyIdentifier="IssuerSerial"/>
+        </ws:security>
+    </ws:consumer-config>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithSignatureNoKeyIdentifier">
+        <ws:security>
+            <ws:wss-sign tlsContext-ref="tlsContext"/>
         </ws:security>
     </ws:consumer-config>
 
@@ -37,6 +44,11 @@
 
     <flow name="requestWithSignature">
         <inbound-endpoint address="vm://requestWithSignature" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configWithSignature" />
+    </flow>
+
+    <flow name="requestWithSignatureNoIdentifier">
+        <inbound-endpoint address="vm://requestWithSignatureNoIdentifier" exchange-pattern="request-response"/>
         <ws:consumer operation="echo" config-ref="configWithSignature" />
     </flow>
 
