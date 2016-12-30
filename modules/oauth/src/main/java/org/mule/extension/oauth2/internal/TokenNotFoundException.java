@@ -19,10 +19,10 @@ public class TokenNotFoundException extends Exception {
   private final String tokenResponseRefreshToken;
   private final Event tokenUrlResponse;
 
-  public TokenNotFoundException(Event tokenUrlResponse, String accessToken, String refreshToken) {
+  public TokenNotFoundException(Event tokenUrlResponse, String tokenResponseAccessToken, String tokenResponseRefreshToken) {
     this.tokenUrlResponse = tokenUrlResponse;
-    this.tokenResponseAccessToken = accessToken;
-    this.tokenResponseRefreshToken = refreshToken;
+    this.tokenResponseAccessToken = tokenResponseAccessToken;
+    this.tokenResponseRefreshToken = tokenResponseRefreshToken;
   }
 
   public Event getTokenUrlResponse() {

@@ -10,7 +10,6 @@ import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -26,11 +25,10 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
    */
   @Parameter
   @Optional
-  @Alias("tokenManager-ref")
   protected TokenManagerConfig tokenManager;
 
   /**
-   * @param accessToken an ouath access token
+   * @param accessToken an oauth access token
    * @return the content of the HTTP authentication header.
    */
   public static String buildAuthorizationHeaderContent(String accessToken) {

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
+      xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
+       http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
-    <oauth2:token-manager-config name="tokenManagerConfig"/>
+    <oauth:token-manager-config name="tokenManagerConfig"/>
 
     <flow name="invalidateOauthContext">
-        <oauth2:invalidate-oauth-context tokenManager="tokenManagerConfig"/>
+        <oauth:invalidate-oauth-context tokenManager="tokenManagerConfig"/>
     </flow>
 
     <flow name="invalidateOauthContextWithResourceOwnerId">
-        <oauth2:invalidate-oauth-context tokenManager="tokenManagerConfig" resourceOwnerId="#[flowVars['resourceOwnerId']]"/>
+        <oauth:invalidate-oauth-context tokenManager="tokenManagerConfig" resourceOwnerId="#[flowVars['resourceOwnerId']]"/>
     </flow>
 
 </mule>
