@@ -21,7 +21,7 @@
     <flow name="proxyTemplate">
         <httpn:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
             <httpn:response-builder statusCode="#[dw:attributes.statusCode]"
-                                    reasonPhrase="#[dw:attributes.reasonPhrase]">
+                                    reasonPhrase="#[dw:attributes.reasonPhrase]" >
                 <httpn:headers>#[dw:attributes.headers]</httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

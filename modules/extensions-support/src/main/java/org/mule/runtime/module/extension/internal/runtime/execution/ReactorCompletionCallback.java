@@ -39,6 +39,7 @@ final class ReactorCompletionCallback implements CompletionCallback<Object, Attr
   public void error(Exception e) {
     //TODO: MULE-11184 - it shouldn't be necessary to create the MessagingException here.
     // it shouldn't even be necessary to keep the event at all.
-    sink.error(new MessagingException(event, e));
+    MessagingException me = e instanceof MessagingException ? (MessagingException) e : new MessagingException(event, e);
+    sink.error(me);
   }
 }

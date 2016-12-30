@@ -6,35 +6,25 @@
  */
 package org.mule.test.module.http.functional.proxy;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.http.api.HttpHeaders;
-import org.mule.tck.SensingNullRequestResponseMessageProcessor;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.http.functional.TestInputStream;
-import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
-import org.mule.test.runner.RunnerDelegateTo;
-
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -44,14 +34,14 @@ import org.apache.http.entity.ContentType;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.tck.SensingNullRequestResponseMessageProcessor;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.TestInputStream;
+import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
 
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
@@ -65,6 +55,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
   private static String CPU_LIGHT_THREAD_PREFIX = "SchedulerService_cpuLight";
+  private static String IO_THREAD_PREFIX = "SchedulerService_io";
 
   @Override
   protected String getConfigFile() {
@@ -256,7 +247,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     assertRequestOk(getProxyUrl(""), null);
     SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
     assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
-    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(CPU_LIGHT_THREAD_PREFIX));
+    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(IO_THREAD_PREFIX));
   }
 
   private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor() {

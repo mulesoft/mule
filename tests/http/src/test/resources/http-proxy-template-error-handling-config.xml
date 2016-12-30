@@ -21,12 +21,12 @@
 
     <flow name="noExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false"/>
+        <httpn:request config-ref="requestConfig" method="#[message.attributes.method]" path="#[message.attributes.requestPath]" parseResponse="false"/>
     </flow>
 
     <flow name="catchExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false"/>
+        <httpn:request config-ref="requestConfig" method="#[message.attributes.method]]" path="#[message.attributes.requestPath]" parseResponse="false"/>
         <error-handler>
             <on-error-continue>
                 <processor ref="catchSensingMessageProcessor"/>
@@ -38,7 +38,7 @@
 
     <flow name="rollbackExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false"/>
+        <httpn:request config-ref="requestConfig" method="#[message.attributes.method]]" path="#[message.attributes.requestPath]" parseResponse="false"/>
         <error-handler>
             <on-error-propagate>
                 <processor ref="rollbackSensingMessageProcessor"/>
