@@ -11,6 +11,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
 import org.mule.extension.file.common.api.command.DeleteCommand;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.io.IOException;
@@ -74,7 +75,9 @@ public final class LocalDeleteCommand extends LocalFileCommand implements Delete
         doDelete(path);
       }
     } catch (AccessDeniedException e) {
-      throw exception(format("Could not delete file '%s' because access was denied by the operating system", path), e);
+      throw new FileAccessDeniedException(format("Could not delete file '%s' because access was denied by the operating system",
+                                                 path),
+                                          e);
     } catch (IOException e) {
       throw exception(format("Could not delete '%s'", path), e);
     }

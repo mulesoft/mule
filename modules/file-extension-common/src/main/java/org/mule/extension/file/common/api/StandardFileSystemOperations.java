@@ -8,15 +8,22 @@ package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.extension.file.common.api.exceptions.FileCopyErrorTypeProvider;
+import org.mule.extension.file.common.api.exceptions.FileDeleteErrorTypeProvider;
+import org.mule.extension.file.common.api.exceptions.FileListErrorTypeProvider;
+import org.mule.extension.file.common.api.exceptions.FileReadErrorTypeProvider;
+import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider;
+import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
+import org.mule.extension.file.common.api.exceptions.IllegalContentException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
 import org.mule.extension.file.common.api.metadata.FileTreeNodeMetadataResolver;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -31,7 +38,6 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.inject.Inject;
 
 /**
  * Basic set of operations for extensions which perform operations over a generic file system
@@ -40,9 +46,6 @@ import javax.inject.Inject;
  */
 // TODO: MULE-9215
 public class StandardFileSystemOperations {
-
-  @Inject
-  private MuleContext muleContext;
 
   /**
    * Lists all the files in the {@code directoryPath} which match the given {@code matcher}.
@@ -63,6 +66,7 @@ public class StandardFileSystemOperations {
    */
   @Summary("List all the files from given directory")
   @OutputResolver(output = FileTreeNodeMetadataResolver.class)
+  @Throws(FileListErrorTypeProvider.class)
   public TreeNode list(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String directoryPath,
                        @Optional(defaultValue = "false") boolean recursive, Message message,
                        @Optional @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
@@ -94,6 +98,7 @@ public class StandardFileSystemOperations {
    */
   @DataTypeParameters
   @Summary("Obtains the content and metadata of a file at a given path")
+  @Throws(FileReadErrorTypeProvider.class)
   public Result<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
                                                   @Connection FileSystem fileSystem, Message message,
                                                   @DisplayName("File Path") String path,
@@ -144,6 +149,7 @@ public class StandardFileSystemOperations {
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
+  @Throws(FileWriteErrorTypeProvider.class)
   public void write(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
                     @Content @Summary("Content to be written into the file") Object content,
                     @Optional(
@@ -153,7 +159,7 @@ public class StandardFileSystemOperations {
                     @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
                     Event event) {
     if (content == null) {
-      throw new IllegalArgumentException("Cannot write a null content");
+      throw new IllegalContentException("Cannot write a null content");
     }
 
     fileSystem.changeToBaseDir();
@@ -198,6 +204,7 @@ public class StandardFileSystemOperations {
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Copies a file in another directory")
+  @Throws(FileCopyErrorTypeProvider.class)
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "false") boolean overwrite,
                    @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
@@ -209,7 +216,7 @@ public class StandardFileSystemOperations {
 
   private void validateTargetPath(String targetPath) {
     if (StringUtils.isBlank(targetPath)) {
-      throw new IllegalArgumentException("target path cannot be null nor blank");
+      throw new IllegalPathException("target path cannot be null nor blank");
     }
   }
 
@@ -245,6 +252,7 @@ public class StandardFileSystemOperations {
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Moves a file to another directory")
+  @Throws(FileCopyErrorTypeProvider.class)
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "false") boolean overwrite,
                    @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
@@ -268,6 +276,7 @@ public class StandardFileSystemOperations {
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
   @Summary("Deletes a file")
+  @Throws(FileDeleteErrorTypeProvider.class)
   public void delete(@Connection FileSystem fileSystem, @Optional String path, Event event) {
     fileSystem.changeToBaseDir();
     path = resolvePath(path, event, "path");
@@ -293,11 +302,14 @@ public class StandardFileSystemOperations {
    */
   // TODO: MULE-9715
   @Summary("Renames a file")
+  @Throws(FileRenameErrorTypeProvider.class)
   public void rename(@Connection FileSystem fileSystem, @Optional String path,
                      @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
-    checkArgument(get(to).getNameCount() == 1,
-                  format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
-                         to));
+    if (get(to).getNameCount() != 1) {
+      throw new IllegalPathException(format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
+                                            to));
+    }
+
     fileSystem.changeToBaseDir();
     path = resolvePath(path, event, "path");
     fileSystem.rename(path, to, overwrite);
@@ -310,6 +322,7 @@ public class StandardFileSystemOperations {
    * @param directoryPath the new directory's name
    */
   @Summary("Creates a new directory")
+  @Throws(FileRenameErrorTypeProvider.class)
   public void createDirectory(@Connection FileSystem fileSystem, String directoryPath) {
     fileSystem.changeToBaseDir();
     fileSystem.createDirectory(directoryPath);
@@ -325,8 +338,8 @@ public class StandardFileSystemOperations {
       return ((FileAttributes) message.getAttributes()).getPath();
     }
 
-    throw new IllegalArgumentException(format("A %s was not specified and a default one could not be obtained from the current message attributes",
-                                              attributeName));
+    throw new IllegalPathException(format("A %s was not specified and a default one could not be obtained from the current message attributes",
+                                          attributeName));
   }
 
   private Predicate<FileAttributes> getPredicate(FilePredicateBuilder builder) {

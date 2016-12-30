@@ -6,13 +6,13 @@
  */
 package org.mule.extension.file;
 
-import org.junit.Test;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 
 import java.io.File;
 import java.nio.file.Paths;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.core.StringContains.containsString;
+import org.junit.Test;
 
 public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
 
@@ -31,10 +31,9 @@ public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
 
   @Test
   public void createExistingDirectory() throws Exception {
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
     final String directory = "washerefirst";
     temporaryFolder.newFolder(directory);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-    expectedException.expectMessage(containsString(temporaryFolder.getRoot().getAbsolutePath()));
 
     doCreateDirectory(directory);
   }

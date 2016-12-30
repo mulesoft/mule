@@ -8,19 +8,21 @@ package org.mule.extension.ftp;
 
 import static java.nio.charset.Charset.availableCharsets;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
-import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
-
+import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import org.mule.extension.FtpTestHarness;
-import org.mule.runtime.core.api.Event;
 import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.runtime.core.api.Event;
 
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -53,7 +55,6 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
   @Test
   public void createNewOnNotExistingFile() throws Exception {
-
     doWriteOnNotExistingFile(CREATE_NEW);
   }
 
@@ -71,25 +72,29 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
   @Test
   public void createNewOnExistingFile() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "Use a different write mode or point to a path which doesn't exists");
     doWriteOnExistingFile(CREATE_NEW);
   }
 
   @Test
   public void appendOnNotExistingParentWithoutCreateFolder() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
   }
 
   @Test
   public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
   }
 
   @Test
   public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
   }
 

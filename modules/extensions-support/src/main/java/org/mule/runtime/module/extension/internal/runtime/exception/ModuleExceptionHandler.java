@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -20,8 +19,6 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
-import java.util.HashMap;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -87,9 +84,9 @@ public class ModuleExceptionHandler {
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
             + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
                                                                         extensionNamespace + ":" + errorDefinition),
-                                                    exception.getCause()));
+                                                    getExceptionCause(exception)));
 
-    return new TypedException(exception.getCause(), errorType);
+    return new TypedException(getExceptionCause(exception), errorType);
   }
 
 
@@ -98,5 +95,9 @@ public class ModuleExceptionHandler {
         .stream()
         .anyMatch(errorModel -> errorModel.getType().equals(errorTypeDefinition.getType())
             && errorModel.getNamespace().equals(extensionNamespace));
+  }
+
+  private Throwable getExceptionCause(Throwable throwable) {
+    return throwable.getClass().equals(ModuleException.class) ? throwable.getCause() : throwable;
   }
 }

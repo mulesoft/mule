@@ -7,12 +7,6 @@
 package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
-
-import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -21,7 +15,13 @@ import org.mule.extension.file.common.api.command.MoveCommand;
 import org.mule.extension.file.common.api.command.ReadCommand;
 import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -165,7 +165,7 @@ public abstract class AbstractFileSystem implements FileSystem {
   public final synchronized PathLock lock(Path path, Object... params) {
     PathLock lock = createLock(path, params);
     if (!lock.tryLock()) {
-      throw new IllegalStateException(format("Could not lock file '%s' because it's already owned by another process", path));
+      throw new FileLockedException(format("Could not lock file '%s' because it's already owned by another process", path));
     }
 
     return lock;
@@ -200,7 +200,7 @@ public abstract class AbstractFileSystem implements FileSystem {
   @Override
   public void verifyNotLocked(Path path) {
     if (isLocked(path)) {
-      throw new IllegalStateException(format("File '%s' is locked by another process", path));
+      throw new FileLockedException(format("File '%s' is locked by another process", path));
     }
   }
 

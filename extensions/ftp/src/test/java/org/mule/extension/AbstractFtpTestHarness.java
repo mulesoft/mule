@@ -6,10 +6,10 @@
  */
 package org.mule.extension;
 
-import static org.junit.rules.ExpectedException.none;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.junit.rules.ExpectedException;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -23,7 +23,7 @@ import org.junit.runners.model.Statement;
 public abstract class AbstractFtpTestHarness extends ExternalResource implements FtpTestHarness {
 
   private SystemProperty profileSystemProperty;
-  private ExpectedException expectedException = none();
+  private ExpectedError expectedError = none();
 
   /**
    * Creates a new instance
@@ -36,7 +36,7 @@ public abstract class AbstractFtpTestHarness extends ExternalResource implements
 
   @Override
   public final Statement apply(Statement base, Description description) {
-    base = applyAll(base, description, profileSystemProperty, expectedException);
+    base = applyAll(base, description, profileSystemProperty, expectedError);
     base = applyAll(base, description, getChildRules());
     return super.apply(base, description);
   }
@@ -59,7 +59,7 @@ public abstract class AbstractFtpTestHarness extends ExternalResource implements
   }
 
   /**
-   * Delegates into {@link #doAfter()} and resets the {@link #expectedException}
+   * Delegates into {@link #doAfter()} and resets the {@link #expectedError}
    */
   @Override
   protected final void after() {
@@ -68,7 +68,7 @@ public abstract class AbstractFtpTestHarness extends ExternalResource implements
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
-      expectedException = ExpectedException.none();
+      expectedError = none();
     }
   }
 
@@ -83,8 +83,8 @@ public abstract class AbstractFtpTestHarness extends ExternalResource implements
    * {@inheritDoc}
    */
   @Override
-  public ExpectedException expectedException() {
-    return expectedException;
+  public ExpectedError expectedError() {
+    return expectedError;
   }
 
   private Statement applyAll(Statement base, Description description, TestRule... rules) {

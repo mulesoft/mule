@@ -7,12 +7,14 @@
 package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
@@ -86,13 +88,14 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readUnexisting() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     readPath("files/not-there.txt");
   }
 
   @Test
   public void readWithLockAndWithoutEnoughPermissions() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedError.expectError(NAMESPACE, ACCESS_DENIED.getType(), FileAccessDeniedException.class,
+                              "access was denied by the operating system");
     File forbiddenFile = temporaryFolder.newFile("forbiddenFile");
     forbiddenFile.createNewFile();
     forbiddenFile.setWritable(false);
@@ -101,7 +104,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readDirectory() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "since it's a directory");
     readPath("files");
   }
 

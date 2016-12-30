@@ -7,15 +7,15 @@
 package org.mule.extension.ftp;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.BINARY_FILE_NAME;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.runtime.api.message.Message;
@@ -82,13 +82,14 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void readUnexisting() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     readPath("files/not-there.txt");
   }
 
   @Test
   public void readDirectory() throws Exception {
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "since it's a directory");
     readPath("files");
   }
 

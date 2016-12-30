@@ -29,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {SftpClientFactory.class, SftpClient.class})
 public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
+  protected static final String NAMESPACE = "FTP";
   private final String name;
 
   @Rule

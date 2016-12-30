@@ -9,6 +9,7 @@ package org.mule.extension.ftp.internal;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.extension.file.common.api.exceptions.FileErrors;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
@@ -22,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 import javax.inject.Inject;
 
@@ -35,6 +37,7 @@ import javax.inject.Inject;
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = FtpFilePredicateBuilder.class)
 @ConnectionProviders({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
 @Export(classes = {SftpFileAttributes.class, ClassicFtpFileAttributes.class, FtpFileAttributes.class})
+@ErrorTypes(FileErrors.class)
 @Xml(namespace = "ftp")
 public class FtpConnector extends FileConnectorConfig {
 

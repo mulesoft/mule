@@ -8,15 +8,17 @@ package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -55,9 +57,11 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void listWithoutReadPermission() throws Exception {
+    expectedError.expectError(NAMESPACE, ACCESS_DENIED.getType(), FileAccessDeniedException.class,
+                              "access was denied by the operating system");
+
     temporaryFolder.newFolder("forbiddenDirectory").setReadable(false);
-    expectedException.expectCause(is(instanceOf(MuleRuntimeException.class)));
-    TreeNode node = doList(".", true);
+    doList(".", true);
   }
 
   private void assertRecursiveTreeNode(TreeNode node) throws Exception {
@@ -77,13 +81,13 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void notDirectory() throws Exception {
-    expectedException.expectCause(is(instanceOf(IllegalArgumentException.class)));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "Only directories can be listed");
     doList(String.format(TEST_FILE_PATTERN, 0), false);
   }
 
   @Test
   public void notExistingPath() throws Exception {
-    expectedException.expectCause(is(instanceOf(IllegalArgumentException.class)));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
     doList(String.format("whatever", 0), false);
   }
 
@@ -149,7 +153,6 @@ public class FileListTestCase extends FileConnectorTestCase {
     FileAttributes attributes = node.getAttributes();
     assertThat(attributes.isDirectory(), is(true));
     assertThat(attributes.getPath(), equalTo(Paths.get(temporaryFolder.getRoot().toURI()).resolve(path).toString()));
-    assertThat(attributes.isDirectory(), is(true));
 
     return node;
   }
