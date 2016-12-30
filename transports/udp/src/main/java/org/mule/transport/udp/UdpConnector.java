@@ -6,6 +6,9 @@
  */
 package org.mule.transport.udp;
 
+import java.net.DatagramSocket;
+
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -13,10 +16,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractConnector;
-
-import java.net.DatagramSocket;
-
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>UdpConnector</code> can send and receive Mule events as Datagram packets.
@@ -167,24 +166,27 @@ public class UdpConnector extends AbstractConnector
      */
     DatagramSocket getSocket(ImmutableEndpoint endpoint) throws Exception
     {
-        return (DatagramSocket) dispatcherSocketsPool.borrowObject(endpoint);
+    	UdpSocketKey socketKey = new UdpSocketKey(endpoint);
+        return (DatagramSocket) dispatcherSocketsPool.borrowObject(socketKey);
     }
 
     DatagramSocket getServerSocket(ImmutableEndpoint endpoint) throws Exception
     {
-        return (DatagramSocket) socketFactory.makeObject(endpoint);
+    	UdpSocketKey socketKey = new UdpSocketKey(endpoint);
+        return (DatagramSocket) socketFactory.makeObject(socketKey);
     }
 
     void releaseSocket(DatagramSocket socket, ImmutableEndpoint endpoint) throws Exception
     {
+    	UdpSocketKey socketKey = new UdpSocketKey(endpoint);
         // Sockets can't be recycled if we close them at the end...
         if (!keepSendSocketOpen)
         {
-            dispatcherSocketsPool.clear(endpoint);
+            dispatcherSocketsPool.clear(socketKey);
         }
         else
         {
-            dispatcherSocketsPool.returnObject(endpoint, socket);
+            dispatcherSocketsPool.returnObject(socketKey, socket);
         }
     }
 

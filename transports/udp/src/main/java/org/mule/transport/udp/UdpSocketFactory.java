@@ -33,9 +33,10 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
 
     public Object makeObject(Object key) throws Exception
     {
-        ImmutableEndpoint ep = (ImmutableEndpoint)key;
+        UdpSocketKey socketKey = (UdpSocketKey)key;
         DatagramSocket socket;
-
+        
+        ImmutableEndpoint ep = socketKey.getEndpoint();
         if(ep instanceof InboundEndpoint)
         {
             int port = ep.getEndpointURI().getPort();
@@ -106,7 +107,8 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
 
     public void passivateObject(Object key, Object object) throws Exception
     {
-        ImmutableEndpoint ep = (ImmutableEndpoint)key;
+    	UdpSocketKey socketKey = (UdpSocketKey)key;
+        ImmutableEndpoint ep = socketKey.getEndpoint();
 
         boolean keepSocketOpen = MapUtils.getBooleanValue(ep.getProperties(),
             UdpConnector.KEEP_SEND_SOCKET_OPEN_PROPERTY, ((UdpConnector)ep.getConnector()).isKeepSendSocketOpen());
