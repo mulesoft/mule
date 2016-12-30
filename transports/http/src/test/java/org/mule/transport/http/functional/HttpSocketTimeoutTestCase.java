@@ -25,14 +25,15 @@ import org.mule.util.concurrent.Latch;
 
 public class HttpSocketTimeoutTestCase extends FunctionalTestCase {
 
+    private static final int LATCH_TIMEOUT = 300;
+    private static final int POLL_TIMEOUT = 600;
+    private static final int POLL_DELAY = 150;
+
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
     private static Latch latch;
-    private static boolean timedout;
-    private static final int LATCH_TIMEOUT = 300;
-    private static final int POLL_TIMEOUT = 600;
-    private static final int POLL_DELAY = 150;
+    private static boolean timedOut;
 
     @Override
     protected String getConfigFile() {
@@ -42,7 +43,7 @@ public class HttpSocketTimeoutTestCase extends FunctionalTestCase {
     @Before
     public void setUp() {
         latch = new Latch();
-        timedout = false;
+        timedOut = false;
     }
 
     @Test
@@ -60,7 +61,7 @@ public class HttpSocketTimeoutTestCase extends FunctionalTestCase {
             @Override
             public boolean isSatisfied()
             {
-                return timedout;
+                return timedOut;
             }
 
             @Override
@@ -78,11 +79,11 @@ public class HttpSocketTimeoutTestCase extends FunctionalTestCase {
         {
             try
             {
-                timedout = latch.await(LATCH_TIMEOUT, MILLISECONDS);
+                timedOut = latch.await(LATCH_TIMEOUT, MILLISECONDS);
             }
             catch (InterruptedException e)
             {
-                //do nothing
+                // Do nothing
             }
             return event;
         }
