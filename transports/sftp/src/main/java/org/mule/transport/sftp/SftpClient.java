@@ -49,7 +49,8 @@ public class SftpClient
     public static final String CHANNEL_SFTP = "sftp";
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
     public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
-
+    public static final int FILE_NOT_FOUND_EXCEPTION = 2;
+    
     private Log logger = LogFactory.getLog(getClass());
 
     private ChannelSftp channelSftp;
@@ -92,23 +93,64 @@ public class SftpClient
     public void changeWorkingDirectory(String wd) throws IOException
     {
         currentDirectory = wd;
-
-        try
-        {
-            wd = getAbsolutePath(wd);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Attempting to cwd to: " + wd);
-            }
-            channelSftp.cd(wd);
-        }
-        catch (SftpException e)
-        {
-            String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
-            logger.error(message);
-            throw new IOException(message);
-        }
-    }
+	      try
+	      {
+	          wd = getAbsolutePath(wd);
+	          if (logger.isDebugEnabled()) 
+	          {
+	              logger.debug("Attempting to cwd to: " + wd);
+	          }
+	          channelSftp.cd(wd);
+	      }
+	      catch (SftpException e)
+	      {
+	          if (e.id == FILE_NOT_FOUND_EXCEPTION)
+	          {
+	              String[] subPaths = wd.split("(?=[/])");
+	              wd = "";
+	              for (String subPath : subPaths)
+	        	    {
+	                  if (logger.isDebugEnabled())
+	                  {
+	                      logger.debug("Inside changeWorkingDirectory with path = " + subPath);
+	                  }
+	                  try
+	                  {
+	                      if (!subPath.isEmpty())
+	                      {
+	                          wd = getAbsolutePath(wd + subPath);
+	                          channelSftp.cd(wd);
+	                      }
+	                  }
+	                  catch (SftpException e2)
+	                  {
+	                      if (logger.isDebugEnabled())
+	                      {
+	                          logger.debug("Got an exception when trying to change the working directory to the new dir. Will try to create the directory " + 
+	                          subPath);
+	                      }
+	                      try
+	                      {
+	                          mkdir(wd);
+	                          channelSftp.cd(wd);
+	                      }
+	                      catch (SftpException e3)
+	                      {
+	                          String message = "Error '" + e3.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
+	                          logger.error(message);
+	                          throw new IOException(message);
+	                      }
+	                  }
+	              }
+	          }
+	          else
+	          {
+	              String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
+	              logger.error(message);
+	              throw new IOException(message);
+	          }
+	      }
+	  }
 
     /**
      * Converts a relative path to an absolute path according to
