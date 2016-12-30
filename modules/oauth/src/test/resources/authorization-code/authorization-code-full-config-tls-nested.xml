@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
+      xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-       http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
+       http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
-    <oauth2:token-manager-config name="tokenManagerConfig"/>
+    <oauth:token-manager-config name="tokenManagerConfig"/>
 
     <httpn:request-config name="requestConfig">
         <httpn:request-connection>
             <httpn:authentication>
-                <oauth2:authorization-code-grant-type
+                <oauth:authorization-code-grant-type
                         clientId="${client.id}"
                         clientSecret="${client.secret}"
                         localCallbackUrl="${local.callback.url}"
                         externalCallbackUrl="${local.callback.url}"
-                        tokenManager-ref="tokenManagerConfig"
+                        tokenManager="tokenManagerConfig"
                         localAuthorizationUrl="${local.authorization.url}"
                         authorizationUrl="${authorization.url}"
                         scopes="${scopes}"
@@ -29,21 +29,21 @@
                         responseAccessToken="#[payload['access_token']]"
                         responseExpiresIn="#[payload['expires_in']]"
                         responseRefreshToken="#[payload['refresh_token']]">
-                    <oauth2:custom-parameters>
-                        <oauth2:custom-parameter key="${auth.request.param1}" value="${auth.request.value1}"/>
-                        <oauth2:custom-parameter key="${auth.request.param2}" value="${auth.request.value2}"/>
-                    </oauth2:custom-parameters>
-                    <oauth2:custom-parameter-extractors>
-                        <oauth2:parameter-extractor paramName="${custom.param.extractor1}"
+                    <oauth:custom-parameters>
+                        <oauth:custom-parameter key="${auth.request.param1}" value="${auth.request.value1}"/>
+                        <oauth:custom-parameter key="${auth.request.param2}" value="${auth.request.value2}"/>
+                    </oauth:custom-parameters>
+                    <oauth:custom-parameter-extractors>
+                        <oauth:parameter-extractor paramName="${custom.param.extractor1}"
                                                     value="#[payload['${custom.param.extractor1}']]"/>
-                        <oauth2:parameter-extractor paramName="${custom.param.extractor2}"
+                        <oauth:parameter-extractor paramName="${custom.param.extractor2}"
                                                     value="#[payload['${custom.param.extractor2}']]"/>
-                    </oauth2:custom-parameter-extractors>
+                    </oauth:custom-parameter-extractors>
                     <tls:context>
                         <tls:trust-store path="ssltest-cacerts.jks" password="changeit" />
                         <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
                     </tls:context>
-                </oauth2:authorization-code-grant-type>
+                </oauth:authorization-code-grant-type>
             </httpn:authentication>
         </httpn:request-connection>
     </httpn:request-config>

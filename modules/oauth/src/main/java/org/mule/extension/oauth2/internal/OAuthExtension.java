@@ -23,12 +23,12 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
  *
  * @since 4.0
  */
-@Extension(name = "OAuth2")
+@Extension(name = "OAuth")
 @Import(type = HttpAuthentication.class, from = "HTTP")
 @Operations(OAuthOperations.class)
 @SubTypeMapping(baseType = HttpAuthentication.class,
     subTypes = {DefaultAuthorizationCodeGrantType.class, ClientCredentialsGrantType.class})
-@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/oauth2", namespace = "oauth2")
+@Xml(namespace = "oauth")
 @Export(classes = {TokenManagerConfig.class, ResourceOwnerOAuthContext.class, TokenNotFoundException.class})
 public class OAuthExtension {
 
