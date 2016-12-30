@@ -6,7 +6,12 @@
  */
 package org.mule.extension.file.common.api.exceptions;
 
-import static org.mule.extension.file.common.api.exceptions.FileErrors.*;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
@@ -15,6 +20,10 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 /**
+ * Errors that can be thrown both in
+ * {@link StandardFileSystemOperations#copy(FileConnectorConfig, FileSystem, String, String, boolean, boolean, Event)} or
+ * {@link StandardFileSystemOperations#move(FileConnectorConfig, FileSystem, String, String, boolean, boolean, Event)} operation.
+ *
  * @since 1.0
  */
 public class FileCopyErrorTypeProvider implements ErrorTypeProvider {

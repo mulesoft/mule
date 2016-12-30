@@ -9,16 +9,30 @@ package org.mule.extension.file.common.api.exceptions;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
+ * {@link ModuleException} to be thrown in the cases in which a given path is invalid. For instance, if the path is {@code null}
+ * or doesn't exist.
+ *
  * @since 4.0
  */
 public final class IllegalPathException extends ModuleException {
 
   private static final FileErrors ERROR = FileErrors.ILLEGAL_PATH;
 
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   */
   public IllegalPathException(String message) {
     super(message, ERROR);
   }
 
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   * @param exception cause of this exception
+   */
   public IllegalPathException(String message, Exception exception) {
     super(exception, ERROR, message);
   }

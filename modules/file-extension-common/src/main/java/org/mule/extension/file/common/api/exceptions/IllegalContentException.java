@@ -6,14 +6,21 @@
  */
 package org.mule.extension.file.common.api.exceptions;
 
-import static org.mule.extension.file.common.api.exceptions.FileErrors.*;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_CONTENT;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
+ * {@link ModuleException} to be thrown in the cases in which the received content to be written is invalid.
+ *
  * @since 4.0
  */
 public final class IllegalContentException extends ModuleException {
 
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   */
   public IllegalContentException(String message) {
     super(message, ILLEGAL_CONTENT);
   }

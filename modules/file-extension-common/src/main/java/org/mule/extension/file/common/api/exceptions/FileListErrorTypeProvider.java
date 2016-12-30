@@ -6,7 +6,13 @@
  */
 package org.mule.extension.file.common.api.exceptions;
 
-import static org.mule.extension.file.common.api.exceptions.FileErrors.*;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
@@ -15,6 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 /**
+ * Errors that can be thrown in the
+ * {@link StandardFileSystemOperations#list(FileConnectorConfig, FileSystem, String, boolean, Message, FilePredicateBuilder)}
+ * operation.
+ *
  * @since 1.0
  */
 public class FileListErrorTypeProvider implements ErrorTypeProvider {

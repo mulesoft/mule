@@ -10,10 +10,17 @@ import static org.mule.extension.file.common.api.exceptions.FileErrors.*;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
+ * {@link ModuleException} for the cases in which a lock cannot be acquired over a file.
+ * 
  * @since 4.0
  */
 public final class FileLockedException extends ModuleException {
 
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   */
   public FileLockedException(String message) {
     super(message, CONCURRENCY);
   }
