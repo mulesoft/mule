@@ -12,10 +12,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.lock.LockFactory;
 
 import org.junit.Test;
 import org.mockito.Answers;

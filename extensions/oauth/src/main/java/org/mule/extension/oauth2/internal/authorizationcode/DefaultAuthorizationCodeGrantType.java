@@ -38,6 +38,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
@@ -46,7 +47,6 @@ import org.mule.service.http.api.server.HttpServerConfiguration;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +111,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
    * This element configures an automatic flow created by mule to handle
    */
   @Parameter
-  @ParameterGroup("authorization-request")
+  @ParameterGroup(name = "authorization-request")
   private AuthorizationRequestHandler authorizationRequestHandler;
 
   /**
@@ -119,7 +119,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
    * process the request to retrieve an access token from the oauth authentication server.
    */
   @Parameter
-  @ParameterGroup("token-request")
+  @ParameterGroup(name = "token-request")
   private AutoAuthorizationCodeTokenRequestHandler tokenRequestHandler;
 
   private HttpService httpService;
@@ -145,7 +145,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
    */
   @Parameter
   @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID)
-  private Function<Event, String> resourceOwnerId;
+  private ParameterResolver<String> resourceOwnerId;
 
   @Override
   public HttpListenerConfig getLocalCallbackConfig() {
@@ -259,7 +259,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @Override
   public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
     final String accessToken =
-        getUserOAuthContext().getContextForResourceOwner(resourceOwnerId.apply(muleEvent)).getAccessToken();
+        getUserOAuthContext().getContextForResourceOwner(resourceOwnerId.resolve()).getAccessToken();
     if (accessToken == null) {
       throw new RequestAuthenticationException(createStaticMessage(format("No access token for the %s user. Verify that you have authenticated the user before trying to execute an operation to the API.",
                                                                           resourceOwnerId)));
@@ -269,15 +269,27 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
 
   @Override
   public boolean shouldRetry(final Event firstAttemptResponseEvent) throws MuleException {
-    Boolean shouldRetryRequest = tokenRequestHandler.getRefreshTokenWhen().apply(firstAttemptResponseEvent);
+    Boolean shouldRetryRequest = resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
     if (shouldRetryRequest) {
       try {
-        tokenRequestHandler.refreshToken(firstAttemptResponseEvent, resourceOwnerId.apply(firstAttemptResponseEvent));
+        tokenRequestHandler.refreshToken(firstAttemptResponseEvent,
+                                         resolveExpression(resourceOwnerId, firstAttemptResponseEvent));
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }
     }
     return shouldRetryRequest;
+  }
+
+  private <T> T resolveExpression(ParameterResolver<T> expr, Event event) {
+    if (expr == null) {
+      return null;
+    } else if (!expr.getExpression().isPresent()
+        && !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+      return expr.resolve();
+    } else {
+      return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
+    }
   }
 
   @Override
