@@ -6,27 +6,7 @@
  */
 package org.mule.compatibility.transport.http;
 
-import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
-import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
-import org.mule.compatibility.transport.http.transformers.ObjectToHttpClientMethodRequest;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.transformer.TransformerChain;
-import org.mule.runtime.core.util.StringUtils;
+import static org.mule.compatibility.core.api.transport.Connector.INT_VALUE_NOT_SET;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -42,6 +22,27 @@ import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.BooleanUtils;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
+import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
+import org.mule.compatibility.transport.http.transformers.ObjectToHttpClientMethodRequest;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.TransformerChain;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over HTTP.
@@ -172,7 +173,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     // precedence and is not available before send/dispatch.
     // Given that dispatchers are borrowed from a thread pool mutating client
     // here is ok even though it is not ideal.
-    client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
+    int timeout = httpConnector.getClientSoTimeout() != INT_VALUE_NOT_SET ? httpConnector.getClientSoTimeout()
+        : endpoint.getResponseTimeout();
+    client.getHttpConnectionManager().getParams().setSoTimeout(timeout);
 
     event = setPropertyFromEndpoint(event, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
     InternalMessage msg = event.getMessage();
