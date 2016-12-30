@@ -6,6 +6,21 @@
  */
 package org.mule.transport.http;
 
+import static org.mule.api.transport.Connector.INT_VALUE_NOT_SET;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.lang.BooleanUtils;
 import org.mule.VoidMuleEvent;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
@@ -26,20 +41,6 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.util.StringUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.httpclient.protocol.Protocol;
-import org.apache.commons.lang.BooleanUtils;
 
 /**
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over HTTP.
@@ -196,7 +197,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // precedence and is not available before send/dispatch.
         // Given that dispatchers are borrowed from a thread pool mutating client
         // here is ok even though it is not ideal.
-        client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
+        int timeout = httpConnector.getClientSoTimeout() != INT_VALUE_NOT_SET ? httpConnector.getClientSoTimeout() : endpoint.getResponseTimeout();
+        client.getHttpConnectionManager().getParams().setSoTimeout(timeout);
 
         MuleMessage msg = event.getMessage();
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
