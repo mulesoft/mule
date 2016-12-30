@@ -6,10 +6,8 @@
  */
 package org.mule.extension.oauth2.internal;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import java.util.function.Function;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 /**
  * Configuration of a custom parameter to extract from the token response.
@@ -21,11 +19,12 @@ public class ParameterExtractor {
    */
   @Parameter
   private String paramName;
+
   /**
    * MEL expression to extract the parameter value. This value can be later used by using the oauthContext function.
    */
   @Parameter
-  private Function<Event, String> value;
+  private ParameterResolver<String> value;
 
   /**
    * @return name of the parameter used to store it in the oauth context.
@@ -37,7 +36,7 @@ public class ParameterExtractor {
   /**
    * @return value extracted from the token response.
    */
-  public Function<Event, String> getValue() {
+  public ParameterResolver<String> getValue() {
     return value;
   }
 }

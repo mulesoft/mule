@@ -43,6 +43,7 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -55,7 +56,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,18 +73,18 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
    */
   @Parameter
   @Optional(defaultValue = ACCESS_TOKEN_EXPRESSION)
-  protected Function<Event, String> responseAccessToken;
+  protected ParameterResolver<String> responseAccessToken;
 
   @Parameter
   @Optional(defaultValue = REFRESH_TOKEN_EXPRESSION)
-  protected Function<Event, String> responseRefreshToken;
+  protected ParameterResolver<String> responseRefreshToken;
 
   /**
    * MEL expression to extract the expiresIn parameter from the response of the call to tokenUrl.
    */
   @Parameter
   @Optional(defaultValue = EXPIRATION_TIME_EXPRESSION)
-  protected Function<Event, String> responseExpiresIn;
+  protected ParameterResolver<String> responseExpiresIn;
 
   @Parameter
   @Alias("custom-parameter-extractors")
@@ -100,7 +100,7 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
    */
   @Parameter
   @Optional(defaultValue = "#[message.attributes.statusCode == 401 || message.attributes.statusCode == 403]")
-  private Function<Event, Boolean> refreshTokenWhen;
+  private ParameterResolver<Boolean> refreshTokenWhen;
 
   /**
    * The oauth authentication server url to get access to the token. Mule, after receiving the authentication code from the oauth
@@ -128,7 +128,7 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
     }
   };
 
-  public Function<Event, Boolean> getRefreshTokenWhen() {
+  public ParameterResolver<Boolean> getRefreshTokenWhen() {
     return refreshTokenWhen;
   }
 
@@ -188,25 +188,36 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
   public TokenResponse processTokenResponse(Event muleEvent, boolean retrieveRefreshToken) {
     TokenResponse response = new TokenResponse();
 
-    response.accessToken = responseAccessToken.apply(muleEvent);
+    response.accessToken = resolveExpression(responseAccessToken, muleEvent);
     response.accessToken = isEmpty(response.accessToken) ? null : response.accessToken;
     if (response.accessToken == null) {
       logger.error("Could not extract access token from token URL. "
           + "Expressions used to retrieve access token was " + responseAccessToken);
     }
     if (retrieveRefreshToken) {
-      response.refreshToken = responseRefreshToken.apply(muleEvent);
+      response.refreshToken = resolveExpression(responseRefreshToken, muleEvent);
       response.refreshToken = isEmpty(response.refreshToken) ? null : response.refreshToken;
     }
-    response.expiresIn = responseExpiresIn.apply(muleEvent);
+    response.expiresIn = resolveExpression(responseExpiresIn, muleEvent);
     if (!CollectionUtils.isEmpty(parameterExtractors)) {
       for (ParameterExtractor parameterExtractor : parameterExtractors) {
         response.customResponseParameters.put(parameterExtractor.getParamName(),
-                                              parameterExtractor.getValue().apply(muleEvent));
+                                              resolveExpression(parameterExtractor.getValue(), muleEvent));
       }
     }
 
     return response;
+  }
+
+  private String resolveExpression(ParameterResolver<String> expr, Event event) {
+    if (expr == null) {
+      return null;
+    } else if (!expr.getExpression().isPresent()
+        && !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+      return expr.resolve();
+    } else {
+      return (String) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
+    }
   }
 
   protected boolean tokenResponseContentIsValid(TokenResponse response) {

@@ -32,9 +32,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
-
-import java.util.function.Function;
 
 /**
  * Authorization element for client credentials oauth grant type
@@ -58,7 +57,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
    * process the request to retrieve an access token from the oauth authentication server.
    */
   @Parameter
-  @ParameterGroup("Token Request")
+  @ParameterGroup(name = "Token Request")
   private ClientCredentialsTokenRequestHandler tokenRequestHandler;
 
   /**
@@ -125,7 +124,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
   @Override
   public boolean shouldRetry(final Event firstAttemptResponseEvent) {
-    final Boolean shouldRetryRequest = tokenRequestHandler.getRefreshTokenWhen().apply(firstAttemptResponseEvent);
+    final Boolean shouldRetryRequest = resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
     if (shouldRetryRequest) {
       try {
         tokenRequestHandler.refreshAccessToken();
@@ -134,6 +133,17 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
       }
     }
     return shouldRetryRequest;
+  }
+
+  private <T> T resolveExpression(ParameterResolver<T> expr, Event event) {
+    if (expr == null) {
+      return null;
+    } else if (!expr.getExpression().isPresent()
+        && !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+      return expr.resolve();
+    } else {
+      return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
+    }
   }
 
   public void setTokenManager(TokenManagerConfig tokenManager) {
