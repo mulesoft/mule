@@ -69,11 +69,6 @@ abstract class ExecutableTypeSchemaDelegate {
     this.dsl = builder.getDslResolver();
   }
 
-  //protected ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
-  //                                               DslElementSyntax dslSyntax) {
-  //  return registerExecutableType(name, parameterizedModel.getAllParameterModels(), base, dslSyntax);
-  //}
-
   protected ExtensionType createExecutableType(String name, QName base, DslElementSyntax dslSyntax) {
     TopLevelComplexType complexType = new TopLevelComplexType();
     complexType.setName(name);
@@ -122,52 +117,6 @@ abstract class ExecutableTypeSchemaDelegate {
 
     return type;
   }
-
-  //protected ExtensionType registerExecutableType(String name, List<ParameterModel> parameterModels, QName base,
-  //                                               DslElementSyntax dslSyntax) {
-  //  TopLevelComplexType complexType = new TopLevelComplexType();
-  //  complexType.setName(name);
-  //
-  //  ComplexContent complexContent = new ComplexContent();
-  //  complexType.setComplexContent(complexContent);
-  //  final ExtensionType complexContentExtension = new ExtensionType();
-  //  complexContentExtension.setBase(base);
-  //  complexContent.setExtension(complexContentExtension);
-  //
-  //  if (dslSyntax.requiresConfig()) {
-  //    Attribute configAttr = builder.createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
-  //    complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
-  //  }
-  //
-  //  List<TopLevelElement> childElements = new LinkedList<>();
-  //  parameterModels.forEach(parameter -> {
-  //    DslElementSyntax paramDsl = dsl.resolve(parameter);
-  //    MetadataType parameterType = parameter.getType();
-  //
-  //    if (isOperation(parameterType)) {
-  //      String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
-  //      childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
-  //    } else {
-  //      this.builder.declareAsParameter(parameterType, complexContentExtension, parameter, paramDsl, childElements);
-  //    }
-  //  });
-  //
-  //
-  //  if (childElements.isEmpty()) {
-  //    complexContentExtension.setSequence(null);
-  //  } else {
-  //    final ExplicitGroup all = new ExplicitGroup();
-  //    all.setMinOccurs(ZERO);
-  //    all.setMaxOccurs(MAX_ONE);
-  //
-  //    builder.addParameterToSequence(childElements, all);
-  //    complexContentExtension.setSequence(all);
-  //  }
-  //
-  //  this.builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
-  //
-  //  return complexContentExtension;
-  //}
 
   protected void initialiseSequence(ExtensionType operationType) {
     if (operationType.getSequence() == null) {

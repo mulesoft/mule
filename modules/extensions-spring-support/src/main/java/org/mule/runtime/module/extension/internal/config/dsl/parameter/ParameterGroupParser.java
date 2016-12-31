@@ -23,8 +23,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
- * A {@link ExtensionDefinitionParser} for parsing extension objects that can be defined as named top level elements and be placed
- * in the mule registry.
+ * A {@link ExtensionDefinitionParser} for parsing extension objects that are expressed as an inline {@link ParameterGroupModel}
  * <p>
  * These objects are parsed as {@link ValueResolver}s which are later resolved by a {@link TopLevelParameterObjectFactory}
  * instance

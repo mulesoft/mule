@@ -110,10 +110,11 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
     Map<String, Object> parameters = getParameters();
     inlineGroups.forEach(g -> {
-      String containerName = getContainerName(
-                                              g.getModelProperty(ParameterGroupModelProperty.class)
-                                                  .map(mp -> mp.getDescriptor().getContainer())
-                                                  .orElseThrow(() -> new IllegalArgumentException("IllegalArgumentExceptionIllegalArgumentExceptionIllegalArgumentExceptionIllegalArgumentException")));
+      String containerName =
+          getContainerName(g.getModelProperty(ParameterGroupModelProperty.class)
+              .map(mp -> mp.getDescriptor().getContainer())
+              .orElseThrow(() -> new IllegalArgumentException(format("Missing ParameterGroup information for group '%s'",
+                                                                     g.getName()))));
 
       if (parameters.containsKey(containerName)) {
         resolverSet.add(containerName, toValueResolver(parameters.get(containerName)));
