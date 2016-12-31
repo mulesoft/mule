@@ -77,8 +77,12 @@ final class ConfigurationSchemaDelegate {
       });
 
       configurationModel.getParameterGroupModels().forEach(group -> {
-        List<TopLevelElement> parameters = builder.registerParameters(config, group.getParameterModels());
-        builder.addParameterGroupsToSequence(parameters, sequence);
+        if (!group.isShowInline()) {
+          List<TopLevelElement> parameters = builder.registerParameters(config, group.getParameterModels());
+          builder.addParameterToSequence(parameters, sequence);
+        } else {
+          builder.addInlineParameterGroup(group, sequence);
+        }
       });
 
       config.setSequence(sequence);

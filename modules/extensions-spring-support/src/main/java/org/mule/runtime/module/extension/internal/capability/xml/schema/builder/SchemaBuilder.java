@@ -51,6 +51,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -690,12 +691,30 @@ public final class SchemaBuilder {
     return element.getMinOccurs().equals(ONE);
   }
 
-  void addParameterGroupsToSequence(List<TopLevelElement> parameters, ExplicitGroup sequence) {
+  void addParameterToSequence(List<TopLevelElement> parameters, ExplicitGroup sequence) {
     parameters.forEach(parameter -> {
       sequence.getParticle().add(objectFactory.createElement(parameter));
       if (isRequired(parameter)) {
         sequence.setMinOccurs(ONE);
       }
     });
+  }
+
+  void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
+
+    DslElementSyntax groupDsl = dslResolver.resolveInlineGroupDsl(group);
+
+    LocalComplexType complexType = objectTypeDelegate.createTypeExtension(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
+    ExplicitGroup groupSequence = new ExplicitGroup();
+
+    List<TopLevelElement> parameters =
+        registerParameters(complexType.getComplexContent().getExtension(), group.getParameterModels());
+    addParameterToSequence(parameters, groupSequence);
+
+    TopLevelElement groupElement = createTopLevelElement(groupDsl.getElementName(), ZERO, MAX_ONE);
+    groupElement.setComplexType(complexType);
+
+    complexType.getComplexContent().getExtension().setSequence(groupSequence);
+    parentSequence.getParticle().add(objectFactory.createElement(groupElement));
   }
 }

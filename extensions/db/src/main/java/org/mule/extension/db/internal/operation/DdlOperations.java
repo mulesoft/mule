@@ -39,7 +39,7 @@ public class DdlOperations extends BaseDbOperations {
    */
   @DisplayName("Execute DDL")
   public int executeDdl(@DisplayName(SQL_QUERY_TEXT) @Text String sql,
-                        @ParameterGroup(QUERY_SETTINGS) QuerySettings settings,
+                        @ParameterGroup(name = QUERY_SETTINGS) QuerySettings settings,
                         @UseConfig DbConnector connector,
                         @Connection DbConnection connection)
       throws SQLException {

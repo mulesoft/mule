@@ -34,7 +34,7 @@ public class ParameterType {
   @Expression(NOT_SUPPORTED)
   private String key;
 
-  @ParameterGroup("Type")
+  @ParameterGroup(name = "Type")
   private TypeClassifier typeClassifier;
 
   public String getKey() {

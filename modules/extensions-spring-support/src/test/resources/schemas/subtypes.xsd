@@ -499,14 +499,6 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypedAndConcreteParametersType" substitutionGroup="mule:abstract-operator" name="subtyped-and-concrete-parameters"></xs:element>
-    <xs:complexType name="org.mule.test.subtypes.extension.NoReferencePojo">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="required" name="number"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="string"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
     <xs:complexType name="SubtypedAndConcreteParametersType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -581,4 +573,12 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+      <xs:complexType name="org.mule.test.subtypes.extension.NoReferencePojo">
+        <xs:complexContent>
+          <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+            <xs:attribute type="mule:expressionInt" use="required" name="number"></xs:attribute>
+            <xs:attribute type="mule:expressionString" use="required" name="string"></xs:attribute>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
 </xs:schema>

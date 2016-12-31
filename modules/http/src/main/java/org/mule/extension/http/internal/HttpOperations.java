@@ -50,7 +50,7 @@ public class HttpOperations {
    *
    * @return the resource defined by the path of an HTTP request
    */
-  public Result<?, ?> loadStaticResource(@ParameterGroup("Resource") StaticResourceLoader resourceLoader, Event event)
+  public Result<?, ?> loadStaticResource(@ParameterGroup(name = "Resource") StaticResourceLoader resourceLoader, Event event)
       throws ResourceNotFoundException, InitialisationException {
     return builder(resourceLoader.load(event)).build();
   }

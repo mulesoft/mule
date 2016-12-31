@@ -69,7 +69,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @ConfigName
   private String configName;
 
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private RequestConnectionParams connectionParams;
 
   /**

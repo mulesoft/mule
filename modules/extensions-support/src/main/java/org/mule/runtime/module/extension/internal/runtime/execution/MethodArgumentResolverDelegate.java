@@ -20,6 +20,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
@@ -113,7 +114,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = ERROR_ARGUMENT_RESOLVER;
       } else if (SourceCallbackContext.class.isAssignableFrom(parameterType)) {
         argumentResolver = SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
-      } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
+      } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)) &&
+          !((ParameterGroup) annotations.get(ParameterGroup.class)).showInline()) {
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
       } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));

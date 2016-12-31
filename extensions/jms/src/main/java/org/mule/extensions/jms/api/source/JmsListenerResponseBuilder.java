@@ -32,7 +32,7 @@ public class JmsListenerResponseBuilder {
   @Expression(NOT_SUPPORTED)
   private MessageBuilder messageBuilder;
 
-  @ParameterGroup("Reply Configuration")
+  @ParameterGroup(name = "Reply Configuration")
   private JmsPublishParameters overrides;
 
   public MessageBuilder getMessageBuilder() {

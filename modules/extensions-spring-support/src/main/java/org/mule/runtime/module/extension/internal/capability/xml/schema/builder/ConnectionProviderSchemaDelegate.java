@@ -74,11 +74,13 @@ final class ConnectionProviderSchemaDelegate {
       addConnectionProviderPoolingProfile(sequence);
     }
 
-    providerModel.getParameterGroupModels().forEach(g -> builder.addParameterGroupsToSequence(
-                                                                                              builder
-                                                                                                  .registerParameters(providerType,
-                                                                                                                      g.getParameterModels()),
-                                                                                              sequence));
+    providerModel.getParameterGroupModels().forEach(group -> {
+      if (!group.isShowInline()) {
+        builder.addParameterToSequence(builder.registerParameters(providerType, group.getParameterModels()), sequence);
+      } else {
+        builder.addInlineParameterGroup(group, sequence);
+      }
+    });
 
     providerType.setSequence(sequence);
 

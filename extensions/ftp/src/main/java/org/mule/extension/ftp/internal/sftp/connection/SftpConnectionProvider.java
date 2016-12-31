@@ -32,7 +32,7 @@ import java.util.Set;
 @DisplayName("SFTP Connection")
 public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFileSystem> {
 
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private SftpConnectionSettings connectionSettings = new SftpConnectionSettings();
 
   /**

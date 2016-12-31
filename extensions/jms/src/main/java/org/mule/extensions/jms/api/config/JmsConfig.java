@@ -12,7 +12,7 @@ import org.mule.extensions.jms.api.operation.JmsAck;
 import org.mule.extensions.jms.api.operation.JmsConsume;
 import org.mule.extensions.jms.api.operation.JmsPublish;
 import org.mule.extensions.jms.api.operation.JmsPublishConsume;
-import org.mule.extensions.jms.api.source.JmsSubscribe;
+import org.mule.extensions.jms.api.source.JmsListener;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -34,7 +34,7 @@ import javax.jms.Topic;
  */
 @Configuration(name = "config")
 @Operations({JmsConsume.class, JmsPublish.class, JmsPublishConsume.class, JmsAck.class})
-@Sources({JmsSubscribe.class})
+@Sources({JmsListener.class})
 public class JmsConfig {
 
   /**

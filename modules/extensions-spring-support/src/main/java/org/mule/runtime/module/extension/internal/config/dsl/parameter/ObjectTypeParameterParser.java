@@ -101,7 +101,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     final boolean acceptsReferences = acceptsReferences(objectField);
     final Object defaultValue = getDefaultValue(fieldType).orElse(null);
     final ExpressionSupport expressionSupport = getExpressionSupport(objectField);
-    Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
+    Optional<DslElementSyntax> fieldDsl = typeDsl.getContainedElement(fieldName);
     if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
       return;
     }

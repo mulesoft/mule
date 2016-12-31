@@ -57,7 +57,7 @@ public final class JndiConnectionFactory extends DelegatingConnectionFactory imp
   /**
    *  Provider for the {@link JndiNameResolver}
    */
-  @ParameterGroup("Jndi Name Resolver")
+  @ParameterGroup(name = "Jndi Name Resolver")
   private JndiNameResolverProvider nameResolverProvider;
 
 

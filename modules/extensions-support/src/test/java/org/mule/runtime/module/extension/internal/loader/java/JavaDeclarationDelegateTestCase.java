@@ -204,7 +204,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getAllParameters(), hasSize(30));
+    assertThat(configuration.getAllParameters(), hasSize(32));
     assertParameter(configuration.getAllParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED,
                     null);
   }
@@ -344,7 +344,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getAllParameters();
-    assertThat(parameters, hasSize(29));
+    assertThat(parameters, hasSize(31));
 
     assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -421,10 +421,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(29));
+    assertThat(extensionDeclaration.getOperations(), hasSize(31));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(8));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(9));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_OPERATION, "");
@@ -769,7 +769,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
   public static class HeisenbergWithParameterGroupAsOptional extends HeisenbergExtension {
 
-    @ParameterGroup("personalInfo")
+    @ParameterGroup(name = "personalInfo")
     @Optional
     private PersonalInfo personalInfo;
 
@@ -778,7 +778,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
   public static class HeisenbergWithRecursiveParameterGroup extends HeisenbergExtension {
 
-    @ParameterGroup("recursive")
+    @ParameterGroup(name = "recursive")
     private RecursiveParameterGroup group;
   }
 
@@ -854,7 +854,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
   private static class RecursiveParameterGroup {
 
-    @ParameterGroup("recursive")
+    @ParameterGroup(name = "recursive")
     private RecursiveParameterGroup recursiveParameterGroup;
   }
 }

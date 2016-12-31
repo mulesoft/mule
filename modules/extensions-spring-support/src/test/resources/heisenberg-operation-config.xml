@@ -44,6 +44,7 @@
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
+        <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE" fullyBald="false"/>
     </heisenberg:config>
 
     <flow name="sayMyName">
@@ -76,6 +77,22 @@
 
     <flow name="collectFromMessage">
         <heisenberg:get-payment-from-message/>
+    </flow>
+
+    <flow name="getInlineInfo">
+        <heisenberg:get-inline-info>
+            <heisenberg:personal-barber beardTrimming="MUSTACHE" fullyBald="true"/>
+        </heisenberg:get-inline-info>
+    </flow>
+
+    <flow name="getInlinePersonalInfo">
+        <heisenberg:get-inline-personal-info>
+            <heisenberg:personal-info-argument myName="Pepe" age="26">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="explicitAddress"/>
+                </heisenberg:known-addresses>
+            </heisenberg:personal-info-argument>
+        </heisenberg:get-inline-personal-info>
     </flow>
 
     <flow name="killFromPayload">
@@ -228,6 +245,10 @@
 
     <flow name="getGramsInStorage">
         <heisenberg:get-grams-in-storage/>
+    </flow>
+
+    <flow name="getBarberPreferences">
+        <heisenberg:get-barber-preferences config-ref="heisenberg"/>
     </flow>
 
     <flow name="investment">

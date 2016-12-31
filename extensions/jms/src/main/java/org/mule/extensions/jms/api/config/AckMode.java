@@ -11,7 +11,7 @@ import static javax.jms.Session.CLIENT_ACKNOWLEDGE;
 import static javax.jms.Session.DUPS_OK_ACKNOWLEDGE;
 import static javax.jms.Session.SESSION_TRANSACTED;
 import org.mule.extensions.jms.api.operation.JmsConsume;
-import org.mule.extensions.jms.api.source.JmsSubscribe;
+import org.mule.extensions.jms.api.source.JmsListener;
 
 import javax.jms.Session;
 
@@ -39,7 +39,7 @@ public enum AckMode {
   /**
    * This is JMS {@link Session#AUTO_ACKNOWLEDGE} mode.
    * The session automatically acknowledges the receipt when it successfully delivered the message
-   * to a {@link JmsConsume#consume} or {@link JmsSubscribe} handler.
+   * to a {@link JmsConsume#consume} or {@link JmsListener} handler.
    */
   AUTO(AUTO_ACKNOWLEDGE),
 

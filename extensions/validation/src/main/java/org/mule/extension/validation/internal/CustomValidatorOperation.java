@@ -45,8 +45,8 @@ public final class CustomValidatorOperation extends ValidationSupport {
         }
       });
 
-  public void customValidator(@Placement(order = 0) @ParameterGroup("Validator") ObjectSource<Validator> source,
-                              @Placement(order = 1) @ParameterGroup(ERROR_GROUP) ValidationOptions options,
+  public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") ObjectSource<Validator> source,
+                              @Placement(order = 1) @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
                               Event event,
                               @UseConfig ValidationExtension config)
       throws Exception {

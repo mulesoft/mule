@@ -65,7 +65,7 @@ public class BulkOperations extends BaseDbOperations {
    */
   public int[] bulkInsert(@Content @Placement(
       order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
-                          @ParameterGroup(QUERY_GROUP) BulkQueryDefinition query,
+                          @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -88,7 +88,7 @@ public class BulkOperations extends BaseDbOperations {
    */
   public int[] bulkUpdate(@Content @Placement(
       order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
-                          @ParameterGroup(QUERY_GROUP) BulkQueryDefinition query,
+                          @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -111,7 +111,7 @@ public class BulkOperations extends BaseDbOperations {
    */
   public int[] bulkDelete(@Content @Placement(
       order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
-                          @ParameterGroup(QUERY_GROUP) BulkQueryDefinition query,
+                          @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -130,8 +130,8 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] executeScript(@ParameterGroup(QUERY_GROUP) BulkScript script,
-                             @ParameterGroup(QUERY_SETTINGS) QuerySettings settings,
+  public int[] executeScript(@ParameterGroup(name = QUERY_GROUP) BulkScript script,
+                             @ParameterGroup(name = QUERY_SETTINGS) QuerySettings settings,
                              @Connection DbConnection connection)
       throws SQLException {
 

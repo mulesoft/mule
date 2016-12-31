@@ -35,13 +35,13 @@ public class UdpListenerProvider implements CachedConnectionProvider<UdpListener
   /**
    * This configuration parameter refers to the address where the UDP socket should listen for incoming packets.
    */
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link DatagramSocket} configuration properties
    */
-  @ParameterGroup(SocketProperties.GROUP_NAME)
+  @ParameterGroup(name = SocketProperties.GROUP_NAME)
   private UdpSocketProperties udpSocketProperties;
 
   @Override

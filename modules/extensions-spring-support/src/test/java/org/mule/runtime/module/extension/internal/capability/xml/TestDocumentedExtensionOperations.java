@@ -16,7 +16,7 @@ public class TestDocumentedExtensionOperations {
    *
    * @param value test value
    */
-  public void operation(String value, @ParameterGroup("group") TestDocumentedParameterGroup group) {
+  public void operation(String value, @ParameterGroup(name = "group") TestDocumentedParameterGroup group) {
 
   }
 

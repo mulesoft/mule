@@ -36,6 +36,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
@@ -73,6 +74,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   public static final String RICIN_GROUP_NAME = "Dangerous-Ricin";
   public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
+  public static final String INLINE_BARBER_PREFERENCES = "Inline Barber Preferences";
   public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
   public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "weaponValueMap";
   public static final String LAB_ADDRESS_EXAMPLE = "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104";
@@ -113,10 +115,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Optional
   private Map<String, List<String>> deathsBySeasons;
 
-  @ParameterGroup(RICIN_GROUP_NAME)
+  @ParameterGroup(name = RICIN_GROUP_NAME)
   private RicinGroup ricinGroup;
 
-  @ParameterGroup(PERSONAL_INFORMATION_GROUP_NAME)
+  @ParameterGroup(name = PERSONAL_INFORMATION_GROUP_NAME)
   private PersonalInfo personalInfo = new PersonalInfo();
 
   @Parameter
@@ -178,6 +180,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Optional
   private List<HealthStatus> healthProgressions;
 
+  @ParameterGroup(name = INLINE_BARBER_PREFERENCES, showInline = true)
+  private BarberPreferences barberPreferences;
+
   @Override
   public void initialise() throws InitialisationException {
     initialise++;
@@ -196,6 +201,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Override
   public void dispose() {
     dispose++;
+  }
+
+  public BarberPreferences getBarberPreferences() {
+    return barberPreferences;
   }
 
   public List<HealthStatus> getHealthProgression() {

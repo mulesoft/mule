@@ -45,19 +45,19 @@ import javax.inject.Inject;
 @Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
 
-  @ParameterGroup(URL_CONFIGURATION)
+  @ParameterGroup(name = URL_CONFIGURATION)
   @NullSafe
   private RequestUrlConfiguration urlConfiguration;
 
-  @ParameterGroup(REQUEST_SETTINGS)
+  @ParameterGroup(name = REQUEST_SETTINGS)
   @NullSafe
   private RequestSettings requestSettings;
 
-  @ParameterGroup(RESPONSE_SETTINGS)
+  @ParameterGroup(name = RESPONSE_SETTINGS)
   @NullSafe
   private ResponseSettings responseSettings;
 
-  @ParameterGroup(OTHER_SETTINGS)
+  @ParameterGroup(name = OTHER_SETTINGS)
   @NullSafe
   private OtherRequestSettings otherSettings;
 

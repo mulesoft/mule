@@ -127,7 +127,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @ConfigName
   private String configName;
 
-  @ParameterGroup(ParameterGroup.CONNECTION)
+  @ParameterGroup(name = ParameterGroup.CONNECTION)
   private ConnectionParams connectionParams;
 
   /**

@@ -86,7 +86,8 @@ public class JmsPublishConsume {
                                                       @Optional(
                                                           defaultValue = "MILLISECONDS") @Summary("Time unit to be used in the maximumWaitTime configuration") TimeUnit maximumWaitUnit,
                                                       @Placement(
-                                                          order = 2) @ParameterGroup("Publish Configuration") JmsPublishParameters overrides)
+                                                          order = 2) @ParameterGroup(
+                                                              name = "Publish Configuration") JmsPublishParameters overrides)
       throws JmsExtensionException {
 
     JmsSession session;
