@@ -341,8 +341,7 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        String parameterName = paramDsl.getAttributeName()
-            .orElseThrow(() -> new IllegalArgumentException("Invalid DSL definition for the given Map value type"));
+        String parameterName = paramDsl.getAttributeName();
 
         addDefinition(baseDefinitionBuilder.copy()
             .withIdentifier(valueDsl.getElementName())
@@ -379,8 +378,7 @@ public abstract class ExtensionDefinitionParser {
 
             @Override
             protected void visitBasicType(MetadataType metadataType) {
-              String parameterName = paramDsl.getAttributeName()
-                  .orElseThrow(() -> new IllegalArgumentException("Invalid DSL definition for the given generic type"));
+              String parameterName = paramDsl.getAttributeName();
               addDefinition(baseDefinitionBuilder.copy().withIdentifier(valueListGenericDsl.get().getElementName())
                   .withTypeDefinition(fromType(getType(metadataType)))
                   .withTypeConverter(
