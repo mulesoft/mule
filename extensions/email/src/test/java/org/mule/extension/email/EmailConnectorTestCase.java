@@ -15,7 +15,9 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.setUpServer;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -23,15 +25,16 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestCase {
+
+  protected static final String NAMESPACE = "EMAIL";
 
   @Rule
   public DynamicPort PORT = new DynamicPort("port");
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedError expectedError = none();
 
   protected GreenMail server;
   protected GreenMailUser user;

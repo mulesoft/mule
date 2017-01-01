@@ -7,7 +7,7 @@
 package org.mule.extension.email.api.attributes;
 
 import static java.lang.Long.parseLong;
-import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailAttributesException;
 
 import com.sun.mail.pop3.POP3Folder;
 
@@ -37,7 +37,7 @@ public class POP3EmailAttributes extends BaseEmailAttributes {
     try {
       this.id = parseLong(folder.getUID(msg));
     } catch (MessagingException e) {
-      throw new EmailException("Could not initialize POP3 attributes", e);
+      throw new EmailAttributesException("Could not initialize POP3 attributes", e);
     }
   }
 

@@ -10,8 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 /**
- * Is the base {@link RuntimeException} type for the Email Connector any other exceptions thrown by the connector code will use or
- * be based on this exception.
+ * Is the generic {@link RuntimeException} type for the Email Connector, used when an error could not be specified.
  *
  * @since 4.0
  */

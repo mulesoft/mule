@@ -13,6 +13,7 @@ import static javax.mail.Folder.READ_WRITE;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
+import org.mule.extension.email.api.exception.EmailAttributesException;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.BaseEmailPredicateBuilder;
 import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
@@ -115,6 +116,8 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
       }
 
       return retrievedEmails;
+    } catch (EmailAttributesException e) {
+      throw e;
     } catch (MessagingException me) {
       throw new EmailException("Error while retrieving emails: " + me.getMessage(), me);
     }

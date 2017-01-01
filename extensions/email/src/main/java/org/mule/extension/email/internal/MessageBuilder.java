@@ -19,6 +19,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorConstants.MUL
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.email.api.EmailAttachment;
+import org.mule.extension.email.api.exception.EmailAttachmentException;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -190,7 +191,7 @@ public final class MessageBuilder {
         DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
         attachmentsMap.put(a.getId(), dataHandler);
       } catch (Exception e) {
-        throw new EmailException(ERROR + " could not add attachments", e);
+        throw new EmailAttachmentException(ERROR + " could not add attachments", e);
       }
     });
     this.attachments = attachmentsMap;
@@ -288,7 +289,7 @@ public final class MessageBuilder {
           setAttachmentHeaders(attachmentPart, attachmentDataHandler);
           multipart.addBodyPart(attachmentPart);
         } catch (Exception e) {
-          throw new EmailException("Error while adding attachment: " + attachment, e);
+          throw new EmailAttachmentException("Error while adding attachment: " + attachment, e);
         }
       }
 

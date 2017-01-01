@@ -7,7 +7,7 @@
 package org.mule.extension.email.api.attributes;
 
 import org.mule.extension.email.api.EmailFlags;
-import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailAttributesException;
 
 import com.sun.mail.imap.IMAPFolder;
 
@@ -39,7 +39,7 @@ public class IMAPEmailAttributes extends BaseEmailAttributes {
       this.id = folder.getUID(msg);
       this.flags = new EmailFlags(msg.getFlags());
     } catch (MessagingException mse) {
-      throw new EmailException(mse.getMessage(), mse);
+      throw new EmailAttributesException(mse.getMessage(), mse);
     }
   }
 
