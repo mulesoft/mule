@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.http.api.HttpConstants;
@@ -45,6 +46,7 @@ public final class RequestConnectionParams {
    */
   @Parameter
   @Optional
+  @Example("www.somehost.com")
   @Placement(order = 2)
   private Function<Event, String> host;
 

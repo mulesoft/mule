@@ -10,11 +10,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
-import java.util.function.Function;
-
-import javax.inject.Inject;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -40,6 +35,10 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
+
+import java.util.function.Function;
+
+import javax.inject.Inject;
 
 public class HttpRequestOperations {
 
@@ -67,9 +66,9 @@ public class HttpRequestOperations {
    */
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpRequestMetadataResolver.class)
-  public void request(String path, @Optional(defaultValue = "GET") String method,
-                      @ParameterGroup(
-                          name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
+  public void request(@Optional(defaultValue = "/") String path,
+                      @Optional(defaultValue = "GET") String method,
+                      @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
                       @ParameterGroup(
                           name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
                       @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
