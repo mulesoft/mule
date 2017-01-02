@@ -73,7 +73,7 @@ public class HttpRequestOperations {
                       @ParameterGroup(
                           name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
                       @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
-                      @ParameterGroup( name = OTHER_SETTINGS) OutputSettings outputSettings,
+                      @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @UseConfig HttpRequesterConfig config, Event muleEvent,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {
