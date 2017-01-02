@@ -12,7 +12,7 @@ import static java.util.Collections.list;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
-import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.api.exception.CannotFetchMetadataException;
 import org.mule.extension.email.internal.commands.PagingProviderEmailDelegate;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -120,7 +120,7 @@ public abstract class BaseEmailAttributes extends BaseAttributes {
       this.receivedDate = asDateTime(msg.getReceivedDate());
       this.fromAddresses = addressesAsList(msg.getFrom());
     } catch (MessagingException mse) {
-      throw new EmailException(mse.getMessage(), mse);
+      throw new CannotFetchMetadataException(mse.getMessage(), mse);
     }
   }
 
