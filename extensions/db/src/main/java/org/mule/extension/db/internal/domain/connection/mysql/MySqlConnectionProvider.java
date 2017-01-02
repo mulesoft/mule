@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 @Alias("my-sql")
 public class MySqlConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private MySqlConnectionParameters mySqlParameters;
 
   @Override

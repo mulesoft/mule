@@ -16,7 +16,7 @@ public class VeganPolicy {
   @Optional(defaultValue = "false")
   private Boolean meetAllowed;
 
-  @ParameterGroup("Ingredients")
+  @ParameterGroup(name = "Ingredients")
   private VeganIngredients ingredients;
 
   public Boolean getMeetAllowed() {

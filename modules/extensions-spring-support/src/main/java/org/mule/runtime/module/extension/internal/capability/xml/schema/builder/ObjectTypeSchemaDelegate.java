@@ -16,9 +16,9 @@ import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
-import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
+import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
@@ -29,9 +29,9 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ElementDslModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -302,14 +302,16 @@ final class ObjectTypeSchemaDelegate {
 
     complexContent.setExtension(extension);
 
+    DslElementSyntax typeDsl = dsl.resolve(metadataType).get();
     List<TopLevelElement> childElements = new LinkedList<>();
     fields.forEach(field -> {
-      if (isParameterGroup(field)) {
-        ((ObjectType) field.getValue()).getFields().forEach(
-                                                            subField -> declareObjectField(subField, extension, childElements));
 
+      String fieldName = field.getKey().getName().getLocalPart();
+      DslElementSyntax fieldDsl = typeDsl.getContainedElement(fieldName).orElse(null);
+      if (isParameterGroup(field)) {
+        declareGroupedFields(extension, childElements, field);
       } else {
-        declareObjectField(field, extension, childElements);
+        declareObjectField(fieldDsl, field, extension, childElements);
       }
     });
 
@@ -327,11 +329,25 @@ final class ObjectTypeSchemaDelegate {
     return complexType;
   }
 
-  private void declareObjectField(ObjectFieldType field, ExtensionType extension, List<TopLevelElement> all) {
-    ParameterModel parameter = asParameter(field);
-    DslElementSyntax paramDsl = dsl.resolve(parameter);
+  private void declareGroupedFields(ExtensionType extension, List<TopLevelElement> childElements, ObjectFieldType field) {
+    DslElementSyntax groupDsl = dsl.resolve(field.getValue()).get();
+    ((ObjectType) field.getValue()).getFields().forEach(
+                                                        subField -> {
+                                                          DslElementSyntax subFieldDsl = groupDsl
+                                                              .getContainedElement(subField.getKey().getName().getLocalPart())
+                                                              .orElse(null);
+                                                          declareObjectField(subFieldDsl, subField, extension, childElements);
+                                                        });
+  }
 
-    builder.declareAsParameter(field.getValue(), extension, parameter, paramDsl, all);
+  private void declareObjectField(DslElementSyntax fieldDsl, ObjectFieldType field, ExtensionType extension,
+                                  List<TopLevelElement> all) {
+    ParameterModel parameter = asParameter(field);
+    if (fieldDsl == null) {
+      fieldDsl = dsl.resolve(parameter);
+    }
+
+    builder.declareAsParameter(field.getValue(), extension, parameter, fieldDsl, all);
   }
 
   private void registerPojoGlobalElements(DslElementSyntax typeDsl, ObjectType type, ObjectType baseType, String description) {
@@ -474,7 +490,7 @@ final class ObjectTypeSchemaDelegate {
     subTypes.forEach(subtype -> registerPojoType(subtype, baseType, EMPTY));
   }
 
-  private LocalComplexType createTypeExtension(QName base) {
+  LocalComplexType createTypeExtension(QName base) {
     final LocalComplexType complexType = new LocalComplexType();
     ComplexContent complexContent = new ComplexContent();
     complexType.setComplexContent(complexContent);

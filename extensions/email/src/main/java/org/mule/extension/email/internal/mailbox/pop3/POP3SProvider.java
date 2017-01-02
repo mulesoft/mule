@@ -29,7 +29,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 @DisplayName("POP3S Connection")
 public class POP3SProvider extends AbstractMailboxConnectionProvider<MailboxConnection> implements Initialisable {
 
-  @ParameterGroup(ParameterGroup.CONNECTION)
+  @ParameterGroup(name = ParameterGroup.CONNECTION)
   private POP3SConnectionSettings connectionSettings;
 
   /**

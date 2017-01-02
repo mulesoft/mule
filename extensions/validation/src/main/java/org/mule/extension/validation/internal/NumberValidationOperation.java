@@ -41,7 +41,8 @@ public class NumberValidationOperation extends ValidationSupport {
    */
   public void isNumber(String value, @Optional String locale, @Optional String pattern,
                        @Optional String minValue,
-                       @Optional String maxValue, NumberType numberType, @ParameterGroup(ERROR_GROUP) ValidationOptions options,
+                       @Optional String maxValue, NumberType numberType,
+                       @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
                        Event event, @UseConfig ValidationExtension config)
       throws Exception {
 

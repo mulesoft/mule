@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -22,6 +23,8 @@ import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
+
+import java.util.List;
 
 /**
  * An {@link ExtensionMessageSource} used to parse instances of {@link ExtensionMessageSource} instances through a
@@ -54,6 +57,14 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
 
-    parseParameters(sourceModel.getAllParameterModels());
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(sourceModel);
+    sourceModel.getErrorCallback().ifPresent(cb -> inlineGroups.addAll(getInlineGroups(cb)));
+    sourceModel.getSuccessCallback().ifPresent(cb -> inlineGroups.addAll(getInlineGroups(cb)));
+
+    parseParameters(getFlatParameters(inlineGroups, sourceModel.getAllParameterModels()));
+
+    for (ParameterGroupModel group : inlineGroups) {
+      parseParameterGroup(group);
+    }
   }
 }

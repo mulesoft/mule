@@ -139,6 +139,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(configurationModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam, topLevelConfigParam));
     when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(configurationModel.getConnectionProviders()).thenReturn(ImmutableList.of());
+    when(configurationModel.getParameterGroupModels()).thenReturn(ImmutableList.of());
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getAllParameterModels()).thenReturn(asList(simpleOperationParam, topLevelOperationParam));
@@ -361,14 +362,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
-  @Test
-  public void mapSingularizeClashOnParameterDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
-    ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestMap);
-    ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, String.class);
-    when(operationModel.getAllParameterModels()).thenReturn(asList(singular, offending));
-    validate();
-  }
 
   @Test
   public void mapSingularizeClashOnParameterSameType() {
@@ -410,15 +403,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(connectionProviderModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
-  }
-
-  @Test
-  public void listSingularizeClashOnParameterDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
-    ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
-    ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, String.class);
-    when(operationModel.getAllParameterModels()).thenReturn(asList(singular, offending));
     validate();
   }
 

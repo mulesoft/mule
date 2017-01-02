@@ -6,17 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_REDELIVERY_POLICY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -47,17 +53,29 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
   }
 
   private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax) {
-    final ExtensionType extensionType =
-        registerExecutableType(name, sourceModel.getAllParameterModels(), MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
-    ExplicitGroup sequence = extensionType.getSequence();
+    final ExtensionType sourceType = createExecutableType(name, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
+    initialiseSequence(sourceType);
+    ExplicitGroup sequence = sourceType.getSequence();
 
-    if (sequence == null) {
-      sequence = new ExplicitGroup();
-      extensionType.setSequence(sequence);
-    }
+    List<ParameterGroupModel> inlineGroupedParameters = getInlineGroups(sourceModel);
+    sourceModel.getErrorCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
+    sourceModel.getSuccessCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
+
+    List<ParameterModel> flatParameters = sourceModel.getAllParameterModels().stream()
+        .filter(p -> inlineGroupedParameters.stream().noneMatch(g -> g.getParameterModels().contains(p)))
+        .collect(toList());
+
+    registerParameters(sourceType, flatParameters);
+    inlineGroupedParameters.forEach(g -> builder.addInlineParameterGroup(g, sourceType.getSequence()));
 
     builder.addRetryPolicy(sequence);
     addMessageRedeliveryPolicy(sequence);
+  }
+
+  private List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
+    return model.getParameterGroupModels().stream()
+        .filter(ParameterGroupModel::isShowInDsl)
+        .collect(toList());
   }
 
   private void addMessageRedeliveryPolicy(ExplicitGroup sequence) {

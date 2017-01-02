@@ -37,13 +37,13 @@ public final class UdpRequesterProvider implements PoolingConnectionProvider<Udp
   /**
    * This configuration parameter refers to the address where the {@link DatagramSocket} should send packages to.
    */
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link DatagramSocket} configuration properties
    */
-  @ParameterGroup(SocketProperties.GROUP_NAME)
+  @ParameterGroup(name = SocketProperties.GROUP_NAME)
   private UdpSocketProperties udpSocketProperties;
 
   /**

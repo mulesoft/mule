@@ -7,21 +7,15 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -34,23 +28,21 @@ import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -67,12 +59,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatcher;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -115,6 +105,41 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
     InternalMessage responseMessage = (InternalMessage) responseEvent.getVariable("myFace").getValue();
     assertThat(responseMessage.getPayload().getValue(), is(HEISENBERG));
+  }
+
+  @Test
+  public void getInlineGroupDefinition() throws Exception {
+    InternalMessage message = flowRunner("getBarberPreferences").withPayload(EMPTY_STRING).run().getMessage();
+
+    assertThat(message.getPayload().getValue(), is(notNullValue()));
+
+    BarberPreferences preferences = (BarberPreferences) message.getPayload().getValue();
+    assertThat(preferences.getBeardTrimming(), is(BarberPreferences.BEARD_KIND.MUSTACHE));
+    assertThat(preferences.isFullyBald(), is(false));
+  }
+
+  @Test
+  public void getInlineGroupDefinitionAsArgument() throws Exception {
+    InternalMessage message = flowRunner("getInlineInfo").withPayload(EMPTY_STRING).run().getMessage();
+
+    assertThat(message.getPayload().getValue(), is(notNullValue()));
+
+    BarberPreferences preferences = (BarberPreferences) message.getPayload().getValue();
+    assertThat(preferences.getBeardTrimming(), is(BarberPreferences.BEARD_KIND.MUSTACHE));
+    assertThat(preferences.isFullyBald(), is(true));
+  }
+
+  @Test
+  public void getInlineGroupPersonalInfoAsArgument() throws Exception {
+    InternalMessage message = flowRunner("getInlinePersonalInfo").withPayload(EMPTY_STRING).run().getMessage();
+
+    assertThat(message.getPayload().getValue(), is(notNullValue()));
+    PersonalInfo value = (PersonalInfo) message.getPayload().getValue();
+    assertThat(value.getAge(), is(26));
+    assertThat(value.getKnownAddresses().get(0), is("explicitAddress"));
+
+    // TODO MULE-11315: Enable this assertion when aliased parameters are injected correctly
+    //assertThat(value.getName(), is("Pepe"));
   }
 
   @Test

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -15,6 +16,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_ATTRIBUTE
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.policy.PolicyManager;
@@ -24,6 +26,8 @@ import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+
+import java.util.List;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor} instances through a
@@ -58,6 +62,12 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withSetterParameterDefinition(TARGET_ATTRIBUTE, fromSimpleParameter(TARGET_ATTRIBUTE).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
 
-    parseParameters(operationModel.getAllParameterModels());
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(operationModel);
+
+    parseParameters(getFlatParameters(inlineGroups, operationModel.getAllParameterModels()));
+
+    for (ParameterGroupModel group : inlineGroups) {
+      parseParameterGroup(group);
+    }
   }
 }

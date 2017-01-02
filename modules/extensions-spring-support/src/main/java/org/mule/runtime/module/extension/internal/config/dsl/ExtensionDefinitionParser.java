@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -26,10 +27,8 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-import com.google.common.collect.ImmutableList;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -44,7 +43,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
@@ -69,10 +70,13 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.ObjectParsin
 import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
+import org.mule.runtime.module.extension.internal.config.dsl.parameter.ParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.FunctionParameterTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.TypedValueTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
@@ -83,8 +87,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcess
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+
+import com.google.common.collect.ImmutableList;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -105,6 +109,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -313,7 +322,7 @@ public abstract class ExtensionDefinitionParser {
     final MetadataType valueType = dictionaryType.getValueType();
     final Class<?> keyClass = getType(keyType);
     final Class<?> valueClass = getType(valueType);
-    final String parameterName = paramDsl.getAttributeName();
+
     final String mapElementName = paramDsl.getElementName();
 
     addParameter(getChildKey(key), fromChildMapConfiguration(keyClass, valueClass).withWrapperIdentifier(mapElementName)
@@ -332,6 +341,8 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
+        String parameterName = paramDsl.getAttributeName();
+
         addDefinition(baseDefinitionBuilder.copy()
             .withIdentifier(valueDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
@@ -367,6 +378,7 @@ public abstract class ExtensionDefinitionParser {
 
             @Override
             protected void visitBasicType(MetadataType metadataType) {
+              String parameterName = paramDsl.getAttributeName();
               addDefinition(baseDefinitionBuilder.copy().withIdentifier(valueListGenericDsl.get().getElementName())
                   .withTypeDefinition(fromType(getType(metadataType)))
                   .withTypeConverter(
@@ -481,7 +493,7 @@ public abstract class ExtensionDefinitionParser {
 
   }
 
-  private ClassLoader getContextClassLoader() {
+  protected ClassLoader getContextClassLoader() {
     return Thread.currentThread().getContextClassLoader();
   }
 
@@ -738,6 +750,12 @@ public abstract class ExtensionDefinitionParser {
     }
   }
 
+  protected List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
+    return model.getParameterGroupModels().stream()
+        .filter(ParameterGroupModel::isShowInDsl)
+        .collect(toList());
+  }
+
   private void parseNestedProcessor(ParameterModel parameterModel) {
     final String processorElementName = hyphenize(parameterModel.getName());
     addParameter(getChildKey(parameterModel.getName()),
@@ -837,7 +855,7 @@ public abstract class ExtensionDefinitionParser {
     return getMemberName(parameterModel, parameterModel.getName());
   }
 
-  private String getChildKey(String key) {
+  protected String getChildKey(String key) {
     return format("%s%s%s", CHILD_ELEMENT_KEY_PREFIX, key, CHILD_ELEMENT_KEY_SUFFIX);
   }
 
@@ -852,5 +870,25 @@ public abstract class ExtensionDefinitionParser {
 
   private boolean acceptsReferences(ParameterModel parameterModel) {
     return parameterModel.getDslModel().allowsReferences();
+  }
+
+  protected void parseParameterGroup(ParameterGroupModel group) throws ConfigurationException {
+    ParameterGroupDescriptor descriptor =
+        group.getModelProperty(ParameterGroupModelProperty.class)
+            .map(ParameterGroupModelProperty::getDescriptor)
+            .orElseThrow(() -> new IllegalArgumentException("Incomplete group"));
+
+    DslElementSyntax dslElementSyntax = dslResolver.resolveInlineGroupDsl(group);
+    addParameter(getChildKey(getContainerName(descriptor.getContainer())),
+                 new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax, muleContext));
+
+    new ParameterGroupParser(baseDefinitionBuilder.copy(), group, descriptor, getContextClassLoader(), dslElementSyntax,
+                             dslResolver, parsingContext, muleContext).parse().forEach(this::addDefinition);
+  }
+
+  protected List<ParameterModel> getFlatParameters(List<ParameterGroupModel> inlineGroups, List<ParameterModel> parameters) {
+    return parameters.stream()
+        .filter(p -> inlineGroups.stream().noneMatch(g -> g.getParameterModels().contains(p)))
+        .collect(toList());
   }
 }

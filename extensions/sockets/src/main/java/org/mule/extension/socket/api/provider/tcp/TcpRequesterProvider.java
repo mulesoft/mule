@@ -64,13 +64,13 @@ public final class TcpRequesterProvider implements PoolingConnectionProvider<Tcp
   /**
    * This configuration parameter refers to the address where the {@link Socket} should connect to.
    */
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private SocketConnectionSettings connectionSettings;
 
   /**
    * {@link Socket} configuration properties
    */
-  @ParameterGroup(SocketProperties.GROUP_NAME)
+  @ParameterGroup(name = SocketProperties.GROUP_NAME)
   private TcpClientSocketProperties tcpClientSocketProperties;
 
   /**

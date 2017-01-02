@@ -31,6 +31,6 @@ public class TestExtensionWithDocumentation {
   @Optional
   private String configParameterWithComplexJavadoc;
 
-  @ParameterGroup("group")
+  @ParameterGroup(name = "group")
   private TestDocumentedParameterGroup group;
 }

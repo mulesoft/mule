@@ -63,7 +63,7 @@ public final class JmsPublish {
                           allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
                       @Optional(defaultValue = "QUEUE") @Summary("The type of the Destination") DestinationType destinationType,
                       @Optional @NullSafe @Summary("A builder for the message that will be published") MessageBuilder messageBuilder,
-                      @ParameterGroup("Publish Configuration") JmsPublishParameters overrides)
+                      @ParameterGroup(name = "Publish Configuration") JmsPublishParameters overrides)
 
       throws JmsExtensionException {
 

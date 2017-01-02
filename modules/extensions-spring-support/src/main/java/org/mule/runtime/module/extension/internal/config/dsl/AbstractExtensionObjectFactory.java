@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
@@ -18,6 +19,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTyp
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
@@ -40,6 +42,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
@@ -101,7 +104,36 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
    */
   protected ResolverSet getParametersAsResolverSet(ParameterizedModel model)
       throws ConfigurationException {
-    return getParametersAsResolverSet(model, model.getAllParameterModels());
+
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(model);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()));
+
+    Map<String, Object> parameters = getParameters();
+    inlineGroups.forEach(g -> {
+      String containerName =
+          getContainerName(g.getModelProperty(ParameterGroupModelProperty.class)
+              .map(mp -> mp.getDescriptor().getContainer())
+              .orElseThrow(() -> new IllegalArgumentException(format("Missing ParameterGroup information for group '%s'",
+                                                                     g.getName()))));
+
+      if (parameters.containsKey(containerName)) {
+        resolverSet.add(containerName, toValueResolver(parameters.get(containerName)));
+      }
+    });
+
+    return resolverSet;
+  }
+
+  protected List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
+    return model.getParameterGroupModels().stream()
+        .filter(ParameterGroupModel::isShowInDsl)
+        .collect(toList());
+  }
+
+  protected List<ParameterModel> getFlatParameters(List<ParameterGroupModel> inlineGroups, List<ParameterModel> parameters) {
+    return parameters.stream()
+        .filter(p -> inlineGroups.stream().noneMatch(g -> g.getParameterModels().contains(p)))
+        .collect(toList());
   }
 
   protected ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels)

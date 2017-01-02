@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 @Alias("pet-source")
 public class PetStoreSource extends Source<String, Attributes> {
 
-  @ParameterGroup("Breeder")
+  @ParameterGroup(name = "Breeder")
   private ExclusivePetBreeder breeder;
 
   @Override

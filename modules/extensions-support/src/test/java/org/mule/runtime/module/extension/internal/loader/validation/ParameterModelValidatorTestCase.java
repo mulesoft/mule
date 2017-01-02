@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
@@ -19,8 +20,10 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.runtime.api.meta.model.ElementDslModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -64,13 +67,23 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     mockSubTypes(extensionModel);
+    when(extensionModel.getName()).thenReturn("extensionModel");
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
+    when(extensionModel.getXmlDslModel())
+        .thenReturn(XmlDslModel.builder().setNamespace("ns").setNamespaceUri("http://www.mulesoft.org/schema/mule/ns")
+            .setSchemaLocation("http://www.mulesoft.org/schema/mule/heisenberg/current/mule-ns.xsd").build());
+
+    when(operationModel.getName()).thenReturn("dummyOperation");
+
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
+    when(validParameterModel.getRole()).thenReturn(BEHAVIOUR);
+    when(validParameterModel.getLayoutModel()).thenReturn(Optional.empty());
+
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
-    when(operationModel.getName()).thenReturn("dummyOperation");
-    when(extensionModel.getName()).thenReturn("extensionModel");
+    when(invalidParameterModel.getRole()).thenReturn(BEHAVIOUR);
+    when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());
   }
 
   @Test
@@ -151,6 +164,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
+  @XmlHints(allowTopLevelDefinition = true)
   private static class InvalidPojo {
 
     public InvalidPojo() {
@@ -194,7 +208,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static class InvalidPojoParameterGroup {
 
-    @ParameterGroup("exclusion")
+    @ParameterGroup(name = "exclusion")
     private Serializable nonInstantiableField;
   }
 

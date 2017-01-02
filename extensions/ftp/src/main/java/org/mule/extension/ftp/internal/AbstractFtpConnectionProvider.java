@@ -48,7 +48,7 @@ public abstract class AbstractFtpConnectionProvider<C extends FtpFileSystem>
   @DisplayName("Working Directory")
   private String workingDir = null;
 
-  @ParameterGroup(TIMEOUT_CONFIGURATION)
+  @ParameterGroup(name = TIMEOUT_CONFIGURATION)
   private TimeoutSettings timeoutSettings = new TimeoutSettings();
 
   /**

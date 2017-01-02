@@ -60,11 +60,11 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.FunctionParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
@@ -275,7 +275,7 @@ public final class JavaModelLoaderDelegate {
       return false;
     }
 
-    final String groupName = groupAnnotation.value();
+    final String groupName = groupAnnotation.name();
     if (DEFAULT_GROUP_NAME.equals(groupName)) {
       throw new IllegalParameterModelDefinitionException(
                                                          format("%s '%s' defines parameter group of name '%s' which is the default one. "
@@ -317,9 +317,9 @@ public final class JavaModelLoaderDelegate {
                                                                 getComponentDeclarationTypeName(component),
                                                                 ((NamedDeclaration) component.getDeclaration()).getName()));
     } else {
-      declarer.withModelProperty(new ParameterGroupModelProperty(new ParameterGroupDescriptor(
-                                                                                              groupName, type, groupParameter
-                                                                                                  .getDeclaringElement())));
+      declarer.withModelProperty(new ParameterGroupModelProperty(
+                                                                 new ParameterGroupDescriptor(groupName, type, groupParameter
+                                                                     .getDeclaringElement())));
     }
 
     type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {
@@ -331,6 +331,8 @@ public final class JavaModelLoaderDelegate {
       declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
     });
 
+
+    declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
 
     MuleExtensionAnnotationParser.parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 

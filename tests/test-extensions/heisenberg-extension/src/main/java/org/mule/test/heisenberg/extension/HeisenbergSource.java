@@ -74,7 +74,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
 
   @OnSuccess
   public void onResponse(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter,
-                         @ParameterGroup(RICIN_GROUP_NAME) RicinGroup ricin) {
+                         @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
     heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
   }
 

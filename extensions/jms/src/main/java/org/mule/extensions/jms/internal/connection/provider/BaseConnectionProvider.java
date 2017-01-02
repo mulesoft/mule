@@ -60,7 +60,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
 
   private static final Logger LOGGER = getLogger(BaseConnectionProvider.class);
 
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private GenericConnectionParameters connectionParameters;
 
   /**

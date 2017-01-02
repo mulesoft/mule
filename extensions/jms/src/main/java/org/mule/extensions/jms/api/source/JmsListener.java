@@ -68,9 +68,9 @@ import org.slf4j.Logger;
 @Alias("listener")
 @EmitsResponse
 @MetadataScope(outputResolver = JmsOutputResolver.class)
-public class JmsSubscribe extends Source<Object, JmsAttributes> {
+public class JmsListener extends Source<Object, JmsAttributes> {
 
-  private static final Logger LOGGER = getLogger(JmsSubscribe.class);
+  private static final Logger LOGGER = getLogger(JmsListener.class);
 
   private static final String MESSAGE_TO_ACK = "MESSAGE_TO_ACK";
   private static final String REPLY_TO_DESTINATION = "REPLY_TO_DESTINATION";

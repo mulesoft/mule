@@ -705,4 +705,15 @@ public final class IntrospectionUtils {
 
     return java.util.Optional.ofNullable(annotatedElement);
   }
+
+  public static String getContainerName(AnnotatedElement container) {
+    if (container instanceof Field) {
+      return ((Field) container).getName();
+    } else if (container instanceof java.lang.reflect.Parameter) {
+      return ((java.lang.reflect.Parameter) container).getName();
+    } else {
+      throw new IllegalArgumentException("Unknown container type");
+    }
+  }
+
 }

@@ -23,7 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 @DisplayName("SMTP Connection")
 public class SMTPProvider extends AbstractSenderProvider {
 
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private SMTPConnectionSettings connectionSettings;
 
   /**

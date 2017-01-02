@@ -35,6 +35,7 @@ import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
+import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KillParameters;
@@ -99,7 +100,7 @@ public class HeisenbergOperations {
     return killWithCustomMessage(new KillParameters(victim, goodbyeMessage));
   }
 
-  public String killWithCustomMessage(@ParameterGroup(KILL_WITH_GROUP) KillParameters killParameters) {
+  public String killWithCustomMessage(@ParameterGroup(name = KILL_WITH_GROUP) KillParameters killParameters) {
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }
 
@@ -150,13 +151,28 @@ public class HeisenbergOperations {
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
-  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting, @ParameterGroup("Personal Info") PersonalInfo info) {
+  public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting,
+                      @ParameterGroup(name = "Personal Info") PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 
   public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, Message message) {
     Long payment = (Long) message.getPayload().getValue();
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
+  }
+
+  public BarberPreferences getBarberPreferences(@UseConfig HeisenbergExtension config) {
+    return config.getBarberPreferences();
+  }
+
+  public BarberPreferences getInlineInfo(@ParameterGroup(name = "Personal Barber",
+      showInDsl = true) BarberPreferences preferences) {
+    return preferences;
+  }
+
+  public PersonalInfo getInlinePersonalInfo(@ParameterGroup(name = "Personal Info Argument",
+      showInDsl = true) PersonalInfo info) {
+    return info;
   }
 
   public List<String> knockMany(@Summary(KNOCKEABLE_DOORS_SUMMARY) List<KnockeableDoor> doors) {

@@ -30,7 +30,7 @@ import javax.sql.DataSource;
 @Alias("data-source")
 public class DataSourceReferenceConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup(CONNECTION)
+  @ParameterGroup(name = CONNECTION)
   private DataSourceConnectionSettings connectionSettings;
 
   @Override

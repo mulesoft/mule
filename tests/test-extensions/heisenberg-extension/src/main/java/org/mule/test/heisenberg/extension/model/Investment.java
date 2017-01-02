@@ -28,7 +28,7 @@ public abstract class Investment {
   @Optional
   private Map<String, Investment> investmentSpinOffs;
 
-  @ParameterGroup("Investment")
+  @ParameterGroup(name = "Investment")
   private InvestmentInfo investmentInfo;
 
   public String getCommercialName() {

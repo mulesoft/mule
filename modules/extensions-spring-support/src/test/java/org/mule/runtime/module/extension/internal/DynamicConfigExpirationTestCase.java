@@ -12,7 +12,6 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
