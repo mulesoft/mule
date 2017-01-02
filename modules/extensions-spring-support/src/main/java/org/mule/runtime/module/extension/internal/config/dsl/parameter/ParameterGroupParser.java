@@ -46,7 +46,7 @@ public class ParameterGroupParser extends ExtensionDefinitionParser {
                               MuleContext muleContext) {
     super(definition, dslResolver, context, muleContext);
 
-    checkArgument(group.isShowInline(), "Cannot parse an implicit group");
+    checkArgument(group.isShowInDsl(), "Cannot parse an implicit group");
     this.group = group;
     this.groupDescriptor = groupDescriptor;
     this.classLoader = classLoader;

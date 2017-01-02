@@ -166,12 +166,12 @@ public class HeisenbergOperations {
   }
 
   public BarberPreferences getInlineInfo(@ParameterGroup(name = "Personal Barber",
-      showInline = true) BarberPreferences preferences) {
+      showInDsl = true) BarberPreferences preferences) {
     return preferences;
   }
 
   public PersonalInfo getInlinePersonalInfo(@ParameterGroup(name = "Personal Info Argument",
-      showInline = true) PersonalInfo info) {
+      showInDsl = true) PersonalInfo info) {
     return info;
   }
 

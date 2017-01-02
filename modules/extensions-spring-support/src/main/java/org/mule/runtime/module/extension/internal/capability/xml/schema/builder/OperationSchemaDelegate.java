@@ -60,7 +60,7 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
     ExtensionType operationType = createExecutableType(name, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax);
 
     List<ParameterModel> inlineGroupedParameters = operationModel.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInline)
+        .filter(ParameterGroupModel::isShowInDsl)
         .flatMap(g -> g.getParameterModels().stream())
         .collect(toList());
 
@@ -71,7 +71,7 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
     registerParameters(operationType, flatParameters);
 
     operationModel.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInline)
+        .filter(ParameterGroupModel::isShowInDsl)
         .forEach(g -> {
           initialiseSequence(operationType);
           builder.addInlineParameterGroup(g, operationType.getSequence());

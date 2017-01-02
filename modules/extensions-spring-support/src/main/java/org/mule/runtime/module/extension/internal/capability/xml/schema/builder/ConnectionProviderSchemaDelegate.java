@@ -75,7 +75,7 @@ final class ConnectionProviderSchemaDelegate {
     }
 
     providerModel.getParameterGroupModels().forEach(group -> {
-      if (!group.isShowInline()) {
+      if (!group.isShowInDsl()) {
         builder.addParameterToSequence(builder.registerParameters(providerType, group.getParameterModels()), sequence);
       } else {
         builder.addInlineParameterGroup(group, sequence);

@@ -332,7 +332,7 @@ public final class JavaModelLoaderDelegate {
     });
 
 
-    declarer.withInlineDefinition(groupAnnotation.showInline());
+    declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
 
     MuleExtensionAnnotationParser.parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 

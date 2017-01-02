@@ -77,7 +77,7 @@ final class ConfigurationSchemaDelegate {
       });
 
       configurationModel.getParameterGroupModels().forEach(group -> {
-        if (!group.isShowInline()) {
+        if (!group.isShowInDsl()) {
           List<TopLevelElement> parameters = builder.registerParameters(config, group.getParameterModels());
           builder.addParameterToSequence(parameters, sequence);
         } else {

@@ -752,7 +752,7 @@ public abstract class ExtensionDefinitionParser {
 
   protected List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
     return model.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInline)
+        .filter(ParameterGroupModel::isShowInDsl)
         .collect(toList());
   }
 

@@ -115,7 +115,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (SourceCallbackContext.class.isAssignableFrom(parameterType)) {
         argumentResolver = SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
       } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)) &&
-          !((ParameterGroup) annotations.get(ParameterGroup.class)).showInline()) {
+          !((ParameterGroup) annotations.get(ParameterGroup.class)).showInDsl()) {
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
       } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));

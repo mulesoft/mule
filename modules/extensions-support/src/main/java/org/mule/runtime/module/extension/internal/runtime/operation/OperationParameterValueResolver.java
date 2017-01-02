@@ -42,7 +42,7 @@ public class OperationParameterValueResolver implements ParameterValueResolver {
 
   private Optional<ParameterGroupDescriptor> getParameterGroup(String parameterGroupName) {
     return operationModel.getParameterGroupModels().stream()
-        .filter(group -> group.getName().equals(parameterGroupName) && !group.isShowInline())
+        .filter(group -> group.getName().equals(parameterGroupName) && !group.isShowInDsl())
         .findFirst()
         .map(group -> group.getModelProperty(ParameterGroupModelProperty.class))
         .filter(Optional::isPresent)

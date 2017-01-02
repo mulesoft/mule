@@ -180,7 +180,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Optional
   private List<HealthStatus> healthProgressions;
 
-  @ParameterGroup(name = INLINE_BARBER_PREFERENCES, showInline = true)
+  @ParameterGroup(name = INLINE_BARBER_PREFERENCES, showInDsl = true)
   private BarberPreferences barberPreferences;
 
   @Override
