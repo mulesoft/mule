@@ -42,6 +42,9 @@ public class OperationParameterValueResolver implements ParameterValueResolver {
 
   private Optional<ParameterGroupDescriptor> getParameterGroup(String parameterGroupName) {
     return operationModel.getParameterGroupModels().stream()
+        // when resolving an inline group, we need to obtain it from the executionContext
+        // and avoid its resolution using the ParameterGroupArgumentResolver
+        // thus we filter all the groups that are shown in the dsl
         .filter(group -> group.getName().equals(parameterGroupName) && !group.isShowInDsl())
         .findFirst()
         .map(group -> group.getModelProperty(ParameterGroupModelProperty.class))
