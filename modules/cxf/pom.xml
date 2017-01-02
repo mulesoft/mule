@@ -18,7 +18,7 @@
 
     <build>
         <plugins>
-            <!--TODO FIX: MULE-10747 test generated classes are copied into org.mule.runtime.module.cxf.example -->
+            <!--TODO FIX: MULE-10747 test generated classes are copied into org.mule.compatibility.module.cxf.example -->
             <!--<plugin>-->
                 <!--<groupId>org.apache.cxf</groupId>-->
                 <!--<artifactId>cxf-codegen-plugin</artifactId>-->

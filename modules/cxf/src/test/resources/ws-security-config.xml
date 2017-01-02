@@ -15,7 +15,7 @@
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <spring:bean name="noOp" class="org.apache.ws.security.validate.NoOpValidator" />
-    <spring:bean name="clientPasswordCallback" class="org.mule.runtime.module.cxf.wssec.ClientPasswordCallback"/>
+    <spring:bean name="clientPasswordCallback" class="org.mule.compatibility.module.cxf.wssec.ClientPasswordCallback"/>
 
     <cxf:ws-security name="config1">
         <cxf:mule-security-manager/>
@@ -23,7 +23,7 @@
             <cxf:property key="action" value="UsernameToken"/>
             <cxf:property key="user" value="joe"/>
             <cxf:property key="passwordType" value="PasswordText"/>
-            <cxf:property key="passwordCallbackClass" value="org.mule.runtime.module.cxf.wssec.ClientPasswordCallback"/>
+            <cxf:property key="passwordCallbackClass" value="org.mule.compatibility.module.cxf.wssec.ClientPasswordCallback"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:username-token-validator ref="noOp"/>
@@ -34,8 +34,8 @@
         <cxf:ws-config>
             <cxf:property key="action" value="Timestamp Signature Encrypt"/>
             <cxf:property key="user" value="joe"/>
-            <cxf:property key="signaturePropFile" value="org/mule/runtime/module/cxf/wssec/wssecurity.properties" />
-            <cxf:property key="encryptionPropFile" value="org/mule/runtime/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="signaturePropFile" value="org/mule/compatibility/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="encryptionPropFile" value="org/mule/compatibility/module/cxf/wssec/wssecurity.properties" />
             <cxf:property key="encryptionUser" value="joe"/>
             <cxf:property key="passwordCallbackRef" value-ref="clientPasswordCallback"/>
         </cxf:ws-config>

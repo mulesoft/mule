@@ -12,9 +12,9 @@
            ">
 
 
-    <custom-transformer name="holderTransformer" class="org.mule.runtime.module.cxf.HolderNonBlockingTestCase$HolderTransformer"/>
-    <custom-transformer name="holderTransformer2" class="org.mule.runtime.module.cxf.HolderNonBlockingTestCase$HolderTransformer2"/>
-    <custom-transformer name="holderTransformer3" class="org.mule.runtime.module.cxf.HolderNonBlockingTestCase$HolderTransformer3"/>
+    <custom-transformer name="holderTransformer" class="org.mule.compatibility.module.cxf.HolderNonBlockingTestCase$HolderTransformer"/>
+    <custom-transformer name="holderTransformer2" class="org.mule.compatibility.module.cxf.HolderNonBlockingTestCase$HolderTransformer2"/>
+    <custom-transformer name="holderTransformer3" class="org.mule.compatibility.module.cxf.HolderNonBlockingTestCase$HolderTransformer3"/>
 
     <httpn:listener-config name="listenerConfig">
         <httpn:listener-connection host="localhost" port="${port1}"/>
@@ -26,8 +26,8 @@
 
     <flow name="echoService" processingStrategy="non-blocking">
         <httpn:listener path="echo" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.HolderService"/>
-        <component class="org.mule.runtime.module.cxf.HolderServiceImplForNonBlocking" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.HolderService"/>
+        <component class="org.mule.compatibility.module.cxf.HolderServiceImplForNonBlocking" />
     </flow>
 
 
@@ -40,7 +40,7 @@
             <!-- Ensure message owner is correct, test will fail otherwise -->
             <set-property propertyName="foo" value="bar"/>
         </response>
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.HolderService" operation="echo"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.HolderService" operation="echo"/>
         <httpn:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -53,7 +53,7 @@
             <!-- Ensure message owner is correct, test will fail otherwise -->
             <set-property propertyName="foo" value="bar"/>
         </response>
-        <cxf:jaxws-client clientClass="org.mule.runtime.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo" wsdlLocation="echoHolder.wsdl"/>
+        <cxf:jaxws-client clientClass="org.mule.compatibility.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo" wsdlLocation="echoHolder.wsdl"/>
         <httpn:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -67,7 +67,7 @@
             <!-- Ensure message owner is correct, test will fail otherwise -->
             <set-property propertyName="foo" value="bar"/>
         </response>
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.HolderService" operation="echo2"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.HolderService" operation="echo2"/>
         <httpn:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -80,7 +80,7 @@
             <!-- Ensure message owner is correct, test will fail otherwise -->
             <set-property propertyName="foo" value="bar"/>
         </response>
-        <cxf:jaxws-client clientClass="org.mule.runtime.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo2" wsdlLocation="echoHolder.wsdl"/>
+        <cxf:jaxws-client clientClass="org.mule.compatibility.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo2" wsdlLocation="echoHolder.wsdl"/>
         <httpn:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -94,7 +94,7 @@
             <!-- Ensure message owner is correct, test will fail otherwise -->
             <set-property propertyName="foo" value="bar"/>
         </response>
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.HolderService" operation="echo3"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.HolderService" operation="echo3"/>
         <httpn:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -107,7 +107,7 @@
             <!-- Ensure message owner is correct, test will fail otherwise -->
             <set-property propertyName="foo" value="bar"/>
         </response>
-        <cxf:jaxws-client clientClass="org.mule.runtime.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo3" wsdlLocation="echoHolder.wsdl"/>
+        <cxf:jaxws-client clientClass="org.mule.compatibility.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo3" wsdlLocation="echoHolder.wsdl"/>
         <httpn:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 

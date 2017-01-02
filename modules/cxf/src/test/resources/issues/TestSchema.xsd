@@ -1,4 +1,4 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.module.runtime.mule.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.module.runtime.mule.org/">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.module.compatibility.mule.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.module.compatibility.mule.org/">
     <xs:element name="echo" type="tns:echo"/>
     <xs:element name="echoResponse" type="tns:echoResponse"/>
     <xs:complexType name="echo">

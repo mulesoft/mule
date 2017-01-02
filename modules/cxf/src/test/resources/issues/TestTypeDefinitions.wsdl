@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.module.runtime.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestService" targetNamespace="http://cxf.module.runtime.mule.org/">
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.module.compatibility.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestService" targetNamespace="http://cxf.module.compatibility.mule.org/">
 
     <!--
     This WSDL contains the type definitions for the TestService, and imports the schema from a separate file "TestSchema.xsd".
     -->
 
     <wsdl:types>
-        <xsd:schema targetNamespace="http://cxf.module.runtime.mule.org/">
-            <xsd:import schemaLocation="TestSchema.xsd" namespace="http://cxf.module.runtime.mule.org/"/>
+        <xsd:schema targetNamespace="http://cxf.module.compatibility.mule.org/">
+            <xsd:import schemaLocation="TestSchema.xsd" namespace="http://cxf.module.compatibility.mule.org/"/>
         </xsd:schema>
     </wsdl:types>
     <wsdl:message name="echoResponse">

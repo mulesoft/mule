@@ -36,6 +36,7 @@ import org.mule.compatibility.core.routing.EndpointDlqUntilSuccessful;
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.core.routing.requestreply.SimpleAsyncEndpointRequestReplyRequester;
 import org.mule.compatibility.core.transformer.simple.MessageProcessorTransformerAdaptor;
+import org.mule.compatibility.module.cxf.CxfConstants;
 import org.mule.compatibility.module.cxf.builder.WebServiceMessageProcessorWithInboundEndpointBuilder;
 import org.mule.compatibility.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
@@ -57,7 +58,6 @@ import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataT
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
-import org.mule.runtime.module.cxf.CxfConstants;
 
 public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler {
 

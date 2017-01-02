@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wsdl:definitions name="OnlineStoreService" targetNamespace="http://support.cxf.module.runtime.mule.org/"
-    xmlns="http://support.cxf.module.runtime.mule.org/"
+<wsdl:definitions name="OnlineStoreService" targetNamespace="http://support.cxf.module.compatibility.mule.org/"
+    xmlns="http://support.cxf.module.compatibility.mule.org/"
     xmlns:messages="http://www.nile-online.co.uk/schema/messages"
     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
     <wsdl:types>

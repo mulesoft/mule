@@ -1,6 +1,6 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
-        <ns1:getAllResponse xmlns:ns1="http://example.cxf.module.runtime.mule.org/">
+        <ns1:getAllResponse xmlns:ns1="http://example.cxf.module.compatibility.mule.org/">
             <return>
                 <item>
                     <artType>AUTHOR</artType>

@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.module.cxf.config;
 
-import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.runtime.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.compatibility.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.compatibility.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 
 import org.springframework.beans.factory.FactoryBean;
 

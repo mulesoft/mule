@@ -23,13 +23,13 @@
             <fixed-frequency-scheduler frequency="1000" startDelay="1000" timeUnit="MILLISECONDS"/>
             <set-payload value="TEST"/>
         </poll>
-        <component class="org.mule.runtime.module.cxf.employee.EmployeeMessageGenerator">
+        <component class="org.mule.compatibility.module.cxf.employee.EmployeeMessageGenerator">
         </component>
         <cxf:jaxws-client clientClass="org.mule.example.employee.EmployeeDirectory_Service"
                           operation="addEmployee" port="EmployeeDirectoryPort" wsdlLocation="classpath:employeeDirectory.wsdl"
                           mtomEnabled="true">
             <cxf:outInterceptors>
-                <spring:bean class="org.mule.runtime.module.cxf.employee.AttachmentVerifyInterceptor"/>
+                <spring:bean class="org.mule.compatibility.module.cxf.employee.AttachmentVerifyInterceptor"/>
             </cxf:outInterceptors>
         </cxf:jaxws-client>
         <httpn:request config-ref="requestConfig" path="/services/employeeDirectory" method="POST" />
@@ -42,10 +42,10 @@
 
     <flow name="employeeDirectoryService">
         <httpn:listener path="/services/employeeDirectory" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.employee.EmployeeDirectoryImpl"
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.employee.EmployeeDirectoryImpl"
                            mtomEnabled="true"/>
         <component>
-            <singleton-object class="org.mule.runtime.module.cxf.employee.EmployeeDirectoryImpl"/>
+            <singleton-object class="org.mule.compatibility.module.cxf.employee.EmployeeDirectoryImpl"/>
         </component>
     </flow>
     

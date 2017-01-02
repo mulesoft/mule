@@ -12,7 +12,7 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <custom-transformer name="throwsException" class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$CxfTransformerThrowsExceptions"/>
+    <custom-transformer name="throwsException" class="org.mule.compatibility.module.cxf.OnErrorContinueTestCase$CxfTransformerThrowsExceptions"/>
 
     <httpn:listener-config name="listenerConfig">
         <httpn:listener-connection host="localhost" port="${port1}"/>
@@ -26,8 +26,8 @@
     <!-- Jaxws Service with exception thrown by component with catch exception strategy -->
     <flow name="FlowServiceFaultWithCatchException">
         <httpn:listener path="testServiceWithFaultCatchException" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
         <error-handler>
             <on-error-continue>
                 <object-to-string-transformer/>
@@ -41,18 +41,18 @@
         <httpn:listener path="testServiceWithFaultCatchExceptionRethrown" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
-        <custom-exception-strategy class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$RethrowExceptionStrategy">
-            <custom-processor class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$RethrowFaultProcessor"/>
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
+        <custom-exception-strategy class="org.mule.compatibility.module.cxf.OnErrorContinueTestCase$RethrowExceptionStrategy">
+            <custom-processor class="org.mule.compatibility.module.cxf.OnErrorContinueTestCase$RethrowFaultProcessor"/>
         </custom-exception-strategy>
     </flow>
 
     <!-- Jaxws Service with exception thrown by transformer with catch exception strategy -->
     <flow name="FlowWithExceptionThrownInTransformerWithCatchException">
         <httpn:listener path="testTransformerExceptionCatchException" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
         <object-to-string-transformer/>
         <append-string-transformer message="APPEND"/>
         <transformer ref="throwsException"/>
@@ -67,33 +67,33 @@
 
     <flow name="helloFaultFlow">
         <httpn:listener path="helloFault" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
     </flow>
 
     <flow name="helloFlow">
         <httpn:listener path="hello" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorld"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <flow name="FlowWithClientAndSOAPFaultCatchException" processingStrategy="synchronous">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.TestServiceFault" operation="sayHi"/>
         <httpn:request path="helloFault" config-ref="requestConfig"/>
         <error-handler>
             <on-error-continue>
-                <custom-processor class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$ProxyCustomProcessor"/>
+                <custom-processor class="org.mule.compatibility.module.cxf.OnErrorContinueTestCase$ProxyCustomProcessor"/>
             </on-error-continue>
         </error-handler>
     </flow>
 
     <flow name="FlowWithClientAndSOAPFaultCatchExceptionRedirect" processingStrategy="synchronous">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.TestServiceFault" operation="sayHi"/>
         <httpn:request path="helloFault" method="POST" config-ref="requestConfig"/>
         <error-handler>
             <on-error-continue>
                 <processor-chain>
-                    <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="sayHi"/>
+                    <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld" operation="sayHi"/>
                     <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
                 </processor-chain>
             </on-error-continue>
@@ -101,7 +101,7 @@
     </flow>
 
     <flow name="FlowWithClientAndTransformerExceptionCatchException" processingStrategy="synchronous">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld" operation="sayHi"/>
         <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
         <object-to-string-transformer/>
         <append-string-transformer message=" Anonymous"/>
@@ -124,7 +124,7 @@
         <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
         <error-handler>
             <on-error-continue>
-                <custom-processor class="org.mule.runtime.module.cxf.OnErrorContinueTestCase$ProxyCustomProcessor"/>
+                <custom-processor class="org.mule.compatibility.module.cxf.OnErrorContinueTestCase$ProxyCustomProcessor"/>
             </on-error-continue>
         </error-handler>
     </flow>

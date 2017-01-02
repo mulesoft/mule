@@ -29,16 +29,16 @@
             </httpn:response-builder>
         </httpn:listener>
         <cxf:proxy-service payload="body" service="ArtistRegistryWebServicesService"
-                           namespace="http://example.cxf.module.runtime.mule.org/"
+                           namespace="http://example.cxf.module.compatibility.mule.org/"
                            port="ArtistRegistryWebServicesPort"
                            wsdlLocation="artistregistry.wsdl" >
             <cxf:features>
-                    <spring:bean class="org.mule.runtime.module.cxf.feature.ProxyGZIPFeature"/>
+                    <spring:bean class="org.mule.compatibility.module.cxf.feature.ProxyGZIPFeature"/>
             </cxf:features>
         </cxf:proxy-service>
         <cxf:proxy-client payload="body">
             <cxf:features>
-                <spring:bean class="org.mule.runtime.module.cxf.feature.ProxyGZIPFeature"/>
+                <spring:bean class="org.mule.compatibility.module.cxf.feature.ProxyGZIPFeature"/>
             </cxf:features>
         </cxf:proxy-client>
         <httpn:request config-ref="requestConfig" path="/artistRegistry" method="POST">
@@ -62,11 +62,11 @@
             <object-to-byte-array-transformer />
             <gzip-compress-transformer/>
         </response>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.artistregistry.ArtistRegistryWebServices">
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.testmodels.artistregistry.ArtistRegistryWebServices">
             <cxf:inInterceptors>
-                <spring:bean class="org.mule.runtime.module.cxf.support.ProxyGZIPInInterceptor"/>
+                <spring:bean class="org.mule.compatibility.module.cxf.support.ProxyGZIPInInterceptor"/>
             </cxf:inInterceptors>
         </cxf:jaxws-service>
-        <component class="org.mule.runtime.module.cxf.testmodels.artistregistry.ArtistRegistry"/>
+        <component class="org.mule.compatibility.module.cxf.testmodels.artistregistry.ArtistRegistry"/>
     </flow>
 </mule>
