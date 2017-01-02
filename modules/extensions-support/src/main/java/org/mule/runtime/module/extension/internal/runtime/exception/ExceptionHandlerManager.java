@@ -13,34 +13,34 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;
 
 /**
  * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will
- * test for a {@link ExceptionEnricherModelProperty} to determine the {@link ExceptionEnricher}
- * which should be use. If no such property is available then a default {@link NullExceptionEnricher}
+ * test for a {@link ExceptionHandlerModelProperty} to determine the {@link ExceptionHandler}
+ * which should be use. If no such property is available then a default {@link NullExceptionHandler}
  * is used.
  * <p>
  * It also contains all the logic for operations and sources {@link Throwable} process and handling.
  *
  * @since 4.0
  */
-public final class ExceptionEnricherManager {
+public final class ExceptionHandlerManager {
 
-  private static final ExceptionEnricher DEFAULT_EXCEPTION_ENRICHER = new NullExceptionEnricher();
-  private final ExceptionEnricher exceptionEnricher;
+  private static final ExceptionHandler DEFAULT_EXCEPTION_ENRICHER = new NullExceptionHandler();
+  private final ExceptionHandler exceptionHandler;
 
-  public ExceptionEnricherManager(ExtensionModel extensionModel, ComponentModel componentModel) {
-    exceptionEnricher = findExceptionEnricher(extensionModel, componentModel);
+  public ExceptionHandlerManager(ExtensionModel extensionModel, ComponentModel componentModel) {
+    exceptionHandler = findExceptionHandler(extensionModel, componentModel);
   }
 
   public Exception processException(Throwable t) {
     Exception handledException = handleException(t);
-    Exception exception = exceptionEnricher.enrichException(handledException);
+    Exception exception = exceptionHandler.enrichException(handledException);
     return exception != null ? exception : handledException;
   }
 
@@ -60,16 +60,16 @@ public final class ExceptionEnricherManager {
     return t instanceof Exception ? (Exception) t : new Exception(t);
   }
 
-  private ExceptionEnricher findExceptionEnricher(ExtensionModel extension, EnrichableModel child) {
-    return findExceptionEnricher(child).orElseGet(() -> findExceptionEnricher(extension).orElse(DEFAULT_EXCEPTION_ENRICHER));
+  private ExceptionHandler findExceptionHandler(ExtensionModel extension, EnrichableModel child) {
+    return findExceptionHandler(child).orElseGet(() -> findExceptionHandler(extension).orElse(DEFAULT_EXCEPTION_ENRICHER));
   }
 
-  private Optional<ExceptionEnricher> findExceptionEnricher(EnrichableModel model) {
-    return model.getModelProperty(ExceptionEnricherModelProperty.class)
-        .map(p -> p.getExceptionEnricherFactory().createEnricher());
+  private Optional<ExceptionHandler> findExceptionHandler(EnrichableModel model) {
+    return model.getModelProperty(ExceptionHandlerModelProperty.class)
+        .map(p -> p.getExceptionHandlerFactory().createHandler());
   }
 
-  ExceptionEnricher getExceptionEnricher() {
-    return exceptionEnricher;
+  ExceptionHandler getExceptionHandler() {
+    return exceptionHandler;
   }
 }

@@ -11,7 +11,6 @@ import static org.mule.extensions.jms.api.config.AckMode.AUTO;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.evaluateMessageAck;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
@@ -164,9 +163,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
     } catch (Exception e) {
       LOGGER.error("An error occurred while consuming a message: ", e);
-      sourceCallback.onSourceException(new JmsExtensionException(
-                                                                 createStaticMessage("An error occurred while consuming a message: "),
-                                                                 e));
+      sourceCallback.onSourceException(new JmsExtensionException(e, "An error occurred while consuming a message: "));
     }
   }
 
@@ -260,9 +257,8 @@ public class JmsListener extends Source<Object, JmsAttributes> {
       }
     } catch (JMSException e) {
       LOGGER.error("An error occurred while obtaining the ReplyTo destination: ", e);
-      sourceCallback.onSourceException(new JmsExtensionException(
-                                                                 createStaticMessage("An error occurred while obtaining the ReplyTo destination: "),
-                                                                 e));
+      sourceCallback
+          .onSourceException(new JmsExtensionException(e, "An error occurred while obtaining the ReplyTo destination: "));
     }
   }
 

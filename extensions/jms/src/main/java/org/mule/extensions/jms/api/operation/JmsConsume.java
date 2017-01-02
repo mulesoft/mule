@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.evaluateMessageAck;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
@@ -18,6 +17,8 @@ import org.mule.extensions.jms.api.config.JmsConsumerConfig;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.destination.ConsumerType;
+import org.mule.extensions.jms.api.exception.JmsConsumeErrorTypeProvider;
+import org.mule.extensions.jms.api.exception.JmsConsumeException;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
@@ -25,6 +26,7 @@ import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -67,9 +69,10 @@ public final class JmsConsume {
    * @param maximumWaitUnit  Time unit to be used in the maximumWaitTime configurations
    * @return a {@link Result} with the {@link Message} content as {@link Result#getOutput} and its properties
    * and headers as {@link Result#getAttributes}
-   * @throws JmsExtensionException if an error occurs
+   * @throws JmsConsumeException if an error occurs
    */
   @OutputResolver(output = JmsOutputResolver.class)
+  @Throws(JmsConsumeErrorTypeProvider.class)
   public Result<Object, JmsAttributes> consume(@Connection JmsConnection connection, @UseConfig JmsConfig config,
                                                @XmlHints(
                                                    allowReferences = false) @Summary("The name of the Destination from where the Message should be consumed") String destination,
@@ -110,7 +113,6 @@ public final class JmsConsume {
 
       if (received != null) {
         evaluateMessageAck(connection, ackMode, session, received);
-
         // If no explicit content type was provided to the operation, fallback to the
         // one communicated in the message properties. Finally if no property was set,
         // use the default one provided by the config
@@ -125,7 +127,7 @@ public final class JmsConsume {
       String msg = format("An error occurred while consuming a message from destination [%s] of type [%s]: ",
                           destination, consumerType.isTopic() ? "TOPIC" : "QUEUE");
       LOGGER.error(msg, e);
-      throw new JmsExtensionException(createStaticMessage(msg), e);
+      throw new JmsConsumeException(msg, e);
     }
   }
 

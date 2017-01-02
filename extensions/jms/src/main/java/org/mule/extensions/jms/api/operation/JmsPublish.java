@@ -8,7 +8,6 @@ package org.mule.extensions.jms.api.operation;
 
 import static java.lang.String.format;
 import static org.mule.extensions.jms.api.config.AckMode.AUTO;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
@@ -16,9 +15,12 @@ import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.destination.DestinationType;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
+import org.mule.extensions.jms.api.exception.JmsPublishException;
+import org.mule.extensions.jms.api.exception.JmsPublisherErrorTypeProvider;
 import org.mule.extensions.jms.api.message.MessageBuilder;
 import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -56,8 +58,9 @@ public final class JmsPublish {
    * @param timeToLiveUnit     unit to be used in the timeToLive configurations
    * @param deliveryDelay      Only used by JMS 2.0. Sets the delivery delay to be applied in order to postpone the Message delivery
    * @param deliveryDelayUnit  Time unit to be used in the deliveryDelay configurations
-   * @throws JmsExtensionException if an error occurs
+   * @throws JmsPublishException if an error occurs
    */
+  @Throws(JmsPublisherErrorTypeProvider.class)
   public void publish(@UseConfig JmsConfig config, @Connection JmsConnection connection,
                       @XmlHints(
                           allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
@@ -91,7 +94,7 @@ public final class JmsPublish {
       }
     } catch (Exception e) {
       LOGGER.error(format("An error occurred while sending a message to [%s]: ", destination), e);
-      throw new JmsExtensionException(createStaticMessage("An error occurred while sending a message to [%s]: ", destination), e);
+      throw new JmsPublishException(format("An error occurred while sending a message to [%s]: ", destination), e);
     }
   }
 

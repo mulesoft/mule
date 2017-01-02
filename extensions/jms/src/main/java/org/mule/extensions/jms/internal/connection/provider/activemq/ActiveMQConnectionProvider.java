@@ -9,7 +9,7 @@ package org.mule.extensions.jms.internal.connection.provider.activemq;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.internal.connection.exception.ActiveMQConnectionException;
+import org.mule.extensions.jms.internal.connection.exception.ActiveMQException;
 import org.mule.extensions.jms.internal.connection.provider.BaseConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.util.proxy.TargetInvocationHandler;
@@ -45,7 +45,7 @@ public class ActiveMQConnectionProvider extends BaseConnectionProvider {
   private ConnectionFactory connectionFactory;
 
   @Override
-  public ConnectionFactory getConnectionFactory() throws ActiveMQConnectionException {
+  public ConnectionFactory getConnectionFactory() throws ActiveMQException {
     if (connectionFactory != null) {
       return connectionFactory;
     }
@@ -54,7 +54,7 @@ public class ActiveMQConnectionProvider extends BaseConnectionProvider {
     return connectionFactory;
   }
 
-  private void createConnectionFactory() throws ActiveMQConnectionException {
+  private void createConnectionFactory() throws ActiveMQException {
     connectionFactory = connectionFactoryProvider.getConnectionFactory();
     if (connectionFactory == null) {
       if (LOGGER.isDebugEnabled()) {
@@ -63,9 +63,9 @@ public class ActiveMQConnectionProvider extends BaseConnectionProvider {
       if (JMS_2_0.equals(getConnectionParameters().getSpecification())) {
 
         //TODO we could support a JMS 2.0 default using ActiveMQ Artemis (HornetQ) instead of ActiveMQ 5.x
-        throw new IllegalArgumentException(
-                                           "No ConnectionFactory was provided, but JMS 2.0 specification was selected."
-                                               + " Default ActiveMQConnectionFactory implementation provides support only for JMS 1.1 and 1.0.2b versions");
+        throw new ActiveMQException(
+                                    "No ConnectionFactory was provided, but JMS 2.0 specification was selected."
+                                        + " Default ActiveMQConnectionFactory implementation provides support only for JMS 1.1 and 1.0.2b versions");
       }
 
       connectionFactory = connectionFactoryProvider.createDefaultConnectionFactory();

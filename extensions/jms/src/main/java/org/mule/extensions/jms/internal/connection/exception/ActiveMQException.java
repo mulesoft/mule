@@ -6,21 +6,24 @@
  */
 package org.mule.extensions.jms.internal.connection.exception;
 
+import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.internal.connection.provider.activemq.ActiveMQConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.i18n.I18nMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 /**
- * Generic {@link MuleException} thrown by the {@link ActiveMQConnectionProvider}
+ * Generic {@link JmsExtensionException} thrown by the {@link ActiveMQConnectionProvider}
  * when an error occurs related to an {@link ActiveMQConnectionFactory}
  *
  * @since 4.0
  */
-public class ActiveMQConnectionException extends MuleException {
+public class ActiveMQException extends JmsExtensionException {
 
-  public ActiveMQConnectionException(I18nMessage message, Throwable cause) {
-    super(message, cause);
+  public ActiveMQException(String message) {
+    super(message);
+  }
+
+  public ActiveMQException(String message, Exception exception) {
+    super(exception, message);
   }
 }

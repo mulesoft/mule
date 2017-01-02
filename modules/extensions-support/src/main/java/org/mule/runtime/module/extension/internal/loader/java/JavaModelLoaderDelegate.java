@@ -67,7 +67,7 @@ import org.mule.runtime.module.extension.internal.loader.java.contributor.Parame
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
@@ -163,7 +163,7 @@ public final class JavaModelLoaderDelegate {
   }
 
   <M extends WithAnnotations> HasModelProperties addExceptionEnricher(M model, HasModelProperties declarer) {
-    MuleExtensionAnnotationParser.getExceptionEnricherFactory(model).map(ExceptionEnricherModelProperty::new)
+    MuleExtensionAnnotationParser.getExceptionEnricherFactory(model).map(ExceptionHandlerModelProperty::new)
         .ifPresent(declarer::withModelProperty);
     return declarer;
   }

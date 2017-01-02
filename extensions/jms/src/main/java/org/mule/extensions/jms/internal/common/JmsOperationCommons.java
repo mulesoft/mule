@@ -15,6 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.api.exception.JmsAckException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -48,20 +49,24 @@ public final class JmsOperationCommons {
   public static void evaluateMessageAck(JmsConnection connection, AckMode ackMode, JmsSession session,
                                         Message received)
       throws JMSException {
-    if (ackMode.equals(NONE)) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Automatically performing an ACK over the message, since AckMode was NONE");
-      }
-      received.acknowledge();
+    try {
+      if (ackMode.equals(NONE)) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Automatically performing an ACK over the message, since AckMode was NONE");
+        }
+        received.acknowledge();
 
-    } else if (ackMode.equals(MANUAL)) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Registering pending ACK on session: " + session.getAckId());
-      }
-      String id = session.getAckId()
-          .orElseThrow(() -> new IllegalArgumentException("An AckId is required when MANUAL AckMode is set"));
+      } else if (ackMode.equals(MANUAL)) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Registering pending ACK on session: " + session.getAckId());
+        }
+        String id = session.getAckId()
+            .orElseThrow(() -> new IllegalArgumentException("An AckId is required when MANUAL AckMode is set"));
 
-      connection.registerMessageForAck(id, received);
+        connection.registerMessageForAck(id, received);
+      }
+    } catch (JMSException e) {
+      throw new JmsAckException("An error occurred while acking message", e);
     }
   }
 

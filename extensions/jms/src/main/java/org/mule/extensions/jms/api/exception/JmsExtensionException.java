@@ -6,38 +6,49 @@
  */
 package org.mule.extensions.jms.api.exception;
 
-import org.mule.runtime.api.exception.ExceptionHelper;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.i18n.I18nMessage;
+import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
  * Custom generic exception for JmsExtension thrown errors
  *
  * @since 4.0
  */
-public class JmsExtensionException extends MuleException {
+public class JmsExtensionException extends ModuleException {
 
   /**
    * {@inheritDoc}
    */
-  public JmsExtensionException(I18nMessage message) {
-    super();
-    setMessage(message);
+  public JmsExtensionException(String message) {
+    super(message, ANY);
   }
 
   /**
    * {@inheritDoc}
    */
-  public JmsExtensionException(I18nMessage message, Throwable cause) {
-    super(ExceptionHelper.unwrap(cause));
-    setMessage(message);
+  public JmsExtensionException(Exception exception, String message) {
+    super(exception, ANY, message);
   }
 
   /**
-   * {@inheritDoc}
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   * @param errorType JMS error
    */
-  public JmsExtensionException(Throwable cause) {
-    super(cause);
+  protected JmsExtensionException(String message, JmsErrors errorType) {
+    super(message, errorType);
+  }
+
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param exception cause of this exception
+   * @param message the detail message
+   * @param errorType JMS error
+   */
+  protected JmsExtensionException(Exception exception, JmsErrors errorType, String message) {
+    super(exception, errorType, message);
   }
 
 }

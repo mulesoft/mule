@@ -14,23 +14,24 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -45,31 +46,31 @@ public class ExceptionEnricherManagerTestCase {
   private SourceModel sourceModel;
 
   @Mock
-  private ExceptionEnricherFactory extensionFactory;
+  private ExceptionHandlerFactory extensionFactory;
 
   @Mock
-  private ExceptionEnricher extensionEnricher;
+  private ExceptionHandler extensionEnricher;
 
   @Mock
-  private ExceptionEnricherFactory sourceFactory;
+  private ExceptionHandlerFactory sourceFactory;
 
   @Mock
-  private ExceptionEnricher sourceEnricher;
+  private ExceptionHandler sourceEnricher;
 
-  private ExceptionEnricherManager manager;
+  private ExceptionHandlerManager manager;
 
   @Before
   public void beforeTest() {
-    when(extensionFactory.createEnricher()).thenReturn(extensionEnricher);
+    when(extensionFactory.createHandler()).thenReturn(extensionEnricher);
     mockExceptionEnricher(extensionModel, extensionFactory);
     mockExceptionEnricher(sourceModel, sourceFactory);
     when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(new HeisenbergException(ERROR_MESSAGE));
-    when(sourceFactory.createEnricher()).thenReturn(sourceEnricher);
+    when(sourceFactory.createHandler()).thenReturn(sourceEnricher);
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
     when(extensionModel.getName()).thenReturn("Test Extension");
     when(sourceModel.getName()).thenReturn("Test Source");
 
-    manager = new ExceptionEnricherManager(extensionModel, sourceModel);
+    manager = new ExceptionHandlerManager(extensionModel, sourceModel);
   }
 
   @Test
@@ -101,9 +102,9 @@ public class ExceptionEnricherManagerTestCase {
 
   @Test
   public void findCorrectEnricher() {
-    assertThat(manager.getExceptionEnricher(), is(sourceEnricher));
+    assertThat(manager.getExceptionHandler(), is(sourceEnricher));
     mockExceptionEnricher(sourceModel, null);
-    ExceptionEnricherManager manager = new ExceptionEnricherManager(extensionModel, sourceModel);
-    assertThat(manager.getExceptionEnricher(), is(extensionEnricher));
+    ExceptionHandlerManager manager = new ExceptionHandlerManager(extensionModel, sourceModel);
+    assertThat(manager.getExceptionHandler(), is(extensionEnricher));
   }
 }

@@ -7,10 +7,9 @@
 package org.mule.extensions.jms.internal.connection.provider.activemq;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import org.mule.extensions.jms.api.connection.factory.activemq.ActiveMQConnectionFactoryConfiguration;
-import org.mule.extensions.jms.internal.connection.exception.ActiveMQConnectionException;
+import org.mule.extensions.jms.internal.connection.exception.ActiveMQException;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -62,7 +61,7 @@ public class ActiveMQConnectionFactoryProvider {
     return connectionFactory;
   }
 
-  ConnectionFactory createDefaultConnectionFactory() throws ActiveMQConnectionException {
+  ConnectionFactory createDefaultConnectionFactory() throws ActiveMQException {
 
     try {
       if (LOGGER.isDebugEnabled()) {
@@ -77,7 +76,7 @@ public class ActiveMQConnectionFactoryProvider {
       String message = format("Failed to create a default Connection Factory for ActiveMQ using the [%s] implementation: ",
                               getFactoryClass());
       LOGGER.error(message, e);
-      throw new ActiveMQConnectionException(createStaticMessage(message), e);
+      throw new ActiveMQException(message, e);
     }
   }
 

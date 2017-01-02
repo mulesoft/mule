@@ -9,14 +9,14 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 
-public final class DefaultExceptionEnricherFactory implements ExceptionEnricherFactory {
+public final class DefaultExceptionHandlerFactory implements ExceptionHandlerFactory {
 
-  private final ExceptionEnricher enricher;
+  private final ExceptionHandler enricher;
 
-  public DefaultExceptionEnricherFactory(Class<? extends ExceptionEnricher> enricherType) {
+  public DefaultExceptionHandlerFactory(Class<? extends ExceptionHandler> enricherType) {
     checkArgument(enricherType != null, "ExceptionEnricher type cannot be null");
     try {
       enricher = enricherType.newInstance();
@@ -27,7 +27,7 @@ public final class DefaultExceptionEnricherFactory implements ExceptionEnricherF
   }
 
   @Override
-  public ExceptionEnricher createEnricher() {
+  public ExceptionHandler createHandler() {
     return enricher;
   }
 }

@@ -6,17 +6,23 @@
  */
 package org.mule.extensions.jms.api.exception;
 
-import org.mule.runtime.api.i18n.I18nMessage;
+import static org.mule.extensions.jms.api.exception.JmsErrors.TIMEOUT;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
- * Custom JMS Exception that represents an error when consuming a Message
+ * {@link ModuleException} that represents an error when consuming a Message
  * but a timeout is reached before the Message arrives
  *
  * @since 4.0
  */
-public class JmsTimeoutException extends JmsExtensionException {
+public final class JmsTimeoutException extends JmsConsumeException {
 
-  public JmsTimeoutException(I18nMessage message) {
-    super(message);
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   */
+  public JmsTimeoutException(String message) {
+    super(message, TIMEOUT);
   }
 }

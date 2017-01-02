@@ -56,13 +56,13 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
@@ -288,12 +288,12 @@ public final class ExtensionsTestUtils {
     return group;
   }
 
-  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionEnricherFactory exceptionEnricherFactory) {
-    Optional<ExceptionEnricherModelProperty> property = exceptionEnricherFactory != null
-        ? of(new ExceptionEnricherModelProperty(exceptionEnricherFactory))
+  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionHandlerFactory exceptionHandlerFactory) {
+    Optional<ExceptionHandlerModelProperty> property = exceptionHandlerFactory != null
+        ? of(new ExceptionHandlerModelProperty(exceptionHandlerFactory))
         : empty();
 
-    when(enrichableModel.getModelProperty(ExceptionEnricherModelProperty.class)).thenReturn(property);
+    when(enrichableModel.getModelProperty(ExceptionHandlerModelProperty.class)).thenReturn(property);
   }
 
   public static void mockInterceptors(EnrichableModel enrichableModel, List<InterceptorFactory> interceptorFactories) {

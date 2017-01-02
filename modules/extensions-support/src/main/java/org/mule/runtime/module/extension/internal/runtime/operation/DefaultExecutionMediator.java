@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
-import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ import reactor.core.publisher.Mono;
 public final class DefaultExecutionMediator implements ExecutionMediator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
-  private final ExceptionEnricherManager exceptionEnricherManager;
+  private final ExceptionHandlerManager exceptionEnricherManager;
   private final ConnectionManagerAdapter connectionManager;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
@@ -76,7 +76,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel,
                                   ConnectionManagerAdapter connectionManager, ErrorTypeRepository typeRepository) {
     this.connectionManager = connectionManager;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
   }
 

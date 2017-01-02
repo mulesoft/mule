@@ -6,7 +6,7 @@
  */
 package org.mule.extensions.jms.api.exception;
 
-import org.mule.runtime.api.i18n.I18nMessage;
+import static org.mule.extensions.jms.api.exception.JmsErrors.DESTINATION_NOT_FOUND;
 
 import javax.jms.Destination;
 
@@ -17,15 +17,8 @@ import javax.jms.Destination;
  */
 public final class DestinationNotFoundException extends JmsExtensionException {
 
-  public DestinationNotFoundException(I18nMessage message) {
-    super(message);
+  public DestinationNotFoundException(String message) {
+    super(message, DESTINATION_NOT_FOUND);
   }
 
-  public DestinationNotFoundException(I18nMessage message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public DestinationNotFoundException(Throwable cause) {
-    super(cause);
-  }
 }

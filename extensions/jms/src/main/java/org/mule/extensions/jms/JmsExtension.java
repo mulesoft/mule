@@ -19,14 +19,18 @@ import org.mule.extensions.jms.api.connection.factory.jndi.SimpleJndiNameResolve
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.destination.QueueConsumer;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
+import org.mule.extensions.jms.api.exception.JmsErrors;
+import org.mule.extensions.jms.api.exception.JmsExceptionHandler;
 import org.mule.extensions.jms.internal.connection.provider.GenericConnectionProvider;
 import org.mule.extensions.jms.internal.connection.provider.activemq.ActiveMQConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 import javax.jms.ConnectionFactory;
 
@@ -51,7 +55,9 @@ import javax.jms.ConnectionFactory;
     baseType = ConnectionFactory.class, subTypes = {JndiConnectionFactory.class})
 @SubTypeMapping(
     baseType = JndiNameResolver.class, subTypes = {SimpleJndiNameResolver.class, CachedJndiNameResolver.class})
+@ErrorTypes(JmsErrors.class)
 @Export(classes = {ConnectionFactory.class})
+@OnException(JmsExceptionHandler.class)
 public class JmsExtension {
 
 }
