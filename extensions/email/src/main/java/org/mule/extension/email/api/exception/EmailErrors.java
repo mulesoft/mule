@@ -6,8 +6,14 @@
  */
 package org.mule.extension.email.api.exception;
 
+import org.mule.extension.email.internal.EmailConnector;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
+/**
+ * Errors for the {@link EmailConnector}
+ *
+ * @since 4.0
+ */
 public enum EmailErrors implements ErrorTypeDefinition<EmailErrors> {
-  ATTACHMENT, ACCESSING_FOLDER, ATTRIBUTES, EMAIL_NOT_FOUND
+  ATTACHMENT, ACCESSING_FOLDER, FETCHING_ATTRIBUTES, EMAIL_NOT_FOUND
 }
