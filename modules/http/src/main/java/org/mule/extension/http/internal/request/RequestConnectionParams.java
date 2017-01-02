@@ -46,9 +46,18 @@ public final class RequestConnectionParams {
    */
   @Parameter
   @Optional
-  @Example("http://www.somehost.com")
+  @Example("www.somehost.com")
   @Placement(order = 2)
   private Function<Event, String> host;
+
+  /**
+   * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
+   * protocol attribute is HTTPS then the default value is 443.
+   */
+  @Parameter
+  @Optional
+  @Placement(order = 3)
+  private Function<Event, Integer> port;
 
   /**
    * If false, each connection will be closed after the first request is completed.
@@ -58,16 +67,6 @@ public final class RequestConnectionParams {
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 1)
   private Boolean usePersistentConnections;
-
-  /**
-   * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
-   * protocol attribute is HTTPS then the default value is 443.
-   */
-  @Parameter
-  @Optional
-  @Example("80")
-  @Placement(order = 3)
-  private Function<Event, Integer> port;
 
   /**
    * The maximum number of outbound connections that will be kept open at the same time. By default the number of connections is
