@@ -8,25 +8,26 @@ package org.mule.runtime.core.exception;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.GlobalNameableObject;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.GlobalNameableObject;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -66,7 +67,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
         return exceptionListener.handleException(exception, event);
       }
     }
-    throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must accept any event."));
+    throw new MuleRuntimeException(createStaticMessage("Default exception strategy must accept any event."));
   }
 
   private boolean isCriticalException(MessagingException exception) {
@@ -91,11 +92,16 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private void addDefaultExceptionStrategyIfRequired() throws InitialisationException {
     if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll()) {
+      if (getMuleContext().getConfiguration().getDefaultErrorHandlerName().equals(this.getGlobalName())) {
+        throw new InitialisationException(
+                                          createStaticMessage("Default error-handler must include a final component that matches all errors."),
+                                          this);
+      }
       MessagingExceptionHandler defaultExceptionStrategy;
       try {
         defaultExceptionStrategy = getMuleContext().getDefaultErrorHandler();
       } catch (Exception e) {
-        throw new InitialisationException(CoreMessages.createStaticMessage("Failure initializing "
+        throw new InitialisationException(createStaticMessage("Failure initializing "
             + "error-handler. If error-handler is defined as default one "
             + "check that last exception strategy inside matches all errors"), e, this);
       }
@@ -116,8 +122,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     for (int i = 0; i < exceptionListeners.size() - 1; i++) {
       MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
       if (messagingExceptionHandlerAcceptor.acceptsAll()) {
-        throw new MuleRuntimeException(CoreMessages
-            .createStaticMessage("Only last exception strategy inside <error-handler> can accept any message. Maybe expression attribute is empty."));
+        throw new MuleRuntimeException(
+                                       createStaticMessage("Only last exception strategy inside <error-handler> can accept any message. Maybe expression attribute is empty."));
       }
     }
   }
