@@ -92,7 +92,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private void addDefaultExceptionStrategyIfRequired() throws InitialisationException {
     if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll()) {
-      if (getMuleContext().getConfiguration().getDefaultErrorHandlerName().equals(this.getGlobalName())) {
+      String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
+      if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(this.getGlobalName())) {
         throw new InitialisationException(
                                           createStaticMessage("Default error-handler must include a final component that matches all errors."),
                                           this);
