@@ -46,6 +46,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
@@ -126,10 +127,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
    * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
    * always contain the raw contents of the HTTP request.
    */
-  @Parameter
-  @Optional
-  @Placement(tab = CONFIGURATION_OVERRIDES)
-  private Boolean parseRequest;
+  @ParameterGroup(name = CONFIGURATION_OVERRIDES)
+  private ConfigurationOverrides configurationOverrides;
 
   /**
    * Defines if the response should be sent using streaming or not. If this attribute is not present, the behavior will depend on
@@ -148,6 +147,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private List<ErrorType> knownErrors;
+  private Boolean parseRequest;
 
   //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
@@ -223,7 +223,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     startIfNeeded(responseFactory);
 
     validatePath();
-    parseRequest = config.resolveParseRequest(parseRequest);
+    this.parseRequest = config.resolveParseRequest(configurationOverrides.getParseRequest());
     try {
       requestHandlerManager =
           server.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler(sourceCallback));
