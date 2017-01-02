@@ -12,6 +12,35 @@ import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderCon
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.SSLContext;
+
+import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.BodyDeferringAsyncHandler;
+import com.ning.http.client.HttpResponseBodyPart;
+import com.ning.http.client.HttpResponseHeaders;
+import com.ning.http.client.HttpResponseStatus;
+import com.ning.http.client.ProxyServer;
+import com.ning.http.client.Realm;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.multipart.ByteArrayPart;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -25,6 +54,7 @@ import org.mule.service.http.api.client.HttpAuthenticationType;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.client.HttpRequestAuthentication;
+import org.mule.service.http.api.client.async.ResponseHandler;
 import org.mule.service.http.api.client.proxy.NtlmProxyConfig;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -35,30 +65,6 @@ import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.tcp.TcpClientSocketProperties;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.BodyDeferringAsyncHandler;
-import com.ning.http.client.ProxyServer;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.multipart.ByteArrayPart;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,6 +234,18 @@ public class GrizzlyHttpClient implements HttpClient {
     }
   }
 
+  @Override
+  public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
+                   ResponseHandler handler) {
+    try {
+      PipedOutputStream outPipe = new PipedOutputStream();
+      asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
+                                     new ResponseBodyDeferringAsyncHandler(handler, outPipe));
+    } catch (Exception e) {
+      handler.onFailure(e);
+    }
+  }
+
   private HttpResponse createMuleResponse(Response response, InputStream inputStream) throws IOException {
     HttpResponseBuilder responseBuilder = HttpResponse.builder();
     responseBuilder.setStatusCode(response.getStatusCode());
@@ -354,4 +372,85 @@ public class GrizzlyHttpClient implements HttpClient {
   public void stop() {
     asyncHttpClient.close();
   }
+
+  private class ResponseBodyDeferringAsyncHandler implements AsyncHandler<Response> {
+
+    private volatile Response response;
+    private final OutputStream output;
+    private final InputStream input;
+    private final ResponseHandler responseHandler;
+    private final Response.ResponseBuilder responseBuilder = new Response.ResponseBuilder();
+    private final AtomicBoolean handled = new AtomicBoolean(false);
+
+    public ResponseBodyDeferringAsyncHandler(ResponseHandler responseHandler, PipedOutputStream output)
+        throws IOException {
+      this.output = output;
+      this.responseHandler = responseHandler;
+      this.input = new PipedInputStream(output);
+    }
+
+    public void onThrowable(Throwable t) {
+      try {
+        closeOut();
+      } catch (IOException e) {
+        // ignore
+      }
+      if (!handled.getAndSet(true)) {
+        Exception exception;
+        if (t.getCause() instanceof TimeoutException) {
+          exception = (TimeoutException) t.getCause();
+        } else if (t.getCause() instanceof IOException) {
+          exception = (IOException) t.getCause();
+        } else {
+          exception = t instanceof IOException ? (IOException) t : new IOException(t);
+        }
+        responseHandler.onFailure(exception);
+      }
+    }
+
+    public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
+      responseBuilder.reset();
+      responseBuilder.accumulate(responseStatus);
+      return STATE.CONTINUE;
+    }
+
+    public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
+      responseBuilder.accumulate(headers);
+      return STATE.CONTINUE;
+    }
+
+    public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
+      //body arrived, can handle the partial response
+      handleIfNecessary();
+      bodyPart.writeTo(output);
+      return STATE.CONTINUE;
+    }
+
+    protected void closeOut() throws IOException {
+      try {
+        output.flush();
+      } finally {
+        output.close();
+      }
+    }
+
+    public Response onCompleted() throws IOException {
+      //there may have been no body, handle partial response
+      handleIfNecessary();
+      closeOut();
+      return null;
+    }
+
+    private void handleIfNecessary() {
+      if (!handled.getAndSet(true)) {
+        response = responseBuilder.build();
+        try {
+          responseHandler.onCompletion(createMuleResponse(response, input));
+        } catch (IOException e) {
+          responseHandler.onFailure(e);
+        }
+      }
+    }
+  }
+
 }

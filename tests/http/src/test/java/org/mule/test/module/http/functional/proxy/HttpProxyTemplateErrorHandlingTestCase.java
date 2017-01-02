@@ -11,18 +11,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
-
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
-import org.mule.test.runner.RunnerDelegateTo;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -30,9 +18,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
 
-@RunnerDelegateTo(Parameterized.class)
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
   public static String SERVICE_DOWN_MESSAGE = "Service Down";
@@ -42,31 +32,9 @@ public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestT
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
-  @Rule
-  public SystemProperty systemProperty;
-
-  private String configFile;
-  private boolean nonBlocking;
-
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"http-proxy-template-error-handling-config.xml", false}// ,
-        // {"http-proxy-template-error-handling-config.xml", true}
-    });
-  }
-
-  public HttpProxyTemplateErrorHandlingTestCase(String configFile, boolean nonBlocking) {
-    this.configFile = configFile;
-    this.nonBlocking = nonBlocking;
-    if (nonBlocking) {
-      systemProperty = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, NON_BLOCKING_PROCESSING_STRATEGY);
-    }
-  }
-
   @Override
   protected String getConfigFile() {
-    return configFile;
+    return "http-proxy-template-error-handling-config.xml";
   }
 
   @Override
