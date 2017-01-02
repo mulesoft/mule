@@ -675,10 +675,6 @@
          -->
 
         <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
         </dependency>
