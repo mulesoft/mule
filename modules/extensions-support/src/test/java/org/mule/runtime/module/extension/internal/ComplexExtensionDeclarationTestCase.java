@@ -109,11 +109,11 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
 
     ParameterModel parameter = parameters.get(0);
     assertThat(parameter.getName(), is(REDELIVERY_POLICY_PARAMETER_NAME));
-    assertThat(parameter.getType(), equalTo(new RedeliveryPolicyTypeBuilder().buildRetryPolicyType()));
+    assertThat(parameter.getType(), equalTo(new RedeliveryPolicyTypeBuilder().buildRedeliveryPolicyType()));
 
     parameter = parameters.get(1);
     assertThat(parameter.getName(), is(RECONNECTION_STRATEGY_PARAMETER_NAME));
-    assertThat(parameter.getType(), equalTo(new ReconnectionStrategyTypeBuilder().builReconnectionStrategyType()));
+    assertThat(parameter.getType(), equalTo(new ReconnectionStrategyTypeBuilder().buildReconnectionStrategyType()));
 
     parameter = parameters.get(2);
     assertThat(parameter.getName(), is(PORT));

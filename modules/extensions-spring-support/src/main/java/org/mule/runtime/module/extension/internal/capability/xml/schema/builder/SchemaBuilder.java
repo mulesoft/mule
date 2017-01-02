@@ -22,6 +22,7 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_S
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
@@ -688,16 +689,15 @@ public final class SchemaBuilder {
         .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
         .forEach(parameter -> parameter.getModelProperty(QNameModelProperty.class).map(QNameModelProperty::getValue)
             .ifPresent(qName -> {
-              TopLevelElement redeliveryPolicy = createRefElement(qName, false);
-              sequence.getParticle().add(objectFactory.createElement(redeliveryPolicy));
+              TopLevelElement refElement = createRefElement(qName, false);
+              sequence.getParticle().add(objectFactory.createElement(refElement));
             }));
   }
 
   void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
-
     DslElementSyntax groupDsl = dslResolver.resolveInlineGroupDsl(group);
 
-    LocalComplexType complexType = objectTypeDelegate.createTypeExtension(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
+    LocalComplexType complexType = objectTypeDelegate.createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
     ExplicitGroup groupSequence = new ExplicitGroup();
 
     List<TopLevelElement> parameters =

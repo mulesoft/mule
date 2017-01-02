@@ -384,6 +384,8 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
                 <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="door-param">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
@@ -392,20 +394,8 @@
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="doorParam"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="redeliveryPolicy">
-                    <xs:annotation>
-                        <xs:documentation>Defines a policy for processing the redelivery of the same message</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="reconnectionStrategy">
-                    <xs:annotation>
-                        <xs:documentation>A retry strategy in case of connectivity errors</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -583,12 +573,12 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-      <xs:complexType name="org.mule.test.subtypes.extension.NoReferencePojo">
+    <xs:complexType name="org.mule.test.subtypes.extension.NoReferencePojo">
         <xs:complexContent>
-          <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-            <xs:attribute type="mule:expressionInt" use="required" name="number"></xs:attribute>
-            <xs:attribute type="mule:expressionString" use="required" name="string"></xs:attribute>
-          </xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionInt" use="required" name="number"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="string"></xs:attribute>
+            </xs:extension>
         </xs:complexContent>
-      </xs:complexType>
+    </xs:complexType>
 </xs:schema>

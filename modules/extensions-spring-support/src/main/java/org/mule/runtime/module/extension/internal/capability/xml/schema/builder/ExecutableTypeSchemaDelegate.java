@@ -33,6 +33,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -98,7 +99,14 @@ abstract class ExecutableTypeSchemaDelegate {
         String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
         childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
       } else {
-        this.builder.declareAsParameter(parameterType, type, parameter, paramDsl, childElements);
+        boolean shouldDeclare = true;
+        if (parameter.getModelProperty(QNameModelProperty.class).isPresent() && !parameter.getDslModel().allowsReferences()) {
+          shouldDeclare = false;
+        }
+
+        if (shouldDeclare) {
+          this.builder.declareAsParameter(parameterType, type, parameter, paramDsl, childElements);
+        }
       }
     });
 
