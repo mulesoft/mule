@@ -39,7 +39,6 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.TestInputStream;
 import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
 
@@ -47,9 +46,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");
-
-  @Rule
-  public SystemProperty systemProperty;
 
   private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
   private RequestHandlerExtender handlerExtender;

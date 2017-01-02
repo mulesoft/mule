@@ -7,15 +7,11 @@
 package org.mule.test.module.http.functional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.extension.http.api.HttpHeaders.Values.CHUNKED;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.rule.DynamicPort;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +26,13 @@ import org.apache.http.nio.protocol.BasicAsyncResponseConsumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpStreamingTestCase extends AbstractHttpTestCase {
 
@@ -50,8 +53,10 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
 
   @Test
   public void requesterStreams() throws Exception {
-    runFlow("client");
+    Event response = flowRunner("client").nonBlocking().run();
     stop.set(true);
+    assertThat(response.getMessage(), hasAttributes(instanceOf(HttpResponseAttributes.class)));
+    assertThat(response.getMessage().getPayload().getValue(), instanceOf(InputStream.class));
   }
 
   @Test

@@ -6,13 +6,15 @@
  */
 package org.mule.tck.processor;
 
+import java.util.concurrent.Executor;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Test non-blocking {@link Processor} implementation that simply uses a @{link Executor} to invoke the
+ * Test non-blocking {@link Processor} implementation that simply uses a {@link Executor} to invoke the
  * {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
  */
 public class TestNonBlockingProcessor implements NonBlockingMessageProcessor {
