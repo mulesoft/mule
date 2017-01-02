@@ -6,10 +6,8 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 public class ConfigurationOverrides {
 
@@ -20,7 +18,6 @@ public class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = CONFIGURATION_OVERRIDES)
   private Boolean parseRequest;
 
   public Boolean getParseRequest() {
