@@ -9,10 +9,9 @@ package org.mule.runtime.config.spring.dsl.model.extension.xml;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
-import org.mule.metadata.api.model.VoidType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
@@ -194,10 +193,7 @@ public class MacroExpansionModuleModel {
         .setIdentifier(new ComponentIdentifier.Builder().withNamespace("mule").withName("module-operation-chain").build());
 
 
-    ReturnsVoidTypeVisitor returnsVoidTypeVisitor = new ReturnsVoidTypeVisitor();
-    operationModel.getOutput().getType().accept(returnsVoidTypeVisitor);
-
-    processorChainBuilder.addParameter("returnsVoid", Boolean.toString(returnsVoidTypeVisitor.returnsVoid), false);
+    processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
     Map<String, String> propertiesMap = extractProperties(operationRefModel, extensionModel);
     Map<String, String> parametersMap = extractParameters(operationRefModel, operationModel.getAllParameterModels());
     ComponentModel propertiesComponentModel =
@@ -218,20 +214,6 @@ public class MacroExpansionModuleModel {
       processoChainModelChild.setParent(processorChainModel);
     }
     return processorChainModel;
-  }
-
-  /**
-   * visits all the possible types of a given parameter to realize if it's a "void return type", in which case the
-   * expanded chain will not modify the structure of the event
-   */
-  private class ReturnsVoidTypeVisitor extends MetadataTypeVisitor {
-
-    private boolean returnsVoid = false;
-
-    @Override
-    public void visitVoid(VoidType voidType) {
-      returnsVoid = true;
-    }
   }
 
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
@@ -285,7 +267,10 @@ public class MacroExpansionModuleModel {
       } else if (parameterExtension.getDefaultValue() != null) {
         value = (String) parameterExtension.getDefaultValue();
       }
-      valuesMap.put(paramName, value);
+
+      if (value != null) {
+        valuesMap.put(paramName, value);
+      }
     }
     return valuesMap;
   }
