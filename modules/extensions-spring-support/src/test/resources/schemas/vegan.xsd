@@ -136,9 +136,9 @@
     <xs:complexType name="PaulMcCartneySourceType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -152,9 +152,9 @@
     <xs:complexType name="Harvest-applesType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -404,9 +404,9 @@
     <xs:complexType name="Harvest-peachesType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                <xs:sequence minOccurs="0" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -438,15 +438,15 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-  <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConvinceAnimalKillerType" substitutionGroup="mule:abstract-operator" name="convince-animal-killer"></xs:element>
     <xs:complexType name="ConvinceAnimalKillerType">
         <xs:complexContent>
@@ -479,17 +479,17 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.WaterMelon">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
-        <xs:attribute type="mule:expressionDouble" use="optional" name="radius"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="seeds"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="state"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+    <xs:complexType name="org.mule.tck.testmodels.fruit.WaterMelon">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
+                <xs:attribute type="mule:expressionDouble" use="optional" name="radius"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="seeds"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="state"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetAllApplesType" substitutionGroup="mule:abstract-operator" name="get-all-apples"></xs:element>
     <xs:complexType name="GetAllApplesType">
         <xs:complexContent>

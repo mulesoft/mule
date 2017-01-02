@@ -14,16 +14,18 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
@@ -53,17 +55,19 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
 import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
+import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.internal.property.QNameModelProperty;
+import org.mule.runtime.extension.internal.util.ParameterModelComparator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Documentation;
@@ -81,7 +85,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Sc
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
-import org.mule.runtime.module.extension.internal.loader.java.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import java.math.BigInteger;
@@ -215,7 +218,7 @@ public final class SchemaBuilder {
 
   private SchemaBuilder importMuleNamespace() {
     Import muleSchemaImport = new Import();
-    muleSchemaImport.setNamespace(MULE_NAMESPACE);
+    muleSchemaImport.setNamespace(MULE_NAMESPACE_SCHEMA_LOCATION);
     muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
     schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
     return this;
@@ -237,11 +240,6 @@ public final class SchemaBuilder {
     schema.getIncludeOrImportOrRedefine().add(tlsImport);
 
     return this;
-  }
-
-  void addRetryPolicy(ExplicitGroup sequence) {
-    TopLevelElement providerElementRetry = createRefElement(MULE_ABSTRACT_RECONNECTION_STRATEGY, false);
-    sequence.getParticle().add(objectFactory.createElement(providerElementRetry));
   }
 
   public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel) {
@@ -270,10 +268,13 @@ public final class SchemaBuilder {
 
   List<TopLevelElement> registerParameters(ExtensionType type, Collection<ParameterModel> parameterModels) {
     List<TopLevelElement> all = new ArrayList<>(parameterModels.size());
-    for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels)) {
-      DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
-      declareAsParameter(parameterModel.getType(), type, parameterModel, paramDsl, all);
-    }
+    getSortedParameterModels(parameterModels).stream()
+        .filter(p -> !p.getModelProperty(QNameModelProperty.class).isPresent())
+        .forEach(parameterModel -> {
+          DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
+          declareAsParameter(parameterModel.getType(), type, parameterModel, paramDsl, all);
+        });
+
     return all;
   }
 
@@ -288,24 +289,7 @@ public final class SchemaBuilder {
    */
   private List<ParameterModel> getSortedParameterModels(Collection<ParameterModel> parameterModels) {
     List<ParameterModel> sortedParameters = new ArrayList<>(parameterModels);
-    sortedParameters.sort((left, right) -> {
-      boolean isLeftInfrastructure = left.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
-      boolean isRightInfrastructure = right.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
-
-      if (!isLeftInfrastructure && !isRightInfrastructure) {
-        return 0;
-      }
-
-      if (!isLeftInfrastructure) {
-        return 1;
-      }
-
-      if (!isRightInfrastructure) {
-        return -1;
-      }
-
-      return left.getName().compareTo(right.getName());
-    });
+    sortedParameters.sort(new ParameterModelComparator(true));
     return sortedParameters;
   }
 
@@ -505,7 +489,7 @@ public final class SchemaBuilder {
   void declareAsParameter(MetadataType type, ExtensionType extensionType, ParameterModel parameterModel,
                           DslElementSyntax paramDsl, List<TopLevelElement> childElements) {
 
-    if (ExtensionModelUtils.isContent(parameterModel) || TypeUtils.isContent(type)) {
+    if (isContent(parameterModel) || isContent(type)) {
       childElements.add(generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired()));
     } else {
       type.accept(getParameterDeclarationVisitor(extensionType, childElements, parameterModel));
@@ -700,11 +684,20 @@ public final class SchemaBuilder {
     });
   }
 
-  void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
+  void addInfrastructureParameters(ParameterizedModel model, ExplicitGroup sequence) {
+    model.getAllParameterModels().stream()
+        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+        .forEach(parameter -> parameter.getModelProperty(QNameModelProperty.class).map(QNameModelProperty::getValue)
+            .ifPresent(qName -> {
+              TopLevelElement refElement = createRefElement(qName, false);
+              sequence.getParticle().add(objectFactory.createElement(refElement));
+            }));
+  }
 
+  void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
     DslElementSyntax groupDsl = dslResolver.resolveInlineGroupDsl(group);
 
-    LocalComplexType complexType = objectTypeDelegate.createTypeExtension(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
+    LocalComplexType complexType = objectTypeDelegate.createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
     ExplicitGroup groupSequence = new ExplicitGroup();
 
     List<TopLevelElement> parameters =

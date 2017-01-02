@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
@@ -212,8 +213,13 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     componentId = new ProcessorId(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
     final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
     assertExpectedOutput(metadataDescriptor.getOutputMetadata(), ExtensionsTestUtils.TYPE_BUILDER.anyType().build(), void.class);
+
     Map<String, ParameterMetadataDescriptor> parameters = metadataDescriptor.getInputMetadata().getAllParameters();
-    assertThat("Expecting no input parameters", parameters.isEmpty(), is(true));
+    assertThat(parameters.size(), is(1));
+    assertThat(parameters.containsKey(TARGET_PARAMETER_NAME), is(true));
+    ParameterMetadataDescriptor parameter = parameters.get(TARGET_PARAMETER_NAME);
+    assertThat(parameter.getName(), equalTo(TARGET_PARAMETER_NAME));
+    assertThat(parameter.getType(), is(instanceOf(StringType.class)));
   }
 
   @Test

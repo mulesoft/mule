@@ -7,25 +7,16 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 /**
@@ -35,9 +26,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
  */
 final class ConnectionProviderSchemaDelegate {
 
-  private final ObjectFactory objectFactory = new ObjectFactory();
   private final SchemaBuilder builder;
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   ConnectionProviderSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
@@ -65,15 +54,7 @@ final class ConnectionProviderSchemaDelegate {
     sequence.setMinOccurs(ZERO);
     sequence.setMaxOccurs(MAX_ONE);
 
-    builder.addRetryPolicy(sequence);
-    ConnectionManagementType managementType = providerModel.getConnectionManagementType();
-    if (managementType == POOLING || managementType == CACHED) {
-      addValidationFlag(providerType);
-    }
-    if (managementType == POOLING) {
-      addConnectionProviderPoolingProfile(sequence);
-    }
-
+    builder.addInfrastructureParameters(providerModel, sequence);
     providerModel.getParameterGroupModels().forEach(group -> {
       if (!group.isShowInDsl()) {
         builder.addParameterToSequence(builder.registerParameters(providerType, group.getParameterModels()), sequence);
@@ -85,16 +66,4 @@ final class ConnectionProviderSchemaDelegate {
     providerType.setSequence(sequence);
 
   }
-
-  private void addConnectionProviderPoolingProfile(ExplicitGroup sequence) {
-    TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, false);
-    sequence.getParticle().add(objectFactory.createElement(objectElement));
-  }
-
-  private void addValidationFlag(ExtensionType providerType) {
-    providerType.getAttributeOrAttributeGroup()
-        .add(builder.createAttribute(DISABLE_VALIDATION, typeLoader.load(boolean.class), false, NOT_SUPPORTED));
-  }
-
-
 }

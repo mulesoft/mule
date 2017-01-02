@@ -19,8 +19,8 @@
 
     <flow name="source-fail-on-exception" initialState="stopped">
         <petstore:source failOnException="true" config-ref="petstore-config">
-            <reconnect count="1" frequency="0"/>
             <redelivery-policy maxRedeliveryCount="2"/>
+            <reconnect count="1" frequency="0"/>
         </petstore:source>
         <set-payload value="#[payload]"/>
     </flow>

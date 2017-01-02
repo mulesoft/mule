@@ -8,7 +8,7 @@ package org.mule.runtime.core.util.pool;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.PoolingProfile;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 
 import java.util.NoSuchElementException;
