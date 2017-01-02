@@ -55,13 +55,6 @@
         </dependency>
 
         <dependency>
-            <!-- TODO MULE-10509 Remove this dependency -->
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-cxf</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <!-- TODO MULE-9705 remove this when http is fully migrated to the extension -->      
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http</artifactId>
