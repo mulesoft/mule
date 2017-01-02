@@ -31,6 +31,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -297,6 +298,15 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void connectionProviderWithRepeatedParameterName() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
+    when(connectionProviderModel.getAllParameterModels())
+        .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
+    validate();
+  }
+
+  @Test
+  public void contentParameterValidationIsSkipped() {
+    ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
+    when(offending.getRole()).thenReturn(ParameterRole.CONTENT);
     when(connectionProviderModel.getAllParameterModels())
         .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
     validate();
