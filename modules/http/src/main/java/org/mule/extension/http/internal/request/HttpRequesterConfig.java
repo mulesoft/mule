@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.API_CONFIGURATION;
+import static org.mule.extension.http.internal.HttpConnectorConstants.API_SPECIFICATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
@@ -54,6 +54,7 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
   private RequestSettings requestSettings;
 
   @ParameterGroup(name = RESPONSE_SETTINGS)
+  @Placement(tab = RESPONSE_SETTINGS)
   @NullSafe
   private ResponseSettings responseSettings;
 
@@ -62,14 +63,13 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
   private OtherRequestSettings otherSettings;
 
   /**
-   * Specifies a RAML configuration file for the API that is being consumed.
+   * Specifies a RAML configuration file for the I that is being consumed.
    */
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = API_CONFIGURATION)
+  @Placement(tab = API_SPECIFICATION)
   private RamlApiConfiguration apiConfiguration;
-
 
   @Inject
   private MuleContext muleContext;

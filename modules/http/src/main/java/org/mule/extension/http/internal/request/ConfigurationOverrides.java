@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -25,7 +25,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 1)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 1)
   private String host;
 
   /**
@@ -33,7 +33,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 2)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 2)
   private Integer port;
 
   /**
@@ -41,7 +41,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 3)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 3)
   private Boolean followRedirects;
 
   /**
@@ -49,7 +49,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 4)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 4)
   private HttpSendBodyMode sendBodyMode;
 
   /**
@@ -57,7 +57,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 5)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 5)
   private HttpStreamingType requestStreamingMode;
 
   /**
@@ -65,7 +65,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 6)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 6)
   private Boolean parseResponse;
 
   /**
@@ -73,7 +73,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 7)
+  @Placement(tab = CONFIGURATION_OVERRIDES, order = 7)
   private Integer responseTimeout;
 
   public String getHost() {

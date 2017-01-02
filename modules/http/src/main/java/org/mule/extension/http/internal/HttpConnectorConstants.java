@@ -17,7 +17,7 @@ public interface HttpConnectorConstants {
   String RESPONSE_SETTINGS = "Response Settings";
   String REQUEST_SETTINGS = "Request Settings";
   String CONFIGURATION_OVERRIDES = "Configuration Overrides";
-  String API_CONFIGURATION = "API Configuration";
+  String API_SPECIFICATION = "API Specification";
   String TLS_CONFIGURATION = "TLS Configuration";
   String OTHER_SETTINGS = "Other Settings";
   String AUTHENTICATION = "Authentication";

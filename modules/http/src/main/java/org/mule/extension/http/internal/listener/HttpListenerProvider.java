@@ -35,6 +35,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.service.http.api.HttpService;
@@ -71,6 +72,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
      * Host where the requests will be sent.
      */
     @Parameter
+    @Example("0.0.0.0")
     @Expression(NOT_SUPPORTED)
     @Placement(order = 2)
     private String host;
@@ -79,6 +81,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
      * Port where the requests will be received.
      */
     @Parameter
+    @Example("8081")
     @Expression(NOT_SUPPORTED)
     @Placement(order = 3)
     private Integer port;

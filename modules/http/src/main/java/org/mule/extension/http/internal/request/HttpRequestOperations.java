@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import java.util.function.Function;
@@ -35,6 +36,7 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -67,11 +69,10 @@ public class HttpRequestOperations {
    */
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpRequestMetadataResolver.class)
-  public void request(String path, @Optional(defaultValue = "GET") String method,
-                      @ParameterGroup(
-                          name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
-                      @ParameterGroup(
-                          name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
+  public void request(@Optional(defaultValue = "/") String path,
+                      @Optional(defaultValue = "GET") String method,
+                      @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
+                      @ParameterGroup(name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
                       @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
@@ -88,9 +89,9 @@ public class HttpRequestOperations {
 
       String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
       Boolean resolvedFollowRedirects =
-          resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects(), muleEvent);
+        resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects(), muleEvent);
       HttpStreamingType resolvedStreamingMode =
-          resolveIfNecessary(overrides.getRequestStreamingMode(), config.getRequestStreamingMode(), muleEvent);
+        resolveIfNecessary(overrides.getRequestStreamingMode(), config.getRequestStreamingMode(), muleEvent);
       HttpSendBodyMode resolvedSendBody = resolveIfNecessary(overrides.getSendBodyMode(), config.getSendBodyMode(), muleEvent);
       Boolean resolvedParseResponse = resolveIfNecessary(overrides.getParseResponse(), config.getParseResponse(), muleEvent);
       Integer resolvedTimeout = resolveResponseTimeout(muleEvent, config, overrides.getResponseTimeout());
@@ -99,12 +100,12 @@ public class HttpRequestOperations {
 
 
       HttpRequester requester =
-          new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
-              .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody)
-              .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
-              .setResponseTimeout(resolvedTimeout).setResponseValidator(responseValidator).setConfig(config)
-              .setTransformationService(muleContext.getTransformationService()).setScheduler(schedulerService.ioScheduler())
-              .build();
+        new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
+          .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody)
+          .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
+          .setResponseTimeout(resolvedTimeout).setResponseValidator(responseValidator).setConfig(config)
+          .setTransformationService(muleContext.getTransformationService()).setScheduler(schedulerService.ioScheduler())
+          .build();
 
       // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
       final Flow flowConstruct = new Flow("httpRequestOperation", muleContext);

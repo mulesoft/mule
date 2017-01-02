@@ -47,7 +47,6 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -111,6 +110,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
    * Relative path from the path set in the HTTP Listener configuration
    */
   @Parameter
+  @Placement(order = 1)
   private String path;
 
   /**
@@ -118,6 +118,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
    */
   @Parameter
   @Optional
+  @Placement(order = 2)
   private String allowedMethods;
 
   /**
@@ -150,7 +151,9 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
-  public void onSuccess(@Optional @DisplayName(RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder responseBuilder,
+  public void onSuccess(
+                        @Optional @Placement(
+                            tab = RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder responseBuilder,
                         SourceCallbackContext callbackContext)
       throws Exception {
 
@@ -161,7 +164,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
   public void onError(
-                      @Optional @DisplayName(ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponseBuilder,
+                      @Optional @Placement(
+                          tab = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponseBuilder,
                       SourceCallbackContext callbackContext,
                       Error error) {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
