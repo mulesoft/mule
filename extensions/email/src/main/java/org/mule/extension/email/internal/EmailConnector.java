@@ -7,6 +7,7 @@
 package org.mule.extension.email.internal;
 
 
+import org.mule.extension.email.api.exception.EmailErrors;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.mailbox.imap.IMAPConfiguration;
 import org.mule.extension.email.internal.mailbox.pop3.POP3Configuration;
@@ -14,6 +15,7 @@ import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 /**
  * Email connector used to list and send emails and perform operations in different mailboxes, such as delete and mark as read.
@@ -24,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
  */
 @Configurations({SMTPConfiguration.class, POP3Configuration.class, IMAPConfiguration.class})
 @Extension(name = "Email", description = "Connector to send and list email messages to and from mailboxes")
+@ErrorTypes(EmailErrors.class)
 @Export(classes = EmailException.class)
 public class EmailConnector {
 

@@ -10,9 +10,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.DISCONNECTED;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-
+import org.mule.extension.email.api.exception.EmailAccessingFolderException;
 import org.mule.extension.email.api.exception.EmailConnectionException;
-import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -115,7 +114,7 @@ public class MailboxConnection extends AbstractEmailConnection {
       folder.open(openMode);
       return folder;
     } catch (MessagingException e) {
-      throw new EmailException(format("Error while opening folder %s", mailBoxFolder), e);
+      throw new EmailAccessingFolderException(format("Error while opening folder %s", mailBoxFolder), e);
     }
   }
 
@@ -130,7 +129,7 @@ public class MailboxConnection extends AbstractEmailConnection {
         folder.close(expunge);
       }
     } catch (MessagingException e) {
-      throw new EmailException(format("Error while closing mailbox folder %s", folder.getName()), e);
+      throw new EmailAccessingFolderException(format("Error while closing mailbox folder %s", folder.getName()), e);
     }
   }
 

@@ -8,6 +8,8 @@ package org.mule.extension.email.retriever;
 
 import static javax.mail.Folder.READ_ONLY;
 import static javax.mail.Folder.READ_WRITE;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -23,16 +25,21 @@ import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-
+import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
+import org.mule.extension.email.api.exception.CannotFetchMetadataException;
+import org.mule.extension.email.api.exception.EmailAccessingFolderException;
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
+
+import com.sun.mail.imap.IMAPFolder;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -55,6 +62,7 @@ public class MailboxManagerConnectionTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   private static final String RECENT_FOLDER = "Recent";
+  private static final String ERROR_FOLDER = "Error";
 
   private Store store;
   private MailboxConnection connection;
@@ -80,6 +88,9 @@ public class MailboxManagerConnectionTestCase {
 
     TestFolder recent = new TestFolder(store, RECENT_FOLDER);
     doReturn(recent).when(store).getFolder(RECENT_FOLDER);
+
+    TestFolder errorFolder = new FolderThrowsErrorAtOpening(store, ERROR_FOLDER);
+    doReturn(errorFolder).when(store).getFolder(ERROR_FOLDER);
 
     connection = new MailboxConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
@@ -123,6 +134,24 @@ public class MailboxManagerConnectionTestCase {
     expectedException.expect(EmailException.class);
     expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
     new MailboxConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
+  }
+
+  @Test
+  public void errorOpeningFolder() throws MessagingException, EmailConnectionException {
+    expectedException.expect(EmailAccessingFolderException.class);
+    expectedException.expectCause(instanceOf(MessagingException.class));
+    expectedException.expectMessage(containsString("Error while opening folder"));
+    connection.getFolder(ERROR_FOLDER, READ_ONLY);
+  }
+
+  @Test
+  public void errorFetchingAttributesMetadata() throws MessagingException, EmailConnectionException {
+    expectedException.expect(CannotFetchMetadataException.class);
+    expectedException.expectCause(instanceOf(MessagingException.class));
+    IMAPFolder folder = mock(IMAPFolder.class);
+    Message msg = mock(Message.class);
+    when(msg.getAllHeaders()).thenThrow(new MessagingException(""));
+    new IMAPEmailAttributes(msg, folder);
   }
 
   private void assertFolder(Folder folder, String name, int mode) {
@@ -244,6 +273,23 @@ public class MailboxManagerConnectionTestCase {
     @Override
     public javax.mail.Message[] expunge() throws MessagingException {
       return new javax.mail.Message[0];
+    }
+  }
+
+  private class FolderThrowsErrorAtOpening extends TestFolder {
+
+    FolderThrowsErrorAtOpening(Store store, String folderName) {
+      super(store, folderName);
+    }
+
+    @Override
+    public boolean isOpen() {
+      return false;
+    }
+
+    @Override
+    public void open(int mode) throws MessagingException {
+      throw new MessagingException("Folder is corrupt");
     }
   }
 }

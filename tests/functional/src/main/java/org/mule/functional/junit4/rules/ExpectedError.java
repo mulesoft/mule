@@ -97,7 +97,7 @@ public class ExpectedError implements TestRule {
   }
 
   private void failWithNonMatchingException(Exception e) {
-    fail(format("An exception was caught but it didn't met the following conditions:\n %s \n %s Caught exception was:\n %s %s",
+    fail(format("An exception was caught but it didn't met the following conditions:\n %s \n Caught exception was:\n %s %s",
                 Joiner.on("\n").join(matchers).toString(), e, getStackTraceAsString(e)));
   }
 

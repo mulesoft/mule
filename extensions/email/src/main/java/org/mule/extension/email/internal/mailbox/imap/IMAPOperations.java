@@ -18,7 +18,9 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import org.mule.extension.email.api.EmailMetadataKey;
 import org.mule.extension.email.api.EmailMetadataResolver;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
+import org.mule.extension.email.api.exception.EmailAccessingFolderErrorTypeProvider;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailMarkingErrorTypeProvider;
 import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ExpungeCommand;
 import org.mule.extension.email.internal.commands.PagingProviderEmailDelegate;
@@ -26,6 +28,7 @@ import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -93,6 +96,7 @@ public class IMAPOperations {
    * @param mailboxFolder Folder where the emails are going to be marked as read
    * @param emailId Email ID Number of the email to mark as read.
    */
+  @Throws(EmailMarkingErrorTypeProvider.class)
   public void markAsRead(@Connection MailboxConnection connection,
                          @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                          @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") long emailId) {
@@ -113,6 +117,7 @@ public class IMAPOperations {
    * @param mailboxFolder Mailbox folder where the emails are going to be marked as deleted
    * @param emailId Email ID Number of the email to mark as deleted.
    */
+  @Throws(EmailMarkingErrorTypeProvider.class)
   public void markAsDeleted(@Connection MailboxConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                             @Summary("Email ID Number of the email to mark as deleted") @DisplayName("Email ID") long emailId) {
@@ -127,6 +132,7 @@ public class IMAPOperations {
    *        deleted
    */
 
+  @Throws(EmailAccessingFolderErrorTypeProvider.class)
   public void expungeFolder(@Connection MailboxConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder) {
     expungeCommand.expunge(connection, mailboxFolder);
@@ -166,6 +172,7 @@ public class IMAPOperations {
    * @param emailId Email ID Number of the email to delete.
    */
   @Summary("Deletes an email from the given Mailbox Folder")
+  @Throws(EmailMarkingErrorTypeProvider.class)
   public void delete(@Connection MailboxConnection connection,
                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                      @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") long emailId) {
