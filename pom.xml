@@ -206,7 +206,7 @@
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jodaTimeVersion>2.5</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
-        <junitVersion>4.11</junitVersion>
+        <junitVersion>4.12</junitVersion>
         <log4jVersion>2.3</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
