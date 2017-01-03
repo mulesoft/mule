@@ -32,13 +32,6 @@
         <logger message="check"/>
     </flow>
 
-    <flow name="cxfMP">
-        <cxf:jaxws-service port="80" serviceClass="org.mule.test.core.context.notification.CxfSimpleService"
-                           enableMuleSoapHeaders="false"/>
-        <logger message="check1"/>
-        <logger message="check2"/>
-    </flow>
-
     <flow name="singleMP2">
         <collection-splitter/>
         <logger message="check"/>

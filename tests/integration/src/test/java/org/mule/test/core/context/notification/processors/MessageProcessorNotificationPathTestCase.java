@@ -6,27 +6,28 @@
  */
 package org.mule.test.core.context.notification.processors;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.test.IntegrationTestCaseRunnerConfig;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-
 /**
  *
  */
-public class MessageProcessorNotificationPathTestCase extends AbstractIntegrationTestCase {
+public class MessageProcessorNotificationPathTestCase extends MuleArtifactFunctionalTestCase
+    implements IntegrationTestCaseRunnerConfig {
 
   @Override
   protected String getConfigFile() {
@@ -52,11 +53,6 @@ public class MessageProcessorNotificationPathTestCase extends AbstractIntegratio
     testFlowPaths("choice2", "/0", "/0/0", "/0/0/0", "/0/0/1", "/0/1", "/0/1/0", "/0/2", "/0/2/0", "/0/2/1");
     testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/1");
     testFlowPaths("scatterGather", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/0/1/1");
-  }
-
-  @Test
-  public void interceptors() throws Exception {
-    testFlowPaths("cxfMP", "/0", "/1", "/2");
   }
 
   @Test
