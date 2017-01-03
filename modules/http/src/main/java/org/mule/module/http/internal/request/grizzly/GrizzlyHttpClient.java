@@ -600,4 +600,40 @@ public class GrizzlyHttpClient implements HttpClient
             }
         }
     }
+
+    @Override
+    public InputStream sendAndReceiveInputStream(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                                 HttpRequestAuthentication authentication) throws IOException, TimeoutException
+    {
+        Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
+        PipedOutputStream outPipe = new PipedOutputStream();
+        PipedInputStream inPipe = new PipedInputStream(outPipe);
+        BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
+        asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
+        try
+        {
+            asyncHandler.getResponse();
+            return inPipe;
+        }
+        catch (IOException e)
+        {
+            if (e.getCause() instanceof TimeoutException)
+            {
+                throw (TimeoutException) e.getCause();
+            }
+            else if (e.getCause() instanceof IOException)
+            {
+                throw (IOException) e.getCause();
+            }
+            else
+            {
+                throw new IOException(e);
+            }
+        }
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+
+    }
 }
