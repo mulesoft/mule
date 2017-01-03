@@ -37,6 +37,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
@@ -120,7 +121,7 @@ public abstract class AbstractMuleTestCase
 
         if (isFailOnTimeout())
         {
-            return new Timeout(millisecondsTimeout);
+            return new DisableOnDebug(new Timeout(millisecondsTimeout));
         }
         else
         {

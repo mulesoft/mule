@@ -59,7 +59,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
 
         classesDir = createDirectory("apps/%s/classes", APP_NAME);
 
-        File libDir = tempMuleHome.newFolder(String.format("apps/%s/lib", APP_NAME));
+        File libDir = tempMuleHome.newFolder("apps", APP_NAME, "lib");
 
         // Add jar file with resources in lib dir
         URL resourceSrcJarFile = Thread.currentThread().getContextClassLoader().getResource("test-jar-with-resources.jar");
