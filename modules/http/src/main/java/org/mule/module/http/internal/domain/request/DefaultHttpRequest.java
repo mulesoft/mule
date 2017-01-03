@@ -26,7 +26,10 @@ public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
     private ParameterMap queryParams;
     private HttpEntity entity;
 
-    DefaultHttpRequest(String uri, String path, String method, ParameterMap headers, ParameterMap queryParams, HttpEntity entity)
+    /**
+     * DefaultHttpRequest constructor
+     */
+    public DefaultHttpRequest(String uri, String path, String method, ParameterMap headers, ParameterMap queryParams, HttpEntity entity)
     {
         this.uri = uri;
         this.path = path;

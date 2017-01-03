@@ -27,18 +27,16 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transport.http.HttpConnector;
-import org.mule.util.Base64;
 import org.mule.util.IOUtils;
 
-import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,11 +49,8 @@ import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
-import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.attachment.AttachmentImpl;
@@ -68,7 +63,6 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
@@ -86,11 +80,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private String requestBody;
     private SoapVersion soapVersion;
     private boolean mtomEnabled;
+    private WsdlRetrieverStrategy wsdlRetrieverStrategy;
 
     @Override
     public void initialise() throws InitialisationException
     {
         initializeConfiguration();
+        initializeWsdlRetrievalStrategy();
         parseWsdl();
 
         try
@@ -111,9 +107,23 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
 
+    private void initializeWsdlRetrievalStrategy()
+    {
+        HttpRequesterConfig httpRequesterConfig = config.getConnectorConfig();
+
+        if (httpRequesterConfig == null || httpRequesterConfig.getProxyConfig() == null)
+        {
+            wsdlRetrieverStrategy = new URLRetrieverStrategy();
+        }
+        else
+        {
+            wsdlRetrieverStrategy = new ProxyWsdlRetrieverStrategy(httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
+        }
+    }
+
     /**
-     * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set,
-     * then it is looked up in the registry (only one object of this type must exist in the registry, or an
+     * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set, then it
+     * is looked up in the registry (only one object of this type must exist in the registry, or an
      * InitializationException will be thrown).
      */
     private void initializeConfiguration() throws InitialisationException
@@ -126,7 +136,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 if (config == null)
                 {
                     throw new InitialisationException(CoreMessages.createStaticMessage("No configuration defined for the web service " +
-                                                                                       "consumer. Add a consumer-config element."), this);
+                                                                                       "consumer. Add a consumer-config element."),
+                            this);
                 }
             }
             catch (RegistrationException e)
@@ -137,8 +148,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Creates the message processor chain in which we will delegate the process of mule events.
-     * The chain composes a string transformer, a CXF client proxy and and outbound endpoint.
+     * Creates the message processor chain in which we will delegate the process of mule events. The chain composes a
+     * string transformer, a CXF client proxy and and outbound endpoint.
      */
     private MessageProcessor createMessageProcessor() throws MuleException
     {
@@ -166,8 +177,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             @Override
             protected MuleEvent processRequest(MuleEvent event) throws MuleException
             {
-                /* If the requestBody variable is set, it will be used as the payload to send instead
-                 * of the payload of the message. This will happen when an operation required no input parameters. */
+                /*
+                 * If the requestBody variable is set, it will be used as the payload to send instead of the payload of
+                 * the message. This will happen when an operation required no input parameters.
+                 */
                 if (requestBody != null)
                 {
                     event.getMessage().setPayload(requestBody);
@@ -187,8 +200,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 }
                 catch (DispatchException e)
                 {
-                    /* When a Soap Fault is returned in the response, CXF raises a SoapFault exception.
-                     * We need to wrap the information of this exception into a new exception of the WS consumer module */
+                    /*
+                     * When a Soap Fault is returned in the response, CXF raises a SoapFault exception. We need to wrap
+                     * the information of this exception into a new exception of the WS consumer module
+                     */
 
                     if (e.getCause() instanceof SoapFault)
                     {
@@ -334,7 +349,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new OutputSoapHeadersInterceptor(muleContext));
 
 
-
         return cxfOutboundMessageProcessor;
     }
 
@@ -354,19 +368,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         try
         {
-            WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-
-            URLConnection urlConnection = url.openConnection();
-            if (url.getUserInfo() != null)
-            {
-                urlConnection.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes(url.getUserInfo().getBytes()));
-            }
-
-            wsdlDefinition = wsdlReader.readWSDL(url.toString(), new InputSource(urlConnection.getInputStream()));
+            wsdlDefinition = wsdlRetrieverStrategy.retrieveWsdlFrom(url);
         }
-        catch (WSDLException | IOException e)
+        catch (Exception e)
         {
-            throw new InitialisationException(e, this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), e, this);
         }
 
         Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
@@ -422,8 +428,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation
-     * properties with a set of CXF Attachment objects.
+     * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation properties with
+     * a set of CXF Attachment objects.
      */
     private void copyAttachmentsRequest(MuleEvent event)
     {
@@ -445,8 +451,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets
-     * them as inbound attachments in the Mule Message.
+     * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets them as inbound
+     * attachments in the Mule Message.
      */
     private void copyAttachmentsResponse(MuleEvent event) throws MessagingException
     {
@@ -459,12 +465,12 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             {
                 try
                 {
-                    ((DefaultMuleMessage)message).addInboundAttachment(attachment.getId(), attachment.getDataHandler());
+                    ((DefaultMuleMessage) message).addInboundAttachment(attachment.getId(), attachment.getDataHandler());
                 }
                 catch (Exception e)
                 {
                     throw new MessagingException(CoreMessages.createStaticMessage("Could not set inbound attachment %s",
-                                                                                  attachment.getId()), event, e, this);
+                            attachment.getId()), event, e, this);
                 }
             }
         }
