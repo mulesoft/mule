@@ -9,6 +9,7 @@ package org.mule.extension.socket.api;
 import org.mule.extension.socket.api.config.ListenerConfig;
 import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.tcp.protocol.AbstractByteProtocol;
+import org.mule.extension.socket.api.connection.tcp.protocol.CustomClassLoadingLengthProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.CustomProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.DirectProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.EOFProtocol;
@@ -36,7 +37,8 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 @Extension(name = "Sockets")
 @Configurations({ListenerConfig.class, RequesterConfig.class})
 @SubTypeMapping(baseType = TcpProtocol.class, subTypes = {SafeProtocol.class, DirectProtocol.class, LengthProtocol.class,
-    StreamingProtocol.class, XmlMessageProtocol.class, XmlMessageEOFProtocol.class, CustomProtocol.class, EOFProtocol.class})
+    StreamingProtocol.class, XmlMessageProtocol.class, XmlMessageEOFProtocol.class, CustomProtocol.class, EOFProtocol.class,
+    CustomClassLoadingLengthProtocol.class})
 @Export(classes = {TcpClientSocketProperties.class, TcpServerSocketProperties.class, UdpSocketProperties.class,
     ReadingTimeoutException.class, LengthExceededException.class, LengthProtocol.class, AbstractByteProtocol.class})
 public class SocketsExtension {

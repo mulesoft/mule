@@ -7,6 +7,8 @@
 package org.mule.extension.socket.api.connection.tcp.protocol;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,13 +19,15 @@ import org.apache.log4j.Logger;
 /**
  * A length protocol that uses a specific class loader to load objects from streams
  *
- * @since 2.2.6
+ * @since 4.0
  */
 @XmlHints(allowTopLevelDefinition = true)
 public class CustomClassLoadingLengthProtocol extends LengthProtocol {
 
   private final Logger logger = Logger.getLogger(this.getClass());
 
+  @Parameter
+  @Optional
   private ClassLoader classLoader;
 
   @Override
