@@ -20,9 +20,15 @@ public class GrizzlyHttpClientConfiguration
     private final boolean usePersistentConnections;
     private final int connectionIdleTimeout;
     private final String threadNamePrefix;
+    private final String ownerName;
+    private final Integer maxWorkerPoolSize;
+    private final Integer workerCoreSize;
+    private final Integer maxKernelPoolSize;
+    private final Integer kernelCoreSize;
 
     private GrizzlyHttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-                                           int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix)
+            int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName,
+            Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -31,6 +37,11 @@ public class GrizzlyHttpClientConfiguration
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
         this.threadNamePrefix = threadNamePrefix;
+        this.ownerName = ownerName;
+        this.maxWorkerPoolSize = maxWorkerPoolSize;
+        this.workerCoreSize = workerCoreSize;
+        this.maxKernelPoolSize = maxKernelPoolSize;
+        this.kernelCoreSize = kernelCoreSize;
     }
 
     public TlsContextFactory getTlsContextFactory()
@@ -68,6 +79,32 @@ public class GrizzlyHttpClientConfiguration
         return threadNamePrefix;
     }
 
+
+    public String getOwnerName()
+    {
+        return ownerName;
+    }
+
+    public Integer getMaxWorkerPoolSize()
+    {
+        return maxWorkerPoolSize;
+    }
+
+    public Integer getWorkerCoreSize()
+    {
+        return workerCoreSize;
+    }
+
+    public Integer getMaxKernelPoolSize()
+    {
+        return maxKernelPoolSize;
+    }
+
+    public Integer getKernelCoreSize()
+    {
+        return kernelCoreSize;
+    }
+
     public static class Builder
     {
         private TlsContextFactory tlsContextFactory;
@@ -77,6 +114,11 @@ public class GrizzlyHttpClientConfiguration
         private boolean usePersistentConnections;
         private int connectionIdleTimeout;
         private String threadNamePrefix;
+        private String ownerName;
+        private Integer maxWorkerPoolSize;
+        private Integer workerCoreSize;
+        private Integer maxKernelPoolSize;
+        private Integer kernelCoreSize;
 
         public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
         {
@@ -120,10 +162,41 @@ public class GrizzlyHttpClientConfiguration
             return this;
         }
 
+        public Builder setOwnerName(String ownerName)
+        {
+            this.ownerName = ownerName;
+            return this;
+        }
+
+        public Builder setMaxWorkerPoolSize(Integer maxWorkerPoolSize)
+        {
+            this.maxWorkerPoolSize = maxWorkerPoolSize;
+            return this;
+        }
+
+        public Builder setWorkerCoreSize(Integer workerCoreSize)
+        {
+            this.workerCoreSize = workerCoreSize;
+            return this;
+        }
+
+        public Builder setMaxKernelPoolSize(Integer maxKernelPoolSize)
+        {
+            this.maxKernelPoolSize = maxKernelPoolSize;
+            return this;
+        }
+
+        public Builder setKernelCoreSize(Integer kernelCoreSize)
+        {
+            this.kernelCoreSize = kernelCoreSize;
+            return this;
+        }
+
         public GrizzlyHttpClientConfiguration build()
         {
             return new GrizzlyHttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix);
+                    usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName,
+                    maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize);
         }
     }
 }

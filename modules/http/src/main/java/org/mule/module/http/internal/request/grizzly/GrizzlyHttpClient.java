@@ -14,6 +14,20 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
 import org.mule.api.CompletionHandler;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -37,10 +51,13 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.BodyDeferringAsyncHandler;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
@@ -50,19 +67,6 @@ import com.ning.http.client.Response;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient
 {
@@ -472,5 +476,41 @@ public class GrizzlyHttpClient implements HttpClient
     public void stop()
     {
         asyncHttpClient.close();
+    }
+
+    @Override
+    public InputStream sendAndReceiveInputStream(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                                 HttpRequestAuthentication authentication) throws IOException, TimeoutException
+    {
+        Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
+        PipedOutputStream outPipe = new PipedOutputStream();
+        PipedInputStream inPipe = new PipedInputStream(outPipe);
+        BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
+        asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
+        try
+        {
+            asyncHandler.getResponse();
+            return inPipe;
+        }
+        catch (IOException e)
+        {
+            if (e.getCause() instanceof TimeoutException)
+            {
+                throw (TimeoutException) e.getCause();
+            }
+            else if (e.getCause() instanceof IOException)
+            {
+                throw (IOException) e.getCause();
+            }
+            else
+            {
+                throw new IOException(e);
+            }
+        }
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+
     }
 }
