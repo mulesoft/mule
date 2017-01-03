@@ -16,9 +16,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.unzip;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.CLASSES_DIR;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.LIB_DIR;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.MISSING_POLICY_PROPERTIES_FILE;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.FOLDER_MODEL_LOADER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.MISSING_POLICY_DESCRIPTOR_ERROR;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -69,14 +73,18 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     PolicyTemplateDescriptorFactory descriptorFactory = new PolicyTemplateDescriptorFactory();
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
-    expectedException.expectMessage(MISSING_POLICY_PROPERTIES_FILE);
+    expectedException.expectMessage(MISSING_POLICY_DESCRIPTOR_ERROR);
     descriptorFactory.create(tempFolder);
   }
 
   @Test
   public void readsRuntimeLibs() throws Exception {
-    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).configuredWith("policy.name", POLICY_NAME)
-        .usingLibrary(echoTestJarFile.getAbsolutePath());
+    MuleArtifactLoaderDescriptor policyClassLoaderModelDescriber =
+        new MuleArtifactLoaderDescriptorBuilder().setId(FOLDER_MODEL_LOADER).build();
+    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).usingLibrary(echoTestJarFile.getAbsolutePath())
+        .describedBy(new MulePolicyModel.MulePolicyModelBuilder().setName(POLICY_NAME).withClassLoaderModelDescriber(
+                                                                                                                     policyClassLoaderModelDescriber)
+            .setMinMuleVersion("4.0.0").build());
     File tempFolder = createTempFolder();
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 

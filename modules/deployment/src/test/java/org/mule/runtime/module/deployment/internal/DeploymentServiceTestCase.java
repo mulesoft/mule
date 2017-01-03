@@ -68,6 +68,7 @@ import static org.mule.runtime.module.deployment.internal.TestApplicationFactory
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -163,7 +164,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
   private static final String FOO_POLICY_NAME = "fooPolicy";
-  public static final String TEST_POLICY_ID = "testPolicy";
+  private static final String TEST_POLICY_ID = "testPolicy";
+  private static final String MIN_MULE_VERSION = "4.0.0";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
 
@@ -305,7 +307,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   // Policy file builders
   private static final PolicyFileBuilder policyFileBuilder =
-      new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").configuredWith("policy.name", FOO_POLICY_NAME);
+      new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION).setName(FOO_POLICY_NAME).build());
 
   private final boolean parallelDeployment;
   protected File muleHome;
@@ -1547,7 +1550,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String extensionName = "bye-extension";
     String moduleDestination = "org/mule/module/" + moduleFileName;
 
-    MulePluginModelBuilder builder = new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+    MulePluginModelBuilder builder = new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriber().setId(MAVEN);
@@ -1581,7 +1584,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String moduleDestination = "org/mule/module/" + moduleFileName;
 
     MulePluginModelBuilder builder =
-        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriber().setId(MAVEN);
@@ -1616,7 +1619,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String extensionName = "extension-with-extension-model-id-non-existing";
 
     MulePluginModelBuilder builder =
-        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
@@ -1636,7 +1639,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String extensionName = "extension-with-classloader-model-id-non-existing";
 
     MulePluginModelBuilder builder =
-        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion("4.0.0");
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withClassLoaderModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)

@@ -24,6 +24,28 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
+import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleScope;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -57,29 +79,8 @@ import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
-import org.mule.runtime.api.deployment.meta.MulePluginLoaderDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
-import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a {@link ClassLoaderModel}
@@ -124,7 +125,7 @@ public class MavenClassLoaderModelLoader {
    * or not all plugins are loaded in memory before running an application.
    * <p/>
    * Finally, it will also tell the resulting {@link ClassLoaderModel} which packages and/or resources has to export, consuming the
-   * attributes from the {@link MulePluginLoaderDescriptor#getAttributes()} map.
+   * attributes from the {@link MuleArtifactLoaderDescriptor#getAttributes()} map.
    *
    * @param pluginFolder {@link File} where the current plugin to work with.
    * @param attributes a set of attributes to work with, where the current implementation of this class will look for {@link MavenClassLoaderConstants#EXPORTED_PACKAGES}

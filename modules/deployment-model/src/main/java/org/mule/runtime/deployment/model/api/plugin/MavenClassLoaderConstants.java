@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.plugin;
 
-import org.mule.runtime.api.deployment.meta.MulePluginLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 
 /**
@@ -18,18 +18,18 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 public final class MavenClassLoaderConstants {
 
   /**
-   * ID used to populate a {@link MulePluginLoaderDescriptor#getId()}
+   * ID used to populate a {@link MuleArtifactLoaderDescriptor#getId()}
    */
   public static final String MAVEN = "maven";
 
   /**
-   * Property to fill the {@link MulePluginLoaderDescriptor#getAttributes()} which defines the exported packages of the
+   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported packages of the
    * current plugin.
    */
   public static final String EXPORTED_PACKAGES = "exportedPackages";
 
   /**
-   * Property to fill the {@link MulePluginLoaderDescriptor#getAttributes()} which defines the exported resources of the
+   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported resources of the
    * current plugin.
    */
   public static final String EXPORTED_RESOURCES = "exportedResources";
