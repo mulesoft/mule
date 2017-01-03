@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  * Errors that can be thrown in the
- * {@link StandardFileSystemOperations#write(FileConnectorConfig, FileSystem, String, Object, FileWriteMode, boolean, boolean, String, Event)}
+ * {@link StandardFileSystemOperations#write(FileConnectorConfig, FileSystem, String, Object, String, boolean, boolean, FileWriteMode, Event)}
  * operation.
  *
  * @since 1.0

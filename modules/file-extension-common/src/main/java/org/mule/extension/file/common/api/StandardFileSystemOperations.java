@@ -69,7 +69,7 @@ public class StandardFileSystemOperations {
   @Throws(FileListErrorTypeProvider.class)
   public TreeNode list(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String directoryPath,
                        @Optional(defaultValue = "false") boolean recursive, Message message,
-                       @Optional @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
+                       @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
     fileSystem.changeToBaseDir();
     return fileSystem.list(config, directoryPath, recursive, message, getPredicate(matchWith));
   }
@@ -140,11 +140,11 @@ public class StandardFileSystemOperations {
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path the path of the file to be written
    * @param content the content to be written into the file. Defaults to the current {@link Message} payload
-   * @param mode a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-   * @param lock whether or not to lock the file. Defaults to false
-   * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param encoding when {@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
    *        not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
+   * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+   * @param lock whether or not to lock the file. Defaults to false
+   * @param mode a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
    * @param event The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
@@ -152,11 +152,10 @@ public class StandardFileSystemOperations {
   @Throws(FileWriteErrorTypeProvider.class)
   public void write(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
                     @Content @Summary("Content to be written into the file") Object content,
-                    @Optional(
-                        defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
-                    @Optional(defaultValue = "false") boolean lock,
-                    @Optional(defaultValue = "true") boolean createParentDirectories,
                     @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
+                    @Optional(defaultValue = "true") boolean createParentDirectories,
+                    @Optional(defaultValue = "false") boolean lock, @Optional(
+                        defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
                     Event event) {
     if (content == null) {
       throw new IllegalContentException("Cannot write a null content");
@@ -198,16 +197,17 @@ public class StandardFileSystemOperations {
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param sourcePath the path to the file to be copied
    * @param targetPath the target directory where the file is going to be copied
-   * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+   * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param event the {@link Event} which triggered this operation
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Copies a file in another directory")
   @Throws(FileCopyErrorTypeProvider.class)
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
-                   String targetPath, @Optional(defaultValue = "false") boolean overwrite,
-                   @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
+                   String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
+                   @Optional(defaultValue = "false") boolean overwrite,
+                   Event event) {
     fileSystem.changeToBaseDir();
     validateTargetPath(targetPath);
     sourcePath = resolvePath(sourcePath, event, "sourcePath");
@@ -246,16 +246,17 @@ public class StandardFileSystemOperations {
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param sourcePath the path to the file to be copied
    * @param targetPath the target directory
-   * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+   * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param event The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Moves a file to another directory")
   @Throws(FileCopyErrorTypeProvider.class)
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
-                   String targetPath, @Optional(defaultValue = "false") boolean overwrite,
-                   @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
+                   String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
+                   @Optional(defaultValue = "false") boolean overwrite,
+                   Event event) {
     fileSystem.changeToBaseDir();
     validateTargetPath(targetPath);
     sourcePath = resolvePath(sourcePath, event, "sourcePath");
@@ -300,7 +301,6 @@ public class StandardFileSystemOperations {
    * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param event The current {@link Event}
    */
-  // TODO: MULE-9715
   @Summary("Renames a file")
   @Throws(FileRenameErrorTypeProvider.class)
   public void rename(@Connection FileSystem fileSystem, @Optional String path,
