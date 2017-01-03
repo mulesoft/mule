@@ -166,16 +166,16 @@
 # /plugins
 #
 /mule-standalone-${productVersion}/plugins
-/mule-standalone-${productVersion}/plugins/mule-module-db-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-db-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}-mule-plugin.zip
 /mule-standalone-${productVersion}/plugins/mule-module-file-extension-common-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}.zip
-/mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}-mule-plugin.zip
 /mule-standalone-${productVersion}/plugins/mule-plugin-weave-${productVersion}-dist.zip
 
 #
