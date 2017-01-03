@@ -22,7 +22,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 public class FileSystemPolicyClassLoaderModelLoader {
 
   protected static final String LIB_DIR = "lib";
-  protected static final String CLASSES_DIR = "classes";
+  public static final String CLASSES_DIR = "classes";
   private static final String JAR_FILE = ".jar";
 
 

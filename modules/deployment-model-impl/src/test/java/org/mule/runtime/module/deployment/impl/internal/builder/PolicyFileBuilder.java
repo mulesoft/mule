@@ -15,6 +15,7 @@ import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescrip
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.core.util.StringUtils;
@@ -137,7 +138,7 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
   public PolicyFileBuilder usingResource(String resourceFile, String targetFile) {
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, "classes/" + targetFile));
+    resources.add(new ZipResource(resourceFile, CLASSES_DIR + separator + targetFile));
 
     return getThis();
   }
