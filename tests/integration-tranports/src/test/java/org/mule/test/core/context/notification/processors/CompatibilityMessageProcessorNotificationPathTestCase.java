@@ -23,9 +23,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-/**
- *
- */
 public class CompatibilityMessageProcessorNotificationPathTestCase extends MuleArtifactFunctionalTestCase
     implements CompatibilityFunctionalTestCaseRunnerConfig {
 

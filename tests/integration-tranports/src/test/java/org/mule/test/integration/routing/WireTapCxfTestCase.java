@@ -48,9 +48,4 @@ public class WireTapCxfTestCase extends CompatibilityFunctionalTestCase {
 
     assertThat(client.request("test://wireTapped", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
   }
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 1000 * super.getTestTimeoutSecs();
-  }
 }

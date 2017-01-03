@@ -89,11 +89,6 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>org.mule.modules</groupId> -->
-<!--             <artifactId>mule-module-cxf</artifactId> -->
-<!--             <version>${project.version}</version> -->
-<!--         </dependency> -->
 
         <!-- Required extensions -->
         <dependency>
@@ -157,12 +152,6 @@
             <artifactId>mule-tests-functional-transports</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-<!--             <exclusions> -->
-<!--                 <exclusion> -->
-<!--                     <groupId>org.mule.modules</groupId> -->
-<!--                     <artifactId>mule-module-cxf</artifactId> -->
-<!--                 </exclusion> -->
-<!--             </exclusions> -->
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -459,7 +448,6 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

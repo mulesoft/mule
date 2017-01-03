@@ -6,6 +6,9 @@
  */
 package org.mule.compatibility.module.cxf.wssec;
 
+import static org.apache.ws.security.saml.ext.builder.SAML2Constants.CONF_SENDER_VOUCHES;
+import static org.opensaml.common.SAMLVersion.VERSION_20;
+
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -22,8 +25,6 @@ import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * Callback handler that populates a SAML 2 assertion based on the SAML properties file
@@ -47,20 +48,20 @@ public class SAML2CallbackHandler implements CallbackHandler {
 
     subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
     subjectQualifier = "www.example.com";
-    confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
+    confirmationMethod = CONF_SENDER_VOUCHES;
   }
 
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-    for (Callback callback2 : callbacks) {
-      if (callback2 instanceof SAMLCallback) {
-        SAMLCallback callback = (SAMLCallback) callback2;
-        callback.setSamlVersion(SAMLVersion.VERSION_20);
+    for (Callback callback : callbacks) {
+      if (callback instanceof SAMLCallback) {
+        SAMLCallback samlCallback = (SAMLCallback) callback;
+        samlCallback.setSamlVersion(VERSION_20);
         SubjectBean subjectBean = new SubjectBean(subjectName, subjectQualifier, confirmationMethod);
-        callback.setSubject(subjectBean);
-        createAndSetStatement(null, callback);
+        samlCallback.setSubject(subjectBean);
+        createAndSetStatement(null, samlCallback);
       } else {
-        throw new UnsupportedCallbackException(callback2, "Unrecognized Callback");
+        throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
       }
     }
   }
