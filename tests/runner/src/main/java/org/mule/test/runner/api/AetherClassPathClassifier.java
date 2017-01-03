@@ -27,6 +27,7 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -777,16 +778,17 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     } else {
       logger.debug("RootArtifact already classified as plugin or module, excluding it from application classification");
       exclusionsPatterns.add(rootArtifact.getGroupId() + MAVEN_COORDINATES_SEPARATOR + rootArtifact.getArtifactId() +
-          MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR + rootArtifact.getVersion());
+          MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR
+          + rootArtifact.getVersion());
     }
 
     directDependencies = directDependencies.stream()
         .map(toTransform -> {
           if (toTransform.getScope().equals(TEST)) {
-            return new Dependency(toTransform.getArtifact(), COMPILE);
+            return toTransform.setScope(COMPILE);
           }
           if (PLUGIN.equals(rootArtifactType) && toTransform.getScope().equals(COMPILE)) {
-            return new Dependency(toTransform.getArtifact(), PROVIDED);
+            return toTransform.setScope(PROVIDED);
           }
           return toTransform;
         })

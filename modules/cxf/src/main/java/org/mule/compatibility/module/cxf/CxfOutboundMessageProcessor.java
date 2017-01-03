@@ -11,17 +11,18 @@ import static org.mule.compatibility.module.cxf.CxfConstants.OPERATION;
 import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
 import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
 import org.mule.compatibility.module.cxf.i18n.CxfMessages;
 import org.mule.compatibility.module.cxf.security.WebServiceSecurityException;
+import org.mule.runtime.api.exception.ExceptionHelper;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
@@ -31,7 +32,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.api.exception.ExceptionHelper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -49,10 +49,10 @@ import javax.xml.ws.Holder;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.ws.addressing.WSAContextUtils;
 

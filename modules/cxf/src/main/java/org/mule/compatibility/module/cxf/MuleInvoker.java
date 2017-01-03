@@ -11,14 +11,13 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
-import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
 
@@ -28,7 +27,6 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
-import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -37,6 +35,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**

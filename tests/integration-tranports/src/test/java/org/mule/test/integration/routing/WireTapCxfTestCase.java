@@ -6,11 +6,11 @@
  */
 package org.mule.test.integration.routing;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
@@ -40,12 +40,17 @@ public class WireTapCxfTestCase extends CompatibilityFunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.send(url, InternalMessage.of(msg), newOptions().method(POST.name()).build()).getRight();
-    assertNotNull(response);
+    assertThat(response, not(nullValue()));
 
     String responseString = getPayloadAsString(response);
-    assertTrue(responseString.contains("echoResponse"));
-    assertFalse(responseString.contains("soap:Fault"));
+    assertThat(responseString, containsString("echoResponse"));
+    assertThat(responseString, not(containsString("soap:Fault")));
 
     assertThat(client.request("test://wireTapped", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
+  }
+
+  @Override
+  public int getTestTimeoutSecs() {
+    return 1000 * super.getTestTimeoutSecs();
   }
 }
