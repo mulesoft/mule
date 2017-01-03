@@ -7,67 +7,68 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static java.io.File.separator;
+import static java.lang.String.format;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
+import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Properties;
+import java.io.InputStream;
 
-import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Creates descriptors for policy templates
  */
 public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactory<PolicyTemplateDescriptor> {
 
-  protected static final String CLASSES_DIR = "classes";
-  protected static final String LIB_DIR = "lib";
-  private static final String JAR_FILE = ".jar";
-
-  public static final String POLICY_PROPERTIES = "policy.properties";
-  public static final String MISSING_POLICY_PROPERTIES_FILE = "Policy must contain a " + POLICY_PROPERTIES + " file";
-  public static final String POLICY_PROPERTIES_FILE_READ_ERROR = "Cannot read " + POLICY_PROPERTIES + " file";
+  protected static final String FOLDER_MODEL_LOADER = "FOLDER";
+  protected static final String MISSING_POLICY_DESCRIPTOR_ERROR = "Policy must contain a " + MULE_POLICY_JSON + " file";
 
   @Override
   public PolicyTemplateDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
-    final String pluginName = artifactFolder.getName();
-    final PolicyTemplateDescriptor descriptor = new PolicyTemplateDescriptor(pluginName);
-
-    final File policyPropsFile = new File(artifactFolder, POLICY_PROPERTIES);
-    if (!policyPropsFile.exists()) {
-      throw new ArtifactDescriptorCreateException(MISSING_POLICY_PROPERTIES_FILE);
-    }
-    Properties props = new Properties();
-    try {
-      props.load(new FileReader(policyPropsFile));
-    } catch (IOException e) {
-      throw new ArtifactDescriptorCreateException(POLICY_PROPERTIES_FILE_READ_ERROR, e);
+    final File policyJsonFile = new File(artifactFolder, META_INF + separator + MULE_POLICY_JSON);
+    if (!policyJsonFile.exists()) {
+      throw new ArtifactDescriptorCreateException(MISSING_POLICY_DESCRIPTOR_ERROR);
     }
 
-    ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
-    try {
-      classLoaderModelBuilder.containing(new File(artifactFolder, CLASSES_DIR).toURI().toURL());
-      final File libDir = new File(artifactFolder, LIB_DIR);
-      if (libDir.exists()) {
-        final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(JAR_FILE));
-        for (int i = 0; i < jars.length; i++) {
-          classLoaderModelBuilder.containing(jars[i].toURI().toURL());
-        }
-      }
-    } catch (MalformedURLException e) {
-      throw new ArtifactDescriptorCreateException("Failed to create plugin descriptor " + artifactFolder);
-    }
-    descriptor.setClassLoaderModel(classLoaderModelBuilder.build());
-    descriptor.setConfigResourceFiles(new File[] {new File(artifactFolder, DEFAULT_POLICY_CONFIGURATION_RESOURCE)});
+    final MulePolicyModel mulePolicyModel = getMulePolicyJsonDescriber(policyJsonFile);
+
+    final PolicyTemplateDescriptor descriptor = new PolicyTemplateDescriptor(mulePolicyModel.getName());
     descriptor.setRootFolder(artifactFolder);
+    descriptor.setConfigResourceFiles(new File[] {new File(artifactFolder, DEFAULT_POLICY_CONFIGURATION_RESOURCE)});
+
+    if (mulePolicyModel.getClassLoaderModelLoaderDescriptor().isPresent()) {
+      MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = mulePolicyModel.getClassLoaderModelLoaderDescriptor().get();
+      if (!muleArtifactLoaderDescriptor.getId().equals(FOLDER_MODEL_LOADER)) {
+        throw new ArtifactDescriptorCreateException("Unknown model loader: " + muleArtifactLoaderDescriptor.getId());
+      }
+
+      FileSystemPolicyClassLoaderModelLoader classLoaderModelLoader = new FileSystemPolicyClassLoaderModelLoader();
+      ClassLoaderModel classLoaderModel =
+          classLoaderModelLoader.loadClassLoaderModel(artifactFolder);
+      descriptor.setClassLoaderModel(classLoaderModel);
+    }
 
     return descriptor;
+  }
+
+  private MulePolicyModel getMulePolicyJsonDescriber(File jsonFile) {
+    try (InputStream stream = new FileInputStream(jsonFile)) {
+      return new MulePolicyModelJsonSerializer().deserialize(IOUtils.toString(stream));
+    } catch (IOException e) {
+      throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s'", jsonFile.getAbsolutePath()),
+                                         e);
+    }
   }
 }

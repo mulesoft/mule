@@ -8,15 +8,23 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.io.File.separator;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.POLICY_PROPERTIES;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
+import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
-import org.mule.tck.ZipUtils;
+import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -28,6 +36,7 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
 
   private List<ArtifactPluginFileBuilder> plugins = new LinkedList<>();
   private Properties properties = new Properties();
+  private MulePolicyModel mulePolicyModel;
 
   public PolicyFileBuilder(String id) {
     super(id);
@@ -43,24 +52,44 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
     return this;
   }
 
+
+  /**
+   * Adds a model describer to the policy describer file.
+   *
+   * @param mulePolicyModel the describer to store under
+   *        {@link PolicyTemplateDescriptor#META_INF}/{@link PolicyTemplateDescriptor#MULE_POLICY_JSON} file
+   * @return the same builder instance
+   */
+  public PolicyFileBuilder describedBy(MulePolicyModel mulePolicyModel) {
+    checkImmutable();
+    checkArgument(mulePolicyModel != null, "JSON describer cannot be null");
+    this.mulePolicyModel = mulePolicyModel;
+
+    return this;
+  }
+
   @Override
-  protected List<ZipUtils.ZipResource> getCustomResources() {
-    final List<ZipUtils.ZipResource> customResources = new LinkedList<>();
+  protected List<ZipResource> getCustomResources() {
+    final List<ZipResource> customResources = new LinkedList<>();
 
     for (ArtifactPluginFileBuilder plugin : plugins) {
       customResources
-          .add(new ZipUtils.ZipResource(plugin.getArtifactFile().getAbsolutePath(),
-                                        "plugins/" + plugin.getArtifactFile().getName()));
+          .add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(),
+                               "plugins/" + plugin.getArtifactFile().getName()));
     }
 
-    if (!properties.isEmpty()) {
-      final File applicationPropertiesFile = new File(getTempFolder(), POLICY_PROPERTIES);
-      applicationPropertiesFile.deleteOnExit();
-      createPropertiesFile(applicationPropertiesFile, properties);
+    if (mulePolicyModel != null) {
+      final File jsonDescriptorFile = new File(getTempFolder(), META_INF + separator + MULE_POLICY_JSON);
+      jsonDescriptorFile.deleteOnExit();
 
-      customResources.add(new ZipUtils.ZipResource(applicationPropertiesFile.getAbsolutePath(), POLICY_PROPERTIES));
+      String jsonDescriber = new MulePolicyModelJsonSerializer().serialize(mulePolicyModel);
+      try {
+        writeStringToFile(jsonDescriptorFile, jsonDescriber);
+      } catch (IOException e) {
+        throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
+      }
+      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), META_INF + "/" + MULE_POLICY_JSON));
     }
-
     return customResources;
   }
 
@@ -94,7 +123,7 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
   public PolicyFileBuilder definedBy(String configFile) {
     checkImmutable();
     checkArgument(!StringUtils.isEmpty(configFile), "Config file cannot be empty");
-    this.resources.add(new ZipUtils.ZipResource(configFile, DEFAULT_POLICY_CONFIGURATION_RESOURCE));
+    this.resources.add(new ZipResource(configFile, DEFAULT_POLICY_CONFIGURATION_RESOURCE));
 
     return this;
   }
@@ -109,24 +138,8 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
   public PolicyFileBuilder usingResource(String resourceFile, String targetFile) {
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipUtils.ZipResource(resourceFile, "classes/" + targetFile));
+    resources.add(new ZipResource(resourceFile, CLASSES_DIR + separator + targetFile));
 
     return getThis();
-  }
-
-  /**
-   * Adds a property into the policy properties file.
-   *
-   * @param propertyName name fo the property to add. Non empty
-   * @param propertyValue value of the property to add. Non null.
-   * @return the same builder instance
-   */
-  public PolicyFileBuilder configuredWith(String propertyName, String propertyValue) {
-    checkImmutable();
-    checkArgument(!isEmpty(propertyName), "Property name cannot be empty");
-    checkArgument(propertyValue != null, "Property value cannot be null");
-    properties.put(propertyName, propertyValue);
-
-    return this;
   }
 }
