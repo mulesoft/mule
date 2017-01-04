@@ -372,7 +372,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         }
         catch (Exception e)
         {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Couldn't retrieve wsdl at %s", config.getWsdlLocation()), e, this);
+            throw new InitialisationException(e, this);
         }
 
         Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
