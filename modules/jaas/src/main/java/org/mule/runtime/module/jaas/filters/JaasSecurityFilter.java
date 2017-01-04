@@ -8,8 +8,8 @@ package org.mule.runtime.module.jaas.filters;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.security.CredentialsNotSetException;
@@ -41,7 +41,6 @@ public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
     Credentials user = new MuleCredentials(userHeader, getSecurityManager());
     Authentication authResult;
     JaasAuthentication authentication = new JaasAuthentication(user);
-    authentication.setEvent(event);
     try {
       authResult = getSecurityManager().authenticate(authentication);
     } catch (SecurityException se) {
