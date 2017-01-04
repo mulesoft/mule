@@ -103,7 +103,7 @@ public class ProxyWsdlRetrieverStrategy extends AbstractInputStreamStrategy
         }
         catch (Exception e)
         {
-            throw new WSDLException("Exception retrieving wsdl for url : %s", url.toString(), e);
+            throw new WSDLException("Exception retrieving WSDL for URL: %s", url.toString(), e);
         }
     }
 
