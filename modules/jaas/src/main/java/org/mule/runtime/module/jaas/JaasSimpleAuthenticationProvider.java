@@ -150,6 +150,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider {
    * @throws org.mule.runtime.core.api.security.SecurityException
    *
    */
+  @Override
   public final Authentication authenticate(Authentication authentication)
       throws org.mule.runtime.core.api.security.SecurityException {
     LoginContext loginContext;
@@ -180,7 +181,6 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider {
     Subject subject = loginContext.getSubject();
     JaasAuthentication finalAuth = new JaasAuthentication(auth.getPrincipal(), auth.getCredentials(), subject);
     finalAuth.setAuthenticated(true);
-    finalAuth.setEvent(authentication.getEvent());
 
     return finalAuth;
   }
@@ -192,6 +192,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider {
    *
    * @throws InitialisationException
    */
+  @Override
   protected void doInitialise() throws InitialisationException {
     // configure jaas from properties passed to the provider from the Mule XML
     // configuration file
@@ -200,7 +201,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider {
         AppConfigurationEntry entry = null;
         JaasConfig.init();
 
-        HashMap options = new HashMap();
+        Map<String, String> options = new HashMap();
         options.put("credentials", credentials);
 
         // if a custom login module is not found, it will use the Default
@@ -263,6 +264,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider {
      *
      * @param applicationName
      */
+    @Override
     public final AppConfigurationEntry[] getAppConfigurationEntry(String applicationName) {
 
       if (applicationName == null) {
@@ -279,6 +281,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider {
       }
     }
 
+    @Override
     public void refresh() {
       // Nothing to do here
     }

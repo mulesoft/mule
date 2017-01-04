@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.Event;
-
 import java.io.Serializable;
 import java.util.Map;
 
@@ -28,8 +26,4 @@ public interface Authentication extends Serializable {
   Map<String, Object> getProperties();
 
   void setProperties(Map<String, Object> properties);
-
-  Event getEvent();
-
-  void setEvent(Event event);
 }

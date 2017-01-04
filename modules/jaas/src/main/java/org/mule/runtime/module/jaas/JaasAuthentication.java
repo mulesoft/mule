@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.jaas;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.Credentials;
 
@@ -21,7 +20,6 @@ public class JaasAuthentication implements Authentication {
   private String user;
   private Map<String, Object> properties;
   private Subject subject;
-  transient private Event event;
 
   public JaasAuthentication(Credentials credentials) {
     this.user = credentials.getUsername();
@@ -32,15 +30,6 @@ public class JaasAuthentication implements Authentication {
     this.user = (String) user;
     this.credentials = ((String) credentials).toCharArray();
     this.subject = subject;
-  }
-
-  @Override
-  public Event getEvent() {
-    return event;
-  }
-
-  public void setEvent(Event muleEvent) {
-    this.event = muleEvent;
   }
 
   @Override

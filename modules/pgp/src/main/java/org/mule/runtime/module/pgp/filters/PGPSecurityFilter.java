@@ -6,23 +6,25 @@
  */
 package org.mule.runtime.module.pgp.filters;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.config.i18n.CoreMessages.failedToReadPayload;
+import static org.mule.runtime.module.pgp.i18n.PGPMessages.encryptionStrategyNotSet;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
 import org.mule.runtime.module.pgp.LiteralMessage;
-import org.mule.runtime.module.pgp.PgpMessage;
 import org.mule.runtime.module.pgp.MessageFactory;
 import org.mule.runtime.module.pgp.PGPAuthentication;
 import org.mule.runtime.module.pgp.PGPKeyRing;
+import org.mule.runtime.module.pgp.PgpMessage;
 import org.mule.runtime.module.pgp.SignedMessage;
-import org.mule.runtime.module.pgp.i18n.PGPMessages;
 
 public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
 
@@ -35,8 +37,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
   private PGPKeyRing keyManager;
 
   @Override
-  protected Event authenticateInbound(Event event)
-      throws UnauthorisedException, UnknownAuthenticationTypeException {
+  protected Event authenticateInbound(Event event) throws UnauthorisedException, UnknownAuthenticationTypeException {
     InternalMessage message = event.getMessage();
 
     String userId = (String) getCredentialsAccessor().getCredentials(event);
@@ -46,14 +47,14 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
       creds = event.getMessageAsBytes(muleContext);
       creds = strategy.decrypt(creds, null);
     } catch (Exception e1) {
-      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), e1);
+      throw new UnauthorisedException(failedToReadPayload(), e1);
     }
 
     Authentication authentication;
     try {
-      authentication = new PGPAuthentication(userId, decodeMsgRaw(creds), event);
+      authentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
     } catch (Exception e1) {
-      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), e1);
+      throw new UnauthorisedException(failedToReadPayload(), e1);
     }
 
     final Authentication authResult;
@@ -65,7 +66,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
         logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
       }
 
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), e);
+      throw new UnauthorisedException(authFailedForUser(userId), e);
     }
 
     // Authentication success
@@ -110,7 +111,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
     }
 
     if (strategy == null) {
-      throw new InitialisationException(PGPMessages.encryptionStrategyNotSet(), this);
+      throw new InitialisationException(encryptionStrategyNotSet(), this);
     }
   }
 

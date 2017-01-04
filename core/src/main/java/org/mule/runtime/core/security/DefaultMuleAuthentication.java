@@ -18,25 +18,14 @@ public class DefaultMuleAuthentication implements Authentication {
   private char[] credentials;
   private String user;
   private Map<String, Object> properties;
-  transient private Event event;
 
   public DefaultMuleAuthentication(Credentials credentials) {
     this(credentials, null);
   }
 
   public DefaultMuleAuthentication(Credentials credentials, Event event) {
-    this.event = event;
     this.user = credentials.getUsername();
     this.credentials = credentials.getPassword();
-  }
-
-  @Override
-  public Event getEvent() {
-    return event;
-  }
-
-  public void setEvent(Event muleEvent) {
-    this.event = muleEvent;
   }
 
   @Override

@@ -252,9 +252,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     Event event = createEventUsingInboundEndpoint(builder, message, getEndpoint());
 
     setCurrentEvent(event);
-    if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {
-      session.getSecurityContext().getAuthentication().setEvent(event);
-    }
     return event;
   }
 
