@@ -7,15 +7,6 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.module.http.internal.domain.HttpEntity;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.util.Preconditions;
 
 import java.io.IOException;
 
@@ -27,6 +18,15 @@ import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.http.HttpServerFilter;
 import org.glassfish.grizzly.memory.Buffers;
+import org.mule.api.MuleRuntimeException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
+import org.mule.module.http.internal.domain.HttpEntity;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.util.Preconditions;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous response writing
@@ -135,7 +135,8 @@ public class ResponseCompletionHandler
     @Override
     public void cancelled()
     {
-        responseStatusCallback.responseSendFailure(new Exception("http response transferring cancelled"));
+        super.cancelled();
+        sendFailureIfPossible(responseStatusCallback, new Exception("http response transferring cancelled"), ctx);
         resume();
     }
 
@@ -147,7 +148,8 @@ public class ResponseCompletionHandler
     @Override
     public void failed(Throwable throwable)
     {
-        responseStatusCallback.responseSendFailure(throwable);
+        super.failed(throwable);
+        sendFailureIfPossible(responseStatusCallback, throwable, ctx);
         resume();
     }
 

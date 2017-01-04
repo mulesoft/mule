@@ -7,17 +7,12 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
-import org.mule.api.DefaultMuleException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-
-import com.google.common.base.Preconditions;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.google.common.base.Preconditions;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.WriteResult;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -25,6 +20,10 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.memory.MemoryManager;
+import org.mule.api.DefaultMuleException;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous http response transferring
@@ -129,8 +128,12 @@ public class ResponseStreamingCompletionHandler
     @Override
     public void cancelled()
     {
+        super.cancelled();
         close();
-        responseStatusCallback.responseSendFailure(new DefaultMuleException(CoreMessages.createStaticMessage("Http response sending task was cancelled")));
+        sendFailureIfPossible(responseStatusCallback,
+                              new DefaultMuleException(createStaticMessage("Http response sending task was cancelled")),
+                              ctx);
+
         resume();
     }
 
@@ -142,8 +145,9 @@ public class ResponseStreamingCompletionHandler
     @Override
     public void failed(Throwable throwable)
     {
+        super.failed(throwable);
         close();
-        responseStatusCallback.responseSendFailure(throwable);
+        sendFailureIfPossible(responseStatusCallback, throwable, ctx);
         resume();
     }
 
