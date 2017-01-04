@@ -785,9 +785,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     directDependencies = directDependencies.stream()
         .map(toTransform -> {
           if (toTransform.getScope().equals(TEST)) {
+            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
             return toTransform.setScope(COMPILE);
           }
           if (PLUGIN.equals(rootArtifactType) && toTransform.getScope().equals(COMPILE)) {
+            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
             return toTransform.setScope(PROVIDED);
           }
           return toTransform;
