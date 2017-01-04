@@ -38,8 +38,7 @@ import java.lang.reflect.Constructor;
  * @param <T> the type of the object to be returned
  * @since 3.7.0
  */
-//TODO MULE-11144 : Add '(isOneRequired = true)' when the bug is fixed
-@ExclusiveOptionals
+@ExclusiveOptionals(isOneRequired = true)
 public class ObjectSource<T> {
 
   @Parameter
