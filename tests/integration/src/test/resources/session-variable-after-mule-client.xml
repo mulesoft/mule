@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+    <flow name="flow-dispatcher">
+        <set-session-variable variableName="testVariable" value="TEST"/>
+        <component class="org.mule.transformers.simple.SessionVariableAfterMuleClientTestCase$DispatchJavaComponent" />
+        <component class="org.mule.transformers.simple.SessionVariableAfterMuleClientTestCase$OutboundJavaComponent" />
+    </flow>
+    <flow name="flow-sender">
+        <set-session-variable variableName="testVariable" value="TEST"/>
+        <component class="org.mule.transformers.simple.SessionVariableAfterMuleClientTestCase$SendJavaComponent" />
+        <component class="org.mule.transformers.simple.SessionVariableAfterMuleClientTestCase$OutboundJavaComponent" />
+    </flow>
+    <flow name="flow-receiver">
+        <vm:inbound-endpoint path="in"/>
+        <echo-component/>
+    </flow>
+</mule>

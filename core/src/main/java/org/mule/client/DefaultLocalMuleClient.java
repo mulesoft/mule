@@ -18,6 +18,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.MuleSession;
+import org.mule.RequestContext;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.client.OperationOptions;
 import org.mule.api.connector.ConnectorOperationLocator;
@@ -41,6 +43,7 @@ import java.util.Map;
 
 public class DefaultLocalMuleClient implements LocalMuleClient
 {
+
     protected final MuleContext muleContext;
     private final EndpointCache endpointCache;
     private ConnectorOperationLocator connectorOperatorLocator;
@@ -90,13 +93,13 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     }
 
     public void dispatch(String url, Object payload, Map<String, Object> messageProperties)
-        throws MuleException
+            throws MuleException
     {
         dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
     public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties)
-        throws MuleException
+            throws MuleException
     {
         return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
@@ -111,7 +114,14 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         else
         {
             OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
-            return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
+            if (RequestContext.getEvent() != null)
+            {
+                return returnMessage(endpoint.process(createMuleEvent(message, endpoint, RequestContext.getEvent().getSession())));
+            }
+            else
+            {
+                return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
+            }
         }
     }
 
@@ -130,7 +140,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     }
 
     public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
-        throws MuleException
+            throws MuleException
     {
         return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);
 
@@ -157,8 +167,16 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         else
         {
             OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
-            endpoint.process(createMuleEvent(message, endpoint));
+            if (RequestContext.getEvent() != null)
+            {
+                endpoint.process(createMuleEvent(message, endpoint, RequestContext.getEvent().getSession()));
+            }
+            else
+            {
+                endpoint.process(createMuleEvent(message, endpoint));
+            }
         }
+
     }
 
     @Override
@@ -197,17 +215,24 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     }
 
     public MuleMessage process(String uri, MessageExchangePattern mep, MuleMessage message)
-        throws MuleException
+            throws MuleException
     {
         OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(uri, mep, null);
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
     protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint)
-        throws EndpointException
+            throws EndpointException
     {
         return new DefaultMuleEvent(message, endpoint.getExchangePattern(), new MuleClientFlowConstruct(
-            muleContext));
+                muleContext));
+    }
+
+    protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint, MuleSession session)
+            throws EndpointException
+    {
+        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), new MuleClientFlowConstruct(
+                muleContext), session);
     }
 
     protected MuleEvent createRequestResponseMuleEvent(MuleMessage message)
