@@ -24,37 +24,30 @@ public class URLRetrieverStrategy extends AbstractInputStreamStrategy
 {
 
     @Override
-    public Definition retrieveWsdlFrom(URL url) throws Exception
+    public Definition retrieveWsdlFrom(URL url) throws WSDLException
     {
-        InputStream responseStream = null;
-        Definition wsdlDefinition = null;
-
-        URLConnection urlConnection = url.openConnection();
-
-        if (url.getUserInfo() != null)
-        {
-            urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(url.getUserInfo().getBytes()));
-        }
-
-        responseStream = urlConnection.getInputStream();
-
         try
         {
-            wsdlDefinition = getWsdlDefinition(url, responseStream);
-        }
-        finally
-        {
-            try
-            {
-                responseStream.close();
-            }
-            catch (Exception e)
-            {
-                throw new WSDLException("Exception closing streaming for url: %s", url.toString(), e);
-            }
-        }
+            InputStream responseStream = null;
+            Definition wsdlDefinition = null;
 
-        return wsdlDefinition;
+            URLConnection urlConnection = url.openConnection();
+
+            if (url.getUserInfo() != null)
+            {
+                urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(url.getUserInfo().getBytes()));
+            }
+
+            responseStream = urlConnection.getInputStream();
+
+            wsdlDefinition = getWsdlDefinition(url, responseStream);
+            responseStream.close();
+            return wsdlDefinition;
+        }
+        catch (Exception e)
+        {
+            throw new WSDLException("Exception retrieving WSDL for URL: %s", url.toString(), e);
+        }
     }
 
 }

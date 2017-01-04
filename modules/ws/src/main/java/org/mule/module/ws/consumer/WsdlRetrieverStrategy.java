@@ -10,6 +10,7 @@ package org.mule.module.ws.consumer;
 import java.net.URL;
 
 import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
 
 /**
  * A strategy to retrieve the wsdl from the url defined
@@ -18,5 +19,5 @@ import javax.wsdl.Definition;
  */
 public interface WsdlRetrieverStrategy 
 {
-	Definition retrieveWsdlFrom(URL url) throws Exception;
+	Definition retrieveWsdlFrom(URL url) throws WSDLException;
 }
