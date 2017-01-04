@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -19,6 +20,10 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpRequestMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -40,7 +45,7 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-public class HttpRequestOperations {
+public class HttpRequestOperations implements Initialisable, Disposable {
 
   private static final int WAIT_FOR_EVER = MAX_VALUE;
 
@@ -48,6 +53,8 @@ public class HttpRequestOperations {
   private MuleContext muleContext;
   @Inject
   private SchedulerService schedulerService;
+
+  private Scheduler scheduler;
 
   /**
    * Consumes an HTTP service.
@@ -102,7 +109,7 @@ public class HttpRequestOperations {
               .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody)
               .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
               .setResponseTimeout(resolvedTimeout).setResponseValidator(responseValidator).setConfig(config)
-              .setTransformationService(muleContext.getTransformationService()).setScheduler(schedulerService.ioScheduler())
+              .setTransformationService(muleContext.getTransformationService()).setScheduler(scheduler)
               .build();
 
       // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
@@ -153,6 +160,17 @@ public class HttpRequestOperations {
     }
 
     return resolvedBasePath + resolvedRequestPath;
+  }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    this.scheduler = schedulerService.ioScheduler();
+  }
+
+  @Override
+  public void dispose() {
+    if (this.scheduler != null) {
+      scheduler.shutdownNow();
+    }
   }
 }

@@ -14,11 +14,10 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -30,7 +29,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -143,20 +141,6 @@ public final class MuleEndpointTestUtils {
                                                    Map<String, Serializable> properties, MuleContext context,
                                                    EndpointSource source, Connector connector)
       throws Exception {
-    final Map<String, Serializable> props = new HashMap<>();
-    props.put("name", name);
-    props.put("endpointURI", new MuleEndpointURI("test://test", context));
-    props.put("connector", "testConnector");
-    if (connector == null) {
-      // need to build endpoint this way to avoid depenency to any endpoint
-      // jars
-      connector = (Connector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector", AbstractMuleTestCase.class)
-          .getConstructor(MuleContext.class).newInstance(context);
-    }
-
-    connector.setName("testConnector");
-    context.getRegistry().applyLifecycle(connector);
-
     final String endpoingUri = uri == null ? "test://test" : uri;
     final EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoingUri, context);
     endpointBuilder.setConnector(connector);

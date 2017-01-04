@@ -106,11 +106,32 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
-    SimpleUnitTestSupportLifecycleSchedulerDecorator spied = spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+    SimpleUnitTestSupportLifecycleSchedulerDecorator spied =
+        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(resolveSchedulerCreationLocation(), scheduler, this));
 
     doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
     doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
     return spied;
+  }
+
+  private String resolveSchedulerCreationLocation() {
+    int i = 0;
+    final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+    StackTraceElement ste = stackTrace[i++];
+    // We have to go deep enough, right before the mockito call
+    while (skip(ste) && i < stackTrace.length) {
+      ste = stackTrace[i++];
+    }
+    if (skip(ste)) {
+      ste = stackTrace[3];
+    }
+
+    return ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber();
+  }
+
+  private boolean skip(StackTraceElement ste) {
+    return ste.getClassName().startsWith(SimpleUnitTestSupportSchedulerService.class.getName())
+        || ste.getClassName().startsWith("org.mockito");
   }
 
   @Override
@@ -118,12 +139,16 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     scheduler.shutdownNow();
   }
 
-  public List<Scheduler> getCreatedSchedulers() {
+  public List<Scheduler> getActiveSchedulers() {
     return unmodifiableList(decorators);
   }
 
   public void clearCreatedSchedulers() {
     decorators.clear();
+  }
+
+  void stoppedScheduler(Scheduler scheduler) {
+    decorators.remove(scheduler);
   }
 
   public int getScheduledTasks() {

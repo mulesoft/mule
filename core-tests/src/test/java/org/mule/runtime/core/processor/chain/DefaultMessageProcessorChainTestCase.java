@@ -55,6 +55,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -71,7 +72,6 @@ import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.runtime.core.util.ObjectUtils;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -773,11 +773,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     try {
       return super.process(messageProcessor, event);
     } finally {
-      final SimpleUnitTestSupportSchedulerService schedulerService =
-          (SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService());
+      final SchedulerService schedulerService = muleContext.getSchedulerService();
       if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && (mode == MONO || mode == FLUX)) {
         new PollingProber().check(new JUnitLambdaProbe(() -> {
-          verify(schedulerService.getCreatedSchedulers().get(1), atLeast(nonBlockingProcessorsExecuted.get()))
+          verify(schedulerService.getActiveSchedulers().get(0), atLeast(nonBlockingProcessorsExecuted.get()))
               .submit(any(Runnable.class));
           return true;
         }));

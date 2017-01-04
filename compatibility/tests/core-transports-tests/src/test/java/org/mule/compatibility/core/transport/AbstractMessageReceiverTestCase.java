@@ -28,6 +28,11 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleContex
     endpoint = getEndpoint();
   }
 
+  @Override
+  protected void doTearDown() throws Exception {
+    endpoint.getConnector().stop();
+  }
+
   @Test
   public void testCreate() throws Exception {
     InboundEndpoint endpoint = getTestInboundEndpoint("Test");

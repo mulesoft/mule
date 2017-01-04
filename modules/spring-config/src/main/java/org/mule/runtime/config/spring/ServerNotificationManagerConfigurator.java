@@ -8,8 +8,10 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
@@ -24,10 +26,9 @@ import java.util.function.BiConsumer;
 import javax.inject.Inject;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.context.ApplicationContext;
 
-public class ServerNotificationManagerConfigurator implements SmartFactoryBean {
+public class ServerNotificationManagerConfigurator implements Initialisable {
 
   @Inject
   private MuleContext muleContext;
@@ -43,7 +44,8 @@ public class ServerNotificationManagerConfigurator implements SmartFactoryBean {
     this.muleContext = context;
   }
 
-  public Object getObject() throws Exception {
+  @Override
+  public void initialise() {
     ServerNotificationManager notificationManager = muleContext.getNotificationManager();
     if (dynamic != null) {
       notificationManager.setNotificationDynamic(dynamic.booleanValue());
@@ -64,7 +66,6 @@ public class ServerNotificationManagerConfigurator implements SmartFactoryBean {
         notificationManager.addListenerSubscriptionPair(sub);
       }
     }
-    return notificationManager;
   }
 
   private void disableNotifications(ServerNotificationManager notificationManager) {
@@ -100,12 +101,12 @@ public class ServerNotificationManagerConfigurator implements SmartFactoryBean {
   }
 
   protected Set<ListenerSubscriptionPair> getMergedListeners(ServerNotificationManager notificationManager) {
-    Set<ListenerSubscriptionPair> mergedListeners = new HashSet<ListenerSubscriptionPair>();
+    Set<ListenerSubscriptionPair> mergedListeners = new HashSet<>();
 
     // Any singleton bean defined in spring that implements
     // ServerNotificationListener or a subclass.
     String[] listenerBeans = applicationContext.getBeanNamesForType(ServerNotificationListener.class, false, true);
-    Set<ListenerSubscriptionPair> adhocListeners = new HashSet<ListenerSubscriptionPair>();
+    Set<ListenerSubscriptionPair> adhocListeners = new HashSet<>();
     for (String name : listenerBeans) {
       adhocListeners.add(new ListenerSubscriptionPair((ServerNotificationListener<?>) applicationContext.getBean(name), null));
     }
@@ -132,24 +133,8 @@ public class ServerNotificationManagerConfigurator implements SmartFactoryBean {
     return mergedListeners;
   }
 
-  public Class getObjectType() {
-    return ServerNotificationManager.class;
-  }
-
-  public boolean isSingleton() {
-    return true;
-  }
-
   public void setNotificationDynamic(boolean dynamic) {
     this.dynamic = new Boolean(dynamic);
-  }
-
-  public boolean isEagerInit() {
-    return true;
-  }
-
-  public boolean isPrototype() {
-    return false;
   }
 
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

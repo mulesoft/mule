@@ -8,7 +8,6 @@ package org.mule.runtime.core.construct;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
@@ -327,7 +326,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
     startIfStartable(processingStrategy);
     startIfStartable(pipeline);
-    startIfNeeded(processingStrategy);
     canProcessMessage = true;
     if (muleContext.isStarted()) {
       try {

@@ -104,6 +104,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     // TestConnector dispatches events via the test: protocol to test://test
     // endpoints, which seems to end up in a directory called "test" :(
     deleteTree(newFile(getTestConnector().getProtocol()));
+    connector.stop();
     super.doTearDown();
   }
 

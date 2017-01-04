@@ -9,6 +9,7 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.service.scheduler.ThreadType;
 
 import java.util.concurrent.ExecutorService;
@@ -16,8 +17,7 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.quartz.Scheduler;
+import java.util.function.Consumer;
 
 /**
  * Extension of {@link DefaultScheduler} that has a limit on the tasks that can be run at the same time.
@@ -41,10 +41,12 @@ public class ThrottledScheduler extends DefaultScheduler {
    *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
    * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
    * @param maxConcurrentTasks how many tasks can be running at the same time for this {@link Scheduler}.
+   * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
    */
   ThrottledScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                     Scheduler quartzScheduler, ThreadType threadsType, int maxConcurrentTasks) {
-    super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType);
+                     org.quartz.Scheduler quartzScheduler, ThreadType threadsType, int maxConcurrentTasks,
+                     Consumer<Scheduler> shutdownCallback) {
+    super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownCallback);
     this.maxConcurrentTasks = maxConcurrentTasks;
   }
 

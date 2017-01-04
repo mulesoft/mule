@@ -9,13 +9,13 @@ package org.mule.compatibility.core.transport;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -184,8 +184,8 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextEndpo
     OutboundEndpoint endpoint = getEndpointFactory().getOutboundEndpoint("test://test");
     endpoint.setFlowConstruct(new Flow("testFlow", muleContext));
 
-    endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
-    endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
+    endpoint.process(getTestEvent("data", getTestInboundEndpoint(ONE_WAY)));
+    endpoint.process(getTestEvent("data", getTestInboundEndpoint(ONE_WAY)));
   }
 
   public class DelayTestMessageDispatcher extends TestMessageDispatcher {

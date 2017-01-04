@@ -6,12 +6,12 @@
  */
 package org.mule.compatibility.transport.vm.functional.transactions;
 
+import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
@@ -36,7 +36,7 @@ public abstract class AbstractExternalTransactionTestCase extends CompatibilityF
 
   protected static final Logger logger = LoggerFactory.getLogger(AbstractExternalTransactionTestCase.class);
 
-  protected MuleContext context;
+  // protected MuleContext context;
   protected TransactionManager tm;
 
   @Override
@@ -68,15 +68,14 @@ public abstract class AbstractExternalTransactionTestCase extends CompatibilityF
   }
 
   protected void init() throws Exception {
-    context = createMuleContext();
-    tm = context.getTransactionManager();
+    tm = muleContext.getTransactionManager();
   }
 
   protected <T> ExecutionTemplate<T> createExecutionTemplate(byte action, boolean considerExternal) {
     TransactionConfig tc = new MuleTransactionConfig(action);
     tc.setFactory(new XaTransactionFactory());
     tc.setInteractWithExternal(considerExternal);
-    ExecutionTemplate<T> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(context, tc);
+    ExecutionTemplate<T> executionTemplate = createTransactionalExecutionTemplate(muleContext, tc);
     return executionTemplate;
   }
 

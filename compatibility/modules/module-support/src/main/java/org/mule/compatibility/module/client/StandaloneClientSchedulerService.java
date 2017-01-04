@@ -7,6 +7,7 @@
 package org.mule.compatibility.module.client;
 
 import static java.lang.Runtime.getRuntime;
+import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -120,6 +122,11 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
     public String getName() {
       return StandaloneClientThreadScheduler.class.getSimpleName();
     }
+  }
+
+  @Override
+  public List<Scheduler> getActiveSchedulers() {
+    return singletonList(scheduler);
   }
 
 }

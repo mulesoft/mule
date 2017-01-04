@@ -16,22 +16,36 @@ import static org.junit.Assert.fail;
 import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class HttpConnectionTimeoutTestCase extends CompatibilityFunctionalTestCase {
+
+  private MuleClient client;
 
   @Override
   protected String getConfigFile() {
     return "http-connection-timeout-config.xml";
   }
 
+  @Before
+  public void before() throws MuleException {
+    client = new MuleClient(muleContext);
+  }
+
+  @After
+  public void after() {
+    client.dispose();
+  }
+
   @Test
   public void usesConnectionTimeout() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     FutureMessageResult result = client.sendAsync("vm://testInput", TEST_MESSAGE, null);
 
     InternalMessage message = null;

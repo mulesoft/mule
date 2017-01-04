@@ -8,10 +8,12 @@ package org.mule.runtime.core.interceptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -23,6 +25,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class InterceptorTestCase extends AbstractMuleContextTestCase {
@@ -182,12 +185,20 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     }
   }
 
+  private Flow flow;
+
   protected Flow createUninitializedFlow() throws Exception {
     TestComponent component = new TestComponent();
-    Flow flow = new Flow("name", muleContext);
+    flow = new Flow("name", muleContext);
     flow.setMessageProcessors(new ArrayList<Processor>());
     flow.getMessageProcessors().add(component);
     return flow;
+  }
+
+  @After
+  public void after() throws MuleException {
+    stopIfNeeded(flow);
+    disposeIfNeeded(flow, logger);
   }
 
   class TestComponent extends AbstractComponent {

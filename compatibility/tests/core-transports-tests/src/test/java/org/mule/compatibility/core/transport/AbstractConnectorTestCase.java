@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -19,9 +20,9 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageDispatcherFactory;
 import org.mule.compatibility.core.api.transport.MessageRequesterFactory;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -77,6 +78,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
     SystemExceptionHandler ehandlerMock = mock(SystemExceptionHandler.class);
 
     assertNotNull(muleContext.getExceptionListener());
+    disposeIfNeeded(muleContext.getExceptionListener(), logger);
     muleContext.setExceptionListener(ehandlerMock);
     muleContext.getExceptionListener().handleException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("Dummy")));
 

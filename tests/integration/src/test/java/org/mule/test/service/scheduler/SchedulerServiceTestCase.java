@@ -6,7 +6,6 @@
  */
 package org.mule.test.service.scheduler;
 
-import static java.lang.Runtime.getRuntime;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -50,8 +49,6 @@ import ru.yandex.qatools.allure.annotations.Features;
 @Features("Scheduler Service")
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
-  private static long mem = getRuntime().maxMemory() / 1024;
-
   @Override
   protected String getConfigFile() {
     return "org/mule/test/service/scheduler/scheduler-service.xml";
@@ -66,15 +63,19 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Test
   public void schedulerDefaultName() {
     SchedulerService schedulerService = muleContext.getSchedulerService();
-    assertThat(schedulerService.ioScheduler().getName(),
+    final Scheduler ioScheduler = schedulerService.ioScheduler();
+    assertThat(ioScheduler.getName(),
                startsWith("SchedulerService_io@" + SchedulerServiceTestCase.class.getName() + ".schedulerDefaultName:"));
+    ioScheduler.shutdownNow();
   }
 
   @Test
   public void schedulerCustomName() {
     SchedulerService schedulerService = muleContext.getSchedulerService();
-    assertThat(schedulerService.ioScheduler(config().withName("myPreciousScheduler")).getName(),
+    final Scheduler ioScheduler = schedulerService.ioScheduler(config().withName("myPreciousScheduler"));
+    assertThat(ioScheduler.getName(),
                startsWith("myPreciousScheduler"));
+    ioScheduler.shutdownNow();
   }
 
   @Test
@@ -136,16 +137,28 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  public static class HasSchedulingService implements Processor {
+  public static class HasSchedulingService implements Processor, Initialisable, Disposable {
 
     @Inject
-    private SchedulerService scheduler;
+    private SchedulerService schedulerService;
+
+    private Scheduler scheduler;
+
+    @Override
+    public void initialise() throws InitialisationException {
+      scheduler = schedulerService.cpuLightScheduler();
+    }
+
+    @Override
+    public void dispose() {
+      scheduler.shutdownNow();
+    }
 
     @Override
     public Event process(Event event) throws MuleException {
       try {
         // just exercise the scheduler.
-        return scheduler.cpuLightScheduler().submit(() -> event).get();
+        return scheduler.submit(() -> event).get();
       } catch (InterruptedException e) {
         currentThread().interrupt();
         return event;

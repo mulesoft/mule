@@ -119,6 +119,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     try {
       initStats();
       doInitialise();
+      super.initialise();
     } catch (Exception e) {
       if (e instanceof InitialisationException) {
         throw (InitialisationException) e;
@@ -224,7 +225,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
     initialiseIfNeeded(value, true, muleContext);
     retryScheduler = schedulerService.ioScheduler();
-    super.initialise();
   }
 
   /**

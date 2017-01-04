@@ -405,17 +405,18 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       return;
     }
 
-    scheduler = createScheduler();
-
     if (!isConnected()) {
+      scheduler = createScheduler();
       try {
         // startAfterConnect() will get called from the connect() method once connected.
         // This is necessary for reconnection strategies.
         startOnConnect = true;
         connect();
       } catch (MuleException me) {
+        shutdownScheduler();
         throw me;
       } catch (Exception e) {
+        shutdownScheduler();
         throw new EndpointConnectException(e, this);
       }
     } else {

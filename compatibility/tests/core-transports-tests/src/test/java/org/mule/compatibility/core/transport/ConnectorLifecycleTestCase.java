@@ -9,6 +9,7 @@ package org.mule.compatibility.core.transport;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +17,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -26,8 +28,8 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -82,6 +84,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     assertEquals(0, connector.getStopCount());
     assertEquals(0, connector.getDisconnectCount());
     assertEquals(0, connector.getDisposeCount());
+
+    connector.stop();
 
     // Initialising the connector again should not throw an exception.
     try {
@@ -570,11 +574,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     assertNull(connector.getScheduler());
 
     connector.start();
-    assertFalse(connector.getScheduler().isShutdown());
-    assertFalse(connector.getScheduler().isTerminated());
+    assertThat(connector.getScheduler(), nullValue());
 
     connector.dispose();
-    assertNull(connector.getScheduler());
+    assertThat(connector.getScheduler(), nullValue());
   }
 
   @Test
@@ -607,6 +610,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
         return receiver;
       }
     };
+    registerConnector(muleContext.getRegistry(), connector);
 
     InboundEndpoint in = getTestInboundEndpoint("out", "test://out", null, null, null, connector);
 

@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.scheduler;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.service.Service;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
@@ -124,5 +125,12 @@ public interface SchedulerService extends Service {
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
   Scheduler customScheduler(SchedulerConfig config, int queueSize);
+
+  /**
+   * Provides a read-only view of all currently active {@link Scheduler}s created through this service.
+   * 
+   * @return all currently active {@link Scheduler}s.
+   */
+  List<Scheduler> getActiveSchedulers();
 
 }

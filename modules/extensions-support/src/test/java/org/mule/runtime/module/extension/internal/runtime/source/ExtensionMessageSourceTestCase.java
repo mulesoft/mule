@@ -23,7 +23,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -68,7 +67,6 @@ import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
-import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
@@ -76,17 +74,16 @@ import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Supplier;
 
 import javax.resource.spi.work.Work;
@@ -94,12 +91,12 @@ import javax.resource.spi.work.Work;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -242,6 +239,12 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         .thenReturn(of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), METADATA_KEY)));
 
     messageSource = getNewExtensionMessageSourceInstance();
+  }
+
+  @After
+  public void after() throws MuleException {
+    messageSource.stop();
+    messageSource.dispose();
   }
 
   @Test
@@ -408,18 +411,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void stop() throws Exception {
-    ((SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService())).clearCreatedSchedulers();
     messageSource.initialise();
     messageSource.start();
 
-    List<Scheduler> createdSchedulers =
-        ((SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService())).getCreatedSchedulers();
-    InOrder inOrder = inOrder(source, createdSchedulers.get(0), createdSchedulers.get(1));
-
     messageSource.stop();
-    inOrder.verify(source).onStop();
-    inOrder.verify(createdSchedulers.get(0)).stop(anyLong(), any());
-    inOrder.verify(createdSchedulers.get(1)).stop(anyLong(), any());
+    verify(source).onStop();
   }
 
   @Test
@@ -433,6 +429,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
     assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
+
+    messageSource.stop();
   }
 
   @Test
@@ -447,11 +445,12 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     Throwable t = catchThrowable(messageSource::start);
 
     assertThat(t.getMessage(), containsString(enrichedErrorMessage));
+
+    messageSource.stop();
   }
 
   @Test
   public void workManagerDisposedIfSourceFailsToStart() throws Exception {
-    ((SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService())).clearCreatedSchedulers();
     initialise();
     start();
 
@@ -470,12 +469,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         description.appendText("Exception was not wrapped as expected");
       }
     });
-
-    messageSource.stop();
-    List<Scheduler> createdSchedulers =
-        ((SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService())).getCreatedSchedulers();
-    verify(createdSchedulers.get(0)).stop(anyLong(), any());
-    verify(createdSchedulers.get(1)).stop(anyLong(), any());
   }
 
   private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {

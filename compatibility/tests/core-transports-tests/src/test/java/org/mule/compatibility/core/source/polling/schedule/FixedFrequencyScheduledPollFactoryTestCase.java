@@ -20,8 +20,8 @@ import org.mule.compatibility.core.transport.PollingReceiverWorker;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.ScheduledFuture;
@@ -35,11 +35,11 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
 
   private AbstractPollingMessageReceiver receiver = mock(AbstractPollingMessageReceiver.class);
 
-  private SimpleUnitTestSupportSchedulerService schedulerService;
+  private SchedulerService schedulerService;
 
   @Before
   public void before() {
-    schedulerService = (SimpleUnitTestSupportSchedulerService) muleContext.getSchedulerService();
+    schedulerService = muleContext.getSchedulerService();
   }
 
   @Test
@@ -52,7 +52,7 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
     ScheduledFuture<?> scheduler = factory.doSchedule(schedulerService.ioScheduler(), worker);
 
-    Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
     verify(createdScheduler).scheduleAtFixedRate(any(), eq(400l), eq(300l), eq(DAYS));
   }
 
@@ -63,7 +63,7 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
     ScheduledFuture<?> scheduler = factory.doSchedule(schedulerService.ioScheduler(), worker);
 
-    Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
     verify(createdScheduler).scheduleAtFixedRate(any(), eq(1000l), eq(1000l), eq(MILLISECONDS));
   }
 

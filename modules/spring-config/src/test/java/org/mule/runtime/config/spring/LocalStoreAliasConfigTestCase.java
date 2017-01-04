@@ -9,11 +9,19 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertSame;
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -36,36 +44,35 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void inMemoryObjectStore() throws Exception {
-    this.testSame(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY);
+    this.testSame(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, LOCAL_TRANSIENT_OBJECT_STORE_KEY);
   }
 
   @Test
   public void persistentObjectStore() throws Exception {
-    this.testSame(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY);
+    this.testSame(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, LOCAL_PERSISTENT_OBJECT_STORE_KEY);
   }
 
 
   @Test
   public void userObjectStore() throws Exception {
-    this.testSame(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME, "_localUserObjectStore");
+    this.testSame(DEFAULT_USER_OBJECT_STORE_NAME, "_localUserObjectStore");
   }
 
   @Test
   public void transientUserObjectStore() throws Exception {
-    this.testSame(MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, "_localTransientUserObjectStore");
+    this.testSame(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, "_localTransientUserObjectStore");
   }
 
   @Test
   public void queueManager() throws Exception {
-    this.testSame(MuleProperties.OBJECT_QUEUE_MANAGER, DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY);
-    assertSame(muleContext.getQueueManager(), muleContext.getRegistry().lookupObject(DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY));
+    this.testSame(OBJECT_QUEUE_MANAGER, LOCAL_QUEUE_MANAGER_KEY);
+    assertSame(muleContext.getQueueManager(), muleContext.getRegistry().lookupObject(LOCAL_QUEUE_MANAGER_KEY));
   }
 
   @Test
   public void objectStoreManager() throws Exception {
-    this.testSame(MuleProperties.OBJECT_STORE_MANAGER, DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY);
-    assertSame(muleContext.getObjectStoreManager(),
-               muleContext.getRegistry().lookupObject(DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY));
+    this.testSame(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER_KEY);
+    assertSame(muleContext.getObjectStoreManager(), muleContext.getRegistry().lookupObject(LOCAL_OBJECT_STORE_MANAGER_KEY));
   }
 
   private void testSame(String key1, String key2) {

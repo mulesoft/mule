@@ -16,6 +16,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -40,6 +42,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -85,8 +88,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   public void testSingleEventNoTimeoutAsync() throws Exception {
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-    AsyncDelegateMessageProcessor asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
-    asyncMP.setMuleContext(muleContext);
+    AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
     asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
     asyncMP.initialise();
     asyncMP.start();
@@ -106,8 +108,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setTimeout(1);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(30000);
-    AsyncDelegateMessageProcessor asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
-    asyncMP.setMuleContext(muleContext);
+    AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
     asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
     asyncMP.initialise();
     asyncMP.start();
@@ -178,8 +179,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(50);
-    AsyncDelegateMessageProcessor asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
-    asyncMP.setMuleContext(muleContext);
+    AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
     asyncMP.initialise();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
@@ -204,6 +204,20 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       assertThat(count.get(), greaterThanOrEqualTo(500));
       return true;
     }));
+  }
+
+  private AsyncDelegateMessageProcessor asyncMP;
+
+  @After
+  public void after() throws MuleException {
+    stopIfNeeded(asyncMP);
+    disposeIfNeeded(asyncMP, logger);
+  }
+
+  protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target) {
+    asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
+    asyncMP.setMuleContext(muleContext);
+    return asyncMP;
   }
 
   @Override

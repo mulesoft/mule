@@ -6,9 +6,10 @@
  */
 package org.mule.compatibility.module.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
 
@@ -18,19 +19,18 @@ public class MuleClientTestCase extends AbstractMuleClientTestCase {
 
   @Test
   public void testCreateMuleClient() throws MuleException {
-    assertNotNull(muleContext);
-    MuleClient muleClient = new MuleClient(muleContext);
-    assertEquals(muleContext, muleClient.getMuleContext());
-    assertTrue(muleContext.isInitialised());
+    assertThat(muleContext, not(nullValue()));
+    assertThat(getMuleClient().getMuleContext(), is(muleContext));
+    assertThat(muleContext.isInitialised(), is(true));
 
     muleContext.start();
 
-    assertTrue(muleContext.isStarted());
-    muleClient.dispatch("test://test", "message", null);
-    muleClient.send("test://test", "message", null);
-    muleClient.dispose();
-    assertTrue(muleClient.getMuleContext().isInitialised());
-    assertTrue(muleClient.getMuleContext().isStarted());
+    assertThat(muleContext.isStarted(), is(true));
+    getMuleClient().dispatch("test://test", "message", null);
+    getMuleClient().send("test://test", "message", null);
+    getMuleClient().dispose();
+    assertThat(getMuleClient().getMuleContext().isInitialised(), is(true));
+    assertThat(getMuleClient().getMuleContext().isStarted(), is(true));
   }
 
 }

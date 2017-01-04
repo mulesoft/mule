@@ -12,11 +12,14 @@ import static org.junit.Assert.fail;
 import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -25,14 +28,25 @@ public class SocketTimeoutTestCase extends CompatibilityFunctionalTestCase {
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
+  private MuleClient client;
+
   @Override
   protected String getConfigFile() {
     return "tcp-outbound-timeout-config.xml";
   }
 
+  @Before
+  public void before() throws MuleException {
+    client = new MuleClient(muleContext);
+  }
+
+  @After
+  public void after() {
+    client.dispose();
+  }
+
   @Test
   public void socketReadWriteResponseTimeout() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     FutureMessageResult result = client.sendAsync("vm://inboundTest1", "something", null);
     InternalMessage message = null;
     try {
@@ -45,7 +59,6 @@ public class SocketTimeoutTestCase extends CompatibilityFunctionalTestCase {
 
   @Test
   public void socketConnectionResponseTimeout() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     FutureMessageResult result = client.sendAsync("vm://inboundTest2", "something", null);
     InternalMessage message = null;
     try {

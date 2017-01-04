@@ -13,26 +13,39 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class MuleClientJmsTestCase extends CompatibilityFunctionalTestCase {
 
   public static final int INTERATIONS = 1;
 
+  private MuleClient client;
+
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
   }
 
+  @Before
+  public void before() throws MuleException {
+    client = new MuleClient(muleContext);
+  }
+
+  @After
+  public void after() {
+    client.dispose();
+  }
+
   @Test
   public void testClientSend() throws Exception {
-    MuleClient client = new MuleClient(muleContext);
-
     InternalMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
     assertNotNull(message);
     assertEquals("Received: Test Client Send message", message.getPayload().getValue());
@@ -40,8 +53,6 @@ public class MuleClientJmsTestCase extends CompatibilityFunctionalTestCase {
 
   @Test
   public void testClientMultiSend() throws Exception {
-    MuleClient client = new MuleClient(muleContext);
-
     for (int i = 0; i < INTERATIONS; i++) {
       InternalMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
       assertNotNull(message);
@@ -51,8 +62,6 @@ public class MuleClientJmsTestCase extends CompatibilityFunctionalTestCase {
 
   @Test
   public void testClientMultiDispatch() throws Exception {
-    MuleClient client = new MuleClient(muleContext);
-
     int i = 0;
     // to init
     client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
@@ -67,8 +76,6 @@ public class MuleClientJmsTestCase extends CompatibilityFunctionalTestCase {
 
   @Test
   public void testClientDispatchAndReceiveOnReplyTo() throws Exception {
-    MuleClient client = new MuleClient(muleContext);
-
     Map props = new HashMap();
     props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");
 

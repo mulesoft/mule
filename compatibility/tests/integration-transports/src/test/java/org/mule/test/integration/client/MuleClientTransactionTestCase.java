@@ -22,6 +22,7 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsTransactionFactory;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -33,18 +34,31 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class MuleClientTransactionTestCase extends CompatibilityFunctionalTestCase {
+
+  private MuleClient client;
 
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
   }
 
+  @Before
+  public void before() throws MuleException {
+    client = new MuleClient(muleContext);
+  }
+
+  @After
+  public void after() {
+    client.dispose();
+  }
+
   @Test
   public void testTransactionsWithSetRollbackOnly() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     final Map<String, Serializable> props = new HashMap<>();
     props.put("JMSReplyTo", "replyTo.queue");
     props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
@@ -84,7 +98,6 @@ public class MuleClientTransactionTestCase extends CompatibilityFunctionalTestCa
 
   @Test
   public void testTransactionsWithExceptionThrown() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     final Map<String, Serializable> props = new HashMap<>();
     props.put("JMSReplyTo", "replyTo.queue");
     props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
@@ -126,7 +139,6 @@ public class MuleClientTransactionTestCase extends CompatibilityFunctionalTestCa
 
   @Test
   public void testTransactionsWithCommit() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     final Map<String, Serializable> props = new HashMap<>();
     props.put("JMSReplyTo", "replyTo.queue");
     props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
@@ -167,7 +179,6 @@ public class MuleClientTransactionTestCase extends CompatibilityFunctionalTestCa
   }
 
   protected void emptyReplyQueue() throws Exception {
-    final MuleClient client = new MuleClient(muleContext);
     MuleTransactionConfig tc = new MuleTransactionConfig(ACTION_ALWAYS_BEGIN);
     tc.setFactory(new JmsTransactionFactory());
     ExecutionTemplate<Void> executionTemplate =

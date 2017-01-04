@@ -7,9 +7,8 @@
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
@@ -27,16 +26,16 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 /**
  * Grizzly based implementation of an {@link HttpServer}.
  */
-public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier<ExecutorService> {
+public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> {
 
   private final TCPNIOTransport transport;
   private final ServerAddress serverAddress;
   private final HttpListenerRegistry listenerRegistry;
   private TCPNIOServerConnection serverConnection;
+  private Supplier<Scheduler> schedulerSource;
   private Scheduler scheduler;
   private boolean stopped = true;
   private boolean stopping;
-  private MuleContext muleContext;
   private String ownerName;
 
   public GrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry,
@@ -44,11 +43,12 @@ public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier
     this.serverAddress = serverAddress;
     this.transport = transport;
     this.listenerRegistry = listenerRegistry;
-    this.scheduler = schedulerSource.get();
+    this.schedulerSource = schedulerSource;
   }
 
   @Override
   public synchronized void start() throws IOException {
+    this.scheduler = schedulerSource.get();
     serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
     stopped = false;
   }
@@ -61,16 +61,17 @@ public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier
     } finally {
       stopping = false;
     }
+    try {
+      // TODO - MULE-11115: Get rid of muleContext once we have a stop() method
+      scheduler.stop(5000, MILLISECONDS);
+    } finally {
+      scheduler = null;
+    }
   }
 
   @Override
   public void dispose() {
-    try {
-      //TODO - MULE-11115: Get rid of muleContext once we have a stop() method
-      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-    } finally {
-      scheduler = null;
-    }
+    // Nothing to do
   }
 
   @Override
@@ -91,11 +92,6 @@ public class GrizzlyHttpServer implements HttpServer, MuleContextAware, Supplier
   @Override
   public RequestHandlerManager addRequestHandler(PathAndMethodRequestMatcher requestMatcher, RequestHandler requestHandler) {
     return this.listenerRegistry.addRequestHandler(this, requestHandler, requestMatcher);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
   @Override
