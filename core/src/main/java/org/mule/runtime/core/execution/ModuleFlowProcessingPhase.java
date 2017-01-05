@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 public class ModuleFlowProcessingPhase
     extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> {
 
+  public static final String ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY = "enableSourcePolicies";
   private final PolicyManager policyManager;
   protected static transient Logger logger = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 
@@ -81,7 +82,7 @@ public class ModuleFlowProcessingPhase
           .message((InternalMessage) template.getMessage()).build();
 
       // TODO MULE-11167 Policies should be non blocking
-      if (System.getProperty("enableSourcePolicies") == null) {
+      if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
 
         just(templateEvent)
             .doOnNext(request -> fireNotification(messageProcessContext.getMessageSource(), request,

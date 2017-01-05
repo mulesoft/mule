@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -43,7 +42,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
 
     private DefaultSourceCallback<T, A> product = new DefaultSourceCallback();
 
-    public Builder<T, A> setListener(AsyncProcessor listener) {
+    public Builder<T, A> setListener(Processor listener) {
       product.listener = listener;
       return this;
     }
@@ -97,7 +96,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     return new Builder();
   }
 
-  private AsyncProcessor listener;
+  private Processor listener;
   private FlowConstruct flowConstruct;
   private ExceptionCallback exceptionCallback;
   private MessageProcessingManager messageProcessingManager;

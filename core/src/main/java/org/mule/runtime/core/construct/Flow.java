@@ -8,10 +8,8 @@ package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
-import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.util.rx.internal.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
@@ -34,16 +32,12 @@ import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageP
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -54,7 +48,7 @@ import reactor.core.publisher.Mono;
  * <li>Supports the optional configuration of a {@link ProcessingStrategy} that determines how message processors are processed.
  * </ul>
  */
-public class Flow extends AbstractPipeline implements Processor, AsyncProcessor, DynamicPipeline {
+public class Flow extends AbstractPipeline implements Processor, DynamicPipeline {
 
   private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
 
@@ -81,19 +75,10 @@ public class Flow extends AbstractPipeline implements Processor, AsyncProcessor,
       }
     } else {
       try {
-        return Mono.from(processAsync(event)).block();
+        return just(event).transform(this).block();
       } catch (Exception e) {
         throw rxExceptionToMuleException(e);
       }
-    }
-  }
-
-  @Override
-  public Publisher<Event> processAsync(Event event) {
-    if (useBlockingCodePath()) {
-      return just(event).handle(nullSafeMap(checkedFunction(request -> process(request))));
-    } else {
-      return just(event).transform(this);
     }
   }
 

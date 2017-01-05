@@ -11,12 +11,12 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
-import org.mule.runtime.core.processor.AsyncProcessor;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -28,12 +28,12 @@ import reactor.core.publisher.Mono;
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
   private final Message message;
-  private final AsyncProcessor messageProcessor;
+  private final Processor messageProcessor;
   private final SourceCompletionHandler completionHandler;
   private final MessageProcessContext messageProcessorContext;
 
   ModuleFlowProcessingTemplate(Message message,
-                               AsyncProcessor messageProcessor,
+                               Processor messageProcessor,
                                SourceCompletionHandler completionHandler, MessageProcessContext messageProcessContext) {
     this.message = message;
     this.messageProcessor = messageProcessor;
@@ -58,16 +58,12 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public Event routeEvent(Event muleEvent) throws MuleException {
-    try {
-      return just(muleEvent).then(event -> Mono.from(routeEventAsync(event))).block();
-    } catch (Exception e) {
-      throw rxExceptionToMuleException(e);
-    }
+    return messageProcessor.process(muleEvent);
   }
 
   @Override
   public Publisher<Event> routeEventAsync(Event event) {
-    return messageProcessor.processAsync(event);
+    return just(event).transform(messageProcessor);
   }
 
   @Override

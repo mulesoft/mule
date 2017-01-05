@@ -20,7 +20,6 @@ import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.util.rx.internal.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
@@ -46,7 +45,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.source.AsyncMessageSource;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -238,28 +236,26 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     pipeline = createPipeline();
 
     if (messageSource != null) {
-      messageSource.setListener(event -> {
-        if (useBlockingCodePath()) {
-          return pipeline.process(event);
-        } else {
-          try {
-            return just(event).transform(processFlowFunction()).block();
-          } catch (Exception e) {
-            throw rxExceptionToMuleException(e);
+      messageSource.setListener(new Processor() {
+
+        @Override
+        public Event process(Event event) throws MuleException {
+          if (useBlockingCodePath()) {
+            return pipeline.process(event);
+          } else {
+            try {
+              return just(event).transform(processFlowFunction()).block();
+            } catch (Exception e) {
+              throw rxExceptionToMuleException(e);
+            }
           }
         }
+
+        @Override
+        public Publisher<Event> apply(Publisher<Event> publisher) {
+          return from(publisher).transform(processFlowFunction());
+        }
       });
-      // TODO MULE-11250 Replace/migrate uses of MessageSource with Async version or improve co-existence of blocking/async
-      // sources
-      if (messageSource instanceof AsyncMessageSource) {
-        ((AsyncMessageSource) messageSource).setAsyncListener(event -> {
-          if (useBlockingCodePath()) {
-            return just(event).handle(nullSafeMap(checkedFunction(request -> pipeline.process(request))));
-          } else {
-            return just(event).transform(processFlowFunction());
-          }
-        });
-      }
     }
 
     injectFlowConstructMuleContext(messageSource);

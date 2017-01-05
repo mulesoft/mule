@@ -273,7 +273,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
   private Event triggerSource(Event event) throws MuleException {
     if (mode == Mode.ASYNC) {
-      return Mono.from(directInboundMessageSource.asyncListener.processAsync(event)).block();
+      return Mono.just(event).transform(directInboundMessageSource.listener).block();
     } else {
       return directInboundMessageSource.listener.process(event);
     }

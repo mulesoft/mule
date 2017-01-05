@@ -26,19 +26,19 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
-import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Map;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import reactor.core.publisher.Mono;
+import org.reactivestreams.Publisher;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -51,7 +51,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   private Event event;
 
   @Mock
-  private AsyncProcessor messageProcessor;
+  private Processor messageProcessor;
 
   @Mock
   private MessageProcessContext messageProcessorContext;
@@ -87,15 +87,15 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Test
   public void routeEvent() throws Exception {
-    when(messageProcessor.processAsync(event)).thenReturn(just(event));
     template.routeEvent(event);
-    verify(messageProcessor).processAsync(event);
+    verify(messageProcessor).process(event);
   }
 
   @Test
   public void routeEventAsync() throws Exception {
+    when(messageProcessor.apply(any(Publisher.class))).thenReturn(just(event));
     template.routeEventAsync(event);
-    verify(messageProcessor).processAsync(event);
+    verify(messageProcessor).apply(any(Publisher.class));
   }
 
   @Test
