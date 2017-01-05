@@ -6,32 +6,25 @@
  */
 package org.mule.tck;
 
-import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
+import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
 
-import java.util.function.Function;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 
-public class TriggerableMessageSource implements NonBlockingMessageSource, Function<Publisher<Event>, Publisher<Event>> {
+public class TriggerableMessageSource implements NonBlockingMessageSource {
 
   protected Processor listener;
 
-  public TriggerableMessageSource() {
-    // empty
-  }
-
-  public TriggerableMessageSource(Processor listener) {
-    this.listener = listener;
-  }
-
   public Event trigger(Event event) throws MuleException {
     return listener.process(event);
+  }
+
+  public Publisher<Event> triggerAsync(Event event) {
+    return just(event).transform(listener);
   }
 
   public void setListener(Processor listener) {
@@ -43,8 +36,4 @@ public class TriggerableMessageSource implements NonBlockingMessageSource, Funct
     return ObjectUtils.toString(this);
   }
 
-  @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).transform(listener);
-  }
 }

@@ -413,10 +413,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return new SensingNullMessageProcessor();
   }
 
-  public TriggerableMessageSource getTriggerableMessageSource(Processor listener) {
-    return new TriggerableMessageSource(listener);
-  }
-
   public TriggerableMessageSource getTriggerableMessageSource() {
     return new TriggerableMessageSource();
   }

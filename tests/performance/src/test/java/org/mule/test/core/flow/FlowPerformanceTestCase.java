@@ -10,6 +10,7 @@ import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
@@ -120,7 +121,7 @@ public class FlowPerformanceTestCase extends AbstractMuleContextTestCase {
     muleContext.getRegistry().registerFlowConstruct(flow);
 
     fluxProcessor = EmitterProcessor.create(1);
-    fluxProcessor.transform(source)
+    fluxProcessor.flatMap(event -> source.triggerAsync(event))
         .doOnError(EventDroppedException.class, mde -> mde.getEvent().getContext().success())
         .doOnNext(response -> response.getContext().success(response))
         .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me))
@@ -151,7 +152,7 @@ public class FlowPerformanceTestCase extends AbstractMuleContextTestCase {
   public void mono() throws Exception {
     for (int i = 0; i < ITERATIONS; i++) {
       Mono.just(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(InternalMessage.of(TEST_PAYLOAD))
-          .build()).transform(source).block(Duration.of(LOCK_TIMEOUT, MILLIS));
+          .build()).then(event -> from(source.triggerAsync(event))).block(Duration.of(LOCK_TIMEOUT, MILLIS));
     }
   }
 
@@ -164,7 +165,7 @@ public class FlowPerformanceTestCase extends AbstractMuleContextTestCase {
       Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
           .message(InternalMessage.of(TEST_PAYLOAD)).build();
       fluxSink.accept(event);
-      Mono.from(event.getContext()).doOnNext(e -> latch.countDown()).subscribe();
+      from(event.getContext()).doOnNext(e -> latch.countDown()).subscribe();
     }
     latch.await(LOCK_TIMEOUT, SECONDS);
   }
@@ -183,7 +184,7 @@ public class FlowPerformanceTestCase extends AbstractMuleContextTestCase {
         Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
             .message(InternalMessage.of(TEST_PAYLOAD)).build();
         // Subscriber to EventContext to countdown latch when response is notified.
-        Mono.from(event.getContext())
+        from(event.getContext())
             .doOnNext(e -> latch.countDown())
             .doOnError(MessagingException.class, e -> e.getEvent().getContext().error(e))
             .subscribe();
@@ -193,7 +194,7 @@ public class FlowPerformanceTestCase extends AbstractMuleContextTestCase {
         // Complete Flux once `ITERATIONS` sent.
         eventSynchronousSink.complete();
       }
-    }).transform(source)
+    }).flatMap(event -> source.triggerAsync(event))
         .doOnError(EventDroppedException.class, mde -> mde.getEvent().getContext().success())
         .doOnNext(response -> response.getContext().success(response))
         .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me))
