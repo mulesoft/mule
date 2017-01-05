@@ -181,6 +181,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String FOO_POLICY_ID = "fooPolicy";
   private static final String BAR_POLICY_ID = "barPolicy";
   private static final String MIN_MULE_VERSION = "4.0.0";
+  public static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
+  public static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
 
@@ -3010,7 +3012,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void appliesApplicationPolicy() throws Exception {
-    doApplicationPolicyExecutionTest(parameters -> true, 1, "policyPropertyValue");
+    doApplicationPolicyExecutionTest(parameters -> true, 1, POLICY_PROPERTY_VALUE);
   }
 
   @Test
@@ -3049,7 +3051,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
-                                                      singletonMap("policyPropertyKey", "policyPropertyValue")));
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE)));
     startDeployment();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
