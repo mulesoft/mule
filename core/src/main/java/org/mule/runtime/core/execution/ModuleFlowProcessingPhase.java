@@ -12,6 +12,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -31,7 +32,6 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.util.rx.Exceptions;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Map;
@@ -40,7 +40,6 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.util.function.Tuple2;
 
 /**
  * This phase routes the message through the flow.
@@ -77,25 +76,26 @@ public class ModuleFlowProcessingPhase
           getErrorConsumer(messageSource, template.getFailedExecutionResponseParametersFunction(),
                            messageProcessContext, template, phaseResultNotifier);
 
+      Event templateEvent = Event
+          .builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
+          .message((InternalMessage) template.getMessage()).build();
+
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty("enableSourcePolicies") == null) {
-        just(template.getMessage())
-            .map(Exceptions.checkedFunction(message -> Event
-                .builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
-                .message((InternalMessage) template.getMessage()).build()))
+
+        just(templateEvent)
             .doOnNext(request -> fireNotification(messageProcessContext.getMessageSource(), request,
                                                   messageProcessContext.getFlowConstruct(),
                                                   MESSAGE_RECEIVED))
-            .and(request -> from(template.routeEventAsync(request)))
-            .doOnSuccess(getSuccessConsumer(messageSource, exceptionHandler, errorConsumer,
+            .then(request -> from(template.routeEventAsync(request)))
+            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, exceptionHandler, errorConsumer,
                                             messageProcessContext, phaseResultNotifier,
                                             template))
             .doOnError(MessagingException.class, errorConsumer)
+            .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                       throwable -> logger.error("Unhandled exception processing request" + throwable))
             .subscribe();
       } else {
-        final Event templateEvent =
-            Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
-                .message((InternalMessage) template.getMessage()).build();
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
         SourcePolicy policy =
             policyManager.createSourcePolicyInstance(sourceIdentifier, templateEvent, nextOperation, template);
@@ -179,15 +179,14 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private Consumer<Tuple2<Event, Event>> getSuccessConsumer(MessageSource messageSource,
-                                                            MessagingExceptionHandler exceptionHandler,
-                                                            Consumer<MessagingException> onExceptionFunction,
-                                                            MessageProcessContext messageProcessContext,
-                                                            PhaseResultNotifier phaseResultNotifier,
-                                                            ModuleFlowProcessingPhaseTemplate template) {
-    return tuple2 -> {
-      Event request = tuple2.getT1();
-      Event response = tuple2.getT2();
+  private Consumer<Event> getSuccessConsumer(MessageSource messageSource,
+                                             Event request,
+                                             MessagingExceptionHandler exceptionHandler,
+                                             Consumer<MessagingException> onExceptionFunction,
+                                             MessageProcessContext messageProcessContext,
+                                             PhaseResultNotifier phaseResultNotifier,
+                                             ModuleFlowProcessingPhaseTemplate template) {
+    return response -> {
 
       fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
       ResponseCompletionCallback responseCompletationCallback =
