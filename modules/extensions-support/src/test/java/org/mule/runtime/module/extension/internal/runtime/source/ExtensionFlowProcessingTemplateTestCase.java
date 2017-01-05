@@ -25,6 +25,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -48,7 +49,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   private Event event;
 
   @Mock
-  private Processor messageProcessor;
+  private AsyncProcessor messageProcessor;
 
   @Mock
   private MessageProcessContext messageProcessorContext;
@@ -85,7 +86,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   @Test
   public void routeEvent() throws Exception {
     template.routeEvent(event);
-    verify(messageProcessor).process(event);
+    verify(messageProcessor).processAsync(event);
   }
 
   @Test

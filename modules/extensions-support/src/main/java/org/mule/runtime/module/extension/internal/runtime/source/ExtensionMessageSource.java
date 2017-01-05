@@ -29,12 +29,14 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.source.AsyncMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -58,7 +60,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ExtensionMessageSource extends ExtensionComponent implements MessageSource, ExceptionCallback {
+public class ExtensionMessageSource extends ExtensionComponent implements AsyncMessageSource, ExceptionCallback {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -72,7 +74,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final ExceptionEnricherManager exceptionEnricherManager;
-  private Processor messageProcessor;
+  private AsyncProcessor messageProcessor;
 
   private SourceAdapter sourceAdapter;
   private Scheduler retryScheduler;
@@ -295,9 +297,13 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   @Override
   public void setListener(Processor listener) {
-    messageProcessor = listener;
+    // Ignore, this source only needs AsyncProcessor listener
   }
 
+  @Override
+  public void setAsyncListener(AsyncProcessor listener) {
+    messageProcessor = listener;
+  }
 
   /**
    * Validates if the current source is valid for the set configuration. In case that the validation fails, the method will throw
