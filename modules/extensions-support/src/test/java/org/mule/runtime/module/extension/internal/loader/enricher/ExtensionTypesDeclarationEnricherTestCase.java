@@ -19,6 +19,7 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -45,7 +46,7 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
   @Test
   public void assertTypes() throws Exception {
     doAssertTypes(extensionModel.getTypes(), Ricin.class, KnockeableDoor.class, HeisenbergException.class, CarWash.class,
-                  Weapon.class, Weapon.WeaponAttributes.class, PersonalInfo.class);
+                  Weapon.class, Weapon.WeaponAttributes.class, PersonalInfo.class, Methylamine.class);
   }
 
   private void doAssertTypes(Set<ObjectType> extensionTypes, Class<?>... expectedTypes) {

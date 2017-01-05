@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.test.heisenberg.extension.model.Methylamine;
 
 import java.math.BigDecimal;
 
@@ -79,7 +80,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @OnError
-  public void onError(Error error, @Optional String sameNameParameter) {
+  public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine) {
     heisenberg.setMoney(BigDecimal.valueOf(-1));
   }
 
