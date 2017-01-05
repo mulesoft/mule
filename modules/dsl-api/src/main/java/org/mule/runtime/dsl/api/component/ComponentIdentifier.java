@@ -11,8 +11,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 
-import com.google.common.base.Preconditions;
-
 import javax.xml.namespace.QName;
 
 /**
@@ -26,6 +24,7 @@ import javax.xml.namespace.QName;
 public class ComponentIdentifier {
 
   public static QName ANNOTATION_NAME = new QName("config", "componentIdentifier");
+  public static QName ANNOTATION_PARAMETERS = new QName("config", "parameters");
 
   private String namespace;
   private String identifier;

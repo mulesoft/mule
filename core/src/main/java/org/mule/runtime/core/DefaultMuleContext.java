@@ -65,6 +65,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.interception.ProcessorInterceptionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -236,6 +237,8 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
+
+  private ProcessorInterceptionManager processorInterceptionManager;
 
   static {
     // Ensure reactor operatorError hook is always registered.
@@ -1066,4 +1069,17 @@ public class DefaultMuleContext implements MuleContext {
   public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
     this.errorTypeRepository = errorTypeRepository;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ProcessorInterceptionManager getProcessorInterceptorManager() {
+    return processorInterceptionManager;
+  }
+
+  public void setProcessorInterceptionManager(ProcessorInterceptionManager processorInterceptionManager) {
+    this.processorInterceptionManager = processorInterceptionManager;
+  }
+
 }

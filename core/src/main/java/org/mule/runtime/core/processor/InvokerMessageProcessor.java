@@ -19,6 +19,7 @@ import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -55,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * argument type. Multiple methods with the same name and same number of arguments are not supported currently.
  */
 public class InvokerMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, Initialisable, MuleContextAware, FlowConstructAware {
+    implements Processor, Initialisable, MuleContextAware, FlowConstructAware, Interceptable {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 

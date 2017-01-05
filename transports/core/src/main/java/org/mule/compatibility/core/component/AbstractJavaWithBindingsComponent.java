@@ -9,6 +9,7 @@ package org.mule.compatibility.core.component;
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.api.component.JavaWithBindingsComponent;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
@@ -23,7 +24,8 @@ import java.util.List;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public abstract class AbstractJavaWithBindingsComponent extends AbstractJavaComponent implements JavaWithBindingsComponent {
+public abstract class AbstractJavaWithBindingsComponent extends AbstractJavaComponent implements JavaWithBindingsComponent,
+    Interceptable {
 
   protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 

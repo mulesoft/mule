@@ -24,20 +24,24 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttribut
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.component.Interceptable;
+import org.mule.runtime.core.api.interception.ProcessorInterceptionManager;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
+import org.mule.runtime.core.execution.interception.InterceptorMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -51,6 +55,8 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -68,6 +74,8 @@ import org.w3c.dom.Node;
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
+  private transient Logger logger = LoggerFactory.getLogger(CommonBeanDefinitionCreator.class);
+
   private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS =
       "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
   private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS = new ImmutableSet.Builder<ComponentIdentifier>()
@@ -84,9 +92,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private BeanDefinitionPostProcessor beanDefinitionPostProcessor;
+  private ProcessorInterceptionManager processorInterceptionManager;
 
-  public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
+  public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
+                                     ProcessorInterceptionManager processorInterceptionManager) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
+    this.processorInterceptionManager = processorInterceptionManager;
     try {
       // TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
       this.beanDefinitionPostProcessor = (BeanDefinitionPostProcessor) ClassUtils
@@ -224,7 +235,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptFilterBeanDefinitions(parentComponentModel, originalBeanDefinition);
+    AbstractBeanDefinition wrappedBeanDefinition = interceptBeanDefinition(componentModel, originalBeanDefinition);
+    wrappedBeanDefinition = adaptFilterBeanDefinitions(parentComponentModel, wrappedBeanDefinition);
     if (originalBeanDefinition != wrappedBeanDefinition) {
       componentModel.setType(wrappedBeanDefinition.getBeanClass());
     }
@@ -265,6 +277,27 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     new ComponentConfigurationBuilder(componentModel, componentBuildingDefinition, beanDefinitionBuilderHelper)
         .processConfiguration();
 
+  }
+
+  public AbstractBeanDefinition interceptBeanDefinition(ComponentModel componentModel,
+                                                        AbstractBeanDefinition originalBeanDefinition) {
+    boolean shouldBeIntercepted =
+        processorInterceptionManager.retrieveInterceptorCallback(componentModel.getIdentifier()).isPresent();
+    if (!shouldBeIntercepted) {
+      return originalBeanDefinition;
+    }
+    Class beanClass = componentModel.getType() != null ? componentModel.getType() : originalBeanDefinition.getBeanClass();
+    if (areMatchingTypes(Interceptable.class, beanClass)) {
+      BeanDefinition newBeanDefinition = BeanDefinitionBuilder.rootBeanDefinition(InterceptorMessageProcessor.class)
+          .addPropertyValue("intercepted", originalBeanDefinition)
+          .setScope(SCOPE_PROTOTYPE)
+          .getBeanDefinition();
+      return (AbstractBeanDefinition) newBeanDefinition;
+    } else {
+      logger.warn("ComponentIdentifier: '{}' defined to be intercepted but beanClass: '{}' does not implement: '{}'",
+                  componentModel.getIdentifier(), beanClass, Interceptable.class);
+    }
+    return originalBeanDefinition;
   }
 
   public static AbstractBeanDefinition adaptFilterBeanDefinitions(ComponentModel parentComponentModel,

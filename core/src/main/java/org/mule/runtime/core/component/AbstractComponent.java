@@ -16,6 +16,7 @@ import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.component.Component;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
 public abstract class AbstractComponent extends AbstractAnnotatedObject
-    implements Component, MuleContextAware, Lifecycle, MessagingExceptionHandlerAware {
+    implements Component, MuleContextAware, Lifecycle, MessagingExceptionHandlerAware, Interceptable {
 
   /**
    * logger used by this class
