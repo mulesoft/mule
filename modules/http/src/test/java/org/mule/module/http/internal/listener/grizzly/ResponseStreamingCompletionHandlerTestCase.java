@@ -9,14 +9,14 @@ package org.mule.module.http.internal.listener.grizzly;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.response.DefaultHttpResponse;
+import org.mule.module.http.internal.domain.response.ResponseStatus;
 
 import java.io.InputStream;
 
 import org.apache.commons.collections.MultiMap;
 import org.glassfish.grizzly.Transport;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.response.DefaultHttpResponse;
-import org.mule.module.http.internal.domain.response.ResponseStatus;
 
 public class ResponseStreamingCompletionHandlerTestCase extends BaseResponseCompletionHandlerTestCase
 {
@@ -28,11 +28,12 @@ public class ResponseStreamingCompletionHandlerTestCase extends BaseResponseComp
     {
         super.setUp();
         when(connection.getTransport()).thenReturn(mock(Transport.class, RETURNS_DEEP_STUBS));
+        InputStream mockStream = mock(InputStream.class);
         handler = new ResponseStreamingCompletionHandler(ctx,
                                                          request,
                                                          new DefaultHttpResponse(mock(ResponseStatus.class),
                                                                                 mock(MultiMap.class),
-                                                                                new InputStreamHttpEntity(mock(InputStream.class))),
+                                                                                new InputStreamHttpEntity(mockStream)),
                                                          callback);
     }
 

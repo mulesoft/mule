@@ -9,16 +9,14 @@ package org.mule.module.http.internal.listener.grizzly;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import org.mule.module.http.internal.domain.response.HttpResponse;
 
 import java.util.Collection;
 
 import org.glassfish.grizzly.EmptyCompletionHandler;
 import org.glassfish.grizzly.WriteResult;
-import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,26 +53,18 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
         return httpResponsePacket;
     }
 
-    protected void sendFailureIfPossible(ResponseStatusCallback callback, Throwable throwable, FilterChainContext ctx)
-    {
-        if (ctx.getConnection() != null && ctx.getConnection().isOpen())
-        {
-            callback.responseSendFailure(throwable);
-        }
-    }
-
     @Override
     public void cancelled()
     {
-        logger.debug("HTTP response sending task was cancelled");
+        logger.warn("HTTP response sending task was cancelled");
     }
 
     @Override
     public void failed(Throwable throwable)
     {
-        if (logger.isDebugEnabled())
+        if (logger.isWarnEnabled())
         {
-            logger.debug(String.format("HTTP response sending task failed with error: %s", throwable.getMessage()));
+            logger.warn(String.format("HTTP response sending task failed with error: %s", throwable.getMessage()));
         }
     }
 }

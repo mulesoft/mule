@@ -8,11 +8,16 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.api.DefaultMuleException;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.google.common.base.Preconditions;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.WriteResult;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -20,10 +25,6 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.memory.MemoryManager;
-import org.mule.api.DefaultMuleException;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous http response transferring
@@ -130,10 +131,7 @@ public class ResponseStreamingCompletionHandler
     {
         super.cancelled();
         close();
-        sendFailureIfPossible(responseStatusCallback,
-                              new DefaultMuleException(createStaticMessage("Http response sending task was cancelled")),
-                              ctx);
-
+        responseStatusCallback.responseSendFailure(new DefaultMuleException(createStaticMessage("HTTP response sending task was cancelled")));
         resume();
     }
 
@@ -147,7 +145,6 @@ public class ResponseStreamingCompletionHandler
     {
         super.failed(throwable);
         close();
-        sendFailureIfPossible(responseStatusCallback, throwable, ctx);
         resume();
     }
 

@@ -14,6 +14,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 
@@ -22,11 +24,11 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public abstract class BaseResponseCompletionHandlerTestCase extends AbstractMuleTestCase
 {
+
+    private static final String ERROR = "Error";
     protected FilterChainContext ctx = mock(FilterChainContext.class);
     protected Connection connection = mock(Connection.class, RETURNS_DEEP_STUBS);
     protected HttpRequestPacket request = mock(HttpRequestPacket.class);
@@ -41,31 +43,15 @@ public abstract class BaseResponseCompletionHandlerTestCase extends AbstractMule
     }
 
     @Test
-    public void failedTaskWithoutConnectionAvoidsResponse()
+    public void failedTaskAvoidsResponse()
     {
         when(connection.isOpen()).thenReturn(false);
-        getHandler().failed(new IOException("Error"));
+        getHandler().failed(new IOException(ERROR));
         verify(callback, never()).responseSendFailure(any(Throwable.class));
     }
 
     @Test
-    public void cancelledTaskWithoutConnectionAvoidsResponse()
-    {
-        when(connection.isOpen()).thenReturn(false);
-        getHandler().cancelled();
-        verify(callback, never()).responseSendFailure(any(Throwable.class));
-    }
-
-    @Test
-    public void failedTaskWithConnectionResponse()
-    {
-        when(connection.isOpen()).thenReturn(true);
-        getHandler().failed(new IOException("Error"));
-        verify(callback, atLeastOnce()).responseSendFailure(any(Throwable.class));
-    }
-
-    @Test
-    public void cancelledTaskWithConnectionResponse()
+    public void cancelledTaskResponse()
     {
         when(connection.isOpen()).thenReturn(true);
         getHandler().cancelled();
