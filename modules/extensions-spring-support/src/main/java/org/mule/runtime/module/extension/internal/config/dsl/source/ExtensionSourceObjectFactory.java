@@ -62,7 +62,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   @Override
   public ExtensionMessageSource doGetObject() throws ConfigurationException {
-    checkParameterGroupExclusiveness(sourceModel, getParameters().keySet());
+    parametersResolver.checkParameterGroupExclusiveness(sourceModel, parameters.keySet());
     ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
     if (nonCallbackParameters.isDynamic()) {
@@ -89,14 +89,14 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   private ResolverSet getNonCallbackParameters() throws ConfigurationException {
-    return getParametersAsResolverSet(sourceModel, sourceModel.getParameterGroupModels().stream()
+    return parametersResolver.getParametersAsResolverSet(sourceModel, sourceModel.getParameterGroupModels().stream()
         .flatMap(g -> g.getParameterModels().stream())
         .collect(toList()));
   }
 
   private ResolverSet getCallbackParameters(Optional<SourceCallbackModel> callbackModel) throws ConfigurationException {
-    return getParametersAsResolverSet(sourceModel,
-                                      callbackModel.map(ParameterizedModel::getAllParameterModels).orElse(emptyList()));
+    return parametersResolver.getParametersAsResolverSet(sourceModel, callbackModel.map(ParameterizedModel::getAllParameterModels)
+        .orElse(emptyList()));
   }
 
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,

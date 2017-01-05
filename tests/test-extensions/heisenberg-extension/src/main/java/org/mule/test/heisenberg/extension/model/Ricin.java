@@ -20,6 +20,13 @@ public class Ricin implements Weapon {
   @Parameter
   private KnockeableDoor destination;
 
+  public Ricin(KnockeableDoor destination, Long microgramsPerKilo) {
+    this.destination = destination;
+    this.microgramsPerKilo = microgramsPerKilo;
+  }
+
+  public Ricin() {}
+
   public Long getMicrogramsPerKilo() {
     return microgramsPerKilo;
   }
