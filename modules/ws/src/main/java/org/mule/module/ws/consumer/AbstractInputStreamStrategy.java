@@ -20,11 +20,11 @@ import org.xml.sax.InputSource;
 public abstract class AbstractInputStreamStrategy implements WsdlRetrieverStrategy
 {
 
-    protected Definition getWsdlDefinition(URL url, InputStream response) throws WSDLException
+    protected Definition getWsdlDefinition(String url, InputStream response) throws WSDLException
     {
         Definition wsdlDefinition;
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-        wsdlDefinition = wsdlReader.readWSDL(url.toString(), new InputSource(response));
+        wsdlDefinition = wsdlReader.readWSDL(url, new InputSource(response));
         return wsdlDefinition;
     }
 }

@@ -33,7 +33,7 @@ import javax.wsdl.WSDLException;
 /**
  * A wsdl retriever strategy implementation to get the wsdl through a proxy.
  */
-public class ProxyWsdlRetrieverStrategy extends AbstractInputStreamStrategy
+public class HttpRequesterWsdlRetrieverStrategy extends AbstractInputStreamStrategy
 {
 
     private static final int MINIMUM_KERNEL_MAX_POOL_SIZE = 1;
@@ -55,16 +55,18 @@ public class ProxyWsdlRetrieverStrategy extends AbstractInputStreamStrategy
     private TlsContextFactory tlsContextFactory = null;
     private ProxyConfig proxyConfig = null;
     private MuleContext context = null;
+    private String url = null;
 
-    public ProxyWsdlRetrieverStrategy(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, MuleContext context)
+    public HttpRequesterWsdlRetrieverStrategy(String url, TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, MuleContext context)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
         this.context = context;
+        this.url = url;
     }
 
     @Override
-    public Definition retrieveWsdlFrom(URL url) throws WSDLException
+    public Definition retrieveWsdlFrom() throws WSDLException
     {
         try
         {

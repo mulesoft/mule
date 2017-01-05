@@ -19,7 +19,8 @@
 
     <ws:consumer-config name="Web_Service_Consumer"
                         service="TestService" port="TestPort" serviceAddress="http://localhost:${port}/service/Test"
-                        wsdlLocation="http://fake.com/services/Test?wsdl" connectorConfig="HTTP_Request_Configuration"/>
+                        wsdlLocation="http://fake.com/services/Test?wsdl" connectorConfig="HTTP_Request_Configuration"
+                        useConnectorToRetrieveWsdl="true"/>
 
     <flow name="test">
         <ws:consumer config-ref="Web_Service_Consumer" operation="noParamsWithHeader"/>

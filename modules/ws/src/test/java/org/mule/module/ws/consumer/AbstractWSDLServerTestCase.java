@@ -9,13 +9,7 @@ package org.mule.module.ws.consumer;
 
 import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
@@ -25,69 +19,54 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.junit.After;
 import org.junit.Rule;
-import org.junit.Test;;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
 
-/**
- * This tests "mocks" a proxy server through which a wsdl file is served.
- *
- */
-public class WSConsumerWsdlProxyTestCase extends FunctionalTestCase
-{
-
+public class AbstractWSDLServerTestCase extends FunctionalTestCase{
+	
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
-
+    
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("portNoReply");
+    
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
-    private static final String EXPECTED_OPERATION = "noParamsWithHeader";
-
-    private MockProxyServer proxyServer = new MockProxyServer(dynamicPort.getNumber());
-
-
+    private MockServer server = new MockServer(dynamicPort.getNumber());
+    
+    
     @After
     public void after() throws Exception
     {
-        proxyServer.stop();
+        server.stop();
     }
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "ws-consumer-wsdl-proxy.xml";
-    }
-
-    @Test
-    public void wsConsumerConfigGetWsdlThroughProxy() throws Exception
-    {
-        WSConsumer consumer = muleContext.getRegistry().lookupObject(WSConsumer.class);
-        assertThat(EXPECTED_OPERATION, equalTo(consumer.getOperation()));
-    }
-
+    
     /**
-     * Implementation of an http proxy fake server
+     * Implementation of an http fake server
      */
-    private static class MockProxyServer
+    private static class MockServer
     {
 
-        private int proxyServerPort;
+        private int serverPort;
         private HttpServer server;
 
-        public MockProxyServer(int proxyServerPort)
+        public MockServer(int serverPort)
         {
             try
             {
-                this.proxyServerPort = proxyServerPort;
+                this.serverPort = serverPort;
                 start();
             }
             catch (Exception e)
             {
-                fail("Could not construct mock proxy server");
+                fail("Could not construct mock server");
             }
         }
 
         public void start() throws IOException
         {
-            server = HttpServer.createSimpleServer("/", proxyServerPort);
+            server = HttpServer.createSimpleServer("/", serverPort);
             server.getServerConfiguration().addHttpHandler(new HttpHandler()
             {
                 public void service(Request request, Response response) throws Exception
@@ -109,5 +88,6 @@ public class WSConsumerWsdlProxyTestCase extends FunctionalTestCase
         }
 
     }
+
 
 }

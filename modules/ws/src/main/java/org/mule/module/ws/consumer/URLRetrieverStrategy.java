@@ -9,6 +9,8 @@ package org.mule.module.ws.consumer;
 
 import static org.mule.util.Base64.encodeBytes;
 
+import org.mule.util.IOUtils;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,8 +25,15 @@ import javax.wsdl.WSDLException;
 public class URLRetrieverStrategy extends AbstractInputStreamStrategy
 {
 
+    private URL url;
+
+    public URLRetrieverStrategy(String url)
+    {
+        this.url = IOUtils.getResourceAsUrl(url, getClass());
+    }
+
     @Override
-    public Definition retrieveWsdlFrom(URL url) throws WSDLException
+    public Definition retrieveWsdlFrom() throws WSDLException
     {
         try
         {
@@ -40,7 +49,7 @@ public class URLRetrieverStrategy extends AbstractInputStreamStrategy
 
             responseStream = urlConnection.getInputStream();
 
-            wsdlDefinition = getWsdlDefinition(url, responseStream);
+            wsdlDefinition = getWsdlDefinition(url.toString(), responseStream);
             responseStream.close();
             return wsdlDefinition;
         }
