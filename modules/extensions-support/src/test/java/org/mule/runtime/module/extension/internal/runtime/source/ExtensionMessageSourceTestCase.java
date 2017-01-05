@@ -62,6 +62,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.util.ExceptionUtils;
@@ -138,7 +139,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   Scheduler cpuLightScheduler;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Processor messageProcessor;
+  private AsyncProcessor messageProcessor;
 
   @Mock
   private SourceCompletionHandlerFactory completionHandlerFactory;
@@ -483,7 +484,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
                                    retryPolicyTemplate, extensionManager);
-    messageSource.setListener(messageProcessor);
+    messageSource.setAsyncListener(messageProcessor);
     messageSource.setFlowConstruct(flowConstruct);
     muleContext.getInjector().inject(messageSource);
     return messageSource;
