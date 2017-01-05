@@ -15,6 +15,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWor
 import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -178,23 +179,27 @@ public class PollingMessageSource
 
         @Override
         public Event process() throws Exception {
-          Event event = Event.builder(create(flowConstruct, getPollingUniqueName())).message(request)
-              .exchangePattern(ONE_WAY).flow(flowConstruct).build();
-          event = interceptor.prepareSourceEvent(event);
+          return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
+            Event event = Event.builder(create(flowConstruct, getPollingUniqueName())).message(request)
+                .exchangePattern(ONE_WAY).flow(flowConstruct).build();
+            event = interceptor.prepareSourceEvent(event);
 
-          setCurrentEvent(event);
+            setCurrentEvent(event);
 
-          Event sourceEvent = sourceMessageProcessor.process(event);
-          if (isNewMessage(sourceEvent)) {
-            muleContext.getNotificationManager()
-                .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
-                                                                   flowConstruct, MESSAGE_RECEIVED));
-            event = interceptor.prepareRouting(sourceEvent, sourceEvent);
-            interceptor.postProcessRouting(listener.process(event));
-          } else {
-            logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());
-          }
-          return null;
+            Event sourceEvent = sourceMessageProcessor.process(event);
+            if (isNewMessage(sourceEvent)) {
+              muleContext.getNotificationManager()
+                  .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
+                                                                     flowConstruct, MESSAGE_RECEIVED));
+              event = interceptor.prepareRouting(sourceEvent, sourceEvent);
+              interceptor.postProcessRouting(listener.process(event));
+            } else {
+              logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());
+            }
+            return null;
+          }, Exception.class, e -> {
+            throw e;
+          });
         }
       });
       if (muleEvent != null) {
