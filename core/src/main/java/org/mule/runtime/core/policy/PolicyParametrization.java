@@ -24,7 +24,7 @@ public class PolicyParametrization {
 
   private final String id;
   private final PolicyPointcut pointcut;
-  private final Map<String, Object> parameters;
+  private final Map<String, String> parameters;
   private final int order;
 
   /**
@@ -36,7 +36,7 @@ public class PolicyParametrization {
    *        has to be applied before polices with smaller order and after policies with bigger order. Must be positive
    * @param parameters parameters for the policy template on which the parametrization is based on. Non null.
    */
-  public PolicyParametrization(String id, PolicyPointcut pointcut, int order, Map<String, Object> parameters) {
+  public PolicyParametrization(String id, PolicyPointcut pointcut, int order, Map<String, String> parameters) {
     checkArgument(!isEmpty(id), "id cannot be null");
     checkArgument(pointcut != null, "pointcut cannot be null");
     checkArgument(parameters != null, "parameters cannot be null");
@@ -72,7 +72,7 @@ public class PolicyParametrization {
   /**
    * @return parameters to configure the policy template
    */
-  public Map<String, Object> getParameters() {
+  public Map<String, String> getParameters() {
     return parameters;
   }
 }
