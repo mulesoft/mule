@@ -135,7 +135,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
         .message(InternalMessage.of(TEST_PAYLOAD))
         .exchangePattern(ONE_WAY)
         .build();
-    Event response = directInboundMessageSource.listener.process(event);
+    Event response = triggerSource(event);
 
     assertSucessfulProcessing(response);
   }
@@ -144,7 +144,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = directInboundMessageSource.listener.process(testEvent());
+    Event response = triggerSource(testEvent());
 
     assertSucessfulProcessing(response);
   }
