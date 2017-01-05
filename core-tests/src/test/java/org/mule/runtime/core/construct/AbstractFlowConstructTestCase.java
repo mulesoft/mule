@@ -14,7 +14,9 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.source.AsyncMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.processor.AsyncProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -22,16 +24,18 @@ import org.junit.Test;
 
 public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextTestCase {
 
-  public static class DirectInboundMessageSource implements MessageSource {
+  public static class DirectInboundMessageSource implements AsyncMessageSource {
 
-    private Processor listener;
+    Processor listener;
+    AsyncProcessor asyncListener;
 
     public void setListener(Processor listener) {
       this.listener = listener;
     }
 
-    public Event process(Event event) throws MuleException {
-      return listener.process(event);
+    @Override
+    public void setAsyncListener(AsyncProcessor asyncListener) {
+      this.asyncListener = asyncListener;
     }
 
     @Override

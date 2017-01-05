@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -37,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import reactor.core.publisher.Mono;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -85,7 +87,14 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Test
   public void routeEvent() throws Exception {
+    when(messageProcessor.processAsync(event)).thenReturn(just(event));
     template.routeEvent(event);
+    verify(messageProcessor).processAsync(event);
+  }
+
+  @Test
+  public void routeEventAsync() throws Exception {
+    template.routeEventAsync(event);
     verify(messageProcessor).processAsync(event);
   }
 
