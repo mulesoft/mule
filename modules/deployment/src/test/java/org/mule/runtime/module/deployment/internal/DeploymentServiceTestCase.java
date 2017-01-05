@@ -13,6 +13,7 @@ import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
@@ -70,6 +71,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.invocationCount;
+import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.policyParametrization;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
@@ -83,6 +85,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.StartupContext;
@@ -178,6 +181,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String FOO_POLICY_ID = "fooPolicy";
   private static final String BAR_POLICY_ID = "barPolicy";
   private static final String MIN_MULE_VERSION = "4.0.0";
+  public static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
+  public static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
 
@@ -405,6 +410,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Reset test component state
     invocationCount = 0;
+    policyParametrization = "";
   }
 
   private void configurePolicyManagerListener() {
@@ -3006,7 +3012,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void appliesApplicationPolicy() throws Exception {
-    doApplicationPolicyExecutionTest(parameters -> true, 1);
+    doApplicationPolicyExecutionTest(parameters -> true, 1, POLICY_PROPERTY_VALUE);
   }
 
   @Test
@@ -3031,10 +3037,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void skipsApplicationPolicy() throws Exception {
-    doApplicationPolicyExecutionTest(parameters -> false, 0);
+    doApplicationPolicyExecutionTest(parameters -> false, 0, "");
   }
 
-  private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations) throws Exception {
+  private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
+                                                Object expectedPolicyParametrization)
+      throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
@@ -3042,13 +3050,15 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
-                            new PolicyParametrization(FOO_POLICY_ID, pointcut, 1, emptyMap()));
+                            new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE)));
     startDeployment();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(expectedPolicyInvocations));
+    assertThat(policyParametrization, equalTo(expectedPolicyParametrization));
   }
 
   @Test
@@ -3752,13 +3762,25 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
    * <p/>
    * Static state must be reset before each test is executed
    */
-  public static class TestPolicyComponent {
+  public static class TestPolicyComponent implements org.mule.runtime.core.api.lifecycle.Callable {
 
     public static volatile int invocationCount;
+    public static volatile String policyParametrization = "";
 
     public Object execute(Object payload) {
       invocationCount++;
       return payload;
+    }
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      invocationCount++;
+      String variableName = "policyParameter";
+      if (eventContext.getEvent().getVariableNames().contains(variableName)) {
+        policyParametrization += eventContext.getEvent().getVariable(variableName).getValue();
+      }
+
+      return eventContext.getMessage().getPayload();
     }
   }
 }

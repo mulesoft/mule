@@ -7,6 +7,7 @@
 
     <test-policy:proxy>
         <test-policy:operation>
+            <set-variable variableName="policyParameter" value="${policyPropertyKey}"/>
             <component class="org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase$TestPolicyComponent" />
             <test-policy:execute-next/>
         </test-policy:operation>

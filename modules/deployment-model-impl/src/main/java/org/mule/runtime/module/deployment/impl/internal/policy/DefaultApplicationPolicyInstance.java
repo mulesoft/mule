@@ -27,6 +27,7 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +67,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     if (policyContext == null) {
       ArtifactContextBuilder artifactBuilder =
           newBuilder().setArtifactType(APP)
+              .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
               .setArtifactName(parametrization.getId())
               .setConfigurationFiles(getResourcePaths(template.getDescriptor().getConfigResourceFiles()))
               .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
