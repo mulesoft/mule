@@ -298,7 +298,6 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     messageProcessor = listener;
   }
 
-
   /**
    * Validates if the current source is valid for the set configuration. In case that the validation fails, the method will throw
    * a {@link IllegalSourceException}

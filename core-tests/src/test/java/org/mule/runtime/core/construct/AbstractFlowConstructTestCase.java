@@ -10,7 +10,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -22,7 +21,7 @@ import org.junit.Test;
 
 public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextTestCase {
 
-  public static class DirectInboundMessageSource implements MessageSource {
+  static class DirectInboundMessageSource implements MessageSource {
 
     private Processor listener;
 
@@ -30,8 +29,8 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
       this.listener = listener;
     }
 
-    public Event process(Event event) throws MuleException {
-      return listener.process(event);
+    public Processor getListener() {
+      return listener;
     }
 
     @Override

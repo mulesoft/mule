@@ -8,12 +8,11 @@ package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -35,12 +34,10 @@ import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -61,8 +58,8 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   public Event process(final Event event) throws MuleException {
-    if (isTransactionActive() || processingStrategy.isSynchronous()) {
-      // TODO MULE-11023	Migrate transaction execution template mechanism to use non-blocking API
+    if (useBlockingCodePath()) {
+      // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
       final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
       try {
         ExecutionTemplate<Event> executionTemplate =
@@ -78,10 +75,7 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
       }
     } else {
       try {
-        return Mono.just(event)
-            .transform(this)
-            .otherwise(EventDroppedException.class, mde -> empty())
-            .block();
+        return just(event).transform(this).block();
       } catch (Exception e) {
         throw rxExceptionToMuleException(e);
       }
@@ -90,18 +84,10 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    if (isTransactionActive()) {
-      // TODO MULE-11023	Migrate transaction execution template mechanism to use non-blocking API
-      return Processor.super.apply(publisher);
-    } else {
-      return from(publisher).concatMap(event -> just(event)
-          .map(request -> createMuleEventForCurrentFlow(request, request.getReplyToDestination(), request.getReplyToHandler()))
-          .transform(pipeline)
-          .onErrorResumeWith(MessagingException.class, getExceptionListener())
-          .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                     throwable -> LOGGER.error("Unhandled exception in async processing " + throwable))
-          .map(response -> createReturnEventForParentFlowConstruct(response, event)));
-    }
+    return from(publisher).concatMap(event -> just(event)
+        .map(request -> createMuleEventForCurrentFlow(request, request.getReplyToDestination(), request.getReplyToHandler()))
+        .transform(processFlowFunction())
+        .map(response -> createReturnEventForParentFlowConstruct(response, event)));
   }
 
   private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {

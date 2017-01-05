@@ -7,6 +7,7 @@
 package org.mule.runtime.core.construct;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -45,13 +47,19 @@ import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 import org.mule.tck.SensingNullMessageProcessor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
 
+@RunWith(Parameterized.class)
 public class FlowTestCase extends AbstractFlowConstructTestCase {
 
   private static final String FLOW_NAME = "test-flow";
@@ -59,6 +67,24 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
   private Flow flow;
   private DynamicMessageProcessorContainer dynamicProcessorContainer;
   private SensingNullMessageProcessor sensingMessageProcessor;
+  private BiFunction<Processor, Event, Event> triggerFunction;
+
+  public FlowTestCase(BiFunction<Processor, Event, Event> triggerFunction) {
+    this.triggerFunction = triggerFunction;
+  }
+
+  @Parameters
+  public static Collection<Object[]> parameters() {
+    BiFunction<Processor, Event, Event> blocking = (listener, event) -> just(event).transform(listener).block();
+    BiFunction<Processor, Event, Event> async = (listener, event) -> {
+      try {
+        return listener.process(event);
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
+    };
+    return asList(new Object[][] {{blocking}, {async}});
+  }
 
   @Override
   protected void doSetUp() throws Exception {
@@ -118,7 +144,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
         .message(InternalMessage.of(TEST_PAYLOAD))
         .exchangePattern(ONE_WAY)
         .build();
-    Event response = directInboundMessageSource.process(event);
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 
     assertSucessfulProcessing(response);
   }
@@ -127,7 +153,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = directInboundMessageSource.process(testEvent());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
 
     assertSucessfulProcessing(response);
   }
@@ -170,7 +196,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.initialise();
 
     try {
-      directInboundMessageSource.process(testEvent());
+      triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
       fail("exception expected");
     } catch (Exception e) {
     }
@@ -185,7 +211,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.stop();
     flow.start();
 
-    Event response = directInboundMessageSource.process(testEvent());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());;
     assertThat(response, not(nullValue()));
   }
 
@@ -199,7 +225,8 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
 
     Event response =
-        directInboundMessageSource.process(eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
+        triggerFunction.apply(directInboundMessageSource.getListener(),
+                              eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
     assertThat(response, not(nullValue()));
   }
 
@@ -213,16 +240,16 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = directInboundMessageSource.process(testEvent());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertEquals(TEST_PAYLOAD + "12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
-    response = directInboundMessageSource.process(testEvent());
+    response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertEquals(TEST_PAYLOAD + "2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
-    response = directInboundMessageSource.process(testEvent());
+    response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
   }
 
@@ -253,4 +280,5 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     verify((Startable) mockMessageSource, times(1)).start();
     verify((Stoppable) mockMessageSource, times(1)).stop();
   }
+
 }

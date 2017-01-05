@@ -17,9 +17,12 @@ import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStra
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.core.util.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -67,6 +70,7 @@ import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
@@ -232,19 +236,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     pipeline = createPipeline();
 
     if (messageSource != null) {
-      // Wrap chain to decouple lifecycle
-      messageSource.setListener(new AbstractInterceptingMessageProcessor() {
+      messageSource.setListener(new Processor() {
 
         @Override
-        public Event process(final Event event) throws MuleException {
-          if (isTransactionActive() || processingStrategy.isSynchronous()) {
+        public Event process(Event event) throws MuleException {
+          if (useBlockingCodePath()) {
             return pipeline.process(event);
           } else {
             try {
-              return Mono.just(event)
-                  .transform(this)
-                  .otherwise(EventDroppedException.class, mde -> empty())
-                  .block();
+              return just(event).transform(processFlowFunction()).block();
             } catch (Exception e) {
               throw rxExceptionToMuleException(e);
             }
@@ -253,7 +253,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher).transform(pipeline);
+          return from(publisher).transform(processFlowFunction());
         }
       });
     }
@@ -266,6 +266,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     initialiseIfInitialisable(pipeline);
 
     createFlowMap();
+  }
+
+  Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
+    return mono -> Mono.from(mono).transform(pipeline)
+        .otherwise(MessagingException.class, me -> Mono.from(getExceptionListener().apply(me)))
+        .otherwise(EventDroppedException.class, mde -> empty())
+        .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                   throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
@@ -414,6 +422,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     disposeIfDisposable(pipeline);
     disposeIfDisposable(messageSource);
     super.doDispose();
+  }
+
+  protected boolean useBlockingCodePath() {
+    return isTransactionActive() || processingStrategy.isSynchronous();
   }
 
   private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalMessageProcessor {
