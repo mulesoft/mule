@@ -135,7 +135,8 @@ public class ResponseCompletionHandler
     @Override
     public void cancelled()
     {
-        responseStatusCallback.responseSendFailure(new Exception("http response transferring cancelled"));
+        super.cancelled();
+        responseStatusCallback.responseSendFailure(new Exception("HTTP response transferring cancelled"));
         resume();
     }
 
@@ -147,7 +148,7 @@ public class ResponseCompletionHandler
     @Override
     public void failed(Throwable throwable)
     {
-        responseStatusCallback.responseSendFailure(throwable);
+        super.failed(throwable);
         resume();
     }
 

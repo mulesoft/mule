@@ -7,8 +7,8 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.DefaultMuleException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
@@ -129,8 +129,9 @@ public class ResponseStreamingCompletionHandler
     @Override
     public void cancelled()
     {
+        super.cancelled();
         close();
-        responseStatusCallback.responseSendFailure(new DefaultMuleException(CoreMessages.createStaticMessage("Http response sending task was cancelled")));
+        responseStatusCallback.responseSendFailure(new DefaultMuleException(createStaticMessage("HTTP response sending task was cancelled")));
         resume();
     }
 
@@ -142,8 +143,8 @@ public class ResponseStreamingCompletionHandler
     @Override
     public void failed(Throwable throwable)
     {
+        super.failed(throwable);
         close();
-        responseStatusCallback.responseSendFailure(throwable);
         resume();
     }
 
