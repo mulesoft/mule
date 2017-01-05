@@ -16,14 +16,13 @@ import static org.eclipse.aether.repository.RepositoryPolicy.CHECKSUM_POLICY_IGN
 import static org.eclipse.aether.repository.RepositoryPolicy.UPDATE_POLICY_NEVER;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.REPOSITORY;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
@@ -36,8 +35,6 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,9 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
@@ -94,27 +89,6 @@ public class MavenClassLoaderModelLoader {
 
   private DefaultRepositorySystemSession session;
   private RepositorySystem system;
-
-  /**
-   * Looks for the POM file within the current {@code pluginFolder} structure (under {@link ArtifactPluginDescriptor#META_INF} folder)
-   * to retrieve the plugin artifact locator.
-   *
-   * @param pluginFolder {@link File} where the current plugin to work with.
-   * @return a locator of the coordinates of the current plugin
-   * @throws ArtifactDescriptorCreateException if the plugin is missing the {@link ArtifactPluginDescriptor#MULE_PLUGIN_POM} or
-   * there's an issue while reading that file
-   */
-  public BundleDescriptor loadBundleDescriptor(File pluginFolder) {
-    Model model = getPomModel(pluginFolder);
-
-    return new BundleDescriptor.Builder()
-        .setArtifactId(model.getArtifactId())
-        .setGroupId(model.getGroupId())
-        .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-        .setType(EXTENSION_BUNDLE_TYPE)
-        .setClassifier(MULE_PLUGIN_CLASSIFIER)
-        .build();
-  }
 
   /**
    * Given a plugin's location, it will resolve its dependencies on a Maven based mechanism. It will assume there's a {@link ArtifactPluginDescriptor#REPOSITORY}
@@ -190,25 +164,6 @@ public class MavenClassLoaderModelLoader {
   private boolean isMulePlugin(Dependency dependency) {
     return BundleScope.PROVIDED.toString().equals(dependency.getScope().toUpperCase())
         && MULE_PLUGIN_CLASSIFIER.equals(dependency.getArtifact().getClassifier());
-  }
-
-  private Model getPomModel(File pluginFolder) {
-    final File mulePluginPom = new File(pluginFolder, META_INF + separator + MULE_PLUGIN_POM);
-    if (!mulePluginPom.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' (error found while reading plugin '%s')",
-                                                         MAVEN, mulePluginPom.getName(),
-                                                         pluginFolder.getName()));
-    }
-    MavenXpp3Reader reader = new MavenXpp3Reader();
-    Model model;
-    try {
-      model = reader.read(new FileReader(mulePluginPom));
-    } catch (IOException | XmlPullParserException e) {
-      throw new ArtifactDescriptorCreateException(format("There was an issue reading '%s' for the plugin '%s'",
-                                                         mulePluginPom.getName(), pluginFolder.getAbsolutePath()),
-                                                  e);
-    }
-    return model;
   }
 
   private PreorderNodeListGenerator assemblyDependenciesFromPom(File pluginFolder, Model model) {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.resources.descriptor;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
@@ -14,6 +15,7 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.LOADER_ID;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -56,6 +58,8 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
         .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())
         //TODO(fernandezlautaro): MULE-11136 remove this property when the manifest is dropped as generating an extension model should not require version
         .addProperty("version", extensionModel.getVersion());
+
+    builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
     return of(new GeneratedResource(MULE_PLUGIN_JSON, descriptorJson.getBytes()));
   }

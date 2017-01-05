@@ -20,8 +20,7 @@ import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFi
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -44,6 +43,9 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
@@ -193,8 +195,15 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
       final ClassLoaderModel classLoaderModel =
           mavenClassLoaderModelLoader.loadClassLoaderModel(pluginFolder, classLoaderModelLoaderDescriptor.getAttributes());
       descriptor.setClassLoaderModel(classLoaderModel);
-      descriptor.setBundleDescriptor(mavenClassLoaderModelLoader.loadBundleDescriptor(pluginFolder));
     });
+
+    MuleArtifactLoaderDescriptor bundleDescriptorLoader = mulePluginModel.getBundleDescriptorLoader();
+    if (!bundleDescriptorLoader.getId().equals(MAVEN)) {
+      throw new ArtifactDescriptorCreateException(format("The identifier '%s' for a bundle descriptor loader is not supported (error found while reading plugin '%s')",
+                                                         bundleDescriptorLoader.getId(),
+                                                         pluginFolder.getAbsolutePath()));
+    }
+    descriptor.setBundleDescriptor(new MavenBundleDescriptorLoader().loadBundleDescriptor(pluginFolder));
 
     mulePluginModel.getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
       final LoaderDescriber loaderDescriber = new LoaderDescriber(extensionModelDescriptor.getId());

@@ -56,19 +56,27 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.invocationCount;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
-import org.mule.runtime.api.deployment.meta.MulePolicyModel;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -155,6 +163,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   protected static final int DEPLOYMENT_TIMEOUT = 10000;
   protected static final String[] NONE = new String[0];
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
+  private static final String MULE_POLICY_CLASSIFIER = "mule-policy";
+  private static final String MULE_EXTENSION_CLASSIFIER = "mule-extension";
 
   // Resources
   private static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
@@ -164,7 +174,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
   private static final String FOO_POLICY_NAME = "fooPolicy";
-  private static final String TEST_POLICY_ID = "testPolicy";
+  private static final String BAR_POLICY_NAME = "barPolicy";
+  private static final String FOO_POLICY_ID = "fooPolicy";
+  private static final String BAR_POLICY_ID = "barPolicy";
   private static final String MIN_MULE_VERSION = "4.0.0";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
@@ -306,9 +318,19 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       .definedBy("shared-domain-config.xml").containing(sharedAAppFileBuilder).containing(sharedBAppFileBuilder);
 
   // Policy file builders
-  private static final PolicyFileBuilder policyFileBuilder =
-      new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").describedBy(new MulePolicyModel.MulePolicyModelBuilder()
-          .setMinMuleVersion(MIN_MULE_VERSION).setName(FOO_POLICY_NAME).build());
+  private static final PolicyFileBuilder fooPolicyFileBuilder =
+      new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").describedBy(new MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION).setName(FOO_POLICY_NAME)
+          .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(FOO_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                         PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .build());
+
+  private static final PolicyFileBuilder barPolicyFileBuilder =
+      new PolicyFileBuilder(BAR_POLICY_NAME).definedBy("barPolicy.xml").describedBy(new MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
+          .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                         PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .build());
 
   private final boolean parallelDeployment;
   protected File muleHome;
@@ -1549,11 +1571,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String moduleFileName = "module-bye.xml";
     String extensionName = "bye-extension";
     String moduleDestination = "org/mule/module/" + moduleFileName;
-
     MulePluginModelBuilder builder = new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriber().setId(MAVEN);
+    builder.withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MAVEN));
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-byeSource.xml", moduleDestination)
@@ -1582,12 +1604,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String moduleFileName = "module-using-java.xml";
     String extensionName = "using-java-extension";
     String moduleDestination = "org/mule/module/" + moduleFileName;
-
     MulePluginModelBuilder builder =
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriber().setId(MAVEN);
+    builder.withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MAVEN));
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-using-javaSource.xml", moduleDestination)
@@ -1617,10 +1639,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void failsToDeployWithExtensionThatHasNonExistingIdForExtensionModel() throws Exception {
     String extensionName = "extension-with-extension-model-id-non-existing";
-
     MulePluginModelBuilder builder =
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
+    builder.withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER,
+                                                                          PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .describedBy(builder.build());
@@ -1641,6 +1664,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder builder =
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withClassLoaderModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
+    builder.withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER,
+                                                                          PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .describedBy(builder.build());
@@ -2985,19 +3010,39 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void appliesMultipleApplicationPolicies() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1, emptyMap()));
+    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getId(),
+                            new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap()));
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(2));
+  }
+
+  @Test
   public void skipsApplicationPolicy() throws Exception {
     doApplicationPolicyExecutionTest(parameters -> false, 0);
   }
 
   private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations) throws Exception {
-    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
     addPackedAppFromBuilder(applicationFileBuilder);
 
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization(TEST_POLICY_ID, pointcut, 1, emptyMap()));
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointcut, 1, emptyMap()));
     startDeployment();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -3008,13 +3053,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void removesApplicationPolicy() throws Exception {
-    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
     addPackedAppFromBuilder(applicationFileBuilder);
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getId(),
-                            new PolicyParametrization(TEST_POLICY_ID, parameters -> true, 1, emptyMap()));
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1, emptyMap()));
 
     startDeployment();
 
@@ -3023,7 +3068,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
 
-    policyManager.removePolicy(applicationFileBuilder.getId(), TEST_POLICY_ID);
+    policyManager.removePolicy(applicationFileBuilder.getId(), FOO_POLICY_ID);
 
     executeApplicationFlow("main");
     assertThat("Policy is still applied on the application", invocationCount, equalTo(1));
@@ -3667,6 +3712,18 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private interface Action {
 
     void perform() throws Exception;
+  }
+
+  private static MuleArtifactLoaderDescriptor createPolicyBundleDescriptorLoader(String artifactId, String classifier,
+                                                                                 String bundleDescriptorLoaderId) {
+    Map<String, Object> attributes = new HashMap();
+    attributes.put(VERSION, "1.0");
+    attributes.put(GROUP_ID, "org.mule.test");
+    attributes.put(ARTIFACT_ID, artifactId);
+    attributes.put(CLASSIFIER, classifier);
+    attributes.put(TYPE, EXTENSION_BUNDLE_TYPE);
+
+    return new MuleArtifactLoaderDescriptor(bundleDescriptorLoaderId, attributes);
   }
 
   public static class WaitComponent implements Initialisable {
