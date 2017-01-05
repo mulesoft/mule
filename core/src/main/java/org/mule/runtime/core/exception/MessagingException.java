@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.routing.filters.RegExFilter;
@@ -238,12 +237,12 @@ public class MessagingException extends MuleException {
   /**
    * @return the exception thrown by the failing message processor
    */
-  public Exception getCauseException() {
+  public Throwable getRootCause() {
     Throwable rootException = ExceptionHelper.getRootException(this);
     if (rootException == null) {
       rootException = this;
     }
-    return (Exception) rootException;
+    return rootException;
   }
 
   /**

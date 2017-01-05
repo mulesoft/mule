@@ -120,7 +120,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(expected);
+        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(expected);
       }
     }), eq(testEvent));
     assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));

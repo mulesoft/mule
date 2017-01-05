@@ -158,7 +158,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object item) {
         return item instanceof MessagingException
             && ((MessagingException) item).getCause() instanceof RetryPolicyExhaustedException
-            && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getCauseException().getMessage());
+            && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getRootCause().getMessage());
       }
     }), any(Event.class));
     verify(mockDLQ, never()).process(any(Event.class));
@@ -179,8 +179,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object item) {
         return item instanceof MessagingException
-            && ((MessagingException) item).getCauseException() instanceof RetryPolicyExhaustedException
-            && ((MessagingException) item).getCauseException().getMessage()
+            && ((MessagingException) item).getRootCause() instanceof RetryPolicyExhaustedException
+            && ((MessagingException) item).getRootCause().getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
     }), any(Event.class));
@@ -202,8 +202,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object item) {
         return item instanceof MessagingException
-            && ((MessagingException) item).getCauseException() instanceof RetryPolicyExhaustedException
-            && (((MessagingException) item).getCauseException()).getMessage()
+            && ((MessagingException) item).getRootCause() instanceof RetryPolicyExhaustedException
+            && (((MessagingException) item).getRootCause()).getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
     }), any(Event.class));
