@@ -1,6 +1,11 @@
 {
   "name":"Heisenberg",
   "minMuleVersion":"4.1.0",
+  "bundleDescriptorLoader": {
+    "id": "maven",
+    "attributes": {
+    }
+  },
   "classLoaderModelLoaderDescriptor":{
     "id":"maven",
     "attributes":{

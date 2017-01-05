@@ -32,7 +32,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactory<PolicyTemplateDescriptor> {
 
-  protected static final String FOLDER_MODEL_LOADER = "FOLDER";
+  public static final String PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID = "PROPERTIES";
+  protected static final String FILE_SYSTEM_MODEL_LOADER_ID = "FILE_SYSTEM";
   protected static final String MISSING_POLICY_DESCRIPTOR_ERROR = "Policy must contain a " + MULE_POLICY_JSON + " file";
 
   @Override
@@ -50,7 +51,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
     if (mulePolicyModel.getClassLoaderModelLoaderDescriptor().isPresent()) {
       MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = mulePolicyModel.getClassLoaderModelLoaderDescriptor().get();
-      if (!muleArtifactLoaderDescriptor.getId().equals(FOLDER_MODEL_LOADER)) {
+      if (!muleArtifactLoaderDescriptor.getId().equals(FILE_SYSTEM_MODEL_LOADER_ID)) {
         throw new ArtifactDescriptorCreateException("Unknown model loader: " + muleArtifactLoaderDescriptor.getId());
       }
 
@@ -59,6 +60,14 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
           classLoaderModelLoader.loadClassLoaderModel(artifactFolder);
       descriptor.setClassLoaderModel(classLoaderModel);
     }
+
+    MuleArtifactLoaderDescriptor bundleDescriptorLoader = mulePolicyModel.getBundleDescriptorLoader();
+    if (!bundleDescriptorLoader.getId().equals(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID)) {
+      throw new ArtifactDescriptorCreateException("Unknown bundle descriptor loader: " + bundleDescriptorLoader.getId());
+    }
+
+    PropertiesBundleDescriptorLoader propertiesBundleDescriptorLoader = new PropertiesBundleDescriptorLoader();
+    descriptor.setBundleDescriptor(propertiesBundleDescriptorLoader.loadBundleDescriptor(bundleDescriptorLoader.getAttributes()));
 
     return descriptor;
   }

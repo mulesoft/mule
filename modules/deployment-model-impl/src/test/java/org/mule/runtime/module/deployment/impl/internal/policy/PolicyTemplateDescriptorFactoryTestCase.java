@@ -18,11 +18,16 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.FOLDER_MODEL_LOADER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.FILE_SYSTEM_MODEL_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.MISSING_POLICY_DESCRIPTOR_ERROR;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
-import org.mule.runtime.api.deployment.meta.MulePolicyModel;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -33,6 +38,8 @@ import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,12 +49,17 @@ import org.junit.rules.ExpectedException;
 @SmallTest
 public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
-  public static final String POLICY_NAME = "testPolicy";
-  public static final String JAR_FILE_NAME = "test.jar";
+  private static final String POLICY_NAME = "testPolicy";
+  private static final String JAR_FILE_NAME = "test.jar";
+  private static final String POLICY_VERSION = "1.0";
+  private static final String POLICY_GROUP_ID = "org.mule.test";
+  private static final String POLICY_CLASSIFIER = "mule-policy";
+  private static final String POLICY_ARTIFACT_TYPE = "zip";
 
   private static final File echoTestJarFile =
       new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java"))
           .compile(JAR_FILE_NAME);
+
 
   private static File getResourceFile(String resource) {
     return new File(PolicyTemplateDescriptorFactoryTestCase.class.getResource(resource).getFile());
@@ -79,12 +91,12 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void readsRuntimeLibs() throws Exception {
-    MuleArtifactLoaderDescriptor policyClassLoaderModelDescriber =
-        new MuleArtifactLoaderDescriptorBuilder().setId(FOLDER_MODEL_LOADER).build();
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader());
+    mulePolicyModelBuilder.withClassLoaderModelDescriber().setId(FILE_SYSTEM_MODEL_LOADER_ID);
+
     PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).usingLibrary(echoTestJarFile.getAbsolutePath())
-        .describedBy(new MulePolicyModel.MulePolicyModelBuilder().setName(POLICY_NAME).withClassLoaderModelDescriber(
-                                                                                                                     policyClassLoaderModelDescriber)
-            .setMinMuleVersion("4.0.0").build());
+        .describedBy(mulePolicyModelBuilder.build());
     File tempFolder = createTempFolder();
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
@@ -95,6 +107,37 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     assertThat(desc.getClassLoaderModel().getUrls()[0].getFile(), equalTo(new File(tempFolder, CLASSES_DIR).toString()));
     assertThat(desc.getClassLoaderModel().getUrls()[1].getFile(),
                equalTo(new File(tempFolder, LIB_DIR + separator + JAR_FILE_NAME).toString()));
+  }
+
+  @Test
+  public void assignsBundleDescriptor() throws Exception {
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader());
+
+
+    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).usingLibrary(echoTestJarFile.getAbsolutePath())
+        .describedBy(mulePolicyModelBuilder.build());
+    File tempFolder = createTempFolder();
+    unzip(policyFileBuilder.getArtifactFile(), tempFolder);
+
+    PolicyTemplateDescriptorFactory descriptorFactory = new PolicyTemplateDescriptorFactory();
+    PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder);
+
+    assertThat(desc.getBundleDescriptor().getArtifactId(), equalTo(POLICY_NAME));
+    assertThat(desc.getBundleDescriptor().getGroupId(), equalTo(POLICY_GROUP_ID));
+    assertThat(desc.getBundleDescriptor().getClassifier().get(), equalTo(POLICY_CLASSIFIER));
+    assertThat(desc.getBundleDescriptor().getType(), equalTo(POLICY_ARTIFACT_TYPE));
+    assertThat(desc.getBundleDescriptor().getVersion(), equalTo(POLICY_VERSION));
+  }
+
+  private MuleArtifactLoaderDescriptor createPolicyBundleDescriptorLoader() {
+    Map<String, Object> attributes = new HashMap();
+    attributes.put(VERSION, POLICY_VERSION);
+    attributes.put(GROUP_ID, POLICY_GROUP_ID);
+    attributes.put(ARTIFACT_ID, POLICY_NAME);
+    attributes.put(CLASSIFIER, POLICY_CLASSIFIER);
+    attributes.put(TYPE, POLICY_ARTIFACT_TYPE);
+    return new MuleArtifactLoaderDescriptor(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, attributes);
   }
 
   private File createTempFolder() throws IOException {
