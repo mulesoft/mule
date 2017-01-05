@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.module.cxf.transport;
 
-import org.mule.runtime.module.cxf.CxfConfiguration;
-import org.mule.runtime.module.cxf.transport.MuleUniversalConduit;
-import org.mule.runtime.module.cxf.transport.MuleUniversalConduitFactory;
-import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
+import org.mule.compatibility.module.cxf.CxfConfiguration;
+import org.mule.compatibility.module.cxf.transport.MuleUniversalConduit;
+import org.mule.compatibility.module.cxf.transport.MuleUniversalConduitFactory;
+import org.mule.compatibility.module.cxf.transport.MuleUniversalTransport;
 
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;

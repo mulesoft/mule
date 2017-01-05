@@ -22,14 +22,14 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <flow name="serviceflow">
         <httpn:listener path="/service" config-ref="listenerConfig" allowedMethods="POST" />
         <logger level="INFO"/>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.Greeter">
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.Greeter">
             <cxf:ws-security>
                 <cxf:ws-config>
                     <cxf:property key="action" value="UsernameToken"/>
-                    <cxf:property key="passwordCallbackClass" value="org.mule.runtime.module.cxf.PasswordCallback"/>
+                    <cxf:property key="passwordCallbackClass" value="org.mule.compatibility.module.cxf.PasswordCallback"/>
                 </cxf:ws-config>
             </cxf:ws-security>
         </cxf:jaxws-service>
-        <component class="org.mule.runtime.module.cxf.GreeterService"/>
+        <component class="org.mule.compatibility.module.cxf.GreeterService"/>
     </flow>
 </mule>

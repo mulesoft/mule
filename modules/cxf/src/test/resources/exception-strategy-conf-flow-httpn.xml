@@ -15,16 +15,16 @@
 
     <flow name="CxfWithExceptionStrategy">
         <httpn:listener path="/services/CxfWithExceptionStrategy" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:simple-service serviceClass="org.mule.runtime.module.cxf.testmodels.TestCxfComponent"/>
+        <cxf:simple-service serviceClass="org.mule.compatibility.module.cxf.testmodels.TestCxfComponent"/>
 
-        <component class="org.mule.runtime.module.cxf.testmodels.TestCxfComponent"/>
-        <custom-exception-strategy class="org.mule.runtime.module.cxf.CxfComponentExceptionStrategy"/>
+        <component class="org.mule.compatibility.module.cxf.testmodels.TestCxfComponent"/>
+        <custom-exception-strategy class="org.mule.compatibility.module.cxf.CxfComponentExceptionStrategy"/>
     </flow>
 
     <flow name="CxfWithDefaultExceptionStrategy">
         <httpn:listener path="/services/CxfWithDefaultExceptionStrategy" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:simple-service serviceClass="org.mule.runtime.module.cxf.testmodels.TestCxfComponent"/>
-        <component class="org.mule.runtime.module.cxf.testmodels.TestCxfComponent"/>
+        <cxf:simple-service serviceClass="org.mule.compatibility.module.cxf.testmodels.TestCxfComponent"/>
+        <component class="org.mule.compatibility.module.cxf.testmodels.TestCxfComponent"/>
     </flow>
 
 </mule>

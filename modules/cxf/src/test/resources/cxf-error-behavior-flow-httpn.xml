@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <custom-transformer name="throwsException" class="org.mule.runtime.module.cxf.CxfErrorBehaviorTestCase$CxfTransformerThrowsExceptions"/>
+    <custom-transformer name="throwsException" class="org.mule.compatibility.module.cxf.CxfErrorBehaviorTestCase$CxfTransformerThrowsExceptions"/>
     <httpn:listener-config name="listenerConfig">
         <httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
@@ -26,8 +26,8 @@
         <httpn:listener path="testServiceWithFault" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
     </flow>
 
     <!-- Jaxws Service with exception thrown by transformer with no exception strategy -->
@@ -35,8 +35,8 @@
         <httpn:listener path="testTransformerException" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
         <object-to-string-transformer/>
         <append-string-transformer message="APPEND"/>
         <transformer ref="throwsException"/>
@@ -47,17 +47,17 @@
         <httpn:listener path="testSimpleServiceWithFault" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:simple-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
-        <custom-exception-strategy class="org.mule.runtime.module.cxf.CxfComponentExceptionStrategy"/>
+        <cxf:simple-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
+        <custom-exception-strategy class="org.mule.compatibility.module.cxf.CxfComponentExceptionStrategy"/>
     </flow>
 
     <flow name="FlowWithExceptionUnwrapped">
         <httpn:listener path="testUnwrapException" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorld"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
         <set-variable variableName="unwrapMuleExceptions" value="true"/>
         <scripting:transformer>
             <scripting:script engine="groovy">
@@ -74,21 +74,21 @@
         <httpn:listener path="helloFault" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
     </flow>
 
     <flow name="helloFlow">
         <httpn:listener path="hello" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorld"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <flow name="FlowWithClientAndSOAPFault" processingStrategy="synchronous">
         <processor-chain>
-            <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
+            <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.TestServiceFault" operation="sayHi"/>
             <httpn:request path="helloFault" method="POST" config-ref="requestConfig">
                 <httpn:response-validator>
                     <httpn:success-status-code-validator values="0..599" />
@@ -100,7 +100,7 @@
     </flow>
 
     <flow name="FlowWithClientAndTransformerException" processingStrategy="synchronous">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld" operation="sayHi"/>
         <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
         <object-to-string-transformer/>
         <transformer ref="throwsException"/>
@@ -138,9 +138,9 @@
         <httpn:listener path="testUnwrapProxyFault" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorld"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="sayHi"/>
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld" operation="sayHi"/>
         <httpn:request path="testUnwrapException" method="POST" config-ref="requestConfig">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="0..599" />

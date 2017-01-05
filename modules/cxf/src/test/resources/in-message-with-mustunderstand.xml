@@ -9,7 +9,7 @@
         <name>Joe Schmoe</name>
     </soapenv:Header>
     <soapenv:Body>
-        <ns2:greet xmlns:ns2="http://cxf.module.runtime.mule.org/">
+        <ns2:greet xmlns:ns2="http://cxf.module.compatibility.mule.org/">
             <name>MuleMan</name>
         </ns2:greet>
     </soapenv:Body>

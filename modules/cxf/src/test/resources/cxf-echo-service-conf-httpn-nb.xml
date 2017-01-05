@@ -17,8 +17,8 @@
 
     <flow name="helloService" processingStrategy="non-blocking">
         <httpn:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <httpn:request-config name="requestConfig">
@@ -30,7 +30,7 @@
         <httpn:listener path="/helloClient" config-ref="listenerConfig" allowedMethods="POST" />
         <object-to-string-transformer />
         <processor ref="sensingRequestResponseProcessor" />
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <httpn:request config-ref="requestConfig" path="/hello" method="POST" />
         <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
     </flow>
@@ -40,7 +40,7 @@
         <httpn:listener path="/helloClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
         <object-to-string-transformer />
         <processor ref="sensingRequestResponseProcessorProxy" />
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <httpn:request config-ref="requestConfig" path="/hello" method="POST" />
         <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
     </flow>

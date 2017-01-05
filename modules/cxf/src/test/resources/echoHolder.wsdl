@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wsdl:definitions name="HolderServiceService" targetNamespace="http://cxf.module.runtime.mule.org/"
+<wsdl:definitions name="HolderServiceService" targetNamespace="http://cxf.module.compatibility.mule.org/"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:tns="http://cxf.module.runtime.mule.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://cxf.module.compatibility.mule.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   >
     <wsdl:types>
-        <xs:schema elementFormDefault="unqualified" targetNamespace="http://cxf.module.runtime.mule.org/" version="1.0"
-                   xmlns:tns="http://cxf.module.runtime.mule.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:schema elementFormDefault="unqualified" targetNamespace="http://cxf.module.compatibility.mule.org/" version="1.0"
+                   xmlns:tns="http://cxf.module.compatibility.mule.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:element name="echo" type="tns:echo"/>
             <xs:element name="echoResponse" type="tns:echoResponse"/>
             <xs:element name="echo2" type="tns:echo2"/>

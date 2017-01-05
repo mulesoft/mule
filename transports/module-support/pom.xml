@@ -25,8 +25,6 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${project.version}</version>
-            <!-- TODO MULE-10509 Make this dependency compile -->
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

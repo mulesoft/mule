@@ -15,8 +15,8 @@
 
     <flow name="helloService">
         <httpn:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
 
-        <component class="org.mule.runtime.module.cxf.functional.UnwrapsComponentExceptionTestCase$HelloWorldImpl" />
+        <component class="org.mule.compatibility.module.cxf.functional.UnwrapsComponentExceptionTestCase$HelloWorldImpl" />
     </flow>
 </mule>

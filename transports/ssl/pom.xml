@@ -32,6 +32,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-security</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-tls</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -42,13 +48,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-tcp</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <!-- TODO MULE-10509 Remove this dependency -->
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-cxf</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Required extensions -->

@@ -14,15 +14,15 @@
 
     <flow name="helloService">
         <httpn:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <httpn:request-config name="requestConfig">
         <httpn:request-connection host="localhost" port="${port1}"/>
     </httpn:request-config>
     <flow name="helloServiceClient" processingStrategy="synchronous">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <httpn:request config-ref="requestConfig" path="/hello" method="POST" />
         <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
     </flow>

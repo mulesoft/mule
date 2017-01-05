@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <custom-transformer name="throwsException" class="org.mule.runtime.module.cxf.ExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
+    <custom-transformer name="throwsException" class="org.mule.compatibility.module.cxf.ExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
     <httpn:listener-config name="listenerConfig">
         <httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
@@ -26,8 +26,8 @@
         <httpn:listener path="testServiceWithFault" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
         <default-exception-strategy/>
     </flow>
 
@@ -36,8 +36,8 @@
         <httpn:listener path="testServiceWithException" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
         <transformer ref="throwsException"/>
         <default-exception-strategy/>
     </flow>
@@ -49,21 +49,21 @@
         <httpn:listener path="hello" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <flow name="helloFault">
         <httpn:listener path="helloFault" config-ref="listenerConfig">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFault"/>
-        <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFault"/>
+        <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
     </flow>
 
     <flow name="FlowWithClientWithFaultDefaultException" processingStrategy="synchronous">
         <processor-chain>
-            <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
+            <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.TestServiceFault" operation="sayHi"/>
             <httpn:request path="helloFault" method="POST" config-ref="requestConfig">
                 <httpn:response-validator>
                     <httpn:success-status-code-validator values="0..599" />
@@ -77,7 +77,7 @@
     </flow>
 
     <flow name="FlowWithClientAndTransformerExceptionDefaultException" processingStrategy="synchronous">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
         <object-to-string-transformer/>
         <append-string-transformer message="APPEND"/>

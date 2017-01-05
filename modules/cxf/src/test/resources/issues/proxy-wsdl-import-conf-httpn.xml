@@ -15,7 +15,7 @@
 
     <flow name="proxy-wsdl">
         <httpn:listener path="test" config-ref="listenerConfig"/>
-        <cxf:proxy-service namespace="http://cxf.module.runtime.mule.org/" payload="envelope" service="TestService" wsdlLocation="issues/TestImportedTypes.wsdl" soapVersion="1.2" validationEnabled="true"/>
+        <cxf:proxy-service namespace="http://cxf.module.compatibility.mule.org/" payload="envelope" service="TestService" wsdlLocation="issues/TestImportedTypes.wsdl" soapVersion="1.2" validationEnabled="true"/>
     </flow>
 
 </mule>

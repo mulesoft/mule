@@ -18,7 +18,7 @@
 
     <build>
         <plugins>
-            <!--TODO FIX: MULE-10747 test generated classes are copied into org.mule.runtime.module.cxf.example -->
+            <!--TODO FIX: MULE-10747 test generated classes are copied into org.mule.compatibility.module.cxf.example -->
             <!--<plugin>-->
                 <!--<groupId>org.apache.cxf</groupId>-->
                 <!--<artifactId>cxf-codegen-plugin</artifactId>-->
@@ -599,15 +599,31 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!--  We should reenable this as it makes CXF faster
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm.osgi</artifactId>
+            <version>${asmVersion}</version>
+        </dependency>
+         -->
+
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-security</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -638,13 +654,6 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -666,35 +675,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--  We should reenable this as it makes CXF faster
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm.osgi</artifactId>
-            <version>${asmVersion}</version>
-        </dependency>
-         -->
-
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
@@ -707,6 +687,13 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>

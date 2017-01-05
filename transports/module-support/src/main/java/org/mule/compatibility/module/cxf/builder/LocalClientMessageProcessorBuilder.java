@@ -6,9 +6,9 @@
  */
 package org.mule.compatibility.module.cxf.builder;
 
+import org.mule.compatibility.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.compatibility.module.cxf.builder.AbstractOutboundMessageProcessorBuilder;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.runtime.module.cxf.builder.AbstractOutboundMessageProcessorBuilder;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;

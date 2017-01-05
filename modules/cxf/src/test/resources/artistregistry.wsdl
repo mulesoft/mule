@@ -1,6 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://example.cxf.module.runtime.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="ArtistRegistryWebServicesService" targetNamespace="http://example.cxf.module.runtime.mule.org/">
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://example.cxf.module.compatibility.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="ArtistRegistryWebServicesService" targetNamespace="http://example.cxf.module.compatibility.mule.org/">
     <wsdl:types>
-        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://example.cxf.module.runtime.mule.org/" targetNamespace="http://example.cxf.module.runtime.mule.org/" version="1.0">
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://example.cxf.module.compatibility.mule.org/" targetNamespace="http://example.cxf.module.compatibility.mule.org/" version="1.0">
             <xs:complexType name="artist">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="artType" type="tns:artType"/>
@@ -58,19 +58,19 @@
         <wsdl:operation name="addArtist">
             <soap:operation soapAction="" style="rpc"/>
             <wsdl:input name="addArtist">
-                <soap:body namespace="http://example.cxf.module.runtime.mule.org/" use="literal"/>
+                <soap:body namespace="http://example.cxf.module.compatibility.mule.org/" use="literal"/>
             </wsdl:input>
             <wsdl:output name="addArtistResponse">
-                <soap:body namespace="http://example.cxf.module.runtime.mule.org/" use="literal"/>
+                <soap:body namespace="http://example.cxf.module.compatibility.mule.org/" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="getAll">
             <soap:operation soapAction="" style="rpc"/>
             <wsdl:input name="getAll">
-                <soap:body namespace="http://example.cxf.module.runtime.mule.org/" use="literal"/>
+                <soap:body namespace="http://example.cxf.module.compatibility.mule.org/" use="literal"/>
             </wsdl:input>
             <wsdl:output name="getAllResponse">
-                <soap:body namespace="http://example.cxf.module.runtime.mule.org/" use="literal"/>
+                <soap:body namespace="http://example.cxf.module.compatibility.mule.org/" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>

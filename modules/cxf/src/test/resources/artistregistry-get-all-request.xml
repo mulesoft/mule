@@ -1,4 +1,4 @@
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sam="http://example.cxf.module.runtime.mule.org/">
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sam="http://example.cxf.module.compatibility.mule.org/">
     <soapenv:Header/>
     <soapenv:Body>
         <sam:getAll>

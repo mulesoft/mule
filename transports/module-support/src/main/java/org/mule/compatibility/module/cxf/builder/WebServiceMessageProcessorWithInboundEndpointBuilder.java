@@ -7,9 +7,9 @@
 package org.mule.compatibility.module.cxf.builder;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.module.cxf.config.WebServiceFactoryBean;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.module.cxf.config.WebServiceFactoryBean;
 
 public class WebServiceMessageProcessorWithInboundEndpointBuilder extends WebServiceFactoryBean {
 

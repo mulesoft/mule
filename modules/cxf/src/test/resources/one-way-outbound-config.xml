@@ -18,14 +18,14 @@
         <httpn:listener config-ref="listenerConfig" path="/test">
             <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
-        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncService"/>
+        <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.testmodels.AsyncService"/>
         <component>
-            <singleton-object class="org.mule.runtime.module.cxf.testmodels.AsyncService" />
+            <singleton-object class="org.mule.compatibility.module.cxf.testmodels.AsyncService" />
         </component>
     </flow>
 
     <flow name="jaxwsClient">
-        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncService" operation="send"/>
+        <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.testmodels.AsyncService" operation="send"/>
         <httpn:request config-ref="requestConfig" path="/test" method="POST" />
     </flow>
 
