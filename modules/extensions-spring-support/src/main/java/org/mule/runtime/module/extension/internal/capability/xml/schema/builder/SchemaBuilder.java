@@ -60,9 +60,9 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
@@ -163,7 +163,7 @@ public final class SchemaBuilder {
 
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
     this.dslExtensionContext = dslContext;
-    this.dslResolver = new DslSyntaxResolver(model, dslContext);
+    this.dslResolver = DslSyntaxResolver.getDefault(model, dslContext);
     return this;
   }
 
@@ -695,7 +695,7 @@ public final class SchemaBuilder {
   }
 
   void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
-    DslElementSyntax groupDsl = dslResolver.resolveInlineGroupDsl(group);
+    DslElementSyntax groupDsl = dslResolver.resolveInline(group);
 
     LocalComplexType complexType = objectTypeDelegate.createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
     ExplicitGroup groupSequence = new ExplicitGroup();

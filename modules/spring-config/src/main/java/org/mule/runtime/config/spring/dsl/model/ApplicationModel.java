@@ -34,6 +34,7 @@ import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.api.dsl.model.ApplicationElement;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -686,6 +687,27 @@ public class ApplicationModel {
       }
     }
     return requestedComponentModelOptional;
+  }
+
+  /**
+   * Find a named component configuration.
+   *
+   * @param name the expected value for the name attribute configuration.
+   * @return the component if present, if not, an empty {@link Optional}
+   */
+  //TODO
+  public Optional<ApplicationElement> findNamedElement(String name) {
+    Optional<ApplicationElement> requestedElement = empty();
+    for (ComponentModel muleComponentModel : muleComponentModels) {
+      requestedElement = muleComponentModel.getInnerComponents().stream()
+          .filter(componentModel -> name.equals(componentModel.getNameAttribute()))
+          .map(ComponentModel::asElement)
+          .findAny();
+      if (requestedElement.isPresent()) {
+        break;
+      }
+    }
+    return requestedElement;
   }
 
   /**

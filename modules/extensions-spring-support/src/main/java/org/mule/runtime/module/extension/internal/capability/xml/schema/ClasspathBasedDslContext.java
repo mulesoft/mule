@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.reflections.util.ClasspathHelper.forClassLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
 
 import java.net.URL;
 import java.util.Collection;

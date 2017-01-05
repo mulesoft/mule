@@ -26,6 +26,7 @@
         <module>test-services</module>
         <module>runner</module>
         <module>wsc</module>
+        <module>dsl</module>
     </modules>
 
     <build>
