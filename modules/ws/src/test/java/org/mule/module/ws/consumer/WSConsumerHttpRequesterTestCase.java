@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Map;
 
-import org.junit.Test;;
+import org.junit.Test;
 
 /**
  * This tests "mocks" a proxy server through which a wsdl file is served.
