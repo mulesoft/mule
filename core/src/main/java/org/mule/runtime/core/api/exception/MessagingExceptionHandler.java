@@ -14,7 +14,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).

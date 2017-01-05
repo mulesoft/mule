@@ -120,7 +120,7 @@ public class InboundMessageLossTestCase extends CompatibilityFunctionalTestCase 
     public Event handleException(MessagingException ex, Event event) {
       doHandleException(ex, event);
       ex.setHandled(true);
-      return Event.builder(event).message(InternalMessage.builder().payload("Success!").build()).build();
+      return Event.builder(event).message(InternalMessage.builder().payload("Success!").build()).error(null).build();
     }
   }
 

@@ -93,7 +93,7 @@ public class Flow extends AbstractPipeline implements Processor, AsyncProcessor,
     if (useBlockingCodePath()) {
       return just(event).handle(nullSafeMap(checkedFunction(request -> process(request))));
     } else {
-      return just(event).transform(processFlowFunction());
+      return just(event).transform(this);
     }
   }
 
