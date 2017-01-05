@@ -64,6 +64,8 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.InitializationException;
+
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
 {
@@ -114,13 +116,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         boolean isHttpRequester = verifyIsHttpRequester(url);
 
-        if (config.isUseConnectorToRetrieveWsdl() && !isHttpRequester)
+        if (httpRequesterConfig == null && config.isUseConnectorToRetrieveWsdl())
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("You must provide an http/https for the wsdlLocation to use the connector for retrieval"),
+            throw new InitialisationException(CoreMessages.createStaticMessage("The useConnectorToRetrieveWsdl option requires connectorConfig to work"),
                     this);
         }
 
-        if (httpRequesterConfig != null && config.isUseConnectorToRetrieveWsdl())
+        if(config.isUseConnectorToRetrieveWsdl() && isHttpRequester)
         {
             wsdlRetrieverStrategy = new HttpRequesterWsdlRetrieverStrategy(url, httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
         }

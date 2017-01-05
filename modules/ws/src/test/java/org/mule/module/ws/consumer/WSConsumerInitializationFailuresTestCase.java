@@ -22,7 +22,7 @@ public class WSConsumerInitializationFailuresTestCase extends AbstractMuleContex
     @Test(expected = ConfigurationException.class)
     public void wsConsumerConfigUseConnectorToRetrieveWsdlNoHttp() throws Exception
     {
-        loadConfiguration("ws-consumer-wsdl-no-http-and-connector-to-retrieve.xml");
+        loadConfiguration("ws-consumer-wsdl-no-connector-config-and-connector-to-retrieve.xml");
     }
     
     @Test(expected = ConfigurationException.class)

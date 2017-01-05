@@ -24,7 +24,7 @@ import org.junit.Test;;
  */
 public class WSConsumerHttpURLConnectionTestCase extends AbstractWSDLServerTestCase {
 
-	private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 2;
+	private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 3;
 	
 	@Override
 	protected String getConfigFile() {
