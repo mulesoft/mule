@@ -24,6 +24,7 @@ import org.apache.maven.model.Model;
  */
 public class MavenBundleDescriptorLoader {
 
+  // TODO(pablo.kraan): MULE-11340: Add BundleDescriptorLoader and ClassLoaderModelDescriptorLoader interfaces
   /**
    * Looks for the POM file within the current {@code pluginFolder} structure (under {@link ArtifactPluginDescriptor#META_INF} folder)
    * to retrieve the plugin artifact locator.

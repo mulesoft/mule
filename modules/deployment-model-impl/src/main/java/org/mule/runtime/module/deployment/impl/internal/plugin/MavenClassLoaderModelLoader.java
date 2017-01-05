@@ -22,6 +22,7 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.REPOSITORY;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
@@ -108,7 +109,7 @@ public class MavenClassLoaderModelLoader {
    */
   public ClassLoaderModel loadClassLoaderModel(File pluginFolder,
                                                Map<String, Object> attributes) {
-    final Model model = MavenUtils.getPomModel(pluginFolder);
+    final Model model = getPomModel(pluginFolder);
     final ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
     classLoaderModelBuilder
         .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
