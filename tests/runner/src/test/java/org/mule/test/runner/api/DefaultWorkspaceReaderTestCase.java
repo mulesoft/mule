@@ -10,12 +10,13 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.test.runner.classification.DefaultWorkspaceReader.findClassPathURL;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.runner.classification.DefaultWorkspaceReader;
 
 import java.io.File;
 import java.net.URL;
@@ -68,9 +69,18 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void resolveAlsoReleaseVersions() throws Exception {
+    WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
+    when(workspaceLocationResolver.resolvePath(artifact.getArtifactId())).thenReturn(bar);
+    DefaultWorkspaceReader reader = new DefaultWorkspaceReader(urls, workspaceLocationResolver);
+
+    File result = reader.findArtifact(artifact);
+    assertThat(result, equalTo(targetClasses));
+  }
+
+  @Test
   public void handleEncodedURLs() throws Exception {
     File result = findClassPathURL(artifact, bar, urls);
-    assertThat(result, not(nullValue()));
     assertThat(result, equalTo(targetClasses));
   }
 
@@ -81,13 +91,11 @@ public class DefaultWorkspaceReaderTestCase extends AbstractMuleTestCase {
     urls.add(targetTestClasses.toURI().toURL());
 
     File result = findClassPathURL(artifact, bar, urls);
-    assertThat(result, not(nullValue()));
     assertThat(result, equalTo(targetClasses));
 
     result = findClassPathURL(new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), TESTS_CLASSIFIER,
                                                   artifact.getExtension(), artifact.getVersion()),
                               bar, urls);
-    assertThat(result, not(nullValue()));
     assertThat(result, equalTo(targetTestClasses));
   }
 

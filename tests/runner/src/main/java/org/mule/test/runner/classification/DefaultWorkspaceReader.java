@@ -121,11 +121,6 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
 
   @Override
   public File findArtifact(Artifact artifact) {
-    if (!artifact.isSnapshot()) {
-      // Only snapshot artifacts would be found here...
-      return null;
-    }
-
     File workspaceArtifactPath = workspaceLocationResolver.resolvePath(artifact.getArtifactId());
     if (workspaceArtifactPath == null) {
       // Cannot be resolved in workspace so delegate its resolution to the Maven local repository
