@@ -118,6 +118,7 @@ public class ResponseCompletionHandler extends BaseResponseCompletionHandler {
    */
   @Override
   public void cancelled() {
+    super.cancelled();
     responseStatusCallback.responseSendFailure(new Exception("http response transferring cancelled"));
     resume();
   }
@@ -129,7 +130,7 @@ public class ResponseCompletionHandler extends BaseResponseCompletionHandler {
    */
   @Override
   public void failed(Throwable throwable) {
-    responseStatusCallback.responseSendFailure(throwable);
+    super.failed(throwable);
     resume();
   }
 

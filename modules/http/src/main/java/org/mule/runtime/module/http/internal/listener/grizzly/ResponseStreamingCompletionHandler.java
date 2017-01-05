@@ -112,6 +112,7 @@ public class ResponseStreamingCompletionHandler extends BaseResponseCompletionHa
    */
   @Override
   public void cancelled() {
+    super.cancelled();
     close();
     responseStatusCallback.responseSendFailure(new DefaultMuleException(CoreMessages
         .createStaticMessage("Http response sending task was cancelled")));
@@ -125,8 +126,8 @@ public class ResponseStreamingCompletionHandler extends BaseResponseCompletionHa
    */
   @Override
   public void failed(Throwable throwable) {
+    super.failed(throwable);
     close();
-    responseStatusCallback.responseSendFailure(throwable);
     resume();
   }
 
