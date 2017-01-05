@@ -17,7 +17,6 @@
         <module>all-modules</module>
         <module>artifact</module>
         <module>builders</module>
-        <module>cxf</module>
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>
@@ -39,7 +38,6 @@
         <module>schedulers</module>
         <module>scripting</module>
         <module>scripting-jruby</module>
-        <module>spring-extras</module>
         <module>spring-config</module>
         <module>service</module>
 
