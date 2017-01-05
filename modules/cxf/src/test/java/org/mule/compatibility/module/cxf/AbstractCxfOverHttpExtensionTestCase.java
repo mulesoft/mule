@@ -8,6 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -22,7 +23,9 @@ import java.util.List;
 
 /**
  * Declares a dependency on HTTP extension for integration tests cases.
- *
+ * 
+ * TODO MULE-11341 change to extend MuleArtifactFunctionalTestCase
+ * 
  * @since 4.0
  */
 public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunctionalTestCase {
