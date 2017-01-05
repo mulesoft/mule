@@ -29,8 +29,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
       this.listener = listener;
     }
 
-    public Processor getListener()
-    {
+    public Processor getListener() {
       return listener;
     }
 
