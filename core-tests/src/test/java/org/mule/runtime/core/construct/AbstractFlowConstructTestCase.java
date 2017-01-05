@@ -21,12 +21,17 @@ import org.junit.Test;
 
 public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextTestCase {
 
-  public static class DirectInboundMessageSource implements MessageSource {
+  static class DirectInboundMessageSource implements MessageSource {
 
-    Processor listener;
+    private Processor listener;
 
     public void setListener(Processor listener) {
       this.listener = listener;
+    }
+
+    public Processor getListener()
+    {
+      return listener;
     }
 
     @Override

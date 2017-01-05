@@ -51,7 +51,9 @@ import org.slf4j.LoggerFactory;
 public class ModuleFlowProcessingPhase
     extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> {
 
-  public static final String ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY = "enableSourcePolicies";
+  // TODO MULE-11167 Policies should be non blocking
+  private static final String ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY = "enableSourcePolicies";
+
   private final PolicyManager policyManager;
   protected static transient Logger logger = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 

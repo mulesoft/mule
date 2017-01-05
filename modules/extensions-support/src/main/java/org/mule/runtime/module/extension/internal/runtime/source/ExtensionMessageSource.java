@@ -295,7 +295,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   @Override
   public void setListener(Processor listener) {
-    this.messageProcessor = listener;
+    messageProcessor = listener;
   }
 
   /**

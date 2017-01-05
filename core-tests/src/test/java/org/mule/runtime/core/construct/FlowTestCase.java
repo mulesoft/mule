@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.junit.After;
 import org.junit.Test;
@@ -56,7 +58,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 @RunWith(Parameterized.class)
 public class FlowTestCase extends AbstractFlowConstructTestCase {
@@ -66,15 +67,23 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
   private Flow flow;
   private DynamicMessageProcessorContainer dynamicProcessorContainer;
   private SensingNullMessageProcessor sensingMessageProcessor;
-  private Mode mode;
+  private BiFunction<Processor, Event, Event> triggerFunction;
 
-  public FlowTestCase(Mode mode) {
-    this.mode = mode;
+  public FlowTestCase(BiFunction<Processor, Event, Event> triggerFunction) {
+    this.triggerFunction = triggerFunction;
   }
 
   @Parameters
   public static Collection<Object[]> parameters() {
-    return asList(new Object[][] {{Mode.BLOCKING}, {Mode.ASYNC}});
+    BiFunction<Processor, Event, Event> blocking = (listener, event) -> just(event).transform(listener).block();
+    BiFunction<Processor, Event, Event> async = (listener, event) -> {
+      try {
+        return listener.process(event);
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
+    };
+    return asList(new Object[][] {{blocking}, {async}});
   }
 
   @Override
@@ -135,7 +144,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
         .message(InternalMessage.of(TEST_PAYLOAD))
         .exchangePattern(ONE_WAY)
         .build();
-    Event response = triggerSource(event);
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 
     assertSucessfulProcessing(response);
   }
@@ -144,7 +153,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = triggerSource(testEvent());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
 
     assertSucessfulProcessing(response);
   }
@@ -187,7 +196,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.initialise();
 
     try {
-      triggerSource(testEvent());
+      triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
       fail("exception expected");
     } catch (Exception e) {
     }
@@ -202,7 +211,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.stop();
     flow.start();
 
-    Event response = triggerSource(testEvent());;
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());;
     assertThat(response, not(nullValue()));
   }
 
@@ -216,7 +225,8 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
 
     Event response =
-        triggerSource(eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
+        triggerFunction.apply(directInboundMessageSource.getListener(),
+                              eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
     assertThat(response, not(nullValue()));
   }
 
@@ -230,16 +240,16 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = triggerSource(testEvent());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertEquals(TEST_PAYLOAD + "12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
-    response = triggerSource(testEvent());
+    response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertEquals(TEST_PAYLOAD + "2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
-    response = triggerSource(testEvent());
+    response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
   }
 
@@ -271,15 +281,4 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     verify((Stoppable) mockMessageSource, times(1)).stop();
   }
 
-  private Event triggerSource(Event event) throws MuleException {
-    if (mode == Mode.ASYNC) {
-      return Mono.just(event).transform(directInboundMessageSource.listener).block();
-    } else {
-      return directInboundMessageSource.listener.process(event);
-    }
-  }
-
-  public enum Mode {
-    BLOCKING, ASYNC,
-  }
 }
